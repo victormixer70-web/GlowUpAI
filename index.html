@@ -2403,7 +2403,7 @@ Responde en Markdown, sin preámbulo. Estructura la respuesta con encabezados de
       messages: apiMessages
     };
     if(useWebSearch){ body.tools = [{ type: "web_search_20250305", name: "web_search" }]; }
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("https://cors-anywhere.herokuapp.com/https:sapi.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
