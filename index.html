@@ -2395,56 +2395,23 @@ Responde en Markdown, sin preámbulo. Estructura la respuesta con encabezados de
   }
 
   // ---------- API call ----------
- // --------- API call ---------
-async function callClaude(apiMessages, useWebSearch) {
-  // 1. Buscamos la clave en la memoria de tu navegador
-  let apiKey = localStorage.getItem("anthropic_api_key");
-
-  // 2. Si no existe, se la pedimos al usuario con una cajita emergente
-  if (!apiKey) {
-    apiKey = prompt("Por favor, introduce tu API Key de Anthropic (se guardará de forma segura en tu navegador):");
-    if (apiKey) {
-      localStorage.setItem("anthropic_api_key", apiKey);
-    } else {
-      throw new Error("No se ha introducido ninguna API Key.");
-    }
-  }
-
-  const body = {
-    model: "claude-3-5-sonnet-20240620", // Asegúrate de que el nombre del modelo es correcto para Anthropic (este es el estándar de Sonnet 3.5)
-    max_tokens: 1000,
-    system: SYSTEM_PROMPT,
-    messages: apiMessages
-  };
-
-  if (useWebSearch) { 
-    body.tools = [{ type: "web_search_20250305", name: "web_search" }]; 
-  }
-
-  // 3. Hacemos la llamada enviando la clave de forma segura en las cabeceras (headers)
-  const response = await fetch("https://cors-anywhere.herokuapp.com/https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { 
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,                                // <-- Enviamos tu clave
-      "anthropic-version": "2023-06-01",                  // <-- Versión de API requerida
-      "anthropic-dangerous-direct-browser-access": "true" // <-- Permite usarla en el navegador
-    },
-    body: JSON.stringify(body)
-  });
-
-  if (!response.ok) {
-    // Si la clave es errónea o caducó (errores 401 o 403), la borramos para volver a pedirla
-    if (response.status === 401 || response.status === 403) {
-      localStorage.removeItem("anthropic_api_key");
-    }
-    throw new Error('La API respondió con estado ' + response.status);
-  }
-
-  const data = await response.json();
-  const textBlocks = (data.content || []).filter(b => b.type === "text").map(b => b.text);
-  return textBlocks.join('\n');
-}
+  async function callClaude(apiMessages, useWebSearch){
+    const body = {
+      model: "claude-sonnet-4-6",
+      max_tokens: 1000,
+      system: SYSTEM_PROMPT,
+      messages: apiMessages
+    };
+    if(useWebSearch){ body.tools = [{ type: "web_search_20250305", name: "web_search" }]; }
+    const response = await fetch("https://cors-anywhere.herokuapp.com/https:api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if(!response.ok) throw new Error('La API respondió con estado ' + response.status);
+    const data = await response.json();
+    const textBlocks = (data.content || []).filter(b => b.type === "text").map(b => b.text);
+    return textBlocks.join('\n');
   }
 
   // ---------- Send flow ----------
