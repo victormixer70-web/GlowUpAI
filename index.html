@@ -1,0 +1,2516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlowUp — Estudia y enseña con IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --bg: #0B0518;
+    --bg-elevated: #180C33;
+    --sidebar: #120826;
+    --border: #35205E;
+    --text: #F3EEFF;
+    --text-soft: #A996CE;
+    --bubble-user: #2A1550;
+    --bubble-user-text: #F3EEFF;
+    --bubble-assistant: #180C33;
+    --accent: #FF3EC9;
+    --accent-2: #00E7FF;
+    --accent-3: #C6FF3D;
+    --accent-soft: rgba(255,62,201,0.16);
+    --danger: #FF4D6D;
+    --radius: 14px;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; height:100%; }
+  body{
+    font-family:'Inter', sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(circle at 12% 15%, rgba(255,62,201,0.16), transparent 42%),
+      radial-gradient(circle at 88% 12%, rgba(0,231,255,0.14), transparent 42%),
+      radial-gradient(circle at 25% 92%, rgba(198,255,61,0.10), transparent 45%),
+      radial-gradient(circle at 80% 85%, rgba(255,62,201,0.10), transparent 45%),
+      var(--bg);
+    display:flex;
+    height:100vh;
+    overflow:hidden;
+  }
+  ::selection{ background: var(--accent-soft); }
+
+  /* ---------- Glow logo ---------- */
+  .glow-ring{
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+    background: conic-gradient(from 220deg, var(--accent), var(--accent-2), var(--accent-3), var(--accent));
+    filter: drop-shadow(0 0 6px rgba(255,62,201,0.55)) drop-shadow(0 0 12px rgba(0,231,255,0.35));
+  }
+  .glow-ring::before{
+    content:'';
+    position:absolute; inset: 2.5px;
+    border-radius:50%;
+    background: var(--sidebar);
+  }
+  .glow-ring::after{
+    content:'';
+    position:absolute;
+    width:22%; height:22%;
+    border-radius:50%;
+    top:10%; right:8%;
+    background: var(--accent-3);
+    box-shadow: 0 0 8px var(--accent-3), 0 0 16px var(--accent-3);
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width: 296px;
+    flex-shrink:0;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    padding: 14px 12px;
+    overflow-y:auto;
+    transition: width .22s ease, transform .22s ease, padding .22s ease;
+  }
+  .sidebar.hide-desktop{ width:0; padding-left:0; padding-right:0; border-right:none; overflow:hidden; }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    padding: 6px 6px 16px;
+  }
+  .brand-mark{ width:26px; height:26px; }
+  .brand-name{ font-weight:700; font-size:15.5px; letter-spacing:-0.01em; }
+
+  .new-chat-btn{
+    display:flex; align-items:center; gap:8px;
+    width:100%;
+    padding: 9px 12px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family:inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    cursor:pointer;
+    margin-bottom: 16px;
+  }
+  .new-chat-btn:hover{ background: var(--accent-soft); border-color: var(--accent); box-shadow: 0 0 14px rgba(255,62,201,0.35); }
+
+  .panel-label{
+    font-size: 11px;
+    font-weight:600;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: 4px 8px 8px;
+    margin-top: 6px;
+  }
+  .panel-label:first-of-type{ margin-top:0; }
+
+  /* Quick tools grid */
+  .tool-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 0 8px 4px;
+  }
+  .tool-btn{
+    display:flex; flex-direction:column; align-items:flex-start; gap:4px;
+    text-align:left;
+    padding: 9px 10px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .tool-btn .t-icon{ font-size: 15px; }
+  .tool-btn .t-label{ font-size: 11.5px; font-weight:700; color: var(--text); line-height:1.25; }
+  .tool-btn:hover{ border-color: var(--accent); }
+  .tool-btn.active{ border-color: var(--accent-2); background: var(--accent-soft); }
+
+  .field-block{ padding: 0 8px 4px; margin-bottom: 6px; }
+  .field-inline-label{
+    font-size: 12px; font-weight:600; color: var(--text-soft);
+    margin-bottom: 5px; display:block;
+  }
+  select.panel-select, input.panel-input{
+    width:100%;
+    font-family:inherit;
+    font-size: 13px;
+    padding: 8px 9px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-elevated);
+    color: var(--text);
+  }
+  select.panel-select:focus, input.panel-input:focus{
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .chip-row{ display:flex; flex-wrap:wrap; gap:6px; }
+  .chip{
+    font-size: 11.5px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg-elevated);
+    cursor: pointer;
+    user-select: none;
+    color: var(--text-soft);
+  }
+  .chip:hover{ border-color: var(--accent); color: var(--text); }
+  .chip.active{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+  .sidebar-divider{ height:1px; background: var(--border); margin: 12px 8px; }
+
+  .conv-list{
+    display:flex; flex-direction:column; gap:2px;
+    padding: 0 8px;
+  }
+  .conv-item{
+    padding: 9px 8px;
+    border-radius: 9px;
+    font-size: 13px;
+    color: var(--text);
+    cursor:pointer;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    border: 1px solid transparent;
+  }
+  .conv-item:hover{ background: var(--bg-elevated); }
+  .conv-item.active{ background: var(--accent-soft); color: var(--accent); font-weight:600; }
+  .conv-empty{ font-size:12px; color: var(--text-soft); padding: 6px 8px; line-height:1.6; }
+
+  .sidebar-foot{
+    font-size: 11px;
+    color: var(--text-soft);
+    padding: 12px 8px 2px;
+    line-height:1.5;
+  }
+
+  /* ---------- Account section ---------- */
+  .account-section{
+    position: relative;
+    display:flex; align-items:center; gap:10px;
+    margin-top: auto;
+    padding: 10px 8px;
+    border-radius: 10px;
+    cursor:pointer;
+    border: 1px solid transparent;
+  }
+  .account-section:hover{ background: var(--bg-elevated); border-color: var(--border); }
+  .account-avatar{
+    width: 34px; height:34px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 12px; font-weight:700; color:#0E1013;
+    background: conic-gradient(from 220deg, var(--accent), var(--accent-2), var(--accent-3), var(--accent));
+    box-shadow: 0 0 10px rgba(255,62,201,0.4);
+  }
+  .account-info{ flex:1; min-width:0; }
+  .account-name{ font-size: 13px; font-weight:700; color: var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .account-sub{ font-size: 11px; color: var(--text-soft); }
+  .account-chevron{ color: var(--text-soft); font-size: 13px; }
+
+  .account-menu{
+    display:none;
+    position:absolute;
+    bottom: calc(100% + 8px);
+    left: 0; right: 0;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.5);
+    z-index: 30;
+  }
+  .account-menu.show{ display:block; }
+  .account-menu-label{
+    font-size: 10px; font-weight:700; color: var(--text-soft);
+    text-transform:uppercase; letter-spacing:.05em;
+    padding: 6px 8px 4px;
+  }
+  .account-menu-item{
+    display:flex; align-items:center; gap:9px;
+    padding: 8px; border-radius: 8px;
+    font-size: 13px; font-weight:600; color: var(--text);
+    cursor:pointer;
+  }
+  .account-menu-item:hover{ background: var(--sidebar); }
+  .account-menu-item.active{ color: var(--accent-2); }
+  .account-menu-item .am-avatar{
+    width:22px; height:22px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 10px; font-weight:700; color:#0E1013;
+    background: var(--accent-soft);
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  }
+  .account-menu-item .am-text{ flex:1; }
+  .account-menu-item .am-check{ color: var(--accent-2); font-size: 12px; }
+  .account-menu-item.danger{ color: var(--danger); }
+  .account-menu-item.danger .am-icon{ font-size: 13px; }
+  .account-menu-divider{ height:1px; background: var(--border); margin: 6px 4px; }
+
+  /* ---------- Logout overlay ---------- */
+  .logout-overlay{
+    display:none;
+    position: fixed; inset:0;
+    background: rgba(6,2,16,0.88);
+    align-items:center; justify-content:center;
+    z-index: 200;
+    padding: 20px;
+  }
+  .logout-overlay.show{ display:flex; }
+  .logout-box{ text-align:center; max-width: 320px; }
+  .logout-mark{ width:64px; height:64px; margin: 0 auto 20px; }
+  .logout-box h2{ font-size: 21px; margin: 0 0 10px; }
+  .logout-box p{ font-size: 13px; color: var(--text-soft); line-height:1.6; margin: 0 0 26px; }
+
+  /* ---------- Main column ---------- */
+  .main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+  }
+  .topbar{
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    gap: 14px;
+  }
+  .topbar-left{ display:flex; align-items:center; gap:14px; min-width:0; }
+  .topbar-right{ display:flex; align-items:center; gap:9px; flex-shrink:0; }
+  .topbar-avatar{
+    width: 28px; height:28px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 11px; font-weight:700; color:#0E1013;
+    background: conic-gradient(from 220deg, var(--accent), var(--accent-2), var(--accent-3), var(--accent));
+    box-shadow: 0 0 8px rgba(255,62,201,0.4);
+  }
+  .topbar-username{ font-size: 13px; font-weight:700; color: var(--text); }
+  .topbar-title{ font-size: 15px; font-weight:700; }
+  .topbar-sub{ font-size:12px; color:var(--text-soft); margin-top:1px; }
+
+  .profile-toggle{ display:flex; border:1px solid var(--border); border-radius:20px; overflow:hidden; }
+  .profile-toggle button{
+    font-family:inherit; font-size:12px; font-weight:600;
+    padding: 7px 14px;
+    background: var(--bg-elevated);
+    border:none;
+    color: var(--text-soft);
+    cursor:pointer;
+  }
+  .profile-toggle button.active{ background: var(--accent); color:#0E1013; }
+
+  .chat-scroll{
+    flex:1;
+    overflow-y:auto;
+    padding: 22px 0 12px;
+  }
+  .chat-inner{
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display:flex; flex-direction:column; gap: 18px;
+  }
+
+  .welcome{
+    text-align:center;
+    padding: 56px 20px;
+    color: var(--text-soft);
+  }
+  .welcome-brand{
+    display:flex; flex-direction:column; align-items:center; gap:18px;
+    margin-bottom: 38px;
+  }
+  .welcome-mark{ width:64px; height:64px; }
+  .welcome-name{
+    font-size: 46px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 55%, var(--accent-3) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    text-shadow:
+      0 0 22px rgba(255,62,201,0.5),
+      0 0 44px rgba(0,231,255,0.3),
+      0 4px 1px rgba(0,0,0,0.5);
+  }
+  .welcome h2{
+    font-size: 20px;
+    color: var(--text);
+    margin: 0;
+  }
+  .welcome p{ font-size: 13.5px; line-height:1.6; max-width:460px; margin: 0 auto; }
+  .suggestion-row{
+    display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:18px;
+  }
+  .suggestion-chip{
+    font-size:12.5px;
+    font-weight:700;
+    padding: 8px 13px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    cursor:pointer;
+    color: var(--text);
+    background: var(--bg-elevated);
+  }
+  .suggestion-chip:hover{ border-color: var(--accent); color: var(--accent); }
+
+  .msg-row{ display:flex; gap:10px; }
+  .msg-row.user{ justify-content:flex-end; padding-right: 2px; }
+  .avatar{ width:24px; height:24px; flex-shrink:0; margin-top:2px; }
+  .avatar.glow-ring::before{ background: var(--bg); }
+
+  .bubble{
+    max-width: 70%;
+    padding: 11px 16px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    line-height:1.55;
+    white-space: pre-wrap;
+  }
+  .bubble.user{
+    background: var(--bubble-user);
+    color: var(--bubble-user-text);
+    border-bottom-right-radius: 4px;
+    margin-right: 2px;
+  }
+  .bubble.assistant-wrap{
+    background: transparent;
+    padding: 0;
+    max-width: 100%;
+    width:100%;
+  }
+
+  .img-thumbs{
+    display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;
+    justify-content:flex-end;
+  }
+  .img-thumbs img{
+    width:64px; height:64px; object-fit:cover;
+    border-radius:8px;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+
+  /* ---------- Assistant content card ---------- */
+  .ficha-card{ border:none; border-radius:0; background:transparent; }
+  .ficha-toolbar{
+    display:flex; gap:14px; flex-wrap:wrap; align-items:center; justify-content:flex-end;
+    padding: 0 0 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 18px;
+  }
+  .ficha-actions{ display:flex; align-items:center; gap:14px; }
+  button.mini{
+    font-family:inherit; font-size: 12px; font-weight:700;
+    padding: 0; background: transparent; border: none;
+    color: var(--text-soft); cursor: pointer;
+  }
+  button.mini:hover{ color: var(--accent-2); }
+
+  .ficha-body{ padding: 0; }
+  .f-section{ padding: 16px 0; border-top: 1px solid var(--border); }
+  .f-section:first-child{ padding-top:0; border-top:none; }
+  .f-section:last-child{ padding-bottom:0; }
+  .f-section h3{
+    font-size: 11.5px; font-weight:600; margin: 0 0 10px;
+    color: var(--text-soft); text-transform: uppercase; letter-spacing: .06em;
+  }
+  .f-content{ font-size: 14.5px; line-height:1.68; color: var(--text); }
+  .f-content p{ margin: 0 0 10px; }
+  .f-content p:last-child{ margin-bottom:0; }
+  .f-content ul, .f-content ol{ margin:0; padding-left:20px; }
+  .f-content li{ margin-bottom:7px; }
+  .f-section table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  .f-section table td, .f-section table th{ border:none; border-bottom:1px solid var(--border); padding:8px 6px; text-align:left; }
+  .f-section table th{ color: var(--text-soft); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .f-section table tr:last-child td{ border-bottom:none; }
+  .sec-copy{ margin-top: 10px; font-size: 11.5px; color: var(--text-soft); cursor:pointer; display:inline-block; opacity:.7; }
+  .sec-copy:hover{ color: var(--accent-2); opacity:1; }
+
+  .thinking-row{ display:flex; gap:10px; align-items:center; }
+  .thinking-dots{ display:flex; gap:4px; padding: 11px 14px; background: var(--bubble-assistant); border-radius: var(--radius); }
+  .thinking-dots span{ width:6px; height:6px; border-radius:50%; background: var(--text-soft); animation: bounce 1.1s infinite ease-in-out; }
+  .thinking-dots span:nth-child(2){ animation-delay:.15s; }
+  .thinking-dots span:nth-child(3){ animation-delay:.3s; }
+  @keyframes bounce{ 0%,80%,100%{ transform: translateY(0); opacity:.4;} 40%{ transform: translateY(-3px); opacity:1;} }
+
+  .err-inline{
+    font-size: 12.5px; color: var(--danger);
+    background: rgba(255,77,109,0.14); border: 1px solid rgba(255,77,109,0.4);
+    padding: 8px 12px; border-radius: 9px;
+  }
+
+  .session-locked-notice{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    font-size: 12.5px; color: var(--text-soft);
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    padding: 10px 14px; border-radius: 12px;
+  }
+  .session-locked-btn{
+    font-family:inherit; font-size: 12px; font-weight:700;
+    padding: 6px 12px; border-radius: 20px;
+    background: var(--accent); border: 1px solid var(--accent); color:#0E1013;
+    cursor:pointer; flex-shrink:0;
+  }
+  .session-locked-btn:hover{ background: var(--accent-2); border-color: var(--accent-2); }
+
+  /* ---------- Composer ---------- */
+  .composer-wrap{ border-top: 1px solid var(--border); padding: 14px 24px 18px; background: var(--bg); }
+  .composer-inner{ max-width: 760px; margin:0 auto; }
+
+  .composer-options{
+    display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap;
+    margin-bottom: 12px;
+  }
+  .opt-group{
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .opt-group-label{
+    font-size: 10px;
+    font-weight:700;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    padding-left: 2px;
+  }
+  .opt-toggle-group{
+    display:flex; border:1px solid var(--border); border-radius:20px; overflow:hidden; flex-shrink:0;
+  }
+  .opt-toggle-group button{
+    font-family:inherit; font-size:12.5px; font-weight:700;
+    padding: 8px 13px;
+    background: var(--bg-elevated);
+    border:none;
+    color: var(--text-soft);
+    cursor:pointer;
+  }
+  .opt-toggle-group button.active{ background: var(--accent); color:#0E1013; box-shadow: 0 0 10px rgba(255,62,201,0.4); }
+  .opt-select{
+    font-family:inherit; font-size: 12.5px; font-weight:700;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg-elevated);
+    color: var(--text);
+    cursor:pointer;
+    max-width: 150px;
+  }
+  .opt-input{
+    font-family:inherit; font-size: 12.5px;
+    padding: 8px 13px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg-elevated);
+    color: var(--text);
+    width: 118px;
+  }
+  .opt-input.career-input{ width: 150px; border-color: var(--accent-2); }
+  .opt-input::placeholder{ color: var(--text-soft); }
+  .opt-select:focus, .opt-input:focus{ outline:none; border-color: var(--accent); }
+  .opt-chip-group{ display:flex; gap:5px; flex-shrink:0; }
+  .opt-chip{
+    font-size: 12.5px;
+    font-weight:700;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg-elevated);
+    cursor: pointer;
+    user-select: none;
+    color: var(--text-soft);
+  }
+  .opt-chip:hover{ border-color: var(--accent); color: var(--text); }
+  .opt-chip.active{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+  .opt-chip.diff-easy.active{ background: rgba(57, 255, 106, 0.16); border-color: #39FF6A; color: #6CFF9C; box-shadow: 0 0 10px rgba(57,255,106,0.3); }
+  .opt-chip.diff-medium.active{ background: rgba(255, 232, 61, 0.16); border-color: #FFE83D; color: #FFF08A; box-shadow: 0 0 10px rgba(255,232,61,0.3); }
+  .opt-chip.diff-hard.active{ background: rgba(255, 77, 109, 0.16); border-color: var(--danger); color: #FF9DAF; box-shadow: 0 0 10px rgba(255,77,109,0.3); }
+
+  .opt-chip.locked{
+    border-style: dashed;
+    color: var(--text-soft);
+    opacity: 0.85;
+  }
+  .opt-chip.locked:hover{ border-color: var(--accent-2); color: var(--accent-2); }
+  .opt-chip.locked.active{
+    background: linear-gradient(90deg, var(--accent-soft), rgba(0,231,255,0.16));
+    border-style: solid;
+    border-color: var(--accent-2);
+    color: var(--accent-2);
+  }
+
+  /* ---------- Thinking level dropdown (next to send button) ---------- */
+  .thinking-dropdown-wrap{ position: relative; flex-shrink:0; }
+  .thinking-btn.has-selection{ border-color: var(--accent); color: var(--accent); }
+  .thinking-menu{
+    display:none;
+    position:absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    min-width: 190px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 6px;
+    margin:0; list-style:none;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.4);
+    z-index: 20;
+  }
+  .thinking-menu.show{ display:block; }
+  .thinking-item{
+    display:flex; align-items:center; gap:8px;
+    padding: 8px 9px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    cursor:pointer;
+  }
+  .thinking-item:hover{ background: var(--sidebar); }
+  .thinking-item.active{ background: var(--accent-soft); color: var(--accent); }
+  .thinking-item .ti-icon{ font-size: 14px; }
+  .thinking-item .ti-text{ flex:1; }
+  .thinking-item.locked{ color: var(--text-soft); }
+  .thinking-item.locked em{
+    font-style:normal;
+    font-size: 10px;
+    font-weight:700;
+    color: var(--accent-2);
+    margin-left:6px;
+  }
+  .thinking-item.locked.active{ background: linear-gradient(90deg, var(--accent-soft), rgba(0,231,255,0.16)); color: var(--accent-2); }
+
+  .attach-preview{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+  .attach-thumb{ position:relative; width:56px; height:56px; border-radius:9px; overflow:hidden; border: 1px solid var(--border); }
+  .attach-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .attach-remove{
+    position:absolute; top:2px; right:2px; width:16px; height:16px; border-radius:50%;
+    background: rgba(0,0,0,0.75); color:#fff; font-size: 10px; line-height:16px;
+    text-align:center; cursor:pointer; border:none; padding:0;
+  }
+
+  .composer-box{
+    display:flex; align-items:flex-end; gap:8px;
+    border: 1px solid var(--border); border-radius: 18px;
+    padding: 8px 8px 8px 14px; background: var(--bg-elevated);
+  }
+  .composer-box:focus-within{ border-color: var(--accent); }
+  textarea#composerInput{
+    flex:1; border:none; outline:none; resize:none;
+    font-family:inherit; font-size:14px; line-height:1.5;
+    max-height: 140px; padding: 6px 0; background:transparent; color: var(--text);
+  }
+  textarea#composerInput::placeholder{ color: var(--text-soft); }
+  textarea#composerInput:disabled{ color: var(--text-soft); cursor:not-allowed; }
+  .icon-btn{
+    width:34px; height:34px; border-radius:50%; border:1px solid var(--border);
+    background: var(--bg-elevated); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; flex-shrink:0; color: var(--text-soft);
+  }
+  .icon-btn:hover{ border-color: var(--accent); color: var(--accent); }
+  .icon-btn:disabled{ opacity:0.4; cursor:not-allowed; border-color: var(--border); color: var(--text-soft); }
+  .mic-btn.recording{ background: var(--danger); border-color: var(--danger); color: #fff; animation: mic-pulse 1.2s infinite ease-in-out; }
+  @keyframes mic-pulse{ 0%,100%{ box-shadow: 0 0 0 0 rgba(255,77,109,0.5);} 50%{ box-shadow: 0 0 0 8px rgba(255,77,109,0);} }
+  .speak-btn.speaking{ color: var(--accent-2); border-color: var(--accent-2); }
+  .send-btn{ background: var(--accent); border-color: var(--accent); color:#0E1013; box-shadow: 0 0 14px rgba(255,62,201,0.5); }
+  .send-btn:hover{ background: var(--accent-2); border-color: var(--accent-2); color:#0E1013; box-shadow: 0 0 16px rgba(0,231,255,0.55); }
+  .send-btn:disabled{ background:#3A3550; border-color:#3A3550; color: var(--text-soft); cursor:not-allowed; opacity:1; box-shadow:none; }
+
+  .composer-hint{ font-size: 11px; color: var(--text-soft); text-align:center; margin-top:8px; }
+
+  /* ---------- Plans nav button ---------- */
+  .plans-nav-btn{
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    width: calc(100% - 16px);
+    margin: 6px 8px 4px;
+    padding: 9px 12px;
+    background: transparent;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    font-family:inherit; font-size: 12.5px; font-weight:700;
+    color: var(--accent);
+    cursor:pointer;
+    box-shadow: 0 0 10px rgba(255,62,201,0.25);
+  }
+  .plans-nav-btn:hover{ background: var(--accent-soft); box-shadow: 0 0 16px rgba(255,62,201,0.45); }
+
+  /* ---------- Chat view / Plans view / Tool-config view swap ---------- */
+  .chat-view{ display:flex; flex-direction:column; flex:1; min-height:0; }
+  .plans-view, .toolconfig-view{ display:none; flex:1; overflow-y:auto; }
+  .plans-view.show, .toolconfig-view.show{ display:block; }
+  .main.plans-active .chat-view, .main.config-active .chat-view{ display:none; }
+
+  .plans-scroll{ height:100%; overflow-y:auto; }
+  .plans-inner{ max-width: 920px; margin: 0 auto; padding: 20px 32px 60px; }
+  .plans-header{ padding: 4px 0 8px; }
+  .plans-back{
+    font-family:inherit; font-size:12.5px; font-weight:700;
+    background:transparent; border:none; color: var(--text-soft); cursor:pointer; padding:6px 0;
+  }
+  .plans-back:hover{ color: var(--accent-2); }
+
+  .plans-hero{ text-align:center; padding: 20px 10px 8px; }
+  .plans-hero h2{ font-size: 24px; margin: 0 0 8px; }
+  .plans-hero p{ font-size: 13.5px; color: var(--text-soft); line-height:1.6; max-width: 460px; margin: 0 auto; }
+
+  .billing-toggle{
+    display:flex; width: fit-content; margin: 20px auto 30px;
+    border: 1px solid var(--border); border-radius: 20px; overflow:hidden;
+  }
+  .billing-toggle button{
+    font-family:inherit; font-size:12.5px; font-weight:700;
+    padding: 8px 18px; background: var(--bg-elevated); border:none;
+    color: var(--text-soft); cursor:pointer;
+  }
+  .billing-toggle button.active{ background: var(--accent); color:#0E1013; box-shadow: 0 0 10px rgba(255,62,201,0.4); }
+
+  .plans-grid{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    align-items: stretch;
+  }
+  @media (max-width: 760px){ .plans-grid{ grid-template-columns: 1fr; } }
+
+  .plan-card{
+    position:relative;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 20px 24px;
+    background: var(--bg-elevated);
+    display:flex; flex-direction:column;
+  }
+  .plan-card.featured{
+    border-color: var(--accent);
+    background: linear-gradient(180deg, var(--accent-soft), var(--bg-elevated) 55%);
+    box-shadow: 0 0 26px rgba(255,62,201,0.25);
+  }
+  .plan-badge{
+    position:absolute; top:-11px; left: 20px;
+    background: var(--accent); color:#0E1013;
+    font-size: 10.5px; font-weight:700;
+    padding: 4px 10px; border-radius: 20px;
+  }
+  .plan-name{ font-size: 15px; font-weight:700; margin-bottom: 10px; }
+  .plan-price{ display:flex; align-items:baseline; gap:3px; margin-bottom: 10px; }
+  .plan-price .amount{ font-size: 30px; font-weight:700; }
+  .plan-price .period{ font-size: 12.5px; color: var(--text-soft); }
+  .plan-tagline{ font-size: 12.5px; color: var(--text-soft); line-height:1.5; margin-bottom: 18px; min-height: 38px; }
+  .plan-features{ list-style:none; margin:0 0 22px; padding:0; flex:1; }
+  .plan-features li{
+    font-size: 13px; line-height:1.5; color: var(--text);
+    padding-left: 20px; position:relative; margin-bottom: 10px;
+  }
+  .plan-features li::before{
+    content:'✓'; position:absolute; left:0; top:0;
+    color: var(--accent-2); font-weight:700;
+  }
+  .plan-cta{
+    font-family:inherit; font-size: 13px; font-weight:700;
+    padding: 10px; border-radius: 10px; cursor:pointer;
+    background: transparent; border: 1px solid var(--border); color: var(--text);
+  }
+  .plan-cta:hover{ border-color: var(--accent); color: var(--accent); }
+  .plan-cta.primary{ background: var(--accent); border-color: var(--accent); color:#0E1013; }
+  .plan-cta.primary:hover{ background: var(--accent-2); border-color: var(--accent-2); }
+
+  .plans-note{ text-align:center; font-size: 11.5px; color: var(--text-soft); margin-top: 26px; }
+
+  /* ---------- Tool config (questionnaire) view ---------- */
+  .toolconfig-scroll{ height:100%; overflow-y:auto; }
+  .toolconfig-inner{ max-width: 640px; margin: 0 auto; padding: 20px 32px 60px; }
+  .toolconfig-header{ padding: 4px 0 8px; }
+  .toolconfig-hero{ text-align:center; padding: 14px 10px 8px; }
+  .toolconfig-hero .tc-icon{
+    width:56px; height:56px; border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px; margin: 0 auto 14px;
+    background: var(--accent-soft); border: 1px solid var(--border);
+  }
+  .toolconfig-hero h2{ font-size: 21px; margin: 0 0 8px; }
+  .toolconfig-hero p{ font-size: 13px; color: var(--text-soft); line-height:1.6; max-width: 440px; margin: 0 auto; }
+
+  .tc-form{ margin-top: 28px; display:flex; flex-direction:column; gap: 20px; }
+  .tc-field label{
+    display:block; font-size: 12.5px; font-weight:700; color: var(--text);
+    margin-bottom: 8px;
+  }
+  .tc-field .tc-optional{ font-weight:500; color: var(--text-soft); }
+  .tc-field input[type=text], .tc-field textarea, .tc-field select{
+    width:100%; font-family:inherit; font-size: 14px;
+    padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--bg-elevated); color: var(--text);
+  }
+  .tc-field textarea{ resize: vertical; min-height: 68px; }
+  .tc-field input:focus, .tc-field textarea:focus, .tc-field select:focus{ outline:none; border-color: var(--accent); }
+  .tc-chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .tc-chip{
+    font-size: 13px; font-weight:600;
+    padding: 8px 14px; border: 1px solid var(--border); border-radius: 20px;
+    background: var(--bg-elevated); color: var(--text-soft); cursor:pointer; user-select:none;
+  }
+  .tc-chip:hover{ border-color: var(--accent); color: var(--text); }
+  .tc-chip.active{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+  .tc-actions{ margin-top: 32px; display:flex; gap:10px; }
+  .tc-generate-btn{
+    flex:1; font-family:inherit; font-size: 14px; font-weight:700;
+    padding: 13px; border-radius: 12px; cursor:pointer;
+    background: var(--accent); border: 1px solid var(--accent); color:#0E1013;
+    box-shadow: 0 0 16px rgba(255,62,201,0.4);
+  }
+  .tc-generate-btn:hover{ background: var(--accent-2); border-color: var(--accent-2); box-shadow: 0 0 18px rgba(0,231,255,0.45); }
+
+  /* ---------- Reminder modal ---------- */
+  .reminder-modal{
+    display:none;
+    position: fixed; inset:0;
+    background: rgba(0,0,0,0.55);
+    align-items:center; justify-content:center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .reminder-modal.show{ display:flex; }
+  .reminder-modal-box{
+    width: 100%; max-width: 340px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+  }
+  .reminder-modal-box h3{ font-size: 16px; margin: 0 0 16px; }
+  .reminder-modal-row{ display:flex; gap:10px; }
+  .reminder-modal-row .tc-field{ flex:1; }
+  .reminder-modal-actions{ display:flex; gap:8px; margin-top: 6px; }
+  .reminder-modal-actions .mini{
+    background: var(--sidebar); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px; color: var(--text);
+  }
+  .reminder-modal-hint{ font-size: 11px; color: var(--text-soft); line-height:1.5; margin: 12px 0 0; }
+  .pay-plan-name{ color: var(--accent-2); }
+  .pay-price-row{ margin: -8px 0 16px; }
+  .pay-price{ font-size: 13px; color: var(--text-soft); }
+  .pay-method-toggle{ width:100%; margin: 0 0 18px; }
+  .pay-method-toggle button{ flex:1; }
+  #payConfirmBtn:disabled{ opacity:0.6; cursor:progress; }
+
+  .toast{
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+    background: var(--bg-elevated); color: var(--text); border: 1px solid var(--border);
+    font-size: 12.5px; padding: 9px 16px; border-radius: 20px;
+    opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 50;
+  }
+  .toast.show{ opacity: 1; }
+
+  .sidebar-backdrop{
+    display:none;
+    position: fixed; inset:0;
+    background: rgba(4,1,12,0.6);
+    z-index: 140;
+  }
+  .sidebar-backdrop.show{ display:block; }
+
+  .hamburger-btn{ flex-shrink:0; }
+
+  @media (max-width: 520px){ .topbar-username{ display:none; } }
+
+  @media (max-width: 900px){
+    .sidebar{
+      position: fixed; top:0; left:0; bottom:0;
+      width: 280px;
+      z-index: 150;
+      transform: translateX(-100%);
+      box-shadow: 20px 0 50px rgba(0,0,0,0.55);
+    }
+    .sidebar.show-mobile{ transform: translateX(0); }
+    .sidebar.hide-desktop{ width:280px; padding:14px 12px; border-right:1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<div class="sidebar" id="sidebarEl">
+  <div class="brand">
+    <div class="brand-mark glow-ring"></div>
+    <div class="brand-name">GlowUp</div>
+  </div>
+  <button class="new-chat-btn" id="newChatBtn"><span>+</span> Nueva sesión</button>
+
+  <div class="panel-label">Herramientas rápidas</div>
+  <div class="tool-grid" id="toolGrid">
+    <button class="tool-btn" data-tool="Resumen"><span class="t-icon">📝</span><span class="t-label">Resumen de apuntes</span></button>
+    <button class="tool-btn" data-tool="Tarjetas de estudio"><span class="t-icon">🗂️</span><span class="t-label">Tarjetas de estudio</span></button>
+    <button class="tool-btn" data-tool="Examen de práctica"><span class="t-icon">✅</span><span class="t-label">Examen de práctica</span></button>
+    <button class="tool-btn" data-tool="Plan de clase"><span class="t-icon">📅</span><span class="t-label">Plan de clase</span></button>
+    <button class="tool-btn" data-tool="Rúbrica de evaluación"><span class="t-icon">📊</span><span class="t-label">Rúbrica</span></button>
+    <button class="tool-btn" data-tool="Corrección de texto"><span class="t-icon">🖊️</span><span class="t-label">Corregir texto</span></button>
+    <button class="tool-btn" data-tool="Explicación paso a paso"><span class="t-icon">💡</span><span class="t-label">Explicar paso a paso</span></button>
+    <button class="tool-btn" data-tool="Duda general"><span class="t-icon">💬</span><span class="t-label">Resolver una duda</span></button>
+    <button class="tool-btn" data-tool="Rutina de estudio"><span class="t-icon">🗓️</span><span class="t-label">Hábitos de estudio</span></button>
+  </div>
+
+  <div class="sidebar-divider"></div>
+  <div class="panel-label">Sesiones</div>
+  <div class="conv-list" id="convList">
+    <div class="conv-empty">Aún no hay sesiones. Elige una herramienta o escribe abajo para empezar.</div>
+  </div>
+
+  <button class="plans-nav-btn" id="plansNavBtn">💎 Ver planes</button>
+
+  <div class="account-section" id="accountSection">
+    <div class="account-avatar" id="accountAvatar">AE</div>
+    <div class="account-info">
+      <div class="account-name" id="accountName">Alex Estudiante</div>
+      <div class="account-sub" id="accountSub">Plan Gratis</div>
+    </div>
+    <span class="account-chevron">⌄</span>
+
+    <div class="account-menu" id="accountMenu">
+      <div class="account-menu-item" id="changePhotoItem">
+        <span class="am-icon">🖼️</span><span class="am-text">Cambiar foto de perfil</span>
+      </div>
+      <div class="account-menu-divider"></div>
+      <div class="account-menu-label">Cambiar de cuenta</div>
+      <div class="account-menu-item active" data-account="0">
+        <span class="am-avatar" id="amAvatar0">AE</span><span class="am-text">Alex Estudiante</span><span class="am-check">✓</span>
+      </div>
+      <div class="account-menu-item" data-account="1">
+        <span class="am-avatar" id="amAvatar1">MP</span><span class="am-text">Marta Profesora</span><span class="am-check">✓</span>
+      </div>
+      <div class="account-menu-item" data-account="2">
+        <span class="am-avatar">+</span><span class="am-text">Añadir cuenta…</span>
+      </div>
+      <div class="account-menu-divider"></div>
+      <div class="account-menu-item danger" id="logoutMenuItem">
+        <span class="am-icon">⏻</span><span class="am-text">Cerrar sesión</span>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="avatarFileInput" accept="image/*" style="display:none">
+
+  <div class="sidebar-foot">GlowUp ayuda a estudiantes y profesores a estudiar, preparar clases y resolver dudas.</div>
+</div>
+
+<div class="logout-overlay" id="logoutOverlay">
+  <div class="logout-box">
+    <div class="logout-mark glow-ring"></div>
+    <h2>Sesión cerrada</h2>
+    <p>Has cerrado la sesión de GlowUp. Vuelve a entrar cuando quieras seguir estudiando.</p>
+    <button class="tc-generate-btn" id="loginAgainBtn">Volver a iniciar sesión</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="chat-view" id="chatView">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="icon-btn hamburger-btn" id="hamburgerBtn" title="Ver funciones">☰</button>
+      <div>
+        <div class="topbar-title" id="convTitle">Nueva sesión</div>
+        <div class="topbar-sub">Escribe, adjunta apuntes o dicta por voz</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-avatar" id="topbarAvatar">AE</div>
+      <span class="topbar-username" id="topbarUsername">Alex Estudiante</span>
+    </div>
+  </div>
+
+  <div class="chat-scroll" id="chatScroll">
+    <div class="chat-inner" id="chatInner">
+      <div class="welcome" id="welcomeState">
+        <div class="welcome-brand">
+          <div class="welcome-mark glow-ring"></div>
+          <div class="welcome-name">GlowUp</div>
+        </div>
+        <h2>¿Qué estudiamos o preparamos hoy?</h2>
+        <div class="suggestion-row">
+          <span class="suggestion-chip" data-fill="resumen">Resumir un tema</span>
+          <span class="suggestion-chip" data-fill="examen">Crear un examen de práctica</span>
+          <span class="suggestion-chip" data-fill="photo">Adjuntar foto de apuntes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="composer-wrap">
+    <div class="composer-inner">
+      <div class="attach-preview" id="attachPreview"></div>
+
+      <div class="composer-options" id="composerOptions">
+        <div class="opt-group">
+          <span class="opt-group-label">Perfil</span>
+          <div class="opt-toggle-group" id="profileToggle">
+            <button class="active" data-profile="Estudiante">🎓 Estudiante</button>
+            <button data-profile="Profesor">🍎 Profesor</button>
+          </div>
+        </div>
+
+        <div class="opt-group">
+          <span class="opt-group-label">🎯 Nivel</span>
+          <select class="opt-select" id="levelSelect" title="Nivel educativo">
+            <option value="Primaria">Primaria</option>
+            <option value="ESO" selected>ESO</option>
+            <option value="Bachillerato">Bachillerato</option>
+            <option value="Formación profesional">Formación profesional</option>
+            <option value="Universidad">Universidad</option>
+            <option value="Oposición / adulto">Oposición / adulto</option>
+          </select>
+        </div>
+
+        <div class="opt-group" id="careerGroup" style="display:none;">
+          <span class="opt-group-label">🎓 Carrera</span>
+          <input type="text" class="opt-input career-input" id="careerInput" placeholder="Ej. Medicina, Derecho…">
+        </div>
+
+        <div class="opt-group">
+          <span class="opt-group-label">📚 Asignatura</span>
+          <input type="text" class="opt-input" id="subjectInput" placeholder="Ej. Historia…">
+        </div>
+
+        <div class="opt-group">
+          <span class="opt-group-label">⚡ Dificultad</span>
+          <div class="opt-chip-group" id="difficultyChips">
+            <span class="opt-chip diff-easy" data-difficulty="Fácil">🟢 Fácil</span>
+            <span class="opt-chip diff-medium active" data-difficulty="Media">🟡 Media</span>
+            <span class="opt-chip diff-hard" data-difficulty="Avanzada">🔴 Avanzada</span>
+          </div>
+        </div>
+
+        <div class="opt-group">
+          <span class="opt-group-label">📏 Extensión</span>
+          <div class="opt-chip-group" id="lengthChips">
+            <span class="opt-chip" data-length="Breve">✂️ Breve</span>
+            <span class="opt-chip active" data-length="Detallada">📖 Detallada</span>
+          </div>
+        </div>
+
+        <div class="opt-group">
+          <span class="opt-group-label">🌐 Idioma</span>
+          <select class="opt-select" id="langSelect" title="Idioma de salida">
+            <option value="ES" selected>Español</option>
+            <option value="EN">English</option>
+            <option value="FR">Français</option>
+            <option value="PT">Português</option>
+            <option value="IT">Italiano</option>
+            <option value="DE">Deutsch</option>
+            <option value="CA">Català</option>
+            <option value="EU">Euskera</option>
+            <option value="GL">Galego</option>
+            <option value="ZH">中文</option>
+            <option value="AR">العربية</option>
+            <option value="OTHER">Otro…</option>
+          </select>
+        </div>
+
+        <div class="opt-group" id="customLangGroup" style="display:none;">
+          <span class="opt-group-label">✏️ ¿Qué idioma?</span>
+          <input type="text" class="opt-input" id="customLangInput" placeholder="Escribe el idioma…">
+        </div>
+      </div>
+
+      <div class="composer-box">
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+        <button class="icon-btn" id="attachBtn" title="Adjuntar fotos de apuntes o exámenes">📷</button>
+        <button class="icon-btn mic-btn" id="micBtn" title="Dictar por voz">🎙️</button>
+        <textarea id="composerInput" rows="1" placeholder="Escribe tu duda, pega un tema o pide un examen, resumen, plan de clase…"></textarea>
+        <div class="thinking-dropdown-wrap" id="thinkingDropdownWrap">
+          <button class="icon-btn thinking-btn" id="thinkingBtn" title="Nivel de pensamiento">🧠</button>
+          <ul class="thinking-menu" id="thinkingMenu">
+            <li class="thinking-item active" data-thinking="Estándar"><span class="ti-icon">🧠</span><span class="ti-text">Estándar</span></li>
+            <li class="thinking-item" data-thinking="Avanzado"><span class="ti-icon">✨</span><span class="ti-text">Avanzado</span></li>
+            <li class="thinking-item locked" data-thinking="Profundo"><span class="ti-icon">🔒</span><span class="ti-text">Profundo <em>Pro/Premium</em></span></li>
+          </ul>
+        </div>
+        <button class="icon-btn send-btn" id="sendBtn" title="Enviar">➤</button>
+      </div>
+      <div class="composer-hint">Pulsa 🎙️ para dictar por voz. GlowUp explica el razonamiento, no solo la respuesta final, y avisa si algo no puede verificar.</div>
+    </div>
+  </div>
+  </div>
+
+  <div class="plans-view" id="plansView">
+    <div class="plans-scroll">
+      <div class="plans-inner">
+        <div class="plans-header">
+          <button class="plans-back" id="plansBackBtn">← Volver al chat</button>
+        </div>
+
+        <div class="plans-hero">
+          <h2>Elige tu plan</h2>
+          <p>Empieza gratis y pasa a Pro o Premium cuando quieras fotos ilimitadas, más velocidad o herramientas para profesores.</p>
+        </div>
+
+        <div class="billing-toggle" id="billingToggle">
+          <button class="active" data-billing="monthly">Mensual</button>
+          <button data-billing="annual">Anual</button>
+        </div>
+
+        <div class="plans-grid">
+
+          <div class="plan-card">
+            <div class="plan-name">Gratis</div>
+            <div class="plan-price"><span class="amount">0€</span><span class="period">/mes</span></div>
+            <div class="plan-tagline">Para probar GlowUp sin compromiso.</div>
+            <ul class="plan-features">
+              <li>Mensajes ilimitados para el día a día</li>
+              <li>Adjunta fotos de tus apuntes o exámenes</li>
+              <li>Herramientas básicas de estudio</li>
+              <li>Velocidad y razonamiento estándar</li>
+            </ul>
+            <button class="plan-cta" data-plan="Gratis">Empezar gratis</button>
+          </div>
+
+          <div class="plan-card featured">
+            <div class="plan-badge">Más popular</div>
+            <div class="plan-name">Pro</div>
+            <div class="plan-price">
+              <span class="amount" data-monthly="7€" data-annual="84€/año">7€</span><span class="period" data-monthly="/mes" data-annual="">/mes</span>
+            </div>
+            <div class="plan-tagline">Para estudiar o preparar clases sin límites de uso.</div>
+            <ul class="plan-features">
+              <li>Fotos y adjuntos ilimitados</li>
+              <li>Herramientas extra para profesores (plan de clase, rúbricas, corrección)</li>
+              <li>Respuestas más rápidas</li>
+              <li>Prioridad frente al plan Gratis en horas de mucho uso</li>
+            </ul>
+            <button class="plan-cta primary" data-plan="Pro">Elegir Pro</button>
+          </div>
+
+          <div class="plan-card">
+            <div class="plan-name">Premium</div>
+            <div class="plan-price">
+              <span class="amount" data-monthly="15€" data-annual="180€/año">15€</span><span class="period" data-monthly="/mes" data-annual="">/mes</span>
+            </div>
+            <div class="plan-tagline">Todo Pro, con la máxima velocidad y precisión de GlowUp.</div>
+            <ul class="plan-features">
+              <li>Todo lo incluido en Pro</li>
+              <li>Pensamiento profundo activado siempre, para respuestas más elaboradas y precisas</li>
+              <li>Velocidad máxima y prioridad de respuesta</li>
+              <li>Exportación a PDF y voz sin límites</li>
+            </ul>
+            <button class="plan-cta" data-plan="Premium">Elegir Premium</button>
+          </div>
+
+        </div>
+
+        <div class="plans-note">Los precios anuales equivalen a 12 mensualidades (84€/año en Pro, 180€/año en Premium), pagadas de una vez.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolconfig-view" id="toolConfigView">
+    <div class="toolconfig-scroll">
+      <div class="toolconfig-inner">
+        <div class="toolconfig-header">
+          <button class="plans-back" id="toolConfigBackBtn">← Volver al chat</button>
+        </div>
+        <div class="toolconfig-hero">
+          <div class="tc-icon" id="tcIcon">📝</div>
+          <h2 id="tcTitle">Resumen de apuntes</h2>
+          <p id="tcIntro">Cuéntame qué necesitas y cómo lo prefieres, para generarlo a tu medida.</p>
+        </div>
+        <div class="tc-form" id="tcForm"></div>
+        <div class="tc-actions">
+          <button class="tc-generate-btn" id="tcGenerateBtn">Generar ✨</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copiado</div>
+
+<div class="reminder-modal" id="reminderModal">
+  <div class="reminder-modal-box">
+    <h3>Crear recordatorio</h3>
+    <div class="tc-field">
+      <label>Título</label>
+      <input type="text" id="remTitleInput" placeholder="Ej. Repasar Historia">
+    </div>
+    <div class="reminder-modal-row">
+      <div class="tc-field">
+        <label>Fecha</label>
+        <input type="date" id="remDateInput">
+      </div>
+      <div class="tc-field">
+        <label>Hora</label>
+        <input type="time" id="remTimeInput">
+      </div>
+    </div>
+    <div class="reminder-modal-actions">
+      <button class="mini" id="remCancelBtn">Cancelar</button>
+      <button class="tc-generate-btn" id="remConfirmBtn">Añadir a mi calendario</button>
+    </div>
+    <p class="reminder-modal-hint">Se descarga un archivo .ics: ábrelo desde tu móvil para añadirlo directamente a Google Calendar, Apple Calendar u Outlook, con aviso 30 minutos antes.</p>
+  </div>
+</div>
+
+<div class="reminder-modal" id="paymentModal">
+  <div class="reminder-modal-box">
+    <h3>Suscribirte a GlowUp <span id="payPlanName" class="pay-plan-name"></span></h3>
+    <div class="pay-price-row">
+      <span id="payPrice" class="pay-price"></span>
+    </div>
+
+    <div class="billing-toggle pay-method-toggle" id="payMethodToggle">
+      <button class="active" data-method="card">💳 Tarjeta</button>
+      <button data-method="bizum">📱 Bizum</button>
+    </div>
+
+    <div id="payCardFields">
+      <div class="tc-field">
+        <label>Nombre en la tarjeta</label>
+        <input type="text" id="payCardName" placeholder="Como aparece en la tarjeta">
+      </div>
+      <div class="tc-field">
+        <label>Número de tarjeta</label>
+        <input type="text" id="payCardNumber" placeholder="0000 0000 0000 0000" inputmode="numeric" maxlength="19">
+      </div>
+      <div class="reminder-modal-row">
+        <div class="tc-field">
+          <label>Caducidad</label>
+          <input type="text" id="payCardExpiry" placeholder="MM/AA" maxlength="5">
+        </div>
+        <div class="tc-field">
+          <label>CVV</label>
+          <input type="text" id="payCardCvv" placeholder="123" inputmode="numeric" maxlength="4">
+        </div>
+      </div>
+    </div>
+
+    <div id="payBizumFields" style="display:none;">
+      <div class="tc-field">
+        <label>Número de teléfono asociado a Bizum</label>
+        <input type="text" id="payBizumPhone" placeholder="600 000 000" inputmode="numeric" maxlength="9">
+      </div>
+    </div>
+
+    <div class="reminder-modal-actions">
+      <button class="mini" id="payCancelBtn">Cancelar</button>
+      <button class="tc-generate-btn" id="payConfirmBtn">Pagar</button>
+    </div>
+    <p class="reminder-modal-hint">Esto es una demostración: no se procesa ningún pago real ni se envían tus datos a ningún sitio.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  // ---------- Hamburger menu (toggle sidebar) ----------
+  const sidebarEl = document.getElementById('sidebarEl');
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+
+  function toggleSidebar(){
+    if(window.innerWidth <= 900){
+      sidebarEl.classList.toggle('show-mobile');
+      sidebarBackdrop.classList.toggle('show');
+    } else {
+      sidebarEl.classList.toggle('hide-desktop');
+    }
+  }
+  function closeSidebarMobile(){
+    sidebarEl.classList.remove('show-mobile');
+    sidebarBackdrop.classList.remove('show');
+  }
+  hamburgerBtn.addEventListener('click', toggleSidebar);
+  sidebarBackdrop.addEventListener('click', closeSidebarMobile);
+
+  // ---------- Plans view ----------
+  const mainEl = document.querySelector('.main');
+  const plansView = document.getElementById('plansView');
+  const plansNavBtn = document.getElementById('plansNavBtn');
+  const plansBackBtn = document.getElementById('plansBackBtn');
+
+  function openPlans(){
+    closeToolConfig();
+    mainEl.classList.add('plans-active');
+    plansView.classList.add('show');
+  }
+  function closePlans(){
+    mainEl.classList.remove('plans-active');
+    plansView.classList.remove('show');
+  }
+  plansNavBtn.addEventListener('click', openPlans);
+  plansBackBtn.addEventListener('click', closePlans);
+
+  // ---------- Account section (switch account / log out) ----------
+  const accountSection = document.getElementById('accountSection');
+  const accountMenu = document.getElementById('accountMenu');
+  const accountAvatar = document.getElementById('accountAvatar');
+  const topbarAvatar = document.getElementById('topbarAvatar');
+  const topbarUsername = document.getElementById('topbarUsername');
+  const accountName = document.getElementById('accountName');
+  const accountSub = document.getElementById('accountSub');
+  const logoutMenuItem = document.getElementById('logoutMenuItem');
+  const logoutOverlay = document.getElementById('logoutOverlay');
+  const loginAgainBtn = document.getElementById('loginAgainBtn');
+  const changePhotoItem = document.getElementById('changePhotoItem');
+  const avatarFileInput = document.getElementById('avatarFileInput');
+
+  const DEMO_ACCOUNTS = [
+    { initials:'AE', name:'Alex Estudiante', photo:null },
+    { initials:'MP', name:'Marta Profesora', photo:null }
+  ];
+  let currentAccountIndex = 0;
+
+  function paintAvatarEl(el, acc){
+    if(!el) return;
+    if(acc.photo){
+      el.style.background = 'url("' + acc.photo + '") center/cover no-repeat';
+      el.textContent = '';
+    } else {
+      el.style.background = '';
+      el.textContent = acc.initials;
+    }
+  }
+  function renderAccountVisuals(){
+    const acc = DEMO_ACCOUNTS[currentAccountIndex];
+    paintAvatarEl(accountAvatar, acc);
+    paintAvatarEl(topbarAvatar, acc);
+    accountName.textContent = acc.name;
+    topbarUsername.textContent = acc.name;
+    DEMO_ACCOUNTS.forEach((a,i)=> paintAvatarEl(document.getElementById('amAvatar' + i), a));
+  }
+  renderAccountVisuals();
+
+  function closeAccountMenu(){ accountMenu.classList.remove('show'); }
+
+  accountSection.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    accountMenu.classList.toggle('show');
+  });
+  document.addEventListener('click', (e)=>{
+    if(!accountMenu.contains(e.target) && e.target !== accountSection){ closeAccountMenu(); }
+  });
+
+  changePhotoItem.addEventListener('click', ()=> avatarFileInput.click());
+  avatarFileInput.addEventListener('change', (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      DEMO_ACCOUNTS[currentAccountIndex].photo = reader.result;
+      renderAccountVisuals();
+      closeAccountMenu();
+      showToast('Foto de perfil actualizada');
+    };
+    reader.readAsDataURL(file);
+    avatarFileInput.value = '';
+  });
+
+  document.querySelectorAll('.account-menu-item[data-account]').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      const idx = item.dataset.account;
+      if(idx === '2'){
+        showToast('Añadir otra cuenta no está disponible en esta demo');
+        closeAccountMenu();
+        return;
+      }
+      currentAccountIndex = Number(idx);
+      renderAccountVisuals();
+      document.querySelectorAll('.account-menu-item[data-account]').forEach(i=>i.classList.remove('active'));
+      item.classList.add('active');
+      closeAccountMenu();
+      showToast('Cuenta cambiada a ' + DEMO_ACCOUNTS[currentAccountIndex].name);
+    });
+  });
+
+  logoutMenuItem.addEventListener('click', ()=>{
+    closeAccountMenu();
+    logoutOverlay.classList.add('show');
+  });
+  loginAgainBtn.addEventListener('click', ()=>{
+    logoutOverlay.classList.remove('show');
+  });
+
+  function refreshAccountPlanLabel(){
+    accountSub.textContent = 'Plan ' + currentPlan;
+  }
+
+  document.querySelectorAll('#billingToggle button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#billingToggle button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const billing = btn.dataset.billing;
+      document.querySelectorAll('.plan-price .amount[data-monthly]').forEach(el=>{
+        el.textContent = billing === 'annual' ? el.dataset.annual : el.dataset.monthly;
+      });
+      document.querySelectorAll('.plan-price .period[data-monthly]').forEach(el=>{
+        el.textContent = billing === 'annual' ? '' : '/mes';
+      });
+    });
+  });
+
+  // ---------- Payment modal (Tarjeta / Bizum) ----------
+  const paymentModal = document.getElementById('paymentModal');
+  const payPlanName = document.getElementById('payPlanName');
+  const payPrice = document.getElementById('payPrice');
+  const payMethodToggle = document.getElementById('payMethodToggle');
+  const payCardFields = document.getElementById('payCardFields');
+  const payBizumFields = document.getElementById('payBizumFields');
+  const payCardName = document.getElementById('payCardName');
+  const payCardNumber = document.getElementById('payCardNumber');
+  const payCardExpiry = document.getElementById('payCardExpiry');
+  const payCardCvv = document.getElementById('payCardCvv');
+  const payBizumPhone = document.getElementById('payBizumPhone');
+  const payCancelBtn = document.getElementById('payCancelBtn');
+  const payConfirmBtn = document.getElementById('payConfirmBtn');
+
+  let payTargetPlan = null;
+  let payMethod = 'card';
+
+  function closePaymentModal(){ paymentModal.classList.remove('show'); }
+
+  function openPaymentModal(planName, priceText){
+    payTargetPlan = planName;
+    payPlanName.textContent = planName;
+    payPrice.textContent = priceText || '';
+    payMethod = 'card';
+    payMethodToggle.querySelectorAll('button').forEach(b=> b.classList.toggle('active', b.dataset.method === 'card'));
+    payCardFields.style.display = '';
+    payBizumFields.style.display = 'none';
+    payCardName.value = ''; payCardNumber.value = ''; payCardExpiry.value = ''; payCardCvv.value = ''; payBizumPhone.value = '';
+    payConfirmBtn.disabled = false;
+    payConfirmBtn.textContent = 'Pagar';
+    paymentModal.classList.add('show');
+  }
+
+  payMethodToggle.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      payMethodToggle.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      payMethod = btn.dataset.method;
+      payCardFields.style.display = payMethod === 'card' ? '' : 'none';
+      payBizumFields.style.display = payMethod === 'bizum' ? '' : 'none';
+    });
+  });
+
+  payCancelBtn.addEventListener('click', closePaymentModal);
+  paymentModal.addEventListener('click', (e)=>{ if(e.target === paymentModal) closePaymentModal(); });
+
+  payCardNumber.addEventListener('input', ()=>{
+    payCardNumber.value = payCardNumber.value.replace(/\D/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim();
+  });
+  payCardExpiry.addEventListener('input', ()=>{
+    let v = payCardExpiry.value.replace(/\D/g,'').slice(0,4);
+    if(v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+    payCardExpiry.value = v;
+  });
+
+  payConfirmBtn.addEventListener('click', ()=>{
+    if(payMethod === 'card'){
+      if(!payCardName.value.trim() || payCardNumber.value.replace(/\s/g,'').length < 12 || !payCardExpiry.value.trim() || payCardCvv.value.trim().length < 3){
+        showToast('Revisa los datos de la tarjeta');
+        return;
+      }
+    } else {
+      if(payBizumPhone.value.replace(/\s/g,'').length < 9){
+        showToast('Introduce un número de teléfono válido para Bizum');
+        return;
+      }
+    }
+    payConfirmBtn.disabled = true;
+    payConfirmBtn.textContent = 'Procesando pago…';
+    setTimeout(()=>{
+      currentPlan = payTargetPlan;
+      applyPlanUnlocks();
+      refreshAccountPlanLabel();
+      closePaymentModal();
+      showToast('¡Pago simulado con ' + (payMethod === 'card' ? 'tarjeta' : 'Bizum') + '! Plan ' + payTargetPlan + ' activado');
+    }, 900);
+  });
+
+  document.querySelectorAll('.plan-cta').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const plan = btn.dataset.plan;
+      if(plan === 'Gratis'){
+        currentPlan = 'Gratis';
+        applyPlanUnlocks();
+        refreshAccountPlanLabel();
+        showToast('Plan Gratis activado');
+        return;
+      }
+      const card = btn.closest('.plan-card');
+      const amountEl = card ? card.querySelector('.plan-price .amount') : null;
+      const periodEl = card ? card.querySelector('.plan-price .period') : null;
+      const priceText = (amountEl ? amountEl.textContent : '') + (periodEl ? periodEl.textContent : '');
+      openPaymentModal(plan, priceText);
+    });
+  });
+
+  // ---------- Tool config (questionnaire) view ----------
+  const toolConfigView = document.getElementById('toolConfigView');
+  const toolConfigBackBtn = document.getElementById('toolConfigBackBtn');
+  const tcIcon = document.getElementById('tcIcon');
+  const tcTitle = document.getElementById('tcTitle');
+  const tcIntro = document.getElementById('tcIntro');
+  const tcForm = document.getElementById('tcForm');
+  const tcGenerateBtn = document.getElementById('tcGenerateBtn');
+
+  const TOOL_ICONS = {
+    'Resumen': '📝', 'Tarjetas de estudio': '🗂️', 'Examen de práctica': '✅',
+    'Plan de clase': '📅', 'Rúbrica de evaluación': '📊', 'Corrección de texto': '🖊️',
+    'Explicación paso a paso': '💡', 'Duda general': '💬', 'Rutina de estudio': '🗓️'
+  };
+
+  const TOOL_CONFIGS = {
+    'Resumen': {
+      intro: 'Cuéntame qué quieres resumir y cómo lo prefieres.',
+      fields: [
+        { id:'tema', label:'¿Qué tema o apuntes quieres resumir?', type:'textarea', placeholder:'Ej. La Revolución Francesa, el capítulo 4 de biología…' },
+        { id:'formato', label:'Formato del resumen', type:'chips', options:['Puntos clave','Párrafos','Esquema'], value:'Puntos clave' }
+      ]
+    },
+    'Tarjetas de estudio': {
+      intro: 'Dime el tema y cómo quieres las tarjetas de repaso.',
+      fields: [
+        { id:'tema', label:'¿Sobre qué tema quieres las tarjetas?', type:'text', placeholder:'Ej. Vocabulario de inglés, la tabla periódica…' },
+        { id:'cantidad', label:'Número de tarjetas', type:'select', options:['10','20','30'], value:'20' },
+        { id:'formato', label:'Formato', type:'chips', options:['Pregunta/Respuesta','Término/Definición'], value:'Pregunta/Respuesta' }
+      ]
+    },
+    'Examen de práctica': {
+      intro: 'Cuéntame sobre qué es el examen y cómo lo quieres.',
+      fields: [
+        { id:'tema', label:'¿Sobre qué tema es el examen?', type:'textarea', placeholder:'Ej. Unidad 3: las funciones matemáticas' },
+        { id:'numPreguntas', label:'Número de preguntas', type:'select', options:['5','10','15','20'], value:'10' },
+        { id:'tipos', label:'Tipo de preguntas', type:'chips-multi', options:['Tipo test','Desarrollo','Verdadero/Falso'], value:['Tipo test'] }
+      ]
+    },
+    'Plan de clase': {
+      intro: 'Dime sobre qué es la clase y cuánto dura.',
+      fields: [
+        { id:'tema', label:'¿Sobre qué es la clase?', type:'text', placeholder:'Ej. Introducción a la fotosíntesis' },
+        { id:'duracion', label:'Duración de la clase', type:'chips', options:['30 min','45 min','60 min','90 min'], value:'60 min' },
+        { id:'alumnos', label:'Nº de alumnos', type:'text', optional:true, placeholder:'Opcional' }
+      ]
+    },
+    'Rúbrica de evaluación': {
+      intro: 'Cuéntame qué vas a evaluar y con qué escala.',
+      fields: [
+        { id:'tema', label:'¿Qué vas a evaluar?', type:'text', placeholder:'Ej. Trabajo en grupo, examen escrito, presentación oral…' },
+        { id:'escala', label:'Escala de puntuación', type:'chips', options:['0-10','A/B/C/D','Niveles de logro'], value:'0-10' }
+      ]
+    },
+    'Corrección de texto': {
+      intro: 'Pega el texto que quieres que corrija.',
+      fields: [
+        { id:'texto', label:'Texto a corregir', type:'textarea', placeholder:'Pega aquí la redacción o el texto (también puedes adjuntar una foto desde el chat)…' }
+      ]
+    },
+    'Explicación paso a paso': {
+      intro: 'Dime qué concepto o problema quieres que te explique.',
+      fields: [
+        { id:'tema', label:'¿Qué concepto o problema quieres entender?', type:'textarea', placeholder:'Ej. Cómo resolver ecuaciones de segundo grado' },
+        { id:'ejemplos', label:'¿Con ejemplos?', type:'chips', options:['Con ejemplos','Solo la teoría'], value:'Con ejemplos' }
+      ]
+    },
+    'Duda general': {
+      intro: 'Cuéntame cuál es tu duda.',
+      fields: [
+        { id:'duda', label:'¿Cuál es tu duda?', type:'textarea', placeholder:'Escribe aquí lo que necesitas resolver…' }
+      ]
+    },
+    'Rutina de estudio': {
+      intro: 'Cuéntame tus preferencias para diseñarte una rutina a medida.',
+      fields: [
+        { id:'asignaturas', label:'¿Qué asignaturas o temas quieres repartir?', type:'text', placeholder:'Ej. Matemáticas, Historia, Inglés' },
+        { id:'dias', label:'¿Qué días tienes disponibles?', type:'chips-multi', options:['L','M','X','J','V','S','D'], value:['L','M','X','J','V'] },
+        { id:'momento', label:'¿Cuándo rindes mejor?', type:'chips', options:['Mañana','Tarde','Noche'], value:'Tarde' },
+        { id:'tiempo', label:'Tiempo disponible al día', type:'chips', options:['30 min','1 h','2 h','3+ h'], value:'1 h' }
+      ]
+    }
+  };
+
+  let tcCurrentTool = null;
+  let tcState = {};
+
+  function renderTcField(field){
+    const wrap = document.createElement('div');
+    wrap.className = 'tc-field';
+    const label = document.createElement('label');
+    label.textContent = field.label + (field.optional ? '' : '');
+    if(field.optional){
+      const span = document.createElement('span');
+      span.className = 'tc-optional';
+      span.textContent = ' (opcional)';
+      label.appendChild(span);
+    }
+    wrap.appendChild(label);
+
+    if(field.type === 'text'){
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = field.placeholder || '';
+      input.addEventListener('input', ()=> tcState[field.id] = input.value);
+      wrap.appendChild(input);
+    } else if(field.type === 'textarea'){
+      const ta = document.createElement('textarea');
+      ta.placeholder = field.placeholder || '';
+      ta.addEventListener('input', ()=> tcState[field.id] = ta.value);
+      wrap.appendChild(ta);
+    } else if(field.type === 'select'){
+      const sel = document.createElement('select');
+      field.options.forEach(opt=>{
+        const o = document.createElement('option');
+        o.value = opt; o.textContent = opt;
+        if(opt === field.value) o.selected = true;
+        sel.appendChild(o);
+      });
+      tcState[field.id] = field.value;
+      sel.addEventListener('change', ()=> tcState[field.id] = sel.value);
+      wrap.appendChild(sel);
+    } else if(field.type === 'chips'){
+      tcState[field.id] = field.value;
+      const row = document.createElement('div');
+      row.className = 'tc-chip-row';
+      field.options.forEach(opt=>{
+        const chip = document.createElement('span');
+        chip.className = 'tc-chip' + (opt === field.value ? ' active' : '');
+        chip.textContent = opt;
+        chip.addEventListener('click', ()=>{
+          row.querySelectorAll('.tc-chip').forEach(c=>c.classList.remove('active'));
+          chip.classList.add('active');
+          tcState[field.id] = opt;
+        });
+        row.appendChild(chip);
+      });
+      wrap.appendChild(row);
+    } else if(field.type === 'chips-multi'){
+      tcState[field.id] = field.value.slice();
+      const row = document.createElement('div');
+      row.className = 'tc-chip-row';
+      field.options.forEach(opt=>{
+        const chip = document.createElement('span');
+        chip.className = 'tc-chip' + (field.value.includes(opt) ? ' active' : '');
+        chip.textContent = opt;
+        chip.addEventListener('click', ()=>{
+          const arr = tcState[field.id];
+          const idx = arr.indexOf(opt);
+          if(idx === -1){
+            if(chip.classList.contains('active')) return;
+            arr.push(opt);
+            chip.classList.add('active');
+          } else {
+            if(arr.length === 1) return;
+            arr.splice(idx,1);
+            chip.classList.remove('active');
+          }
+        });
+        row.appendChild(chip);
+      });
+      wrap.appendChild(row);
+    }
+    return wrap;
+  }
+
+  function openToolConfig(toolName){
+    closePlans();
+    tcCurrentTool = toolName;
+    tcState = {};
+    const config = TOOL_CONFIGS[toolName] || { intro:'Cuéntame qué necesitas.', fields:[{id:'tema', label:'¿Qué necesitas?', type:'textarea', placeholder:'Describe lo que necesitas…'}] };
+    tcIcon.textContent = TOOL_ICONS[toolName] || '✨';
+    tcTitle.textContent = toolName;
+    tcIntro.textContent = config.intro;
+    tcForm.innerHTML = '';
+    config.fields.forEach(field=> tcForm.appendChild(renderTcField(field)));
+
+    mainEl.classList.add('config-active');
+    toolConfigView.classList.add('show');
+  }
+  function closeToolConfig(){
+    mainEl.classList.remove('config-active');
+    toolConfigView.classList.remove('show');
+  }
+  toolConfigBackBtn.addEventListener('click', closeToolConfig);
+
+  tcGenerateBtn.addEventListener('click', ()=>{
+    const config = TOOL_CONFIGS[tcCurrentTool];
+    const lines = [];
+    if(config){
+      config.fields.forEach(field=>{
+        const val = tcState[field.id];
+        if(val === undefined || val === '' || (Array.isArray(val) && val.length === 0)) return;
+        const displayVal = Array.isArray(val) ? val.join(', ') : val;
+        lines.push(field.label.replace(/^¿|\?$/g,'') + ': ' + displayVal);
+      });
+    }
+    const summary = 'Quiero: ' + tcCurrentTool + (lines.length ? '\n' + lines.join('\n') : '');
+
+    composerInput.value = summary;
+    autoGrow(composerInput);
+    closeToolConfig();
+    handleSend();
+  });
+
+  // ---------- Panel state ----------
+  let selectedProfile = 'Estudiante';
+  document.querySelectorAll('#profileToggle button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#profileToggle button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedProfile = btn.dataset.profile;
+    });
+  });
+
+  let selectedTool = null;
+  document.querySelectorAll('.tool-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      selectedTool = btn.dataset.tool;
+      openToolConfig(selectedTool);
+    });
+  });
+
+  const levelSelect = document.getElementById('levelSelect');
+  const subjectInput = document.getElementById('subjectInput');
+  const langSelect = document.getElementById('langSelect');
+  const careerGroup = document.getElementById('careerGroup');
+  const careerInput = document.getElementById('careerInput');
+
+  function updateCareerVisibility(){
+    const isUniversity = levelSelect.value === 'Universidad';
+    careerGroup.style.display = isUniversity ? 'flex' : 'none';
+    if(isUniversity){
+      careerInput.focus();
+    } else {
+      careerInput.value = '';
+    }
+  }
+  levelSelect.addEventListener('change', updateCareerVisibility);
+  updateCareerVisibility();
+
+  const customLangGroup = document.getElementById('customLangGroup');
+  const customLangInput = document.getElementById('customLangInput');
+  const LANG_LABELS = { ES:'Español', EN:'English', FR:'Français', PT:'Português', IT:'Italiano', DE:'Deutsch', CA:'Català', EU:'Euskera', GL:'Galego', ZH:'中文', AR:'العربية' };
+
+  function updateCustomLangVisibility(){
+    const isOther = langSelect.value === 'OTHER';
+    customLangGroup.style.display = isOther ? 'flex' : 'none';
+    if(isOther) customLangInput.focus();
+  }
+  function getLangLabel(){
+    if(langSelect.value === 'OTHER') return customLangInput.value.trim() || 'el mismo idioma en que te escriba el usuario';
+    return LANG_LABELS[langSelect.value] || langSelect.value;
+  }
+  langSelect.addEventListener('change', updateCustomLangVisibility);
+  updateCustomLangVisibility();
+
+  let selectedDifficulty = 'Media';
+  document.querySelectorAll('#difficultyChips .opt-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('#difficultyChips .opt-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      selectedDifficulty = chip.dataset.difficulty;
+    });
+  });
+
+  let selectedLength = 'Detallada';
+  document.querySelectorAll('#lengthChips .opt-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('#lengthChips .opt-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      selectedLength = chip.dataset.length;
+    });
+  });
+
+  // ---------- Plan (demo) + Pensamiento profundo (dropdown junto al botón de enviar) ----------
+  let currentPlan = 'Gratis';
+  let selectedThinking = 'Estándar';
+  const thinkingBtn = document.getElementById('thinkingBtn');
+  const thinkingMenu = document.getElementById('thinkingMenu');
+  const thinkingItems = document.querySelectorAll('.thinking-item');
+
+  function applyPlanUnlocks(){
+    thinkingItems.forEach(item=>{
+      if(item.dataset.thinking === 'Profundo'){
+        const unlocked = currentPlan === 'Pro' || currentPlan === 'Premium';
+        item.classList.toggle('locked', !unlocked);
+        item.querySelector('.ti-icon').textContent = unlocked ? '✨' : '🔒';
+        const em = item.querySelector('em');
+        if(em) em.style.display = unlocked ? 'none' : 'inline';
+      }
+    });
+  }
+  applyPlanUnlocks();
+  refreshAccountPlanLabel();
+
+  function closeThinkingMenu(){ thinkingMenu.classList.remove('show'); }
+  thinkingBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    thinkingMenu.classList.toggle('show');
+  });
+  document.addEventListener('click', (e)=>{
+    if(!thinkingMenu.contains(e.target) && e.target !== thinkingBtn){ closeThinkingMenu(); }
+  });
+
+  thinkingItems.forEach(item=>{
+    item.addEventListener('click', ()=>{
+      if(item.classList.contains('locked')){
+        showToast('El pensamiento Profundo está disponible en los planes Pro y Premium');
+        closeThinkingMenu();
+        openPlans();
+        return;
+      }
+      thinkingItems.forEach(i=>i.classList.remove('active'));
+      item.classList.add('active');
+      selectedThinking = item.dataset.thinking;
+      thinkingBtn.classList.toggle('has-selection', selectedThinking !== 'Estándar');
+      thinkingBtn.title = 'Nivel de pensamiento: ' + selectedThinking;
+      closeThinkingMenu();
+    });
+  });
+
+
+  // ---------- Toast ----------
+  const toastEl = document.getElementById('toast');
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(()=> toastEl.classList.remove('show'), 1400);
+  }
+  function copyText(text){
+    navigator.clipboard.writeText(text).then(()=> showToast('Copiado')).catch(()=> showToast('No se pudo copiar'));
+  }
+
+  // ---------- System prompt ----------
+  const SYSTEM_PROMPT = `Eres GlowUp, un asistente educativo pensado tanto para estudiantes como para profesores de cualquier nivel (primaria, ESO, bachillerato, formación profesional, universidad y preparación de oposiciones).
+
+## CÓMO ADAPTARTE
+- Si el usuario es estudiante: prioriza que entienda el porqué, no solo la respuesta. Si te piden resolver un ejercicio o unos deberes, explica el razonamiento paso a paso y anímale a intentarlo por su cuenta; no te limites a dar la respuesta final sin explicación cuando parezca una tarea evaluable.
+- Si el usuario es profesor/a: prioriza que el material sea utilizable directamente en clase (formato claro, tiempos orientativos, soluciones incluidas cuando aplique).
+- Adapta el vocabulario, la profundidad y los ejemplos al nivel educativo y la asignatura indicados. El nivel educativo manda sobre el vocabulario: en Primaria y ESO usa un lenguaje sencillo y cercano, evitando jerga innecesaria; en Bachillerato empieza a introducir terminología propia de la asignatura explicándola brevemente la primera vez; en Formación profesional, Universidad y Oposición/adulto usa directamente el vocabulario técnico y la nomenclatura propia de la disciplina (términos específicos, notación, fórmulas, nombres correctos de conceptos, autores o corrientes) como lo haría un profesional o un manual universitario de esa asignatura, sin simplificarlo de más ni traducirlo a un lenguaje genérico.
+- Cuando el nivel sea Universidad y el usuario indique su carrera, usa ese dato para afinar aún más la respuesta: adapta los ejemplos, el enfoque y el grado de especialización al campo concreto de esa carrera (por ejemplo, un tema de estadística no se explica igual para Medicina que para Ingeniería o Económicas), y usa la terminología y las convenciones propias de esa disciplina universitaria.
+- Si se adjuntan fotos de apuntes, exámenes, libros de texto o ejercicios, léelas como fuente principal: extrae el contenido relevante y trabaja sobre él, indicando si algo no se lee con claridad.
+
+## TIPOS DE CONTENIDO QUE PUEDES GENERAR
+Según lo que pida el usuario (o la herramienta rápida seleccionada), genera, por ejemplo:
+- **Resumen**: ideas clave organizadas, sin relleno, siguiendo la estructura del tema original.
+- **Tarjetas de estudio**: pares pregunta/respuesta cortos, listos para repasar.
+- **Examen de práctica**: preguntas variadas (tipo test, desarrollo, verdadero/falso) con la solución y una breve explicación de cada respuesta al final.
+- Si el usuario pide un examen (o usa la herramienta "Examen de práctica") y todavía no ha dicho si lo quiere en PDF, antes de generarlo pregúntale explícitamente si quiere el examen como PDF descargable listo para imprimir, o si le vale en el chat. Genera el examen igualmente aunque preguntes, y recuérdale al final que puede pedirlo en PDF si aún no lo ha dicho. Si ya ha indicado que sí lo quiere en PDF, no vuelvas a preguntar, dalo por hecho.
+- **Plan de clase**: objetivos, duración orientativa por bloque, actividades y recursos necesarios.
+- **Rúbrica de evaluación**: criterios claros con niveles de logro y puntuación, en formato tabla.
+- **Corrección de texto**: comentarios constructivos, errores señalados con la corrección propuesta, y una valoración general.
+- **Explicación paso a paso**: desglose ordenado y didáctico de un concepto o problema.
+- **Rutina de estudio / hábitos de estudio**: inventa una rutina de estudio semanal realista y concreta para el estudiante, adaptada a su nivel educativo, asignatura(s) y dificultad indicados (aunque no tengas datos reales de su horario, propón una estructura razonable y dilo si es orientativa). Ajusta la rutina a las preferencias que el estudiante mencione en su mensaje (por ejemplo, si rinde mejor por la mañana o por la noche, qué días tiene libres o cuáles no, cuánto tiempo puede dedicar al día, si prefiere sesiones cortas y frecuentes o largas y pocas, o técnicas de estudio que ya le funcionan). Si no ha dado esas preferencias, propón una rutina general razonable y pregúntale por ellas para poder ajustarla mejor la próxima vez (puedes usar para eso la pregunta final de seguimiento). Incluye días y bloques horarios de estudio, descansos (por ejemplo con la técnica Pomodoro u otra), técnicas de repaso (repaso espaciado, autoevaluación, tarjetas de estudio), y 2-3 hábitos recomendados (sueño, orden del entorno de estudio, evitar distracciones). Si el perfil es "Profesor", en su lugar propón cómo guiar a sus alumnos a construir su propia rutina según las preferencias de cada uno.
+- Si no se especifica el tipo, interpreta la petición y responde de la forma más útil posible.
+
+## RAZONAMIENTO Y UTILIDAD
+- Antes de responder, piensa con calma qué es lo que realmente necesita esta persona (no solo lo que pide literalmente): identifica el objetivo real detrás de la pregunta, qué le falta para resolverla, y qué errores o dudas típicas suele haber en ese punto concreto del temario o de la tarea.
+- Razona el contenido paso a paso internamente antes de escribir la respuesta final: en temas técnicos o problemas (matemáticas, ciencias, lógica, código, etc.), resuelve o verifica el resultado tú mismo con cuidado antes de explicarlo, en vez de generar una explicación plausible sin comprobarla. Si detectas que un enfoque inicial no cuadra, corrígelo antes de responder en vez de dejar el error.
+- Prioriza siempre la utilidad real sobre la extensión o la apariencia: una respuesta corta pero precisa y accionable vale más que una larga y genérica. Da información concreta y aplicable (pasos, ejemplos, cifras, criterios claros), no generalidades que cualquiera podría haber escrito sin conocer la pregunta.
+- Si la petición es ambigua o le falta un dato clave para dar una buena respuesta, no lo inventes ni lo ignores: responde con la mejor interpretación razonable indicando qué has asumido, y pregunta por lo que falta si es imprescindible para acertar.
+
+## CALIDAD
+- Nunca inventes datos, fechas, fórmulas, autores o citas: si no estás seguro, dilo explícitamente en vez de inventarlo.
+- Sin relleno ni frases genéricas vacías.
+- Ajusta la extensión a lo solicitado (breve = directo al grano; detallada = con contexto y ejemplos) y la dificultad al nivel pedido.
+- Responde SIEMPRE en el idioma indicado en "Idioma de salida" de las [Opciones], en cada mensaje de la conversación, no solo al principio. Si el valor es "el mismo idioma en que te escriba el usuario" (porque ha elegido "Otro" sin especificarlo), detecta tú mismo el idioma en el que está escrito su mensaje y responde en ese idioma. Si el usuario escribe en un idioma distinto al indicado sin pedir explícitamente el cambio, respeta igualmente el idioma de salida indicado; si te pide explícitamente cambiar de idioma o traducir algo, hazlo a partir de ese momento. Si no se indica ningún idioma, usa español neutro.
+- Termina SIEMPRE tu respuesta con una única pregunta breve de seguimiento, directamente relacionada con la duda o el material que acabas de dar (por ejemplo, ofrecer profundizar en un punto, generar más preguntas de repaso, ajustar la dificultad, explicar algo de otra forma, o preparar el siguiente tema). No la omitas nunca, ni siquiera en mensajes de seguimiento cortos.
+
+## FORMATO DE SALIDA
+Responde en Markdown, sin preámbulo. Estructura la respuesta con encabezados de nivel 2 (##) para cada bloque temático de la respuesta (por ejemplo "## Resumen", "## Puntos clave", "## Preguntas de repaso", "## Solución"; adapta los títulos al contenido concreto). Usa listas para enumerar y tablas Markdown cuando el contenido sea tabular (rúbricas, horarios, comparativas, tarjetas de estudio con pregunta/respuesta). La pregunta de seguimiento final va SIEMPRE en su propia sección "## ¿Sigo ayudando?" al final de la respuesta, con una sola frase. Si respondes a un mensaje de seguimiento sobre algo ya generado (p. ej. "hazlo más breve", "añade más preguntas"), aplica el cambio sobre lo anterior en vez de empezar de cero, pero mantén igualmente esa sección final.`;
+
+  // ---------- Conversations state ----------
+  let conversations = [];
+  let currentConvId = null;
+  let convCounter = 0;
+
+  const convListEl = document.getElementById('convList');
+  const convTitleEl = document.getElementById('convTitle');
+  const chatInner = document.getElementById('chatInner');
+  const welcomeState = document.getElementById('welcomeState');
+
+  function renderConvList(){
+    if(!conversations.length){
+      convListEl.innerHTML = '<div class="conv-empty">Aún no hay sesiones. Elige una herramienta o escribe abajo para empezar.</div>';
+      return;
+    }
+    convListEl.innerHTML = '';
+    conversations.slice().reverse().forEach(c=>{
+      const div = document.createElement('div');
+      div.className = 'conv-item' + (c.id === currentConvId ? ' active' : '');
+      div.textContent = c.title;
+      div.addEventListener('click', ()=> switchConversation(c.id));
+      convListEl.appendChild(div);
+    });
+  }
+
+  function switchConversation(id){
+    currentConvId = id;
+    const conv = conversations.find(c=>c.id===id);
+    convTitleEl.textContent = conv.title;
+    chatInner.innerHTML = '';
+    conv.displayMessages.forEach(m => chatInner.appendChild(m.el));
+    renderConvList();
+    setComposerLocked(!!conv.locked);
+    scrollToBottom();
+  }
+
+  function newConversation(){
+    currentConvId = null;
+    convTitleEl.textContent = 'Nueva sesión';
+    chatInner.innerHTML = '';
+    chatInner.appendChild(welcomeState);
+    clearAttachments();
+    document.getElementById('composerInput').value = '';
+    document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
+    selectedTool = null;
+    setComposerLocked(false);
+    renderConvList();
+  }
+  document.getElementById('newChatBtn').addEventListener('click', newConversation);
+
+  // ---------- Free-plan session response limit ----------
+  const FREE_SESSION_RESPONSE_LIMIT = 10;
+
+  function setComposerLocked(locked){
+    composerInput.disabled = locked;
+    document.getElementById('sendBtn').disabled = locked;
+    document.getElementById('attachBtn').disabled = locked;
+    micBtn.disabled = locked;
+    composerInput.placeholder = locked
+      ? 'Límite de esta sesión alcanzado — abre una nueva sesión para seguir escribiendo'
+      : 'Escribe tu duda, pega un tema o pide un examen, resumen, plan de clase…';
+  }
+
+  function buildSessionLockedNotice(){
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar glow-ring';
+    row.appendChild(avatar);
+    const box = document.createElement('div');
+    box.className = 'session-locked-notice';
+    box.innerHTML = '<span>Has llegado al límite de ' + FREE_SESSION_RESPONSE_LIMIT + ' respuestas de esta sesión en el plan Gratis.</span>';
+    const btn = document.createElement('button');
+    btn.className = 'session-locked-btn';
+    btn.textContent = '+ Abrir nueva sesión';
+    btn.addEventListener('click', newConversation);
+    box.appendChild(btn);
+    row.appendChild(box);
+    return row;
+  }
+
+  function scrollToBottom(){
+    const scroll = document.getElementById('chatScroll');
+    scroll.scrollTop = scroll.scrollHeight;
+  }
+
+  // ---------- Suggestion chips ----------
+  document.querySelectorAll('.suggestion-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const fill = chip.dataset.fill;
+      const input = document.getElementById('composerInput');
+      if(fill === 'resumen'){
+        input.value = 'Resume este tema: ';
+        input.focus();
+      } else if(fill === 'examen'){
+        input.value = 'Crea un examen de práctica sobre: ';
+        input.focus();
+      } else if(fill === 'photo'){
+        document.getElementById('fileInput').click();
+      }
+      autoGrow(input);
+    });
+  });
+
+  // ---------- Attachments ----------
+  let attachments = [];
+  const attachPreview = document.getElementById('attachPreview');
+  const fileInput = document.getElementById('fileInput');
+  document.getElementById('attachBtn').addEventListener('click', ()=> fileInput.click());
+
+  fileInput.addEventListener('change', async (e)=>{
+    const files = Array.from(e.target.files || []);
+    for(const file of files){
+      if(!file.type.startsWith('image/')) continue;
+      const base64 = await fileToBase64(file);
+      attachments.push({ file, base64, mediaType: file.type, previewUrl: URL.createObjectURL(file) });
+    }
+    fileInput.value = '';
+    renderAttachPreview();
+  });
+
+  function fileToBase64(file){
+    return new Promise((resolve, reject)=>{
+      const r = new FileReader();
+      r.onload = ()=> resolve(r.result.split(',')[1]);
+      r.onerror = ()=> reject(new Error('No se pudo leer la imagen'));
+      r.readAsDataURL(file);
+    });
+  }
+
+  function renderAttachPreview(){
+    attachPreview.innerHTML = '';
+    attachments.forEach((att, idx)=>{
+      const thumb = document.createElement('div');
+      thumb.className = 'attach-thumb';
+      const img = document.createElement('img');
+      img.src = att.previewUrl;
+      thumb.appendChild(img);
+      const rm = document.createElement('button');
+      rm.className = 'attach-remove';
+      rm.textContent = '✕';
+      rm.addEventListener('click', ()=>{ attachments.splice(idx,1); renderAttachPreview(); });
+      thumb.appendChild(rm);
+      attachPreview.appendChild(thumb);
+    });
+  }
+  function clearAttachments(){ attachments = []; renderAttachPreview(); }
+
+  // ---------- Voice input (dictado) ----------
+  const composerInput = document.getElementById('composerInput');
+  const micBtn = document.getElementById('micBtn');
+  const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognizer = null;
+  let isRecording = false;
+
+  if(!SpeechRecognitionCtor){
+    micBtn.style.opacity = '0.4';
+    micBtn.title = 'Dictado por voz no disponible en este navegador';
+  } else {
+    recognizer = new SpeechRecognitionCtor();
+    recognizer.lang = 'es-ES';
+    recognizer.continuous = true;
+    recognizer.interimResults = true;
+    let baseText = '';
+
+    recognizer.addEventListener('start', ()=>{
+      isRecording = true;
+      micBtn.classList.add('recording');
+      baseText = composerInput.value ? composerInput.value + ' ' : '';
+    });
+    recognizer.addEventListener('result', (e)=>{
+      let transcript = '';
+      for(let i = 0; i < e.results.length; i++){ transcript += e.results[i][0].transcript; }
+      composerInput.value = (baseText + transcript).trim();
+      autoGrow(composerInput);
+    });
+    recognizer.addEventListener('end', ()=>{ isRecording = false; micBtn.classList.remove('recording'); });
+    recognizer.addEventListener('error', ()=>{
+      isRecording = false;
+      micBtn.classList.remove('recording');
+      showToast('No se pudo escuchar el micrófono');
+    });
+    micBtn.addEventListener('click', ()=>{
+      if(isRecording){ recognizer.stop(); } else { try{ recognizer.start(); } catch(e){} }
+    });
+  }
+
+  // ---------- Voice output ----------
+  let currentUtterance = null;
+  function stripForSpeech(section){
+    return section.title + '. ' + section.content.replace(/\|/g, ', ').replace(/[#*_\`>-]/g, '').replace(/\n+/g, '. ');
+  }
+  function toggleSpeak(sections, lang, btn){
+    if(!window.speechSynthesis){ showToast('Lectura en voz alta no disponible en este navegador'); return; }
+    if(currentUtterance && speechSynthesis.speaking){
+      speechSynthesis.cancel();
+      document.querySelectorAll('.speak-btn.speaking').forEach(b=> b.classList.remove('speaking'));
+      currentUtterance = null;
+      if(btn) btn.textContent = '🔊 Escuchar';
+      return;
+    }
+    const fullText = sections.map(stripForSpeech).join('. ');
+    const utter = new SpeechSynthesisUtterance(fullText);
+    const langMap = { ES:'es-ES', EN:'en-US', FR:'fr-FR', PT:'pt-PT', IT:'it-IT', DE:'de-DE', CA:'ca-ES', EU:'eu-ES', GL:'gl-ES', ZH:'zh-CN', AR:'ar-SA' };
+    if(langMap[lang]) utter.lang = langMap[lang];
+    utter.rate = 1;
+    utter.onstart = ()=>{ if(btn){ btn.classList.add('speaking'); btn.textContent = '⏸ Detener'; } };
+    utter.onend = ()=>{ if(btn){ btn.classList.remove('speaking'); btn.textContent = '🔊 Escuchar'; } currentUtterance = null; };
+    utter.onerror = ()=>{ if(btn){ btn.classList.remove('speaking'); btn.textContent = '🔊 Escuchar'; } currentUtterance = null; };
+    currentUtterance = utter;
+    speechSynthesis.speak(utter);
+  }
+
+  // ---------- PDF export ----------
+  function downloadAsPDF(sections){
+    if(!window.jspdf || !window.jspdf.jsPDF){
+      showToast('No se pudo cargar el generador de PDF');
+      return;
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const marginX = 48;
+    const marginTop = 56;
+    const marginBottom = 56;
+    const contentWidth = pageWidth - marginX * 2;
+    let y = marginTop;
+
+    function ensureSpace(lineHeight){
+      if(y + lineHeight > pageHeight - marginBottom){
+        doc.addPage();
+        y = marginTop;
+      }
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(17);
+    const titleLines = doc.splitTextToSize('GlowUp', contentWidth);
+    titleLines.forEach(line=>{ ensureSpace(22); doc.text(line, marginX, y); y += 22; });
+    y += 6;
+
+    sections.forEach(sec=>{
+      ensureSpace(20);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12.5);
+      const headingLines = doc.splitTextToSize(sec.title, contentWidth);
+      headingLines.forEach(line=>{ ensureSpace(18); doc.text(line, marginX, y); y += 18; });
+      y += 2;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10.5);
+      const cleaned = sec.content
+        .replace(/\*\*(.+?)\*\*/g, '$1')
+        .replace(/\*(.+?)\*/g, '$1')
+        .replace(/\`(.+?)\`/g, '$1')
+        .replace(/^\s*\|.*\|\s*$/gm, m => m.replace(/\|/g, '   ').replace(/-{2,}/g,''))
+        .trim();
+
+      const paragraphs = cleaned.split(/\n{1,}/).filter(p=>p.trim());
+      paragraphs.forEach(p=>{
+        const lines = doc.splitTextToSize(p.trim(), contentWidth);
+        lines.forEach(line=>{ ensureSpace(15); doc.text(line, marginX, y); y += 15; });
+        y += 5;
+      });
+      y += 10;
+    });
+
+    doc.save('glowup-examen.pdf');
+  }
+
+  // ---------- Reminders: link to the phone's calendar/reminder apps via .ics ----------
+  const reminderModal = document.getElementById('reminderModal');
+  const remTitleInput = document.getElementById('remTitleInput');
+  const remDateInput = document.getElementById('remDateInput');
+  const remTimeInput = document.getElementById('remTimeInput');
+  const remCancelBtn = document.getElementById('remCancelBtn');
+  const remConfirmBtn = document.getElementById('remConfirmBtn');
+
+  function openReminderModal(suggestedTitle){
+    remTitleInput.value = suggestedTitle || 'Recordatorio de GlowUp';
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    remDateInput.value = d.toISOString().slice(0,10);
+    remTimeInput.value = '18:00';
+    reminderModal.classList.add('show');
+  }
+  function closeReminderModal(){ reminderModal.classList.remove('show'); }
+  remCancelBtn.addEventListener('click', closeReminderModal);
+  reminderModal.addEventListener('click', (e)=>{ if(e.target === reminderModal) closeReminderModal(); });
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function toICSDate(date){
+    return date.getUTCFullYear() + pad(date.getUTCMonth()+1) + pad(date.getUTCDate()) + 'T' + pad(date.getUTCHours()) + pad(date.getUTCMinutes()) + '00Z';
+  }
+  function buildICS(title, dateStr, timeStr){
+    const start = new Date(dateStr + 'T' + (timeStr || '18:00') + ':00');
+    const end = new Date(start.getTime() + 30*60000);
+    const now = new Date();
+    const uid = 'glowup-' + now.getTime() + '@glowup.app';
+    const escapedTitle = (title || 'Recordatorio de GlowUp').replace(/[,;]/g, '\\$&');
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//GlowUp//Recordatorios//ES',
+      'CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT',
+      'UID:' + uid,
+      'DTSTAMP:' + toICSDate(now),
+      'DTSTART:' + toICSDate(start),
+      'DTEND:' + toICSDate(end),
+      'SUMMARY:' + escapedTitle,
+      'DESCRIPTION:Recordatorio creado desde GlowUp.',
+      'BEGIN:VALARM',
+      'ACTION:DISPLAY',
+      'DESCRIPTION:' + escapedTitle,
+      'TRIGGER:-PT30M',
+      'END:VALARM',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+  }
+
+  remConfirmBtn.addEventListener('click', ()=>{
+    if(!remDateInput.value){ showToast('Elige una fecha para el recordatorio'); return; }
+    const ics = buildICS(remTitleInput.value, remDateInput.value, remTimeInput.value);
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'recordatorio-glowup.ics';
+    a.click();
+    URL.revokeObjectURL(url);
+    closeReminderModal();
+    showToast('Recordatorio descargado: ábrelo desde tu móvil para añadirlo al calendario');
+  });
+
+  // Share the material to any app installed on the phone (WhatsApp, Notas, Calendario…) via the native share sheet
+  async function shareToPhone(title, text){
+    if(navigator.share){
+      try{
+        await navigator.share({ title: 'GlowUp — ' + (title || 'material de estudio'), text: text });
+      } catch(err){
+        if(err && err.name !== 'AbortError') showToast('No se pudo compartir');
+      }
+    } else {
+      copyText(text);
+      showToast('Tu navegador no permite compartir directo: copiado, pégalo en la app que quieras');
+    }
+  }
+
+  // ---------- Composer auto-grow ----------
+  function autoGrow(el){
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+  }
+  composerInput.addEventListener('input', ()=> autoGrow(composerInput));
+  composerInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); handleSend(); }
+  });
+  document.getElementById('sendBtn').addEventListener('click', handleSend);
+
+  // ---------- Message bubble builders ----------
+  function buildUserBubble(text, images){
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+    const col = document.createElement('div');
+    col.style.display = 'flex';
+    col.style.flexDirection = 'column';
+    col.style.alignItems = 'flex-end';
+    col.style.maxWidth = '70%';
+
+    if(images && images.length){
+      const thumbs = document.createElement('div');
+      thumbs.className = 'img-thumbs';
+      images.forEach(img=>{ const im = document.createElement('img'); im.src = img.previewUrl; thumbs.appendChild(im); });
+      col.appendChild(thumbs);
+    }
+    if(text && text.trim()){
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble user';
+      bubble.textContent = text;
+      col.appendChild(bubble);
+    }
+    row.appendChild(col);
+    return row;
+  }
+
+  function buildThinkingBubble(){
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar glow-ring';
+    row.appendChild(avatar);
+    const dots = document.createElement('div');
+    dots.className = 'thinking-dots';
+    dots.innerHTML = '<span></span><span></span><span></span>';
+    row.appendChild(dots);
+    return row;
+  }
+
+  function buildErrorBubble(msg){
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar glow-ring';
+    row.appendChild(avatar);
+    const box = document.createElement('div');
+    box.className = 'err-inline';
+    box.textContent = msg;
+    row.appendChild(box);
+    return row;
+  }
+
+  // ---------- Generic markdown parsing ----------
+  function inlineMd(str){
+    return str
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/\`(.+?)\`/g, '<code>$1</code>');
+  }
+  function mdTableToHtml(block){
+    const lines = block.trim().split('\n').filter(l=>l.trim().startsWith('|'));
+    if(lines.length < 2) return null;
+    const rows = lines.filter((l,i)=> i !== 1);
+    let html = '<table>';
+    rows.forEach((row,i)=>{
+      const cells = row.split('|').slice(1,-1).map(c=>c.trim());
+      html += '<tr>' + cells.map(c => (i===0 ? '<th>' : '<td>') + inlineMd(c) + (i===0 ? '</th>' : '</td>')).join('') + '</tr>';
+    });
+    html += '</table>';
+    return html;
+  }
+  function renderSectionContent(title, raw){
+    raw = raw.trim();
+    if(!raw) return '<p class="missing-note">[Sin contenido generado para esta sección]</p>';
+
+    const pipeLines = raw.split('\n').filter(l => (l.match(/\|/g)||[]).length >= 2);
+    if(pipeLines.length >= 2){
+      const table = mdTableToHtml(raw);
+      if(table) return table;
+    }
+
+    const lines = raw.split('\n').map(l=>l.trim()).filter(Boolean);
+    const bulletLines = lines.filter(l => /^[-*•]\s+/.test(l));
+    if(bulletLines.length && bulletLines.length === lines.length){
+      return '<ul>' + bulletLines.map(l => '<li>' + inlineMd(l.replace(/^[-*•]\s+/, '')) + '</li>').join('') + '</ul>';
+    }
+    const numberedLines = lines.filter(l => /^\d+[.)]\s+/.test(l));
+    if(numberedLines.length && numberedLines.length === lines.length){
+      return '<ol>' + numberedLines.map(l => '<li>' + inlineMd(l.replace(/^\d+[.)]\s+/, '')) + '</li>').join('') + '</ol>';
+    }
+
+    return raw.split(/\n{2,}/).map(p => '<p>' + inlineMd(p.replace(/\n/g,' ')) + '</p>').join('');
+  }
+  function parseSections(markdown){
+    const body = markdown.trim();
+    const sectionSplit = body.split(/\n(?=##\s+)/);
+    const sections = [];
+    sectionSplit.forEach(sec=>{
+      sec = sec.trim();
+      if(!sec) return;
+      const titleMatch = sec.match(/^##\s+(.+)/);
+      if(titleMatch){
+        const title = titleMatch[1].trim();
+        const content = sec.replace(/^##\s+.+\n?/, '');
+        sections.push({ title, content });
+      } else if(sections.length === 0){
+        sections.push({ title: 'Respuesta', content: sec });
+      }
+    });
+    return sections.length ? sections : [{ title: 'Respuesta', content: markdown }];
+  }
+
+  function buildAssistantContentEl(sections, lang){
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar glow-ring';
+    row.appendChild(avatar);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'bubble assistant-wrap';
+    const card = document.createElement('div');
+    card.className = 'ficha-card';
+
+    const toolbar = document.createElement('div');
+    toolbar.className = 'ficha-toolbar';
+    const actions = document.createElement('div');
+    actions.className = 'ficha-actions';
+
+    const fullRaw = sections.map(s => '## ' + s.title + '\n' + s.content.trim()).join('\n\n');
+
+    const speakBtn = document.createElement('button');
+    speakBtn.className = 'mini speak-btn';
+    speakBtn.textContent = '🔊 Escuchar';
+    speakBtn.addEventListener('click', ()=> toggleSpeak(sections, lang, speakBtn));
+
+    const copyAllBtn = document.createElement('button');
+    copyAllBtn.className = 'mini';
+    copyAllBtn.textContent = 'Copiar todo';
+    copyAllBtn.addEventListener('click', ()=> copyText(fullRaw));
+
+    const dlBtn = document.createElement('button');
+    dlBtn.className = 'mini';
+    dlBtn.textContent = 'Descargar .md';
+    dlBtn.addEventListener('click', ()=>{
+      const blob = new Blob([fullRaw], {type:'text/markdown'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'glowup-material.md';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    const pdfBtn = document.createElement('button');
+    pdfBtn.className = 'mini';
+    pdfBtn.textContent = '📄 Descargar PDF';
+    pdfBtn.addEventListener('click', ()=> downloadAsPDF(sections));
+
+    const reminderBtn = document.createElement('button');
+    reminderBtn.className = 'mini';
+    reminderBtn.textContent = '📅 Recordatorio';
+    reminderBtn.addEventListener('click', ()=>{
+      const suggestedTitle = sections[0] ? ('Repasar: ' + sections[0].title) : 'Recordatorio de GlowUp';
+      openReminderModal(suggestedTitle);
+    });
+
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'mini';
+    shareBtn.textContent = '📤 Enviar al móvil';
+    shareBtn.addEventListener('click', ()=> shareToPhone(sections[0] ? sections[0].title : 'GlowUp', fullRaw));
+
+    actions.appendChild(speakBtn);
+    actions.appendChild(copyAllBtn);
+    actions.appendChild(dlBtn);
+    actions.appendChild(pdfBtn);
+    actions.appendChild(reminderBtn);
+    actions.appendChild(shareBtn);
+    toolbar.appendChild(actions);
+    card.appendChild(toolbar);
+
+    const body = document.createElement('div');
+    body.className = 'ficha-body';
+    sections.forEach(sec=>{
+      const secEl = document.createElement('div');
+      secEl.className = 'f-section';
+      const h3 = document.createElement('h3');
+      h3.textContent = sec.title;
+      secEl.appendChild(h3);
+      const content = document.createElement('div');
+      content.className = 'f-content';
+      content.innerHTML = renderSectionContent(sec.title, sec.content);
+      secEl.appendChild(content);
+      const copyLink = document.createElement('span');
+      copyLink.className = 'sec-copy';
+      copyLink.textContent = 'Copiar sección';
+      copyLink.addEventListener('click', ()=> copyText(sec.title + '\n' + sec.content.trim()));
+      secEl.appendChild(copyLink);
+      body.appendChild(secEl);
+    });
+    card.appendChild(body);
+    wrap.appendChild(card);
+    row.appendChild(wrap);
+    return row;
+  }
+
+  // ---------- API call ----------
+  async function callClaude(apiMessages, useWebSearch){
+    const body = {
+      model: "claude-sonnet-4-6",
+      max_tokens: 1000,
+      system: SYSTEM_PROMPT,
+      messages: apiMessages
+    };
+    if(useWebSearch){ body.tools = [{ type: "web_search_20250305", name: "web_search" }]; }
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if(!response.ok) throw new Error('La API respondió con estado ' + response.status);
+    const data = await response.json();
+    const textBlocks = (data.content || []).filter(b => b.type === "text").map(b => b.text);
+    return textBlocks.join('\n');
+  }
+
+  // ---------- Send flow ----------
+  async function handleSend(){
+    const text = composerInput.value.trim();
+    if(!text && attachments.length === 0) return;
+
+    const activeConvCheck = currentConvId !== null ? conversations.find(c=>c.id === currentConvId) : null;
+    if(activeConvCheck && activeConvCheck.locked) return;
+
+    const sendBtn = document.getElementById('sendBtn');
+    sendBtn.disabled = true;
+
+    if(currentConvId === null){
+      convCounter++;
+      currentConvId = convCounter;
+      conversations.push({ id: currentConvId, title: 'Sesión ' + currentConvId, apiMessages: [], displayMessages: [] });
+      chatInner.innerHTML = '';
+    }
+    const conv = conversations.find(c=>c.id === currentConvId);
+    const isFirstMessage = conv.apiMessages.length === 0;
+    const currentAttachments = attachments.slice();
+    const currentLang = langSelect.value;
+    const langLabel = getLangLabel();
+
+    const contentBlocks = [];
+    currentAttachments.forEach(att=>{
+      contentBlocks.push({ type: 'image', source: { type: 'base64', media_type: att.mediaType, data: att.base64 } });
+    });
+
+    let messageText = text;
+    if(isFirstMessage){
+      const options = [];
+      options.push('Perfil: ' + selectedProfile);
+      options.push('Nivel educativo: ' + levelSelect.value);
+      if(subjectInput.value.trim()) options.push('Asignatura: ' + subjectInput.value.trim());
+      if(levelSelect.value === 'Universidad' && careerInput.value.trim()) options.push('Carrera universitaria: ' + careerInput.value.trim());
+      if(selectedTool) options.push('Tipo de ayuda solicitada: ' + selectedTool);
+      options.push('Dificultad: ' + selectedDifficulty);
+      options.push('Extensión deseada: ' + selectedLength);
+      options.push('Nivel de pensamiento/razonamiento solicitado: ' + selectedThinking + (selectedThinking === 'Profundo' ? ' (analiza el problema con más profundidad y varios ángulos antes de responder)' : selectedThinking === 'Avanzado' ? ' (razona con algo más de detalle de lo habitual)' : ''));
+      options.push('Idioma de salida: ' + langLabel + (langSelect.value === 'OTHER' ? '' : ' (usa siempre este idioma en toda la conversación, salvo que el usuario pida explícitamente cambiarlo)'));
+      if(currentAttachments.length) options.push('Se adjuntan ' + currentAttachments.length + ' foto(s) (apuntes/examen/libro) como fuente principal.');
+      messageText = (text ? text + '\n\n' : (currentAttachments.length ? 'Trabaja a partir de las fotos adjuntas.\n\n' : '')) + '[Opciones]\n' + options.join('\n');
+    } else {
+      messageText = text + '\n\n[Idioma de salida: ' + langLabel + ']';
+    }
+    contentBlocks.push({ type: 'text', text: messageText });
+
+    conv.apiMessages.push({ role: 'user', content: contentBlocks });
+    const userEl = buildUserBubble(text, currentAttachments);
+    conv.displayMessages.push({ el: userEl });
+    chatInner.appendChild(userEl);
+
+    composerInput.value = '';
+    autoGrow(composerInput);
+    clearAttachments();
+    scrollToBottom();
+
+    const thinkingEl = buildThinkingBubble();
+    chatInner.appendChild(thinkingEl);
+    scrollToBottom();
+
+    const useWebSearch = /https?:\/\//i.test(text);
+
+    try{
+      const markdown = await callClaude(conv.apiMessages, useWebSearch);
+      conv.apiMessages.push({ role: 'assistant', content: markdown });
+
+      thinkingEl.remove();
+      const sections = parseSections(markdown);
+      const assistantEl = buildAssistantContentEl(sections, currentLang);
+      conv.displayMessages.push({ el: assistantEl });
+      chatInner.appendChild(assistantEl);
+
+      if(isFirstMessage){
+        let label = (selectedTool || 'Sesión') + (subjectInput.value.trim() ? ' · ' + subjectInput.value.trim() : '');
+        conv.title = label.slice(0,42);
+        convTitleEl.textContent = conv.title;
+      }
+      renderConvList();
+
+      const responseCount = conv.apiMessages.filter(m => m.role === 'assistant').length;
+      if(responseCount >= FREE_SESSION_RESPONSE_LIMIT){
+        conv.locked = true;
+        chatInner.appendChild(buildSessionLockedNotice());
+      }
+    } catch(err){
+      thinkingEl.remove();
+      const errEl = buildErrorBubble('No se ha podido generar la respuesta: ' + err.message + '. Inténtalo de nuevo.');
+      chatInner.appendChild(errEl);
+    } finally {
+      setComposerLocked(!!(conv && conv.locked));
+      scrollToBottom();
+    }
+  }
+
+})();
+</script>
+
+</body>
+</html>
