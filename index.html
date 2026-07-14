@@ -2395,54 +2395,71 @@ Responde en Markdown, sin preámbulo. Estructura la respuesta con encabezados de
   }
 
   // ---------- API call ----------
-  async function callClaude(apiMessages, useWebSearch){
-   // 1. Buscamos si ya tienes la clave guardada en tu navegador
-   let apiKey = localStorage.getItem("anthropic_api_key");
+ // ---------- API call (Gemini Gratis) ----------
+ async function callClaude(apiMessages, useWebSearch){
+   // 1. Buscamos si ya tienes la clave de Gemini guardada en tu navegador
+   let apiKey = localStorage.getItem("gemini_api_key");
 
-   // 2. Si no la tienes guardada, te la pedimos con una cajita en pantalla
+   // 2. Si no la tienes guardada, te la pedimos
    if (!apiKey) {
-     apiKey = prompt("Por favor, introduce tu API Key de Anthropic (se guardará de forma segura en tu navegador y GitHub no la bloqueará):");
+     apiKey = prompt("Por favor, introduce tu API Key de Google Gemini (¡Es GRATIS!):");
      if (apiKey) {
-       localStorage.setItem("anthropic_api_key", apiKey.trim());
+       localStorage.setItem("gemini_api_key", apiKey.trim());
      } else {
        throw new Error("No se ha introducido ninguna API Key.");
      }
    }
 
-   const body = {
-     model: "claude-3-5-sonnet-20240620", // Nombre del modelo oficial para Claude 3.5 Sonnet
-     max_tokens: 1000,
-     system: SYSTEM_PROMPT,
-     messages: apiMessages
-   };
-   
-   if(useWebSearch){ 
-     body.tools = [{ type: "web_search_20250305", name: "web_search" }]; 
-   }
+   // 3. Convertimos el formato de mensajes de Claude al formato que entiende Gemini
+   const geminiMessages = apiMessages.map(msg => {
+     let textContent = "";
+     if (typeof msg.content === "string") {
+       textContent = msg.content;
+     } else if (Array.isArray(msg.content)) {
+       textContent = msg.content.map(part => part.text || "").join("\n");
+     }
+     
+     return {
+       role: msg.role === "assistant" ? "model" : "user",
+       parts: [{ text: textContent }]
+     };
+   });
 
-   // 3. Hacemos la llamada segura usando el puente de CORS Anywhere y tus cabeceras
-   const response = await fetch("https://cors-anywhere.herokuapp.com/https://api.anthropic.com/v1/messages", {
+   const body = {
+     contents: geminiMessages,
+     systemInstruction: {
+       parts: [{ text: SYSTEM_PROMPT }]
+     },
+     generationConfig: {
+       maxOutputTokens: 1000
+     }
+   };
+
+   // 4. Hacemos la llamada directa a Gemini (¡Google permite llamadas directas sin CORS!)
+   const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
      method: "POST",
-     headers: { 
-       "Content-Type": "application/json",
-       "x-api-key": apiKey,
-       "anthropic-version": "2023-06-01",
-       "anthropic-dangerous-direct-browser-access": "true"
+     headers: {
+       "Content-Type": "application/json"
      },
      body: JSON.stringify(body)
    });
 
    if(!response.ok) {
-     // Si da error de permisos (clave incorrecta o caducada), borramos la guardada para volver a pedirla la próxima vez
-     if (response.status === 401 || response.status === 403) {
-       localStorage.removeItem("anthropic_api_key");
+     // Si la clave es incorrecta, la borramos para que la vuelva a pedir
+     if (response.status === 400 || response.status === 403) {
+       localStorage.removeItem("gemini_api_key");
      }
-     throw new Error('La API respondió con estado ' + response.status);
+     throw new Error('La API de Gemini respondió con estado ' + response.status);
    }
 
    const data = await response.json();
-   const textBlocks = (data.content || []).filter(b => b.type === "text").map(b => b.text);
-   return textBlocks.join('\n');
+   
+   // 5. Extraemos el texto de la respuesta de Gemini
+   try {
+     return data.candidates[0].content.parts[0].text;
+   } catch (e) {
+     throw new Error("Error al procesar la respuesta de Gemini: " + e.message);
+   }
  }
 
   // ---------- Send flow ----------
