@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J.A.R.V.I.S</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #02070D;
+    --holo: #3FE3FF;
+    --holo-soft: rgba(63,227,255,0.14);
+    --holo-dim: rgba(63,227,255,0.45);
+    --gold: #FFB23F;
+    --red: #FF4D5E;
+    --text: #D9F7FF;
+    --text-soft: #7FB6C6;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; overflow:hidden; }
+  body{
+    background: radial-gradient(ellipse at 50% 40%, #06202c 0%, var(--bg) 70%);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    user-select: none;
+  }
+  #scene, #hud{ position:fixed; inset:0; width:100%; height:100%; display:block; }
+  #hud{ pointer-events:none; z-index:2; }
+  #scene{ z-index:1; touch-action:none; }
+
+  /* ---------- Frame / corners ---------- */
+  .frame{ position:fixed; inset:12px; pointer-events:none; z-index:3; }
+  .frame i{ position:absolute; width:34px; height:34px; border:2px solid var(--holo); opacity:.7; }
+  .frame i:nth-child(1){ top:0; left:0; border-right:none; border-bottom:none; }
+  .frame i:nth-child(2){ top:0; right:0; border-left:none; border-bottom:none; }
+  .frame i:nth-child(3){ bottom:0; left:0; border-right:none; border-top:none; }
+  .frame i:nth-child(4){ bottom:0; right:0; border-left:none; border-top:none; }
+
+  /* ---------- Header ---------- */
+  header{
+    position:fixed; top:22px; left:28px; right:28px; z-index:4;
+    display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+  }
+  .title{
+    font-family:'Orbitron', sans-serif; font-weight:700; letter-spacing:.32em;
+    font-size:20px; color:var(--holo); text-shadow:0 0 12px var(--holo);
+  }
+  .title small{ display:block; font-size:9px; letter-spacing:.3em; color:var(--text-soft); text-shadow:none; margin-top:3px; }
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; }
+  .chip{
+    font-family:'Orbitron', sans-serif; font-size:10px; letter-spacing:.14em;
+    padding:6px 10px; border:1px solid var(--holo-dim); background:var(--holo-soft);
+    color:var(--text-soft); cursor:pointer; clip-path: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+  }
+  .chip b{ display:inline-block; width:7px; height:7px; border-radius:50%; background:#335; margin-right:7px; vertical-align:1px; }
+  .chip.on{ color:var(--text); border-color:var(--holo); }
+  .chip.on b{ background:var(--holo); box-shadow:0 0 8px var(--holo); }
+  .chip.warn b{ background:var(--gold); box-shadow:0 0 8px var(--gold); }
+  .chip.err b{ background:var(--red); box-shadow:0 0 8px var(--red); }
+  .clock{ margin-left:auto; font-family:'Orbitron', sans-serif; font-size:13px; letter-spacing:.2em; color:var(--text-soft); }
+  a.back{ color:var(--text-soft); font-size:13px; text-decoration:none; letter-spacing:.1em; }
+  a.back:hover{ color:var(--holo); }
+
+  /* ---------- Panels ---------- */
+  .panel{
+    position:fixed; z-index:4; width:260px;
+    background: linear-gradient(180deg, rgba(4,30,42,.72), rgba(2,12,20,.6));
+    border:1px solid var(--holo-dim); padding:12px 14px;
+    clip-path: polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);
+    backdrop-filter: blur(3px);
+  }
+  .panel h3{
+    margin:0 0 8px; font-family:'Orbitron', sans-serif; font-size:10px; letter-spacing:.24em;
+    color:var(--holo); font-weight:500;
+  }
+  #objPanel{ top:96px; left:28px; }
+  #logPanel{ top:96px; right:28px; width:300px; }
+  #objList{ list-style:none; margin:0; padding:0; max-height:30vh; overflow:auto; }
+  #objList li{
+    display:flex; justify-content:space-between; padding:5px 8px; margin-bottom:3px;
+    font-size:14px; letter-spacing:.06em; cursor:pointer; border-left:2px solid transparent;
+  }
+  #objList li:hover{ background:var(--holo-soft); }
+  #objList li.sel{ border-left-color:var(--holo); background:var(--holo-soft); color:#fff; }
+  #objList li span:last-child{ color:var(--text-soft); font-size:12px; }
+  .stats{ margin-top:10px; font-size:13px; color:var(--text-soft); line-height:1.55; }
+  .stats b{ color:var(--text); font-weight:600; }
+  #log{ max-height:42vh; overflow:auto; font-size:14px; line-height:1.4; }
+  #log div{ margin-bottom:7px; }
+  #log .u{ color:var(--text-soft); }
+  #log .u::before{ content:'› '; color:var(--holo); }
+  #log .j{ color:var(--text); }
+  #log .j::before{ content:'JARVIS: '; color:var(--gold); font-family:'Orbitron', sans-serif; font-size:10px; letter-spacing:.14em; }
+  #log .s{ color:var(--holo-dim); font-size:12px; letter-spacing:.08em; }
+  #interim{ min-height:18px; font-size:13px; color:var(--holo); opacity:.8; font-style:italic; }
+
+  /* ---------- Camera preview ---------- */
+  #camWrap{
+    position:fixed; z-index:4; left:28px; bottom:96px; width:200px; aspect-ratio:4/3;
+    border:1px solid var(--holo-dim); overflow:hidden; background:#000;
+  }
+  #cam{ width:100%; height:100%; object-fit:cover; transform:scaleX(-1); opacity:.75; filter:saturate(.3) hue-rotate(160deg) contrast(1.1); }
+  #camWrap span{ position:absolute; top:4px; left:6px; font-family:'Orbitron', sans-serif; font-size:9px; letter-spacing:.2em; color:var(--holo); }
+
+  /* ---------- Gesture chip ---------- */
+  #gesture{
+    position:fixed; z-index:4; left:50%; top:96px; transform:translateX(-50%);
+    font-family:'Orbitron', sans-serif; font-size:11px; letter-spacing:.2em; color:var(--holo);
+    padding:6px 14px; border:1px solid var(--holo-dim); background:rgba(2,12,20,.6);
+    transition:opacity .2s; opacity:0;
+  }
+  #gesture.show{ opacity:1; }
+
+  /* ---------- Footer / command bar ---------- */
+  footer{
+    position:fixed; z-index:4; left:50%; bottom:26px; transform:translateX(-50%);
+    width:min(640px, calc(100% - 32px)); display:flex; gap:10px; align-items:center;
+  }
+  .orb{
+    width:52px; height:52px; flex-shrink:0; border-radius:50%; cursor:pointer;
+    border:2px solid var(--holo-dim); background: radial-gradient(circle, rgba(63,227,255,.35), rgba(63,227,255,.05) 65%);
+    display:grid; place-items:center; color:var(--holo); font-size:20px; transition: box-shadow .15s, transform .15s;
+  }
+  .orb.listening{ border-color:var(--holo); box-shadow:0 0 18px var(--holo); }
+  .orb.speaking{ animation: pulse .5s ease-in-out infinite alternate; border-color:var(--gold); color:var(--gold); }
+  @keyframes pulse{ from{ box-shadow:0 0 8px var(--gold); transform:scale(1);} to{ box-shadow:0 0 28px var(--gold); transform:scale(1.07);} }
+  #cmd{
+    flex:1; min-width:0; background:rgba(2,12,20,.75); border:1px solid var(--holo-dim); color:var(--text);
+    font-family:'Rajdhani', sans-serif; font-size:16px; padding:12px 14px; outline:none; letter-spacing:.04em;
+  }
+  #cmd:focus{ border-color:var(--holo); box-shadow:0 0 12px rgba(63,227,255,.3); }
+  .btn{
+    background:var(--holo-soft); border:1px solid var(--holo-dim); color:var(--holo); cursor:pointer;
+    font-family:'Orbitron', sans-serif; font-size:11px; letter-spacing:.16em; padding:13px 14px;
+  }
+  .btn:hover{ border-color:var(--holo); }
+
+  /* ---------- Boot + help overlays ---------- */
+  .overlay{
+    position:fixed; inset:0; z-index:10; display:grid; place-items:center;
+    background:rgba(1,5,9,.92); padding:16px;
+  }
+  .overlay.hidden{ display:none; }
+  .boot-box{ text-align:center; max-width:560px; }
+  .boot-ring{
+    width:150px; height:150px; margin:0 auto 26px; border-radius:50%; position:relative;
+    border:2px solid var(--holo); box-shadow:0 0 30px rgba(63,227,255,.5), inset 0 0 30px rgba(63,227,255,.4);
+  }
+  .boot-ring::before, .boot-ring::after{
+    content:''; position:absolute; border-radius:50%; border:2px dashed var(--holo-dim);
+  }
+  .boot-ring::before{ inset:14px; animation: spin 8s linear infinite; }
+  .boot-ring::after{ inset:40px; border-style:solid; border-color:var(--holo); background:radial-gradient(circle, #fff 0%, var(--holo) 40%, transparent 72%); animation: glow 2s ease-in-out infinite alternate; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  @keyframes glow{ from{ opacity:.6; } to{ opacity:1; } }
+  .boot-box h1{ font-family:'Orbitron', sans-serif; letter-spacing:.4em; color:var(--holo); text-shadow:0 0 16px var(--holo); font-size:28px; margin:0 0 6px; }
+  .boot-box p{ color:var(--text-soft); font-size:16px; line-height:1.5; margin:0 0 22px; }
+  .boot-box .btn{ font-size:13px; padding:15px 26px; }
+  #bootLines{ margin-top:22px; text-align:left; font-family:monospace; font-size:12px; color:var(--holo); min-height:110px; white-space:pre-line; }
+  .help-box{
+    max-width:720px; width:100%; max-height:86vh; overflow:auto; padding:22px 26px;
+    border:1px solid var(--holo-dim); background:rgba(3,18,28,.95);
+  }
+  .help-box h2{ font-family:'Orbitron', sans-serif; letter-spacing:.2em; font-size:15px; color:var(--holo); margin:0 0 14px; }
+  .help-box h4{ font-family:'Orbitron', sans-serif; letter-spacing:.16em; font-size:11px; color:var(--gold); margin:18px 0 8px; }
+  .help-box table{ width:100%; border-collapse:collapse; font-size:15px; }
+  .help-box td{ padding:5px 8px; border-bottom:1px solid rgba(63,227,255,.12); vertical-align:top; }
+  .help-box td:first-child{ color:var(--holo); white-space:nowrap; width:40%; }
+  .help-box .btn{ margin-top:18px; }
+
+  @media (max-width: 860px){
+    #objPanel, #logPanel{ display:none; }
+    #camWrap{ width:120px; bottom:92px; left:16px; }
+    header{ top:16px; left:18px; right:18px; }
+    .clock{ display:none; }
+    .title{ font-size:16px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="scene"></div>
+<canvas id="hud"></canvas>
+<div class="frame"><i></i><i></i><i></i><i></i></div>
+
+<header>
+  <div class="title">J.A.R.V.I.S<small>JUST A RATHER VERY INTELLIGENT SYSTEM</small></div>
+  <div class="chips">
+    <button class="chip" id="chipMic" title="Activar / desactivar micrófono"><b></b>VOZ</button>
+    <button class="chip" id="chipHands" title="Activar / desactivar cámara"><b></b>MANOS</button>
+    <button class="chip" id="chipAI" title="Configurar clave de Gemini"><b></b>NÚCLEO IA</button>
+  </div>
+  <div class="clock" id="clock"></div>
+  <a class="back" href="index.html">← GlowUp</a>
+</header>
+
+<aside class="panel" id="objPanel">
+  <h3>HOLOGRAMAS ACTIVOS</h3>
+  <ul id="objList"></ul>
+  <div class="stats" id="stats"></div>
+</aside>
+
+<aside class="panel" id="logPanel">
+  <h3>REGISTRO DE COMUNICACIONES</h3>
+  <div id="log"></div>
+  <div id="interim"></div>
+</aside>
+
+<div id="camWrap"><video id="cam" playsinline muted></video><span>SENSOR ÓPTICO</span></div>
+<div id="gesture"></div>
+
+<footer>
+  <div class="orb" id="orb" title="Micrófono">◉</div>
+  <input id="cmd" type="text" placeholder="Di o escribe: «Jarvis, crea un reactor»" autocomplete="off">
+  <button class="btn" id="helpBtn">AYUDA</button>
+</footer>
+
+<div class="overlay" id="boot">
+  <div class="boot-box">
+    <div class="boot-ring"></div>
+    <h1>J.A.R.V.I.S</h1>
+    <p>Controla hologramas 3D con las manos y con la voz.<br>Necesita permiso para la <b>cámara</b> y el <b>micrófono</b>. Funciona mejor en Chrome o Edge.</p>
+    <button class="btn" id="bootBtn">INICIAR SISTEMAS</button>
+    <div id="bootLines"></div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="help">
+  <div class="help-box">
+    <h2>MANUAL DE OPERACIONES</h2>
+    <h4>GESTOS CON LAS MANOS</h4>
+    <table>
+      <tr><td>☝️ Apuntar con el índice</td><td>Mueve el cursor. Mantenlo sobre un holograma para seleccionarlo.</td></tr>
+      <tr><td>🤏 Pinza (pulgar + índice)</td><td>Agarra el holograma y muévelo. Acerca o aleja la mano para traerlo o alejarlo.</td></tr>
+      <tr><td>✋ Mano abierta</td><td>Gira el holograma seleccionado. Suelta con un movimiento rápido para lanzarlo girando.</td></tr>
+      <tr><td>✊ Puño</td><td>Frena el giro.</td></tr>
+      <tr><td>🤏🤏 Pinza con las dos manos</td><td>Separa las manos para agrandar, júntalas para encoger, gíralas como un volante para rotar.</td></tr>
+      <tr><td>✋✋ Abrir las dos manos de golpe</td><td>Vista despiezada (como Tony Stark). Júntalas rápido para volver a montar.</td></tr>
+    </table>
+    <h4>COMANDOS DE VOZ</h4>
+    <table>
+      <tr><td>«Crea un reactor / cubo / esfera / pirámide / toro / nudo / planeta / átomo / ADN»</td><td>Materializa un holograma.</td></tr>
+      <tr><td>«Despiézalo» / «Explota» · «Móntalo»</td><td>Vista despiezada y volver a ensamblar.</td></tr>
+      <tr><td>«Gira» · «Para»</td><td>Rotación automática.</td></tr>
+      <tr><td>«Más grande» · «Más pequeño» · «Al centro»</td><td>Tamaño y posición.</td></tr>
+      <tr><td>«Color rojo / azul / verde / dorado / morado / rosa / blanco»</td><td>Cambia el color.</td></tr>
+      <tr><td>«Siguiente» · «Anterior»</td><td>Cambia de holograma seleccionado.</td></tr>
+      <tr><td>«Escanéalo» · «Analiza»</td><td>Informe del holograma.</td></tr>
+      <tr><td>«Borra esto» · «Borra todo»</td><td>Elimina hologramas.</td></tr>
+      <tr><td>«¿Qué hora es?» · «¿Qué día es?»</td><td>Hora y fecha.</td></tr>
+      <tr><td>«Jarvis, …» cualquier pregunta</td><td>Responde con el núcleo de IA (Gemini, la misma clave que GlowUp).</td></tr>
+      <tr><td>«Silencio»</td><td>Desactiva el micrófono.</td></tr>
+    </table>
+    <h4>SIN CÁMARA</h4>
+    <table>
+      <tr><td>Ratón / dedo</td><td>Clic para seleccionar y arrastrar. Rueda para escalar. Mayús + arrastrar para girar. Doble clic para despiezar.</td></tr>
+    </table>
+    <button class="btn" id="helpClose">ENTENDIDO</button>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const $ = id => document.getElementById(id);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[¿?¡!.,;:]/g, ' ').replace(/\s+/g, ' ').trim();
+
+/* =========================================================
+   ESCENA 3D
+   ========================================================= */
+const container = $('scene');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+container.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x02070d);
+scene.fog = new THREE.FogExp2(0x02070d, 0.045);
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 200);
+camera.position.set(0, 1.6, 10.5);
+camera.lookAt(0, 0, 0);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.8, 0.4, 0.2);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+// Suelo de rejilla holográfica
+const grid = new THREE.GridHelper(60, 60, 0x3fe3ff, 0x3fe3ff);
+grid.material.transparent = true;
+grid.material.opacity = 0.12;
+grid.position.y = -3;
+scene.add(grid);
+
+// Polvo de partículas
+const dust = (() => {
+  const n = 1400, pos = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    pos[i * 3] = (Math.random() - 0.5) * 40;
+    pos[i * 3 + 1] = (Math.random() - 0.5) * 20;
+    pos[i * 3 + 2] = (Math.random() - 0.5) * 30 - 5;
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const m = new THREE.PointsMaterial({ color: 0x3fe3ff, size: 0.035, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false });
+  const p = new THREE.Points(g, m);
+  scene.add(p);
+  return p;
+})();
+
+/* ---------- Materiales holográficos ---------- */
+const DEFAULT_COLOR = 0x3fe3ff;
+
+function holoMats(ctx, color = DEFAULT_COLOR, fillOpacity = 0.08) {
+  const fill = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: fillOpacity, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+  const line = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false });
+  ctx.mats.push(fill, line);
+  return { fill, line };
+}
+
+// Malla holográfica: relleno translúcido + líneas. mode: 'edges' | 'wire'
+function holo(ctx, geom, { mode = 'edges', fillOpacity = 0.1, color } = {}) {
+  const { fill, line } = holoMats(ctx, color, fillOpacity * 0.7);
+  const g = new THREE.Group();
+  const mesh = new THREE.Mesh(geom, fill);
+  const lineGeom = mode === 'wire' ? new THREE.WireframeGeometry(geom) : new THREE.EdgesGeometry(geom, 1);
+  g.add(mesh, new THREE.LineSegments(lineGeom, line));
+  return g;
+}
+
+function curveLine(ctx, points, color) {
+  const { line } = holoMats(ctx, color);
+  return new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), line);
+}
+
+// Registra una pieza desmontable: se desplaza en `dir` durante la vista despiezada
+function part(ctx, obj, dir) {
+  obj.userData.base = obj.position.clone();
+  obj.userData.dir = dir;
+  ctx.parts.push(obj);
+  return obj;
+}
+
+/* ---------- Constructores de hologramas ---------- */
+const BUILDERS = {
+  reactor: { name: 'REACTOR ARC', build(ctx, root) {
+    const outer = holo(ctx, new THREE.TorusGeometry(1.35, 0.1, 10, 64), { mode: 'wire', fillOpacity: 0.15 });
+    root.add(part(ctx, outer, new THREE.Vector3(0, 0, -1.6)));
+
+    const coils = new THREE.Group();
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * Math.PI * 2;
+      const b = holo(ctx, new THREE.BoxGeometry(0.28, 0.42, 0.22), { fillOpacity: 0.18 });
+      b.position.set(Math.cos(a) * 1.05, Math.sin(a) * 1.05, 0);
+      b.rotation.z = a + Math.PI / 2;
+      coils.add(part(ctx, b, new THREE.Vector3(Math.cos(a) * 0.9, Math.sin(a) * 0.9, -0.6)));
+    }
+    root.add(coils);
+
+    const mid = holo(ctx, new THREE.TorusGeometry(0.75, 0.05, 8, 48), { mode: 'wire' });
+    root.add(part(ctx, mid, new THREE.Vector3(0, 0, 0.6)));
+
+    const tri = new THREE.Shape();
+    for (let i = 0; i < 3; i++) {
+      const a = Math.PI / 2 + (i / 3) * Math.PI * 2;
+      tri[i ? 'lineTo' : 'moveTo'](Math.cos(a) * 0.62, Math.sin(a) * 0.62);
+    }
+    const triMesh = holo(ctx, new THREE.ExtrudeGeometry(tri, { depth: 0.08, bevelEnabled: false }), { fillOpacity: 0.2 });
+    root.add(part(ctx, triMesh, new THREE.Vector3(0, 0, 1.3)));
+
+    const core = holo(ctx, new THREE.CylinderGeometry(0.34, 0.34, 0.3, 32).rotateX(Math.PI / 2), { fillOpacity: 0.55 });
+    root.add(part(ctx, core, new THREE.Vector3(0, 0, 2.1)));
+    return t => { core.children[0].material.opacity = 0.45 + Math.sin(t * 4) * 0.15; mid.rotation.z = t * 0.8; };
+  }},
+
+  cube: { name: 'CUBO', build(ctx, root) {
+    const faces = [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+    for (const [x, y, z] of faces) {
+      const f = holo(ctx, new THREE.PlaneGeometry(1.8, 1.8), { fillOpacity: 0.12 });
+      const n = new THREE.Vector3(x, y, z);
+      f.position.copy(n).multiplyScalar(0.9);
+      f.lookAt(n.clone().multiplyScalar(2));
+      root.add(part(ctx, f, n.clone().multiplyScalar(1.1)));
+    }
+    const inner = holo(ctx, new THREE.BoxGeometry(0.7, 0.7, 0.7), { fillOpacity: 0.25 });
+    root.add(inner);
+    return t => { inner.rotation.set(t, t * 1.3, 0); };
+  }},
+
+  sphere: { name: 'ESFERA', build(ctx, root) {
+    const shell = holo(ctx, new THREE.IcosahedronGeometry(1.2, 2), { mode: 'wire', fillOpacity: 0.06 });
+    root.add(part(ctx, shell, new THREE.Vector3(0, 0, -1)));
+    const core = holo(ctx, new THREE.IcosahedronGeometry(0.5, 1), { fillOpacity: 0.3 });
+    root.add(part(ctx, core, new THREE.Vector3(0, 0, 1)));
+    const eq = curveLine(ctx, new THREE.EllipseCurve(0, 0, 1.45, 1.45).getPoints(80).map(p => new THREE.Vector3(p.x, 0, p.y)));
+    root.add(part(ctx, eq, new THREE.Vector3(0, 1.2, 0)));
+    return t => { core.rotation.y = -t * 1.5; eq.rotation.y = t * 0.6; };
+  }},
+
+  pyramid: { name: 'PIRÁMIDE', build(ctx, root) {
+    const top = holo(ctx, new THREE.ConeGeometry(1.2, 1.2, 4, 1, true).translate(0, 0.6, 0), { fillOpacity: 0.12 });
+    root.add(part(ctx, top, new THREE.Vector3(0, 1.2, 0)));
+    const base = holo(ctx, new THREE.CylinderGeometry(1.2, 1.7, 0.8, 4, 1, true).translate(0, -0.4, 0), { fillOpacity: 0.12 });
+    root.add(part(ctx, base, new THREE.Vector3(0, -0.6, 0)));
+    const eye = holo(ctx, new THREE.OctahedronGeometry(0.28), { fillOpacity: 0.4 });
+    eye.position.y = 0.35;
+    root.add(part(ctx, eye, new THREE.Vector3(0, 0, 1.2)));
+    return t => { eye.rotation.y = t * 2; };
+  }},
+
+  torus: { name: 'TORO', build(ctx, root) {
+    root.add(holo(ctx, new THREE.TorusGeometry(1, 0.38, 14, 40), { mode: 'wire', fillOpacity: 0.06 }));
+  }},
+
+  knot: { name: 'NUDO TOROIDAL', build(ctx, root) {
+    root.add(holo(ctx, new THREE.TorusKnotGeometry(0.85, 0.24, 110, 10), { mode: 'wire', fillOpacity: 0.05 }));
+  }},
+
+  planet: { name: 'PLANETA', build(ctx, root) {
+    const body = holo(ctx, new THREE.SphereGeometry(1, 28, 18), { mode: 'wire', fillOpacity: 0.07 });
+    root.add(body);
+    const ring = holo(ctx, new THREE.RingGeometry(1.45, 2.1, 72, 2).rotateX(-Math.PI / 2 + 0.35), { fillOpacity: 0.12 });
+    root.add(part(ctx, ring, new THREE.Vector3(0, 1.4, 0)));
+    const moonPivot = new THREE.Group();
+    const moon = holo(ctx, new THREE.IcosahedronGeometry(0.22, 1), { mode: 'wire', fillOpacity: 0.2 });
+    moon.position.x = 2.7;
+    moonPivot.add(moon);
+    root.add(part(ctx, moonPivot, new THREE.Vector3(0, -1.2, 0)));
+    return t => { body.rotation.y = t * 0.3; moonPivot.rotation.y = t * 0.7; };
+  }},
+
+  atom: { name: 'ÁTOMO', build(ctx, root) {
+    const nucleus = holo(ctx, new THREE.IcosahedronGeometry(0.35, 1), { fillOpacity: 0.5 });
+    root.add(nucleus);
+    const orbits = [];
+    for (let i = 0; i < 3; i++) {
+      const orbit = new THREE.Group();
+      orbit.add(curveLine(ctx, new THREE.EllipseCurve(0, 0, 1.6, 0.6).getPoints(90).map(p => new THREE.Vector3(p.x, p.y, 0))));
+      const e = holo(ctx, new THREE.SphereGeometry(0.09, 12, 8), { fillOpacity: 0.9 });
+      orbit.add(e);
+      orbit.rotation.z = (i / 3) * Math.PI;
+      orbit.rotation.x = 0.5;
+      const d = new THREE.Vector3(Math.cos(orbit.rotation.z + Math.PI / 2), Math.sin(orbit.rotation.z + Math.PI / 2), 0).multiplyScalar(1.2);
+      root.add(part(ctx, orbit, d));
+      orbits.push({ e, speed: 1.6 + i * 0.5, phase: i * 2 });
+    }
+    return t => {
+      nucleus.rotation.set(t, t * 0.7, 0);
+      for (const o of orbits) { const a = t * o.speed + o.phase; o.e.position.set(Math.cos(a) * 1.6, Math.sin(a) * 0.6, 0); }
+    };
+  }},
+
+  dna: { name: 'ADN', build(ctx, root) {
+    const strandA = new THREE.Group(), strandB = new THREE.Group(), rungs = new THREE.Group();
+    const ptsA = [], ptsB = [], n = 22;
+    for (let i = 0; i < n; i++) {
+      const y = (i / (n - 1) - 0.5) * 3.6, a = i * 0.55;
+      const pa = new THREE.Vector3(Math.cos(a) * 0.7, y, Math.sin(a) * 0.7);
+      const pb = new THREE.Vector3(Math.cos(a + Math.PI) * 0.7, y, Math.sin(a + Math.PI) * 0.7);
+      ptsA.push(pa); ptsB.push(pb);
+      for (const [p, g] of [[pa, strandA], [pb, strandB]]) {
+        const s = holo(ctx, new THREE.SphereGeometry(0.08, 10, 6), { fillOpacity: 0.7 });
+        s.position.copy(p);
+        g.add(s);
+      }
+      if (i % 2 === 0) rungs.add(curveLine(ctx, [pa, pb]));
+    }
+    strandA.add(curveLine(ctx, new THREE.CatmullRomCurve3(ptsA).getPoints(120)));
+    strandB.add(curveLine(ctx, new THREE.CatmullRomCurve3(ptsB).getPoints(120)));
+    const helix = new THREE.Group();
+    helix.add(part(ctx, strandA, new THREE.Vector3(-1.1, 0, 0)), part(ctx, strandB, new THREE.Vector3(1.1, 0, 0)), rungs);
+    root.add(helix);
+    return t => { helix.rotation.y = t * 0.6; rungs.children.forEach(l => { l.material.opacity = 0.9 * (1 - ctx.explode); }); };
+  }},
+};
+
+const SHAPE_WORDS = {
+  reactor: 'reactor', arc: 'reactor', cubo: 'cube', caja: 'cube', esfera: 'sphere', bola: 'sphere', globo: 'sphere',
+  piramide: 'pyramid', toro: 'torus', dona: 'torus', donut: 'torus', rosquilla: 'torus', anillo: 'torus',
+  nudo: 'knot', planeta: 'planet', saturno: 'planet', atomo: 'atom', adn: 'dna', helice: 'dna',
+};
+
+/* ---------- Gestión de hologramas ---------- */
+const objects = [];
+let selected = null;
+let objCounter = 0;
+const clock = new THREE.Clock();
+
+function spawn(type, { silent = false } = {}) {
+  const def = BUILDERS[type];
+  const root = new THREE.Group();
+  const ctx = { mats: [], parts: [], explode: 0 };
+  const update = def.build(ctx, root);
+  const pos = freeSpot();
+  root.position.copy(pos);
+  root.scale.setScalar(0.001);
+  root.userData = {
+    id: ++objCounter, type, name: def.name, ctx, update,
+    posTarget: pos.clone(), scaleTarget: 1, angVel: new THREE.Vector3(0, 0.35, 0), autoSpin: 0.35,
+    explodeTarget: 0, color: new THREE.Color(DEFAULT_COLOR), born: clock.elapsedTime,
+  };
+  scene.add(root);
+  objects.push(root);
+  select(root);
+  if (!silent) sfx('spawn');
+  refreshList();
+  return root;
+}
+
+// Primer hueco libre de la cuadrícula para no solapar hologramas
+const SPOTS = [[0, 0], [-3, 0.9], [3, 0.9], [-3, -1.4], [3, -1.4], [0, 2.2], [0, -2.1], [-6, 0], [6, 0]];
+function freeSpot() {
+  const minDist = p => Math.min(Infinity, ...objects.map(o => o.userData.posTarget.distanceTo(p)));
+  for (const [x, y] of SPOTS) {
+    const p = new THREE.Vector3(x, y, 0);
+    if (minDist(p) > 2.4) return p;
+  }
+  return new THREE.Vector3((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 3, -2 - Math.random() * 2);
+}
+
+function remove(obj) {
+  const i = objects.indexOf(obj);
+  if (i < 0) return;
+  objects.splice(i, 1);
+  scene.remove(obj);
+  obj.traverse(o => { o.geometry?.dispose(); });
+  obj.userData.ctx.mats.forEach(m => m.dispose());
+  if (selected === obj) selected = objects[objects.length - 1] || null;
+  if (grab?.obj === obj) grab = null;
+  refreshList();
+}
+
+function select(obj) {
+  selected = obj;
+  refreshList();
+}
+
+function setColor(obj, hex) {
+  obj.userData.color.set(hex);
+  obj.userData.ctx.mats.forEach(m => m.color.set(hex));
+}
+
+function refreshList() {
+  const ul = $('objList');
+  ul.innerHTML = '';
+  for (const o of objects) {
+    const li = document.createElement('li');
+    li.className = o === selected ? 'sel' : '';
+    li.innerHTML = `<span>${o.userData.name}</span><span>#${String(o.userData.id).padStart(2, '0')}</span>`;
+    li.onclick = () => { select(o); sfx('tick'); };
+    ul.appendChild(li);
+  }
+  if (!objects.length) ul.innerHTML = '<li><span style="color:var(--text-soft)">Sin hologramas. Di «crea un reactor».</span></li>';
+}
+
+function updateStats() {
+  const el = $('stats');
+  if (!selected) { el.innerHTML = ''; return; }
+  const u = selected.userData, p = selected.position;
+  el.innerHTML = `OBJETIVO <b>${u.name}</b><br>POSICIÓN <b>${p.x.toFixed(2)} · ${p.y.toFixed(2)} · ${p.z.toFixed(2)}</b><br>ESCALA <b>${selected.scale.x.toFixed(2)}×</b> · GIRO <b>${u.angVel.length().toFixed(2)} rad/s</b><br>DESPIECE <b>${Math.round(u.ctx.explode * 100)}%</b>`;
+}
+
+/* =========================================================
+   HUD 2D (manos, cursor, retícula)
+   ========================================================= */
+const hud = $('hud');
+const hctx = hud.getContext('2d');
+function resizeHud() {
+  const dpr = Math.min(devicePixelRatio, 2);
+  hud.width = innerWidth * dpr; hud.height = innerHeight * dpr;
+  hctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+resizeHud();
+
+const tmpV = new THREE.Vector3();
+function toScreen(v3) {
+  tmpV.copy(v3).project(camera);
+  return { x: (tmpV.x + 1) / 2 * innerWidth, y: (1 - tmpV.y) / 2 * innerHeight, behind: tmpV.z > 1 };
+}
+
+function objScreenRadius(obj) {
+  const c = toScreen(obj.position);
+  const edge = toScreen(tmpV.set(1.6 * obj.scale.x, 0, 0).add(obj.position));
+  return Math.max(40, Math.hypot(edge.x - c.x, edge.y - c.y));
+}
+
+const HAND_LINKS = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+let scanT = -1;
+
+function drawHud(t) {
+  hctx.clearRect(0, 0, innerWidth, innerHeight);
+  hctx.lineCap = 'round';
+
+  // Etiquetas de todos los hologramas + retícula del seleccionado
+  for (const o of objects) {
+    const s = toScreen(o.position);
+    if (s.behind) continue;
+    const r = objScreenRadius(o);
+    const isSel = o === selected;
+    hctx.strokeStyle = isSel ? 'rgba(63,227,255,.9)' : 'rgba(63,227,255,.25)';
+    hctx.fillStyle = isSel ? '#D9F7FF' : 'rgba(127,182,198,.7)';
+    hctx.font = '600 11px Orbitron, sans-serif';
+    hctx.fillText(`${o.userData.name} #${String(o.userData.id).padStart(2, '0')}`, s.x + r * 0.75, s.y - r * 0.75);
+    if (!isSel) continue;
+    hctx.lineWidth = 1.5;
+    hctx.shadowColor = '#3FE3FF'; hctx.shadowBlur = 8;
+    for (let k = 0; k < 4; k++) {
+      const a0 = t * 0.8 + k * Math.PI / 2;
+      hctx.beginPath(); hctx.arc(s.x, s.y, r, a0, a0 + 0.9); hctx.stroke();
+    }
+    hctx.setLineDash([3, 6]);
+    hctx.beginPath(); hctx.arc(s.x, s.y, r + 10, -t * 0.5, -t * 0.5 + Math.PI * 1.5); hctx.stroke();
+    hctx.setLineDash([]);
+    hctx.shadowBlur = 0;
+    hctx.font = '500 11px Rajdhani, sans-serif';
+    hctx.fillText(`ESC ${o.scale.x.toFixed(2)}  Z ${o.position.z.toFixed(1)}`, s.x + r * 0.75, s.y - r * 0.75 + 14);
+
+    if (scanT >= 0) {
+      const p = scanT / 2.2;
+      const y = s.y - r + p * 2 * r;
+      const half = Math.sqrt(Math.max(0, r * r - (y - s.y) ** 2));
+      hctx.strokeStyle = 'rgba(255,178,63,.95)'; hctx.shadowColor = '#FFB23F'; hctx.shadowBlur = 12; hctx.lineWidth = 2;
+      hctx.beginPath(); hctx.moveTo(s.x - half - 20, y); hctx.lineTo(s.x + half + 20, y); hctx.stroke();
+      hctx.shadowBlur = 0;
+    }
+  }
+
+  // Esqueletos de las manos
+  for (const h of hands) {
+    hctx.strokeStyle = h.g === 'pinch' ? 'rgba(255,178,63,.85)' : 'rgba(63,227,255,.75)';
+    hctx.shadowColor = hctx.strokeStyle; hctx.shadowBlur = 10; hctx.lineWidth = 2;
+    hctx.beginPath();
+    for (const [a, b] of HAND_LINKS) { hctx.moveTo(h.pts[a].x, h.pts[a].y); hctx.lineTo(h.pts[b].x, h.pts[b].y); }
+    hctx.stroke();
+    hctx.fillStyle = '#D9F7FF';
+    for (const p of h.pts) { hctx.beginPath(); hctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2); hctx.fill(); }
+    hctx.shadowBlur = 0;
+
+    // Cursor
+    const c = h.cursor;
+    hctx.strokeStyle = h.g === 'pinch' ? '#FFB23F' : '#3FE3FF';
+    hctx.lineWidth = 2;
+    const cr = h.g === 'pinch' ? 10 : 16;
+    hctx.beginPath(); hctx.arc(c.x, c.y, cr, 0, Math.PI * 2); hctx.stroke();
+    hctx.beginPath();
+    hctx.moveTo(c.x - cr - 8, c.y); hctx.lineTo(c.x - cr + 2, c.y);
+    hctx.moveTo(c.x + cr - 2, c.y); hctx.lineTo(c.x + cr + 8, c.y);
+    hctx.moveTo(c.x, c.y - cr - 8); hctx.lineTo(c.x, c.y - cr + 2);
+    hctx.moveTo(c.x, c.y + cr - 2); hctx.lineTo(c.x, c.y + cr + 8);
+    hctx.stroke();
+    if (h === primaryHand && dwell.obj && dwell.obj !== selected) {
+      hctx.strokeStyle = '#FFB23F'; hctx.lineWidth = 3;
+      hctx.beginPath(); hctx.arc(c.x, c.y, cr + 6, -Math.PI / 2, -Math.PI / 2 + (dwell.t / DWELL_TIME) * Math.PI * 2); hctx.stroke();
+    }
+  }
+}
+
+/* =========================================================
+   SEGUIMIENTO DE MANOS (MediaPipe)
+   ========================================================= */
+const video = $('cam');
+let handLandmarker = null;
+let handsOn = false;
+let lastVideoTime = -1;
+let hands = [];            // manos analizadas del frame actual
+let primaryHand = null;
+const slotState = [{}, {}]; // histéresis por mano
+
+const DWELL_TIME = 0.7;
+let grab = null;           // { obj, offset, size0, z0 } o { obj:null }
+let twoHand = null;        // { d0, s0, aPrev }
+let palmPrev = null;
+let dwell = { obj: null, t: 0 };
+let spreadHist = [];
+
+async function startHands() {
+  setChip('chipHands', 'warn');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' }, audio: false });
+    video.srcObject = stream;
+    await video.play();
+    if (!handLandmarker) {
+      bootLog('Cargando red neuronal de visión…');
+      const { FilesetResolver, HandLandmarker } = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs');
+      const files = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+      const opts = delegate => ({
+        baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task', delegate },
+        runningMode: 'VIDEO', numHands: 2,
+        minHandDetectionConfidence: 0.6, minHandPresenceConfidence: 0.6, minTrackingConfidence: 0.5,
+      });
+      try { handLandmarker = await HandLandmarker.createFromOptions(files, opts('GPU')); }
+      catch { handLandmarker = await HandLandmarker.createFromOptions(files, opts('CPU')); }
+    }
+    handsOn = true;
+    setChip('chipHands', 'on');
+    log('s', 'Sensor óptico en línea. Seguimiento de manos activo.');
+    return true;
+  } catch (err) {
+    console.error(err);
+    stopHands();
+    setChip('chipHands', 'err');
+    log('s', 'No se pudo activar la cámara: ' + (err.message || err.name) + '. Puedes usar el ratón.');
+    return false;
+  }
+}
+
+function stopHands() {
+  handsOn = false;
+  hands = []; primaryHand = null; grab = null; twoHand = null;
+  video.srcObject?.getTracks().forEach(t => t.stop());
+  video.srcObject = null;
+  setChip('chipHands', '');
+  showGesture('');
+}
+
+const d2 = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+// Amplía el rango central de la cámara para llegar a los bordes sin estirar el brazo
+const remap = v => clamp((v - 0.1) / 0.8, 0, 1);
+
+function analyzeHand(lm, slot) {
+  const st = slotState[slot];
+  const size = d2(lm[0], lm[9]);
+  const ext = (tip, pip) => d2(lm[0], lm[tip]) > d2(lm[0], lm[pip]) * 1.12;
+  const fingers = [ext(8, 6), ext(12, 10), ext(16, 14), ext(20, 18)];
+  const count = fingers.filter(Boolean).length;
+  const pinchD = d2(lm[4], lm[8]) / size;
+  const pinch = st.pinch ? pinchD < 0.5 : pinchD < 0.32;
+  st.pinch = pinch;
+
+  let raw = 'other';
+  if (pinch) raw = 'pinch';
+  else if (count >= 4) raw = 'open';
+  else if (count === 0) raw = 'fist';
+  else if (fingers[0] && !fingers[2] && !fingers[3]) raw = 'point';
+
+  // Estabilidad: el gesto debe repetirse unos frames (la pinza entra/sale al instante)
+  if (raw === st.cand) st.count = (st.count || 0) + 1; else { st.cand = raw; st.count = 1; }
+  if (!st.g || st.count >= 3 || raw === 'pinch' || st.g === 'pinch') st.g = raw;
+
+  const pts = lm.map(p => ({ x: remap(1 - p.x) * innerWidth, y: remap(p.y) * innerHeight }));
+  const target = st.g === 'pinch' ? { x: (pts[4].x + pts[8].x) / 2, y: (pts[4].y + pts[8].y) / 2 }
+    : st.g === 'point' ? pts[8] : pts[9];
+  // Suavizado del cursor
+  st.cursor = st.cursor ? { x: st.cursor.x + (target.x - st.cursor.x) * 0.5, y: st.cursor.y + (target.y - st.cursor.y) * 0.5 } : { ...target };
+  return { g: st.g, pts, cursor: st.cursor, size };
+}
+
+function detectHands() {
+  if (!handsOn || !handLandmarker || video.readyState < 2 || video.currentTime === lastVideoTime) return;
+  lastVideoTime = video.currentTime;
+  const res = handLandmarker.detectForVideo(video, performance.now());
+  const lms = res.landmarks || [];
+  // Ordena por posición en pantalla para que cada mano mantenga su ranura
+  const sorted = lms.map(lm => lm).sort((a, b) => b[0].x - a[0].x);
+  if (sorted.length < 2) slotState[1] = {};
+  if (!sorted.length) slotState[0] = {};
+  hands = sorted.slice(0, 2).map((lm, i) => analyzeHand(lm, i));
+}
+
+const raycaster = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+
+function screenToWorld(p, z, out = new THREE.Vector3()) {
+  ndc.set(p.x / innerWidth * 2 - 1, -(p.y / innerHeight) * 2 + 1);
+  raycaster.setFromCamera(ndc, camera);
+  plane.constant = -z;
+  return raycaster.ray.intersectPlane(plane, out) || out.set(0, 0, z);
+}
+
+function pickAt(p) {
+  ndc.set(p.x / innerWidth * 2 - 1, -(p.y / innerHeight) * 2 + 1);
+  raycaster.setFromCamera(ndc, camera);
+  const hit = raycaster.intersectObjects(objects, true).find(h => h.object.isMesh);
+  if (hit) {
+    let o = hit.object;
+    while (o && !objects.includes(o)) o = o.parent;
+    if (o) return o;
+  }
+  // Tolerancia: el holograma más cercano en pantalla
+  let best = null, bestD = Infinity;
+  for (const o of objects) {
+    const s = toScreen(o.position);
+    const d = Math.hypot(s.x - p.x, s.y - p.y);
+    if (d < objScreenRadius(o) && d < bestD) { best = o; bestD = d; }
+  }
+  return best;
+}
+
+const GESTURE_LABEL = {
+  point: '☝️ APUNTAR · SELECCIONAR', pinch: '🤏 PINZA · MOVER', open: '✋ PALMA · GIRAR',
+  fist: '✊ PUÑO · FRENAR', two: '🤏🤏 DOS MANOS · ESCALAR / ROTAR', spread: '✋✋ DESPIECE', other: '',
+};
+function showGesture(key) {
+  const el = $('gesture');
+  el.textContent = GESTURE_LABEL[key] || '';
+  el.classList.toggle('show', !!el.textContent);
+}
+
+function handleHands(dt) {
+  if (!hands.length) { primaryHand = null; grab = null; twoHand = null; palmPrev = null; spreadHist = []; showGesture(''); return; }
+  const now = clock.elapsedTime;
+
+  // --- Dos manos en pinza: escalar y rotar como un volante ---
+  if (hands.length === 2 && hands.every(h => h.g === 'pinch') && selected) {
+    grab = null; palmPrev = null;
+    const [a, b] = hands;
+    const d = d2(a.cursor, b.cursor);
+    const ang = Math.atan2(b.cursor.y - a.cursor.y, b.cursor.x - a.cursor.x);
+    if (!twoHand) { twoHand = { d0: Math.max(d, 20), s0: selected.userData.scaleTarget, aPrev: ang }; sfx('tick'); }
+    selected.userData.scaleTarget = clamp(twoHand.s0 * d / twoHand.d0, 0.25, 4);
+    let da = ang - twoHand.aPrev;
+    if (da > Math.PI) da -= Math.PI * 2; else if (da < -Math.PI) da += Math.PI * 2;
+    selected.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), -da);
+    twoHand.aPrev = ang;
+    selected.userData.angVel.set(0, 0, 0); selected.userData.autoSpin = 0;
+    primaryHand = a;
+    showGesture('two');
+    return;
+  }
+  twoHand = null;
+
+  // --- Dos palmas que se separan / juntan de golpe: despiece ---
+  if (hands.length === 2 && hands.every(h => h.g === 'open') && selected) {
+    const d = d2(hands[0].cursor, hands[1].cursor) / innerWidth;
+    spreadHist.push({ t: now, d });
+    spreadHist = spreadHist.filter(s => now - s.t < 0.5);
+    const delta = d - spreadHist[0].d;
+    const u = selected.userData;
+    if (delta > 0.22 && u.explodeTarget === 0) { explode(selected, true); spreadHist = []; }
+    else if (delta < -0.22 && u.explodeTarget === 1) { explode(selected, false); spreadHist = []; }
+    primaryHand = hands[0];
+    showGesture('spread');
+    return;
+  }
+  spreadHist = [];
+
+  const h = hands.find(x => x.g === 'pinch') || hands[0];
+  primaryHand = h;
+  showGesture(h.g);
+
+  // --- Pinza: agarrar y mover (profundidad según el tamaño de la mano) ---
+  if (h.g === 'pinch') {
+    if (!grab) {
+      const obj = pickAt(h.cursor);
+      if (obj) {
+        select(obj);
+        const u = obj.userData;
+        const wp = screenToWorld(h.cursor, u.posTarget.z);
+        grab = { obj, offset: u.posTarget.clone().sub(wp).setZ(0), size0: h.size, z0: u.posTarget.z };
+        u.autoSpin = 0;
+        sfx('grab');
+      } else grab = { obj: null };
+    } else if (grab.obj) {
+      const z = clamp(grab.z0 + (h.size / grab.size0 - 1) * 7, -8, 3.5);
+      screenToWorld(h.cursor, z, grab.obj.userData.posTarget).add(grab.offset);
+    }
+  } else if (grab) {
+    if (grab.obj) sfx('release');
+    grab = null;
+  }
+
+  // --- Palma abierta: girar, con inercia al soltar ---
+  if (h.g === 'open' && selected) {
+    if (palmPrev) {
+      const dx = h.cursor.x - palmPrev.x, dy = h.cursor.y - palmPrev.y;
+      const k = 0.012;
+      selected.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), dx * k);
+      selected.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), dy * k);
+      const u = selected.userData;
+      u.autoSpin = 0;
+      u.angVel.lerp(new THREE.Vector3(dy * k / dt, dx * k / dt, 0), 0.35);
+      u.angVel.clampLength(0, 8);
+    }
+    palmPrev = { ...h.cursor };
+  } else palmPrev = null;
+
+  // --- Puño: frenar ---
+  if (h.g === 'fist' && selected) {
+    selected.userData.angVel.multiplyScalar(0.85);
+    selected.userData.autoSpin = 0;
+  }
+
+  // --- Apuntar: seleccionar manteniendo el cursor encima ---
+  if (h.g === 'point') {
+    const obj = pickAt(h.cursor);
+    if (obj && obj === dwell.obj) {
+      dwell.t += dt;
+      if (dwell.t >= DWELL_TIME && selected !== obj) { select(obj); sfx('tick'); }
+    } else dwell = { obj, t: 0 };
+  } else dwell = { obj: null, t: 0 };
+}
+
+/* =========================================================
+   CONTROL CON RATÓN / TÁCTIL (sin cámara)
+   ========================================================= */
+let mouse = null;
+renderer.domElement.addEventListener('pointerdown', e => {
+  const p = { x: e.clientX, y: e.clientY };
+  const obj = pickAt(p);
+  if (!obj) return;
+  select(obj);
+  const u = obj.userData;
+  const rotate = e.shiftKey || e.button === 2;
+  mouse = { obj, rotate, last: p, offset: u.posTarget.clone().sub(screenToWorld(p, u.posTarget.z)).setZ(0) };
+  u.autoSpin = 0;
+  renderer.domElement.setPointerCapture(e.pointerId);
+});
+renderer.domElement.addEventListener('pointermove', e => {
+  if (!mouse) return;
+  const p = { x: e.clientX, y: e.clientY };
+  const u = mouse.obj.userData;
+  if (mouse.rotate) {
+    mouse.obj.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), (p.x - mouse.last.x) * 0.01);
+    mouse.obj.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), (p.y - mouse.last.y) * 0.01);
+    u.angVel.set(0, 0, 0);
+  } else screenToWorld(p, u.posTarget.z, u.posTarget).add(mouse.offset);
+  mouse.last = p;
+});
+renderer.domElement.addEventListener('pointerup', () => { mouse = null; });
+renderer.domElement.addEventListener('contextmenu', e => e.preventDefault());
+renderer.domElement.addEventListener('wheel', e => {
+  if (!selected) return;
+  e.preventDefault();
+  selected.userData.scaleTarget = clamp(selected.userData.scaleTarget * Math.exp(-e.deltaY * 0.0015), 0.25, 4);
+}, { passive: false });
+renderer.domElement.addEventListener('dblclick', e => {
+  const obj = pickAt({ x: e.clientX, y: e.clientY });
+  if (obj) explode(obj, obj.userData.explodeTarget === 0);
+});
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+function explode(obj, on) {
+  if (!obj.userData.ctx.parts.length) return false;
+  obj.userData.explodeTarget = on ? 1 : 0;
+  sfx(on ? 'explode' : 'assemble');
+  return true;
+}
+
+function startScan() {
+  scanT = 0;
+  sfx('scan');
+}
+
+/* =========================================================
+   AUDIO: efectos y voz
+   ========================================================= */
+let audioCtx = null;
+function sfx(kind) {
+  if (!audioCtx) return;
+  const t = audioCtx.currentTime;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  const presets = {
+    tick: [1400, 1800, 0.05, 0.05], grab: [500, 900, 0.08, 0.07], release: [900, 500, 0.08, 0.05],
+    spawn: [200, 1200, 0.35, 0.08], explode: [300, 1500, 0.3, 0.08], assemble: [1500, 300, 0.3, 0.08],
+    scan: [800, 1600, 1.2, 0.04], boot: [120, 900, 0.8, 0.09], error: [300, 180, 0.25, 0.08],
+  };
+  const [f0, f1, dur, vol] = presets[kind] || presets.tick;
+  o.type = 'sine';
+  o.frequency.setValueAtTime(f0, t);
+  o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(audioCtx.destination);
+  o.start(t); o.stop(t + dur + 0.02);
+}
+
+let speaking = false;
+let lastSpokeAt = 0;
+let jarvisVoice = null;
+function pickVoice() {
+  const voices = speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith('es'));
+  const male = /jorge|pablo|diego|alvaro|álvaro|enrique|carlos|juan|raul|raúl|male|hombre/i;
+  jarvisVoice = voices.find(v => male.test(v.name)) || voices.find(v => /google/i.test(v.name)) || voices[0] || null;
+}
+if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+
+function say(text) {
+  log('j', text);
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/[*_#`]/g, ''));
+  u.lang = jarvisVoice?.lang || 'es-ES';
+  if (jarvisVoice) u.voice = jarvisVoice;
+  u.rate = 1.03; u.pitch = 0.85;
+  u.onstart = () => { speaking = true; $('orb').classList.add('speaking'); };
+  u.onend = u.onerror = () => { speaking = false; lastSpokeAt = performance.now(); $('orb').classList.remove('speaking'); };
+  speechSynthesis.speak(u);
+}
+
+/* ---------- Reconocimiento de voz ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, micOn = false;
+
+function startMic() {
+  if (!SR) {
+    setChip('chipMic', 'err');
+    log('s', 'Este navegador no tiene reconocimiento de voz. Usa Chrome o Edge, o escribe los comandos.');
+    return;
+  }
+  if (!rec) {
+    rec = new SR();
+    rec.lang = 'es-ES';
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.onresult = e => {
+      // Ignora lo que capte mientras JARVIS habla (se oiría a sí mismo)
+      if (speaking || performance.now() - lastSpokeAt < 400) return;
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) { $('interim').textContent = ''; handleCommand(r[0].transcript, 'voice'); }
+        else interim += r[0].transcript;
+      }
+      $('interim').textContent = interim;
+    };
+    rec.onerror = e => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        micOn = false; setChip('chipMic', 'err'); $('orb').classList.remove('listening');
+        log('s', 'Permiso de micrófono denegado.');
+      }
+    };
+    rec.onend = () => { if (micOn) setTimeout(() => { try { rec.start(); } catch {} }, 250); };
+  }
+  micOn = true;
+  try { rec.start(); } catch {}
+  setChip('chipMic', 'on');
+  $('orb').classList.add('listening');
+}
+
+function stopMic() {
+  micOn = false;
+  try { rec?.stop(); } catch {}
+  setChip('chipMic', '');
+  $('orb').classList.remove('listening');
+  $('interim').textContent = '';
+}
+
+/* =========================================================
+   CEREBRO: comandos y núcleo de IA
+   ========================================================= */
+const COLORS = {
+  rojo: 0xff3b4e, azul: 0x3f8cff, cian: 0x3fe3ff, celeste: 0x3fe3ff, verde: 0x3fff8c, amarillo: 0xffe23f,
+  dorado: 0xffb23f, oro: 0xffb23f, naranja: 0xff8a3f, morado: 0xb05bff, violeta: 0xb05bff, lila: 0xc79bff,
+  rosa: 0xff5bd1, blanco: 0xeefbff, plateado: 0xc8d6e0,
+};
+let conversationUntil = 0;
+const aiHistory = [];
+
+const has = (s, re) => re.test(s);
+
+function handleCommand(raw, source = 'text') {
+  const text = raw.trim();
+  if (!text) return;
+  const s = norm(text);
+  const addressed = /\b(jarvis|yarvis|harvis|javis)\b/.test(s);
+  const c = s.replace(/\b(jarvis|yarvis|harvis|javis|por favor|porfa)\b/g, '').trim();
+  log('u', text);
+
+  const reply = localCommand(c);
+  if (reply !== null) { if (reply) say(reply); return; }
+
+  // Conversación libre: solo si se le nombra (por voz) o tras una respuesta reciente
+  if (source === 'voice' && !addressed && performance.now() > conversationUntil) {
+    log('s', '(Di «Jarvis» para hacerle una pregunta)');
+    return;
+  }
+  if (!c) { say(pick(['¿Sí, señor?', 'A su servicio.', 'Le escucho, señor.'])); conversationUntil = performance.now() + 10000; return; }
+  askAI(text);
+}
+
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+function localCommand(c) {
+  const sel = selected;
+  const need = () => sel ? null : 'No hay ningún holograma seleccionado, señor.';
+
+  if (has(c, /\b(silencio|deja de escuchar|desactiva(r)? (el )?microfono|duerme)\b/)) {
+    stopMic(); return 'Micrófono desactivado. Estaré aquí si me necesita.';
+  }
+  if (has(c, /\b(ayuda|comandos|que puedes hacer|instrucciones|manual)\b/)) {
+    $('help').classList.remove('hidden');
+    return 'Le muestro el manual de operaciones, señor.';
+  }
+  if (has(c, /\bque hora\b/) || c === 'hora') {
+    return `Son las ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}, señor.`;
+  }
+  if (has(c, /\b(que dia|que fecha|fecha de hoy)\b/)) {
+    return `Hoy es ${new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}.`;
+  }
+  // Las preguntas («¿cuál es el planeta más grande?») van al núcleo de IA, no a los hologramas
+  if (has(c, /^(que|cual|cuales|como|por que|porque|cuanto|cuantos|cuanta|cuantas|quien|quienes|donde|cuando|explica|explicame|dime|cuentame|hablame|sabes|puedes decirme)\b/)) return null;
+
+  // Borrar
+  if (has(c, /\b(borra|borrar|elimina|eliminar|quita|quitar|destruye|destruir|limpia|limpiar)\b/)) {
+    if (has(c, /\b(todo|todos|todas|escena|pantalla)\b/)) {
+      const n = objects.length;
+      [...objects].forEach(remove);
+      sfx('assemble');
+      return n ? `Eliminados ${n} hologramas. Área despejada.` : 'La escena ya está vacía, señor.';
+    }
+    if (!sel) return need();
+    const name = sel.userData.name;
+    remove(sel); sfx('assemble');
+    return `${cap(name)} eliminado.`;
+  }
+
+  // Crear
+  const shapeKey = Object.keys(SHAPE_WORDS).find(w => new RegExp(`\\b${w}\\b`).test(c));
+  if (shapeKey) {
+    if (objects.length >= 12) return 'Hay demasiados hologramas en escena, señor. Borre alguno primero.';
+    const type = SHAPE_WORDS[shapeKey];
+    const o = spawn(type);
+    const color = colorIn(c);
+    if (color) setColor(o, color);
+    return pick([`Materializando ${BUILDERS[type].name.toLowerCase()}.`, `${cap(BUILDERS[type].name.toLowerCase())} en pantalla, señor.`, `Proyectando ${BUILDERS[type].name.toLowerCase()}.`]);
+  }
+
+  // Despiece
+  if (has(c, /\b(explota|explotalo|despieza|despiezalo|despiece|desmonta|desmontalo|desarma|desarmalo|abrelo|expande|expandelo|separa|separalo)\b/)) {
+    if (!sel) return need();
+    return explode(sel, true) ? 'Vista despiezada activada.' : 'Este holograma no tiene componentes desmontables, señor.';
+  }
+  if (has(c, /\b(monta|montalo|ensambla|ensamblalo|unelo|junta|juntalo|cierralo|armalo|contrae|contraelo)\b/)) {
+    if (!sel) return need();
+    return explode(sel, false) ? 'Reensamblando componentes.' : 'Ya está ensamblado, señor.';
+  }
+
+  // Giro
+  if (has(c, /\b(paralo|para de girar|no gires|detente|deten|detenlo|quieto|frena|frenalo|stop)\b|^para$/)) {
+    if (!sel) return need();
+    sel.userData.autoSpin = 0; sel.userData.angVel.set(0, 0, 0);
+    return 'Rotación detenida.';
+  }
+  if (has(c, /\b(gira|giralo|rota|rotalo|vueltas|girar|rotar)\b/)) {
+    if (!sel) return need();
+    const fast = has(c, /\b(rapido|mas rapido)\b/);
+    sel.userData.autoSpin = fast ? 2.5 : 0.8;
+    sel.userData.angVel.set(0, sel.userData.autoSpin, 0);
+    return fast ? 'Máxima rotación.' : 'Iniciando rotación.';
+  }
+
+  // Tamaño
+  if (has(c, /\b(grande|agranda|agrandalo|aumenta|aumentalo|amplia|amplialo|zoom|crece)\b/)) {
+    if (!sel) return need();
+    sel.userData.scaleTarget = clamp(sel.userData.scaleTarget * 1.4, 0.25, 4);
+    return 'Ampliando.';
+  }
+  if (has(c, /\b(pequeno|chico|reduce|reducelo|encoge|encogelo|achica|achicalo|disminuye)\b/)) {
+    if (!sel) return need();
+    sel.userData.scaleTarget = clamp(sel.userData.scaleTarget / 1.4, 0.25, 4);
+    return 'Reduciendo.';
+  }
+  if (has(c, /\b(centra|centralo|centro|reinicia posicion)\b/)) {
+    if (!sel) return need();
+    sel.userData.posTarget.set(0, 0, 0);
+    return 'Centrado.';
+  }
+
+  // Color
+  const color = colorIn(c);
+  if (color && (has(c, /\b(color|pinta|pintalo|ponlo|cambia|cambialo)\b/) || c.split(' ').length <= 2)) {
+    if (!sel) return need();
+    setColor(sel, color);
+    sfx('tick');
+    return 'Color actualizado.';
+  }
+
+  // Selección
+  if (has(c, /\b(siguiente|proximo)\b/) && objects.length) {
+    select(objects[(objects.indexOf(sel) + 1) % objects.length]); sfx('tick');
+    return `${cap(selected.userData.name.toLowerCase())} seleccionado.`;
+  }
+  if (has(c, /\b(anterior|previo)\b/) && objects.length) {
+    select(objects[(objects.indexOf(sel) - 1 + objects.length) % objects.length]); sfx('tick');
+    return `${cap(selected.userData.name.toLowerCase())} seleccionado.`;
+  }
+
+  // Análisis
+  if (has(c, /\b(escanea|escanealo|analiza|analizalo|analisis|diagnostico|informe|estado del objeto)\b/)) {
+    if (!sel) return need();
+    startScan();
+    let verts = 0;
+    sel.traverse(o => { if (o.isMesh) verts += o.geometry.attributes.position.count; });
+    const u = sel.userData;
+    return `Análisis completo. ${cap(u.name.toLowerCase())}, ${u.ctx.parts.length || 'sin'} componentes, ${verts.toLocaleString('es-ES')} vértices, escala ${sel.scale.x.toFixed(1)}. Integridad estructural al cien por cien.`;
+  }
+
+  // Utilidades
+  if (has(c, /^(hola|buenas|buenos dias|buenas tardes|buenas noches|estas ahi|despierta|hey)\b/)) {
+    conversationUntil = performance.now() + 10000;
+    return pick(['A su servicio, señor.', 'Hola, señor. Todos los sistemas operativos.', 'Aquí estoy. ¿En qué trabajamos hoy?']);
+  }
+  if (has(c, /\b(gracias)\b/)) return pick(['Para eso estoy, señor.', 'Siempre un placer.']);
+  if (has(c, /\b(reinicia|reset|reiniciar)\b/)) {
+    [...objects].forEach(remove);
+    spawn('reactor');
+    return 'Sistemas reiniciados.';
+  }
+  return null;
+}
+
+function colorIn(c) {
+  const k = Object.keys(COLORS).find(w => new RegExp(`\\b${w}\\b`).test(c));
+  return k ? COLORS[k] : null;
+}
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+/* ---------- Núcleo de IA (Gemini, misma clave que GlowUp) ---------- */
+function getKey(forcePrompt = false) {
+  let key = null;
+  try { key = localStorage.getItem('gemini_api_key'); } catch {}
+  if (!key || forcePrompt) {
+    const k = prompt('Introduce tu API Key de Google Gemini para el núcleo de IA de JARVIS (gratis en aistudio.google.com):', key || '');
+    if (k && k.trim()) { key = k.trim(); try { localStorage.setItem('gemini_api_key', key); } catch {} }
+  }
+  setChip('chipAI', key ? 'on' : '');
+  return key;
+}
+
+async function askAI(question) {
+  const key = getKey();
+  if (!key) { say('Mi núcleo de inteligencia no está conectado, señor. Configure la clave pulsando «Núcleo IA».'); return; }
+  setChip('chipAI', 'warn');
+  const sceneInfo = objects.length ? `Hologramas en escena: ${objects.map(o => o.userData.name).join(', ')}. Seleccionado: ${selected?.userData.name || 'ninguno'}.` : 'No hay hologramas en escena.';
+  aiHistory.push({ role: 'user', parts: [{ text: question }] });
+  while (aiHistory.length > 10) aiHistory.shift();
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: aiHistory,
+        systemInstruction: { parts: [{ text: `Eres J.A.R.V.I.S., la inteligencia artificial de Tony Stark. Hablas en español, con un tono británico, educado, elegante y con humor seco. Llamas al usuario "señor". Tus respuestas se leen en voz alta: sé muy breve (máximo 3 frases), sin listas, sin markdown ni emojis. ${sceneInfo}` }] },
+        generationConfig: { maxOutputTokens: 300, temperature: 0.8 },
+      }),
+    });
+    if (!res.ok) {
+      if (res.status === 400 || res.status === 403) { try { localStorage.removeItem('gemini_api_key'); } catch {} }
+      throw new Error('estado ' + res.status);
+    }
+    const data = await res.json();
+    const answer = data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('').trim() || 'No he obtenido respuesta, señor.';
+    aiHistory.push({ role: 'model', parts: [{ text: answer }] });
+    setChip('chipAI', 'on');
+    conversationUntil = performance.now() + 12000;
+    say(answer);
+  } catch (err) {
+    aiHistory.pop();
+    setChip('chipAI', 'err');
+    sfx('error');
+    say('Hay interferencias en el enlace con mi núcleo de IA, señor.');
+    console.error(err);
+  }
+}
+
+/* =========================================================
+   INTERFAZ
+   ========================================================= */
+function setChip(id, state) {
+  const el = $(id);
+  el.classList.remove('on', 'warn', 'err');
+  if (state) el.classList.add(state);
+}
+
+function log(kind, text) {
+  const box = $('log');
+  const d = document.createElement('div');
+  d.className = kind;
+  d.textContent = text;
+  box.appendChild(d);
+  while (box.children.length > 40) box.firstChild.remove();
+  box.scrollTop = box.scrollHeight;
+}
+
+function bootLog(text) {
+  $('bootLines').textContent += text + '\n';
+}
+
+$('cmd').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { handleCommand(e.target.value, 'text'); e.target.value = ''; }
+});
+$('orb').onclick = $('chipMic').onclick = () => micOn ? stopMic() : startMic();
+$('chipHands').onclick = () => handsOn ? stopHands() : startHands();
+$('chipAI').onclick = () => getKey(true);
+$('helpBtn').onclick = () => $('help').classList.remove('hidden');
+$('helpClose').onclick = () => $('help').classList.add('hidden');
+$('help').onclick = e => { if (e.target.id === 'help') $('help').classList.add('hidden'); };
+
+setInterval(() => { $('clock').textContent = new Date().toLocaleTimeString('es-ES'); }, 1000);
+
+$('bootBtn').onclick = async () => {
+  $('bootBtn').disabled = true;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  sfx('boot');
+  const lines = ['Inicializando núcleo…', 'Proyector holográfico: OK', 'Síntesis de voz: ' + ('speechSynthesis' in window ? 'OK' : 'NO DISPONIBLE'), 'Reconocimiento de voz: ' + (SR ? 'OK' : 'NO DISPONIBLE')];
+  for (const l of lines) { bootLog(l); await new Promise(r => setTimeout(r, 220)); }
+  const camOk = await startHands();
+  bootLog('Sensor óptico: ' + (camOk ? 'OK' : 'SIN CÁMARA (modo ratón)'));
+  await new Promise(r => setTimeout(r, 300));
+  $('boot').classList.add('hidden');
+  startMic();
+  spawn('reactor', { silent: true });
+  say('Buenas, señor. Todos los sistemas en línea. Puede usar las manos o la voz. Diga «ayuda» si necesita el manual.');
+};
+
+// Estado inicial del chip de IA sin pedir la clave
+try { if (localStorage.getItem('gemini_api_key')) setChip('chipAI', 'on'); } catch {}
+refreshList();
+
+/* =========================================================
+   BUCLE PRINCIPAL
+   ========================================================= */
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  composer.setSize(innerWidth, innerHeight);
+  resizeHud();
+});
+
+const Y = new THREE.Vector3(0, 1, 0), X = new THREE.Vector3(1, 0, 0), Z = new THREE.Vector3(0, 0, 1);
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  const t = clock.elapsedTime;
+
+  detectHands();
+  handleHands(dt);
+
+  for (const o of objects) {
+    const u = o.userData;
+    const beingHeld = grab?.obj === o || mouse?.obj === o;
+    o.position.lerp(u.posTarget, 1 - Math.exp(-dt * (beingHeld ? 14 : 6)));
+    const appear = clamp((t - u.born) / 0.6, 0, 1);
+    const s = u.scaleTarget * (1 - Math.pow(1 - appear, 3));
+    o.scale.setScalar(Math.max(0.001, THREE.MathUtils.lerp(o.scale.x, s, 1 - Math.exp(-dt * 10))));
+
+    // Inercia de giro: decae hasta la rotación automática
+    if (u.autoSpin) u.angVel.lerp(new THREE.Vector3(0, u.autoSpin, 0), 1 - Math.exp(-dt * 1.5));
+    else u.angVel.multiplyScalar(Math.exp(-dt * 0.6));
+    o.rotateOnWorldAxis(X, u.angVel.x * dt);
+    o.rotateOnWorldAxis(Y, u.angVel.y * dt);
+    o.rotateOnWorldAxis(Z, u.angVel.z * dt);
+
+    // Despiece
+    const ctx = u.ctx;
+    ctx.explode += (u.explodeTarget - ctx.explode) * (1 - Math.exp(-dt * 5));
+    for (const p of ctx.parts) p.position.copy(p.userData.base).addScaledVector(p.userData.dir, ctx.explode);
+
+    u.update?.(t);
+  }
+
+  if (scanT >= 0) { scanT += dt; if (scanT > 2.2) scanT = -1; }
+  dust.rotation.y = t * 0.01;
+  grid.position.z = (t * 0.4) % 1;
+
+  composer.render();
+  drawHud(t);
+  updateStats();
+}
+animate();
+</script>
+</body>
+</html>
