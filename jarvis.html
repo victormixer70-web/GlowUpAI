@@ -689,6 +689,25 @@ let palmPrev = null;
 let dwell = { obj: null, t: 0 };
 let spreadHist = [];
 
+// Descarga el modelo de visión en cuanto se abre la página (no necesita permisos)
+let landmarkerPromise = null;
+function loadLandmarker() {
+  landmarkerPromise ??= (async () => {
+    const { FilesetResolver, HandLandmarker } = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs');
+    const files = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+    const opts = delegate => ({
+      baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task', delegate },
+      runningMode: 'VIDEO', numHands: 2,
+      minHandDetectionConfidence: 0.6, minHandPresenceConfidence: 0.6, minTrackingConfidence: 0.5,
+    });
+    try { return await HandLandmarker.createFromOptions(files, opts('GPU')); }
+    catch { return await HandLandmarker.createFromOptions(files, opts('CPU')); }
+  })();
+  landmarkerPromise.catch(() => { landmarkerPromise = null; });
+  return landmarkerPromise;
+}
+loadLandmarker().catch(() => {});
+
 async function startHands() {
   setChip('chipHands', 'warn');
   try {
@@ -696,16 +715,8 @@ async function startHands() {
     video.srcObject = stream;
     await video.play();
     if (!handLandmarker) {
-      bootLog('Cargando red neuronal de visión…');
-      const { FilesetResolver, HandLandmarker } = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs');
-      const files = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
-      const opts = delegate => ({
-        baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task', delegate },
-        runningMode: 'VIDEO', numHands: 2,
-        minHandDetectionConfidence: 0.6, minHandPresenceConfidence: 0.6, minTrackingConfidence: 0.5,
-      });
-      try { handLandmarker = await HandLandmarker.createFromOptions(files, opts('GPU')); }
-      catch { handLandmarker = await HandLandmarker.createFromOptions(files, opts('CPU')); }
+      log('s', 'Cargando red neuronal de visión…');
+      handLandmarker = await loadLandmarker();
     }
     handsOn = true;
     setChip('chipHands', 'on');
@@ -1312,10 +1323,9 @@ $('bootBtn').onclick = async () => {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   sfx('boot');
   const lines = ['Inicializando núcleo…', 'Proyector holográfico: OK', 'Síntesis de voz: ' + ('speechSynthesis' in window ? 'OK' : 'NO DISPONIBLE'), 'Reconocimiento de voz: ' + (SR ? 'OK' : 'NO DISPONIBLE')];
-  for (const l of lines) { bootLog(l); await new Promise(r => setTimeout(r, 220)); }
-  const camOk = await startHands();
-  bootLog('Sensor óptico: ' + (camOk ? 'OK' : 'SIN CÁMARA (modo ratón)'));
-  await new Promise(r => setTimeout(r, 300));
+  for (const l of lines) { bootLog(l); await new Promise(r => setTimeout(r, 120)); }
+  // La cámara y el modelo terminan de cargar en segundo plano; el chip MANOS avisa cuando están listos
+  startHands();
   $('boot').classList.add('hidden');
   startMic();
   spawn('reactor', { silent: true });
