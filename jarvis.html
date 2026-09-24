@@ -1255,9 +1255,9 @@ async function askAI(question) {
   aiHistory.push({ role: 'user', parts: [{ text: question }] });
   while (aiHistory.length > 10) aiHistory.shift();
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`, {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
       body: JSON.stringify({
         contents: aiHistory,
         systemInstruction: { parts: [{ text: `Eres J.A.R.V.I.S., la inteligencia artificial de Tony Stark. Hablas en español, con un tono británico, educado, elegante y con humor seco. Llamas al usuario "señor". Tus respuestas se leen en voz alta: sé muy breve (máximo 3 frases), sin listas, sin markdown ni emojis. ${sceneInfo}` }] },
