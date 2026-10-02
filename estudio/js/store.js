@@ -46,6 +46,7 @@ function defaults() {
       startTime: "17:00",
       days: [1, 2, 3, 4, 5, 6], // 0 = domingo
       context: "Primer semestre de Ingeniería Informática",
+      tutorStyle: "explicar", // "explicar" | "guiar"
     },
     subjects: DEFAULT_SUBJECTS.map((s) => ({ ...s })),
     exams: [],
