@@ -307,7 +307,7 @@ function viewPlan() {
 
 // ---------------------------------------------------------------- vista: Tutor
 
-const QUICK = ["Dame una pista", "Otro ejemplo", "Explícalo más simple", "Ponme un ejercicio", "Hazme un test rápido"];
+const QUICK = ["Dame una pista", "Otro ejemplo", "Más simple"];
 
 function suggestions(sub) {
   const topics = (sub?.topics || "").split(/[,;]/).map((t) => t.trim()).filter(Boolean);
@@ -331,9 +331,9 @@ function viewTutor() {
   const msgs = s.chats[ui.tutorSubject] || [];
   const streaming = ui.streaming && ui.streaming.subjectId === ui.tutorSubject;
   const focus = ui.focus && ui.focus.subjectId === ui.tutorSubject ? ui.focus : null;
+  const lastIsModel = msgs.length && msgs[msgs.length - 1].role === "model";
 
   const empty = `<div class="tutor-empty">
-    <div class="eyebrow accent">Tutor de ${esc(sub?.name || "")}</div>
     <p class="muted">Pregunta lo que no entiendas, pide ejercicios o manda una foto de un problema.</p>
     <div class="suggest">${(focus ? [`Quiero estudiar ${focus.topic}. ${focus.task}`] : suggestions(sub))
       .map((t) => `<button class="suggest-btn" data-action="quick" data-text="${esc(t)}">${esc(t)}</button>`)
@@ -341,30 +341,31 @@ function viewTutor() {
   </div>`;
 
   return `<div class="tutor">
-    <header class="topbar compact">
-      <div class="topbar-text"><div class="eyebrow">Tutor IA</div><h1>${esc(sub?.name || "Tutor")}</h1></div>
-      ${msgs.length ? `<button class="icon-btn" data-action="clear-chat" aria-label="Borrar conversación">${icon("trash", 18)}</button>` : ""}
+    <header class="tutor-bar">
+      <button class="subject-switch" data-action="open-subjects" aria-haspopup="dialog" aria-label="Asignatura: ${esc(sub?.name || "")}. Cambiar">
+        <span class="dot" style="background:${color(sub)}"></span>
+        <span class="subject-switch-text"><span class="subject-switch-name">${esc(sub?.name || "Tutor")}</span>${focus ? `<span class="subject-switch-focus">${esc(focus.topic)}</span>` : ""}</span>
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
     </header>
-    <div class="chips" role="group" aria-label="Asignatura">${s.subjects
-      .map((x) => `<button class="chip${x.id === ui.tutorSubject ? " selected" : ""}" data-action="pick-subject" data-id="${x.id}" aria-pressed="${x.id === ui.tutorSubject}"><span class="dot" style="background:${color(x)}"></span>${esc(x.name)}</button>`)
-      .join("")}</div>
-    ${focus ? `<div class="focus">${icon("flag", 14)}<span>Estudiando: <b>${esc(focus.topic)}</b></span><button class="icon-btn tiny ghost" data-action="clear-focus" aria-label="Quitar tema">${icon("x", 14)}</button></div>` : ""}
     <div class="messages" id="messages" aria-live="polite">
       ${msgs.length || streaming ? msgs.map(messageHTML).join("") : empty}
       ${streaming ? `<div class="msg model md" id="streaming-bubble">${ui.streaming.text ? renderMarkdown(ui.streaming.text) : `<span class="typing"><i></i><i></i><i></i></span>`}</div>` : ""}
       ${ui.chatError ? `<div class="msg error-msg" role="alert">${esc(ui.chatError)}</div>` : ""}
+      ${lastIsModel && !streaming ? `<div class="quick">${QUICK.map((q) => `<button class="quick-btn" data-action="quick" data-text="${esc(q)}">${esc(q)}</button>`).join("")}</div>` : ""}
     </div>
-    ${msgs.length && !streaming ? `<div class="quick">${QUICK.map((q) => `<button class="chip" data-action="quick" data-text="${esc(q)}">${esc(q)}</button>`).join("")}</div>` : ""}
-    ${ui.pendingImage ? `<div class="pending-img"><img src="${ui.pendingImage.url}" alt="Foto para enviar"><button class="icon-btn tiny" data-action="remove-image" aria-label="Quitar foto">${icon("x", 14)}</button></div>` : ""}
     <form class="composer" data-form="chat">
-      <button type="button" class="icon-btn" data-action="attach" aria-label="Adjuntar foto de un ejercicio">${icon("camera")}</button>
-      <label for="chat-input" class="sr-only">Mensaje para el tutor</label>
-      <textarea id="chat-input" rows="1" placeholder="Escribe tu duda…" enterkeyhint="send"></textarea>
-      ${
-        streaming
-          ? `<button type="button" class="send stop" data-action="stop" aria-label="Detener respuesta">${icon("stop", 16)}</button>`
-          : `<button type="submit" class="send" aria-label="Enviar">${icon("send", 18)}</button>`
-      }
+      ${ui.pendingImage ? `<div class="pending-img"><img src="${ui.pendingImage.url}" alt="Foto para enviar"><button type="button" class="pending-remove" data-action="remove-image" aria-label="Quitar foto">${icon("x", 12)}</button></div>` : ""}
+      <div class="composer-pill">
+        <button type="button" class="composer-icon" data-action="attach" aria-label="Adjuntar foto de un ejercicio">${icon("camera")}</button>
+        <label for="chat-input" class="sr-only">Mensaje para el tutor</label>
+        <textarea id="chat-input" rows="1" placeholder="Escribe tu duda…" enterkeyhint="send"></textarea>
+        ${
+          streaming
+            ? `<button type="button" class="send stop" data-action="stop" aria-label="Detener respuesta">${icon("stop", 14)}</button>`
+            : `<button type="submit" class="send" aria-label="Enviar">${icon("send", 16)}</button>`
+        }
+      </div>
     </form>
     <input type="file" id="file-input" accept="image/*" hidden>
   </div>`;
@@ -916,17 +917,31 @@ const actions = {
     ui.planDay = el.dataset.date;
     render();
   },
+  "open-subjects": () => {
+    const s = store.get();
+    const hasChat = (s.chats[ui.tutorSubject] || []).length > 0;
+    const focus = ui.focus && ui.focus.subjectId === ui.tutorSubject;
+    openSheet(`<h2 class="h3">Asignatura</h2>
+      <div class="sheet-list">${s.subjects
+        .map((x) => `<button class="sheet-item${x.id === ui.tutorSubject ? " selected" : ""}" data-action="pick-subject" data-id="${x.id}" aria-pressed="${x.id === ui.tutorSubject}"><span class="dot" style="background:${color(x)}"></span><span class="grow">${esc(x.name)}</span>${x.id === ui.tutorSubject ? icon("check", 18) : ""}</button>`)
+        .join("")}</div>
+      ${focus ? `<button class="btn btn-secondary" data-action="clear-focus">Dejar de centrarse en «${esc(ui.focus.topic)}»</button>` : ""}
+      ${hasChat ? `<button class="btn btn-danger" data-action="clear-chat">${icon("trash", 18)} Borrar esta conversación</button>` : ""}`);
+  },
   "pick-subject": (el) => {
     ui.tutorSubject = el.dataset.id;
     ui.chatError = null;
+    closeSheet();
     render();
     scrollMessages();
   },
   "clear-focus": () => {
     ui.focus = null;
+    closeSheet();
     render();
   },
   "clear-chat": () => {
+    closeSheet();
     if (!confirm("¿Borrar la conversación de esta asignatura?")) return;
     store.update((st) => (st.chats[ui.tutorSubject] = []));
     ui.chatError = null;
@@ -1017,8 +1032,10 @@ document.addEventListener("submit", async (e) => {
   if (kind === "chat") {
     const input = $("#chat-input");
     const text = input.value;
+    const hadFocus = document.activeElement === input;
     input.value = "";
     sendMessage(text);
+    if (hadFocus) $("#chat-input")?.focus();
   } else if (kind === "exam") {
     const data = Object.fromEntries(new FormData(form));
     if (!data.date) return toast("Pon la fecha del examen");
@@ -1099,6 +1116,23 @@ document.addEventListener("keydown", (e) => {
     e.target.form.requestSubmit();
   }
   if (e.key === "Escape" && !$("#sheet").hidden) closeSheet();
+});
+
+// Mientras se escribe en el tutor, esconde la barra inferior para dejar sitio al chat.
+document.addEventListener("focusin", (e) => {
+  if (e.target.id === "chat-input") document.body.classList.add("typing-chat");
+});
+document.addEventListener("focusout", (e) => {
+  if (e.target.id !== "chat-input") return;
+  // Espera un poco: si el foco vuelve al campo (p. ej. tras enviar), la barra no parpadea.
+  setTimeout(() => {
+    if (document.activeElement?.id !== "chat-input") document.body.classList.remove("typing-chat");
+  }, 150);
+});
+// Los botones del cuadro de texto no le quitan el foco: así el teclado no se cierra
+// y el diseño no se mueve justo cuando se pulsa «Enviar».
+document.addEventListener("pointerdown", (e) => {
+  if (e.target.closest(".composer button") && document.activeElement?.id === "chat-input") e.preventDefault();
 });
 
 document.addEventListener("input", (e) => {
