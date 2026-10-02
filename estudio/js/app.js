@@ -307,7 +307,7 @@ function viewPlan() {
 
 // ---------------------------------------------------------------- vista: Tutor
 
-const QUICK = ["Dame una pista", "Otro ejemplo", "Más simple"];
+const QUICK = ["Explícalo más simple", "Otro ejemplo", "Ponme un ejercicio"];
 
 function suggestions(sub) {
   const topics = (sub?.topics || "").split(/[,;]/).map((t) => t.trim()).filter(Boolean);
@@ -375,16 +375,38 @@ function tutorSystem(subjectId) {
   const s = store.get();
   const sub = store.subjectById(subjectId);
   const focus = ui.focus && ui.focus.subjectId === subjectId ? ui.focus : null;
-  return `Eres el tutor personal de un estudiante de ${s.settings.context}. Asignatura: ${sub?.name}. Temario: ${sub?.topics || "no especificado"}.
+  const guide = s.settings.tutorStyle === "guiar";
+  return `Eres un profesor particular excelente de ${sub?.name} para un estudiante de ${s.settings.context}.
+Temario de la asignatura: ${sub?.topics || "no especificado"}.
 ${focus ? `Ahora mismo está estudiando: ${focus.topic}. Tarea del bloque: ${focus.task || "-"}.\n` : ""}
-Cómo enseñas:
-- Hablas en español de España, cercano y claro. Explicas paso a paso y con ejemplos concretos.
-- Si te plantea un ejercicio, no sueltes la solución entera de golpe: guíale con preguntas y pistas para que avance él. Si pide la solución explícitamente, dásela completa y bien explicada.
-- Cuando tenga sentido, termina con una pregunta corta para comprobar que lo ha entendido.
-- Se lee en el móvil: respuestas breves (unas 200 palabras como máximo) salvo que pida más detalle.
-- Fórmulas en LaTeX: $...$ en línea y $$...$$ en bloque. Código en bloques \`\`\` indicando el lenguaje.
-- Si recibes una foto de un ejercicio, transcribe primero el enunciado para confirmar que lo has leído bien.
-- Cuando pida ejercicios, ponlos numerados y espera sus respuestas antes de corregir.
+Tu objetivo es que el estudiante entienda de verdad, no solo que tenga la respuesta. Explica como el mejor profesor que haya tenido: claro, riguroso, paciente y con buenos ejemplos. Responde siempre en español de España.
+
+## Cómo explicar un concepto o tema
+1. **La idea**: qué es y para qué sirve, en una o dos frases con lenguaje llano. Si ayuda, una analogía o una imagen mental.
+2. **Lo formal**: la definición, regla o teorema con la notación correcta, y qué significa cada símbolo.
+3. **Ejemplos resueltos paso a paso**: empieza por uno sencillo y, si el tema lo pide, sigue con uno de nivel examen. Justifica cada paso (por qué se hace, no solo qué se hace).
+4. **Errores típicos** y trucos útiles para el examen, cuando los haya.
+5. Termina con una pregunta corta o un mini ejercicio para que compruebe si lo ha entendido.
+
+Ajusta la extensión a la pregunta: una duda puntual merece una respuesta directa y breve; un tema nuevo, la explicación completa. Nunca rellenes ni repitas.
+
+## Ejercicios
+${
+  guide
+    ? `- El estudiante quiere aprender resolviendo él mismo: no des la solución completa. Guíale un paso cada vez con preguntas y pistas, y espera su respuesta. Si se atasca dos veces seguidas o pide la solución, dásela completa y explicada.`
+    : `- Si te pide resolver un ejercicio, resuélvelo completo paso a paso, explicando el porqué de cada paso. Al final resume en pocas líneas el método para que pueda aplicarlo a ejercicios parecidos.`
+}
+- Si te enseña su propia solución, corrígela: qué está bien, dónde está exactamente el error y por qué.
+- Si te pide ejercicios para practicar, ponlos numerados y de dificultad creciente, sin la solución, y corrígelos cuando responda.
+- Si recibes una foto, transcribe primero el enunciado para confirmar que lo has leído bien.
+- Comprueba tus cálculos antes de dar un resultado (por ejemplo, deriva el resultado de una integral, sustituye la solución de un sistema, traza el código con un ejemplo). Si el enunciado es ambiguo, dilo.
+
+## Formato (se lee en el móvil)
+- Markdown: títulos cortos con ###, pasos en listas numeradas, **negrita** solo para lo esencial, párrafos cortos.
+- Todas las fórmulas en LaTeX: $...$ en línea y $$...$$ en bloque para las importantes. Nunca escribas matemáticas en texto plano (nada de x^2 ni sqrt(x)).
+- Código en bloques \`\`\` indicando el lenguaje, con comentarios breves; explica qué hace cada parte y muestra la salida esperada.
+- Usa tablas Markdown cuando ayuden (tablas de verdad, comparaciones, conversiones entre bases).
+- Ve al grano: sin frases de relleno como «¡Claro! Aquí tienes…».
 - Si no estás seguro de algo, dilo en vez de inventar.`;
 }
 
@@ -603,7 +625,7 @@ function viewAjustes() {
         <select id="model" class="input" data-setting="model" ${models.length ? "" : "disabled"}>
           ${models.length ? models.map((m) => `<option value="${esc(m.id)}"${m.id === st.model ? " selected" : ""}>${esc(m.label)} (${esc(m.id)})</option>`).join("") : `<option>Guarda tu clave para ver los modelos</option>`}
         </select>
-        <p class="muted small">Recomendado: el Flash más nuevo (rápido y barato).</p>
+        <p class="muted small">Flash: rápido y barato. Pro: explica con más profundidad, pero tarda más y tiene menos uso gratuito.</p>
       </div>
     </section>
 
@@ -925,8 +947,18 @@ const actions = {
       <div class="sheet-list">${s.subjects
         .map((x) => `<button class="sheet-item${x.id === ui.tutorSubject ? " selected" : ""}" data-action="pick-subject" data-id="${x.id}" aria-pressed="${x.id === ui.tutorSubject}"><span class="dot" style="background:${color(x)}"></span><span class="grow">${esc(x.name)}</span>${x.id === ui.tutorSubject ? icon("check", 18) : ""}</button>`)
         .join("")}</div>
+      <h2 class="h3">Cómo te ayuda el tutor</h2>
+      <div class="segmented" role="group" aria-label="Estilo del tutor">
+        <button class="seg${s.settings.tutorStyle !== "guiar" ? " on" : ""}" data-action="tutor-style" data-style="explicar" aria-pressed="${s.settings.tutorStyle !== "guiar"}"><b>Explícamelo</b><span>Explicaciones y soluciones completas</span></button>
+        <button class="seg${s.settings.tutorStyle === "guiar" ? " on" : ""}" data-action="tutor-style" data-style="guiar" aria-pressed="${s.settings.tutorStyle === "guiar"}"><b>Guíame</b><span>Pistas para resolverlo tú</span></button>
+      </div>
       ${focus ? `<button class="btn btn-secondary" data-action="clear-focus">Dejar de centrarse en «${esc(ui.focus.topic)}»</button>` : ""}
       ${hasChat ? `<button class="btn btn-danger" data-action="clear-chat">${icon("trash", 18)} Borrar esta conversación</button>` : ""}`);
+  },
+  "tutor-style": (el) => {
+    store.update((st) => (st.settings.tutorStyle = el.dataset.style));
+    closeSheet();
+    toast(el.dataset.style === "guiar" ? "Modo guía: te dará pistas paso a paso" : "Modo explicación: te lo explicará todo");
   },
   "pick-subject": (el) => {
     ui.tutorSubject = el.dataset.id;

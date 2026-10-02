@@ -80,7 +80,7 @@ export async function generateJSON({ apiKey, model, system, prompt }) {
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: system }] },
       contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: "application/json", temperature: 0.4 },
+      generationConfig: { responseMimeType: "application/json" },
     }),
   });
   if (!res.ok) throw await toError(res);
@@ -107,7 +107,6 @@ export async function streamChat({ apiKey, model, system, history, onText, signa
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: system }] },
       contents: history,
-      generationConfig: { temperature: 0.6 },
     }),
   });
   if (!res.ok) throw await toError(res);
