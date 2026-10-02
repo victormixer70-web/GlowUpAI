@@ -1,5 +1,5 @@
 // Service worker: guarda la app para que abra sin conexión.
-const CACHE = "estudio-v1";
+const CACHE = "estudio-v2";
 const SHELL = [
   "./",
   "./index.html",
