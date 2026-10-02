@@ -2,6 +2,7 @@ import * as store from "./store.js";
 import * as gemini from "./gemini.js";
 import { renderMarkdown, escapeHTML as esc } from "./markdown.js";
 import { generatePlan, KIND_LABEL } from "./planner.js";
+import * as nb from "./notebook.js";
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const view = $("#view");
@@ -23,6 +24,16 @@ const ui = {
   sessionOpen: false,
   alerted: false,
   installPrompt: null,
+  tutorTab: "chat", // "chat" | "cuaderno"
+  nbTopic: null, // tema abierto en el cuaderno
+  nbTab: "leccion", // "leccion" | "evaluacion"
+  nbLesson: null, // { topicId, text, controller } mientras se escribe una lección
+  nbBusy: false, // preparando una evaluación
+  nbError: null,
+  quiz: null, // evaluación en curso
+  quizCount: 5,
+  quizDiff: "media",
+  keepInnerScroll: false,
 };
 
 // ---------------------------------------------------------------- utilidades
@@ -47,6 +58,7 @@ const ICONS = {
   download: '<path d="M12 4v11"/><polyline points="7 10 12 15 17 10"/><line x1="5" y1="20" x2="19" y2="20"/>',
   upload: '<path d="M12 15V4"/><polyline points="7 9 12 4 17 9"/><line x1="5" y1="20" x2="19" y2="20"/>',
   chevron: '<polyline points="15 18 9 12 15 6"/>',
+  chevronRight: '<polyline points="9 18 15 12 9 6"/>',
   timer: '<circle cx="12" cy="13" r="8"/><line x1="12" y1="13" x2="12" y2="9"/><line x1="10" y1="2" x2="14" y2="2"/>',
 };
 
@@ -347,8 +359,12 @@ function viewTutor() {
         <span class="subject-switch-text"><span class="subject-switch-name">${esc(sub?.name || "Tutor")}</span>${focus ? `<span class="subject-switch-focus">${esc(focus.topic)}</span>` : ""}</span>
         <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
+      <div class="mode-toggle" role="group" aria-label="Sección del tutor">
+        <button class="mode${ui.tutorTab === "chat" ? " on" : ""}" data-action="tutor-tab" data-tab="chat" aria-pressed="${ui.tutorTab === "chat"}">Chat</button>
+        <button class="mode${ui.tutorTab === "cuaderno" ? " on" : ""}" data-action="tutor-tab" data-tab="cuaderno" aria-pressed="${ui.tutorTab === "cuaderno"}">Cuaderno</button>
+      </div>
     </header>
-    <div class="messages" id="messages" aria-live="polite">
+    ${ui.tutorTab === "cuaderno" ? `${viewNotebook()}</div>` : `<div class="messages" id="messages" aria-live="polite">
       ${msgs.length || streaming ? msgs.map(messageHTML).join("") : empty}
       ${streaming ? `<div class="msg model md" id="streaming-bubble">${ui.streaming.text ? renderMarkdown(ui.streaming.text) : `<span class="typing"><i></i><i></i><i></i></span>`}</div>` : ""}
       ${ui.chatError ? `<div class="msg error-msg" role="alert">${esc(ui.chatError)}</div>` : ""}
@@ -368,7 +384,317 @@ function viewTutor() {
       </div>
     </form>
     <input type="file" id="file-input" accept="image/*" hidden>
+  </div>`}`;
+}
+
+// ---------------------------------------------------------------- tutor: cuaderno
+
+const DIFF_LABEL = { facil: "Fácil", media: "Media", examen: "Examen" };
+const LETTERS = "ABCDEF";
+
+function pct(x) {
+  return x === null || x === undefined ? "—" : `${Math.round(x * 100)}%`;
+}
+
+function levelClass(acc) {
+  if (acc === null || acc === undefined) return "";
+  return acc >= 0.8 ? "lvl-good" : acc >= 0.5 ? "lvl-mid" : "lvl-bad";
+}
+
+function requireKey() {
+  if (store.get().settings.apiKey) return true;
+  toast("Primero añade tu clave de Gemini en Ajustes");
+  location.hash = "#/ajustes";
+  return false;
+}
+
+function conceptList(items) {
+  return `<ul class="concepts">${items
+    .map(
+      (c) => `<li><button class="concept" data-action="nb-open" data-id="${c.topicId}">
+        <span class="grow"><b>${esc(c.name)}</b>${c.name !== c.topic ? `<span class="meta">${esc(c.topic)}</span>` : ""}</span>
+        <span class="concept-pct ${levelClass(c.accuracy)}">${pct(c.accuracy)}</span></button></li>`
+    )
+    .join("")}</ul>`;
+}
+
+function viewNotebook() {
+  const topic = ui.nbTopic && nb.topicById(ui.tutorSubject, ui.nbTopic);
+  if (topic) return viewNotebookTopic(topic);
+  ui.nbTopic = null;
+  const st = nb.subjectStats(ui.tutorSubject);
+
+  const summary = st.total
+    ? `<section class="card nb-summary">
+        <div class="row-between"><div class="eyebrow">Tu nivel en evaluaciones</div><div class="meta">${st.total} preguntas</div></div>
+        <div class="nb-big ${levelClass(st.accuracy)}">${pct(st.accuracy)} <span>de acierto</span></div>
+        ${st.weak.length ? `<h3 class="nb-h">Dónde fallas más</h3>${conceptList(st.weak)}` : ""}
+        ${st.strong.length ? `<h3 class="nb-h">Dónde aciertas más</h3>${conceptList(st.strong)}` : ""}
+        ${st.weak.length ? `<button class="btn" data-action="nb-review-weak" data-id="${st.weak[0].topicId}">${icon("sparkle", 18)} Repasar mis fallos</button>` : ""}
+      </section>`
+    : `<section class="card">
+        <div class="eyebrow accent">Cuaderno</div>
+        <h2>Lecciones y evaluaciones por tema</h2>
+        <p class="muted small">Añade los temas que quieras estudiar. En cada uno, la IA te escribe una lección y te pone evaluaciones tipo test. Aquí verás dónde fallas y dónde aciertas más.</p>
+      </section>`;
+
+  const list = st.topics.length
+    ? `<ul class="list">${st.topics
+        .map(
+          ({ topic: t, stats: s }) => `<li><button class="nb-topic" data-action="nb-open" data-id="${t.id}">
+            <span class="block-main">
+              <span class="block-title">${esc(t.name)}</span>
+              <span class="meta">${t.lesson ? "Lección ✓" : "Sin lección"} · ${s.attempts ? `${s.attempts} ${s.attempts === 1 ? "evaluación" : "evaluaciones"}` : "sin evaluar"}</span>
+              ${s.total ? `<span class="track"><span class="fill ${levelClass(s.accuracy)}" style="width:${Math.max(4, s.accuracy * 100)}%"></span></span>` : ""}
+            </span>
+            ${s.total ? `<span class="nb-pct ${levelClass(s.accuracy)}">${pct(s.accuracy)}</span>` : ""}
+            ${icon("chevronRight", 18)}
+          </button></li>`
+        )
+        .join("")}</ul>`
+    : `<p class="muted small">Todavía no hay temas.</p>`;
+
+  return `<div class="nb-scroll" id="nb-scroll">
+    ${summary}
+    <section class="section">
+      <div class="row-between"><h2 class="h3">Temas</h2>${store.subjectById(ui.tutorSubject)?.topics ? `<button class="link-btn small" data-action="nb-import">Importar del temario</button>` : ""}</div>
+      ${list}
+      <form class="nb-add" data-form="nb-topic">
+        <label for="nb-new" class="sr-only">Nuevo tema</label>
+        <input id="nb-new" name="name" class="input" placeholder="Nuevo tema, p. ej. Derivadas implícitas" maxlength="80" autocomplete="off">
+        <button class="btn" type="submit" aria-label="Añadir tema">${icon("plus", 18)}</button>
+      </form>
+    </section>
   </div>`;
+}
+
+function viewNotebookTopic(topic) {
+  const inQuiz = ui.quiz && ui.quiz.topicId === topic.id;
+  if (inQuiz) ui.nbTab = "evaluacion";
+  const tabs = `<div class="nb-tabs" role="group" aria-label="Sección del tema">
+      <button class="nb-tab${ui.nbTab === "leccion" ? " on" : ""}" data-action="nb-tab" data-tab="leccion" aria-pressed="${ui.nbTab === "leccion"}">Lección</button>
+      <button class="nb-tab${ui.nbTab === "evaluacion" ? " on" : ""}" data-action="nb-tab" data-tab="evaluacion" aria-pressed="${ui.nbTab === "evaluacion"}">Evaluación</button>
+    </div>`;
+  return `<div class="nb-scroll" id="nb-scroll">
+    <div class="nb-head">
+      <button class="icon-btn ghost" data-action="nb-back" aria-label="Volver a los temas">${icon("chevron")}</button>
+      <h2 class="nb-title">${esc(topic.name)}</h2>
+      ${inQuiz ? "" : `<button class="icon-btn ghost" data-action="nb-delete" data-id="${topic.id}" aria-label="Borrar tema">${icon("trash", 18)}</button>`}
+    </div>
+    ${inQuiz ? "" : tabs}
+    ${ui.nbTab === "evaluacion" ? nbEvaluation(topic) : nbLesson(topic)}
+  </div>`;
+}
+
+function nbLesson(topic) {
+  const live = ui.nbLesson && ui.nbLesson.topicId === topic.id ? ui.nbLesson : null;
+  const err = ui.nbError ? `<p class="error" role="alert">${esc(ui.nbError)}</p>` : "";
+  if (live) {
+    return `<article class="md nb-lesson" id="nb-lesson-live">${live.text ? renderMarkdown(live.text) : `<p class="muted"><span class="spinner"></span> Escribiendo la lección…</p>`}</article>
+      <button class="btn btn-secondary" data-action="nb-stop-lesson">${icon("stop", 16)} Detener</button>`;
+  }
+  if (!topic.lesson) {
+    return `<section class="card form">
+      <h2 class="h3">Lección de este tema</h2>
+      <p class="muted small">La IA te escribe unos apuntes con la idea clave, la teoría, ejemplos resueltos paso a paso, errores típicos y un resumen para repasar.</p>
+      <form data-form="nb-lesson" class="form">
+        <div class="field"><label for="nb-focus">¿En qué quieres que se centre? (opcional)</label>
+        <textarea id="nb-focus" name="focus" class="input" rows="2" maxlength="300" placeholder="p. ej. muchos ejemplos de cálculo"></textarea></div>
+        <button class="btn" type="submit">${icon("sparkle", 18)} Generar lección</button>
+      </form>
+      ${err}
+    </section>`;
+  }
+  return `<article class="md nb-lesson">${renderMarkdown(topic.lesson.text)}</article>
+    ${err}
+    <div class="nb-actions">
+      <button class="btn" data-action="nb-tab" data-tab="evaluacion">${icon("check", 18)} Ponme a prueba</button>
+      <button class="btn btn-secondary" data-action="nb-ask" data-id="${topic.id}">${icon("chat", 18)} Preguntar dudas</button>
+      <button class="link-btn small" data-action="nb-regen">Volver a generar la lección</button>
+    </div>`;
+}
+
+function nbEvaluation(topic) {
+  const q = ui.quiz && ui.quiz.topicId === topic.id ? ui.quiz : null;
+  if (q) return q.done ? quizResult(q) : quizQuestion(q);
+  const s = nb.topicStats(topic);
+  const err = ui.nbError ? `<p class="error" role="alert">${esc(ui.nbError)}</p>` : "";
+  const stats = s.total
+    ? `<section class="card">
+        <div class="row-between"><div class="eyebrow">Tu nivel en este tema</div><div class="meta">últimas ${Math.min(5, s.attempts)}</div></div>
+        <div class="nb-big ${levelClass(s.accuracy)}">${pct(s.accuracy)} <span>de acierto</span></div>
+        ${[...s.concepts]
+          .sort((a, b) => a.accuracy - b.accuracy)
+          .map(
+            (c) => `<div class="subject-progress">
+              <div class="row-between small"><span>${esc(c.name)}</span><span class="mono">${c.correct}/${c.total}</span></div>
+              <div class="track"><div class="fill ${levelClass(c.accuracy)}" style="width:${Math.max(4, c.accuracy * 100)}%"></div></div>
+            </div>`
+          )
+          .join("")}
+      </section>`
+    : "";
+  return `${stats}
+    <section class="card form">
+      <h2 class="h3">Nueva evaluación</h2>
+      ${topic.lesson ? "" : `<p class="muted small">Consejo: genera antes la lección para que las preguntas se basen en ella.</p>`}
+      <div class="field"><span class="label">Preguntas</span><div class="pills" role="group" aria-label="Número de preguntas">${[5, 10, 15]
+        .map((n) => `<button class="pill-opt${ui.quizCount === n ? " on" : ""}" data-action="nb-count" data-n="${n}" aria-pressed="${ui.quizCount === n}">${n}</button>`)
+        .join("")}</div></div>
+      <div class="field"><span class="label">Dificultad</span><div class="pills" role="group" aria-label="Dificultad">${Object.entries(DIFF_LABEL)
+        .map(([v, l]) => `<button class="pill-opt${ui.quizDiff === v ? " on" : ""}" data-action="nb-diff" data-v="${v}" aria-pressed="${ui.quizDiff === v}">${l}</button>`)
+        .join("")}</div></div>
+      <button class="btn" data-action="nb-start-quiz" ${ui.nbBusy ? "disabled" : ""}>${ui.nbBusy ? `<span class="spinner"></span> Preparando preguntas…` : `${icon("play", 18)} Empezar evaluación`}</button>
+      ${err}
+    </section>
+    ${
+      topic.attempts.length
+        ? `<section class="section"><h2 class="h3">Historial</h2><ul class="list">${[...topic.attempts]
+            .reverse()
+            .slice(0, 10)
+            .map((a) => `<li class="load-row"><span class="grow">${esc(fmtDateShort(a.date))} · ${esc(DIFF_LABEL[a.difficulty] || "")}</span><span class="mono ${levelClass(a.correct / a.total)}">${a.correct}/${a.total}</span></li>`)
+            .join("")}</ul></section>`
+        : ""
+    }`;
+}
+
+function quizQuestion(q) {
+  const item = q.questions[q.index];
+  const answered = q.selected !== null;
+  const right = answered && q.selected === item.answer;
+  return `<section class="quiz">
+    <div class="row-between"><div class="eyebrow">Pregunta ${q.index + 1} de ${q.questions.length}</div><button class="link-btn small" data-action="nb-quit-quiz">Salir</button></div>
+    <div class="track"><div class="fill" style="width:${((q.index + (answered ? 1 : 0)) / q.questions.length) * 100}%;background:var(--ink)"></div></div>
+    <div class="md quiz-q">${renderMarkdown(item.question)}</div>
+    <div class="quiz-opts">${item.options
+      .map((o, i) => {
+        let cls = "";
+        if (answered && i === item.answer) cls = " right";
+        else if (answered && i === q.selected) cls = " wrong";
+        return `<button class="quiz-opt${cls}" data-action="nb-answer" data-i="${i}" ${answered ? "disabled" : ""}><span class="quiz-letter">${LETTERS[i]}</span><span class="md grow">${renderMarkdown(o, { inline: true })}</span></button>`;
+      })
+      .join("")}</div>
+    ${
+      answered
+        ? `<div class="quiz-feedback ${right ? "ok" : "bad"}" role="status">
+            <b>${right ? "¡Correcto!" : `Incorrecto. La respuesta correcta es la ${LETTERS[item.answer]}.`}</b>
+            <div class="md">${renderMarkdown(item.explanation)}</div>
+          </div>
+          <button class="btn" data-action="nb-next">${q.index + 1 < q.questions.length ? "Siguiente" : "Ver resultado"}</button>`
+        : ""
+    }
+  </section>`;
+}
+
+function quizResult(q) {
+  const total = q.questions.length;
+  const acc = q.correct / total;
+  const wrong = q.answers.filter((a) => !a.correct);
+  const byConcept = {};
+  wrong.forEach((a) => (byConcept[a.concept] = (byConcept[a.concept] || 0) + 1));
+  const msg =
+    acc >= 0.9
+      ? "¡Excelente! Dominas este tema."
+      : acc >= 0.7
+        ? "Bien. Repasa los fallos y lo tendrás."
+        : acc >= 0.5
+          ? "Vas por buen camino, pero hay conceptos que reforzar."
+          : "Este tema necesita más repaso: empieza por la lección y por tus fallos.";
+  return `<section class="card quiz-result">
+      <div class="eyebrow">Resultado · ${esc(DIFF_LABEL[q.difficulty] || "")}</div>
+      <div class="nb-big ${levelClass(acc)}">${q.correct}/${total} <span>${pct(acc)}</span></div>
+      <p>${msg}</p>
+      ${
+        wrong.length
+          ? `<h3 class="nb-h">Has fallado en</h3><ul class="concepts">${Object.entries(byConcept)
+              .sort((a, b) => b[1] - a[1])
+              .map(([c, n]) => `<li class="concept static"><span class="grow"><b>${esc(c)}</b></span><span class="concept-pct lvl-bad">${n} ${n === 1 ? "fallo" : "fallos"}</span></li>`)
+              .join("")}</ul>`
+          : ""
+      }
+    </section>
+    ${wrong.length ? `<button class="btn" data-action="nb-explain-errors">${icon("chat", 18)} Explícame mis fallos</button>` : ""}
+    <div class="row-gap">
+      <button class="btn btn-secondary grow" data-action="nb-start-quiz">Otra evaluación</button>
+      <button class="btn btn-secondary grow" data-action="nb-close-quiz">Terminar</button>
+    </div>`;
+}
+
+let lessonPaintQueued = false;
+function paintLesson() {
+  if (lessonPaintQueued) return;
+  lessonPaintQueued = true;
+  requestAnimationFrame(() => {
+    lessonPaintQueued = false;
+    const el = $("#nb-lesson-live");
+    if (el && ui.nbLesson) el.innerHTML = renderMarkdown(ui.nbLesson.text);
+  });
+}
+
+async function startLesson(focusNote = "") {
+  if (!requireKey() || ui.nbLesson) return;
+  const subjectId = ui.tutorSubject;
+  const topicId = ui.nbTopic;
+  ui.nbLesson = { topicId, text: "", controller: new AbortController() };
+  ui.nbError = null;
+  render();
+  try {
+    const text = await nb.generateLesson({
+      subjectId,
+      topicId,
+      focusNote,
+      signal: ui.nbLesson.controller.signal,
+      onText: (t) => {
+        ui.nbLesson.text = t;
+        paintLesson();
+      },
+    });
+    nb.saveLesson(subjectId, topicId, text);
+  } catch (e) {
+    if (e.name === "AbortError") {
+      if (ui.nbLesson?.text) nb.saveLesson(subjectId, topicId, ui.nbLesson.text);
+    } else ui.nbError = e.message || "No se pudo generar la lección";
+  } finally {
+    ui.nbLesson = null;
+    if (ui.route === "tutor") render();
+  }
+}
+
+async function startQuiz(targetWeak = false) {
+  if (!requireKey() || ui.nbBusy) return;
+  const subjectId = ui.tutorSubject;
+  const topicId = ui.nbTopic;
+  ui.quiz = null;
+  ui.nbBusy = true;
+  ui.nbError = null;
+  ui.nbTab = "evaluacion";
+  render();
+  try {
+    const questions = await nb.generateQuiz({ subjectId, topicId, count: ui.quizCount, difficulty: ui.quizDiff, targetWeak });
+    ui.quiz = { subjectId, topicId, questions, index: 0, selected: null, answers: [], correct: 0, done: false, difficulty: ui.quizDiff };
+  } catch (e) {
+    ui.nbError = e.message || "No se pudo crear la evaluación";
+  } finally {
+    ui.nbBusy = false;
+    if (ui.route === "tutor") {
+      render();
+      const sc = $("#nb-scroll");
+      if (sc) sc.scrollTop = 0;
+    }
+  }
+}
+
+function finishQuiz() {
+  const q = ui.quiz;
+  q.done = true;
+  nb.saveAttempt(q.subjectId, q.topicId, {
+    id: store.uid(),
+    date: store.isoDate(),
+    difficulty: q.difficulty,
+    total: q.questions.length,
+    correct: q.correct,
+    answers: q.answers.map((a) => ({ question: a.question.slice(0, 200), concept: a.concept, correct: a.correct })),
+  });
 }
 
 function tutorSystem(subjectId) {
@@ -376,9 +702,10 @@ function tutorSystem(subjectId) {
   const sub = store.subjectById(subjectId);
   const focus = ui.focus && ui.focus.subjectId === subjectId ? ui.focus : null;
   const guide = s.settings.tutorStyle === "guiar";
+  const weak = nb.weakSummary(subjectId);
   return `Eres un profesor particular excelente de ${sub?.name} para un estudiante de ${s.settings.context}.
 Temario de la asignatura: ${sub?.topics || "no especificado"}.
-${focus ? `Ahora mismo está estudiando: ${focus.topic}. Tarea del bloque: ${focus.task || "-"}.\n` : ""}
+${focus ? `Ahora mismo está estudiando: ${focus.topic}. Tarea del bloque: ${focus.task || "-"}.\n` : ""}${weak ? `Según sus evaluaciones del cuaderno, le cuesta: ${weak}. Tenlo en cuenta al explicar.\n` : ""}
 Tu objetivo es que el estudiante entienda de verdad, no solo que tenga la respuesta. Explica como el mejor profesor que haya tenido: claro, riguroso, paciente y con buenos ejemplos. Responde siempre en español de España.
 
 ## Cómo explicar un concepto o tema
@@ -526,6 +853,27 @@ function compressImage(file) {
 
 // ---------------------------------------------------------------- vista: Progreso
 
+function evalSection() {
+  const rows = store
+    .get()
+    .subjects.map((x) => ({ x, st: nb.subjectStats(x.id) }))
+    .filter((r) => r.st.total);
+  if (!rows.length) return "";
+  return `<section class="section">
+    <h2 class="h3">Evaluaciones del cuaderno</h2>
+    <ul class="list">${rows
+      .map(
+        ({ x, st }) => `<li><button class="nb-topic" data-action="open-notebook" data-id="${x.id}">
+          <span class="dot" style="background:${color(x)}"></span>
+          <span class="block-main"><span class="block-title">${esc(x.name)}</span>
+          <span class="meta">${st.weak.length ? `Te cuesta: ${esc(st.weak.map((c) => c.name).join(", "))}` : "Sin puntos débiles claros"}</span></span>
+          <span class="nb-pct ${levelClass(st.accuracy)}">${pct(st.accuracy)}</span>${icon("chevronRight", 18)}
+        </button></li>`
+      )
+      .join("")}</ul>
+  </section>`;
+}
+
 function viewProgreso() {
   const s = store.get();
   const today = store.isoDate();
@@ -578,6 +926,8 @@ function viewProgreso() {
         )
         .join("")}
     </section>
+
+    ${evalSection()}
 
     ${
       exams.length
@@ -960,8 +1310,119 @@ const actions = {
     closeSheet();
     toast(el.dataset.style === "guiar" ? "Modo guía: te dará pistas paso a paso" : "Modo explicación: te lo explicará todo");
   },
+  "tutor-tab": (el) => {
+    ui.tutorTab = el.dataset.tab;
+    render();
+    if (ui.tutorTab === "chat") scrollMessages();
+  },
+  "open-notebook": (el) => {
+    ui.tutorSubject = el.dataset.id;
+    ui.tutorTab = "cuaderno";
+    ui.nbTopic = null;
+    location.hash = "#/tutor";
+  },
+  "nb-open": (el) => {
+    ui.nbTopic = el.dataset.id;
+    ui.nbError = null;
+    const t = nb.topicById(ui.tutorSubject, ui.nbTopic);
+    ui.nbTab = t && !t.lesson && !t.attempts.length ? "leccion" : ui.nbTab;
+    render();
+  },
+  "nb-back": () => {
+    ui.nbTopic = null;
+    ui.nbError = null;
+    render();
+  },
+  "nb-tab": (el) => {
+    ui.nbTab = el.dataset.tab;
+    ui.nbError = null;
+    render();
+  },
+  "nb-import": () => {
+    const n = nb.importTopicsFromSyllabus(ui.tutorSubject);
+    toast(n ? "Temas importados del temario" : "El temario de esta asignatura está vacío (edítalo en Ajustes)");
+    render();
+  },
+  "nb-delete": (el) => {
+    const t = nb.topicById(ui.tutorSubject, el.dataset.id);
+    if (!t || !confirm(`¿Borrar el tema «${t.name}» con su lección y sus evaluaciones?`)) return;
+    nb.deleteTopic(ui.tutorSubject, t.id);
+    ui.nbTopic = null;
+    render();
+  },
+  "nb-regen": () => {
+    if (confirm("¿Generar una lección nueva? Sustituirá a la actual.")) startLesson();
+  },
+  "nb-stop-lesson": () => ui.nbLesson?.controller.abort(),
+  "nb-ask": (el) => {
+    const t = nb.topicById(ui.tutorSubject, el.dataset.id);
+    ui.focus = { subjectId: ui.tutorSubject, topic: t.name, task: "" };
+    ui.tutorTab = "chat";
+    render();
+    scrollMessages();
+    $("#chat-input")?.focus();
+  },
+  "nb-count": (el) => {
+    ui.quizCount = Number(el.dataset.n);
+    ui.keepInnerScroll = true;
+    render();
+  },
+  "nb-diff": (el) => {
+    ui.quizDiff = el.dataset.v;
+    ui.keepInnerScroll = true;
+    render();
+  },
+  "nb-start-quiz": () => startQuiz(false),
+  "nb-review-weak": (el) => {
+    ui.nbTopic = el.dataset.id;
+    startQuiz(true);
+  },
+  "nb-answer": (el) => {
+    const q = ui.quiz;
+    if (!q || q.selected !== null) return;
+    const item = q.questions[q.index];
+    q.selected = Number(el.dataset.i);
+    const correct = q.selected === item.answer;
+    if (correct) q.correct++;
+    q.answers.push({ question: item.question, concept: item.concept, correct, chosen: item.options[q.selected], right: item.options[item.answer] });
+    ui.keepInnerScroll = true;
+    render();
+    $(".quiz-feedback")?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  },
+  "nb-next": () => {
+    const q = ui.quiz;
+    if (!q) return;
+    if (q.index + 1 < q.questions.length) {
+      q.index++;
+      q.selected = null;
+    } else finishQuiz();
+    render();
+  },
+  "nb-quit-quiz": () => {
+    if (!confirm("¿Salir de la evaluación? No se guardará el resultado.")) return;
+    ui.quiz = null;
+    render();
+  },
+  "nb-close-quiz": () => {
+    ui.quiz = null;
+    render();
+  },
+  "nb-explain-errors": () => {
+    const q = ui.quiz;
+    const t = nb.topicById(q.subjectId, q.topicId);
+    const wrong = q.answers.filter((a) => !a.correct);
+    const text = `He hecho una evaluación del tema «${t?.name}» y he fallado estas preguntas. Explícame en qué me he equivocado, cómo se resuelven bien y qué debo repasar:\n\n${wrong
+      .map((a, i) => `${i + 1}. ${a.question}\n   - Respondí: ${a.chosen}\n   - Correcta: ${a.right}`)
+      .join("\n")}`;
+    ui.focus = { subjectId: q.subjectId, topic: t?.name || "", task: "" };
+    ui.tutorSubject = q.subjectId;
+    ui.quiz = null;
+    ui.tutorTab = "chat";
+    sendMessage(text);
+  },
   "pick-subject": (el) => {
     ui.tutorSubject = el.dataset.id;
+    ui.nbTopic = null;
     ui.chatError = null;
     closeSheet();
     render();
@@ -1068,6 +1529,15 @@ document.addEventListener("submit", async (e) => {
     input.value = "";
     sendMessage(text);
     if (hadFocus) $("#chat-input")?.focus();
+  } else if (kind === "nb-topic") {
+    const name = String(new FormData(form).get("name") || "");
+    const id = nb.addTopic(ui.tutorSubject, name);
+    if (!id) return;
+    ui.nbTopic = id;
+    ui.nbTab = "leccion";
+    render();
+  } else if (kind === "nb-lesson") {
+    startLesson(String(new FormData(form).get("focus") || "").trim());
   } else if (kind === "exam") {
     const data = Object.fromEntries(new FormData(form));
     if (!data.date) return toast("Pon la fecha del examen");
@@ -1183,8 +1653,14 @@ function render() {
   const keepScroll = ui.route === view.dataset.route ? view.scrollTop : 0;
   view.dataset.route = ui.route;
   view.className = `view view--${ui.route}`;
+  const innerTop = ui.keepInnerScroll ? $("#nb-scroll")?.scrollTop || 0 : 0;
   view.innerHTML = fn();
   view.scrollTop = keepScroll;
+  if (ui.keepInnerScroll) {
+    const inner = $("#nb-scroll");
+    if (inner) inner.scrollTop = innerTop;
+    ui.keepInnerScroll = false;
+  }
   document.querySelectorAll(".tabbar a").forEach((a) => {
     const on = a.dataset.route === ui.route;
     a.classList.toggle("active", on);

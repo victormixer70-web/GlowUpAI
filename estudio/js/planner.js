@@ -2,6 +2,7 @@
 
 import * as store from "./store.js";
 import { generateJSON } from "./gemini.js";
+import { weakSummary } from "./notebook.js";
 
 const DAY_NAMES = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
 const KINDS = ["teoria", "ejercicios", "repaso", "practica", "simulacro"];
@@ -31,7 +32,12 @@ export async function generatePlan({ extraNotes = "" } = {}) {
   }
   if (!studyDates.length) throw new Error("Elige al menos un día de estudio en Ajustes.");
 
-  const subjects = s.subjects.map((x) => `- id "${x.id}": ${x.name}. Temario: ${x.topics || "(sin detallar)"}`).join("\n");
+  const subjects = s.subjects
+    .map((x) => {
+      const weak = weakSummary(x.id);
+      return `- id "${x.id}": ${x.name}. Temario: ${x.topics || "(sin detallar)"}${weak ? `. Según sus evaluaciones le cuesta: ${weak} (dale repasos extra)` : ""}`;
+    })
+    .join("\n");
   const exams = upcoming.length
     ? upcoming
         .map((e) => `- ${e.date} (${DAY_NAMES[store.parseDate(e.date).getDay()]}): ${e.title || "Examen"} de ${store.subjectById(e.subjectId)?.name || e.subjectId}${e.topics ? `. Entra: ${e.topics}` : ""}`)

@@ -15,7 +15,7 @@ function renderMath(tex, display) {
   }
 }
 
-export function renderMarkdown(src) {
+export function renderMarkdown(src, { inline = false } = {}) {
   if (typeof marked === "undefined" || typeof DOMPurify === "undefined") {
     return `<p>${escapeHTML(src).replace(/\n/g, "<br>")}</p>`;
   }
@@ -41,7 +41,7 @@ export function renderMarkdown(src) {
 
   // 3. Devuelve el código y convierte a HTML.
   text = text.replace(/KXCODE(\d+)KX/g, (_, i) => code[Number(i)]);
-  const html = DOMPurify.sanitize(marked.parse(text, { breaks: true, gfm: true }));
+  const html = DOMPurify.sanitize(inline ? marked.parseInline(text, { gfm: true }) : marked.parse(text, { breaks: true, gfm: true }));
 
   // 4. Inserta las fórmulas ya renderizadas por KaTeX.
   return html
