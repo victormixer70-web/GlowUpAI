@@ -53,6 +53,7 @@ function defaults() {
     plan: null, // { createdAt, summary, blocks: [...] }
     log: [], // { id, date, subjectId, minutes, blockId }
     chats: {}, // subjectId -> [{ role: "user" | "model", text, hadImage }]
+    notebook: {}, // subjectId -> { topics: [{ id, name, lesson, attempts }] }
     session: null, // sesión de estudio en curso
   };
 }

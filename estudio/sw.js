@@ -1,5 +1,5 @@
 // Service worker: guarda la app para que abra sin conexión.
-const CACHE = "estudio-v3";
+const CACHE = "estudio-v4";
 const SHELL = [
   "./",
   "./index.html",
@@ -10,6 +10,7 @@ const SHELL = [
   "./js/gemini.js",
   "./js/planner.js",
   "./js/markdown.js",
+  "./js/notebook.js",
   "./vendor/marked.min.js",
   "./vendor/purify.min.js",
   "./vendor/katex/katex.min.js",
