@@ -3,6 +3,7 @@ import * as gemini from "./gemini.js";
 import { renderMarkdown, escapeHTML as esc } from "./markdown.js";
 import { generatePlan, KIND_LABEL } from "./planner.js";
 import * as nb from "./notebook.js";
+import * as games from "./games.js";
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const view = $("#view");
@@ -34,6 +35,8 @@ const ui = {
   quizCount: 5,
   quizDiff: "media",
   keepInnerScroll: false,
+  gameId: null,
+  gameCleanup: null,
 };
 
 // ---------------------------------------------------------------- utilidades
@@ -943,6 +946,62 @@ function viewProgreso() {
   `;
 }
 
+// ---------------------------------------------------------------- vista: Otros y minijuegos
+
+const GAME_ART = {
+  2048: '<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/>',
+  serpiente: '<path d="M4 18h8a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h10"/><circle cx="19" cy="6" r="1.2"/>',
+  parejas: '<rect x="3" y="5" width="9" height="14" rx="2"/><rect x="12" y="5" width="9" height="14" rx="2"/><path d="M7.5 10v4M16.5 10v4"/>',
+  binario: '<rect x="3" y="6" width="7" height="12" rx="3.5"/><path d="M16 6v12M14 8l2-2"/>',
+  calculo: '<path d="M7 4v6M4 7h6M14 7h6M5 15l4 4M9 15l-4 4M14 15h6M14 19h6"/>',
+};
+
+function gameArt(id) {
+  return `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${GAME_ART[id] || ""}</svg>`;
+}
+
+function viewOtros() {
+  return `
+    ${topbar("Más cosas", "Otros", "<span></span>")}
+    <ul class="list">
+      <li><a class="menu-row" href="#/juegos">
+        <span class="menu-icon">${gameArt("2048")}</span>
+        <span class="block-main"><span class="block-title">Minijuegos</span><span class="meta">Para descansar entre bloques de estudio</span></span>
+        ${icon("chevronRight", 18)}
+      </a></li>
+      <li><a class="menu-row" href="#/ajustes">
+        <span class="menu-icon">${icon("settings", 24)}</span>
+        <span class="block-main"><span class="block-title">Ajustes</span><span class="meta">IA, horario, asignaturas y tus datos</span></span>
+        ${icon("chevronRight", 18)}
+      </a></li>
+    </ul>
+  `;
+}
+
+function viewJuegos() {
+  return `
+    ${topbar("Otros", "Minijuegos", `<a class="icon-btn" href="#/otros" aria-label="Volver a Otros">${icon("chevron")}</a>`)}
+    <p class="muted small">Un descanso corto sienta bien. Luego, ¡a por el siguiente bloque!</p>
+    <div class="game-grid">${games.GAMES.map((g) => {
+      const b = games.best(g.id);
+      return `<a class="game-card" href="#/juego/${g.id}">
+        <span class="game-art">${gameArt(g.id)}</span>
+        <span class="game-name">${esc(g.name)}</span>
+        <span class="game-desc">${esc(g.desc)}</span>
+        <span class="meta">${b === null ? "Sin jugar" : `${esc(g.record)}: ${b}`}</span>
+      </a>`;
+    }).join("")}</div>
+  `;
+}
+
+function viewJuego() {
+  const g = games.gameById(ui.gameId);
+  return `
+    ${topbar("Minijuegos", g.name, `<a class="icon-btn" href="#/juegos" aria-label="Volver a Minijuegos">${icon("chevron")}</a>`)}
+    <div id="game-root" class="game-root"></div>
+  `;
+}
+
 // ---------------------------------------------------------------- vista: Ajustes
 
 const DAY_LABELS = [
@@ -1646,7 +1705,8 @@ document.addEventListener("input", (e) => {
 
 // ---------------------------------------------------------------- router
 
-const VIEWS = { hoy: viewHoy, plan: viewPlan, tutor: viewTutor, progreso: viewProgreso, ajustes: viewAjustes };
+const VIEWS = { hoy: viewHoy, plan: viewPlan, tutor: viewTutor, progreso: viewProgreso, ajustes: viewAjustes, otros: viewOtros, juegos: viewJuegos, juego: viewJuego };
+const TAB_OF = { ajustes: "otros", juegos: "otros", juego: "otros" };
 
 function render() {
   const fn = VIEWS[ui.route] || viewHoy;
@@ -1654,15 +1714,20 @@ function render() {
   view.dataset.route = ui.route;
   view.className = `view view--${ui.route}`;
   const innerTop = ui.keepInnerScroll ? $("#nb-scroll")?.scrollTop || 0 : 0;
+  if (ui.gameCleanup) {
+    ui.gameCleanup();
+    ui.gameCleanup = null;
+  }
   view.innerHTML = fn();
   view.scrollTop = keepScroll;
+  if (ui.route === "juego") ui.gameCleanup = games.mount(ui.gameId, $("#game-root"));
   if (ui.keepInnerScroll) {
     const inner = $("#nb-scroll");
     if (inner) inner.scrollTop = innerTop;
     ui.keepInnerScroll = false;
   }
   document.querySelectorAll(".tabbar a").forEach((a) => {
-    const on = a.dataset.route === ui.route;
+    const on = a.dataset.route === (TAB_OF[ui.route] || ui.route);
     a.classList.toggle("active", on);
     if (on) a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");
@@ -1670,8 +1735,11 @@ function render() {
 }
 
 function route() {
-  const r = location.hash.replace(/^#\/?/, "") || "hoy";
-  ui.route = VIEWS[r] ? r : "hoy";
+  const [r, param] = (location.hash.replace(/^#\/?/, "") || "hoy").split("/");
+  if (r === "juego" && games.gameById(param)) {
+    ui.route = "juego";
+    ui.gameId = param;
+  } else ui.route = VIEWS[r] && r !== "juego" ? r : "hoy";
   if (ui.route === "ajustes" && !ui.models && store.get().settings.apiKey && !ui.modelsBusy) loadModels(true);
   view.scrollTop = 0;
   view.dataset.route = "";
