@@ -54,6 +54,7 @@ function defaults() {
     log: [], // { id, date, subjectId, minutes, blockId }
     chats: {}, // subjectId -> [{ role: "user" | "model", text, hadImage }]
     notebook: {}, // subjectId -> { topics: [{ id, name, lesson, attempts }] }
+    games: {}, // id del minijuego -> récord
     session: null, // sesión de estudio en curso
   };
 }
