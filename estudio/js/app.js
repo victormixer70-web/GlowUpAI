@@ -508,12 +508,14 @@ function nbLesson(topic) {
       ${err}
     </section>`;
   }
-  return `<article class="md nb-lesson">${renderMarkdown(topic.lesson.text)}</article>
+  const text = nb.lessonText(topic);
+  return `${topic.builtin ? `<div class="builtin-tag">${icon("check", 14)} Apuntes incluidos en la app</div>` : ""}
+    <article class="md nb-lesson">${text ? renderMarkdown(text) : `<p class="muted"><span class="spinner"></span> Cargando apuntes…</p>`}</article>
     ${err}
     <div class="nb-actions">
       <button class="btn" data-action="nb-tab" data-tab="evaluacion">${icon("check", 18)} Ponme a prueba</button>
       <button class="btn btn-secondary" data-action="nb-ask" data-id="${topic.id}">${icon("chat", 18)} Preguntar dudas</button>
-      <button class="link-btn small" data-action="nb-regen">Volver a generar la lección</button>
+      ${topic.builtin ? "" : `<button class="link-btn small" data-action="nb-regen">Volver a generar la lección</button>`}
     </div>`;
 }
 
@@ -949,11 +951,11 @@ function viewProgreso() {
 // ---------------------------------------------------------------- vista: Otros y minijuegos
 
 const GAME_ART = {
-  2048: '<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/>',
-  serpiente: '<path d="M4 18h8a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h10"/><circle cx="19" cy="6" r="1.2"/>',
-  parejas: '<rect x="3" y="5" width="9" height="14" rx="2"/><rect x="12" y="5" width="9" height="14" rx="2"/><path d="M7.5 10v4M16.5 10v4"/>',
-  binario: '<rect x="3" y="6" width="7" height="12" rx="3.5"/><path d="M16 6v12M14 8l2-2"/>',
-  calculo: '<path d="M7 4v6M4 7h6M14 7h6M5 15l4 4M9 15l-4 4M14 15h6M14 19h6"/>',
+  derivadas: '<path d="M4 20c4 0 5-16 9-16 3 0 3 6 7 6"/><path d="M4 4v16h16"/>',
+  matrices: '<path d="M7 4H5v16h2M17 4h2v16h-2"/><path d="M9 9h1M14 9h1M9 15h1M14 15h1"/>',
+  terminal: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M12 15h5"/>',
+  circuitos: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1v.5h5V16c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+  traza: '<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/>',
 };
 
 function gameArt(id) {
@@ -965,8 +967,8 @@ function viewOtros() {
     ${topbar("Más cosas", "Otros", "<span></span>")}
     <ul class="list">
       <li><a class="menu-row" href="#/juegos">
-        <span class="menu-icon">${gameArt("2048")}</span>
-        <span class="block-main"><span class="block-title">Minijuegos</span><span class="meta">Para descansar entre bloques de estudio</span></span>
+        <span class="menu-icon">${gameArt("traza")}</span>
+        <span class="block-main"><span class="block-title">Minijuegos</span><span class="meta">Un juego por asignatura para practicar</span></span>
         ${icon("chevronRight", 18)}
       </a></li>
       <li><a class="menu-row" href="#/ajustes">
@@ -981,14 +983,19 @@ function viewOtros() {
 function viewJuegos() {
   return `
     ${topbar("Otros", "Minijuegos", `<a class="icon-btn" href="#/otros" aria-label="Volver a Otros">${icon("chevron")}</a>`)}
-    <p class="muted small">Un descanso corto sienta bien. Luego, ¡a por el siguiente bloque!</p>
-    <div class="game-grid">${games.GAMES.map((g) => {
+    <p class="muted small">Un juego por asignatura para practicar jugando. Cada fallo viene con su explicación.</p>
+    <div class="game-list">${games.GAMES.map((g) => {
       const b = games.best(g.id);
-      return `<a class="game-card" href="#/juego/${g.id}">
-        <span class="game-art">${gameArt(g.id)}</span>
-        <span class="game-name">${esc(g.name)}</span>
-        <span class="game-desc">${esc(g.desc)}</span>
-        <span class="meta">${b === null ? "Sin jugar" : `${esc(g.record)}: ${b}`}</span>
+      const sub = store.subjectById(g.subject);
+      return `<a class="game-row" href="#/juego/${g.id}">
+        <span class="game-art" style="color:${color(sub)}">${gameArt(g.id)}</span>
+        <span class="block-main">
+          <span class="game-sub">${esc(sub?.name || "")}</span>
+          <span class="game-name">${esc(g.name)}</span>
+          <span class="game-desc">${esc(g.desc)}</span>
+          <span class="meta">${b ? `Récord: ${b.score} puntos · nivel ${b.level}` : "Sin jugar todavía"}</span>
+        </span>
+        ${icon("chevronRight", 18)}
       </a>`;
     }).join("")}</div>
   `;
@@ -1555,6 +1562,7 @@ const actions = {
   reset: () => {
     if (!confirm("Se borrarán plan, exámenes, progreso y conversaciones. ¿Seguro?")) return;
     store.resetAll();
+    nb.ensureBuiltins();
     ui.focus = null;
     render();
     toast("Datos borrados");
@@ -1758,8 +1766,12 @@ setInterval(tick, 1000);
 document.addEventListener("visibilitychange", () => !document.hidden && tick());
 
 if (store.get().settings.apiKey && !store.get().settings.model) store.update((st) => (st.settings.model = gemini.DEFAULT_MODEL));
+nb.ensureBuiltins();
 route();
 renderSession();
+nb.loadBuiltins().then(() => {
+  if (ui.route === "tutor" && ui.tutorTab === "cuaderno") render();
+});
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   navigator.serviceWorker.register("./sw.js").catch(() => {});

@@ -1,5 +1,5 @@
 // Service worker: guarda la app para que abra sin conexión.
-const CACHE = "estudio-v6";
+const CACHE = "estudio-v7";
 const SHELL = [
   "./",
   "./index.html",
@@ -12,6 +12,8 @@ const SHELL = [
   "./js/markdown.js",
   "./js/notebook.js",
   "./js/games.js",
+  "./js/game-content.js",
+  "./content/linux-bash.md",
   "./vendor/marked.min.js",
   "./vendor/purify.min.js",
   "./vendor/katex/katex.min.js",

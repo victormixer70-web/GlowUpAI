@@ -1,16 +1,58 @@
-// Minijuegos para descansar entre bloques de estudio.
-// Cada juego se monta en un contenedor y devuelve una función que lo desmonta
-// (para timers, bucles y escuchas de teclado).
+// Minijuegos de estudio: uno por asignatura.
+// Todos usan el mismo motor «arcade»: 3 vidas, combos, niveles que suben la dificultad
+// y una explicación después de cada respuesta, para aprender de los fallos.
 
 import * as store from "./store.js";
-import { escapeHTML as esc } from "./markdown.js";
+import { escapeHTML as esc, renderMarkdown } from "./markdown.js";
+import { genDerivadas, genMatrices, genCircuitos, genTraza, TERMINAL_MISSIONS } from "./game-content.js";
 
 export const GAMES = [
-  { id: "2048", name: "2048", desc: "Junta fichas iguales hasta llegar a 2048.", record: "Récord", lowerIsBetter: false },
-  { id: "serpiente", name: "Serpiente", desc: "Come, crece y no te muerdas la cola.", record: "Récord", lowerIsBetter: false },
-  { id: "parejas", name: "Parejas", desc: "Une cada concepto con su pareja: derivadas, binario, lógica…", record: "Menos movimientos", lowerIsBetter: true },
-  { id: "binario", name: "Binario contrarreloj", desc: "Decimal, binario y hexadecimal en 60 segundos.", record: "Récord", lowerIsBetter: false },
-  { id: "calculo", name: "Cálculo mental", desc: "Todas las operaciones que puedas en 60 segundos.", record: "Récord", lowerIsBetter: false },
+  {
+    id: "derivadas",
+    subject: "calculo",
+    name: "Duelo de derivadas",
+    desc: "Deriva e integra contra el reloj. Del x² a la regla de la cadena y el producto.",
+    how: "Elige el resultado correcto antes de que se acabe el tiempo. Cada 5 aciertos subes de nivel: primero reglas básicas, luego regla de la cadena, después producto y cociente.",
+    gen: genDerivadas,
+    time: 25,
+  },
+  {
+    id: "matrices",
+    subject: "algebra",
+    name: "Matriz relámpago",
+    desc: "Determinantes, productos, sistemas, rango y valores propios.",
+    how: "Calcula de cabeza (o con papel) y elige la respuesta. Las opciones incorrectas son los errores típicos: fíjate en la explicación cuando falles.",
+    gen: genMatrices,
+    time: 45,
+  },
+  {
+    id: "terminal",
+    subject: "programario",
+    name: "Terminal Quest",
+    desc: "Escribe el comando correcto para cada misión: de ls a scripts de Bash.",
+    how: "Lee la misión y escribe el comando como en una terminal real. Si fallas, te damos una pista y otro intento. «Pista» resta la mitad de los puntos y «Ver solución» no da puntos, pero no quita vidas.",
+    gen: null, // usa misiones
+    time: null,
+  },
+  {
+    id: "circuitos",
+    subject: "fundamentos",
+    name: "Enciende el circuito",
+    desc: "Puertas lógicas, binario, hexadecimal y complemento a 2.",
+    how: "Unas veces tendrás que activar los interruptores para que se encienda la bombilla; otras, calcular qué sale o convertir entre bases.",
+    gen: genCircuitos,
+    time: 40,
+  },
+  {
+    id: "traza",
+    subject: "programacion",
+    name: "¿Qué imprime?",
+    desc: "Lee el código y adivina la salida: bucles, condiciones, funciones y recursión.",
+    how: "Traza el programa a mano y elige lo que muestra por pantalla. Las respuestas falsas son los fallos típicos (te pasas o te quedas corto en un bucle, división entera…).",
+    gen: genTraza,
+    time: 45,
+    languages: true,
+  },
 ];
 
 export function gameById(id) {
@@ -18,669 +60,431 @@ export function gameById(id) {
 }
 
 export function best(id) {
-  return store.get().games?.[id] ?? null;
+  const v = store.get().games?.[id];
+  return typeof v === "object" && v ? v : null; // { score, level }
 }
 
-// Guarda la puntuación si es récord. Devuelve true si lo es.
-function submit(id, score) {
-  const g = gameById(id);
+function saveBest(id, score, level) {
   const cur = best(id);
-  if (!g.lowerIsBetter && score <= 0) return false;
-  const better = cur === null || (g.lowerIsBetter ? score < cur : score > cur);
-  if (better) {
-    store.update((st) => {
-      st.games ||= {};
-      st.games[id] = score;
-    });
-  }
-  return better;
+  if (score <= 0 || (cur && cur.score >= score)) return false;
+  store.update((st) => {
+    st.games ||= {};
+    st.games[id] = { score, level };
+  });
+  return true;
 }
 
 export function mount(id, el) {
-  const fn = { 2048: mount2048, serpiente: mountSnake, parejas: mountPairs, binario: (e) => mountTimed(e, "binario", genBinary), calculo: (e) => mountTimed(e, "calculo", genMath) }[id];
-  return fn ? fn(el) : () => {};
+  const g = gameById(id);
+  return g ? mountArcade(el, g) : () => {};
 }
 
 // ---------------------------------------------------------------- utilidades
 
 const rand = (n) => Math.floor(Math.random() * n);
 
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = rand(i + 1);
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+const HEART = '<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.1 4.3 2.4h2c.7-1.3 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z" fill="currentColor"/></svg>';
+
+function md(text, inline = false) {
+  return renderMarkdown(text, { inline });
 }
 
-function onSwipe(el, cb) {
-  let sx = 0;
-  let sy = 0;
-  let id = null;
-  const down = (e) => {
-    id = e.pointerId;
-    sx = e.clientX;
-    sy = e.clientY;
-  };
-  const up = (e) => {
-    if (id !== e.pointerId) return;
-    id = null;
-    const dx = e.clientX - sx;
-    const dy = e.clientY - sy;
-    if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
-    cb(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : dy > 0 ? "down" : "up");
-  };
-  el.style.touchAction = "none";
-  el.addEventListener("pointerdown", down);
-  el.addEventListener("pointerup", up);
-  return () => {
-    el.removeEventListener("pointerdown", down);
-    el.removeEventListener("pointerup", up);
-  };
+function langPref() {
+  return store.get().games?.lang || null;
 }
 
-function onArrows(cb) {
-  const keys = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
-  const h = (e) => {
-    const d = keys[e.key];
-    if (!d || e.target.closest?.("input, textarea, select")) return;
-    e.preventDefault();
-    cb(d);
-  };
-  document.addEventListener("keydown", h);
-  return () => document.removeEventListener("keydown", h);
-}
+// ---------------------------------------------------------------- motor arcade
 
-function statsBar(id, extra = "") {
-  const b = best(id);
-  return `<div class="g-bar">
-    <div class="g-stat"><span>Puntos</span><b data-score>0</b></div>
-    <div class="g-stat"><span>${esc(gameById(id).record)}</span><b data-best>${b ?? "—"}</b></div>
-    ${extra}
-  </div>`;
-}
+function mountArcade(el, game) {
+  const LIVES = 3;
+  const PER_LEVEL = 5;
+  let s; // estado de la partida
+  let q; // pregunta actual
+  let tick = null;
+  let autoNext = null;
+  let qStart = 0;
 
-function overlay(el, html) {
+  el.innerHTML = `
+    <div class="arc-bar">
+      <div class="arc-lives" data-lives aria-label="Vidas"></div>
+      <div class="arc-level" data-level>Nivel 1</div>
+      <div class="arc-score"><span data-score>0</span><small data-combo></small></div>
+    </div>
+    <div class="g-stage">
+      <section class="arc-card" data-card aria-live="polite"></section>
+      <div class="g-overlay" data-overlay hidden></div>
+    </div>`;
+  const card = el.querySelector("[data-card]");
   const ov = el.querySelector("[data-overlay]");
-  if (!html) {
-    ov.hidden = true;
-    ov.innerHTML = "";
-    return;
-  }
-  ov.innerHTML = `<div class="g-overlay-card">${html}</div>`;
-  ov.hidden = false;
-}
 
-function cssVar(name) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
-// ---------------------------------------------------------------- 2048
-
-function mount2048(el) {
-  let grid;
-  let score;
-  let over;
-  let won;
-  let keepGoing;
-  let lastNew = -1;
-  let startBest = 0;
-
-  el.innerHTML = `${statsBar("2048", `<button class="btn btn-secondary small-btn" data-new>Nueva</button>`)}
-    <div class="g-stage"><div class="g2048" data-board role="img" aria-label="Tablero de 2048"></div><div class="g-overlay" data-overlay hidden></div></div>
-    <p class="muted small center">Desliza el dedo sobre el tablero (o usa las flechas).</p>`;
-  const board = el.querySelector("[data-board]");
-
-  const lineIdx = (k, dir) => {
-    const row = [0, 1, 2, 3].map((j) => k * 4 + j);
-    const col = [0, 1, 2, 3].map((j) => k + j * 4);
-    return { left: row, right: [...row].reverse(), up: col, down: [...col].reverse() }[dir];
-  };
-
-  function addTile() {
-    const empty = grid.map((v, i) => (v ? -1 : i)).filter((i) => i >= 0);
-    if (!empty.length) return;
-    lastNew = empty[rand(empty.length)];
-    grid[lastNew] = Math.random() < 0.9 ? 2 : 4;
+  function overlay(html) {
+    if (!html) {
+      ov.hidden = true;
+      ov.innerHTML = "";
+      return;
+    }
+    ov.innerHTML = `<div class="g-overlay-card">${html}</div>`;
+    ov.hidden = false;
   }
 
-  function canMove() {
-    for (let i = 0; i < 16; i++) {
-      if (!grid[i]) return true;
-      if (i % 4 < 3 && grid[i] === grid[i + 1]) return true;
-      if (i < 12 && grid[i] === grid[i + 4]) return true;
+  function mult() {
+    return s.combo >= 8 ? 4 : s.combo >= 5 ? 3 : s.combo >= 3 ? 2 : 1;
+  }
+
+  function hud() {
+    el.querySelector("[data-lives]").innerHTML = Array.from({ length: LIVES }, (_, i) => `<span class="heart${i < s.lives ? "" : " lost"}">${HEART}</span>`).join("");
+    el.querySelector("[data-lives]").setAttribute("aria-label", `${s.lives} vidas`);
+    el.querySelector("[data-level]").textContent = `Nivel ${s.level}`;
+    el.querySelector("[data-score]").textContent = s.score;
+    el.querySelector("[data-combo]").textContent = mult() > 1 ? ` ×${mult()}` : "";
+  }
+
+  // -------- preguntas
+
+  function nextQuestion() {
+    clearTimeout(autoNext);
+    if (game.id === "terminal") {
+      const pool = TERMINAL_MISSIONS.filter((m) => m.level <= s.level && !s.used.has(m.id));
+      const fresh = pool.filter((m) => m.level === s.level);
+      const pick = (fresh.length ? fresh : pool)[rand((fresh.length ? fresh : pool).length)];
+      if (!pick) return end(true);
+      s.used.add(pick.id);
+      q = { ...pick, type: "input", attempts: 0, hinted: false };
+    } else {
+      q = game.gen(s.level, { lang: s.lang });
+      q.attempts = 0;
+    }
+    q.answered = false;
+    qStart = Date.now();
+    drawQuestion();
+    if (game.time) startTimer();
+  }
+
+  function timeLimit() {
+    // un poco menos de tiempo en niveles altos, pero nunca menos del 60 %
+    return game.time * 1000 * Math.max(0.6, 1 - (s.level - 1) * 0.1);
+  }
+
+  function startTimer() {
+    clearInterval(tick);
+    const bar = card.querySelector("[data-time]");
+    tick = setInterval(() => {
+      const left = timeLimit() - (Date.now() - qStart);
+      if (bar) bar.style.width = `${Math.max(0, (left / timeLimit()) * 100)}%`;
+      if (left <= 0) {
+        clearInterval(tick);
+        resolve(false, { timeout: true });
+      }
+    }, 100);
+  }
+
+  function drawQuestion() {
+    let body = "";
+    if (q.type === "choice") {
+      body = `<div class="arc-opts${q.options.length > 2 && q.options.every((o) => o.length < 28) ? " grid" : ""}">${q.options
+        .map((o, i) => `<button class="arc-opt" data-opt="${i}">${md(o, true)}</button>`)
+        .join("")}</div>`;
+    } else if (q.type === "switches") {
+      body = `<div class="switches">${q.vars
+        .map((v) => `<button class="switch" data-switch="${v}" aria-pressed="false"><span class="switch-name">${v}</span><span class="switch-val">0</span></button>`)
+        .join("")}</div>
+        <div class="bulb" data-bulb aria-hidden="true"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1v.5h5V16c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></div>
+        <button class="btn" data-check>Comprobar</button>`;
+    } else if (q.type === "input") {
+      body = `<form class="term" data-term autocomplete="off">
+          <div class="term-head"><span></span><span></span><span></span></div>
+          <div class="term-body">
+            <div class="term-line"><span class="term-prompt">ana@vcd:~$</span>
+            <label class="sr-only" for="term-in">Comando</label>
+            <input id="term-in" class="term-input" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" autocomplete="off"></div>
+            <div class="term-msg" data-term-msg></div>
+          </div>
+        </form>
+        <div class="row-gap">
+          <button class="btn btn-secondary grow" data-hint>Pista</button>
+          <button class="btn btn-secondary grow" data-skip>Ver solución</button>
+          <button class="btn grow" data-run>Ejecutar</button>
+        </div>`;
+    }
+    card.innerHTML = `
+      <div class="arc-concept">${esc(q.concept)}</div>
+      <div class="arc-prompt md">${md(q.prompt)}</div>
+      ${q.code ? `<pre class="code-view"><code>${highlight(q.code, q.lang)}</code></pre>` : ""}
+      ${q.expr ? `<div class="expr">${md(q.expr)}</div>` : ""}
+      ${body}
+      ${game.time ? `<div class="arc-time"><div class="arc-time-fill" data-time></div></div>` : ""}
+      <div data-feedback></div>`;
+    if (q.type === "input") setTimeout(() => card.querySelector("#term-in")?.focus(), 50);
+  }
+
+  // -------- respuestas
+
+  function points() {
+    let p = 10 * s.level * mult();
+    if (game.time) {
+      const left = Math.max(0, timeLimit() - (Date.now() - qStart));
+      p += Math.round((left / timeLimit()) * 5 * s.level);
+    }
+    if (q.hinted) p = Math.round(p / 2);
+    return p;
+  }
+
+  function resolve(correct, { timeout = false, skipped = false } = {}) {
+    if (q.answered) return;
+    q.answered = true;
+    clearInterval(tick);
+    card.querySelectorAll("button.arc-opt, button.switch, [data-check], [data-hint], [data-skip], [data-run]").forEach((b) => (b.disabled = true));
+    const input = card.querySelector("#term-in");
+    if (input) input.readOnly = true;
+    s.asked++;
+    let gained = 0;
+    let levelUp = false;
+    if (correct) {
+      s.combo++;
+      s.correct++;
+      gained = points();
+      s.score += gained;
+      s.inLevel++;
+      if (s.inLevel >= PER_LEVEL && s.level < 5) {
+        s.level++;
+        s.inLevel = 0;
+        levelUp = true;
+      }
+    } else {
+      s.combo = 0;
+      if (!skipped) s.lives--;
+      s.missed.push(q.concept);
+    }
+    hud();
+    if (correct) {
+      card.classList.remove("shake");
+      card.classList.add("pulse-ok");
+    } else {
+      card.classList.add("shake");
+      navigator.vibrate?.(80);
+    }
+    setTimeout(() => card.classList.remove("pulse-ok", "shake"), 450);
+
+    const title = correct
+      ? `¡Correcto! +${gained}${mult() > 1 ? ` (combo ×${mult()})` : ""}`
+      : timeout
+        ? "¡Se acabó el tiempo!"
+        : skipped
+          ? "Solución"
+          : "No es correcto";
+    const solution = q.type === "input" ? `<pre class="code-view small"><code>${esc(q.solution)}</code></pre>` : q.answerText ? `<p><b>Respuesta:</b> ${md(q.answerText, true)}</p>` : "";
+    const fb = card.querySelector("[data-feedback]");
+    fb.innerHTML = `<div class="arc-fb ${correct ? "ok" : "bad"}" role="status">
+        <b>${title}</b>
+        ${!correct || q.type === "input" ? solution : ""}
+        <div class="md">${md(q.explanation)}</div>
+        ${levelUp ? `<div class="level-up">¡Subes a nivel ${s.level}!</div>` : ""}
+      </div>
+      <button class="btn" data-next>${s.lives > 0 ? (correct ? "Siguiente" : "Entendido, sigo") : "Ver resultado"}</button>`;
+    fb.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    // Si aciertas, se avanza solo; si fallas, te paras a leer la explicación.
+    if (correct && s.lives > 0) autoNext = setTimeout(nextQuestion, levelUp ? 2600 : 1900 + Math.min(2500, q.explanation.length * 12));
+  }
+
+  function check(value) {
+    if (q.type === "choice") return Number(value) === q.answer;
+    if (q.type === "switches") return q.evaluate(value) === q.target;
+    if (q.type === "input") {
+      const cmd = value.trim().replace(/\s+/g, " ");
+      return q.accept.some((re) => re.test(cmd));
     }
     return false;
   }
 
-  function draw() {
-    board.innerHTML = grid
-      .map((v, i) => `<div class="t ${v ? `t${Math.min(v, 4096)}` : ""}${i === lastNew ? " new" : ""}${v >= 1024 ? " small" : ""}">${v || ""}</div>`)
-      .join("");
-    board.setAttribute("aria-label", `Tablero de 2048. Puntos: ${score}`);
-    el.querySelector("[data-score]").textContent = score;
+  function onChoice(btn) {
+    const i = Number(btn.dataset.opt);
+    const ok = check(i);
+    btn.classList.add(ok ? "right" : "wrong");
+    if (!ok) card.querySelector(`[data-opt="${q.answer}"]`)?.classList.add("right");
+    resolve(ok);
   }
 
-  function finish() {
-    const record = score > startBest;
-    if (won && !keepGoing) {
-      overlay(el, `<h3>¡Has llegado a 2048!</h3><p>${score} puntos${record ? " · ¡nuevo récord!" : ""}</p>
-        <div class="row-gap"><button class="btn btn-secondary grow" data-continue>Seguir jugando</button><button class="btn grow" data-new>Nueva partida</button></div>`);
-    } else {
-      overlay(el, `<h3>Fin de la partida</h3><p>${score} puntos${record ? " · ¡nuevo récord!" : ""}</p><button class="btn" data-new>Jugar otra vez</button>`);
-    }
+  function switchValues() {
+    const vals = {};
+    card.querySelectorAll("[data-switch]").forEach((b) => (vals[b.dataset.switch] = b.getAttribute("aria-pressed") === "true" ? 1 : 0));
+    return vals;
   }
 
-  function move(dir) {
-    if (over || (won && !keepGoing)) return;
-    let moved = false;
-    for (let k = 0; k < 4; k++) {
-      const idx = lineIdx(k, dir);
-      const vals = idx.map((i) => grid[i]).filter(Boolean);
-      const out = [];
-      for (let j = 0; j < vals.length; j++) {
-        if (vals[j] === vals[j + 1]) {
-          const v = vals[j] * 2;
-          out.push(v);
-          score += v;
-          if (v === 2048 && !keepGoing) won = true;
-          j++;
-        } else out.push(vals[j]);
-      }
-      while (out.length < 4) out.push(0);
-      idx.forEach((i, j) => {
-        if (grid[i] !== out[j]) moved = true;
-        grid[i] = out[j];
-      });
-    }
-    if (!moved) return;
-    addTile();
-    if (!canMove()) over = true;
-    draw();
-    if (submit("2048", score)) el.querySelector("[data-best]").textContent = score;
-    if (over || (won && !keepGoing)) finish();
+  function onCheckSwitches() {
+    const vals = switchValues();
+    const out = q.evaluate(vals);
+    const ok = out === q.target;
+    const bulb = card.querySelector("[data-bulb]");
+    bulb.classList.toggle("on", out === 1);
+    resolve(ok);
   }
 
-  function reset() {
-    startBest = best("2048") ?? 0;
-    grid = Array(16).fill(0);
-    score = 0;
-    over = false;
-    won = false;
-    keepGoing = false;
-    overlay(el, null);
-    addTile();
-    addTile();
-    draw();
-  }
-
-  const click = (e) => {
-    if (e.target.closest("[data-new]")) reset();
-    if (e.target.closest("[data-continue]")) {
-      keepGoing = true;
-      overlay(el, null);
-    }
-  };
-  el.addEventListener("click", click);
-  const offSwipe = onSwipe(board, move);
-  const offKeys = onArrows(move);
-  reset();
-  return () => {
-    el.removeEventListener("click", click);
-    offSwipe();
-    offKeys();
-  };
-}
-
-// ---------------------------------------------------------------- Serpiente
-
-function mountSnake(el) {
-  const N = 17;
-  let snake;
-  let dir;
-  let queue;
-  let food;
-  let score;
-  let running = false;
-  let timer = null;
-  let speed;
-
-  el.innerHTML = `${statsBar("serpiente", `<button class="btn btn-secondary small-btn" data-pause>Pausa</button>`)}
-    <div class="g-stage"><canvas class="snake-canvas" data-canvas role="img" aria-label="Juego de la serpiente"></canvas><div class="g-overlay" data-overlay hidden></div></div>
-    <div class="dpad" role="group" aria-label="Controles">
-      <button class="dpad-btn up" data-dir="up" aria-label="Arriba"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg></button>
-      <button class="dpad-btn left" data-dir="left" aria-label="Izquierda"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <button class="dpad-btn right" data-dir="right" aria-label="Derecha"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-      <button class="dpad-btn down" data-dir="down" aria-label="Abajo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
-    </div>`;
-  const canvas = el.querySelector("[data-canvas]");
-  const ctx = canvas.getContext("2d");
-  const pauseBtn = el.querySelector("[data-pause]");
-  const dpr = window.devicePixelRatio || 1;
-  const px = Math.min(el.clientWidth || 340, 420);
-  canvas.style.width = canvas.style.height = `${px}px`;
-  canvas.width = canvas.height = Math.round(px * dpr);
-  const cell = canvas.width / N;
-  const colors = { bg: cssVar("--surface"), grid: cssVar("--surface-2"), snake: cssVar("--ink"), head: cssVar("--ink"), food: cssVar("--accent") };
-
-  const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
-  const opposite = { up: "down", down: "up", left: "right", right: "left" };
-
-  function placeFood() {
-    const free = [];
-    for (let x = 0; x < N; x++) for (let y = 0; y < N; y++) if (!snake.some((s) => s.x === x && s.y === y)) free.push({ x, y });
-    food = free[rand(free.length)];
-  }
-
-  function draw() {
-    ctx.fillStyle = colors.bg;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = colors.grid;
-    for (let x = 0; x < N; x++) for (let y = 0; y < N; y++) if ((x + y) % 2) ctx.fillRect(x * cell, y * cell, cell, cell);
-    if (food) {
-      ctx.fillStyle = colors.food;
-      ctx.beginPath();
-      ctx.arc((food.x + 0.5) * cell, (food.y + 0.5) * cell, cell * 0.36, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    snake.forEach((s, i) => {
-      ctx.fillStyle = colors.snake;
-      ctx.globalAlpha = i === 0 ? 1 : Math.max(0.45, 0.9 - i * 0.02);
-      const pad = cell * 0.08;
-      ctx.beginPath();
-      ctx.roundRect(s.x * cell + pad, s.y * cell + pad, cell - pad * 2, cell - pad * 2, cell * 0.25);
-      ctx.fill();
-    });
-    ctx.globalAlpha = 1;
-  }
-
-  function stop() {
-    running = false;
-    clearTimeout(timer);
-    timer = null;
-    pauseBtn.textContent = "Seguir";
-  }
-
-  function gameOver() {
-    stop();
-    pauseBtn.disabled = true;
-    const record = submit("serpiente", score);
-    el.querySelector("[data-best]").textContent = best("serpiente");
-    overlay(el, `<h3>¡Te has chocado!</h3><p>${score} puntos${record ? " · ¡nuevo récord!" : ""}</p><button class="btn" data-start>Jugar otra vez</button>`);
-  }
-
-  function step() {
-    if (queue.length) dir = queue.shift();
-    const [dx, dy] = DIRS[dir];
-    const head = { x: snake[0].x + dx, y: snake[0].y + dy };
-    const willEat = food && head.x === food.x && head.y === food.y;
-    const body = willEat ? snake : snake.slice(0, -1);
-    if (head.x < 0 || head.y < 0 || head.x >= N || head.y >= N || body.some((s) => s.x === head.x && s.y === head.y)) {
-      gameOver();
+  function onRun() {
+    const input = card.querySelector("#term-in");
+    const value = input.value;
+    if (!value.trim()) return;
+    const msg = card.querySelector("[data-term-msg]");
+    if (check(value)) {
+      msg.innerHTML = q.output ? `<pre>${esc(q.output)}</pre>` : "";
+      resolve(true);
       return;
     }
-    snake = [head, ...body];
-    if (willEat) {
-      score++;
-      el.querySelector("[data-score]").textContent = score;
-      speed = Math.max(70, speed - 4);
-      placeFood();
+    q.attempts++;
+    if (q.attempts === 1) {
+      q.hinted = true;
+      msg.innerHTML = `<span class="term-err">${esc(value.trim().split(" ")[0])}: no es lo que pide la misión.</span><br><span class="term-hint">Pista: ${md(q.hint, true)}</span>`;
+      card.querySelector("[data-hint]").disabled = true;
+      input.select();
+    } else {
+      msg.innerHTML = `<span class="term-err">Tampoco. Fíjate en la solución:</span>`;
+      resolve(false);
     }
-    draw();
-    timer = setTimeout(step, speed);
   }
 
-  function start() {
-    const mid = Math.floor(N / 2);
-    snake = [{ x: mid, y: mid }, { x: mid - 1, y: mid }, { x: mid - 2, y: mid }];
-    dir = "right";
-    queue = [];
-    score = 0;
-    speed = 150;
-    el.querySelector("[data-score]").textContent = 0;
-    placeFood();
-    overlay(el, null);
-    pauseBtn.disabled = false;
-    resume();
+  // -------- partida
+
+  function start(lang) {
+    s = { lives: LIVES, score: 0, combo: 0, level: 1, inLevel: 0, asked: 0, correct: 0, missed: [], used: new Set(), lang };
+    overlay(null);
+    hud();
+    nextQuestion();
   }
 
-  function resume() {
-    if (running) return;
-    running = true;
-    pauseBtn.textContent = "Pausa";
-    overlay(el, null);
-    draw();
-    timer = setTimeout(step, speed);
+  function end(exhausted = false) {
+    clearInterval(tick);
+    clearTimeout(autoNext);
+    const record = saveBest(game.id, s.score, s.level);
+    const counts = {};
+    s.missed.forEach((c) => (counts[c] = (counts[c] || 0) + 1));
+    const review = Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+    const acc = s.asked ? Math.round((s.correct / s.asked) * 100) : 0;
+    const subject = store.subjectById(game.subject);
+    overlay(`<h3>${exhausted ? "¡Has completado todas las misiones!" : "Fin de la partida"}</h3>
+      <div class="end-score">${s.score}<span>puntos</span></div>
+      <p>Nivel ${s.level} · ${s.correct}/${s.asked} aciertos (${acc} %)${record ? " · <b>¡nuevo récord!</b>" : ""}</p>
+      ${
+        review.length
+          ? `<div class="review"><b>Para repasar</b><ul>${review.map(([c, n]) => `<li>${esc(c)}${n > 1 ? ` <span class="muted">×${n}</span>` : ""}</li>`).join("")}</ul></div>`
+          : ""
+      }
+      <button class="btn" data-start>Jugar otra vez</button>
+      ${subject ? `<button class="btn btn-secondary" data-action="open-notebook" data-id="${subject.id}">Estudiar ${esc(subject.name)} en el cuaderno</button>` : ""}`);
   }
 
-  function turn(d) {
-    if (!running) return;
-    const last = queue.length ? queue[queue.length - 1] : dir;
-    if (d === last || d === opposite[last] || queue.length > 2) return;
-    queue.push(d);
+  function intro() {
+    const b = best(game.id);
+    const subject = store.subjectById(game.subject);
+    const pref = langPref();
+    overlay(`<div class="eyebrow accent">${esc(subject?.name || "")}</div>
+      <h3>${esc(game.name)}</h3>
+      <p>${esc(game.how)}</p>
+      <p class="small">3 vidas · combos ×2, ×3, ×4 seguidos · ${game.time ? "contrarreloj" : "sin prisa"}</p>
+      ${b ? `<p class="small">Tu récord: <b>${b.score}</b> puntos (nivel ${b.level})</p>` : ""}
+      ${
+        game.languages
+          ? `<div class="lang-pick" role="group" aria-label="Lenguaje"><b class="small">Lenguaje del código</b>
+              <div class="pills">${["python", "cpp"]
+                .map((l) => `<button class="pill-opt${(pref || detectLang()) === l ? " on" : ""}" data-lang="${l}" aria-pressed="${(pref || detectLang()) === l}">${l === "python" ? "Python" : "C++"}</button>`)
+                .join("")}</div></div>`
+          : ""
+      }
+      <button class="btn" data-start>Empezar</button>`);
   }
+
+  function detectLang() {
+    const t = (store.subjectById("programacion")?.topics || "").toLowerCase();
+    return /c\+\+|\bcpp\b|\bc\b/.test(t) && !/python/.test(t) ? "cpp" : "python";
+  }
+
+  // -------- eventos
 
   const click = (e) => {
-    if (e.target.closest("[data-start]")) start();
-    else if (e.target.closest("[data-resume]")) resume();
-    else if (e.target.closest("[data-pause]")) {
-      if (running) {
-        stop();
-        overlay(el, `<h3>En pausa</h3><button class="btn" data-resume>Seguir</button>`);
-      } else if (snake) resume();
+    const t = e.target;
+    if (t.closest("[data-start]")) {
+      const lang = game.languages ? langPref() || detectLang() : null;
+      return start(lang);
     }
+    const langBtn = t.closest("[data-lang]");
+    if (langBtn) {
+      store.update((st) => {
+        st.games ||= {};
+        st.games.lang = langBtn.dataset.lang;
+      });
+      ov.querySelectorAll("[data-lang]").forEach((b) => {
+        const on = b === langBtn;
+        b.classList.toggle("on", on);
+        b.setAttribute("aria-pressed", String(on));
+      });
+      return;
+    }
+    if (t.closest("[data-next]")) {
+      clearTimeout(autoNext);
+      return s.lives > 0 ? nextQuestion() : end();
+    }
+    if (!q || q.answered) return;
+    const opt = t.closest("[data-opt]");
+    if (opt) return onChoice(opt);
+    const sw = t.closest("[data-switch]");
+    if (sw) {
+      const on = sw.getAttribute("aria-pressed") !== "true";
+      sw.setAttribute("aria-pressed", String(on));
+      sw.querySelector(".switch-val").textContent = on ? "1" : "0";
+      return;
+    }
+    if (t.closest("[data-check]")) return onCheckSwitches();
+    if (t.closest("[data-run]")) return onRun();
+    if (t.closest("[data-hint]")) {
+      q.hinted = true;
+      t.closest("[data-hint]").disabled = true;
+      card.querySelector("[data-term-msg]").innerHTML = `<span class="term-hint">Pista: ${md(q.hint, true)}</span>`;
+      card.querySelector("#term-in")?.focus();
+      return;
+    }
+    if (t.closest("[data-skip]")) return resolve(false, { skipped: true });
   };
-  // Las flechas en pantalla responden al tocar (sin esperar al «click»).
-  const press = (e) => {
-    const b = e.target.closest("[data-dir]");
-    if (!b) return;
+  const submitTerm = (e) => {
+    if (!e.target.closest("[data-term]")) return;
     e.preventDefault();
-    turn(b.dataset.dir);
+    if (q && !q.answered) onRun();
   };
   const hide = () => {
-    if (document.hidden && running) {
-      stop();
-      overlay(el, `<h3>En pausa</h3><button class="btn" data-resume>Seguir</button>`);
-    }
+    // Al salir de la app no se agota el tiempo: se reinicia el reloj de la pregunta.
+    if (!document.hidden && q && !q.answered && game.time) qStart = Date.now() - Math.min(Date.now() - qStart, timeLimit() * 0.5);
   };
   el.addEventListener("click", click);
-  el.addEventListener("pointerdown", press);
+  el.addEventListener("submit", submitTerm);
   document.addEventListener("visibilitychange", hide);
-  const offSwipe = onSwipe(canvas, turn);
-  const offKeys = onArrows(turn);
 
-  snake = null;
-  food = null;
-  ctx.fillStyle = colors.bg;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  pauseBtn.disabled = true;
-  overlay(el, `<h3>Serpiente</h3><p>Desliza sobre el tablero o usa las flechas de abajo.</p><button class="btn" data-start>Empezar</button>`);
-
+  intro();
   return () => {
-    stop();
+    clearInterval(tick);
+    clearTimeout(autoNext);
     el.removeEventListener("click", click);
-    el.removeEventListener("pointerdown", press);
+    el.removeEventListener("submit", submitTerm);
     document.removeEventListener("visibilitychange", hide);
-    offSwipe();
-    offKeys();
   };
 }
 
-// ---------------------------------------------------------------- Parejas
+// ---------------------------------------------------------------- resaltado de código
 
-// Pares de conceptos de primer curso: cada lado es único en todo el banco.
-const PAIRS = [
-  ["1010₂", "10"],
-  ["0xFF", "255"],
-  ["2¹⁰", "1024"],
-  ["1 byte", "8 bits"],
-  ["(x²)′", "2x"],
-  ["(sin x)′", "cos x"],
-  ["(eˣ)′", "eˣ"],
-  ["∫ 1/x dx", "ln|x| + C"],
-  ["cos²x + sin²x", "1"],
-  ["lím sin x / x, x→0", "uno (límite notable)"],
-  ["¬(A ∧ B)", "¬A ∨ ¬B"],
-  ["A + A·B", "A"],
-  ["A XOR A", "0"],
-  ["det de [[1,2],[3,4]]", "−2"],
-  ["rango de I₃", "3"],
-  ["Búsqueda binaria", "O(log n)"],
-  ["Dos for anidados", "O(n²)"],
-  ["chmod 755", "rwxr-xr-x"],
-  ["ls -a", "Muestra ocultos"],
-  ["Σ xⁿ (|x|<1)", "1 / (1 − x)"],
-];
+const KEYWORDS = {
+  python: /\b(def|return|for|in|range|while|if|elif|else|print|and|or|not|True|False|None|len)\b/g,
+  cpp: /\b(int|void|return|for|while|if|else|cout|endl|bool|true|false|auto|const|std|include|using|namespace|main)\b/g,
+};
 
-function mountPairs(el) {
-  let cards;
-  let open;
-  let moves;
-  let found;
-  let lock;
-  let t0;
-  let timer = null;
-  let flipBack = null;
-
-  el.innerHTML = `<div class="g-bar">
-      <div class="g-stat"><span>Movimientos</span><b data-score>0</b></div>
-      <div class="g-stat"><span>Tiempo</span><b data-time>0:00</b></div>
-      <div class="g-stat"><span>${esc(gameById("parejas").record)}</span><b data-best>${best("parejas") ?? "—"}</b></div>
-    </div>
-    <div class="g-stage"><div class="pairs" data-board></div><div class="g-overlay" data-overlay hidden></div></div>
-    <div class="row-gap"><button class="btn btn-secondary grow" data-new>Nueva partida</button></div>`;
-  const board = el.querySelector("[data-board]");
-
-  function clock() {
-    if (!t0) return;
-    const s = Math.floor((Date.now() - t0) / 1000);
-    el.querySelector("[data-time]").textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-  }
-
-  function draw() {
-    board.innerHTML = cards
-      .map(
-        (c, i) => `<button class="pcard${c.open || c.done ? " open" : ""}${c.done ? " done" : ""}" data-i="${i}" ${c.done ? "disabled" : ""} aria-label="${c.open || c.done ? esc(c.text) : "Carta boca abajo"}">
-          <span class="pcard-in"><span class="pcard-back" aria-hidden="true"></span><span class="pcard-front">${esc(c.text)}</span></span>
-        </button>`
-      )
-      .join("");
-    el.querySelector("[data-score]").textContent = moves;
-  }
-
-  function reset() {
-    clearTimeout(flipBack);
-    clearInterval(timer);
-    const chosen = shuffle(PAIRS).slice(0, 8);
-    cards = shuffle(chosen.flatMap((p, k) => [{ pair: k, text: p[0] }, { pair: k, text: p[1] }]));
-    open = [];
-    moves = 0;
-    found = 0;
-    lock = false;
-    t0 = null;
-    el.querySelector("[data-time]").textContent = "0:00";
-    overlay(el, null);
-    draw();
-  }
-
-  function flip(i) {
-    const c = cards[i];
-    if (lock || c.open || c.done) return;
-    if (!t0) {
-      t0 = Date.now();
-      timer = setInterval(clock, 500);
-    }
-    c.open = true;
-    open.push(i);
-    if (open.length === 2) {
-      moves++;
-      const [a, b] = open.map((k) => cards[k]);
-      if (a.pair === b.pair) {
-        a.done = b.done = true;
-        a.open = b.open = false;
-        open = [];
-        found++;
-        if (found === 8) {
-          clearInterval(timer);
-          clock();
-          const record = submit("parejas", moves);
-          el.querySelector("[data-best]").textContent = best("parejas");
-          setTimeout(() => overlay(el, `<h3>¡Completado!</h3><p>${moves} movimientos en ${el.querySelector("[data-time]").textContent}${record ? " · ¡nuevo récord!" : ""}</p><button class="btn" data-new>Jugar otra vez</button>`), 400);
-        }
-      } else {
-        lock = true;
-        flipBack = setTimeout(() => {
-          a.open = b.open = false;
-          open = [];
-          lock = false;
-          draw();
-        }, 1000);
-      }
-    }
-    draw();
-  }
-
-  const click = (e) => {
-    if (e.target.closest("[data-new]")) return reset();
-    const card = e.target.closest("[data-i]");
-    if (card) flip(Number(card.dataset.i));
+function highlight(code, lang) {
+  // Se escapa primero y se marcan números, cadenas, comentarios y palabras clave.
+  const tokens = [];
+  const keep = (html) => {
+    tokens.push(html);
+    return `\u0000T${tokens.length - 1}T\u0000`;
   };
-  el.addEventListener("click", click);
-  reset();
-  return () => {
-    clearTimeout(flipBack);
-    clearInterval(timer);
-    el.removeEventListener("click", click);
-  };
-}
-
-// ---------------------------------------------------------------- juegos contrarreloj
-
-function uniqueOptions(answer, candidates) {
-  const opts = [answer];
-  for (const c of candidates) {
-    if (opts.length === 4) break;
-    if (!opts.includes(c)) opts.push(c);
-  }
-  return shuffle(opts);
-}
-
-const bin = (n) => n.toString(2);
-const hex = (n) => `0x${n.toString(16).toUpperCase()}`;
-
-function genBinary(score) {
-  const max = score < 5 ? 31 : score < 12 ? 127 : 255;
-  const n = 1 + rand(max);
-  const near = () => {
-    const out = [];
-    for (let k = 0; k < 8; k++) out.push(n ^ (1 << k));
-    out.push(n + 1, n - 1, n + 2, n * 2, n >> 1, n + 16, n - 16);
-    return shuffle(out.filter((x) => x > 0 && x <= 255 && x !== n));
-  };
-  const modes = score < 3 ? ["d2b", "b2d"] : ["d2b", "b2d", "d2h", "h2d"];
-  const mode = modes[rand(modes.length)];
-  if (mode === "d2b") return { label: "Decimal → binario", prompt: String(n), answer: bin(n), options: uniqueOptions(bin(n), near().map(bin)), mono: true };
-  if (mode === "b2d") return { label: "Binario → decimal", prompt: bin(n), answer: String(n), options: uniqueOptions(String(n), near().map(String)) };
-  if (mode === "d2h") return { label: "Decimal → hexadecimal", prompt: String(n), answer: hex(n), options: uniqueOptions(hex(n), near().map(hex)), mono: true };
-  return { label: "Hexadecimal → decimal", prompt: hex(n), answer: String(n), options: uniqueOptions(String(n), near().map(String)) };
-}
-
-function genMath(score) {
-  const lvl = score < 5 ? 0 : score < 12 ? 1 : 2;
-  const ops = lvl === 0 ? ["+", "−"] : ["+", "−", "×", "÷"];
-  const op = ops[rand(ops.length)];
-  let a;
-  let b;
-  let r;
-  const big = [20, 60, 150][lvl];
-  if (op === "+") {
-    a = 2 + rand(big);
-    b = 2 + rand(big);
-    r = a + b;
-  } else if (op === "−") {
-    a = 5 + rand(big);
-    b = 1 + rand(a);
-    r = a - b;
-  } else if (op === "×") {
-    a = 2 + rand([6, 10, 15][lvl]);
-    b = 2 + rand([6, 12, 20][lvl]);
-    r = a * b;
-  } else {
-    b = 2 + rand([6, 10, 13][lvl]);
-    r = 2 + rand([6, 12, 15][lvl]);
-    a = b * r;
-  }
-  const near = shuffle([r + 1, r - 1, r + 10, r - 10, r + 2, r - 2, r + b, r - b, Number(String(r).split("").reverse().join(""))]).filter((x) => x >= 0 && x !== r);
-  return { label: "¿Cuánto es?", prompt: `${a} ${op} ${b}`, answer: String(r), options: uniqueOptions(String(r), near.map(String)) };
-}
-
-function mountTimed(el, id, gen) {
-  const DURATION = 60000;
-  let score;
-  let endAt;
-  let penalty;
-  let current;
-  let tick = null;
-  let playing = false;
-
-  el.innerHTML = `${statsBar(id, `<div class="g-stat"><span>Tiempo</span><b data-time>60</b></div>`)}
-    <div class="g-stage">
-      <div class="quick-game" data-board>
-        <div class="qg-label" data-label>&nbsp;</div>
-        <div class="qg-prompt" data-prompt>&nbsp;</div>
-        <div class="qg-opts" data-opts></div>
-        <div class="qg-time"><div class="qg-time-fill" data-bar></div></div>
-      </div>
-      <div class="g-overlay" data-overlay hidden></div>
-    </div>
-    <p class="muted small center">Acierto: +1 punto. Fallo: −3 segundos.</p>`;
-  const board = el.querySelector("[data-board]");
-
-  function next() {
-    current = gen(score);
-    el.querySelector("[data-label]").textContent = current.label;
-    const p = el.querySelector("[data-prompt]");
-    p.textContent = current.prompt;
-    el.querySelector("[data-opts]").innerHTML = current.options
-      .map((o) => `<button class="qg-opt${current.mono ? " mono" : ""}" data-opt="${esc(o)}">${esc(o)}</button>`)
-      .join("");
-  }
-
-  function update() {
-    const left = Math.max(0, endAt - penalty - Date.now());
-    el.querySelector("[data-time]").textContent = Math.ceil(left / 1000);
-    el.querySelector("[data-bar]").style.width = `${(left / DURATION) * 100}%`;
-    if (left <= 0) end();
-  }
-
-  function end() {
-    playing = false;
-    clearInterval(tick);
-    const record = submit(id, score);
-    el.querySelector("[data-best]").textContent = best(id);
-    overlay(el, `<h3>¡Tiempo!</h3><p>${score} ${score === 1 ? "acierto" : "aciertos"}${record ? " · ¡nuevo récord!" : ""}</p><button class="btn" data-start>Jugar otra vez</button>`);
-  }
-
-  function start() {
-    score = 0;
-    penalty = 0;
-    endAt = Date.now() + DURATION;
-    playing = true;
-    el.querySelector("[data-score]").textContent = 0;
-    overlay(el, null);
-    next();
-    update();
-    tick = setInterval(update, 100);
-  }
-
-  function answer(btn) {
-    if (!playing) return;
-    const ok = btn.dataset.opt === current.answer;
-    if (ok) {
-      score++;
-      el.querySelector("[data-score]").textContent = score;
-    } else {
-      penalty += 3000;
-      navigator.vibrate?.(60);
-    }
-    board.classList.remove("flash-ok", "flash-bad");
-    void board.offsetWidth; // reinicia la animación
-    board.classList.add(ok ? "flash-ok" : "flash-bad");
-    update();
-    if (playing) next();
-  }
-
-  const click = (e) => {
-    if (e.target.closest("[data-start]")) return start();
-    const opt = e.target.closest("[data-opt]");
-    if (opt) answer(opt);
-  };
-  el.addEventListener("click", click);
-  const g = gameById(id);
-  overlay(el, `<h3>${esc(g.name)}</h3><p>${esc(g.desc)}</p><button class="btn" data-start>Empezar</button>`);
-  return () => {
-    clearInterval(tick);
-    el.removeEventListener("click", click);
-  };
+  let src = esc(code);
+  src = src.replace(/(#.*$|\/\/.*$)/gm, (m) => (lang === "cpp" && m.startsWith("#include") ? m : keep(`<span class="hl-c">${m}</span>`)));
+  src = src.replace(/(&quot;.*?&quot;|&#39;.*?&#39;)/g, (m) => keep(`<span class="hl-s">${m}</span>`));
+  src = src.replace(KEYWORDS[lang] || KEYWORDS.python, (m) => keep(`<span class="hl-k">${m}</span>`));
+  src = src.replace(/\b(\d+)\b/g, (m) => keep(`<span class="hl-n">${m}</span>`));
+  return src.replace(/\u0000T(\d+)T\u0000/g, (_, i) => tokens[Number(i)]);
 }
