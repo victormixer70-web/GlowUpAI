@@ -3,6 +3,50 @@
 import * as store from "./store.js";
 import { generateJSON, streamChat, DEFAULT_MODEL } from "./gemini.js";
 
+// ---------- temas incluidos en la app ----------
+
+// Apuntes escritos a mano que vienen con la app (no los genera la IA).
+const BUILTIN = {
+  "linux-bash": { subjectId: "programario", match: /programari|sistemas|linux|shell/i, name: "Comandos Linux y Bash", file: "content/linux-bash.md" },
+};
+const builtinText = {};
+
+export async function loadBuiltins() {
+  await Promise.all(
+    Object.entries(BUILTIN).map(async ([key, b]) => {
+      try {
+        const res = await fetch(b.file);
+        if (res.ok) builtinText[key] = await res.text();
+      } catch {
+        /* sin conexión y sin caché: se reintenta en el próximo arranque */
+      }
+    })
+  );
+}
+
+// Añade una sola vez los temas incluidos al cuaderno de su asignatura.
+export function ensureBuiltins() {
+  const st = store.get();
+  for (const [key, b] of Object.entries(BUILTIN)) {
+    if (st.seeded?.[key]) continue;
+    const sub = store.subjectById(b.subjectId) || st.subjects.find((x) => b.match.test(x.name));
+    if (!sub) continue;
+    store.update((s) => {
+      s.seeded ||= {};
+      s.seeded[key] = true;
+      s.notebook ||= {};
+      s.notebook[sub.id] ||= { topics: [] };
+      const topics = s.notebook[sub.id].topics;
+      if (!topics.some((t) => t.id === key)) topics.unshift({ id: key, name: b.name, builtin: true, lesson: { builtin: key }, attempts: [] });
+    });
+  }
+}
+
+export function lessonText(topic) {
+  if (!topic?.lesson) return "";
+  return topic.lesson.builtin ? builtinText[topic.lesson.builtin] || "" : topic.lesson.text || "";
+}
+
 // ---------- datos ----------
 
 export function notebook(subjectId) {
@@ -181,7 +225,7 @@ export async function generateQuiz({ subjectId, topicId, count, difficulty, targ
   const prompt = `Crea una evaluación de ${count} preguntas tipo test sobre el tema «${topic.name}» de ${sub?.name}.
 Temario de la asignatura: ${sub?.topics || "no especificado"}.
 Dificultad: ${DIFFICULTY[difficulty] || DIFFICULTY.media}.
-${targetWeak && weak.length ? `Al menos la mitad de las preguntas deben trabajar estos conceptos en los que falla: ${weak.join(", ")}.\n` : weak.length ? `Conceptos en los que suele fallar (inclúyelos): ${weak.join(", ")}.\n` : ""}${topic.lesson ? `Basa las preguntas en lo que explica esta lección:\n"""\n${topic.lesson.text.slice(0, 6000)}\n"""\n` : ""}${previous.length ? `No repitas estas preguntas de evaluaciones anteriores:\n${previous.map((q) => `- ${q}`).join("\n")}\n` : ""}
+${targetWeak && weak.length ? `Al menos la mitad de las preguntas deben trabajar estos conceptos en los que falla: ${weak.join(", ")}.\n` : weak.length ? `Conceptos en los que suele fallar (inclúyelos): ${weak.join(", ")}.\n` : ""}${lessonText(topic) ? `Basa las preguntas en lo que explica esta lección:\n"""\n${lessonText(topic).slice(0, 14000)}\n"""\n` : ""}${previous.length ? `No repitas estas preguntas de evaluaciones anteriores:\n${previous.map((q) => `- ${q}`).join("\n")}\n` : ""}
 Reglas:
 - Cada pregunta tiene exactamente 4 opciones y una sola correcta.
 - Mezcla preguntas conceptuales y de cálculo/aplicación. En las de cálculo, las opciones incorrectas deben ser resultados de errores típicos reales.

@@ -55,6 +55,7 @@ function defaults() {
     chats: {}, // subjectId -> [{ role: "user" | "model", text, hadImage }]
     notebook: {}, // subjectId -> { topics: [{ id, name, lesson, attempts }] }
     games: {}, // id del minijuego -> récord
+    seeded: {}, // temas incluidos que ya se han añadido al cuaderno
     session: null, // sesión de estudio en curso
   };
 }
