@@ -201,7 +201,7 @@
   });
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(function (reg) {
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(function (reg) {
       reg.addEventListener('updatefound', function () {
         var nw = reg.installing;
         nw && nw.addEventListener('statechange', function () {
