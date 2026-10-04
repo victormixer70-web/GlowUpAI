@@ -19,6 +19,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <canvas ref="{{canvasRef}}" width="844" height="390" style="position: absolute; left: 0; top: 0; width: 844px; height: 390px; display: block"></canvas>
 
   <svg width="844" height="390" viewBox="0 0 844 390" style="position: absolute; left: 0; top: 0; pointer-events: none">
+    <polyline points="{{ghostPts}}" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round" stroke-linejoin="round" opacity="{{ghostOp}}"/>
     <polyline points="{{swipePts}}" fill="none" stroke="#22D3EE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
   </svg>
 
@@ -193,9 +194,11 @@ class Component extends DCLogic {
     const sp = Math.hypot(b.vx, b.vy, b.vz);
     b.vy -= 9.81 * dt;
     b.vx -= 0.0125 * sp * b.vx * dt; b.vy -= 0.0125 * sp * b.vy * dt; b.vz -= 0.0125 * sp * b.vz * dt;
-    b.vx += b.curve * 0.16 * Math.hypot(b.vx, b.vz) * dt;
-    b.curve *= Math.exp(-0.3 * dt);
+    // swerve builds up as the ball travels (it bends most near the goal, like a real free kick)
+    b.age = (b.age || 0) + dt;
+    b.vx += b.curve * 0.16 * Math.hypot(b.vx, b.vz) * (0.35 + 1.3 * Math.min(1, b.age / 0.9)) * dt;
     b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
+    if (b.res && b.vz > 0) { const r = this.resAt(b.res, b.z); b.x += r - (b.resR || 0); b.resR = r; }
     if (b.y < 0.11) { b.y = 0.11; if (b.vy < -1) { b.vy = -b.vy * 0.6; b.vx *= 0.8; b.vz *= 0.8; } else b.vy = 0; }
   }
   predict() {
@@ -227,7 +230,7 @@ class Component extends DCLogic {
   launchPending() {
     const { v, err } = this.pendingShot;
     this.pendingShot = null;
-    Object.assign(this.b, { vx: v.vx + (Math.random() * 2 - 1) * err, vy: v.vy + (Math.random() * 2 - 1) * err * 0.6, vz: v.vz, curve: v.curve });
+    Object.assign(this.b, { vx: v.vx + (Math.random() * 2 - 1) * err, vy: v.vy + (Math.random() * 2 - 1) * err * 0.6, vz: v.vz, curve: v.curve, res: v.res || null, resR: 0, age: 0 });
     this.lastSpeed = v.vz;
     this.phase = 'flight'; this.pt = 0; this.trail = [];
     if (this.pendingDive) { this.k.decided = true; this.pendingDive = null; }
@@ -299,7 +302,7 @@ class Component extends DCLogic {
         if (this.WALL.length && pz < 9.15 && b.z >= 9.15) {
           const c = lerp(9.15), top = 1.5 + this.wallJ + 0.11;
           if (c.x > this.WALL[0] - 0.36 && c.x < this.WALL[this.WALL.length - 1] + 0.36 && c.y < top) {
-            b.z = 9.0; b.vz = -Math.abs(b.vz) * 0.3; b.vy = 2.5; b.vx *= 0.4; b.curve = 0;
+            b.z = 9.0; b.vz = -Math.abs(b.vz) * 0.3; b.vy = 2.5; b.vx *= 0.4; b.curve = 0; b.res = null;
             this.setResult('barrera', 'Ha tocado en la barrera');
           }
         }
@@ -311,7 +314,7 @@ class Component extends DCLogic {
           let dist = Math.hypot(c.x - (ax + vx * t), c.y - (ay + vy * t));
           if (!k.up && Math.abs(c.y - (k.y + 1.25)) < 0.3) dist = Math.min(dist, Math.max(0, Math.abs(c.x - k.x) - 0.65));
           if (dist < 0.33) {
-            b.z = kz - 0.05; b.vz = -Math.abs(b.vz) * 0.35; b.vx = (c.x - k.x) * 3 + (Math.random() - 0.5) * 3; b.vy = 3; b.curve = 0;
+            b.z = kz - 0.05; b.vz = -Math.abs(b.vz) * 0.35; b.vx = (c.x - k.x) * 3 + (Math.random() - 0.5) * 3; b.vy = 3; b.curve = 0; b.res = null;
             this.setResult('parada', this.turn === 'rival' ? '¡La has parado!' : 'El portero lo adivina');
           }
         }
@@ -332,7 +335,7 @@ class Component extends DCLogic {
         this.trailAcc = (this.trailAcc || 0) + dt;
         if (this.trailAcc > 0.02) { this.trailAcc = 0; this.trail.push([b.x, b.y, b.z]); if (this.trail.length > 16) this.trail.shift(); }
       }
-      if (this.result && (this.result.kind === 'gol' || this.result.kind === 'diana') && b.z > D + 1.7) { b.z = D + 1.7; b.vz = -Math.abs(b.vz) * 0.1; b.vx *= 0.3; b.curve = 0; }
+      if (this.result && (this.result.kind === 'gol' || this.result.kind === 'diana') && b.z > D + 1.7) { b.z = D + 1.7; b.vz = -Math.abs(b.vz) * 0.1; b.vx *= 0.3; b.curve = 0; b.res = null; }
     }
     if (this.phase === 'result' && this.result && this.result.kind === 'parada') this.integrate(b, dt);
     if (this.phase === 'result' && this.pt > 2.0) {
@@ -776,14 +779,92 @@ class Component extends DCLogic {
     const dur = Math.max(0.06, (p1.t - p0.t) / 1000);
     const gm = this.toScreen(this.GX, 1.2, this.D);
     if (p1.y > gm.y) { const t = (gm.y - p0.y) / (p1.y - p0.y); p1 = { x: p0.x + (p1.x - p0.x) * t, y: gm.y }; }
-    let dev = 0;
-    const pe = pts[pts.length - 1];
-    pts.forEach((q) => { const t = (q.y - p0.y) / ((pe.y - p0.y) || 1); const cx = p0.x + (pe.x - p0.x) * t; if (Math.abs(q.x - cx) > Math.abs(dev)) dev = q.x - cx; });
     const tgt = this.fromScreen(p1.x, p1.y, this.D);
     if (!tgt) { this.forceUpdate(); return; }
     const speed = Math.max(17, Math.min(26 + 9 * this.tt('pot'), 15 + (len / dur) / 95));
-    const v = this.velFor(tgt.x, Math.max(0.11, tgt.y), speed, Math.max(-1, Math.min(1, -dev / len * 6)));
+    const v = this.solveShot(pts, tgt, speed);
+    this.lastSwipe = { pts: pts.map((q) => ({ x: q.x, y: q.y })), t: 0 };
     this.queueShot(v, 0.9 * (1 - this.tt('pre')) / v.T);
+  }
+  flight(vx, vy, vz, curve) {
+    // the exact flight the game will play (same integrator), sampled until the goal line
+    const b = { x: 0, y: 0.11, z: 0, vx, vy, vz, curve }, path = [];
+    for (let k = 0; k < 900 && b.z < this.D; k++) {
+      const pz = b.z, px = b.x, py = b.y;
+      this.integrate(b, 1 / 240);
+      if (b.z >= this.D) { const t = (this.D - pz) / ((b.z - pz) || 1e-6); path.push({ x: px + (b.x - px) * t, y: py + (b.y - py) * t, z: this.D }); break; }
+      if (k % 3 === 0) path.push({ x: b.x, y: b.y, z: b.z });
+    }
+    return path;
+  }
+  aimFor(tgt, speed, curve) {
+    // shooting method: correct the launch until the simulated ball crosses the goal line on the target
+    const v = this.velFor(tgt.x, Math.max(0.11, tgt.y), speed, curve);
+    let vx = v.vx, vy = v.vy, path = null;
+    for (let it = 0; it < 6; it++) {
+      path = this.flight(vx, vy, speed, curve);
+      const e = path[path.length - 1];
+      if (!e || e.z < this.D - 0.01) { vy += 1; continue; }
+      const ex = tgt.x - e.x, ey = Math.max(0.11, tgt.y) - e.y;
+      vx += ex / v.T; vy += ey / v.T;
+      if (Math.abs(ex) < 0.01 && Math.abs(ey) < 0.01) break;
+    }
+    return { vx, vy, vz: speed, curve, T: v.T, path };
+  }
+  strokeGap(pts, path) {
+    // how far, in screen pixels, the flight runs from the finger line at the same height on screen
+    const sp = path.map((q) => this.toScreen(q.x, q.y, q.z));
+    const b0 = this.toScreen(0, 0.11, 0);
+    sp.unshift(b0);
+    let sum = 0, n = 0;
+    const from = Math.floor(pts.length * 0.12);
+    for (let i = Math.max(1, from); i < pts.length; i++) {
+      const q = pts[i];
+      for (let k = 1; k < sp.length; k++) {
+        const a = sp[k - 1], c = sp[k];
+        if ((a.y - q.y) * (c.y - q.y) <= 0 && a.y !== c.y) { const t = (q.y - a.y) / (c.y - a.y); const dx = a.x + (c.x - a.x) * t - q.x; sum += dx * dx; n++; break; }
+      }
+    }
+    return n ? Math.sqrt(sum / n) : 1e9;
+  }
+  solveShot(pts, tgt, speed) {
+    // pick the spin whose real flight best traces the stroke (golden-section search), aimed exactly at the target
+    const f = (c) => { const sh = this.aimFor(tgt, speed, c); sh.gap = this.strokeGap(pts, sh.path); return sh; };
+    let lo = -6, hi = 6, g = 0.618;
+    let c1 = hi - g * (hi - lo), c2 = lo + g * (hi - lo), s1 = f(c1), s2 = f(c2);
+    for (let it = 0; it < 18; it++) {
+      if (s1.gap < s2.gap) { hi = c2; c2 = c1; s2 = s1; c1 = hi - g * (hi - lo); s1 = f(c1); }
+      else { lo = c1; c1 = c2; s1 = s2; c2 = lo + g * (hi - lo); s2 = f(c2); }
+    }
+    const best = s1.gap < s2.gap ? s1 : s2, straight = f(0);
+    const sh = straight.gap <= best.gap + 1.5 ? straight : best;
+    sh.res = this.residual(pts, sh.path);
+    return sh;
+  }
+  residual(pts, path) {
+    // what is left between the spin's flight and the stroke, in metres sideways by depth; zero at the foot and at the goal
+    const out = [];
+    const sp = [this.toScreen(0, 0.11, 0)].concat(path.map((q) => this.toScreen(q.x, q.y, q.z)));
+    const wp = [{ x: 0, y: 0.11, z: 0 }].concat(path);
+    for (let i = 1; i < pts.length; i++) {
+      const q = pts[i];
+      for (let k = 1; k < sp.length; k++) {
+        const a = sp[k - 1], c = sp[k];
+        if ((a.y - q.y) * (c.y - q.y) > 0 || a.y === c.y) continue;
+        const t = (q.y - a.y) / (c.y - a.y), w = { x: wp[k - 1].x + (wp[k].x - wp[k - 1].x) * t, y: wp[k - 1].y + (wp[k].y - wp[k - 1].y) * t, z: wp[k - 1].z + (wp[k].z - wp[k - 1].z) * t };
+        const sc = this.toScreen(w.x, w.y, w.z), px = this.toScreen(w.x + 1, w.y, w.z).x - sc.x;
+        if (Math.abs(px) > 0.5) out.push({ z: w.z, r: (q.x - sc.x) / px });
+        break;
+      }
+    }
+    out.sort((u, v) => u.z - v.z);
+    const D = this.D;
+    return out.map((o) => ({ z: o.z, r: Math.max(-2.5, Math.min(2.5, o.r)) * Math.min(1, o.z / 2) * Math.min(1, (D - o.z) / 2.5) }));
+  }
+  resAt(res, z) {
+    if (!res || !res.length || z <= res[0].z) return res && res.length ? res[0].r * Math.max(0, z / Math.max(0.01, res[0].z)) : 0;
+    for (let i = 1; i < res.length; i++) if (z <= res[i].z) { const a = res[i - 1], c = res[i], t = (z - a.z) / ((c.z - a.z) || 1); return a.r + (c.r - a.r) * t; }
+    return res[res.length - 1].r * Math.max(0, (this.D - z) / Math.max(0.01, this.D - res[res.length - 1].z));
   }
   renderVals() {
     const R = this.result, youTurn = this.turn === 'you';
@@ -809,6 +890,8 @@ class Component extends DCLogic {
     return {
       canvasRef: this.canvasRef,
       no3d: !!this.no3d,
+      ghostPts: this.lastSwipe && this.phase !== 'aim' ? this.lastSwipe.pts.map((q) => f2(q.x) + ',' + f2(q.y)).join(' ') : '',
+      ghostOp: this.lastSwipe && (this.phase === 'runup' || this.phase === 'flight') ? '0.7' : this.lastSwipe && this.phase === 'result' ? Math.max(0, 0.7 - this.pt * 0.5).toFixed(2) : '0',
       swipePts: this.swipe ? this.swipe.map((q) => f2(q.x) + ',' + f2(q.y)).join(' ') : '',
       titleLabel: this.practice ? 'ENTRENAMIENTO' : this.kind === 'pen' ? 'PENALTIS 1VS1' : 'TIROS LIBRES 1VS1',
       isPractice: this.practice, isDuel: !this.practice,
