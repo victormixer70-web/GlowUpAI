@@ -474,7 +474,7 @@ class Component extends DCLogic {
       p.x = this.clamp(p.x + p.vx * dt, 0.6, 59.4); p.y = this.clamp(p.y + p.vy * dt, 0.6, 29.4);
       const sp = Math.hypot(p.vx, p.vy);
       if (sp > 0.5) p.face += this.ang(Math.atan2(p.vy, p.vx) - p.face) * Math.min(1, dt * 8);
-      p.run += sp * dt * 2.6;
+      if (sp > 0.25) p.run += 2 * Math.PI * (0.9 + 0.09 * sp) * dt;
     });
     if (g.pt > 3) { this.kickoff(g.concede); g.phase = 'play'; g.pt = 0; }
   }
@@ -516,9 +516,11 @@ class Component extends DCLogic {
         }
       }
       const tvx = dx * maxV, tvy = dy * maxV;
-      const brake = (tvx * p.vx + tvy * p.vy) < 0 || Math.hypot(tvx, tvy) < Math.hypot(p.vx, p.vy) - 0.5 ? 1.6 : 1;
-      p.vx += (tvx - p.vx) * Math.min(1, dt * acc * brake);
-      p.vy += (tvy - p.vy) * Math.min(1, dt * acc * brake);
+      if (p.role === 'gk') {
+        const brake = (tvx * p.vx + tvy * p.vy) < 0 || Math.hypot(tvx, tvy) < Math.hypot(p.vx, p.vy) - 0.5 ? 1.6 : 1;
+        p.vx += (tvx - p.vx) * Math.min(1, dt * acc * brake);
+        p.vy += (tvy - p.vy) * Math.min(1, dt * acc * brake);
+      } else this.locomote(p, i, tvx, tvy, maxV, dt);
     }
     p.x += p.vx * dt; p.y += p.vy * dt;
     if (p.role === 'gk') {
@@ -534,10 +536,11 @@ class Component extends DCLogic {
       if (p.role === 'gk') want = Math.atan2(b.y - p.y, b.x - p.x);
       else if (g.own === i) {
         const [ix, iy] = this.inp || [0, 0];
-        if (i === g.ctl && !this.autoplay && Math.hypot(ix, iy) > 0.2) want = Math.atan2(iy, ix);
+        if (sp > 2.2) want = Math.atan2(p.vy, p.vx);
+        else if (i === g.ctl && !this.autoplay && Math.hypot(ix, iy) > 0.2) want = Math.atan2(iy, ix);
         else if (sp > 0.5) want = Math.atan2(p.vy, p.vx);
-        rate = i === g.ctl ? 14 + 6 * this.tt('con') : 7;
-      } else if (i === g.ctl && !this.autoplay && Math.hypot((this.inp || [0, 0])[0], (this.inp || [0, 0])[1]) > 0.2) { want = Math.atan2(this.inp[1], this.inp[0]); rate = 16; }
+        rate = i === g.ctl ? 10 + 4 * this.tt('con') : 7;
+      } else if (sp <= 2.2 && i === g.ctl && !this.autoplay && Math.hypot((this.inp || [0, 0])[0], (this.inp || [0, 0])[1]) > 0.2) { want = Math.atan2(this.inp[1], this.inp[0]); rate = 10; }
       else if (sp > 0.6) want = Math.atan2(p.vy, p.vx);
       else { want = Math.atan2(b.y - p.y, b.x - p.x); rate = 4; }
       if (p.role === 'gk') {
@@ -548,7 +551,31 @@ class Component extends DCLogic {
       if (want != null) p.face = this.ang(p.face + this.ang(want - p.face) * Math.min(1, dt * rate));
     }
     p.turn += (this.ang(p.face - f0) / Math.max(dt, 1e-4) - p.turn) * Math.min(1, dt * 10);
-    p.run += sp * dt * 2.6;
+    if (sp > 0.25) p.run += 2 * Math.PI * (0.9 + 0.09 * sp) * dt;
+  }
+  locomote(p, i, tvx, tvy, maxV, dt) {
+    // a body with momentum: it speeds up quickly then tops out, brakes harder than it accelerates,
+    // and can only turn so sharply at speed (a curve, or brake-and-plant for a reversal)
+    const g = this.g, human = i === g.ctl && !this.autoplay, ball = g.own === i;
+    const agil = human ? this.tt('vel') : 0.3;
+    const aAcc = (ball ? 7 : 9) + 2 * agil, aBrake = 17, aLat = (ball ? 10.5 : 13) + 3 * agil;
+    const sp = Math.hypot(p.vx, p.vy);
+    let ex = tvx - p.vx, ey = tvy - p.vy;
+    if (sp < 0.4) {
+      const n = Math.hypot(ex, ey), lim = aAcc * dt;
+      if (n > lim) { ex = ex / n * lim; ey = ey / n * lim; }
+      p.vx += ex; p.vy += ey;
+      p.accel = n > 0.01 ? Math.min(1, n / (maxV || 1)) : 0;
+      return;
+    }
+    const ux = p.vx / sp, uy = p.vy / sp;
+    let along = ex * ux + ey * uy, lat = -ex * uy + ey * ux;
+    const reversing = (tvx * ux + tvy * uy) < -0.2 * Math.hypot(tvx, tvy) && sp > 3;
+    const accHere = along > 0 ? aAcc * Math.max(0.25, 1 - 0.7 * sp / Math.max(maxV, 1)) : aBrake;
+    along = this.clamp(along, -aBrake * dt, accHere * dt);
+    lat = this.clamp(lat, -(reversing ? 0.35 : 1) * aLat * dt, (reversing ? 0.35 : 1) * aLat * dt);
+    p.vx += ux * along - uy * lat; p.vy += uy * along + ux * lat;
+    p.accel += ((along / Math.max(dt, 1e-4)) / aBrake - p.accel) * Math.min(1, dt * 8);
   }
   humanMove(p, i, dt) {
     const g = this.g, b = g.ball;
@@ -898,15 +925,18 @@ class Component extends DCLogic {
       b.vx += ((tx - b.x) * 5 - b.vx) * k; b.vy += ((ty - b.y) * 5 - b.vy) * k;
     } else if (p.touchT <= 0 && ahead < 0.85 && d < (ahead < 0.3 ? 2.1 : 1.5)) {
       // a touch: push the ball ahead along the running line, correcting sideways drift
-      const push = sp * (p.sprinting ? 1.32 : 1.1 - 0.06 * ctrl) + 0.6;
+      // close touches when jogging, long knock-ons when sprinting; good control keeps it tighter
+      const push = p.sprinting ? sp * 1.28 + 1.3 : sp * (1.07 - 0.05 * ctrl) + 0.55;
       const tx = fx * push - (-fy) * side * (2.2 + 1.5 * ctrl), ty = fy * push - fx * side * (2.2 + 1.5 * ctrl);
       const n = Math.hypot(tx, ty) || 1;
       b.vx = tx / n * push; b.vy = ty / n * push; b.vz = 0;
       const err = (1 - ctrl) * 0.06 * (p.sprinting ? 2 : 1);
       const a = (Math.random() - 0.5) * err, c = Math.cos(a), s = Math.sin(a), vx = b.vx;
       b.vx = vx * c - b.vy * s; b.vy = vx * s + b.vy * c;
-      p.touchT = this.clamp(0.5 - sp * 0.03, 0.22, 0.45) * (p.sprinting ? 1.35 : 1);
-      p.kickFoot = (p.kickFoot || 0) ^ 1; p.touchAnim = 0.2;
+      // one touch per step when jogging, one per stride when sprinting, with the foot that is swinging through
+      const cyc = 1 / (0.9 + 0.09 * sp);
+      p.touchT = cyc * (p.sprinting ? 1 : 0.5);
+      p.kickFoot = Math.cos(p.run) > 0 ? 1 : 0; p.touchAnim = 0.22;
     }
     // poke-away chances for a defender close to the ball (the body bounce handles direct contact)
     for (let qi = 0; qi < g.ps.length; qi++) {
@@ -1350,7 +1380,7 @@ class Component extends DCLogic {
     if (g.own === i) u.head.rotation.x = 0.3;
     // dribble touches: the leading foot reaches for the ball every stride
     if (p.touchAnim > 0) {
-      const t = Math.sin(Math.PI * (1 - p.touchAnim / 0.2)), leg = p.kickFoot ? Lg : Rg;
+      const t = Math.sin(Math.PI * (1 - p.touchAnim / 0.22)), leg = p.kickFoot ? Lg : Rg;
       leg.hip.rotation.x = Math.min(leg.hip.rotation.x, 0) - 0.55 * t; leg.knee.rotation.x *= 1 - 0.6 * t;
     }
     if (p.role === 'gk' && !p.act) {
