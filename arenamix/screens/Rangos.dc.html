@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Rangos competitivos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#22D3EE}a:hover{color:#67E8F9}
+input::placeholder{color:#8686A6}
+</style>
+</helmet>
+<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; overflow: hidden">
+  <div style="display: flex; align-items: center; gap: 10px; padding: 12px 18px 6px 18px">
+    <a href="Modos.dc.html" aria-label="Volver" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+    <div style="display: flex; flex-direction: column">
+      <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1; letter-spacing: 1px">RANGOS</h1>
+      <span style="font-size: 12px; color: #A3A3C2; font-weight: 600">Fútbol · Competitivo · Temporada 1</span>
+    </div>
+  </div>
+  <div style="position: absolute; left: 18px; right: 18px; top: 70px; bottom: 12px; display: grid; grid-template-columns: 200px minmax(0, 1fr) 260px; gap: 14px">
+    <div style="display: flex; flex-direction: column; gap: 10px">
+  <section style="padding: 14px; flex-direction: column; text-align: center; border-radius: 20px; background: #1B1510; border: 1px solid #4A3020; display: flex; align-items: center; gap: 8px">
+    <svg width="78" height="82" viewBox="-6 -10 76 80" style="flex: none">
+      <circle cx="32" cy="32" r="34" fill="#C07A3E" opacity=".15"/>
+      <path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="#C07A3E"/>
+      <path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="#7A4520"/>
+      <path d="M32 8L50 14V30C50 41 42 49 32 53Z" fill="#000000" opacity=".18"/>
+      <path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="#E3A56E"/>
+      <rect x="20" y="62" width="7" height="5" rx="1.5" fill="#E3A56E"/><rect x="29" y="62" width="7" height="5" rx="1.5" fill="#E3A56E"/><rect x="38" y="62" width="7" height="5" rx="1.5" fill="#3A2C1E"/>
+    </svg>
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">TU RANGO</span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1; color: #E3A56E">BRONCE 2</span>
+      <span style="font-size: 13px; font-weight: 700">112 MMR <span style="color: #A3A3C2; font-weight: 600">· Bronce 3 a 200</span></span>
+      <div style="height: 8px; border-radius: 4px; background: #3A2C1E"><div style="width: 12%; height: 8px; border-radius: 4px; background: #E3A56E"></div></div>
+      <span style="font-size: 12px; color: #CACAE0">≈ 4 victorias para ascender</span>
+    </div>
+  </section>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">LOS 8 RANGOS · DE MENOR A MAYOR</span>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+    <sc-for list="{{ranks}}" as="r" hint-placeholder-count="8">
+      <button type="button" onClick="{{r.pick}}" aria-label="{{r.name}}" style="{{r.cardStyle}}">
+        <svg width="46" height="48" viewBox="-6 -10 76 80">
+          <sc-if value="{{r.glow}}" hint-placeholder-val="{{ false }}"><circle cx="32" cy="32" r="36" fill="{{r.c1}}" opacity=".22"/></sc-if>
+          <sc-if value="{{r.wings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{r.c1}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{r.c1}}"/></sc-if>
+          <path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{r.c1}}"/>
+          <path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{r.c2}}"/>
+          <path d="M32 8L50 14V30C50 41 42 49 32 53Z" fill="#000000" opacity=".18"/>
+          <path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{r.c1}}"/>
+          <sc-if value="{{r.crown}}" hint-placeholder-val="{{ false }}"><path d="M20 6L21 -7L27 -1L32 -9L37 -1L43 -7L44 6Z" fill="#FFC53D" stroke="#7A4E0E" stroke-width="1.5" stroke-linejoin="round"/></sc-if>
+        </svg>
+        <span style="{{r.labelStyle}}">{{r.short}}</span>
+        <sc-if value="{{r.isYou}}" hint-placeholder-val="{{ false }}">
+          <span style="position: absolute; top: -6px; right: -4px; padding: 2px 6px; border-radius: 6px; background: #22D3EE; color: #0B0B14; font-size: 10px; font-weight: 800">TÚ</span>
+        </sc-if>
+      </button>
+    </sc-for>
+      </div>
+      <p style="margin: 0; font-size: 12px; line-height: 1.45; color: #A3A3C2">Todos empiezan en Bronce 1 con 0 MMR. Cada deporte tiene su propio MMR y rango.</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; overflow-y: auto">
+  <section style="padding: 12px; border-radius: 18px; background: #17172A; border: 1px solid #2E2E52; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between">
+      <span style="{{selTitleStyle}}">{{selName}}</span>
+      <span style="font-size: 12px; font-weight: 700; color: #A3A3C2">≈ {{selWins}} victorias por fase</span>
+    </div>
+    <sc-for list="{{divs}}" as="d" hint-placeholder-count="3">
+      <div style="display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 12px; border-radius: 10px; background: #111120">
+        <span style="{{d.dotStyle}}">{{d.n}}</span>
+        <span style="flex: 1; font-weight: 700; font-size: 14px">{{d.label}}</span>
+        <span style="font-size: 13px; font-weight: 600; color: #A3A3C2">{{d.range}} MMR</span>
+      </div>
+    </sc-for>
+  </section>
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+    <div style="padding: 10px 12px; border-radius: 12px; background: #13261A; display: flex; flex-direction: column; gap: 2px">
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; color: #53D88E">+25 MMR</span>
+      <span style="font-size: 11px; color: #BABAD6">por victoria (+20 desde Campeón)</span>
+    </div>
+    <div style="padding: 10px 12px; border-radius: 12px; background: #2A1418; display: flex; flex-direction: column; gap: 2px">
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; color: #FF8A8E">−25 MMR</span>
+      <span style="font-size: 11px; color: #BABAD6">por derrota (−12 en Bronce)</span>
+    </div>
+  </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: 'bronce' };
+  }
+  ranks() {
+    return [
+      { id: 'bronce', name: 'Bronce', short: 'Bronce', c1: '#C07A3E', c2: '#7A4520', text: '#E3A56E', wins: 4, start: 0 },
+      { id: 'plata', name: 'Plata', short: 'Plata', c1: '#C9D2DF', c2: '#6D788A', text: '#DCE3EE', wins: 6, start: 300 },
+      { id: 'oro', name: 'Oro', short: 'Oro', c1: '#F2C14E', c2: '#A8771A', text: '#F2C14E', wins: 8, start: 750 },
+      { id: 'platino', name: 'Platino', short: 'Platino', c1: '#5FD3C6', c2: '#24786F', text: '#7FE3D7', wins: 10, start: 1350 },
+      { id: 'diamante', name: 'Diamante', short: 'Diamante', c1: '#6FB6FF', c2: '#2A5FB0', text: '#8CC5FF', wins: 13, start: 2100 },
+      { id: 'campeon', name: 'Campeón', short: 'Campeón', c1: '#B57BFF', c2: '#5E2FA8', text: '#C79BFF', wins: 16, start: 3075, wings: true },
+      { id: 'super', name: 'Super campeón', short: 'Super C.', c1: '#FF5C8A', c2: '#A3204A', text: '#FF86A6', wins: 20, start: 4275, wings: true, crown: true },
+      { id: 'elite', name: 'Élite', short: 'Élite', c1: '#FFE38A', c2: '#2A2410', text: '#FFE38A', wins: 25, start: 5775, wings: true, crown: true, glow: true }
+    ];
+  }
+  fmt(n) {
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+  renderVals() {
+    const R = this.ranks();
+    const sel = this.state.sel;
+    const ranks = R.map((r) => {
+      const on = r.id === sel;
+      return {
+        ...r,
+        wings: !!r.wings, crown: !!r.crown, glow: !!r.glow,
+        isYou: r.id === 'bronce',
+        cardStyle: 'position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 2px 8px 2px; border-radius: 14px; cursor: pointer; font-family: Manrope, sans-serif; ' + (on ? 'background: #1E1A3A; border: 2px solid ' + r.c1 + ';' : 'background: #17172A; border: 2px solid #26264A;'),
+        labelStyle: 'font-size: 11px; font-weight: 800; color: ' + (on ? r.text : '#CACAE0') + ';',
+        pick: () => this.setState({ sel: r.id })
+      };
+    });
+    const i = R.findIndex((r) => r.id === sel);
+    const r = R[i];
+    const step = r.wins * 25;
+    const divs = [0, 1, 2].map((k) => {
+      const lo = r.start + k * step;
+      const hi = k < 2 ? lo + step - 1 : (i < R.length - 1 ? R[i + 1].start - 1 : null);
+      return {
+        n: String(k + 1),
+        label: r.name + ' ' + (k + 1),
+        range: hi === null ? this.fmt(lo) + '+' : this.fmt(lo) + ' – ' + this.fmt(hi),
+        dotStyle: 'width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 16px; background: ' + r.c2 + '; color: ' + r.c1 + ';'
+      };
+    });
+    return {
+      ranks, divs,
+      selName: r.name.toUpperCase(),
+      selWins: String(r.wins),
+      selTitleStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; color: ' + r.text + ';'
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Personaje</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: {{wpx}}; height: {{hpx}}; font-family: 'Barlow Condensed', sans-serif">
+  <svg width="100%" height="100%" viewBox="0 -34 200 354">
+    <defs>
+      <clipPath id="{{clipId}}"><path d="M62 82Q100 70 138 82L158 112L142 124L136 114L134 176H66L64 114L58 124L42 112Z"/></clipPath>
+    </defs>
+    <ellipse cx="100" cy="308" rx="62" ry="9" fill="#000000" opacity=".5"/>
+    <path d="M78 198Q75 228 80 248Q77 268 81 288H95Q98 268 96 248Q100 226 97 198Z" fill="#B9794F"/>
+    <path d="M103 198Q100 226 104 248Q102 268 105 288H119Q123 268 120 248Q125 228 122 198Z" fill="#A66A43"/>
+    <ellipse cx="87.5" cy="236" rx="5" ry="6" fill="#FFFFFF" opacity=".12"/>
+    <ellipse cx="112.5" cy="236" rx="5" ry="6" fill="#FFFFFF" opacity=".08"/>
+    <path d="M90 210Q93 224 91 238M116 210Q119 224 117 238" stroke="#000000" stroke-opacity=".12" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M79.6 246Q77.6 268 81 288H95Q98 268 96.4 246Z" fill="{{socks}}"/>
+    <path d="M103.6 246Q102 268 105 288H119Q122.4 268 120.4 246Z" fill="{{socks}}"/>
+    <path d="M79.3 251H96.7M103.3 251H120.7" stroke="{{secondary}}" stroke-width="4"/>
+    <path d="M112 246V288H119Q122.4 268 120.4 246Z" fill="#000000" opacity=".15"/>
+    <path d="M65 282h31q4 0 4 4v11H58q0-15 7-15z" fill="{{shoe}}"/>
+    <path d="M104 282h31q7 0 7 15H100v-11q0-4 4-4z" fill="{{shoe}}"/>
+    <path d="M70 287l8 3M74 285l8 3M120 287l8 3M124 285l8 3" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>
+    <path d="M62 292h34M104 292h34" stroke="#000000" stroke-opacity=".15" stroke-width="2"/>
+    <rect x="57" y="297" width="43" height="5" rx="2.5" fill="#F4F4FA"/>
+    <rect x="100" y="297" width="43" height="5" rx="2.5" fill="#F4F4FA"/>
+    <path d="M63 302v3M71 302v3M79 302v3M88 302v3M106 302v3M114 302v3M122 302v3M131 302v3" stroke="#3A3A4A" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M68 168h64l6 52h-32l-6-16l-6 16H62z" fill="{{shorts}}"/>
+    <path d="M100 168h32l6 52h-32l-6-16z" fill="#000000" opacity=".14"/>
+    <path d="M66 172l-3 46M134 172l3 46" stroke="{{secondary}}" stroke-width="3"/>
+    <path d="M62 216h32M106 216h32" stroke="#000000" stroke-opacity=".18" stroke-width="2"/>
+    <path d="M80 182q4 10 2 22M120 182q-4 10-2 22" stroke="#000000" stroke-opacity=".12" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M51 104Q39 128 42 150Q38 166 35 178L46 181Q50 165 54 150Q61 128 61 108Z" fill="#B9794F"/>
+    <path d="M149 104Q161 128 158 150Q162 166 165 178L154 181Q150 165 146 150Q139 128 139 108Z" fill="#A66A43"/>
+    <path d="M47 120Q44 134 46 146M153 120Q156 134 154 146" stroke="#FFFFFF" stroke-opacity=".14" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M44 172h9M147 172h9" stroke="{{secondary}}" stroke-width="5" stroke-linecap="round"/>
+    <ellipse cx="39" cy="184" rx="8" ry="9.5" fill="#B9794F"/>
+    <ellipse cx="161" cy="184" rx="8" ry="9.5" fill="#A66A43"/>
+    <ellipse cx="45" cy="180" rx="3" ry="4.5" fill="#A66A43" transform="rotate(-25 45 180)"/>
+    <ellipse cx="155" cy="180" rx="3" ry="4.5" fill="#8F5A38" transform="rotate(25 155 180)"/>
+    <path d="M92 58h16v24H92z" fill="#A66A43"/>
+    <path d="M92 66Q100 74 108 66V72H92Z" fill="#000000" opacity=".18"/>
+    <path d="M62 82Q100 70 138 82L158 112L142 124L136 114L134 176H66L64 114L58 124L42 112Z" fill="{{primary}}"/>
+    <g clip-path="url(#{{clipId}})" fill="{{secondary}}">
+      <sc-if value="{{patStripes}}" hint-placeholder-val="{{ false }}"><rect x="48" y="60" width="10" height="130"/><rect x="68" y="60" width="10" height="130"/><rect x="88" y="60" width="10" height="130"/><rect x="108" y="60" width="10" height="130"/><rect x="128" y="60" width="10" height="130"/><rect x="148" y="60" width="10" height="130"/></sc-if>
+      <sc-if value="{{patPin}}" hint-placeholder-val="{{ false }}"><rect x="55" y="60" width="2.5" height="130"/><rect x="70" y="60" width="2.5" height="130"/><rect x="85" y="60" width="2.5" height="130"/><rect x="100" y="60" width="2.5" height="130"/><rect x="115" y="60" width="2.5" height="130"/><rect x="130" y="60" width="2.5" height="130"/><rect x="145" y="60" width="2.5" height="130"/></sc-if>
+      <sc-if value="{{patHoops}}" hint-placeholder-val="{{ false }}"><rect x="30" y="92" width="140" height="10"/><rect x="30" y="112" width="140" height="10"/><rect x="30" y="132" width="140" height="10"/><rect x="30" y="152" width="140" height="10"/></sc-if>
+      <sc-if value="{{patBand}}" hint-placeholder-val="{{ false }}"><rect x="30" y="102" width="140" height="16"/></sc-if>
+      <sc-if value="{{patSash}}" hint-placeholder-val="{{ false }}"><path d="M40 70L64 70L160 180L136 180Z"/></sc-if>
+      <sc-if value="{{patHalves}}" hint-placeholder-val="{{ false }}"><rect x="100" y="60" width="70" height="130"/></sc-if>
+      <sc-if value="{{patCentre}}" hint-placeholder-val="{{ false }}"><rect x="88" y="60" width="24" height="130"/></sc-if>
+      <sc-if value="{{patDiag}}" hint-placeholder-val="{{ false }}"><path d="M170 60V200H30Z"/></sc-if>
+    </g>
+    <path d="M100 76Q120 76 138 82L158 112L142 124L136 114L134 176H100Z" fill="#000000" opacity=".14"/>
+    <path d="M70 90Q78 84 86 84" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".25" fill="none"/>
+    <path d="M58 124L42 112M142 124L158 112" stroke="{{secondary}}" stroke-width="5" stroke-linecap="round"/>
+    <path d="M86 78Q100 92 114 78" stroke="{{secondary}}" stroke-width="5" fill="none"/>
+    <sc-if value="{{hasCrest}}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{crestShield}}" hint-placeholder-val="{{ true }}"><path d="M77 94h16v8c0 6-4 10-8 11c-4-1-8-5-8-11z" fill="{{secondary}}" stroke="{{primary}}" stroke-width="1.5"/></sc-if>
+      <sc-if value="{{crestCircle}}" hint-placeholder-val="{{ false }}"><circle cx="85" cy="103" r="9" fill="{{secondary}}" stroke="{{primary}}" stroke-width="1.5"/></sc-if>
+      <sc-if value="{{crestDiamond}}" hint-placeholder-val="{{ false }}"><path d="M85 92l11 11l-11 11l-11-11z" fill="{{secondary}}" stroke="{{primary}}" stroke-width="1.5"/></sc-if>
+      <sc-if value="{{markStar}}" hint-placeholder-val="{{ false }}"><path d="M85 85.5l1.2 2.5 2.7.4-2 1.9.5 2.7-2.4-1.3-2.4 1.3.5-2.7-2-1.9 2.7-.4z" fill="#FFC53D"/></sc-if>
+      <sc-if value="{{markBolt}}" hint-placeholder-val="{{ false }}"><path d="M86 84.5l-3.5 5h2.5l-1 4l3.5-5h-2.5z" fill="#FFC53D"/></sc-if>
+      <sc-if value="{{markCrown}}" hint-placeholder-val="{{ false }}"><path d="M81 91.5l.5-5 2 2 1.5-3 1.5 3 2-2 .5 5z" fill="#FFC53D"/></sc-if>
+      <sc-if value="{{markBall}}" hint-placeholder-val="{{ false }}"><circle cx="85" cy="88.5" r="3" fill="#F2F5FA" stroke="#0A0F1C" stroke-width=".8"/><circle cx="85" cy="88.5" r="1" fill="#0A0F1C"/></sc-if>
+      <sc-if value="{{markMoon}}" hint-placeholder-val="{{ false }}"><path d="M86.5 85a3.5 3.5 0 1 0 0 7a4.5 4.5 0 0 1 0-7z" fill="#FFC53D"/></sc-if>
+      <text x="85" y="105.5" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="6.5" fill="{{primary}}">{{crest}}</text>
+    </sc-if>
+    <text x="100" y="148" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="40" fill="{{numColor}}" stroke="#000000" stroke-opacity=".15" stroke-width="1">{{number}}</text>
+    <ellipse cx="76" cy="47" rx="5" ry="7" fill="#A66A43"/>
+    <ellipse cx="124" cy="47" rx="5" ry="7" fill="#A66A43"/>
+    <path d="M76.5 44q2.5 3 0 7M123.5 44q-2.5 3 0 7" stroke="#7E4F31" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M76 42Q76 20 100 20Q124 20 124 42Q124 60 114 67Q106 73 100 73Q94 73 86 67Q76 60 76 42Z" fill="#B9794F"/>
+    <path d="M100 20Q124 20 124 42Q124 60 114 67Q106 73 100 73Z" fill="#000000" opacity=".08"/>
+    <ellipse cx="86" cy="56" rx="4.5" ry="3" fill="#E5484D" opacity=".14"/>
+    <ellipse cx="114" cy="56" rx="4.5" ry="3" fill="#E5484D" opacity=".12"/>
+    <ellipse cx="91" cy="47" rx="4" ry="2.9" fill="#FFFFFF"/>
+    <ellipse cx="109" cy="47" rx="4" ry="2.9" fill="#FFFFFF"/>
+    <circle cx="91.6" cy="47.2" r="2.2" fill="#5A3A22"/>
+    <circle cx="109.6" cy="47.2" r="2.2" fill="#5A3A22"/>
+    <circle cx="91.7" cy="47.3" r="1.1" fill="#120A06"/>
+    <circle cx="109.7" cy="47.3" r="1.1" fill="#120A06"/>
+    <circle cx="92.4" cy="46.4" r=".7" fill="#FFFFFF"/>
+    <circle cx="110.4" cy="46.4" r=".7" fill="#FFFFFF"/>
+    <path d="M86.8 44.6q4.2-1.8 8.4 0M104.8 44.6q4.2-1.8 8.4 0" stroke="#7E4F31" stroke-width="1" fill="none" opacity=".7"/>
+    <path d="M85 41q5-3.5 10.5-.8M104.5 40.2q5.5-2.7 10.5.8" stroke="#241811" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+    <path d="M100.5 47Q99 53 96.8 55.6Q100 57.4 103.4 55.6" stroke="#7E4F31" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M93.5 61Q100 64.5 106.5 61Q103 66.5 100 66.5Q97 66.5 93.5 61Z" fill="#8E3F30"/>
+    <path d="M94.5 61.4Q100 63.2 105.5 61.4" stroke="#F4F4FA" stroke-width="1.2" fill="none" opacity=".85"/>
+    <path d="M75 44Q72 14 100 13Q128 14 125 44Q123 33 115 28Q109 34 100 30Q91 34 85 28Q78 33 75 44Z" fill="#241811"/>
+    <path d="M75.5 44Q75 52 77.5 56L79 44Z" fill="#241811"/>
+    <path d="M124.5 44Q125 52 122.5 56L121 44Z" fill="#241811"/>
+    <path d="M86 20Q96 15 108 18M84 25Q92 20 100 22M104 21Q113 21 119 27" stroke="#4A3428" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+    <sc-if value="{{hatBand}}" hint-placeholder-val="{{ false }}"><rect x="75" y="29" width="50" height="9" rx="4" fill="{{hatColor}}"/></sc-if>
+    <sc-if value="{{hatCap}}" hint-placeholder-val="{{ false }}"><path d="M74 38Q74 10 100 10Q126 10 126 38Z" fill="{{hatColor}}"/><path d="M116 34h28a4 4 0 0 1 0 8h-30z" fill="{{hatColor}}"/><circle cx="100" cy="11" r="3" fill="#0A0F1C" opacity=".4"/><path d="M100 12V38" stroke="#000000" opacity=".15" stroke-width="2"/></sc-if>
+    <sc-if value="{{hatTop}}" hint-placeholder-val="{{ false }}"><rect x="78" y="-16" width="44" height="42" rx="3" fill="#1A1A22"/><rect x="78" y="12" width="44" height="8" fill="#E5484D"/><rect x="64" y="22" width="72" height="9" rx="4.5" fill="#1A1A22"/><rect x="82" y="-12" width="5" height="22" rx="2.5" fill="#FFFFFF" opacity=".15"/></sc-if>
+    <sc-if value="{{hatChef}}" hint-placeholder-val="{{ false }}"><circle cx="86" cy="6" r="13" fill="#F4F4F6"/><circle cx="100" cy="-2" r="15" fill="#FFFFFF"/><circle cx="114" cy="6" r="13" fill="#F4F4F6"/><rect x="78" y="8" width="44" height="22" rx="3" fill="#FFFFFF"/><path d="M78 24h44" stroke="#D6DCE8" stroke-width="2"/></sc-if>
+    <sc-if value="{{hatViking}}" hint-placeholder-val="{{ false }}"><path d="M78 24Q60 22 54 -6Q66 12 82 14Z" fill="#F2E6C8"/><path d="M122 24Q140 22 146 -6Q134 12 118 14Z" fill="#F2E6C8"/><path d="M74 38Q74 10 100 10Q126 10 126 38Z" fill="#8A93A6"/><rect x="72" y="30" width="56" height="9" rx="3" fill="#B7791F"/><circle cx="84" cy="34.5" r="2" fill="#F2C14E"/><circle cx="100" cy="34.5" r="2" fill="#F2C14E"/><circle cx="116" cy="34.5" r="2" fill="#F2C14E"/><path d="M100 10V30" stroke="#6D788A" stroke-width="3"/></sc-if>
+    <sc-if value="{{hatProp}}" hint-placeholder-val="{{ false }}"><path d="M75 38Q75 14 100 14Q125 14 125 38Z" fill="#E5484D"/><path d="M100 14Q112 14 118 22L100 38Z" fill="#FFC53D"/><path d="M100 14Q88 14 82 22L100 38Z" fill="#3EA6FF"/><rect x="98" y="2" width="4" height="12" fill="#2A3556"/><ellipse cx="87" cy="2" rx="13" ry="3.5" fill="#2FBF71"/><ellipse cx="113" cy="2" rx="13" ry="3.5" fill="#C8F031"/><circle cx="100" cy="2" r="3" fill="#F2F5FA"/></sc-if>
+    <sc-if value="{{hatCrown}}" hint-placeholder-val="{{ false }}"><path d="M76 28L78 2L89 16L100 -4L111 16L122 2L124 28Z" fill="#FFC53D" stroke="#B7791F" stroke-width="2" stroke-linejoin="round"/><circle cx="100" cy="21" r="3.5" fill="#E5484D"/><circle cx="86" cy="22" r="2.5" fill="#3EA6FF"/><circle cx="114" cy="22" r="2.5" fill="#2FBF71"/></sc-if>
+    <sc-if value="{{hatSprout}}" hint-placeholder-val="{{ false }}"><path d="M100 20V2" stroke="#2FBF71" stroke-width="3" stroke-linecap="round"/><path d="M100 8Q84 -6 80 8Q92 16 100 8Z" fill="#2FBF71"/><path d="M100 4Q116 -10 122 4Q110 12 100 4Z" fill="#53D88E"/></sc-if>
+    <sc-if value="{{hatPhones}}" hint-placeholder-val="{{ false }}"><path d="M73 46Q73 12 100 12Q127 12 127 46" stroke="#141B2D" stroke-width="6" fill="none"/><rect x="66" y="36" width="13" height="22" rx="6" fill="#C8F031"/><rect x="121" y="36" width="13" height="22" rx="6" fill="#C8F031"/><rect x="69" y="40" width="4" height="14" rx="2" fill="#0A0F1C" opacity=".3"/></sc-if>
+
+    <sc-if value="{{faceSun}}" hint-placeholder-val="{{ false }}"><path d="M81 41h15v7a5 5 0 0 1-5 5h-5a5 5 0 0 1-5-5z" fill="#141B2D"/><path d="M104 41h15v7a5 5 0 0 1-5 5h-5a5 5 0 0 1-5-5z" fill="#141B2D"/><path d="M96 43h8M76 42h5M119 42h5" stroke="#141B2D" stroke-width="2.5"/><path d="M84 44l4 4M107 44l4 4" stroke="#FFFFFF" stroke-width="1.5" opacity=".5"/></sc-if>
+    <sc-if value="{{faceRound}}" hint-placeholder-val="{{ false }}"><circle cx="91" cy="47" r="7" fill="#FFFFFF" fill-opacity=".15" stroke="#C9A227" stroke-width="2.5"/><circle cx="109" cy="47" r="7" fill="#FFFFFF" fill-opacity=".15" stroke="#C9A227" stroke-width="2.5"/><path d="M98 46h4" stroke="#C9A227" stroke-width="2.5"/></sc-if>
+    <sc-if value="{{faceStar}}" hint-placeholder-val="{{ false }}"><path d="M91 37l3 6.5 7 .8-5.2 4.8 1.4 7L91 52.6l-6.2 3.5 1.4-7L81 44.3l7-.8z" fill="#FF5C8A"/><path d="M109 37l3 6.5 7 .8-5.2 4.8 1.4 7L109 52.6l-6.2 3.5 1.4-7L99 44.3l7-.8z" fill="#FF5C8A"/><circle cx="91" cy="47" r="3" fill="#3A1022"/><circle cx="109" cy="47" r="3" fill="#3A1022"/></sc-if>
+    <sc-if value="{{face3d}}" hint-placeholder-val="{{ false }}"><rect x="78" y="40" width="44" height="14" rx="2" fill="#F4F4F6"/><rect x="81" y="42.5" width="16" height="9" fill="#E5484D"/><rect x="103" y="42.5" width="16" height="9" fill="#3EA6FF"/></sc-if>
+    <sc-if value="{{faceSki}}" hint-placeholder-val="{{ false }}"><path d="M72 46h56" stroke="#141B2D" stroke-width="5"/><rect x="78" y="38" width="44" height="16" rx="8" fill="#FF8A3D"/><rect x="81" y="41" width="38" height="10" rx="5" fill="#3EA6FF"/><path d="M86 43l6 6" stroke="#FFFFFF" stroke-width="2" opacity=".6"/></sc-if>
+    <sc-if value="{{faceStache}}" hint-placeholder-val="{{ false }}"><path d="M88 55Q94 49 100 53Q106 49 112 55Q107 59 100 56Q93 59 88 55Z" fill="#241811"/></sc-if>
+  </svg>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"primary":{"editor":"color","default":"#FF8A3D"},"secondary":{"editor":"color","default":"#0A0F1C"},"pattern":{"editor":"enum","options":["solid","stripes","pin","hoops","band","sash","halves","centre","diag"],"default":"solid"},"shorts":{"editor":"color","default":"#141B2D"},"socks":{"editor":"color","default":"#F2F5FA"},"shoe":{"editor":"color","default":"#C8F031"},"number":{"editor":"text","default":"10"},"crest":{"editor":"text","default":""},"crestShape":{"editor":"enum","options":["shield","circle","diamond"],"default":"shield"},"crestMark":{"editor":"enum","options":["none","star","bolt","crown","ball","moon"],"default":"none"},"numColor":{"editor":null},"hat":{"editor":"enum","options":["none","band","cap","top","chef","viking","prop","crown","sprout","phones"],"default":"none"},"hatColor":{"editor":"color","default":"#C8F031"},"face":{"editor":"enum","options":["none","sun","round","star","3d","ski","stache"],"default":"none"},"w":{"editor":"int","default":200,"min":40,"max":600},"$preview":{"width":200,"height":354}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.cid = 'jc' + Math.random().toString(36).slice(2, 9);
+  }
+  lum(hex) {
+    const h = String(hex || '#000000').replace('#', '');
+    const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  }
+  renderVals() {
+    const p = this.props;
+    const w = Number(p.w ?? 200);
+    const primary = p.primary ?? '#FF8A3D';
+    const secondary = p.secondary ?? '#0A0F1C';
+    const pattern = p.pattern ?? 'solid';
+    const hat = p.hat ?? 'none';
+    const face = p.face ?? 'none';
+    const numColor = p.numColor ?? (this.lum(primary) > 0.6 ? (this.lum(secondary) < 0.6 ? secondary : '#0A0F1C') : '#F2F5FA');
+    return {
+      wpx: w + 'px',
+      hpx: Math.round(w * 354 / 200) + 'px',
+      clipId: this.cid,
+      primary, secondary,
+      shorts: p.shorts ?? '#141B2D',
+      socks: p.socks ?? '#F2F5FA',
+      shoe: p.shoe ?? '#C8F031',
+      number: p.number ?? '10',
+      crest: p.crest ?? '',
+      hasCrest: !!(p.crest ?? ''),
+      crestShield: (p.crestShape ?? 'shield') === 'shield', crestCircle: p.crestShape === 'circle', crestDiamond: p.crestShape === 'diamond',
+      markStar: p.crestMark === 'star', markBolt: p.crestMark === 'bolt', markCrown: p.crestMark === 'crown', markBall: p.crestMark === 'ball', markMoon: p.crestMark === 'moon',
+      numColor,
+      hatColor: p.hatColor ?? '#C8F031',
+      patStripes: pattern === 'stripes', patPin: pattern === 'pin', patHoops: pattern === 'hoops', patBand: pattern === 'band',
+      patSash: pattern === 'sash', patHalves: pattern === 'halves', patCentre: pattern === 'centre', patDiag: pattern === 'diag',
+      hatBand: hat === 'band', hatCap: hat === 'cap', hatTop: hat === 'top', hatChef: hat === 'chef', hatViking: hat === 'viking',
+      hatProp: hat === 'prop', hatCrown: hat === 'crown', hatSprout: hat === 'sprout', hatPhones: hat === 'phones',
+      faceSun: face === 'sun', faceRound: face === 'round', faceStar: face === 'star', face3d: face === '3d', faceSki: face === 'ski', faceStache: face === 'stache'
+    };
+  }
+}
+</script>
+</body>
+</html>

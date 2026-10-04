@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inicio y sesión</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#22D3EE}a:hover{color:#67E8F9}
+input::placeholder{color:#8686A6}
+</style>
+</helmet>
+<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; overflow: hidden">
+  <div style="position: absolute; left: 0; top: 0; width: 440px; height: 390px; overflow: hidden">
+    <svg width="440" height="390" viewBox="0 0 390 318" preserveAspectRatio="xMidYMid slice" style="position: absolute; left: 0; top: 0">
+      <defs>
+        <linearGradient id="m-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#15123A"/><stop offset="1" stop-color="#0B0B14"/></linearGradient>
+        <radialGradient id="m-glow"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".7"/><stop offset=".3" stop-color="#DDE8FF" stop-opacity=".25"/><stop offset="1" stop-color="#DDE8FF" stop-opacity="0"/></radialGradient>
+        <linearGradient id="m-beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E8F0FF" stop-opacity=".22"/><stop offset="1" stop-color="#E8F0FF" stop-opacity="0"/></linearGradient>
+        <linearGradient id="m-pitch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1A6B3D"/><stop offset="1" stop-color="#239152"/></linearGradient>
+        <linearGradient id="m-fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B0B14" stop-opacity="0"/><stop offset="1" stop-color="#0B0B14"/></linearGradient>
+        <pattern id="m-crowd" width="8" height="7" patternUnits="userSpaceOnUse"><circle cx="4" cy="3.5" r="2.3" fill="#2A2A55"/></pattern>
+        <pattern id="m-crowd2" width="22" height="13" patternUnits="userSpaceOnUse"><circle cx="6" cy="4" r="2.3" fill="#22D3EE" opacity=".55"/><circle cx="17" cy="10" r="2.3" fill="#FF8A3D" opacity=".55"/></pattern>
+      </defs>
+      <rect width="390" height="318" fill="url(#m-sky)"/>
+      <circle cx="120" cy="40" r="1.2" fill="#FFFFFF" opacity=".6"/>
+      <circle cx="250" cy="24" r="1" fill="#FFFFFF" opacity=".5"/>
+      <circle cx="300" cy="70" r="1.2" fill="#FFFFFF" opacity=".4"/>
+      <circle cx="170" cy="80" r="1" fill="#FFFFFF" opacity=".4"/>
+      <path d="M0 150Q195 104 390 150V214H0Z" fill="#14142C"/>
+      <path d="M0 150Q195 104 390 150V214H0Z" fill="url(#m-crowd)"/>
+      <path d="M0 150Q195 104 390 150V214H0Z" fill="url(#m-crowd2)"/>
+      <path d="M0 196H390V214H0Z" fill="#101024"/>
+      <path d="M0 200H390" stroke="#22D3EE" stroke-width="3" opacity=".7"/>
+      <path d="M-40 318L56 206H334L430 318Z" fill="url(#m-pitch)"/>
+      <path d="M102 206H148L117 318H38Z" fill="#FFFFFF" opacity=".05"/>
+      <path d="M194 206H240L273 318H195Z" fill="#FFFFFF" opacity=".05"/>
+      <path d="M286 206H334L430 318H352Z" fill="#FFFFFF" opacity=".05"/>
+      <path d="M30 262H360" stroke="#FFFFFF" stroke-width="2" opacity=".45"/>
+      <ellipse cx="195" cy="262" rx="74" ry="20" fill="none" stroke="#FFFFFF" stroke-width="2" opacity=".45"/>
+      <path d="M38 36L-60 318H140L56 36Z" fill="url(#m-beam)"/>
+      <path d="M334 36L250 318H450L352 36Z" fill="url(#m-beam)"/>
+      <rect x="44" y="36" width="5" height="164" fill="#21213A"/>
+      <rect x="341" y="36" width="5" height="164" fill="#21213A"/>
+      <rect x="26" y="20" width="40" height="18" rx="3" fill="#21213A"/>
+      <rect x="324" y="20" width="40" height="18" rx="3" fill="#21213A"/>
+      <path d="M30 24h8v10h-8zM41 24h8v10h-8zM52 24h10v10H52z" fill="#F4F8FF"/>
+      <path d="M328 24h10v10h-10zM341 24h8v10h-8zM352 24h8v10h-8z" fill="#F4F8FF"/>
+      <circle cx="46" cy="29" r="60" fill="url(#m-glow)"/>
+      <circle cx="344" cy="29" r="60" fill="url(#m-glow)"/>
+      <ellipse cx="195" cy="296" rx="90" ry="14" fill="#22D3EE" opacity=".12"/>
+      <rect y="268" width="390" height="50" fill="url(#m-fade)"/>
+    </svg>
+    <div style="position: absolute; left: 145px; top: 30px">
+      <dc-import name="Avatar" primary="#FF8A3D" secondary="#0B0B14" pattern="solid" shorts="#17172A" socks="#F4F4FA" shoe="#22D3EE" number="10" hat="band" hat-color="#22D3EE" face="none" w="150" hint-size="150px,266px"></dc-import>
+    </div>
+    <div style="position: absolute; left: 0; right: 0; bottom: 18px; text-align: center">
+      <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 54px; line-height: .95; letter-spacing: 1px; color: #F4F4FA; text-shadow: 0 4px 0 #0B0B14">ARENA <span style="color: #22D3EE">MIX</span></h1>
+    </div>
+  </div>
+  <div style="position: absolute; left: 440px; top: 0; right: 0; bottom: 0; padding: 12px 28px 10px 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; background: #0B0B14">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 24px">Inicia sesión</span>
+            <a href="Idioma.dc.html" aria-label="Cambiar idioma" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 22px; background: #0B0B14CC; border: 1px solid #2E2E52; color: #F4F4FA; text-decoration: none; font-size: 14px; font-weight: 600">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z"/></svg>
+        <span>Español</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A3A3C2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6-6"/></svg>
+      </a>
+    </div>
+  <form style="display: flex; flex-direction: column; gap: 8px">
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: #CACAE0">Correo electrónico
+      <input type="email" placeholder="tu@correo.com" style="height: 42px; box-sizing: border-box; padding: 0 14px; border-radius: 12px; border: 1px solid #2E2E52; background: #17172A; color: #F4F4FA; font: 500 15px Manrope, sans-serif">
+    </label>
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: #CACAE0">Contraseña
+      <input type="password" placeholder="••••••••" style="height: 42px; box-sizing: border-box; padding: 0 14px; border-radius: 12px; border: 1px solid #2E2E52; background: #17172A; color: #F4F4FA; font: 500 15px Manrope, sans-serif">
+    </label>
+    <a href="Deportes.dc.html" style="display: flex; align-items: center; justify-content: center; height: 48px; margin-top: 2px; border-radius: 14px; background: #22D3EE; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 1px; box-shadow: 0 6px 0 #0E8FA3, 0 10px 28px #22D3EE40">INICIAR SESIÓN</a>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 2px">
+      <button type="button" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 40px; border-radius: 12px; border: 1px solid #2E2E52; background: #17172A; color: #F4F4FA; font: 600 14px Manrope, sans-serif"><span style="width: 18px; height: 18px; border-radius: 9px; background: #F4F4FA; color: #0B0B14; font: 800 12px Manrope, sans-serif; display: flex; align-items: center; justify-content: center">G</span>Google</button>
+      <button type="button" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 40px; border-radius: 12px; border: 1px solid #2E2E52; background: #17172A; color: #F4F4FA; font: 600 14px Manrope, sans-serif"><svg width="16" height="18" viewBox="0 0 16 18" fill="#F4F4FA"><path d="M13 9.5c0-2 1.6-3 1.7-3c-1-1.4-2.4-1.6-2.9-1.6c-1.2-.1-2.4.7-3 .7s-1.6-.7-2.6-.7C4.800 5 3.400 5.800 2.700 7.100c-1.500 2.600-.4 6.400 1 8.500c.7 1 1.500 2.100 2.600 2.100c1-.1 1.400-.7 2.600-.7s1.600.7 2.600.7c1.100 0 1.800-1 2.500-2c.8-1.100 1.100-2.200 1.100-2.300c0 0-2.100-.8-2.100-3.200zM11 3.300c.6-.7 1-1.700.9-2.700c-.8 0-1.900.6-2.500 1.300c-.5.600-1 1.600-.9 2.600c1 .1 1.900-.5 2.500-1.200z"/></svg>Apple</button>
+    </div>
+  </form>
+        <a href="Deportes.dc.html" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 42px; box-sizing: border-box; border-radius: 14px; border: 1.5px solid #F4F4FA; color: #F4F4FA; text-decoration: none; font-weight: 700; font-size: 15px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4l13 8l-13 8z"/></svg>
+      Jugar como invitado
+    </a>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px">
+      <p style="margin: 0; font-size: 12px; color: #A3A3C2; text-align: center">Como invitado, el progreso solo se guarda en este dispositivo.</p>
+      <p style="margin: 2px 0 0 0; font-size: 13px; color: #CACAE0">¿No tienes cuenta? <a href="#" style="font-weight: 700">Crear cuenta</a></p>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

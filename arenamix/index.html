@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>ARENA MIX</title>
+<meta name="theme-color" content="#0B0B14">
+<meta name="description" content="Minijuegos de deportes: fútbol, baloncesto, béisbol y vóley.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ARENA MIX">
+<style>
+  html, body { margin: 0; height: 100%; background: #000000; overflow: hidden; overscroll-behavior: none; touch-action: none; -webkit-tap-highlight-color: transparent; }
+  #stage { position: fixed; left: 50%; top: 50%; width: 844px; height: 390px; transform-origin: center center; overflow: hidden; background: #0B0B14; }
+  #loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; color: #22D3EE; font: 800 italic 28px 'Barlow Condensed', system-ui, sans-serif; letter-spacing: 2px; }
+  #rotate { display: none; position: fixed; inset: 0; z-index: 10; background: #0B0B14; color: #F4F4FA; align-items: center; justify-content: center; flex-direction: column; gap: 14px; font: 700 16px system-ui, sans-serif; text-align: center; padding: 24px; }
+  body.portrait #rotate { display: flex; }
+  #rotate svg { animation: turn 1.6s ease-in-out infinite; }
+  @keyframes turn { 0%, 30% { transform: rotate(0deg); } 60%, 100% { transform: rotate(-90deg); } }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="loading">ARENA MIX</div>
+<div id="rotate">
+  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="1.8" stroke-linecap="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+  Gira el móvil para jugar en horizontal
+</div>
+<script src="vendor/preact.min.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

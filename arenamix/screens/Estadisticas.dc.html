@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Perfil y estadísticas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#22D3EE}a:hover{color:#67E8F9}
+input::placeholder{color:#8686A6}
+</style>
+</helmet>
+<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; overflow: hidden">
+  <nav aria-label="Principal" style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; box-sizing: border-box; padding: 12px 8px; background: #111120; border-right: 1px solid #26264A; display: flex; flex-direction: column; align-items: center; gap: 8px">
+    <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; line-height: 1; margin-bottom: 8px">A<span style="color: #22D3EE">M</span></span>
+    <a href="Deportes.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4l13 8l-13 8z"/></svg>Jugar</a>
+    <a href="Taquilla.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M8 3L3 6l2 5l3-1v11h8V10l3 1l2-5l-5-3a4 4 0 0 1-8 0z"/></svg>Taquilla</a>
+    <a href="Tienda.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 8h14l-1 13H6z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Tienda</a>
+    <a href="Estadisticas.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #0B0B14; background: #22D3EE"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Perfil</a>
+  </nav>
+  <div style="position: absolute; left: 80px; top: 0; bottom: 0; width: 280px; padding: 12px 10px 12px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0">
+    <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 28px; letter-spacing: 1px">PERFIL</h1>
+    <span style="display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; border-radius: 20px; background: #1E1A3A; border: 1px solid #22D3EE; font-weight: 800; font-size: 13px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7l7 7"/></svg>
+      {{pmLabel}} PM
+    </span>
+  </div>
+  <div role="tablist" aria-label="Deporte" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 0">
+    <sc-for list="{{sports}}" as="sp" hint-placeholder-count="4">
+      <button type="button" role="tab" onClick="{{sp.pick}}" style="{{sp.style}}">{{sp.label}}</button>
+    </sc-for>
+  </div>
+  <section style="flex: 1; min-height: 0; border-radius: 20px; background: #14142A; border: 1px solid #2E2E52; display: flex; align-items: flex-end; overflow: hidden; position: relative">
+    <div style="flex: none; width: 110px; display: flex; justify-content: center">
+      <dc-import name="Avatar" primary="#FF8A3D" secondary="#0B0B14" pattern="solid" shorts="#17172A" socks="#F4F4FA" shoe="#22D3EE" number="{{num}}" hat="band" hat-color="#22D3EE" face="none" w="84" hint-size="84px,149px"></dc-import>
+    </div>
+    <div style="flex: 1; align-self: stretch; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding-right: 14px">
+      <span style="font-weight: 800; font-size: 15px">Invitado_4821</span>
+      <span style="font-size: 12px; color: #A3A3C2; font-weight: 700">Nivel {{level}} en {{sportName}}</span>
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 4px">
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 54px; line-height: .9">{{overall}}</span>
+        <span style="display: flex; flex-direction: column">
+          <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">MEDIA</span>
+          <span style="{{tierStyle}}">{{tier}}</span>
+        </span>
+      </div>
+      <span style="font-size: 11px; color: #A3A3C2">Cada estadística va de 10 a 150</span>
+    </div>
+  </section>
+  </div>
+  <div style="position: absolute; left: 360px; top: 0; right: 0; bottom: 0; padding: 12px 16px 10px 8px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0">
+    <h2 style="margin: 0; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">ESTADÍSTICAS DE {{sportUpper}}</h2>
+    <button type="button" onClick="{{reset}}" style="min-height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid #2E2E52; background: transparent; color: #CACAE0; font: 700 12px Manrope, sans-serif; cursor: pointer">Restablecer puntos</button>
+  </div>
+    <div style="flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start">
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+      <div style="padding: 10px 12px; border-radius: 14px; background: #17172A; display: flex; align-items: center; gap: 10px">
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+            <span style="font-weight: 800; font-size: 14px">{{r.name}}</span>
+            <span style="font-size: 13px; font-weight: 800">{{r.value}} <span style="color: #8686A6; font-weight: 700">/ 150</span></span>
+          </div>
+          <div style="position: relative; height: 8px; border-radius: 4px; background: #26264A">
+            <div style="{{r.bar}}"></div>
+            <span style="position: absolute; left: 33.33%; top: -2px; width: 2px; height: 12px; background: #0B0B14"></span>
+            <span style="position: absolute; left: 66.67%; top: -2px; width: 2px; height: 12px; background: #0B0B14"></span>
+          </div>
+          <span style="font-size: 11px; color: #A3A3C2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.effect}}</span>
+        </div>
+        <button type="button" onClick="{{r.up}}" aria-label="{{r.aria}}" style="{{r.btn}}">
+          <span style="font-size: 20px; line-height: 1; font-weight: 800">+</span>
+          <span style="font-size: 10px; font-weight: 800">{{r.cost}}</span>
+        </button>
+      </div>
+    </sc-for>
+    </div>
+    <div style="padding: 10px 12px; border-radius: 14px; background: #111120; border: 1px dashed #2E2E52; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 12px; font-weight: 800">Cómo conseguir puntos de mejora (PM)</span>
+      <span style="font-size: 11px; line-height: 1.45; color: #A3A3C2">Cada deporte tiene sus propios PM: se ganan subiendo de nivel en ese deporte (+3 por nivel), en sus entrenamientos y en cofres. Mejorar cuesta 1 PM hasta 50, 2 PM hasta 100, 3 PM hasta 130 y 5 PM hasta 150. Los PM no se venden con dinero real.</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sport: 'futbol', data: this.load() };
+  }
+  defs() {
+    const f1 = (n) => n.toFixed(1).replace('.', ',');
+    const t = (v) => (v - 10) / 140;
+    const pct = (a, b) => (v) => Math.round(a + (b - a) * t(v));
+    return {
+      futbol: { label: 'Fútbol', num: '10', stats: [
+        { id: 'vel', name: 'Velocidad', effect: (v) => 'Carrera ' + f1(6.2 + 2 * t(v)) + ' m/s' },
+        { id: 'pot', name: 'Potencia de tiro', effect: (v) => 'Disparo máximo ' + Math.round((26 + 9 * t(v)) * 3.6) + ' km/h' },
+        { id: 'pre', name: 'Precisión', effect: (v) => 'Desvío del tiro ±' + f1(0.9 * (1 - t(v))) + ' m' },
+        { id: 'con', name: 'Control', effect: (v) => 'Balón pegado al pie ' + pct(50, 100)(v) + '%' },
+        { id: 'res', name: 'Resistencia', effect: (v) => 'Cansancio al final ' + (v >= 150 ? 'ninguno' : '−' + Math.round(12 * (1 - t(v))) + '% velocidad') },
+        { id: 'ref', name: 'Reflejos de portero', effect: (v) => 'Estirada ' + f1(4.2 + 1.8 * t(v)) + ' rad/s en duelos' }] },
+      basket: { label: 'Basket', num: '23', stats: [
+        { id: 'vel', name: 'Velocidad', effect: (v) => 'Contraataque ' + f1(5.8 + 2 * t(v)) + ' m/s' },
+        { id: 'sal', name: 'Salto', effect: (v) => 'Salto vertical ' + pct(55, 95)(v) + ' cm' },
+        { id: 'tri', name: 'Tiro exterior', effect: (v) => 'Triple abierto ' + pct(25, 55)(v) + '% de acierto' },
+        { id: 'bot', name: 'Bote', effect: (v) => 'Pérdidas al botar −' + pct(0, 70)(v) + '%' },
+        { id: 'def', name: 'Defensa', effect: (v) => 'Robos y tapones ' + pct(5, 30)(v) + '% de éxito' },
+        { id: 'res', name: 'Resistencia', effect: (v) => 'Cansancio en el último cuarto −' + Math.round(15 * (1 - t(v))) + '%' }] },
+      beisbol: { label: 'Béisbol', num: '7', stats: [
+        { id: 'bat', name: 'Potencia de bateo', effect: (v) => 'Salida de bola ' + pct(110, 175)(v) + ' km/h' },
+        { id: 'cto', name: 'Contacto', effect: (v) => 'Ventana para batear ' + pct(60, 140)(v) + ' ms' },
+        { id: 'lan', name: 'Velocidad de lanzamiento', effect: (v) => 'Recta ' + pct(120, 165)(v) + ' km/h' },
+        { id: 'clan', name: 'Control de lanzamiento', effect: (v) => 'Desvío del lanzamiento ±' + pct(30, 3)(v) + ' cm' },
+        { id: 'car', name: 'Carrera entre bases', effect: (v) => 'De base a base en ' + f1(4.6 - 1.2 * t(v)) + ' s' },
+        { id: 'fil', name: 'Fildeo', effect: (v) => 'Atrapadas difíciles ' + pct(10, 65)(v) + '%' }] },
+      voley: { label: 'Vóley', num: '4', stats: [
+        { id: 'sal', name: 'Salto', effect: (v) => 'Alcance de remate ' + f1(2.9 + 0.6 * t(v)) + ' m' },
+        { id: 'rem', name: 'Potencia de remate', effect: (v) => 'Remate ' + pct(60, 115)(v) + ' km/h' },
+        { id: 'saq', name: 'Saque', effect: (v) => 'Saque ' + pct(50, 105)(v) + ' km/h · desvío ±' + pct(80, 10)(v) + ' cm' },
+        { id: 'rec', name: 'Recepción', effect: (v) => 'Recepción perfecta ' + pct(20, 75)(v) + '%' },
+        { id: 'blo', name: 'Bloqueo', effect: (v) => 'Bloqueos ganados ' + pct(5, 40)(v) + '%' },
+        { id: 'ref', name: 'Reflejos', effect: (v) => 'Tiempo de reacción ' + pct(420, 220)(v) + ' ms' }] }
+    };
+  }
+  fresh() {
+    const D = this.defs(), lv = { futbol: 12, basket: 5, beisbol: 3, voley: 4 }, out = {};
+    Object.keys(D).forEach((k) => {
+      const st = {}; D[k].stats.forEach((x) => { st[x.id] = 10; });
+      out[k] = { stats: st, pm: lv[k] * 3, level: lv[k] };
+    });
+    return out;
+  }
+  load() {
+    const base = this.fresh();
+    try {
+      const j = JSON.parse(localStorage.getItem('arenamix.stats.v2') || 'null');
+      if (j && j.futbol) { Object.keys(base).forEach((k) => { if (j[k]) base[k] = { ...base[k], ...j[k], stats: { ...base[k].stats, ...j[k].stats } }; }); return base; }
+      const old = JSON.parse(localStorage.getItem('arenamix.stats.v1') || 'null');
+      if (old && old.stats) base.futbol = { ...base.futbol, stats: { ...base.futbol.stats, ...old.stats }, pm: old.pm };
+    } catch (e) {}
+    return base;
+  }
+  save(data) {
+    try {
+      localStorage.setItem('arenamix.stats.v2', JSON.stringify(data));
+      localStorage.setItem('arenamix.stats.v1', JSON.stringify(data.futbol));
+    } catch (e) {}
+  }
+  cost(v) {
+    return v < 50 ? 1 : v < 100 ? 2 : v < 130 ? 3 : 5;
+  }
+  spent(v) {
+    let n = 0;
+    for (let x = 10; x < v; x++) n += this.cost(x);
+    return n;
+  }
+  renderVals() {
+    const D = this.defs(), sp = this.state.sport, def = D[sp];
+    const cur = this.state.data[sp], stats = cur.stats, pm = cur.pm;
+    const put = (next) => { const data = { ...this.state.data, [sp]: next }; this.save(data); this.setState({ data }); };
+    const rows = def.stats.map((d) => {
+      const v = stats[d.id], c = this.cost(v), max = v >= 150, can = !max && pm >= c;
+      return {
+        name: d.name, value: String(v), effect: d.effect(v),
+        cost: max ? 'MÁX' : c + ' PM',
+        aria: max ? d.name + ' al máximo' : 'Mejorar ' + d.name + ' por ' + c + ' PM',
+        bar: 'height: 8px; border-radius: 4px; background: #22D3EE; width: ' + (v / 150 * 100).toFixed(2) + '%;',
+        btn: 'flex: none; width: 52px; height: 52px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: ' + (can ? 'pointer' : 'default') + '; font-family: Manrope, sans-serif; ' + (can ? 'background: #22D3EE; color: #0B0B14; border: 0; box-shadow: 0 3px 0 #0E8FA3;' : 'background: #26264A; color: #8686A6; border: 0;'),
+        up: () => { if (can) put({ ...cur, stats: { ...stats, [d.id]: v + 1 }, pm: pm - c }); }
+      };
+    });
+    const vals = def.stats.map((d) => stats[d.id]);
+    const overall = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+    const tiers = [[130, 'LEYENDA', '#FFE38A'], [100, 'ESTRELLA', '#C79BFF'], [70, 'PRO', '#8CC5FF'], [40, 'AMATEUR', '#7FE3D7'], [0, 'NOVATO', '#E3A56E']];
+    const tr = tiers.find((x) => overall >= x[0]);
+    const tab = (on) => 'min-height: 36px; padding: 0 4px; border-radius: 12px; font: 800 13px Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14; border: 0; box-shadow: 0 3px 0 #0E8FA3;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E52;');
+    return {
+      sports: Object.keys(D).map((k) => ({ label: D[k].label, style: tab(k === sp), pick: () => this.setState({ sport: k }) })),
+      rows, overall: String(overall), pmLabel: String(pm),
+      level: String(cur.level), num: def.num,
+      sportName: { futbol: 'fútbol', basket: 'baloncesto', beisbol: 'béisbol', voley: 'vóley' }[sp],
+      sportUpper: { futbol: 'FÚTBOL', basket: 'BALONCESTO', beisbol: 'BÉISBOL', voley: 'VÓLEY' }[sp],
+      tier: tr[1],
+      tierStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1px; color: ' + tr[2] + ';',
+      reset: () => {
+        const refund = def.stats.reduce((a, d) => a + this.spent(stats[d.id]), 0);
+        const st = {}; def.stats.forEach((d) => { st[d.id] = 10; });
+        put({ ...cur, stats: st, pm: pm + refund });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

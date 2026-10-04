@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Tabla de rangos y MMR</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#22D3EE}a:hover{color:#67E8F9}
+</style>
+</helmet>
+<div style="width: 1200px; height: 1140px; box-sizing: border-box; padding: 56px; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; display: flex; flex-direction: column; gap: 28px">
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 13px; font-weight: 800; letter-spacing: 2px; color: #22D3EE">MODO COMPETITIVO · ESPECIFICACIÓN</span>
+      <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 56px; line-height: 1">8 rangos · 3 fases · 24 escalones</h1>
+    </div>
+    <p style="margin: 0; max-width: 380px; font-size: 15px; line-height: 1.5; color: #BABAD6">El rango sale del MMR. Cuanto más alto el rango, más victorias hacen falta por fase: de 4 en Bronce a 25 en Élite.</p>
+  </div>
+
+  <div style="display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; border: 1px solid #2E2E52">
+    <div style="display: grid; grid-template-columns: 280px repeat(3, minmax(0, 1fr)) 170px; background: #17172A; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">
+      <span style="padding: 16px 20px">RANGO</span>
+      <span style="padding: 16px 20px">FASE 1</span>
+      <span style="padding: 16px 20px">FASE 2</span>
+      <span style="padding: 16px 20px">FASE 3</span>
+      <span style="padding: 16px 20px">VICTORIAS / FASE</span>
+    </div>
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+      <div style="{{r.rowStyle}}">
+        <div style="display: flex; align-items: center; gap: 14px; padding: 0 20px">
+          <svg width="48" height="50" viewBox="-6 -10 76 80">
+            <sc-if value="{{r.glow}}" hint-placeholder-val="{{ false }}"><circle cx="32" cy="32" r="36" fill="{{r.c1}}" opacity=".22"/></sc-if>
+            <sc-if value="{{r.wings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{r.c1}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{r.c1}}"/></sc-if>
+            <path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{r.c1}}"/>
+            <path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{r.c2}}"/>
+            <path d="M32 8L50 14V30C50 41 42 49 32 53Z" fill="#000000" opacity=".18"/>
+            <path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{r.c1}}"/>
+            <sc-if value="{{r.crown}}" hint-placeholder-val="{{ false }}"><path d="M20 6L21 -7L27 -1L32 -9L37 -1L43 -7L44 6Z" fill="#FFC53D" stroke="#7A4E0E" stroke-width="1.5" stroke-linejoin="round"/></sc-if>
+          </svg>
+          <span style="display: flex; flex-direction: column; gap: 2px">
+            <span style="{{r.nameStyle}}">{{r.name}}</span>
+            <span style="font-size: 12px; color: #A3A3C2">{{r.note}}</span>
+          </span>
+        </div>
+        <sc-for list="{{r.divs}}" as="d" hint-placeholder-count="3">
+          <div style="display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 0 20px; border-left: 1px solid #26264A">
+            <span style="font-weight: 700; font-size: 15px">{{d.label}}</span>
+            <span style="font-size: 13px; color: #A3A3C2">{{d.range}} MMR</span>
+          </div>
+        </sc-for>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 0 20px; border-left: 1px solid #26264A">
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px">{{r.wins}}</span>
+          <span style="font-size: 12px; color: #A3A3C2">{{r.step}} MMR</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+    <div style="padding: 18px; border-radius: 16px; background: #17172A; display: flex; flex-direction: column; gap: 6px">
+      <span style="font-weight: 800; font-size: 15px">Inicio</span>
+      <span style="font-size: 13px; line-height: 1.5; color: #BABAD6">Todos empiezan en Bronce 1 con 0 MMR. MMR y rango son independientes para cada deporte.</span>
+    </div>
+    <div style="padding: 18px; border-radius: 16px; background: #17172A; display: flex; flex-direction: column; gap: 6px">
+      <span style="font-weight: 800; font-size: 15px">Ganar y perder</span>
+      <span style="font-size: 13px; line-height: 1.5; color: #BABAD6">Victoria +25 MMR (+20 desde Campeón), derrota −25, ajustado según el MMR del rival. En Bronce una derrota resta solo 12. Llegar a Élite exige unas 230 victorias netas.</span>
+    </div>
+    <div style="padding: 18px; border-radius: 16px; background: #17172A; display: flex; flex-direction: column; gap: 6px">
+      <span style="font-weight: 800; font-size: 15px">Protección de ascenso</span>
+      <span style="font-size: 13px; line-height: 1.5; color: #BABAD6">Al subir a un rango nuevo tienes 3 partidas en las que no puedes bajar de rango.</span>
+    </div>
+    <div style="padding: 18px; border-radius: 16px; background: #17172A; display: flex; flex-direction: column; gap: 6px">
+      <span style="font-weight: 800; font-size: 15px">Fin de temporada</span>
+      <span style="font-size: 13px; line-height: 1.5; color: #BABAD6">Recompensas según el rango más alto alcanzado. El MMR baja un 10% para la temporada nueva (propuesta).</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1200,"height":1140}}'>
+class Component extends DCLogic {
+  fmt(n) {
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+  renderVals() {
+    const R = [
+      { name: 'Bronce', c1: '#C07A3E', c2: '#7A4520', text: '#E3A56E', wins: 4, start: 0, note: 'Rango inicial' },
+      { name: 'Plata', c1: '#C9D2DF', c2: '#6D788A', text: '#DCE3EE', wins: 6, start: 300, note: '' },
+      { name: 'Oro', c1: '#F2C14E', c2: '#A8771A', text: '#F2C14E', wins: 8, start: 750, note: '' },
+      { name: 'Platino', c1: '#5FD3C6', c2: '#24786F', text: '#7FE3D7', wins: 10, start: 1350, note: '' },
+      { name: 'Diamante', c1: '#6FB6FF', c2: '#2A5FB0', text: '#8CC5FF', wins: 13, start: 2100, note: '' },
+      { name: 'Campeón', c1: '#B57BFF', c2: '#5E2FA8', text: '#C79BFF', wins: 16, start: 3075, note: 'Emblema con alas', wings: true },
+      { name: 'Super campeón', c1: '#FF5C8A', c2: '#A3204A', text: '#FF86A6', wins: 20, start: 4275, note: 'Alas y corona', wings: true, crown: true },
+      { name: 'Élite', c1: '#FFE38A', c2: '#2A2410', text: '#FFE38A', wins: 25, start: 5775, note: 'Élite 3 sin techo', wings: true, crown: true, glow: true }
+    ];
+    const rows = R.map((r, i) => {
+      const step = r.wins * 25;
+      const divs = [0, 1, 2].map((k) => {
+        const lo = r.start + k * step;
+        const hi = k < 2 ? lo + step - 1 : (i < R.length - 1 ? R[i + 1].start - 1 : null);
+        return { label: r.name + ' ' + (k + 1), range: hi === null ? this.fmt(lo) + '+' : this.fmt(lo) + ' – ' + this.fmt(hi) };
+      });
+      return {
+        ...r,
+        wings: !!r.wings, crown: !!r.crown, glow: !!r.glow,
+        wins: String(r.wins), step: '+' + step,
+        divs,
+        rowStyle: 'display: grid; grid-template-columns: 280px repeat(3, minmax(0, 1fr)) 170px; height: 76px; border-top: 1px solid #26264A; background: ' + (i % 2 ? '#111120' : '#0B0B14') + ';',
+        nameStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; line-height: 1; color: ' + r.text + ';'
+      };
+    });
+    return { rows };
+  }
+}
+</script>
+</body>
+</html>

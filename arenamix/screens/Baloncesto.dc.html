@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Baloncesto 3D</title>
+<script src="./support.js"></script>
+<script src="/_blob/de0c1b42c380e04fabb186f97a299f57"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#22D3EE}a:hover{color:#67E8F9}
+</style>
+</helmet>
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #120E0A; color: #F4F4FA; font-family: Manrope, sans-serif; user-select: none; -webkit-user-select: none">
+  <canvas ref="{{canvasRef}}" width="844" height="390" style="position: absolute; left: 0; top: 0; width: 844px; height: 390px; display: block"></canvas>
+  <svg width="844" height="390" viewBox="0 0 844 390" style="position: absolute; left: 0; top: 0; pointer-events: none">
+    <polyline points="{{swipePts}}" fill="none" stroke="#FF8A3D" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+  </svg>
+  <button type="button" aria-label="Zona de tiro: desliza hacia arriba hacia la canasta" onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pCancel}}" style="position: absolute; inset: 0; width: 844px; height: 390px; padding: 0; border: 0; background: transparent; touch-action: none; cursor: crosshair"></button>
+  <sc-if value="{{no3d}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #CACAE0">Tu navegador no permite gráficos 3D (WebGL) en esta vista.</div></sc-if>
+
+  <div style="position: absolute; left: 12px; top: 10px; display: flex; align-items: center; gap: 8px">
+    <a href="Deportes.dc.html" aria-label="Volver a deportes" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #0B0B14CC; color: #F4F4FA">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
+    </a>
+    <span style="padding: 8px 12px; border-radius: 12px; background: #0B0B14CC; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1px">BALONCESTO</span>
+    <div style="display: flex; padding: 4px; gap: 4px; border-radius: 14px; background: #0B0B14CC">
+      <button type="button" onClick="{{setThree}}" style="{{threeTab}}">Triples</button>
+      <button type="button" onClick="{{setFree}}" style="{{freeTab}}">Tiros libres</button>
+    </div>
+  </div>
+  <div style="position: absolute; right: 12px; top: 10px; display: flex; gap: 6px">
+    <sc-if value="{{isThree}}" hint-placeholder-val="{{ true }}">
+      <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">TIEMPO</span><span style="{{clockStyle}}">{{clock}}</span></span>
+    </sc-if>
+    <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">BALÓN</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1">{{ballLabel}}</span></span>
+    <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">PUNTOS</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; color: #FF8A3D">{{ptsLabel}}</span></span>
+  </div>
+
+  <sc-if value="{{showMeter}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; right: 24px; top: 90px; width: 18px; height: 200px; border-radius: 9px; background: #0B0B14CC; border: 2px solid #2E2E52; overflow: hidden">
+      <div style="{{greenStyle}}"></div>
+      <div style="{{fillStyle}}"></div>
+    </div>
+  </sc-if>
+  <sc-if value="{{showHint}}" hint-placeholder-val="{{ true }}">
+    <div style="position: absolute; left: 0; right: 0; bottom: 12px; display: flex; justify-content: center; pointer-events: none">
+      <span style="padding: 6px 14px; border-radius: 10px; background: #0B0B14CC; font-size: 12px; font-weight: 700; color: #CACAE0">{{hintText}}</span>
+    </div>
+  </sc-if>
+  <sc-if value="{{showResult}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 0; right: 0; top: 64px; display: flex; flex-direction: column; align-items: center; pointer-events: none">
+      <span style="{{resultStyle}}">{{resultText}}</span>
+      <span style="font-size: 13px; font-weight: 800; text-shadow: 0 2px 0 #0B0B14">{{resultSub}}</span>
+    </div>
+  </sc-if>
+  <sc-if value="{{showStart}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; background: #0B0B14B3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px">
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 40px">{{startTitle}}</span>
+      <span style="font-size: 13px; color: #CACAE0; text-align: center; max-width: 460px; line-height: 1.5">{{startText}}</span>
+      <button type="button" onClick="{{start}}" style="height: 54px; padding: 0 40px; border: 0; border-radius: 14px; background: #FF8A3D; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 6px 0 #9C4A16">EMPEZAR</button>
+    </div>
+  </sc-if>
+  <sc-if value="{{showDone}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; background: #0B0B14D9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
+      <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">{{doneKicker}}</span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 64px; line-height: 1; color: #FF8A3D">{{ptsLabel}} <span style="font-size: 26px; color: #A3A3C2">puntos</span></span>
+      <span style="font-size: 14px; font-weight: 700">{{doneSub}}</span>
+      <button type="button" onClick="{{start}}" style="margin-top: 8px; height: 50px; padding: 0 30px; border: 0; border-radius: 14px; background: #FF8A3D; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #9C4A16">OTRA RONDA</button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { f: 0 };
+    this.tick = this.tick.bind(this);
+    this.canvasRef = (el) => { if (el && el !== this.cv) { this.cv = el; this.init3D(); } };
+    this.mode = 'three';
+    this.best = { three: 0, free: 0 };
+    this.reset();
+  }
+  componentWillUnmount() {
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = null;
+    if (this.R) { this.R.dispose(); this.R = null; }
+  }
+  spots() {
+    if (this.mode === 'free') return Array.from({ length: 10 }, () => ({ d: 4.225, a: 0, money: false }));
+    const out = [];
+    [-1.2, -0.6, 0, 0.6, 1.2].forEach((a, i) => { for (let k = 0; k < 3; k++) out.push({ d: Math.abs(a) > 1 ? 6.75 : 6.75, a, money: k === 2, spot: i }); });
+    return out;
+  }
+  reset() {
+    this.st = this.loadSportStats('basket');
+    this.list = this.spots();
+    this.idx = 0; this.pts = 0; this.made = 0;
+    this.time = 60;
+    this.phase = 'start';
+    this.pt = 0; this.result = null; this.swipe = null;
+    this.placeBall();
+    if (this.R) { this.updateRack(); this.camSnap = true; this.draw3D(0); }
+  }
+  shooterPos() {
+    const s = this.list[Math.min(this.idx, this.list.length - 1)];
+    return { x: Math.sin(s.a) * s.d, z: Math.cos(s.a) * s.d, a: s.a };
+  }
+  placeBall() {
+    const p = this.shooterPos();
+    const tx = -Math.sin(p.a), tz = -Math.cos(p.a);
+    this.b = { x: p.x + tx * 0.3, y: 2.0, z: p.z + tz * 0.3, vx: 0, vy: 0, vz: 0, spin: 0 };
+    this.jump = 0; this.touched = false; this.board = false; this.scored = false; this.below = false;
+  }
+  loop() {
+    if (this.raf) return;
+    this.last = performance.now();
+    this.raf = requestAnimationFrame(this.tick);
+  }
+  tick(now) {
+    const dt = Math.min(0.033, Math.max(0, (now - this.last) / 1000));
+    this.last = now;
+    for (let i = 0; i < 6; i++) this.step(dt / 6);
+    this.draw3D(dt);
+    this.forceUpdate();
+    this.raf = (this.phase === 'aim' && this.mode === 'three') || this.phase === 'jump' || this.phase === 'flight' || this.phase === 'result' || this.camMoving ? requestAnimationFrame(this.tick) : null;
+  }
+  idealSpeed(d, h, th) {
+    const c = Math.cos(th), den = 2 * c * c * (d * Math.tan(th) - h);
+    return Math.sqrt(9.81 * d * d / Math.max(0.1, den));
+  }
+  solveSpeed(d, y0, th) {
+    const range = (v) => {
+      let x = 0, y = y0, vx = Math.cos(th) * v, vy = Math.sin(th) * v, dt = 1 / 400;
+      for (let i = 0; i < 2000; i++) {
+        const sp = Math.hypot(vx, vy), py = y;
+        vy -= 9.81 * dt; vx -= 0.012 * sp * vx * dt; vy -= 0.012 * sp * vy * dt;
+        x += vx * dt; y += vy * dt;
+        if (vy < 0 && py >= 3.05 && y < 3.05) return x;
+        if (y < 0) return 0;
+      }
+      return 0;
+    };
+    let lo = 3, hi = 16;
+    for (let i = 0; i < 28; i++) { const m = (lo + hi) / 2; if (range(m) < d) lo = m; else hi = m; }
+    return (lo + hi) / 2;
+  }
+  shoot() {
+    const pts = this.swipe; this.swipe = null;
+    if (!pts || pts.length < 2) { this.forceUpdate(); return; }
+    const p0 = pts[0], p1 = pts[pts.length - 1];
+    const dy = p0.y - p1.y, dx = p1.x - p0.x;
+    if (dy < 30) { this.forceUpdate(); return; }
+    const ratio = dy / 230;
+    const tol = 0.1 + 0.12 * this.tt('tri');
+    const speedErr = (ratio - 1) * 0.06 * (Math.abs(ratio - 1) < tol ? 0.35 : 1);
+    const lat = Math.atan2(dx, dy) * (0.32 - 0.2 * this.tt('tri')) + (Math.random() - 0.5) * 0.03 * (1 - this.tt('tri'));
+    this.shot = { speedErr, lat, ratio, tol };
+    this.phase = 'jump'; this.pt = 0;
+    this.loop();
+  }
+  release() {
+    const b = this.b, p = this.shooterPos();
+    const jumpH = 0.35 + 0.3 * this.tt('sal');
+    const rx = 0 - b.x, rz = 0 - b.z, d = Math.hypot(rx, rz);
+    const th = 52 * Math.PI / 180, h = 3.05 - b.y;
+    const v = this.solveSpeed(d, b.y, th) * (1 + this.shot.speedErr);
+    const ang = Math.atan2(rx, rz) + this.shot.lat;
+    b.vx = Math.sin(ang) * Math.cos(th) * v;
+    b.vz = Math.cos(ang) * Math.cos(th) * v;
+    b.vy = Math.sin(th) * v;
+    b.spin = -12;
+    this.phase = 'flight'; this.pt = 0;
+    this.lastJump = jumpH;
+  }
+  step(dt) {
+    this.pt += dt;
+    if (this.mode === 'three' && (this.phase === 'aim' || this.phase === 'jump' || this.phase === 'flight' || this.phase === 'result')) {
+      this.time -= dt;
+      if (this.time <= 0) { this.time = 0; this.finish(); return; }
+    }
+    const b = this.b;
+    if (this.phase === 'jump') {
+      const J = 0.35 + 0.3 * this.tt('sal');
+      this.jump = Math.sin(Math.min(1, this.pt / 0.6) * Math.PI) * J;
+      b.y = 2.0 + this.jump + Math.min(1, this.pt / 0.3) * 0.25;
+      if (this.pt >= 0.3) this.release();
+      return;
+    }
+    if (this.phase === 'flight' || this.phase === 'result') {
+      if (this.jump > 0) this.jump = Math.max(0, Math.sin(Math.min(1, (this.pt + 0.3) / 0.6) * Math.PI) * (0.35 + 0.3 * this.tt('sal')));
+      const py = b.y;
+      const sp = Math.hypot(b.vx, b.vy, b.vz);
+      b.vy -= 9.81 * dt;
+      b.vx -= 0.012 * sp * b.vx * dt; b.vy -= 0.012 * sp * b.vy * dt; b.vz -= 0.012 * sp * b.vz * dt;
+      b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
+      const r = 0.12;
+      // rim
+      const hx = b.x, hz = b.z, hd = Math.hypot(hx, hz) || 1e-6;
+      const nx = hx / hd * 0.225, nz = hz / hd * 0.225;
+      const ddx = b.x - nx, ddy = b.y - 3.05, ddz = b.z - nz, dist = Math.hypot(ddx, ddy, ddz);
+      if (dist < r + 0.01) {
+        const ux = ddx / dist, uy = ddy / dist, uz = ddz / dist, vn = b.vx * ux + b.vy * uy + b.vz * uz;
+        if (vn < 0) { b.vx -= 1.55 * vn * ux; b.vy -= 1.55 * vn * uy; b.vz -= 1.55 * vn * uz; b.vx *= 0.92; b.vz *= 0.92; this.touched = true; }
+        const push = r + 0.01 - dist; b.x += ux * push; b.y += uy * push; b.z += uz * push;
+      }
+      // backboard
+      if (b.z - r < -0.375 && b.z > -0.6 && Math.abs(b.x) < 0.9 && b.y > 2.9 && b.y < 3.95 && b.vz < 0) { b.z = -0.375 + r; b.vz = -b.vz * 0.65; this.board = true; }
+      // floor
+      if (b.y < r) { b.y = r; if (b.vy < -1) { b.vy = -b.vy * 0.72; b.vx *= 0.85; b.vz *= 0.85; } else b.vy = 0; }
+      // score
+      if (!this.scored && py >= 3.05 && b.y < 3.05 && b.vy < 0 && Math.hypot(b.x, b.z) < 0.2) { this.scored = true; this.netT = 0.6; this.onResult(true); }
+      if (this.netT > 0) this.netT -= dt;
+      if (this.phase === 'flight' && !this.scored && (b.y < 2.2 && b.vy < 0 && this.pt > 0.5 || this.pt > 3)) this.onResult(false);
+    }
+    if (this.phase === 'result' && this.pt > (this.mode === 'three' ? 0.9 : 1.4)) {
+      this.idx++;
+      if (this.idx >= this.list.length) { this.finish(); return; }
+      const moved = this.list[this.idx].spot !== this.list[this.idx - 1].spot;
+      this.placeBall();
+      this.phase = 'aim'; this.pt = 0; this.result = null;
+      if (moved) { this.camMoving = true; this.camT = 0; }
+    }
+  }
+  onResult(made) {
+    const s = this.list[this.idx];
+    let p = 0;
+    if (made) { p = this.mode === 'free' ? 1 : s.money ? 2 : 1; this.made++; }
+    this.pts += p;
+    const kind = made ? (!this.touched && !this.board ? 'swish' : this.board ? 'tablero' : 'dentro') : 'fallo';
+    this.result = { kind, p };
+    this.phase = 'result'; this.pt = 0;
+  }
+  finish() {
+    this.phase = 'done';
+    this.best[this.mode] = Math.max(this.best[this.mode], this.pts);
+  }
+  mat(color, o) {
+    const m = new THREE.MeshStandardMaterial(Object.assign({ roughness: 0.75, metalness: 0.02 }, o || {}));
+    m.color = new THREE.Color(color).convertSRGBToLinear();
+    if (o && o.emissive != null) m.emissive = new THREE.Color(o.emissive).convertSRGBToLinear();
+    return m;
+  }
+  canvasTex(w, h, draw) {
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    draw(c.getContext('2d'), w, h);
+    const t = new THREE.CanvasTexture(c);
+    t.encoding = THREE.sRGBEncoding;
+    t.anisotropy = 4;
+    return t;
+  }
+  makePlayer(o) {
+    const T = THREE, g = new T.Group(), body = new T.Group();
+    g.add(body);
+    const tones = [0xc68a5e, 0xe0b48f, 0x8d5a3b, 0xf1c9a5, 0x6b4129, 0xb9794f];
+    const skinHex = o.skin || tones[Math.floor(Math.random() * tones.length)];
+    const skin = this.mat(skinHex, { roughness: 0.62 });
+    const skinDark = this.mat(new T.Color(skinHex).multiplyScalar(0.78), { roughness: 0.7 });
+    const shirt = this.mat(o.shirt, { roughness: 0.68 }), shorts = this.mat(o.shorts, { roughness: 0.7 });
+    const trimCol = new T.Color(o.trimCss || '#0B0B14');
+    const trim = this.mat(trimCol, { roughness: 0.6 });
+    const sock = this.mat(o.socks, { roughness: 0.8 });
+    const boot = this.mat(o.boot || 0x22d3ee, { roughness: 0.35, metalness: 0.1 });
+    const sole = this.mat(0x111111, { roughness: 0.6 });
+    const hairM = this.mat(o.hair || 0x241811, { roughness: 0.85 });
+    const hand = o.gloves ? this.mat(0xf2f5fa, { roughness: 0.5 }) : skin;
+    const add = (parent, mesh, x, y, z) => { mesh.position.set(x || 0, y || 0, z || 0); mesh.castShadow = true; parent.add(mesh); return mesh; };
+    const lathe = (pts, m, seg) => new T.Mesh(new T.LatheGeometry(pts.map(([r, y]) => new T.Vector2(r, y)), seg || 18), m);
+    const sph = (r, m, w, h) => new T.Mesh(new T.SphereGeometry(r, w || 18, h || 14), m);
+    const cyl = (rt, rb, h, m, seg) => new T.Mesh(new T.CylinderGeometry(rt, rb, h, seg || 16), m);
+    // legs
+    const legs = [];
+    [-1, 1].forEach((s) => {
+      const hip = new T.Group(); hip.position.set(0.1 * s, 0.94, 0); body.add(hip);
+      add(hip, lathe([[0.001, 0], [0.072, 0.02], [0.088, 0.14], [0.098, 0.3], [0.1, 0.44], [0.001, 0.46]], skin), 0, -0.46, 0);
+      add(hip, cyl(0.112, 0.118, 0.2, shorts), 0, -0.07, 0);
+      add(hip, cyl(0.119, 0.119, 0.025, trim), 0, -0.165, 0);
+      const knee = new T.Group(); knee.position.y = -0.45; hip.add(knee);
+      add(knee, sph(0.066, skin), 0, 0, 0.005);
+      add(knee, lathe([[0.001, -0.43], [0.045, -0.42], [0.05, -0.3], [0.07, -0.16], [0.064, -0.04], [0.06, 0], [0.001, 0.01]], skin), 0, 0, 0);
+      add(knee, cyl(0.068, 0.056, 0.32, sock), 0, -0.27, 0);
+      add(knee, cyl(0.07, 0.07, 0.03, trim), 0, -0.115, 0);
+      const bt = add(knee, new T.Mesh(new T.BoxGeometry(0.105, 0.075, 0.24), boot), 0, -0.44, 0.045);
+      add(knee, sph(0.053, boot), 0, -0.445, 0.155).scale.set(1, 0.7, 1);
+      add(knee, new T.Mesh(new T.BoxGeometry(0.11, 0.022, 0.31), sole), 0, -0.48, 0.06);
+      add(knee, new T.Mesh(new T.BoxGeometry(0.06, 0.01, 0.1), trim), 0, -0.4, 0.06);
+      legs.push({ hip, knee });
+    });
+    // pelvis + torso
+    add(body, lathe([[0.001, 0], [0.17, 0.01], [0.2, 0.08], [0.19, 0.2], [0.001, 0.21]], shorts), 0, 0.84, 0).scale.z = 0.82;
+    const torso = add(body, lathe([[0.001, 0], [0.18, 0.0], [0.17, 0.12], [0.185, 0.3], [0.225, 0.46], [0.2, 0.58], [0.1, 0.64], [0.001, 0.645]], shirt), 0, 1.02, 0);
+    torso.scale.z = 0.72;
+    add(body, cyl(0.181, 0.181, 0.03, trim), 0, 1.04, 0).scale.z = 0.73;
+    const collar = add(body, new T.Mesh(new T.TorusGeometry(0.075, 0.016, 8, 24), trim), 0, 1.655, 0.005);
+    collar.rotation.x = Math.PI / 2;
+    if (o.number) {
+      const mkNum = (size) => this.canvasTex(128, 128, (c) => { c.fillStyle = o.trimCss || '#0B0B14'; c.font = '800 ' + size + 'px Barlow Condensed, Arial'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(o.number, 64, 70); });
+      const back = new T.Mesh(new T.PlaneGeometry(0.28, 0.28), new T.MeshStandardMaterial({ map: mkNum(92), transparent: true, roughness: 0.8 }));
+      back.position.set(0, 1.36, -0.17); back.rotation.y = Math.PI; body.add(back);
+      const front = new T.Mesh(new T.PlaneGeometry(0.12, 0.12), new T.MeshStandardMaterial({ map: mkNum(92), transparent: true, roughness: 0.8 }));
+      front.position.set(0.08, 1.48, 0.162); front.rotation.x = -0.12; body.add(front);
+    }
+    // head
+    add(body, cyl(0.055, 0.065, 0.12, skin), 0, 1.68, 0);
+    const head = new T.Group(); head.position.y = 1.83; body.add(head);
+    add(head, sph(0.112, skin, 24, 18)).scale.set(0.92, 1.08, 1);
+    add(head, sph(0.085, skin), 0, -0.06, 0.03).scale.set(1, 0.8, 1);
+    [-1, 1].forEach((s) => {
+      add(head, sph(0.03, skinDark, 10, 8), 0.103 * s, -0.005, -0.005).scale.set(0.45, 1, 0.75);
+      add(head, sph(0.017, this.mat(0xffffff, { roughness: 0.3 }), 10, 8), 0.036 * s, 0.012, 0.097);
+      add(head, sph(0.009, this.mat(0x2a1a10, { roughness: 0.2 }), 8, 6), 0.036 * s, 0.012, 0.111);
+      const brow = add(head, new T.Mesh(new T.BoxGeometry(0.036, 0.008, 0.01), hairM), 0.037 * s, 0.04, 0.102);
+      brow.rotation.z = -0.12 * s;
+    });
+    const nose = add(head, new T.Mesh(new T.ConeGeometry(0.016, 0.04, 8), skinDark), 0, -0.012, 0.115);
+    nose.rotation.x = Math.PI / 2;
+    add(head, new T.Mesh(new T.BoxGeometry(0.04, 0.007, 0.008), this.mat(0x7a3b2b, { roughness: 0.6 })), 0, -0.052, 0.103);
+    const style = o.hairStyle != null ? o.hairStyle : Math.floor(Math.random() * 4);
+    if (style === 0) { add(head, sph(0.12, hairM, 22, 12), 0, 0.03, -0.012).scale.set(0.97, 0.78, 1.02); }
+    else if (style === 1) { for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; add(head, sph(0.042, hairM, 8, 6), Math.cos(a) * 0.075, 0.075 + (i % 2) * 0.012, Math.sin(a) * 0.075 - 0.01); } add(head, sph(0.07, hairM, 10, 8), 0, 0.1, -0.01); }
+    else if (style === 2) { add(head, sph(0.116, hairM, 22, 12), 0, 0.035, -0.01).scale.set(0.95, 0.62, 1); add(head, new T.Mesh(new T.BoxGeometry(0.05, 0.05, 0.16), hairM), 0, 0.115, 0.01); }
+    else { add(head, sph(0.121, hairM, 22, 12), 0, 0.02, -0.02).scale.set(1, 0.86, 1.04); add(head, sph(0.05, hairM, 10, 8), 0, -0.02, -0.12); }
+    // arms
+    const arms = [];
+    [-1, 1].forEach((s) => {
+      const sho = new T.Group(); sho.position.set(0.245 * s, 1.56, 0); body.add(sho);
+      add(sho, sph(0.075, shirt), 0, 0, 0);
+      add(sho, cyl(0.074, 0.068, 0.17, shirt), 0, -0.08, 0);
+      add(sho, cyl(0.07, 0.07, 0.02, trim), 0, -0.165, 0);
+      add(sho, lathe([[0.001, -0.3], [0.048, -0.29], [0.06, -0.2], [0.056, -0.08], [0.06, 0], [0.001, 0.005]], skin), 0, 0, 0);
+      const elb = new T.Group(); elb.position.y = -0.3; sho.add(elb);
+      add(elb, sph(0.047, skin), 0, 0, 0);
+      add(elb, lathe([[0.001, -0.26], [0.035, -0.25], [0.04, -0.15], [0.05, -0.05], [0.046, 0], [0.001, 0.005]], skin), 0, 0, 0);
+      add(elb, sph(o.gloves ? 0.07 : 0.045, hand), 0, -0.3, 0.005).scale.set(o.gloves ? 1 : 0.75, 1.15, o.gloves ? 0.7 : 0.55);
+      if (o.gloves) add(elb, cyl(0.058, 0.052, 0.07, trim), 0, -0.245, 0);
+      sho.rotation.z = 0.1 * s;
+      arms.push({ sho, elb, s });
+    });
+    g.userData = { body, legs, arms, head };
+    return g;
+  }
+  pose(p, o) {
+    const u = p.userData, run = o.run || 0, amp = o.amp || 0;
+    u.legs[0].hip.rotation.x = Math.sin(run) * 0.7 * amp;
+    u.legs[1].hip.rotation.x = -Math.sin(run) * 0.7 * amp;
+    u.legs[0].knee.rotation.x = Math.max(0, -Math.sin(run)) * 0.9 * amp;
+    u.legs[1].knee.rotation.x = Math.max(0, Math.sin(run)) * 0.9 * amp;
+    u.arms[0].sho.rotation.x = -Math.sin(run) * 0.6 * amp;
+    u.arms[1].sho.rotation.x = Math.sin(run) * 0.6 * amp;
+    if (o.kick != null) {
+      const k = o.kick;
+      u.legs[1].hip.rotation.x = k < 0.6 ? 0.9 * (k / 0.6) : 0.9 - 2.2 * Math.min(1, (k - 0.6) / 0.25);
+      u.legs[1].knee.rotation.x = k < 0.6 ? 1.3 * (k / 0.6) : 1.3 * (1 - Math.min(1, (k - 0.6) / 0.2));
+      u.arms[0].sho.rotation.z = -0.9; u.arms[1].sho.rotation.z = 0.5;
+    }
+    if (o.armsUp != null) {
+      const a = o.armsUp;
+      u.arms[0].sho.rotation.z = -0.25 - 2.5 * a; u.arms[1].sho.rotation.z = 0.25 + 2.5 * a;
+      u.arms[0].elb.rotation.z = 0; u.arms[1].elb.rotation.z = 0;
+    }
+    if (o.ready) {
+      u.arms[0].sho.rotation.z = -0.75; u.arms[1].sho.rotation.z = 0.75;
+      u.arms[0].sho.rotation.x = -0.3; u.arms[1].sho.rotation.x = -0.3;
+      u.legs[0].hip.rotation.z = -0.15; u.legs[1].hip.rotation.z = 0.15;
+      u.legs[0].knee.rotation.x = 0.35; u.legs[1].knee.rotation.x = 0.35;
+      u.legs[0].hip.rotation.x = -0.25; u.legs[1].hip.rotation.x = -0.25;
+    }
+    if (o.hold) {
+      u.arms[0].sho.rotation.x = -1.25; u.arms[1].sho.rotation.x = -1.25;
+      u.arms[0].sho.rotation.z = 0.35; u.arms[1].sho.rotation.z = -0.35;
+      u.arms[0].elb.rotation.x = -0.9; u.arms[1].elb.rotation.x = -0.9;
+    }
+    if (o.wall) {
+      u.arms[0].sho.rotation.x = -0.4; u.arms[1].sho.rotation.x = -0.4;
+      u.arms[0].sho.rotation.z = 0.35; u.arms[1].sho.rotation.z = -0.35;
+    }
+  }
+  initRenderer(fov) {
+    if (typeof THREE === 'undefined') { this.no3d = true; return false; }
+    if (this.R) return false;
+    const T = THREE;
+    let R;
+    try { R = new T.WebGLRenderer({ canvas: this.cv, antialias: true }); } catch (e) { this.no3d = true; return false; }
+    R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    R.setSize(844, 390, false);
+    R.shadowMap.enabled = true;
+    R.shadowMap.type = T.PCFSoftShadowMap;
+    R.outputEncoding = T.sRGBEncoding;
+    R.toneMapping = T.ACESFilmicToneMapping;
+    R.toneMappingExposure = 1.1;
+    this.R = R;
+    this.cam = new T.PerspectiveCamera(fov, 844 / 390, 0.05, 600);
+    return true;
+  }
+  addCrowd(S, cx, cz, len, rows, rotY, colors) {
+    const T = THREE, g = new T.Group(), standMat = this.mat(0x141b2d, { roughness: 0.9 });
+    for (let i = 0; i < rows; i++) { const st = new T.Mesh(new T.BoxGeometry(len, 0.9, 1.4), standMat); st.position.set(0, 0.45 + i * 0.9, i * 1.4); st.receiveShadow = true; g.add(st); }
+    const per = Math.floor(len / 0.62);
+    const fan = new T.InstancedMesh(new T.BoxGeometry(0.42, 0.62, 0.32), new T.MeshStandardMaterial({ roughness: 0.8 }), per * rows);
+    const m4 = new T.Matrix4(), col = new T.Color();
+    let idx = 0;
+    for (let row = 0; row < rows; row++) for (let i = 0; i < per; i++) {
+      if (Math.random() < 0.1) m4.makeScale(0.001, 0.001, 0.001);
+      else m4.makeTranslation(-len / 2 + 0.31 + i * 0.62, 1.2 + row * 0.9, row * 1.4 + 0.1);
+      fan.setMatrixAt(idx, m4); col.setHex(colors[Math.floor(Math.random() * colors.length)]).convertSRGBToLinear(); fan.setColorAt(idx, col); idx++;
+    }
+    g.add(fan); g.position.set(cx, 0, cz); g.rotation.y = rotY; S.add(g);
+    return fan;
+  }
+  loadSportStats(sport) {
+    try {
+      const j = JSON.parse(localStorage.getItem('arenamix.stats.v2') || 'null');
+      if (j && j[sport] && j[sport].stats) return j[sport].stats;
+    } catch (e) {}
+    return {};
+  }
+  tt(k) {
+    const s = this.st || {};
+    return Math.max(0, Math.min(1, ((s[k] ?? 10) - 10) / 140));
+  }
+  init3D() {
+    if (!this.initRenderer(46)) return;
+    this.camPos = new THREE.Vector3(); this.camLook = new THREE.Vector3();
+    this.camSnap = true;
+    this.buildScene();
+    this.draw3D(0);
+  }
+  buildScene() {
+    const T = THREE, S = new T.Scene();
+    this.S = S;
+    S.background = new T.Color(0x120e0a);
+    S.fog = new T.Fog(0x120e0a, 40, 110);
+    S.add(new T.HemisphereLight(0xffe9cc, 0x3a2410, 0.6));
+    const key = new T.DirectionalLight(0xfff1dd, 1.15);
+    key.position.set(-8, 20, 12); key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048);
+    Object.assign(key.shadow.camera, { left: -14, right: 14, top: 14, bottom: -10, near: 2, far: 60 });
+    key.shadow.bias = -0.0005;
+    S.add(key);
+    const spot = new T.SpotLight(0xffffff, 0.9, 40, 0.5, 0.6); spot.position.set(0, 14, 3); spot.target.position.set(0, 3, 0); S.add(spot); S.add(spot.target);
+    const ppm = 40, W = 17, L = 16, z0 = -2.6;
+    const floor = this.canvasTex(W * ppm, L * ppm, (c, w, h) => {
+      const X = (x) => (x + W / 2) * ppm, Z = (z) => (z - z0) * ppm;
+      for (let y = 0; y < h; y += 0.18 * ppm) for (let x = -((y / 7) % 1) * ppm; x < w; x += 1.6 * ppm) {
+        const tone = 180 + Math.floor(Math.random() * 30);
+        c.fillStyle = 'rgb(' + tone + ',' + Math.floor(tone * 0.62) + ',' + Math.floor(tone * 0.34) + ')';
+        c.fillRect(x, y, 1.6 * ppm - 1, 0.18 * ppm - 1);
+      }
+      c.fillStyle = 'rgba(156,74,22,0.85)'; c.fillRect(X(-2.45), Z(-1.575), 4.9 * ppm, 5.8 * ppm);
+      c.strokeStyle = '#F4F4F6'; c.lineWidth = 0.05 * ppm;
+      c.strokeRect(X(-7.5), Z(-1.575), 15 * ppm, 14 * ppm);
+      c.strokeRect(X(-2.45), Z(-1.575), 4.9 * ppm, 5.8 * ppm);
+      c.beginPath(); c.arc(X(0), Z(4.225), 1.8 * ppm, 0, Math.PI * 2); c.stroke();
+      c.beginPath(); c.arc(X(0), Z(0), 1.25 * ppm, 0, Math.PI); c.stroke();
+      const a0 = Math.asin(6.6 / 6.75);
+      c.beginPath(); c.moveTo(X(-6.6), Z(-1.575)); c.lineTo(X(-6.6), Z(Math.cos(a0) * 6.75));
+      c.arc(X(0), Z(0), 6.75 * ppm, Math.PI / 2 + a0, Math.PI / 2 - a0, true); c.lineTo(X(6.6), Z(-1.575)); c.stroke();
+      c.fillStyle = 'rgba(10,15,28,0.55)'; c.font = 'italic 800 ' + (1.4 * ppm) + 'px Barlow Condensed, Arial'; c.textAlign = 'center';
+      c.fillText('ARENA MIX', X(0), Z(10));
+    });
+    const fl = new T.Mesh(new T.PlaneGeometry(W, L), new T.MeshStandardMaterial({ map: floor, roughness: 0.35, metalness: 0.05 }));
+    fl.rotation.x = -Math.PI / 2; fl.position.set(0, 0, z0 + L / 2); fl.receiveShadow = true; S.add(fl);
+    const outer = new T.Mesh(new T.PlaneGeometry(200, 200), this.mat(0x1c120a, { roughness: 0.9 })); outer.rotation.x = -Math.PI / 2; outer.position.y = -0.01; S.add(outer);
+    const colors = [0xff8a3d, 0xffc53d, 0xf2f5fa, 0x5b2a86, 0x3a2410, 0x3a2410, 0x241811];
+    this.fans = [this.addCrowd(S, 0, -8, 40, 12, Math.PI, colors), this.addCrowd(S, -13, 6, 26, 12, -Math.PI / 2, colors), this.addCrowd(S, 13, 6, 26, 12, Math.PI / 2, colors)];
+    // hoop
+    const white = this.mat(0xf4f6fa, { roughness: 0.4 });
+    const boardMat = new T.MeshStandardMaterial({ color: 0xdfe8f5, transparent: true, opacity: 0.28, roughness: 0.1, metalness: 0.1 });
+    const board = new T.Mesh(new T.BoxGeometry(1.8, 1.05, 0.03), boardMat); board.position.set(0, 3.425, -0.39); S.add(board);
+    const edge = (w, h, x, y) => { const m = new T.Mesh(new T.BoxGeometry(w, h, 0.035), white); m.position.set(x, y, -0.385); S.add(m); };
+    edge(1.8, 0.05, 0, 3.95); edge(1.8, 0.05, 0, 2.9); edge(0.05, 1.05, -0.9, 3.425); edge(0.05, 1.05, 0.9, 3.425);
+    edge(0.59, 0.04, 0, 3.5); edge(0.59, 0.04, 0, 3.07); edge(0.04, 0.45, -0.295, 3.285); edge(0.04, 0.45, 0.295, 3.285);
+    const rim = new T.Mesh(new T.TorusGeometry(0.225, 0.012, 10, 48), this.mat(0xff5a1a, { roughness: 0.4, metalness: 0.4 })); rim.rotation.x = Math.PI / 2; rim.position.set(0, 3.05, 0); rim.castShadow = true; S.add(rim);
+    const arm = new T.Mesh(new T.BoxGeometry(0.1, 0.06, 0.18), this.mat(0xff5a1a)); arm.position.set(0, 3.03, -0.29); S.add(arm);
+    const pole = new T.Mesh(new T.BoxGeometry(0.25, 3.6, 0.25), this.mat(0x1c2540)); pole.position.set(0, 1.8, -2.9); pole.castShadow = true; S.add(pole);
+    const beam = new T.Mesh(new T.BoxGeometry(0.2, 0.2, 2.5), this.mat(0x1c2540)); beam.position.set(0, 3.6, -1.65); S.add(beam);
+    const pad = new T.Mesh(new T.BoxGeometry(1.4, 0.9, 1.6), this.mat(0x5b2a86)); pad.position.set(0, 0.45, -3.4); S.add(pad);
+    const netMat = new T.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 });
+    const ng = new T.BufferGeometry(); ng.setAttribute('position', new T.Float32BufferAttribute(new Float32Array(16 * 4 * 3), 3));
+    this.net = new T.LineSegments(ng, netMat); this.net.frustumCulled = false; S.add(this.net);
+    // jumbotron
+    const jt = this.canvasTex(512, 256, (c, w, h) => { c.fillStyle = '#0B0B14'; c.fillRect(0, 0, w, h); c.fillStyle = '#FF8A3D'; c.font = 'italic 800 90px Barlow Condensed, Arial'; c.textAlign = 'center'; c.fillText('ARENA MIX', w / 2, 150); });
+    const jumbo = new T.Mesh(new T.BoxGeometry(5, 2.5, 0.3), new T.MeshStandardMaterial({ map: jt, emissive: 0xffffff, emissiveMap: jt, emissiveIntensity: 0.8 })); jumbo.position.set(0, 9, -6); S.add(jumbo);
+    // ball
+    const bt = this.canvasTex(512, 256, (c, w, h) => {
+      c.fillStyle = '#E8732A'; c.fillRect(0, 0, w, h);
+      for (let i = 0; i < 3000; i++) { c.fillStyle = 'rgba(0,0,0,0.06)'; c.fillRect(Math.random() * w, Math.random() * h, 2, 2); }
+      c.strokeStyle = '#2A1205'; c.lineWidth = 5;
+      c.beginPath(); c.moveTo(0, h / 2); c.lineTo(w, h / 2); c.stroke();
+      [0, w / 4, w / 2, w * 3 / 4].forEach((x) => { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); });
+      c.beginPath(); c.ellipse(w / 4, h / 2, w / 9, h / 2, 0, 0, Math.PI * 2); c.stroke();
+      c.beginPath(); c.ellipse(w * 3 / 4, h / 2, w / 9, h / 2, 0, 0, Math.PI * 2); c.stroke();
+    });
+    this.ballMat = new T.MeshStandardMaterial({ map: bt, roughness: 0.6 });
+    this.moneyMat = new T.MeshStandardMaterial({ color: 0xffc53d, map: bt, roughness: 0.5, emissive: 0x332200 });
+    this.ball = new T.Mesh(new T.SphereGeometry(0.12, 32, 24), this.ballMat); this.ball.castShadow = true; S.add(this.ball);
+    // player
+    this.player = this.makePlayer({ shirt: 0xff8a3d, shorts: 0xff8a3d, socks: 0xf2f5fa, number: '23', trimCss: '#0B0B14', boot: 0xf2f5fa });
+    S.add(this.player);
+    this.rack = new T.Group(); S.add(this.rack);
+    this.updateRack();
+  }
+  updateRack() {
+    if (!this.rack) return;
+    const T = THREE;
+    while (this.rack.children.length) this.rack.remove(this.rack.children[0]);
+    if (this.mode !== 'three') return;
+    [-1.2, -0.6, 0, 0.6, 1.2].forEach((a, i) => {
+      const x = Math.sin(a) * 7.6, z = Math.cos(a) * 7.6;
+      const stand = new T.Mesh(new T.BoxGeometry(0.5, 0.8, 0.3), this.mat(0x1c2540)); stand.position.set(x, 0.4, z); this.rack.add(stand);
+      const left = this.list.filter((s, k) => s.spot === i && k >= this.idx).length;
+      for (let k = 0; k < left; k++) {
+        const bl = new T.Mesh(new T.SphereGeometry(0.12, 16, 12), k === left - 1 && left > 0 && this.list.find((s, kk) => s.spot === i && s.money && kk >= this.idx) ? this.moneyMat : this.ballMat);
+        bl.position.set(x - 0.15 + k * 0.15, 0.92, z); this.rack.add(bl);
+      }
+    });
+  }
+  draw3D(dt) {
+    if (!this.R || !this.S) return;
+    const T = THREE, b = this.b, p = this.shooterPos();
+    if (this.lastIdx !== this.idx) { this.updateRack(); this.lastIdx = this.idx; }
+    this.ball.position.set(b.x, b.y, b.z);
+    this.ball.rotation.x += (b.spin || 0) * (dt || 0);
+    const cur = this.list[Math.min(this.idx, this.list.length - 1)];
+    this.ball.material = cur && cur.money ? this.moneyMat : this.ballMat;
+    const ux = Math.sin(p.a), uz = Math.cos(p.a);
+    this.player.position.set(p.x + ux * 0.15, this.phase === 'jump' || this.phase === 'flight' || this.phase === 'result' ? this.jump : 0, p.z + uz * 0.15);
+    this.player.rotation.y = Math.atan2(-ux, -uz);
+    const shooting = this.phase === 'jump' || (this.phase === 'flight' && this.pt < 0.4);
+    this.pose(this.player, shooting ? { armsUp: 0.95 } : this.phase === 'aim' || this.phase === 'start' ? { hold: true } : { armsUp: 0.1 });
+    if (this.phase === 'aim' || this.phase === 'start') { b.x = p.x - ux * 0.3; b.z = p.z - uz * 0.3; b.y = 2.0; }
+    // net
+    const pos = this.net.geometry.attributes.position, sw = this.netT > 0 ? Math.sin(this.netT * 25) * this.netT * 0.12 : 0, drop = this.netT > 0 ? this.netT * 0.12 : 0;
+    for (let i = 0; i < 16; i++) {
+      const a = i / 16 * Math.PI * 2, a2 = (i + 0.5) / 16 * Math.PI * 2;
+      pos.setXYZ(i * 4, Math.cos(a) * 0.225, 3.04, Math.sin(a) * 0.225);
+      pos.setXYZ(i * 4 + 1, Math.cos(a2) * 0.15 + sw, 2.62 - drop, Math.sin(a2) * 0.15);
+      pos.setXYZ(i * 4 + 2, Math.cos(a2) * 0.15 + sw, 2.62 - drop, Math.sin(a2) * 0.15);
+      pos.setXYZ(i * 4 + 3, Math.cos(a + Math.PI / 8 * 2) * 0.225, 3.04, Math.sin(a + Math.PI / 8 * 2) * 0.225);
+    }
+    pos.needsUpdate = true;
+    // camera behind shooter
+    const want = new T.Vector3(p.x + ux * 3.6 + uz * 0.6, 2.9, p.z + uz * 3.6 - ux * 0.6);
+    const look = new T.Vector3(0, 2.7, 0);
+    if (this.phase === 'flight' || this.phase === 'result') { want.lerp(new T.Vector3(p.x * 0.6 + ux * 2.4, 3.3, p.z * 0.6 + uz * 2.4), Math.min(1, this.pt * 0.6)); }
+    if (this.camSnap) { this.camPos.copy(want); this.camLook.copy(look); this.camSnap = false; }
+    const f = 1 - Math.exp(-4 * (dt || 0.016));
+    this.camPos.lerp(want, f); this.camLook.lerp(look, f);
+    this.camMoving = this.camPos.distanceTo(want) > 0.05;
+    this.cam.position.copy(this.camPos); this.cam.lookAt(this.camLook);
+    if (this.fans) this.fans.forEach((fn) => { fn.position.y = this.result && this.result.p > 0 ? Math.abs(Math.sin(this.pt * 12)) * 0.2 * Math.max(0, 1 - this.pt) : 0; });
+    this.R.render(this.S, this.cam);
+  }
+  local(e) {
+    const r = e.currentTarget.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * 844 / r.width, y: (e.clientY - r.top) * 390 / r.height };
+  }
+  renderVals() {
+    const R = this.result;
+    const map = { swish: ['¡SWISH!', '#22D3EE'], dentro: ['¡DENTRO!', '#22D3EE'], tablero: ['¡TABLERO Y DENTRO!', '#22D3EE'], fallo: ['FALLO', '#FF8A8E'] };
+    const rm = R ? map[R.kind] : ['', '#fff'];
+    const rs = Math.min(1, this.pt / 0.25);
+    const tab = (on) => 'height: 36px; padding: 0 14px; border: 0; border-radius: 10px; font: 800 13px Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #FF8A3D; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
+    const sw = this.swipe;
+    const ratio = sw && sw.length > 1 ? Math.max(0, (sw[0].y - sw[sw.length - 1].y) / 230) : 0;
+    const tol = 0.1 + 0.12 * this.tt('tri');
+    const cur = this.list[Math.min(this.idx, this.list.length - 1)];
+    const setMode = (m) => { this.mode = m; this.reset(); this.forceUpdate(); };
+    return {
+      canvasRef: this.canvasRef, no3d: !!this.no3d,
+      swipePts: sw ? sw.map((q) => q.x.toFixed(1) + ',' + q.y.toFixed(1)).join(' ') : '',
+      isThree: this.mode === 'three',
+      threeTab: tab(this.mode === 'three'), freeTab: tab(this.mode === 'free'),
+      setThree: () => setMode('three'), setFree: () => setMode('free'),
+      clock: '0:' + String(Math.ceil(this.time)).padStart(2, '0'),
+      clockStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; color: ' + (this.time < 10 ? '#FF5C5C' : '#F4F4FA') + ';',
+      ballLabel: Math.min(this.idx + 1, this.list.length) + '/' + this.list.length + (cur && cur.money ? ' ★' : ''),
+      ptsLabel: String(this.pts),
+      showMeter: !!sw,
+      greenStyle: 'position: absolute; left: 0; right: 0; bottom: ' + ((1 - tol) / 2 * 100).toFixed(1) + '%; height: ' + (tol * 100).toFixed(1) + '%; background: #2FBF7166; border-top: 2px solid #53D88E; border-bottom: 2px solid #53D88E;',
+      fillStyle: 'position: absolute; left: 3px; right: 3px; bottom: 3px; border-radius: 6px; height: ' + Math.min(96, ratio * 50).toFixed(1) + '%; background: ' + (Math.abs(ratio - 1) < tol ? '#53D88E' : '#FF8A3D') + ';',
+      showHint: this.phase === 'aim' && !sw,
+      hintText: 'Desliza hacia arriba: la longitud marca la fuerza (zona verde de la barra) y la dirección, el apunte' + (cur && cur.money ? ' · ★ balón dorado: 2 puntos' : ''),
+      showResult: this.phase === 'result' && !!R,
+      resultText: rm[0],
+      resultSub: R && R.p ? '+' + R.p + (R.p > 1 ? ' puntos' : ' punto') : '',
+      resultStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 66px; line-height: 1; letter-spacing: 2px; color: ' + rm[1] + '; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (0.4 + rs * 0.6).toFixed(2) + ');',
+      showStart: this.phase === 'start',
+      startTitle: this.mode === 'three' ? 'CONCURSO DE TRIPLES' : 'TIROS LIBRES',
+      startText: this.mode === 'three' ? '5 posiciones, 3 balones en cada una y 60 segundos. El último balón de cada posición es dorado y vale 2 puntos.' : '10 tiros libres. Intenta meter el máximo; el swish (sin tocar aro) se celebra más.',
+      showDone: this.phase === 'done',
+      doneKicker: this.mode === 'three' ? 'CONCURSO DE TRIPLES' : 'TIROS LIBRES',
+      doneSub: this.made + ' canastas de ' + Math.min(this.idx + (this.phase === 'done' && this.idx < this.list.length ? 0 : 0), this.list.length) + ' tiros · récord ' + this.best[this.mode],
+      start: () => { if (this.phase === 'done') this.reset(); this.phase = 'aim'; this.pt = 0; this.camSnap = true; this.loop(); this.forceUpdate(); },
+      pDown: (e) => {
+        if (this.phase !== 'aim') return;
+        e.preventDefault();
+        if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+        this.swipe = [this.local(e)]; this.forceUpdate();
+      },
+      pMove: (e) => {
+        if (!this.swipe) return;
+        const q = this.local(e), l = this.swipe[this.swipe.length - 1];
+        if (Math.hypot(q.x - l.x, q.y - l.y) > 4 && this.swipe.length < 60) { this.swipe.push(q); this.forceUpdate(); }
+      },
+      pUp: (e) => { if (this.swipe) { this.swipe.push(this.local(e)); this.shoot(); } },
+      pCancel: () => { this.swipe = null; this.forceUpdate(); }
+    };
+  }
+}
+</script>
+</body>
+</html>

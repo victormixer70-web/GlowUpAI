@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Recompensas y tienda</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#22D3EE}a:hover{color:#67E8F9}
+input::placeholder{color:#8686A6}
+</style>
+</helmet>
+<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; overflow: hidden">
+  <nav aria-label="Principal" style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; box-sizing: border-box; padding: 12px 8px; background: #111120; border-right: 1px solid #26264A; display: flex; flex-direction: column; align-items: center; gap: 8px">
+    <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; line-height: 1; margin-bottom: 8px">A<span style="color: #22D3EE">M</span></span>
+    <a href="Deportes.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4l13 8l-13 8z"/></svg>Jugar</a>
+    <a href="Taquilla.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M8 3L3 6l2 5l3-1v11h8V10l3 1l2-5l-5-3a4 4 0 0 1-8 0z"/></svg>Taquilla</a>
+    <a href="Tienda.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #0B0B14; background: #22D3EE"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 8h14l-1 13H6z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Tienda</a>
+    <a href="Estadisticas.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Perfil</a>
+  </nav>
+  <div style="position: absolute; left: 80px; top: 0; right: 0; bottom: 0; padding: 12px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 14px">
+      <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 1px">TIENDA</h1>
+  <div role="tablist" aria-label="Sección" style="width: 280px; padding: 4px; border-radius: 14px; background: #17172A; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px">
+    <button type="button" role="tab" onClick="{{showRewards}}" style="{{rewardsTab}}">Recompensas</button>
+    <button type="button" role="tab" onClick="{{showShop}}" style="{{shopTab}}">Comprar</button>
+  </div>
+      <div style="flex: 1"></div>
+    <span style="display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; border-radius: 20px; background: #17172A; border: 1px solid #2E2E52; font-weight: 700; font-size: 14px">
+      <svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">C</text></svg>
+      2.450 carrascos
+    </span>
+    </div>
+    <div style="flex: 1; min-height: 0; overflow-y: auto">
+      <sc-if value="{{isRewards}}" hint-placeholder-val="{{ true }}">
+        <div style="display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 14px; align-items: start">
+      <section style="padding: 16px; border-radius: 18px; background: #17172A; border: 1px solid #2E2E52; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #22D3EE">RECOMPENSAS ASEGURADAS</span>
+          <span style="font-size: 14px; color: #CACAE0">Cada victoria te acerca a un premio garantizado. Sin azar.</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px">
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 40px; line-height: 1">2<span style="font-size: 22px; color: #A3A3C2"> / 10</span></span>
+          <span style="font-size: 13px; color: #A3A3C2">victorias esta semana</span>
+        </div>
+        <div style="height: 8px; border-radius: 4px; background: #26264A"><div style="width: 20%; height: 8px; border-radius: 4px; background: #22D3EE"></div></div>
+      </section>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #17172A; border: 1px solid #2E2E52">
+          <span style="flex: none; width: 40px; height: 40px; border-radius: 20px; background: #22D3EE; color: #0B0B14; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg></span>
+          <span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 700; font-size: 14px">1 victoria · 100 carrascos</span><span style="font-size: 12px; color: #A3A3C2">Reclamado</span></span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #1E1A3A; border: 2px solid #22D3EE">
+          <span style="flex: none; width: 40px; height: 40px; border-radius: 20px; background: #FF8A3D; color: #0B0B14; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px">2</span>
+          <span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 700; font-size: 14px">2 victorias · Cofre común</span><span style="font-size: 12px; color: #A3A3C2">¡Listo para abrir!</span></span>
+          <button type="button" style="height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: #22D3EE; color: #0B0B14; font: 800 13px Manrope, sans-serif; cursor: pointer">Reclamar</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #17172A; border: 1px solid #2E2E52">
+          <span style="flex: none; width: 40px; height: 40px; border-radius: 20px; background: #21213A; color: #CACAE0; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px">5</span>
+          <span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 700; font-size: 14px">5 victorias · Cofre raro</span><span style="font-size: 12px; color: #A3A3C2">Accesorio aleatorio de equipo</span></span>
+          <svg width="34" height="30" viewBox="0 0 54 50"><path d="M5 22h44v20a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" fill="#2A5FB0"/><path d="M5 22a22 14 0 0 1 44 0z" fill="#6FB6FF"/><rect x="23" y="20" width="8" height="12" rx="2" fill="#FFC53D"/></svg>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #17172A; border: 1px solid #2E2E52">
+          <span style="flex: none; width: 40px; height: 40px; border-radius: 20px; background: #21213A; color: #CACAE0; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px">7</span>
+          <span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 700; font-size: 14px">7 victorias · 300 carrascos</span><span style="font-size: 12px; color: #A3A3C2">Moneda del juego</span></span>
+          <svg width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">C</text></svg>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #17172A; border: 1px solid #2E2E52">
+          <span style="flex: none; width: 40px; height: 40px; border-radius: 20px; background: #21213A; color: #CACAE0; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px">10</span>
+          <span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 700; font-size: 14px">10 victorias · Brote + Botas Carmesí</span><span style="font-size: 12px; color: #A3A3C2">Gran premio semanal</span></span>
+          <svg width="30" height="28" viewBox="0 0 44 40"><path d="M6 14h14l4 6c6 0 14 2 16 8v4H6z" fill="#E5484D"/><rect x="4" y="31" width="38" height="5" rx="2.5" fill="#F4F4FA"/></svg>
+        </div>
+      </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{isShop}}" hint-placeholder-val="{{ false }}">
+        <div style="display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 14px; align-items: start">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+      <section style="position: relative; padding: 18px; border-radius: 18px; background: #2B1A0C; border: 1px solid #6B3A14; overflow: hidden; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #FFB37A">PASE DE TEMPORADA</span>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 28px; line-height: 1.05; max-width: 220px">Equipaciones exclusivas para los 4 deportes</span>
+        <a href="#" style="align-self: flex-start; display: flex; align-items: center; height: 44px; margin-top: 6px; padding: 0 18px; border-radius: 12px; background: #FF8A3D; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px">[PRECIO]</a>
+        <svg width="120" height="120" viewBox="0 0 48 48" style="position: absolute; right: -6px; bottom: -10px"><path d="M14 8l-10 6l4 10l6-2v22h20V22l6 2l4-10l-10-6a8 8 0 0 1-20 0z" fill="#FFC53D"/><text x="24" y="36" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="12" fill="#2B1A0C">S1</text></svg>
+      </section>
+      <a href="Taquilla.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #17172A; border: 1px solid #2E2E52; text-decoration: none; color: #F4F4FA">
+        <svg width="44" height="44" viewBox="66 -18 68 66"><circle cx="100" cy="44" r="24" fill="#B9794F"/><path d="M76 42Q76 16 100 16Q124 16 124 42Q118 30 104 30Q96 26 88 30Q80 32 76 42Z" fill="#241811"/><rect x="78" y="-16" width="44" height="42" rx="3" fill="#1A1A22"/><rect x="78" y="12" width="44" height="8" fill="#E5484D"/><rect x="66" y="22" width="68" height="9" rx="4.5" fill="#1A1A22"/></svg>
+        <span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 700; font-size: 14px">Sombrero de copa</span><span style="font-size: 12px; color: #A3A3C2">Ver en la Taquilla</span></span>
+        <span style="font-weight: 800; color: #FFC53D">900 C</span>
+      </a>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <h2 style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; color: #A3A3C2">PACKS DE CARRASCOS</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
+        <sc-for list="{{packs}}" as="p" hint-placeholder-count="4">
+          <button type="button" style="display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 10px 12px 10px; border-radius: 16px; background: #17172A; border: 1px solid #2E2E52; color: #F4F4FA; font-family: Manrope, sans-serif; cursor: pointer">
+            <svg width="44" height="44" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">C</text></svg>
+            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1">{{p.amount}}</span>
+            <span style="font-size: 12px; font-weight: 700; color: #22D3EE">{{p.bonus}}</span>
+            <span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 38px; margin-top: 4px; border-radius: 10px; background: #F4F4FA; color: #0B0B14; font-weight: 800; font-size: 14px">[PRECIO]</span>
+          </button>
+        </sc-for>
+      </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 'rewards' };
+  }
+  renderVals() {
+    const t = this.state.tab;
+    const tabStyle = (on) => 'min-height: 44px; border: 0; border-radius: 10px; font: 700 14px Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
+    return {
+      isRewards: t === 'rewards',
+      isShop: t === 'shop',
+      rewardsTab: tabStyle(t === 'rewards'),
+      shopTab: tabStyle(t === 'shop'),
+      showRewards: () => this.setState({ tab: 'rewards' }),
+      showShop: () => this.setState({ tab: 'shop' }),
+      packs: [
+        { amount: '500', bonus: 'Básico' },
+        { amount: '1.200', bonus: '+10% extra' },
+        { amount: '2.800', bonus: '+20% extra' },
+        { amount: '6.500', bonus: '+30% extra' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

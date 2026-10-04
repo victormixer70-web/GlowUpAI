@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Taquilla</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#22D3EE}a:hover{color:#67E8F9}
+input::placeholder{color:#8686A6}
+</style>
+</helmet>
+<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; overflow: hidden">
+  <nav aria-label="Principal" style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; box-sizing: border-box; padding: 12px 8px; background: #111120; border-right: 1px solid #26264A; display: flex; flex-direction: column; align-items: center; gap: 8px">
+    <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; line-height: 1; margin-bottom: 8px">A<span style="color: #22D3EE">M</span></span>
+    <a href="Deportes.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4l13 8l-13 8z"/></svg>Jugar</a>
+    <a href="Taquilla.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #0B0B14; background: #22D3EE"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M8 3L3 6l2 5l3-1v11h8V10l3 1l2-5l-5-3a4 4 0 0 1-8 0z"/></svg>Taquilla</a>
+    <a href="Tienda.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 8h14l-1 13H6z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Tienda</a>
+    <a href="Estadisticas.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Perfil</a>
+  </nav>
+  <div style="position: absolute; left: 80px; top: 0; bottom: 0; width: 280px; padding: 12px 10px 12px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0">
+    <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 28px; letter-spacing: 1px">TAQUILLA</h1>
+    <a href="Tienda.dc.html" style="display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; border-radius: 20px; background: #17172A; border: 1px solid #2E2E52; color: #F4F4FA; text-decoration: none; font-weight: 800; font-size: 14px">
+      <svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">C</text></svg>
+      {{coinsLabel}}
+    </a>
+  </div>
+  <div style="position: relative; flex: 1; min-height: 0; border-radius: 22px; overflow: hidden; background: #12122A">
+    <svg width="100%" height="100%" viewBox="0 0 358 214" preserveAspectRatio="xMidYMid slice" style="position: absolute; left: 0; top: 0">
+      <defs>
+        <radialGradient id="tq-spot" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#DDE8FF" stop-opacity=".35"/><stop offset=".55" stop-color="#DDE8FF" stop-opacity="0"/></radialGradient>
+        <linearGradient id="tq-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1A1A3A"/><stop offset="1" stop-color="#12122A"/></linearGradient>
+        <linearGradient id="tq-pod" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E2E52"/><stop offset="1" stop-color="#17172A"/></linearGradient>
+      </defs>
+      <rect width="358" height="214" fill="url(#tq-wall)"/>
+      <rect x="14" y="16" width="56" height="150" rx="8" fill="#17172A" stroke="#2E2E52"/>
+      <rect x="288" y="16" width="56" height="150" rx="8" fill="#17172A" stroke="#2E2E52"/>
+      <path d="M22 30h40M22 40h40M296 30h40M296 40h40" stroke="#2E2E52" stroke-width="2"/>
+      <circle cx="60" cy="100" r="3" fill="#A3A3C2"/>
+      <circle cx="298" cy="100" r="3" fill="#A3A3C2"/>
+      <path d="M118 0L240 0L300 214H58Z" fill="url(#tq-spot)"/>
+      <ellipse cx="179" cy="194" rx="96" ry="18" fill="url(#tq-pod)"/>
+      <ellipse cx="179" cy="190" rx="96" ry="18" fill="#21213A" stroke="#22D3EE" stroke-opacity=".5" stroke-width="2"/>
+    </svg>
+    <div style="position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%)">
+      <dc-import name="Avatar" primary="{{kit.primary}}" secondary="{{kit.secondary}}" pattern="{{kit.pattern}}" shorts="{{kit.shorts}}" socks="{{kit.socks}}" shoe="{{shoe}}" number="{{number}}" crest="{{kit.crest}}" crest-shape="{{kit.crestShape}}" crest-mark="{{kit.crestMark}}" hat="{{hat}}" hat-color="{{hatColor}}" face="{{face}}" w="150" hint-size="150px,266px"></dc-import>
+    </div>
+    <div style="position: absolute; left: 12px; top: 10px; display: flex; flex-direction: column; gap: 2px; max-width: 150px; padding: 6px 8px; border-radius: 8px; background: #0B0B14B3">
+      <span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">EQUIPACIÓN</span>
+      <span style="font-size: 12px; font-weight: 800; line-height: 1.2">{{kitName}}</span>
+    </div>
+    <sc-if value="{{isPreviewing}}" hint-placeholder-val="{{ false }}">
+      <span style="position: absolute; right: 12px; top: 12px; font-size: 10px; font-weight: 800; letter-spacing: 1px; padding: 4px 8px; border-radius: 6px; background: #3A2410; color: #FFB37A">VISTA PREVIA</span>
+    </sc-if>
+  </div>
+  </div>
+  <div style="position: absolute; left: 360px; top: 0; right: 0; bottom: 0; padding: 12px 16px 10px 8px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
+  <div role="tablist" aria-label="Deporte" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 0">
+    <sc-for list="{{sports}}" as="sp" hint-placeholder-count="4">
+      <button type="button" role="tab" onClick="{{sp.pick}}" style="{{sp.style}}">{{sp.label}}</button>
+    </sc-for>
+  </div>
+  <div role="tablist" aria-label="Categoría" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 0">
+    <sc-for list="{{cats}}" as="c" hint-placeholder-count="4">
+      <button type="button" role="tab" onClick="{{c.pick}}" style="{{c.style}}">{{c.label}}</button>
+    </sc-for>
+  </div>
+  <sc-if value="{{isTeams}}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; gap: 6px; padding: 0; overflow-x: auto">
+      <sc-for list="{{leagues}}" as="lg" hint-placeholder-count="5">
+        <button type="button" onClick="{{lg.pick}}" style="{{lg.style}}">{{lg.name}}</button>
+      </sc-for>
+    </div>
+  </sc-if>
+    <div style="flex: 1; min-height: 0; overflow-y: auto">
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+      <sc-for list="{{items}}" as="it" hint-placeholder-count="6">
+        <button type="button" onClick="{{it.pick}}" style="{{it.style}}">
+          <sc-if value="{{it.isKit}}" hint-placeholder-val="{{ true }}">
+            <span style="{{it.jerseyStyle}}"><span style="{{it.crestStyle}}">{{it.crest}}</span></span>
+          </sc-if>
+          <sc-if value="{{it.isShoe}}" hint-placeholder-val="{{ false }}">
+            <svg width="44" height="40" viewBox="0 0 44 40"><path d="M6 14h14l4 6c6 0 14 2 16 8v4H6z" fill="{{it.color}}"/><rect x="4" y="31" width="38" height="5" rx="2.5" fill="#F4F4FA"/><path d="M12 18l6 0M13 22l7 0" stroke="#0B0B14" stroke-opacity=".4" stroke-width="2"/></svg>
+          </sc-if>
+          <sc-if value="{{it.isHead}}" hint-placeholder-val="{{ false }}">
+            <svg width="46" height="44" viewBox="66 -18 68 66">
+              <circle cx="100" cy="44" r="24" fill="#B9794F"/>
+              <path d="M76 42Q76 16 100 16Q124 16 124 42Q118 30 104 30Q96 26 88 30Q80 32 76 42Z" fill="#241811"/>
+              <sc-if value="{{it.k.none}}" hint-placeholder-val="{{ false }}"><circle cx="100" cy="20" r="30" fill="none" stroke="#4C4C78" stroke-width="3" stroke-dasharray="5 4"/></sc-if>
+              <sc-if value="{{it.k.cap}}" hint-placeholder-val="{{ false }}"><path d="M74 38Q74 10 100 10Q126 10 126 38Z" fill="{{it.color}}"/><path d="M116 34h20a4 4 0 0 1 0 8h-22z" fill="{{it.color}}"/></sc-if>
+              <sc-if value="{{it.k.top}}" hint-placeholder-val="{{ false }}"><rect x="78" y="-16" width="44" height="42" rx="3" fill="#1A1A22"/><rect x="78" y="12" width="44" height="8" fill="#E5484D"/><rect x="66" y="22" width="68" height="9" rx="4.5" fill="#1A1A22"/></sc-if>
+              <sc-if value="{{it.k.chef}}" hint-placeholder-val="{{ false }}"><circle cx="86" cy="6" r="13" fill="#F4F4F6"/><circle cx="100" cy="-2" r="15" fill="#FFFFFF"/><circle cx="114" cy="6" r="13" fill="#F4F4F6"/><rect x="78" y="8" width="44" height="22" rx="3" fill="#FFFFFF"/></sc-if>
+              <sc-if value="{{it.k.viking}}" hint-placeholder-val="{{ false }}"><path d="M78 24Q66 22 68 -6Q72 12 82 14Z" fill="#F2E6C8"/><path d="M122 24Q134 22 132 -6Q128 12 118 14Z" fill="#F2E6C8"/><path d="M74 38Q74 10 100 10Q126 10 126 38Z" fill="#8A93A6"/><rect x="72" y="30" width="56" height="9" rx="3" fill="#B7791F"/></sc-if>
+              <sc-if value="{{it.k.prop}}" hint-placeholder-val="{{ false }}"><path d="M75 38Q75 14 100 14Q125 14 125 38Z" fill="#E5484D"/><path d="M100 14Q112 14 118 22L100 38Z" fill="#FFC53D"/><rect x="98" y="2" width="4" height="12" fill="#2E2E52"/><ellipse cx="88" cy="2" rx="12" ry="3.5" fill="#2FBF71"/><ellipse cx="112" cy="2" rx="12" ry="3.5" fill="#22D3EE"/></sc-if>
+              <sc-if value="{{it.k.crown}}" hint-placeholder-val="{{ false }}"><path d="M76 28L78 2L89 16L100 -4L111 16L122 2L124 28Z" fill="#FFC53D" stroke="#B7791F" stroke-width="2" stroke-linejoin="round"/><circle cx="100" cy="21" r="3.5" fill="#E5484D"/></sc-if>
+              <sc-if value="{{it.k.sprout}}" hint-placeholder-val="{{ false }}"><path d="M100 20V2" stroke="#2FBF71" stroke-width="3"/><path d="M100 8Q84 -6 80 8Q92 16 100 8Z" fill="#2FBF71"/><path d="M100 4Q116 -10 122 4Q110 12 100 4Z" fill="#53D88E"/></sc-if>
+              <sc-if value="{{it.k.phones}}" hint-placeholder-val="{{ false }}"><path d="M73 46Q73 12 100 12Q127 12 127 46" stroke="#17172A" stroke-width="6" fill="none"/><rect x="67" y="36" width="12" height="20" rx="6" fill="#22D3EE"/><rect x="121" y="36" width="12" height="20" rx="6" fill="#22D3EE"/></sc-if>
+              <sc-if value="{{it.k.band}}" hint-placeholder-val="{{ false }}"><rect x="75" y="29" width="50" height="9" rx="4" fill="{{it.color}}"/></sc-if>
+              <sc-if value="{{it.k.sun}}" hint-placeholder-val="{{ false }}"><path d="M81 41h15v7a5 5 0 0 1-5 5h-5a5 5 0 0 1-5-5z" fill="#17172A"/><path d="M104 41h15v7a5 5 0 0 1-5 5h-5a5 5 0 0 1-5-5z" fill="#17172A"/><path d="M96 43h8" stroke="#17172A" stroke-width="2.5"/></sc-if>
+              <sc-if value="{{it.k.round}}" hint-placeholder-val="{{ false }}"><circle cx="91" cy="47" r="7" fill="none" stroke="#C9A227" stroke-width="2.5"/><circle cx="109" cy="47" r="7" fill="none" stroke="#C9A227" stroke-width="2.5"/></sc-if>
+              <sc-if value="{{it.k.star}}" hint-placeholder-val="{{ false }}"><path d="M91 37l3 6.5 7 .8-5.2 4.8 1.4 7L91 52.6l-6.2 3.5 1.4-7L81 44.3l7-.8z" fill="#FF5C8A"/><path d="M109 37l3 6.5 7 .8-5.2 4.8 1.4 7L109 52.6l-6.2 3.5 1.4-7L99 44.3l7-.8z" fill="#FF5C8A"/></sc-if>
+              <sc-if value="{{it.k.d3}}" hint-placeholder-val="{{ false }}"><rect x="78" y="40" width="44" height="14" rx="2" fill="#F4F4F6"/><rect x="81" y="42.5" width="16" height="9" fill="#E5484D"/><rect x="103" y="42.5" width="16" height="9" fill="#A78BFA"/></sc-if>
+              <sc-if value="{{it.k.ski}}" hint-placeholder-val="{{ false }}"><rect x="78" y="38" width="44" height="16" rx="8" fill="#FF8A3D"/><rect x="81" y="41" width="38" height="10" rx="5" fill="#A78BFA"/></sc-if>
+              <sc-if value="{{it.k.stache}}" hint-placeholder-val="{{ false }}"><ellipse cx="91" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><ellipse cx="109" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><path d="M88 55Q94 49 100 53Q106 49 112 55Q107 59 100 56Q93 59 88 55Z" fill="#241811"/></sc-if>
+            </svg>
+          </sc-if>
+          <span style="font-size: 11px; font-weight: 700; line-height: 1.2; color: #F4F4FA; text-align: center; height: 27px; overflow: hidden">{{it.name}}</span>
+          <span style="{{it.labelStyle}}">
+            <sc-if value="{{it.isCoins}}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/></svg></sc-if>
+            <sc-if value="{{it.isReward}}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></sc-if>
+            {{it.label}}
+          </span>
+        </button>
+      </sc-for>
+      </div>
+    </div>
+  <div style="flex: none;  display: flex; align-items: center; gap: 10px; min-height: 48px">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0">
+      <span style="font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{selName}}</span>
+      <span style="font-size: 12px; color: #A3A3C2">{{selHint}}</span>
+    </div>
+    <sc-if value="{{showEquip}}" hint-placeholder-val="{{ true }}">
+      <button type="button" onClick="{{doEquip}}" style="height: 46px; padding: 0 18px; border: 0; border-radius: 12px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px; cursor: pointer; box-shadow: 0 4px 0 #0E8FA3">EQUIPAR</button>
+    </sc-if>
+    <sc-if value="{{showEquipped}}" hint-placeholder-val="{{ false }}">
+      <span style="display: flex; align-items: center; height: 46px; padding: 0 16px; border-radius: 12px; border: 1px solid #2E2E52; color: #A3A3C2; font-weight: 700; font-size: 13px">Equipado</span>
+    </sc-if>
+    <sc-if value="{{showBuy}}" hint-placeholder-val="{{ false }}">
+      <button type="button" onClick="{{doBuy}}" style="{{buyStyle}}">COMPRAR · {{selPrice}}</button>
+    </sc-if>
+    <sc-if value="{{showReward}}" hint-placeholder-val="{{ false }}">
+      <a href="{{rewardHref}}" style="display: flex; align-items: center; height: 46px; padding: 0 14px; border-radius: 12px; border: 1.5px solid #22D3EE; color: #22D3EE; text-decoration: none; font-weight: 700; font-size: 13px">Cómo conseguirlo</a>
+    </sc-if>
+    <sc-if value="{{showPremium}}" hint-placeholder-val="{{ false }}">
+      <a href="Tienda.dc.html" style="display: flex; align-items: center; height: 46px; padding: 0 16px; border-radius: 12px; background: #FF8A3D; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px">[PRECIO]</a>
+    </sc-if>
+  </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      sport: 'futbol',
+      cat: 'equipos',
+      league: { futbol: 0, basket: 0, beisbol: 0, voley: 0 },
+      preview: null,
+      coins: 2450,
+      bought: [],
+      equip: {
+        futbol: { equipos: 'futbol-0-0', cabeza: 'h0', cara: 'f0', calzado: 's1' },
+        basket: { equipos: 'basket-0-0', cabeza: 'h9', cara: 'f0', calzado: 's2' },
+        beisbol: { equipos: 'beisbol-0-0', cabeza: 'h1', cara: 'f1', calzado: 's2' },
+        voley: { equipos: 'voley-0-0', cabeza: 'h0', cara: 'f0', calzado: 's1' }
+      }
+    };
+  }
+  leagues() {
+    const W = '#F4F4F6', K = '#141B2D';
+    return {
+      futbol: [
+        { name: 'Liga España', country: 'España', teams: [
+          ['Madrid Blanco', W, '#C9A227', 'solid', W, W], ['Barcelona Azulgrana', '#A50044', '#1A3E8C', 'stripes', '#1A3E8C', '#1A3E8C'],
+          ['Madrid Rojiblanco', '#CB3524', W, 'stripes', '#272E61', '#CB3524'], ['Bilbao Rojiblanco', '#EE2523', W, 'stripes', K, K],
+          ['Sevilla Verdiblanco', '#0BB363', W, 'stripes', W, '#0BB363'], ['Sevilla Blanco', W, '#D4021D', 'solid', W, '#D4021D'],
+          ['Valencia Blanquinegro', W, K, 'solid', K, K], ['Villarreal Amarillo', '#FFE135', '#005187', 'solid', '#005187', '#FFE135'],
+          ['San Sebastián Albiazul', '#0067B1', W, 'stripes', W, W], ['Vigo Celeste', '#8AC3EE', W, 'solid', W, '#8AC3EE'],
+          ['Pamplona Rojo', '#D91A21', '#0A346F', 'solid', '#0A346F', '#0A346F'], ['Girona Franjas', '#E30613', W, 'stripes', '#E30613', '#E30613'],
+          ['Getafe Azul', '#005999', W, 'solid', '#005999', '#005999'], ['Vallecas Franja Roja', W, '#E30613', 'sash', W, W],
+          ['Vitoria Albiazul', '#0761AF', W, 'stripes', '#0761AF', W], ['Mallorca Bermellón', '#E20613', K, 'solid', K, K],
+          ['Barcelona Blanquiazul', '#007FC8', W, 'stripes', '#007FC8', W], ['Valencia Azulgrana', '#B4053F', '#004D98', 'stripes', '#004D98', '#004D98'],
+          ['Elche Franja Verde', W, '#05642C', 'band', '#05642C', W], ['Oviedo Azul', '#0050A0', W, 'solid', W, '#0050A0']] },
+        { name: 'Liga Inglaterra', country: 'Inglaterra', teams: [
+          ['North London Rojo', '#EF0107', W, 'solid', W, '#EF0107'], ['Aston Granate', '#670E36', '#95BFE5', 'solid', W, '#95BFE5'],
+          ['Bournemouth Rojinegro', '#DA291C', K, 'stripes', K, K], ['Brentford Rojiblanco', '#E30613', W, 'stripes', K, K],
+          ['Brighton Albiazul', '#0057B8', W, 'stripes', '#0057B8', W], ['Burnley Clarete', '#6C1D45', '#99D6EA', 'solid', W, W],
+          ['London Azul', '#034694', W, 'solid', '#034694', W], ['South London Rojiazul', '#1B458F', '#C4122E', 'stripes', '#1B458F', '#1B458F'],
+          ['Merseyside Azul', '#003399', W, 'solid', W, W], ['Fulham Blanco', W, K, 'solid', K, W],
+          ['Leeds Blanco', W, '#1D428A', 'solid', W, W], ['Merseyside Rojo', '#C8102E', '#F6EB61', 'solid', '#C8102E', '#C8102E'],
+          ['Manchester Celeste', '#6CABDD', '#1C2C5B', 'solid', W, '#6CABDD'], ['Manchester Rojo', '#DA291C', K, 'solid', W, K],
+          ['Newcastle Blanquinegro', K, W, 'stripes', K, K], ['Nottingham Rojo', '#DD0000', W, 'solid', W, '#DD0000'],
+          ['Sunderland Rojiblanco', '#EB172B', W, 'stripes', K, '#EB172B'], ['North London Blanco', W, '#132257', 'solid', '#132257', W],
+          ['East London Granate', '#7A263A', '#1BB1E7', 'solid', W, W], ['Wolverhampton Oro', '#FDB913', K, 'solid', K, '#FDB913']] },
+        { name: 'Liga Italia', country: 'Italia', teams: [
+          ['Bergamo Nerazzurro', '#1E71B8', K, 'stripes', K, K], ['Bologna Rossoblù', '#A21C26', '#1A2F48', 'stripes', W, '#1A2F48'],
+          ['Cagliari Rossoblù', '#B01028', '#002350', 'halves', W, '#002350'], ['Como Azzurro', '#1B3F8F', W, 'solid', W, '#1B3F8F'],
+          ['Cremona Grigiorossa', '#8A8D8F', '#C8102E', 'stripes', W, '#8A8D8F'], ['Firenze Viola', '#482E92', W, 'solid', W, '#482E92'],
+          ['Genova Rossoblù', '#A21C26', '#002350', 'halves', W, K], ['Verona Gialloblù', '#1E3B8B', '#FFD200', 'solid', '#1E3B8B', '#1E3B8B'],
+          ['Milano Nerazzurro', '#0068A8', K, 'stripes', K, K], ['Torino Bianconero', K, W, 'stripes', W, W],
+          ['Roma Biancoceleste', '#87D8F7', W, 'solid', W, '#87D8F7'], ['Lecce Giallorosso', '#FFDD00', '#E30613', 'stripes', '#002350', '#002350'],
+          ['Milano Rossonero', '#FB090B', K, 'stripes', W, K], ['Napoli Azzurro', '#12A0D7', W, 'solid', W, '#12A0D7'],
+          ['Parma Crociato', W, K, 'centre', K, K], ['Pisa Nerazzurro', K, '#004F9F', 'stripes', K, K],
+          ['Roma Giallorosso', '#8E1F2F', '#F0BC42', 'solid', '#8E1F2F', '#8E1F2F'], ['Sassuolo Neroverde', '#00A752', K, 'stripes', K, K],
+          ['Torino Granata', '#8A1E03', W, 'solid', W, '#8A1E03'], ['Udine Bianconero', W, K, 'stripes', K, W]] },
+        { name: 'Liga Alemania', country: 'Alemania', teams: [
+          ['Múnich Rojo', '#DC052D', W, 'solid', '#DC052D', '#DC052D'], ['Dortmund Amarillo', '#FDE100', K, 'solid', K, '#FDE100'],
+          ['Leverkusen Rojinegro', '#E32221', K, 'solid', K, '#E32221'], ['Leipzig Blanco', W, '#DD0741', 'solid', W, W],
+          ['Stuttgart Blanco', W, '#E32219', 'band', W, W], ['Fráncfort Negro', K, '#E1000F', 'solid', K, K],
+          ['Friburgo Rojo', '#E2001A', K, 'solid', K, '#E2001A'], ['Hoffenheim Azul', '#1961B5', W, 'solid', '#1961B5', '#1961B5'],
+          ['Maguncia Rojo', '#ED1C24', W, 'solid', W, '#ED1C24'], ['Wolfsburgo Verde', '#65B32E', W, 'solid', W, '#65B32E'],
+          ['Gladbach Blanco', W, '#00A650', 'solid', K, W], ['Berlín Rojo', '#EB1923', W, 'solid', W, '#EB1923'],
+          ['Bremen Verde', '#1D9053', W, 'solid', W, '#1D9053'], ['Augsburgo Blanco', W, '#BA3733', 'band', '#46714D', W],
+          ['Heidenheim Rojo', '#E2001A', '#003B79', 'solid', '#003B79', '#E2001A'], ['Hamburgo Marrón', '#624839', W, 'solid', '#624839', '#624839'],
+          ['Colonia Blanco', W, '#ED1C24', 'solid', W, W], ['Hamburgo Blanco', W, '#0A3F86', 'solid', '#E30613', W]] },
+        { name: 'Liga Francia', country: 'Francia', teams: [
+          ['París Azul', '#004170', '#DA291C', 'centre', '#004170', '#004170'], ['Marsella Blanco', W, '#2FAEE0', 'solid', W, W],
+          ['Mónaco Rojiblanco', '#E7172B', W, 'diag', W, '#E7172B'], ['Niza Rojinegro', '#E2001A', K, 'stripes', K, K],
+          ['Lille Rojo', '#E01E13', '#20325F', 'solid', '#20325F', '#E01E13'], ['Lyon Blanco', W, '#DA291C', 'solid', W, W],
+          ['Estrasburgo Azul', '#009FE3', W, 'solid', W, '#009FE3'], ['Lens Sangre y Oro', '#FFD100', '#E51E1E', 'solid', K, '#FFD100'],
+          ['Brest Rojo', '#E30613', W, 'solid', W, '#E30613'], ['Toulouse Violeta', '#6B2C91', W, 'solid', W, '#6B2C91'],
+          ['Auxerre Blanco', W, '#0058A8', 'solid', W, W], ['Rennes Rojinegro', '#E13327', K, 'solid', K, K],
+          ['Nantes Amarillo', '#FCDD09', '#00843D', 'solid', '#00843D', '#FCDD09'], ['Angers Blanquinegro', K, W, 'stripes', K, K],
+          ['Le Havre Celeste', '#87CEEB', '#0F2A55', 'halves', '#0F2A55', '#0F2A55'], ['Lorient Naranja', '#F58113', K, 'solid', K, '#F58113'],
+          ['París Marino', '#1B2A48', W, 'solid', '#1B2A48', '#1B2A48'], ['Metz Granate', '#7A1C2C', W, 'solid', W, '#7A1C2C']] }
+      ],
+      basket: [
+        { name: 'Liga Norteamérica', country: 'EE. UU. y Canadá', teams: [
+          ['Atlanta Rojo', '#E03A3E', '#C1D32F', 'solid', '#E03A3E', W], ['Boston Verde', '#007A33', W, 'solid', '#007A33', W],
+          ['Brooklyn Negro', K, W, 'solid', K, W], ['Charlotte Turquesa', '#00788C', '#1D1160', 'solid', '#00788C', W],
+          ['Chicago Rojo', '#CE1141', K, 'solid', '#CE1141', W], ['Cleveland Vino', '#860038', '#FDBB30', 'solid', '#860038', W],
+          ['Dallas Azul', '#00538C', '#B8C4CA', 'solid', '#00538C', W], ['Denver Marino', '#0E2240', '#FEC524', 'solid', '#0E2240', W],
+          ['Detroit Rojo', '#C8102E', '#1D42BA', 'solid', '#C8102E', W], ['San Francisco Oro', '#1D428A', '#FFC72C', 'solid', '#1D428A', W],
+          ['Houston Rojo', '#CE1141', K, 'solid', K, W], ['Indiana Marino', '#002D62', '#FDBB30', 'solid', '#002D62', W],
+          ['Los Angeles Rojo', '#C8102E', '#1D428A', 'solid', '#1D428A', W], ['Los Angeles Púrpura', '#FDB927', '#552583', 'solid', '#FDB927', W],
+          ['Memphis Azul', '#5D76A9', '#12173F', 'solid', '#5D76A9', W], ['Miami Rojo', '#98002E', '#F9A01B', 'solid', '#98002E', W],
+          ['Milwaukee Verde', '#00471B', '#EEE1C6', 'solid', '#00471B', W], ['Minnesota Medianoche', '#0C2340', '#78BE20', 'solid', '#0C2340', W],
+          ['Nueva Orleans Marino', '#0C2340', '#C8102E', 'solid', '#0C2340', W], ['Nueva York Naranjazul', '#006BB6', '#F58426', 'solid', '#006BB6', W],
+          ['Oklahoma Azul', '#007AC1', '#EF3B24', 'solid', '#007AC1', W], ['Orlando Azul', '#0077C0', K, 'pin', '#0077C0', W],
+          ['Filadelfia Azul', '#006BB6', '#ED174C', 'solid', W, W], ['Phoenix Púrpura', '#1D1160', '#E56020', 'solid', '#1D1160', W],
+          ['Portland Negro', K, '#E03A3E', 'solid', K, W], ['Sacramento Morado', '#5A2D81', '#63727A', 'solid', '#5A2D81', W],
+          ['San Antonio Plata', K, '#C4CED4', 'solid', K, W], ['Toronto Rojo', '#CE1141', K, 'solid', '#CE1141', W],
+          ['Utah Púrpura', '#753BBD', K, 'solid', '#753BBD', W], ['Washington Azul', '#002B5C', '#E31837', 'solid', '#002B5C', W]] },
+        { name: 'Liga Europa', country: 'Europa', teams: [
+          ['Estambul Azul', '#0055A5', W, 'solid', '#0055A5', W], ['Mónaco Rojo', '#E7172B', W, 'diag', '#E7172B', W],
+          ['Vitoria Azulgrana', '#003DA5', '#E2001A', 'solid', '#003DA5', W], ['Múnich Rojo', '#DC052D', W, 'solid', '#DC052D', W],
+          ['Belgrado Rojiblanco', '#E2001A', W, 'solid', '#E2001A', W], ['Dubái Negro', K, '#C9A227', 'solid', K, W],
+          ['Estambul Amarillo', '#002D72', '#FFED00', 'solid', '#002D72', W], ['Tel Aviv Rojo', '#E2001A', W, 'solid', '#E2001A', W],
+          ['Tel Aviv Amarillo', '#FFD100', '#003DA5', 'solid', '#FFD100', W], ['Milano Rosso', '#E2001A', W, 'solid', '#E2001A', W],
+          ['El Pireo Rojo', '#E2001A', W, 'solid', W, W], ['Atenas Verde', '#007A33', W, 'solid', '#007A33', W],
+          ['París Negro', K, '#F5B335', 'solid', K, W], ['Belgrado Negro', K, W, 'solid', K, W],
+          ['Madrid Blanco', W, '#5B2A86', 'solid', W, W], ['Barcelona Azulgrana', '#A50044', '#1A3E8C', 'halves', '#1A3E8C', W],
+          ['Valencia Naranja', '#F18A00', K, 'solid', '#F18A00', W], ['Bolonia Negro', K, W, 'solid', K, W],
+          ['Kaunas Verde', '#006633', W, 'solid', '#006633', W], ['Lyon Verde', '#00824C', W, 'solid', '#00824C', W]] },
+        { name: 'Liga España', country: 'España', teams: [
+          ['Madrid Blanco', W, '#5B2A86', 'solid', W, W], ['Barcelona Azulgrana', '#A50044', '#1A3E8C', 'halves', '#1A3E8C', W],
+          ['Valencia Naranja', '#F18A00', K, 'solid', '#F18A00', W], ['Málaga Verde', '#00843D', '#5B2A86', 'solid', '#00843D', W],
+          ['Murcia Rojo', '#C8102E', W, 'solid', '#C8102E', W], ['Vitoria Azulgrana', '#003DA5', '#E2001A', 'solid', '#003DA5', W],
+          ['Tenerife Aurinegro', '#FFD100', K, 'solid', K, W], ['Badalona Verdinegro', '#00843D', K, 'solid', '#00843D', W],
+          ['Gran Canaria Amarillo', '#FFD100', '#003DA5', 'solid', '#FFD100', W], ['Manresa Rojinegro', '#E2001A', K, 'solid', K, W],
+          ['Lugo Celeste', '#6CB4E4', W, 'solid', '#6CB4E4', W], ['Zaragoza Rojo', '#E2001A', '#FFD100', 'solid', '#E2001A', W],
+          ['Andorra Azul', '#002F6C', '#E2001A', 'solid', '#002F6C', W], ['Girona Rojiblanco', '#E30613', W, 'solid', '#E30613', W],
+          ['Bilbao Negro', K, W, 'solid', K, W], ['Lleida Azul', '#0055A5', W, 'solid', '#0055A5', W],
+          ['Coruña Blanquiazul', W, '#0055A5', 'solid', W, W], ['Burgos Azul', '#003DA5', W, 'solid', '#003DA5', W]] },
+        { name: 'Liga Italia', country: 'Italia', teams: [
+          ['Milano Rosso', '#E2001A', W, 'solid', '#E2001A', W], ['Bologna Nero', K, W, 'solid', K, W],
+          ['Trento Bianconero', W, K, 'solid', W, W], ['Brescia Blu', '#003DA5', W, 'solid', '#003DA5', W],
+          ['Venezia Granata', '#8B0F28', '#C9A227', 'solid', '#8B0F28', W], ['Tortona Bianco', W, '#E2001A', 'solid', W, W],
+          ['Reggio Emilia Granata', '#8B0F28', W, 'solid', '#8B0F28', W], ['Trapani Granata', '#7A1C2C', '#C9A227', 'solid', '#7A1C2C', W],
+          ['Sassari Blu', '#00539F', W, 'solid', '#00539F', W], ['Napoli Azzurro', '#12A0D7', W, 'solid', '#12A0D7', W],
+          ['Treviso Bianco', W, '#E2001A', 'solid', W, W], ['Varese Rosso', '#E2001A', W, 'solid', '#E2001A', W],
+          ['Cremona Bianco', W, '#003DA5', 'solid', W, W], ['Udine Bianconero', W, K, 'solid', K, W],
+          ['Cantù Blu', '#003DA5', W, 'solid', '#003DA5', W], ['Trieste Rosso', '#C8102E', W, 'solid', '#C8102E', W]] },
+        { name: 'Liga Turquía', country: 'Turquía', teams: [
+          ['Estambul Azul', '#0055A5', W, 'solid', '#0055A5', W], ['Estambul Amarillo', '#002D72', '#FFED00', 'solid', '#002D72', W],
+          ['Estambul Negro', K, W, 'solid', K, W], ['Estambul Rojo-Oro', '#A90432', '#FDB912', 'halves', '#A90432', W],
+          ['Ankara Magenta', '#E4007C', W, 'solid', '#E4007C', W], ['İzmir Verde', '#009639', '#E30613', 'halves', '#009639', W],
+          ['Bursa Azul', '#0055A5', W, 'solid', '#0055A5', W], ['Bahçeşehir Turquesa', '#00A6A6', W, 'solid', '#00A6A6', W],
+          ['Aliağa Azul', '#1E5AA8', '#F28C00', 'solid', '#1E5AA8', W], ['Manisa Rojo', '#C8102E', K, 'solid', '#C8102E', W],
+          ['Büyükçekmece Naranja', '#F28C00', K, 'solid', K, W], ['Denizli Blanco', W, '#003DA5', 'solid', W, W],
+          ['Trabzon Granate', '#8B1F3F', '#5DADE2', 'halves', '#8B1F3F', W], ['Bursa Verde', '#00843D', W, 'solid', '#00843D', W],
+          ['Mersin Azul', '#003DA5', '#E30613', 'solid', '#003DA5', W], ['Esenler Rojo', '#E30613', W, 'solid', '#E30613', W]] }
+      ],
+      beisbol: [
+        { name: 'Liga EE. UU.', country: 'EE. UU. y Canadá', teams: [
+          ['Arizona Granate', W, '#A71930', 'solid', W, '#A71930'], ['Atlanta Marino', W, '#13274F', 'solid', W, '#CE1141'],
+          ['Baltimore Naranja', W, '#DF4601', 'solid', W, K], ['Boston Rojo', W, '#BD3039', 'solid', W, '#BD3039'],
+          ['Chicago Azul', W, '#0E3386', 'pin', W, '#0E3386'], ['Chicago Negro', W, K, 'pin', W, K],
+          ['Cincinnati Rojo', W, '#C6011F', 'solid', W, '#C6011F'], ['Cleveland Marino', W, '#0C2340', 'solid', W, '#E31937'],
+          ['Colorado Púrpura', W, '#33006F', 'pin', W, K], ['Detroit Marino', W, '#0C2340', 'solid', W, '#0C2340'],
+          ['Houston Naranja', W, '#EB6E1F', 'solid', W, '#002D62'], ['Kansas City Azul', W, '#004687', 'solid', W, '#004687'],
+          ['Anaheim Rojo', W, '#BA0021', 'solid', W, '#BA0021'], ['Los Angeles Azul', W, '#005A9C', 'solid', W, '#005A9C'],
+          ['Miami Celeste', W, '#00A3E0', 'solid', W, K], ['Milwaukee Azul', W, '#12284B', 'solid', W, '#FFC52F'],
+          ['Minnesota Marino', W, '#002B5C', 'pin', W, '#D31145'], ['Nueva York Rayas', W, '#0C2340', 'pin', W, '#0C2340'],
+          ['Nueva York Naranja', W, '#002D72', 'pin', W, '#FF5910'], ['Sacramento Verde', W, '#003831', 'solid', W, '#EFB21E'],
+          ['Filadelfia Rojo', W, '#E81828', 'pin', W, '#E81828'], ['Pittsburgh Oro', W, K, 'solid', W, '#FDB827'],
+          ['San Diego Marrón', W, '#2F241D', 'pin', W, '#FFC425'], ['San Francisco Naranja', '#EFE6D2', '#FD5A1E', 'solid', '#EFE6D2', K],
+          ['Seattle Turquesa', W, '#005C5C', 'solid', W, '#0C2C56'], ['St. Louis Rojo', W, '#C41E3A', 'solid', W, '#C41E3A'],
+          ['Tampa Azul', W, '#092C5C', 'solid', W, '#8FBCE6'], ['Texas Azul', W, '#003278', 'solid', W, '#C0111F'],
+          ['Toronto Azul', W, '#134A8E', 'solid', W, '#134A8E'], ['Washington Rojo', W, '#AB0003', 'solid', W, '#14225A']] },
+        { name: 'Liga Japón', country: 'Japón', teams: [
+          ['Tokio Naranja', W, '#F97709', 'solid', W, K], ['Osaka Rayas', W, K, 'pin', W, '#FFE201'],
+          ['Yokohama Azul', W, '#0055A5', 'solid', W, '#0055A5'], ['Hiroshima Rojo', W, '#E60033', 'solid', W, '#E60033'],
+          ['Tokio Verde', W, '#00AB5C', 'solid', W, '#0B2B5C'], ['Nagoya Azul', W, '#002569', 'solid', W, '#002569'],
+          ['Fukuoka Amarillo', W, '#F9C304', 'solid', W, K], ['Hokkaidō Azul', W, '#006298', 'solid', W, '#006298'],
+          ['Osaka Marino', W, '#000E4A', 'solid', W, '#B08F26'], ['Chiba Negro', W, K, 'pin', W, K],
+          ['Sendai Carmesí', W, '#860010', 'solid', W, '#860010'], ['Saitama Azul', W, '#1F366A', 'solid', W, '#1F366A']] },
+        { name: 'Liga Corea', country: 'Corea del Sur', teams: [
+          ['Seúl Granate', W, '#C30452', 'pin', W, K], ['Seúl Marino', W, '#131230', 'solid', W, '#131230'],
+          ['Seúl Borgoña', W, '#820024', 'solid', W, '#820024'], ['Incheon Rojo', W, '#CE0E2D', 'solid', W, '#FFB81C'],
+          ['Suwon Negro', W, K, 'solid', W, '#EB1C24'], ['Daejeon Naranja', W, '#FC4E00', 'solid', W, K],
+          ['Daegu Azul', W, '#074CA1', 'solid', W, '#074CA1'], ['Changwon Azul', W, '#315288', 'solid', W, '#AF917B'],
+          ['Busan Marino', W, '#041E42', 'solid', W, '#D00F31'], ['Gwangju Rojo', W, '#EA0029', 'solid', W, K]] },
+        { name: 'Liga Taiwán', country: 'Taiwán', teams: [
+          ['Taichung Amarillo', '#FFD100', K, 'solid', W, K], ['Tainan Naranja', '#F5821F', W, 'solid', W, '#F5821F'],
+          ['Taoyuan Carmesí', '#85002A', W, 'solid', W, '#85002A'], ['Xinzhuang Azul', '#004B97', W, 'solid', W, '#004B97'],
+          ['Tianmu Rojo', '#E50012', W, 'solid', W, '#E50012'], ['Kaohsiung Verde', '#00563F', W, 'solid', W, '#00563F']] },
+        { name: 'Liga México', country: 'México', teams: [
+          ['Monterrey Azul', '#002D72', '#E31837', 'solid', W, '#002D72'], ['Monclova Púrpura', '#4B2E83', W, 'solid', W, '#4B2E83'],
+          ['Tijuana Negro', K, '#C8102E', 'solid', W, K], ['Torreón Verde', '#00843D', W, 'solid', W, '#00843D'],
+          ['Chihuahua Oro', '#C9A227', K, 'solid', W, K], ['Jalisco Azul', '#00205B', '#C9A227', 'solid', W, '#00205B'],
+          ['Laredo Rojo', '#C8102E', '#002D72', 'solid', W, '#C8102E'], ['Aguascalientes Azul', '#0055A5', '#E30613', 'solid', W, '#0055A5'],
+          ['Saltillo Rojiazul', '#002D72', '#E31837', 'pin', W, '#E31837'], ['Durango Naranja', '#F28C00', K, 'solid', W, K],
+          ['Ciudad de México Rojo', '#E31837', K, 'solid', W, '#E31837'], ['Yucatán Rojo', '#E31837', '#FFD100', 'solid', W, '#E31837'],
+          ['Puebla Verde', '#00843D', W, 'solid', W, '#00843D'], ['Tabasco Rojo', '#C8102E', '#00843D', 'solid', W, '#C8102E'],
+          ['Campeche Negro', K, '#E31837', 'solid', W, K], ['Oaxaca Granate', '#7A1C2C', W, 'solid', W, '#7A1C2C'],
+          ['Cancún Naranja', '#F28C00', '#002D72', 'solid', W, '#F28C00'], ['Veracruz Azul', '#003DA5', '#E31837', 'solid', W, '#003DA5'],
+          ['León Marino', '#14225A', '#E31837', 'solid', W, '#14225A'], ['Querétaro Morado', '#5A2D81', W, 'solid', W, '#5A2D81']] }
+      ],
+      voley: [
+        { name: 'Liga Italia', country: 'Italia', teams: [
+          ['Perugia Rosso', '#E30613', K, 'solid', K, '#E30613'], ['Trento Giallo', '#FFD100', '#003DA5', 'solid', '#003DA5', '#FFD100'],
+          ['Civitanova Bianco', W, '#E30613', 'solid', '#E30613', W], ['Milano Blu', '#003DA5', W, 'solid', '#003DA5', '#003DA5'],
+          ['Modena Giallo', '#FFD100', '#00309A', 'solid', '#00309A', '#FFD100'], ['Piacenza Rosso', '#E30613', W, 'solid', W, '#E30613'],
+          ['Monza Blu', '#1E3B8B', '#FFD100', 'solid', '#1E3B8B', '#1E3B8B'], ['Verona Blu', '#002B5C', '#FFD200', 'solid', '#002B5C', '#002B5C'],
+          ['Padova Bianco', W, '#E30613', 'solid', W, W], ['Cisterna Verde', '#00843D', W, 'solid', '#00843D', '#00843D'],
+          ['Grottazzolina Arancio', '#F28C00', K, 'solid', K, '#F28C00'], ['Cuneo Bianco', W, '#003DA5', 'solid', '#003DA5', W]] },
+        { name: 'Liga Polonia', country: 'Polonia', teams: [
+          ['Jastrzębie Naranja', '#F28C00', K, 'solid', K, '#F28C00'], ['Kędzierzyn Azul', '#003DA5', '#E30613', 'solid', '#003DA5', '#003DA5'],
+          ['Varsovia Amarillo', '#FFD100', K, 'solid', K, '#FFD100'], ['Zawiercie Azul', '#0055A5', '#FFD100', 'solid', '#0055A5', '#0055A5'],
+          ['Rzeszów Rojo', '#E30613', W, 'solid', '#E30613', '#E30613'], ['Lublin Negro', K, '#E30613', 'solid', K, K],
+          ['Gdańsk Amarillo', '#FFD100', '#0055A5', 'solid', '#0055A5', '#FFD100'], ['Bełchatów Amarillo', '#FFD100', K, 'stripes', K, K],
+          ['Suwałki Rojo', '#C8102E', W, 'solid', W, '#C8102E'], ['Leópolis Azul', '#0055A5', '#FFD100', 'halves', '#0055A5', '#0055A5'],
+          ['Katowice Verde', '#00843D', '#FFD100', 'solid', '#00843D', '#00843D'], ['Częstochowa Rojo', '#E30613', '#003DA5', 'solid', '#003DA5', '#E30613'],
+          ['Nysa Azul', '#003DA5', W, 'solid', W, '#003DA5'], ['Olsztyn Verde', '#00843D', W, 'solid', W, '#00843D'],
+          ['Radom Negro', K, '#00843D', 'solid', K, K], ['Bydgoszcz Azul', '#1E5AA8', W, 'solid', '#1E5AA8', '#1E5AA8']] },
+        { name: 'Liga Turquía', country: 'Turquía', teams: [
+          ['Ankara Azul', '#0055A5', W, 'solid', '#0055A5', '#0055A5'], ['Estambul Amarillo', '#002D72', '#FFED00', 'stripes', '#002D72', '#002D72'],
+          ['Estambul Rojo-Oro', '#A90432', '#FDB912', 'halves', '#A90432', '#A90432'], ['Ankara Rojo', '#E30613', W, 'solid', '#E30613', '#E30613'],
+          ['İzmir Azul', '#0A4D8C', '#F28C00', 'solid', '#0A4D8C', '#0A4D8C'], ['Ankara Negro', K, '#E30613', 'solid', K, K],
+          ['Konya Verde', '#00843D', W, 'solid', '#00843D', '#00843D'], ['Cizre Rojo', '#C8102E', '#FFD100', 'solid', '#C8102E', '#C8102E'],
+          ['Alanya Naranja', '#F28C00', W, 'solid', W, '#F28C00'], ['Tokat Azul', '#1E5AA8', W, 'solid', '#1E5AA8', '#1E5AA8'],
+          ['Bursa Verde', '#00843D', K, 'solid', K, '#00843D'], ['Gebze Azul', '#003DA5', '#FFD100', 'solid', '#003DA5', '#003DA5'],
+          ['Alanya Azul', '#002D72', '#E30613', 'solid', '#002D72', '#002D72'], ['Yozgat Rojo', '#E30613', K, 'solid', K, '#E30613']] },
+        { name: 'Liga Brasil', country: 'Brasil', teams: [
+          ['Belo Horizonte Azul', '#003DA5', W, 'solid', W, '#003DA5'], ['Belo Horizonte Blanco', W, '#003DA5', 'solid', '#003DA5', W],
+          ['São Paulo Rojo', '#E30613', W, 'solid', W, '#E30613'], ['Campinas Naranja', '#F28C00', K, 'solid', K, '#F28C00'],
+          ['Suzano Verde', '#00843D', W, 'solid', W, '#00843D'], ['Guarulhos Negro', K, '#E30613', 'solid', K, K],
+          ['Joinville Rojo', '#C8102E', W, 'solid', W, '#C8102E'], ['Uberlândia Azul', '#1E5AA8', '#FFD100', 'solid', '#1E5AA8', '#1E5AA8'],
+          ['Monte Carmelo Verde', '#00843D', '#FFD100', 'solid', '#00843D', '#00843D'], ['Goiânia Verde', '#007A33', W, 'solid', W, '#007A33'],
+          ['São José Azul', '#003DA5', '#E30613', 'solid', '#003DA5', '#003DA5'], ['Montes Claros Rojo', '#E30613', K, 'solid', K, '#E30613']] },
+        { name: 'Liga Japón', country: 'Japón', teams: [
+          ['Osaka Ámbar', '#FFB81C', K, 'solid', K, '#FFB81C'], ['Osaka Azul', '#003DA5', W, 'solid', '#003DA5', '#003DA5'],
+          ['Nagoya Negro', K, '#E30613', 'solid', K, K], ['Aichi Rojo', '#E30613', W, 'solid', '#E30613', '#E30613'],
+          ['Tokio Verde', '#00843D', W, 'solid', '#00843D', '#00843D'], ['Hiroshima Púrpura', '#4B2E83', '#FFD100', 'solid', '#4B2E83', '#4B2E83'],
+          ['Shizuoka Azul', '#1E5AA8', W, 'solid', '#1E5AA8', '#1E5AA8'], ['Sakai Naranja', '#F28C00', '#003DA5', 'solid', '#003DA5', '#F28C00'],
+          ['Nagano Rojo', '#C8102E', W, 'solid', W, '#C8102E'], ['Hokkaidō Celeste', '#5DADE2', '#002D72', 'solid', '#002D72', '#5DADE2']] }
+      ]
+    };
+  }
+  extras() {
+    return {
+      cabeza: [
+        { id: 'h0', name: 'Ninguno', kind: 'none', st: 'owned' },
+        { id: 'h9', name: 'Cinta Volt', kind: 'band', color: '#C8F031', st: 'owned' },
+        { id: 'h1', name: 'Gorra', kind: 'cap', color: '#2F4BA8', st: 'owned' },
+        { id: 'h2', name: 'Sombrero de copa', kind: 'top', st: 'coins', price: 900 },
+        { id: 'h3', name: 'Gorro de chef', kind: 'chef', st: 'coins', price: 700 },
+        { id: 'h4', name: 'Casco vikingo', kind: 'viking', st: 'reward', req: 'Oro 1', how: 'rank' },
+        { id: 'h5', name: 'Gorro hélice', kind: 'prop', st: 'coins', price: 600 },
+        { id: 'h6', name: 'Corona', kind: 'crown', st: 'premium' },
+        { id: 'h7', name: 'Brote', kind: 'sprout', st: 'reward', req: '10 victorias', how: 'wins' },
+        { id: 'h8', name: 'Auriculares', kind: 'phones', st: 'coins', price: 800 }
+      ],
+      cara: [
+        { id: 'f0', name: 'Ninguno', kind: 'none', st: 'owned' },
+        { id: 'f1', name: 'Gafas de sol', kind: 'sun', st: 'owned' },
+        { id: 'f2', name: 'Gafas redondas', kind: 'round', st: 'coins', price: 500 },
+        { id: 'f3', name: 'Gafas estrella', kind: 'star', st: 'coins', price: 650 },
+        { id: 'f4', name: 'Gafas 3D', kind: 'd3', st: 'reward', req: 'Plata 1', how: 'rank' },
+        { id: 'f5', name: 'Máscara de esquí', kind: 'ski', st: 'coins', price: 750 },
+        { id: 'f6', name: 'Bigote', kind: 'stache', st: 'premium' }
+      ],
+      calzado: [
+        { id: 's1', name: 'Volt', color: '#C8F031', st: 'owned' },
+        { id: 's2', name: 'Blanco', color: '#F2F5FA', st: 'owned' },
+        { id: 's3', name: 'Naranja', color: '#FF8A3D', st: 'coins', price: 900 },
+        { id: 's4', name: 'Carmesí', color: '#E5484D', st: 'reward', req: '10 victorias', how: 'wins' },
+        { id: 's5', name: 'Celeste', color: '#3EA6FF', st: 'coins', price: 700 },
+        { id: 's6', name: 'Oro', color: '#FFC53D', st: 'premium' }
+      ]
+    };
+  }
+  initials(n) {
+    return n.split(' ').filter((w) => w.length > 2 || /^[A-ZÁÉÍÓÚ]/.test(w)).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+  }
+  crestVariants(L) {
+    if (this._cv) return this._cv;
+    const seen = {}, out = {};
+    const byName = {};
+    Object.keys(L).forEach((sp) => L[sp].forEach((lg, li) => lg.teams.forEach((t, ti) => {
+      if (byName[t[0]] === undefined) {
+        const ini = this.initials(t[0]);
+        const h = ini.split('').reduce((a, ch) => a + ch.charCodeAt(0) * 7, 0);
+        const g = seen[ini] = (seen[ini] ?? -1) + 1;
+        byName[t[0]] = (h + g) % 18;
+      }
+      out[sp + '-' + li + '-' + ti] = byName[t[0]];
+    })));
+    this._cv = out;
+    return out;
+  }
+  teamItem(sport, li, ti, L) {
+    const t = L[sport][li].teams[ti];
+    const rules = [
+      { st: 'owned' }, { st: 'coins', price: 1500 }, { st: 'coins', price: 1500 },
+      { st: 'reward', req: 'Plata 1', how: 'rank' }, { st: 'coins', price: 1200 }, { st: 'premium' }
+    ];
+    const crest = this.initials(t[0]);
+    const v = this.crestVariants(L)[sport + '-' + li + '-' + ti];
+    const crestShape = ['shield', 'circle', 'diamond'][v % 3];
+    const crestMark = ['star', 'bolt', 'crown', 'none', 'ball', 'moon'][Math.floor(v / 3) % 6];
+    return { id: sport + '-' + li + '-' + ti, crest, crestShape, crestMark, name: t[0], primary: t[1], secondary: t[2], pattern: t[3], shorts: t[4], socks: t[5], ...rules[ti % rules.length] };
+  }
+  jerseyBg(p, s, pat) {
+    if (pat === 'stripes') return 'repeating-linear-gradient(90deg, ' + p + ' 0 6px, ' + s + ' 6px 12px)';
+    if (pat === 'pin') return 'repeating-linear-gradient(90deg, ' + p + ' 0 5px, ' + s + ' 5px 6.5px)';
+    if (pat === 'hoops') return 'repeating-linear-gradient(0deg, ' + p + ' 0 6px, ' + s + ' 6px 12px)';
+    if (pat === 'band') return 'linear-gradient(0deg, ' + p + ' 50%, ' + s + ' 50% 64%, ' + p + ' 64%)';
+    if (pat === 'sash') return 'linear-gradient(135deg, ' + p + ' 38%, ' + s + ' 38% 58%, ' + p + ' 58%)';
+    if (pat === 'halves') return 'linear-gradient(90deg, ' + p + ' 50%, ' + s + ' 50%)';
+    if (pat === 'centre') return 'linear-gradient(90deg, ' + p + ' 38%, ' + s + ' 38% 62%, ' + p + ' 62%)';
+    if (pat === 'diag') return 'linear-gradient(135deg, ' + p + ' 50%, ' + s + ' 50%)';
+    return p;
+  }
+  fmt(n) {
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+  renderVals() {
+    const s = this.state;
+    const L = this.leagues();
+    const X = this.extras();
+    const sport = s.sport;
+    const eq = s.equip[sport];
+
+    const findItem = (cat, id) => {
+      if (cat === 'equipos') {
+        const [sp, li, ti] = id.split('-');
+        return this.teamItem(sp, Number(li), Number(ti), L);
+      }
+      return X[cat].find((i) => i.id === id);
+    };
+    const owned = (it) => it.st === 'owned' || s.bought.includes(it.id);
+
+    const outfit = { ...eq };
+    if (s.preview) outfit[s.preview.cat] = s.preview.id;
+    const kitItem = findItem('equipos', outfit.equipos);
+    const headItem = findItem('cabeza', outfit.cabeza);
+    const faceItem = findItem('cara', outfit.cara);
+    const shoeItem = findItem('calzado', outfit.calzado);
+    const kindMap = { none: 'none', band: 'band', cap: 'cap', top: 'top', chef: 'chef', viking: 'viking', prop: 'prop', crown: 'crown', sprout: 'sprout', phones: 'phones' };
+    const faceMap = { none: 'none', sun: 'sun', round: 'round', star: 'star', d3: '3d', ski: 'ski', stache: 'stache' };
+
+    const SPORTS = [
+      { id: 'futbol', label: 'Fútbol', num: '10' }, { id: 'basket', label: 'Basket', num: '23' },
+      { id: 'beisbol', label: 'Béisbol', num: '7' }, { id: 'voley', label: 'Vóley', num: '4' }
+    ];
+    const CATS = [
+      { id: 'equipos', label: 'Equipos' }, { id: 'cabeza', label: 'Cabeza' },
+      { id: 'cara', label: 'Cara' }, { id: 'calzado', label: 'Calzado' }
+    ];
+    const tab = (on) => 'min-height: 40px; padding: 0 4px; border-radius: 12px; font: 800 13px Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14; border: 0; box-shadow: 0 3px 0 #0E8FA3;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E52;');
+    const chip = (on) => 'min-height: 40px; padding: 0 4px; border-radius: 20px; font: 700 12px Manrope, sans-serif; cursor: pointer; background: transparent; ' + (on ? 'color: #F4F4FA; border: 1.5px solid #F4F4FA;' : 'color: #A3A3C2; border: 1.5px solid #2E2E52;');
+    const lchip = (on) => 'flex: none; min-height: 36px; padding: 0 12px; border-radius: 18px; font: 700 12px Manrope, sans-serif; cursor: pointer; white-space: nowrap; ' + (on ? 'background: #1E1A3A; color: #22D3EE; border: 1.5px solid #22D3EE;' : 'background: #17172A; color: #CACAE0; border: 1.5px solid #26264A;');
+
+    const sports = SPORTS.map((sp) => ({ label: sp.label, style: tab(sp.id === sport), pick: () => this.setState({ sport: sp.id, preview: null }) }));
+    const cats = CATS.map((c) => ({ label: c.label, style: chip(c.id === s.cat), pick: () => this.setState({ cat: c.id, preview: null }) }));
+    const li = s.league[sport];
+    const leagues = L[sport].map((lg, i) => ({ name: lg.name, style: lchip(i === li), pick: () => this.setState({ league: { ...s.league, [sport]: i }, preview: null }) }));
+
+    const list = s.cat === 'equipos'
+      ? L[sport][li].teams.map((t, ti) => this.teamItem(sport, li, ti, L))
+      : X[s.cat];
+    const selId = s.preview && s.preview.cat === s.cat ? s.preview.id : eq[s.cat];
+    const items = list.map((it) => {
+      const own = owned(it);
+      const equipped = eq[s.cat] === it.id;
+      const sel = it.id === selId;
+      let label = 'En propiedad', color = '#A3A3C2';
+      if (equipped) { label = 'Equipado'; color = '#22D3EE'; }
+      else if (!own && it.st === 'coins') { label = this.fmt(it.price); color = '#FFC53D'; }
+      else if (!own && it.st === 'reward') { label = it.req; color = '#CACAE0'; }
+      else if (!own && it.st === 'premium') { label = '[PRECIO]'; color = '#FF8A3D'; }
+      const k = {};
+      ['none', 'band', 'cap', 'top', 'chef', 'viking', 'prop', 'crown', 'sprout', 'phones', 'sun', 'round', 'star', 'd3', 'ski', 'stache'].forEach((x) => { k[x] = it.kind === x; });
+      return {
+        name: it.name, label, color: it.color || '#2F4BA8', k,
+        isKit: s.cat === 'equipos', isShoe: s.cat === 'calzado', isHead: s.cat === 'cabeza' || s.cat === 'cara',
+        crest: it.crest || '',
+        crestStyle: s.cat === 'equipos' ? 'position: absolute; left: 24%; top: 28%; width: 13px; height: 13px; ' + ({ shield: 'border-radius: 2px 2px 7px 7px;', circle: 'border-radius: 50%;', diamond: 'clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);' })[it.crestShape] + ' background: ' + it.secondary + '; color: ' + it.primary + '; font: 800 6px Manrope, sans-serif; display: flex; align-items: center; justify-content: center; letter-spacing: -.3px;' : '',
+        jerseyStyle: s.cat === 'equipos' ? 'position: relative; display: block; width: 46px; height: 44px; background: ' + this.jerseyBg(it.primary, it.secondary, it.pattern) + '; clip-path: polygon(32% 0, 68% 0, 100% 18%, 88% 42%, 78% 36%, 78% 100%, 22% 100%, 22% 36%, 12% 42%, 0 18%); filter: drop-shadow(0 2px 0 #00000055);' : '',
+        isCoins: !own && it.st === 'coins',
+        isReward: !own && it.st === 'reward',
+        style: 'display: flex; flex-direction: column; align-items: center; gap: 4px; height: 104px; padding: 8px 4px 6px 4px; box-sizing: border-box; border-radius: 14px; font-family: Manrope, sans-serif; cursor: pointer; min-width: 0; ' + (sel ? 'background: #1E1A3A; border: 2px solid #22D3EE;' : 'background: #17172A; border: 2px solid #26264A;'),
+        labelStyle: 'display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 800; color: ' + color + ';',
+        pick: () => this.setState({ preview: { cat: s.cat, id: it.id } })
+      };
+    });
+
+    const selItem = findItem(s.cat, selId);
+    const selOwned = owned(selItem);
+    const selEquipped = eq[s.cat] === selItem.id;
+    const canAfford = selItem.st === 'coins' && s.coins >= selItem.price;
+    let selHint = 'En tu taquilla';
+    if (selEquipped) selHint = 'Lo llevas puesto';
+    else if (!selOwned && selItem.st === 'coins') selHint = canAfford ? 'Disponible por carrascos' : 'Te faltan carrascos';
+    else if (!selOwned && selItem.st === 'reward') selHint = selItem.how === 'rank' ? 'Recompensa: alcanza ' + selItem.req : 'Recompensa: gana ' + selItem.req;
+    else if (!selOwned && selItem.st === 'premium') selHint = 'Objeto premium';
+
+    const equipNow = (extra) => {
+      const equip = { ...s.equip, [sport]: { ...s.equip[sport], [s.cat]: selItem.id } };
+      this.setState({ equip, preview: null, ...(extra || {}) });
+    };
+    const sportObj = SPORTS.find((x) => x.id === sport);
+    const league = L[sport][Number(kitItem.id.split('-')[1])];
+
+    return {
+      coinsLabel: this.fmt(s.coins),
+      sports, cats, leagues, items,
+      isTeams: s.cat === 'equipos',
+      kit: kitItem,
+      kitName: kitItem.name + ' · ' + league.name,
+      shoe: shoeItem.color,
+      number: sportObj.num,
+      hat: kindMap[headItem.kind] || 'none',
+      hatColor: headItem.color || '#22D3EE',
+      face: faceMap[faceItem.kind] || 'none',
+      isPreviewing: !!s.preview && s.preview.id !== eq[s.preview.cat],
+      selName: selItem.name,
+      selHint,
+      selPrice: selItem.st === 'coins' ? this.fmt(selItem.price) + ' C' : '',
+      showEquipped: selEquipped,
+      showEquip: selOwned && !selEquipped,
+      showBuy: !selOwned && selItem.st === 'coins',
+      showReward: !selOwned && selItem.st === 'reward',
+      showPremium: !selOwned && selItem.st === 'premium',
+      rewardHref: selItem.how === 'rank' ? 'Rangos.dc.html' : 'Tienda.dc.html',
+      buyStyle: 'height: 46px; padding: 0 14px; border: 0; border-radius: 12px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: .5px; cursor: pointer; ' + (canAfford ? 'background: #FFC53D; color: #0B0B14; box-shadow: 0 4px 0 #A8771A;' : 'background: #2E2E52; color: #A3A3C2;'),
+      doEquip: () => equipNow(),
+      doBuy: () => {
+        if (!canAfford) return;
+        equipNow({ coins: s.coins - selItem.price, bought: [...s.bought, selItem.id] });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
