@@ -1,6 +1,6 @@
 /* Network-first so every update you publish reaches the phone; cache is the offline fallback. */
-const CACHE = 'arenamix-v37';
-const CORE = ['./', 'index.html', 'app.js', 'manifest.webmanifest', 'vendor/preact.min.js', 'vendor/three.min.js', 'icons/icon-192.png', 'icons/loading-stadium.jpg'];
+const CACHE = 'arenamix-v38';
+const CORE = ['./', 'index.html', 'app.js', 'manifest.webmanifest', 'vendor/preact.min.js', 'vendor/three.min.js', 'icons/icon-192.png', 'icons/loading-bg.jpg', 'vendor/fonts/knewave.woff2', 'vendor/fonts/rajdhani-500.woff2', 'vendor/fonts/rajdhani-600.woff2', 'vendor/fonts/rajdhani-700.woff2'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
