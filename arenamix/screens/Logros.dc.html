@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Logros</title>
+<script src="./support.js"></script>
+<script src="/_blob/de0c1b42c380e04fabb186f97a299f57"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#22D3EE}a:hover{color:#67E8F9}
+</style>
+</helmet>
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; box-sizing: border-box">
+  <div style="display: flex; align-items: center; gap: 10px; flex: none">
+    <a href="Perfil.dc.html" aria-label="Volver al perfil" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+    <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 28px; letter-spacing: 2px">LOGROS</span>
+    <span style="font-size: 13px; font-weight: 700; color: #A3A3C2">{{doneLabel}}</span>
+    <span style="margin-left: auto; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 12px; background: #17172A; font-weight: 800; font-size: 15px; color: #FFC53D"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#B8860B" stroke-width="2"/></svg>{{coins}}</span>
+  </div>
+  <div style="flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; padding-right: 2px">
+    <sc-for list="{{items}}" as="a" hint-placeholder-count="6">
+      <div style="{{a.style}}">
+        <div style="flex: none; width: 46px; height: 46px; border-radius: 12px; background: #0B0B14; display: flex; align-items: center; justify-content: center"><sc-if value="{{a.is_ball}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#F4F4FA"/><path d="M12 7l3 2.2-1.1 3.5h-3.8L9 9.2z" fill="#17172A"/></svg></sc-if><sc-if value="{{a.is_trophy}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M7 3h10v3h3v2a5 5 0 0 1-5 5h-.3A5 5 0 0 1 13 15v2h3v3H8v-3h3v-2a5 5 0 0 1-1.7-2H9a5 5 0 0 1-5-5V6h3z" fill="#FFC53D"/></svg></sc-if><sc-if value="{{a.is_goal}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M3 6h18v12h-2V8H5v10H3z" fill="#F4F4FA"/><path d="M5 8h14v10H5z" fill="none" stroke="#8C8CB0" stroke-width=".8" stroke-dasharray="1.5 1.5"/><circle cx="14" cy="14" r="3" fill="#22D3EE"/></svg></sc-if><sc-if value="{{a.is_fire}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-4-1-6 1-9z" fill="#FF8A3D"/></svg></sc-if><sc-if value="{{a.is_shield}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="#53D88E"/></svg></sc-if><sc-if value="{{a.is_multi}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><circle cx="8" cy="8" r="4" fill="#F4F4FA"/><circle cx="16" cy="8" r="4" fill="#FF8A3D"/><circle cx="8" cy="16" r="4" fill="#E5484D"/><circle cx="16" cy="16" r="4" fill="#FFC53D"/></svg></sc-if><sc-if value="{{a.is_rank}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="#6FB6FF"/><path d="M12 7l1.5 3 3.3.5-2.4 2.3.6 3.2-3-1.6-3 1.6.6-3.2-2.4-2.3 3.3-.5z" fill="#F4F4FA"/></svg></sc-if></div>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+          <span style="font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{a.title}}</span>
+          <span style="font-size: 11px; color: #A3A3C2">{{a.desc}}</span>
+          <div style="display: flex; align-items: center; gap: 6px"><div style="flex: 1; height: 6px; border-radius: 3px; background: #26264A"><div style="{{a.bar}}"></div></div><span style="font-size: 11px; font-weight: 800; color: #CACAE0">{{a.prog}}</span></div>
+        </div>
+        <div style="flex: none; width: 104px; display: flex; flex-direction: column; align-items: center; gap: 4px">
+          <span style="display: flex; align-items: center; gap: 4px; font-weight: 800; font-size: 13px; color: #FFC53D"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#B8860B" stroke-width="2"/></svg>+{{a.reward}}</span>
+          <sc-if value="{{a.canClaim}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{a.claim}}" style="height: 30px; padding: 0 12px; border: 0; border-radius: 9px; background: #53D88E; color: #0B0B14; font: 800 12px Manrope, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #2F8A57">RECLAMAR</button></sc-if>
+          <sc-if value="{{a.isClaimed}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; font-weight: 800; color: #53D88E">✓ Reclamado</span></sc-if>
+          <sc-if value="{{a.isLocked}}" hint-placeholder-val="{{ true }}"><span style="font-size: 11px; font-weight: 700; color: #6E6E90">En curso</span></sc-if>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; pointer-events: none"><span style="padding: 10px 18px; border-radius: 12px; background: #FFC53D; color: #0B0B14; font-weight: 800; font-size: 14px; box-shadow: 0 6px 20px #0008">{{toastText}}</span></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { toast: '', n: 0 };
+  }
+  store(key, def) { try { const v = JSON.parse(localStorage.getItem(key) || 'null'); return v == null ? def : v; } catch (e) { return def; } }
+  achievements() {
+    // goals for the Logros screen: progress comes from the saved match record and the ranks
+    const R = this.store('arenamix.record.v1', {}), all = R.all || {}, mmr = this.store('arenamix.mmr.v1', {});
+    const top = Object.keys(mmr).reduce((m, k) => Math.max(m, mmr[k] || 0), 0);
+    const sports = ['futbol', 'baloncesto', 'beisbol', 'voley'].filter((s) => R[s] && R[s].played > 0).length;
+    const g = (k) => all[k] || 0;
+    const A = (id, icon, title, desc, cur, goal, reward) => ({ id, icon, title, desc, cur: Math.min(cur, goal), goal, reward });
+    return [
+      A('p1', 'ball', 'Primer partido', 'Juega tu primer partido', g('played'), 1, 50),
+      A('p10', 'ball', 'Calentando motores', 'Juega 10 partidos', g('played'), 10, 100),
+      A('p50', 'ball', 'Habitual del estadio', 'Juega 50 partidos', g('played'), 50, 300),
+      A('p100', 'ball', 'Centenario', 'Juega 100 partidos', g('played'), 100, 600),
+      A('p250', 'ball', 'Leyenda de la arena', 'Juega 250 partidos', g('played'), 250, 1500),
+      A('w1', 'trophy', 'Primera victoria', 'Gana un partido', g('won'), 1, 50),
+      A('w10', 'trophy', 'Ganador', 'Gana 10 partidos', g('won'), 10, 150),
+      A('w50', 'trophy', 'Campeón de barrio', 'Gana 50 partidos', g('won'), 50, 500),
+      A('w100', 'trophy', 'Máquina de ganar', 'Gana 100 partidos', g('won'), 100, 1000),
+      A('g10', 'goal', 'Goleador', 'Marca 10 goles', g('gf'), 10, 100),
+      A('g50', 'goal', 'Pichichi', 'Marca 50 goles', g('gf'), 50, 300),
+      A('g200', 'goal', 'Bota de oro', 'Marca 200 goles', g('gf'), 200, 800),
+      A('s3', 'fire', 'En racha', 'Gana 3 partidos seguidos', g('best'), 3, 150),
+      A('s5', 'fire', 'Intratable', 'Gana 5 partidos seguidos', g('best'), 5, 300),
+      A('s10', 'fire', 'Imparable', 'Gana 10 partidos seguidos', g('best'), 10, 800),
+      A('c5', 'shield', 'Muro', 'Deja la portería a cero 5 veces', g('clean'), 5, 200),
+      A('sp4', 'multi', 'Multideporte', 'Juega a los 4 deportes', sports, 4, 200),
+      A('r1', 'rank', 'Oro', 'Llega a Oro en cualquier modo', top >= 750 ? 1 : 0, 1, 300),
+      A('r2', 'rank', 'Diamante', 'Llega a Diamante en cualquier modo', top >= 2100 ? 1 : 0, 1, 800),
+      A('r3', 'rank', 'Campeón', 'Llega a Campeón en cualquier modo', top >= 3075 ? 1 : 0, 1, 1500)
+    ];
+  }
+  claimed() { return this.store('arenamix.ach.v1', {}); }
+  coins() { const W = this.store('arenamix.wallet.v1', null); return W && typeof W.coins === 'number' ? W.coins : 2450; }
+  fmt(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  claim(a) {
+    const cl = this.claimed();
+    if (cl[a.id] || a.cur < a.goal) return;
+    cl[a.id] = true;
+    try {
+      localStorage.setItem('arenamix.ach.v1', JSON.stringify(cl));
+      localStorage.setItem('arenamix.wallet.v1', JSON.stringify({ coins: this.coins() + a.reward }));
+    } catch (e) {}
+    clearTimeout(this.toastT);
+    this.toastT = setTimeout(() => this.setState({ toast: '' }), 1800);
+    this.setState({ toast: '¡' + a.title + '! +' + a.reward + ' carrascos', n: this.state.n + 1 });
+  }
+  componentWillUnmount() { clearTimeout(this.toastT); }
+  renderVals() {
+    const cl = this.claimed(), list = this.achievements();
+    // ready to claim first, then in progress (closest first), claimed last
+    const rank = (a) => (a.cur >= a.goal ? (cl[a.id] ? 2 : 0) : 1);
+    const sorted = list.slice().sort((x, y) => rank(x) - rank(y) || (y.cur / y.goal) - (x.cur / x.goal));
+    const items = sorted.map((a) => {
+      const done = a.cur >= a.goal, got = !!cl[a.id], ready = done && !got;
+      const o = {
+        title: a.title, desc: a.desc, reward: String(a.reward), prog: a.cur + '/' + a.goal,
+        canClaim: ready, isClaimed: got, isLocked: !done,
+        claim: () => this.claim(a),
+        bar: 'height: 6px; border-radius: 3px; width: ' + Math.round(a.cur / a.goal * 100) + '%; background: ' + (done ? '#53D88E' : '#22D3EE') + ';',
+        style: 'display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 14px; ' + (ready ? 'background: #13261A; border: 1px solid #53D88E;' : got ? 'background: #121220; border: 1px solid #22223A; opacity: .75;' : 'background: #17172A; border: 1px solid #26264A;')
+      };
+      Object.keys({ ball: 1, trophy: 1, goal: 1, fire: 1, shield: 1, multi: 1, rank: 1 }).forEach((k) => { o['is_' + k] = a.icon === k; });
+      return o;
+    });
+    const got = list.filter((a) => cl[a.id]).length;
+    return { items, coins: this.fmt(this.coins()), doneLabel: got + ' de ' + list.length + ' conseguidos', toast: !!this.state.toast, toastText: this.state.toast };
+  }
+}
+</script>
+</body>
+</html>

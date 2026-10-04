@@ -161,7 +161,25 @@ class Component extends DCLogic {
   fmtObj() { return this.C.modes.find((m) => m.id === this.state.fmt); }
   size() { const f = this.fmtObj(); return f.kind === 'team' ? f.n : 1; }
   slotKind(key) { return this.state.slots[key] || 'ai'; }
-  finish(r) { this.setState({ phase: 'result', res: r }); }
+  recordMatch(sport, kind, r) {
+    // lifetime record (Profile and achievements) and the coin reward for the match
+    try {
+      const R = JSON.parse(localStorage.getItem('arenamix.record.v1') || 'null') || {};
+      const w = r.home > r.away, l = r.home < r.away;
+      const add = (k) => {
+        const s = R[k] || (R[k] = { played: 0, won: 0, lost: 0, drawn: 0, gf: 0, ga: 0, clean: 0, streak: 0, best: 0 });
+        s.played++; if (w) s.won++; else if (l) s.lost++; else s.drawn++;
+        if (kind !== 'mg') { s.gf += r.home || 0; s.ga += r.away || 0; if (!r.away) s.clean++; }
+        s.streak = w ? s.streak + 1 : 0; s.best = Math.max(s.best, s.streak);
+      };
+      add('all'); add(sport);
+      localStorage.setItem('arenamix.record.v1', JSON.stringify(R));
+      const W = JSON.parse(localStorage.getItem('arenamix.wallet.v1') || 'null') || { coins: 2450 };
+      W.coins += w ? 40 : l ? 10 : 20;
+      localStorage.setItem('arenamix.wallet.v1', JSON.stringify(W));
+    } catch (e) {}
+  }
+  finish(r) { const f = this.fmtObj(); this.recordMatch(this.sport, f ? f.kind : 'team', r); this.setState({ phase: 'result', res: r }); }
   renderVals() {
     const s = this.state, f = this.fmtObj(), n = this.size();
     const formats = this.C.modes.filter((m) => !m.soon).map((m) => ({

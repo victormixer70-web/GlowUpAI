@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Perfil</title>
+<script src="./support.js"></script>
+<script src="/_blob/de0c1b42c380e04fabb186f97a299f57"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#22D3EE}a:hover{color:#67E8F9}
+</style>
+</helmet>
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; display: flex; gap: 14px; padding: 12px 14px; box-sizing: border-box">
+  <div style="flex: none; width: 250px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <a href="Deportes.dc.html" aria-label="Volver" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 28px; letter-spacing: 2px">PERFIL</span>
+    </div>
+    <div style="flex: 1; min-height: 0; border-radius: 18px; background: linear-gradient(160deg, #1B2A4A, #14142A 60%); border: 1px solid #2E2E52; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px">
+      <div style="width: 104px; height: 104px; border-radius: 52px; overflow: hidden; border: 3px solid #22D3EE; background: #21213A"><svg width="104" height="104" viewBox="64 12 72 72"><rect x="64" y="12" width="72" height="72" fill="#21213A"/><rect x="92" y="60" width="16" height="22" fill="#A66A43"/><path d="M62 82Q100 70 138 82V100H62Z" fill="#FF8A3D"/><path d="M86 78Q100 92 114 78" stroke="#0B0B14" stroke-width="5" fill="none"/><circle cx="100" cy="44" r="24" fill="#B9794F"/><ellipse cx="91" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><ellipse cx="109" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><path d="M93 56q7 5 14 0" stroke="#5A2E1E" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M76 42Q76 16 100 16Q124 16 124 42Q118 30 104 30Q96 26 88 30Q80 32 76 42Z" fill="#241811"/><rect x="75" y="29" width="50" height="9" rx="4" fill="#22D3EE"/></svg></div>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1">Invitado_4821</span>
+      <span style="font-size: 12px; font-weight: 700; color: #A3A3C2">Nv. 12 · {{bestRank}}</span>
+      <span style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 10px; background: #0B0B14; font-weight: 800; font-size: 14px; color: #FFC53D"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#B8860B" stroke-width="2"/></svg>{{coins}} carrascos</span>
+    </div>
+    <a href="Logros.dc.html" style="position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; height: 52px; border-radius: 14px; background: #FFC53D; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; box-shadow: 0 5px 0 #B8860B">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="#0B0B14"><path d="M7 3h10v3h3v2a5 5 0 0 1-5 5h-.3A5 5 0 0 1 13 15v2h3v3H8v-3h3v-2a5 5 0 0 1-1.7-2H9a5 5 0 0 1-5-5V6h3zM6 8a3 3 0 0 0 1.5 2.6A7 7 0 0 1 7 8zm12 0h-1a7 7 0 0 1-.5 2.6A3 3 0 0 0 18 8z"/></svg>
+      LOGROS
+      <sc-if value="{{hasBadge}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: -6px; top: -8px; min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box; border-radius: 12px; background: #FF5C5C; color: #FFFFFF; font: 800 13px Manrope, sans-serif; display: flex; align-items: center; justify-content: center; font-style: normal; letter-spacing: 0">{{badge}}</span></sc-if>
+    </a>
+    <a href="Taquilla.dc.html" style="display: flex; align-items: center; justify-content: center; height: 36px; border-radius: 12px; border: 1px solid #2E2E52; color: #CACAE0; text-decoration: none; font-weight: 800; font-size: 13px">Personalizar en la Taquilla</a>
+  </div>
+  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+    <div role="tablist" style="display: flex; gap: 4px; padding: 4px; border-radius: 14px; background: #17172A">
+      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="5"><button type="button" role="tab" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button></sc-for>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+      <sc-for list="{{tiles}}" as="s" hint-placeholder-count="9">
+        <div style="display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 14px; background: #17172A; border: 1px solid #26264A">
+          <span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">{{s.label}}</span>
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 32px; line-height: 1; color: {{s.color}}">{{s.value}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>VICTORIAS · EMPATES · DERROTAS</span><span>{{totalLabel}}</span></div>
+      <div style="display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: #26264A"><div style="{{barW}}"></div><div style="{{barD}}"></div><div style="{{barL}}"></div></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sport: 'all' };
+  }
+  store(key, def) { try { const v = JSON.parse(localStorage.getItem(key) || 'null'); return v == null ? def : v; } catch (e) { return def; } }
+  achievements() {
+    // goals for the Logros screen: progress comes from the saved match record and the ranks
+    const R = this.store('arenamix.record.v1', {}), all = R.all || {}, mmr = this.store('arenamix.mmr.v1', {});
+    const top = Object.keys(mmr).reduce((m, k) => Math.max(m, mmr[k] || 0), 0);
+    const sports = ['futbol', 'baloncesto', 'beisbol', 'voley'].filter((s) => R[s] && R[s].played > 0).length;
+    const g = (k) => all[k] || 0;
+    const A = (id, icon, title, desc, cur, goal, reward) => ({ id, icon, title, desc, cur: Math.min(cur, goal), goal, reward });
+    return [
+      A('p1', 'ball', 'Primer partido', 'Juega tu primer partido', g('played'), 1, 50),
+      A('p10', 'ball', 'Calentando motores', 'Juega 10 partidos', g('played'), 10, 100),
+      A('p50', 'ball', 'Habitual del estadio', 'Juega 50 partidos', g('played'), 50, 300),
+      A('p100', 'ball', 'Centenario', 'Juega 100 partidos', g('played'), 100, 600),
+      A('p250', 'ball', 'Leyenda de la arena', 'Juega 250 partidos', g('played'), 250, 1500),
+      A('w1', 'trophy', 'Primera victoria', 'Gana un partido', g('won'), 1, 50),
+      A('w10', 'trophy', 'Ganador', 'Gana 10 partidos', g('won'), 10, 150),
+      A('w50', 'trophy', 'Campeón de barrio', 'Gana 50 partidos', g('won'), 50, 500),
+      A('w100', 'trophy', 'Máquina de ganar', 'Gana 100 partidos', g('won'), 100, 1000),
+      A('g10', 'goal', 'Goleador', 'Marca 10 goles', g('gf'), 10, 100),
+      A('g50', 'goal', 'Pichichi', 'Marca 50 goles', g('gf'), 50, 300),
+      A('g200', 'goal', 'Bota de oro', 'Marca 200 goles', g('gf'), 200, 800),
+      A('s3', 'fire', 'En racha', 'Gana 3 partidos seguidos', g('best'), 3, 150),
+      A('s5', 'fire', 'Intratable', 'Gana 5 partidos seguidos', g('best'), 5, 300),
+      A('s10', 'fire', 'Imparable', 'Gana 10 partidos seguidos', g('best'), 10, 800),
+      A('c5', 'shield', 'Muro', 'Deja la portería a cero 5 veces', g('clean'), 5, 200),
+      A('sp4', 'multi', 'Multideporte', 'Juega a los 4 deportes', sports, 4, 200),
+      A('r1', 'rank', 'Oro', 'Llega a Oro en cualquier modo', top >= 750 ? 1 : 0, 1, 300),
+      A('r2', 'rank', 'Diamante', 'Llega a Diamante en cualquier modo', top >= 2100 ? 1 : 0, 1, 800),
+      A('r3', 'rank', 'Campeón', 'Llega a Campeón en cualquier modo', top >= 3075 ? 1 : 0, 1, 1500)
+    ];
+  }
+  claimed() { return this.store('arenamix.ach.v1', {}); }
+  coins() { const W = this.store('arenamix.wallet.v1', null); return W && typeof W.coins === 'number' ? W.coins : 2450; }
+  fmt(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  renderVals() {
+    const s = this.state, R = this.store('arenamix.record.v1', {}), r = R[s.sport] || { played: 0, won: 0, lost: 0, drawn: 0, gf: 0, ga: 0, clean: 0, best: 0 };
+    const goals = s.sport === 'all' || s.sport === 'futbol', pct = (a) => (r.played ? Math.round(a / r.played * 100) : 0);
+    const tile = (label, value, color) => ({ label, value: String(value), color: color || '#F4F4FA' });
+    const tiles = [
+      tile('PARTIDOS', r.played), tile('VICTORIAS', r.won, '#53D88E'), tile('DERROTAS', r.lost, '#FF8A8E'),
+      tile('EMPATES', r.drawn, '#CACAE0'), tile('% VICTORIAS', pct(r.won) + '%', '#22D3EE'), tile('MEJOR RACHA', r.best, '#FFC53D'),
+      tile('GOLES MARCADOS', goals ? r.gf : '—'), tile('GOLES ENCAJADOS', goals ? r.ga : '—'), tile('PORTERÍAS A CERO', goals ? r.clean : '—')
+    ];
+    const labels = { all: 'Todos', futbol: 'Fútbol', baloncesto: 'Baloncesto', beisbol: 'Béisbol', voley: 'Vóley' };
+    const tabs = Object.keys(labels).map((k) => ({ label: labels[k], pick: () => this.setState({ sport: k }), style: 'flex: 1; height: 34px; border: 0; border-radius: 10px; font: 800 12px Manrope, sans-serif; cursor: pointer; ' + (k === s.sport ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;') }));
+    const cl = this.claimed(), ready = this.achievements().filter((a) => a.cur >= a.goal && !cl[a.id]).length;
+    const mmr = this.store('arenamix.mmr.v1', {}), top = Object.keys(mmr).reduce((m, k) => Math.max(m, mmr[k] || 0), 0);
+    const tiers = [['Bronce', 0], ['Plata', 300], ['Oro', 750], ['Platino', 1350], ['Diamante', 2100], ['Campeón', 3075], ['Super campeón', 4275], ['Élite', 5775]];
+    let best = 'Sin rango'; if (Object.keys(mmr).length) tiers.forEach(([n, v]) => { if (top >= v) best = 'Mejor rango: ' + n; });
+    const w = (a, c) => 'width: ' + pct(a) + '%; background: ' + c + ';';
+    return {
+      tiles, tabs, coins: this.fmt(this.coins()), bestRank: best,
+      hasBadge: ready > 0, badge: String(ready),
+      totalLabel: r.played + ' partidos',
+      barW: w(r.won, '#53D88E'), barD: w(r.drawn, '#8C8CB0'), barL: w(r.lost, '#FF5C5C')
+    };
+  }
+}
+</script>
+</body>
+</html>
