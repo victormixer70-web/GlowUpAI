@@ -97,7 +97,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 
   <sc-if value="{{isTeamMatch}}" hint-placeholder-val="{{ false }}">
-    <dc-import name="Partido" keeper="{{asKeeper}}" label="{{matchLabel}}" mode="{{matchMode}}" duration="{{duration}}" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Invitado_4821" mates="{{mates}}" rivals="{{rivals}}" away-name="{{oppName}}" home-color="#FF8A3D" home-trim="#0B0B14" away-color="{{oppColor}}" away-trim="{{oppTrim}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
+    <dc-import name="Partido" ranks="{{ranks}}" keeper="{{asKeeper}}" label="{{matchLabel}}" mode="{{matchMode}}" duration="{{duration}}" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Invitado_4821" mates="{{mates}}" rivals="{{rivals}}" away-name="{{oppName}}" home-color="#FF8A3D" home-trim="#0B0B14" away-color="{{oppColor}}" away-trim="{{oppTrim}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isDuelMatch}}" hint-placeholder-val="{{ false }}">
     <dc-import name="Duelo" kind="{{duelKind}}" rival-name="{{oppName}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
@@ -112,6 +112,23 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <dc-import name="Voley" mode="{{mgMode}}" locked="{{ true }}" on-end="{{onScore}}" hint-size="844px,390px"></dc-import>
   </sc-if>
 
+  <sc-if value="{{isWinners}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 38%, #3A2A08 0%, #12121F 55%, #0B0B14 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+      <span style="font-size: 13px; font-weight: 800; letter-spacing: 4px; color: #FFC53D">{{wKicker}}</span>
+      <div style="display: flex; align-items: flex-end; gap: 40px">
+        <sc-for list="{{wCards}}" as="w" hint-placeholder-count="1">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
+            <svg width="120" height="128" viewBox="-6 -10 76 80" style="{{w.pop}}"><circle cx="32" cy="32" r="34" fill="{{w.c1}}" opacity=".18"/><sc-if value="{{w.wings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{w.c1}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{w.c1}}"/></sc-if><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{w.c1}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{w.c2}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53Z" fill="#000000" opacity=".18"/><path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{w.c1}}"/></svg>
+            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 32px; line-height: 1; color: {{w.nameColor}}">{{w.name}}</span>
+            <span style="padding: 3px 10px; border-radius: 8px; background: #0B0B14; font-size: 13px; font-weight: 800; color: {{w.text}}">{{w.rank}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 40px; line-height: 1; margin-top: 4px">{{scoreLabel}}</span>
+      <span style="font-size: 13px; color: #A3A3C2">{{scoreSub}}</span>
+      <button type="button" onClick="{{toResult}}" style="margin-top: 6px; height: 48px; padding: 0 36px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">CONTINUAR</button>
+    </div>
+  </sc-if>
   <sc-if value="{{isResult}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; inset: 64px 40px 24px 40px; display: flex; align-items: center; gap: 40px">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 280px">
@@ -277,6 +294,7 @@ class Component extends DCLogic {
     if (s.phase === 'search' && this.t > this.findAt) { this.t = 0; this.setState({ phase: 'found', match: this.makeMatch() }); }
     else if (s.phase === 'found' && this.t > 3.2) { this.setState({ phase: 'match' }); this.raf = null; return; }
     else if (s.phase === 'result' && this.t > 2.4) { this.forceUpdate(); this.raf = null; return; }
+    else if (s.phase === 'winners' && this.t > 1.2) { this.forceUpdate(); this.raf = null; return; }
     this.forceUpdate();
     this.raf = requestAnimationFrame(this.tick);
   }
@@ -302,7 +320,7 @@ class Component extends DCLogic {
         placing = false;
       }
       this.store('arenamix.season.v1', S);
-      this.setState({ phase: 'result', res: r, prevMmr: mmr, mmr, delta: 0, place: p, placing, justPlaced: !placing });
+      this.setState({ phase: this.pl.kind === 'team' ? 'result' : 'winners', res: r, prevMmr: mmr, mmr, delta: 0, place: p, placing, justPlaced: !placing, wasPlacing: true });
       this.anim();
       return;
     }
@@ -317,7 +335,7 @@ class Component extends DCLogic {
       all[this.sport + ':' + this.pl.id] = mmr;
       this.store('arenamix.mmr.v1', all);
     }
-    this.setState({ phase: 'result', res: r, prevMmr: s.mmr, mmr, delta: mmr - s.mmr });
+    this.setState({ phase: this.pl.kind === 'team' ? 'result' : 'winners', res: r, prevMmr: s.mmr, mmr, delta: mmr - s.mmr, wasPlacing: false });
     this.anim();
   }
   renderVals() {
@@ -357,6 +375,26 @@ class Component extends DCLogic {
       fieldStyle: segS(!s.keeper), keeperStyle: segS(!!s.keeper),
       setField: () => this.setState({ keeper: false }), setKeeper: () => this.setState({ keeper: true }),
       asKeeper: n === 4 && !!s.keeper,
+      isWinners: s.phase === 'winners',
+      wKicker: won ? '¡GANAS!' : lost ? 'GANADOR' : 'EMPATE',
+      wCards: (() => {
+        if (s.phase !== 'winners' || !m) return [];
+        // my rank as it was during the match (before this result was applied)
+        const meR = s.wasPlacing ? null : this.rankOf(s.prevMmr), opR = this.rankOf(m.rivalMmr[0]);
+        const card = (name, R, mine) => ({ name, rank: R ? R.label : 'Sin clasificar', c1: R ? R.c1 : '#5A5A7A', c2: R ? R.c2 : '#2A2A40', text: R ? R.text : '#A3A3C2', wings: !!(R && R.wings), nameColor: mine ? '#22D3EE' : '#F4F4FA', pop: 'transform: scale(' + Math.min(1, 0.4 + this.t * 2).toFixed(2) + ');' });
+        const me = card('Invitado_4821', meR, true), op = card(m.rivals[0], opR, false);
+        return won ? [me] : lost ? [op] : [me, op];
+      })(),
+      toResult: () => { this.setState({ phase: 'result' }); this.anim(); },
+      ranks: (() => {
+        if (!m) return {};
+        const rk = (mm) => { const R = this.rankOf(mm); return { label: R.label, color: R.text }; };
+        const out = {};
+        out['Invitado_4821'] = placing ? { label: 'Sin clasificar', color: '#A3A3C2' } : rk(s.mmr);
+        m.mates.forEach((x, i) => { out[x] = rk(m.mateMmr[i]); });
+        m.rivals.forEach((x, i) => { out[x] = rk(m.rivalMmr[i]); });
+        return out;
+      })(),
       showBg: s.phase !== 'match', ranked: !casual && !placing, casual, placing, deltaShown: !casual && !placing && !s.justPlaced,
       placeTitle: s.phase === 'result' ? 'CLASIFICATORIA ' + pc.g + ' DE 5' : 'CLASIFICATORIA ' + (pc.g + 1) + ' DE 5',
       placeDots: [0, 1, 2, 3, 4].map((k) => { const x = pc.res[k]; return { style: 'width: 22px; height: 22px; border-radius: 11px; box-sizing: border-box; ' + (x === 'w' ? 'background: #53D88E;' : x === 'l' ? 'background: #FF5C5C;' : x === 'd' ? 'background: #A3A3C2;' : 'border: 2px solid #4C4C78;') }; }),

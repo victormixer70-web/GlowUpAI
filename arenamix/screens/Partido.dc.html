@@ -44,6 +44,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </sc-for>
 
+  <sc-if value="{{hud}}" hint-placeholder-val="{{ true }}">
   <div style="position: absolute; left: 0; right: 0; top: 0; height: 44px; display: flex; align-items: center; justify-content: center; gap: 14px; background: #0B0B14E6; border-bottom: 1px solid #26264A">
     <span style="position: absolute; left: 14px; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: {{modeColor}}">{{modeLabel}}</span>
     <span style="display: flex; align-items: center; gap: 8px; min-width: 190px; justify-content: flex-end">
@@ -101,6 +102,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </sc-if>
 
+  </sc-if>
   <sc-if value="{{showGoal}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; pointer-events: none">
       <span style="{{goalStyle}}">¡GOL!</span>
@@ -116,6 +118,24 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </sc-if>
 
+  <sc-if value="{{showWin}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 0; right: 0; top: 14px; display: flex; flex-direction: column; align-items: center; pointer-events: none">
+      <span style="font-size: 12px; font-weight: 800; letter-spacing: 3px; color: #FFC53D; text-shadow: 0 2px 0 #0B0B14">{{winKicker}}</span>
+      <span style="{{winTitleStyle}}">{{winTitle}}</span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; line-height: 1; color: #F4F4FA; text-shadow: 0 3px 0 #0B0B14">{{s0}} – {{s1}}</span>
+    </div>
+    <sc-for list="{{winTags}}" as="wt" hint-placeholder-count="0">
+      <div style="{{wt.style}}">
+        <span style="{{wt.nameStyle}}">{{wt.name}}</span>
+        <sc-if value="{{wt.hasRank}}" hint-placeholder-val="{{ false }}">
+          <span style="{{wt.rankStyle}}"><svg width="12" height="13" viewBox="0 0 64 68"><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{wt.rankColor}}"/></svg>{{wt.rank}}</span>
+        </sc-if>
+      </div>
+    </sc-for>
+    <div style="position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center">
+      <button type="button" onClick="{{finish}}" style="height: 50px; padding: 0 40px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">{{finishLabel}}</button>
+    </div>
+  </sc-if>
   <sc-if value="{{showEnd}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; inset: 0; background: #0B0B14CC; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px">
       <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">FINAL DEL PARTIDO</span>
@@ -245,6 +265,25 @@ class Component extends DCLogic {
     this.last = performance.now();
     this.raf = requestAnimationFrame(this.tick);
   }
+  setupWinners() {
+    // end of match: the winning team lines up on the pitch to celebrate (both teams if it is a draw)
+    const g = this.g;
+    g.phase = 'winners'; g.pt = 0;
+    const w = g.score[0] > g.score[1] ? 0 : g.score[1] > g.score[0] ? 1 : -1;
+    const team = (t) => g.ps.filter((q) => q.team === t).sort((a, b) => (a.role === 'gk') - (b.role === 'gk') || a.slot - b.slot);
+    const row = w < 0 ? team(0).concat(team(1)) : team(w);
+    g.win = { team: w, list: row };
+    const gap = 1.7, x0 = 30 - (row.length - 1) * gap / 2;
+    g.ps.forEach((q) => { q.act = null; q.vx = q.vy = 0; q.x = -40; q.y = -40; });
+    row.forEach((q, k) => {
+      Object.assign(q, { x: x0 + k * gap + (w < 0 && q.team === 1 ? 0.8 : 0) - (w < 0 && q.team === 0 ? 0.8 : 0), y: 15 + (k % 2) * 0.35, face: Math.PI / 2, run: k });
+      q.act = { type: 'cheer', t: 0, dur: 9999 };
+    });
+    Object.assign(g.ball, { x: -40, y: -40, z: 0, vx: 0, vy: 0, vz: 0 });
+    g.own = -1; g.hold = -1;
+    this.confetti = null;
+    this.loop();
+  }
   tick(now) {
     const dt = Math.min(0.033, Math.max(0, (now - this.last) / 1000));
     this.last = now;
@@ -252,7 +291,7 @@ class Component extends DCLogic {
     this.draw3D(dt);
     this.forceUpdate();
     const g = this.g;
-    this.raf = (g.phase === 'play' || g.phase === 'goal') ? requestAnimationFrame(this.tick) : null;
+    this.raf = (g.phase === 'play' || g.phase === 'goal' || g.phase === 'winners') ? requestAnimationFrame(this.tick) : null;
   }
   ang(a) {
     while (a > Math.PI) a -= 2 * Math.PI;
@@ -483,7 +522,7 @@ class Component extends DCLogic {
     if (g.phase === 'goal') { this.goalStep(dt); return; }
     if (g.phase !== 'play') return;
     if (!this.props.tutorial) g.t -= dt;
-    if (g.t <= 0) { g.t = 0; g.phase = 'end'; g.pt = 0; g.charging = false; return; }
+    if (g.t <= 0) { g.t = 0; g.charging = false; this.setupWinners(); return; }
     if (g.charging) g.charge = Math.min(1, g.charge + dt * 1.15);
     if (g.recv) { g.recv.t -= dt; if (g.recv.t <= 0) g.recv = null; }
     let ix = g.jx + (g.keys.r ? 1 : 0) - (g.keys.l ? 1 : 0);
@@ -1232,6 +1271,33 @@ class Component extends DCLogic {
     this.buildScene();
     this.draw3D(0);
   }
+  updateConfetti(dt) {
+    const T = THREE, g = this.g;
+    if (!this.confetti) {
+      const N = 420, pos = new Float32Array(N * 3), col = new Float32Array(N * 3), vel = [];
+      const P = this.props, cols = g.win && g.win.team === 1 ? [P.awayColor ?? '#A78BFA', P.awayTrim ?? '#F4F4FA', '#FFC53D'] : g.win && g.win.team === 0 ? [P.homeColor ?? '#FF8A3D', P.homeTrim ?? '#0B0B14', '#FFC53D'] : ['#FFC53D', '#F4F4FA', '#22D3EE'];
+      const cc = cols.map((h) => new T.Color(h));
+      for (let i = 0; i < N; i++) {
+        pos[i * 3] = (Math.random() - 0.5) * 18; pos[i * 3 + 1] = 2 + Math.random() * 9; pos[i * 3 + 2] = (Math.random() - 0.5) * 8;
+        const k = cc[i % cc.length]; col[i * 3] = k.r; col[i * 3 + 1] = k.g; col[i * 3 + 2] = k.b;
+        vel.push([(Math.random() - 0.5) * 0.6, 1.2 + Math.random() * 1.3, Math.random() * 6.28]);
+      }
+      const geo = new T.BufferGeometry();
+      geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); geo.setAttribute('color', new T.Float32BufferAttribute(col, 3));
+      this.confetti = new T.Points(geo, new T.PointsMaterial({ size: 0.12, vertexColors: true }));
+      this.confetti.userData.vel = vel;
+      this.S.add(this.confetti);
+    }
+    const pa = this.confetti.geometry.attributes.position, vel = this.confetti.userData.vel;
+    for (let i = 0; i < pa.count; i++) {
+      const v = vel[i];
+      let y = pa.getY(i) - v[1] * dt;
+      const x = pa.getX(i) + (v[0] + Math.sin(this.g.pt * 2 + v[2]) * 0.5) * dt;
+      if (y < 0) y += 11;
+      pa.setX(i, x); pa.setY(i, y);
+    }
+    pa.needsUpdate = true;
+  }
   W(x, y, z) {
     return new THREE.Vector3(x - 30, z, y - 15);
   }
@@ -1513,6 +1579,7 @@ class Component extends DCLogic {
       this.animate(p, m, i);
     });
     this.ball3.position.copy(this.W(b.x, b.y, b.z + 0.2));
+    this.ball3.visible = g.phase !== 'winners';
     const bsp = Math.hypot(b.vx, b.vy);
     if (bsp > 0.01 && dt) {
       if (!this.qTmp) { this.qTmp = new T.Quaternion(); this.aTmp = new T.Vector3(); }
@@ -1521,7 +1588,15 @@ class Component extends DCLogic {
       this.ball3.quaternion.premultiply(this.qTmp);
     }
     const c = g.ps[g.ctl];
-    if (this.keeperMode()) {
+    if (g.phase === 'winners') {
+      const n2 = g.win ? g.win.list.length : 1, dist = Math.max(6.5, n2 * 1.15 + 3), sway = Math.sin(g.pt * 0.4) * 1.2;
+      const want = new T.Vector3(sway, 1.9, dist), look = new T.Vector3(0, 1.25, 0);
+      if (!this.winCam) { this.winCam = true; this.camPos.copy(want); this.camLook.copy(look); if (this.cam.fov !== 40) { this.cam.fov = 40; this.cam.updateProjectionMatrix(); } }
+      const f = 1 - Math.exp(-2 * (dt || 1));
+      this.camPos.lerp(want, f); this.camLook.lerp(look, f);
+      this.cam.position.copy(this.camPos); this.cam.lookAt(this.camLook);
+      this.updateConfetti(dt || 0.016);
+    } else if (this.keeperMode()) {
       // goalkeeper's view: from just behind your goal, looking up the pitch at the ball
       const want = new T.Vector3(-35, 5.8, (c.y - 15) * 0.55 + (b.y - 15) * 0.15);
       const look = new T.Vector3(this.clamp(b.x - 30, -24, 6) * 0.8 - 4, 0, (b.y - 15) * 0.75);
@@ -1928,7 +2003,7 @@ class Component extends DCLogic {
     const won = g.score[0] > g.score[1], lost = g.score[0] < g.score[1];
     const chip = (c, t) => 'width: 22px; height: 22px; border-radius: 6px; background: ' + c + '; border: 3px solid ' + t + '; box-sizing: border-box;';
     const online = !!P.ping;
-    const tags = g.ps.filter((q, k) => q.role !== 'gk' && (online || k === g.ctl || n > 1)).map((q) => {
+    const tags = g.phase === 'winners' ? [] : g.ps.filter((q, k) => q.role !== 'gk' && (online || k === g.ctl || n > 1)).map((q) => {
       const c = g.chat.find((m) => m.p === q), me = q === h, s = SP(q.x, q.y, 2.3);
       return {
         name: me ? 'TÚ' : q.name,
@@ -1988,13 +2063,32 @@ class Component extends DCLogic {
       showReady: g.phase === 'ready',
       readyTitle: (P.coach ? 'MODO ENTRENADOR' : mode === 'comp' ? 'PARTIDO CLASIFICATORIO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA') + ' · ' + n + ' VS ' + n,
       showEnd: g.phase === 'end',
+      showWin: g.phase === 'winners',
+      hud: g.phase !== 'winners',
+      winKicker: g.phase === 'winners' ? (g.win.team < 0 ? 'FINAL DEL PARTIDO' : 'GANADORES') : '',
+      winTitle: g.phase !== 'winners' ? '' : g.win.team < 0 ? 'EMPATE' : g.win.team === 0 ? (P.homeName ?? 'TU EQUIPO') : (P.awayName ?? 'RIVAL'),
+      winTitleStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 48px; line-height: 1; letter-spacing: 1px; text-shadow: 0 4px 0 #0B0B14; color: ' + (g.phase === 'winners' && g.win.team === 1 ? '#FF8A8E' : '#22D3EE') + '; transform: scale(' + Math.min(1, 0.5 + g.pt * 1.5).toFixed(2) + ');',
+      winTags: g.phase !== 'winners' ? [] : g.win.list.map((q) => {
+        const s = SP(q.x, q.y, 2.75), me = q === h, rk = (P.ranks || {})[q.name];
+        return {
+          name: me ? 'TÚ' : q.role === 'gk' ? 'Portero' : q.name,
+          hasRank: !!rk, rank: rk ? rk.label : '', rankColor: rk ? rk.color : '#FFFFFF',
+          style: 'position: absolute; left: 0; top: 0; width: 150px; display: flex; flex-direction: column; align-items: center; gap: 3px; pointer-events: none; transform: translate(' + (s.x - 75).toFixed(1) + 'px, ' + (s.y - 26).toFixed(1) + 'px);',
+          nameStyle: 'padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 800; white-space: nowrap; background: #0B0B14D9; color: ' + (me ? '#22D3EE' : '#F4F4FA') + ';',
+          rankStyle: 'display: flex; align-items: center; gap: 4px; padding: 1px 7px; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; background: #0B0B14D9; color: ' + (rk ? rk.color : '#FFFFFF') + ';'
+        };
+      }),
       endText: won ? '¡VICTORIA!' : lost ? 'DERROTA' : 'EMPATE',
       endStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 2px; color: ' + (won ? '#22D3EE' : lost ? '#FF5C5C' : '#F4F4FA') + ';',
       finishLabel: P.onEnd ? 'CONTINUAR' : 'JUGAR OTRA VEZ',
       start: () => this.start(),
       finish: () => {
         if (P.onEnd) P.onEnd({ home: g.score[0], away: g.score[1] });
-        else { this.newGame(); this.start(); }
+        else {
+          if (this.confetti) { this.S.remove(this.confetti); this.confetti = null; }
+          this.winCam = false;
+          this.newGame(); this.start();
+        }
       },
       joyDown: (e) => {
         // a new thumb always takes over the stick, even if an old touch was never released
