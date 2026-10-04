@@ -226,6 +226,7 @@
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(function (reg) {
+      if (!reg) return;
       reg.addEventListener('updatefound', function () {
         var nw = reg.installing;
         nw && nw.addEventListener('statechange', function () {
@@ -233,6 +234,6 @@
         });
       });
       setInterval(function () { reg.update(); }, 60000);
-    });
+    }).catch(function () {});
   }
 })();

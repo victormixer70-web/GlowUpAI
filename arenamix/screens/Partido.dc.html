@@ -917,8 +917,8 @@ class Component extends DCLogic {
     R.toneMappingExposure = 1.1;
     this.R = R;
     this.cam = new T.PerspectiveCamera(36, 844 / 390, 0.1, 500);
-    this.camPos = new T.Vector3(0, 10.5, 17.5);
-    this.camLook = new T.Vector3(0, 0, 1.5);
+    this.camPos = new T.Vector3(0, 10.5, 14.5);
+    this.camLook = new T.Vector3(0, 0, 1);
     this.buildScene();
     this.draw3D(0);
   }
@@ -1068,11 +1068,12 @@ class Component extends DCLogic {
     }
     const c = g.ps[g.ctl];
     const fx = b.x * 0.75 + c.x * 0.25, fz = b.y * 0.75 + c.y * 0.25;
-    const tx = Math.max(-21, Math.min(21, fx - 30)), tz = Math.max(-6, Math.min(6, fz - 15));
+    // follow the play all the way to both touchlines, keeping it above the on-screen buttons
+    const tx = Math.max(-21, Math.min(21, fx - 30)), tz = Math.max(-15, Math.min(15, fz - 15));
     const goalZoom = g.phase === 'goal' ? Math.min(1, g.pt) : 0;
-    const want = new T.Vector3(tx * 0.95, 10.5 - goalZoom * 2.5, 17.5 + tz * 0.6 - goalZoom * 4);
-    const look = new T.Vector3(tx, 0, tz * 0.7 + 0.5);
-    const f = 1 - Math.exp(-3 * (dt || 1));
+    const want = new T.Vector3(tx * 0.95, 10.5 - goalZoom * 2.5, tz + 14.5 - goalZoom * 4);
+    const look = new T.Vector3(tx, 0, tz + 1);
+    const f = 1 - Math.exp(-4.5 * (dt || 1));
     this.camPos.lerp(want, f); this.camLook.lerp(look, f);
     this.cam.position.copy(this.camPos);
     this.cam.lookAt(this.camLook);
