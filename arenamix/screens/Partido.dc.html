@@ -980,8 +980,8 @@ class Component extends DCLogic {
     const M = 7, ppm = 24, PW = 60 + 2 * M, PH = 30 + 2 * M;
     const tex = this.canvasTex(PW * ppm, PH * ppm, (c, w, h) => {
       const X = (x) => (x + M) * ppm, Y = (y) => (y + M) * ppm;
-      c.fillStyle = '#1d7a43'; c.fillRect(0, 0, w, h);
-      for (let x = -M, i = 0; x < 60 + M; x += 5, i++) if (i % 2) { c.fillStyle = '#23894c'; c.fillRect(X(x), 0, 5 * ppm, h); }
+      c.fillStyle = '#126b2b'; c.fillRect(0, 0, w, h);
+      for (let x = -M, i = 0; x < 60 + M; x += 5, i++) if (i % 2) { c.fillStyle = '#167a32'; c.fillRect(X(x), 0, 5 * ppm, h); }
       for (let i = 0; i < 9000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.035)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
       c.strokeStyle = '#f4f8f4'; c.lineWidth = 0.14 * ppm;
       c.strokeRect(X(0), Y(0), 60 * ppm, 30 * ppm);
@@ -997,7 +997,7 @@ class Component extends DCLogic {
     });
     const pitch = new T.Mesh(new T.PlaneGeometry(PW, PH), new T.MeshStandardMaterial({ map: tex, roughness: 0.95 }));
     pitch.rotation.x = -Math.PI / 2; pitch.receiveShadow = true; S.add(pitch);
-    const apron = new T.Mesh(new T.PlaneGeometry(500, 500), this.mat(0x0f2a1a, { roughness: 1 }));
+    const apron = new T.Mesh(new T.PlaneGeometry(500, 500), this.mat(0x0c2a14, { roughness: 1 }));
     apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; S.add(apron);
     // ---------- big open-air stadium: two tiers on three sides, ultras behind each goal ----------
     const P = this.props;
