@@ -561,6 +561,20 @@ class Component extends DCLogic {
       } else if (i === g.ctl && !this.autoplay) [dx, dy, maxV, acc] = this.humanMove(p, i, dt);
       else if (p.role === 'gk') [dx, dy, maxV, acc] = this.gkMove(p, i, dt);
       else [dx, dy, maxV, acc] = this.aiMove(p, i, dt, chasers);
+      p.watch = false;
+      if (p.role !== 'gk' && g.own !== i && !(i === g.ctl && !this.autoplay) && !(g.recv && g.recv.i === i)) {
+        // players keep their eyes on the ball: over short distances they side-step or backpedal facing play
+        // (jockeying when close to the carrier) instead of turning their back; only long runs are run "forwards"
+        const il = Math.hypot(dx, dy), own = g.own >= 0 ? g.ps[g.own] : null;
+        const off = il > 0.05 ? Math.abs(this.ang(Math.atan2(dy, dx) - Math.atan2(b.y - p.y, b.x - p.x))) : 0;
+        const jockey = own && own.team !== p.team && this.dist(p, own) < 4.5;
+        const attacking = (own && own.team === p.team) || (g.hold >= 0 && g.ps[g.hold].team === p.team);
+        // attackers sprint into space; only short shuffles are done facing the ball
+        if (il <= 0.05 || ((attacking ? p.tdist < 2.5 : p.tdist < 7 || jockey) && off > 1.0)) {
+          p.watch = true;
+          if (off > 1.9) maxV = Math.min(maxV, 4.6); else if (off > 1.0) maxV = Math.min(maxV, 5.8);
+        }
+      }
       if (g.own === i) {
         // a dribbler always adjusts his run to stay on top of the ball
         const t = 0.25, bx = b.x + b.vx * t - p.x, by = b.y + b.vy * t - p.y, bn = Math.hypot(bx, by) || 1;
@@ -595,6 +609,7 @@ class Component extends DCLogic {
         else if (sp > 0.5) want = Math.atan2(p.vy, p.vx);
         rate = i === g.ctl ? 10 + 4 * this.tt('con') : 7;
       } else if (sp <= 2.2 && i === g.ctl && !this.autoplay && Math.hypot((this.inp || [0, 0])[0], (this.inp || [0, 0])[1]) > 0.2) { want = Math.atan2(this.inp[1], this.inp[0]); rate = 10; }
+      else if (p.watch || (sp < 2.5 && !(i === g.ctl && !this.autoplay))) { want = Math.atan2(b.y - p.y, b.x - p.x); rate = 7; }
       else if (sp > 0.6) want = Math.atan2(p.vy, p.vx);
       else { want = Math.atan2(b.y - p.y, b.x - p.x); rate = 4; }
       if (p.role === 'gk') {
@@ -648,6 +663,23 @@ class Component extends DCLogic {
     if (g.own === i) maxV *= 0.95;
     return [dx, dy, maxV, g.own === i ? 11 : 14];
   }
+  seekS(p, tx, ty, slow, dt) {
+    // keep a sensible distance from team-mates so two players never chase the same spot
+    this.g.ps.forEach((q) => {
+      if (q === p || q.team !== p.team || q.role === 'gk') return;
+      const ex = tx - q.x, ey = ty - q.y, e = Math.hypot(ex, ey);
+      if (e < 4) { const push = (4 - e) * 0.6 / (e || 1); tx += ex * push; ty += ey * push; }
+    });
+    tx = this.clamp(tx, 2, 58); ty = this.clamp(ty, 1.5, 28.5);
+    if (p.stx == null || Math.hypot(tx - p.stx, ty - p.sty) > 12) { p.stx = tx; p.sty = ty; }
+    const k = Math.min(1, dt * 2.2);
+    p.stx += (tx - p.stx) * k; p.sty += (ty - p.sty) * k;
+    const d = Math.hypot(p.stx - p.x, p.sty - p.y);
+    p.tdist = d;
+    if (p.parked ? d < 1.3 : d < 0.55) { p.parked = true; return [0, 0]; }
+    p.parked = false;
+    return this.seek(p, p.stx, p.sty, slow);
+  }
   seek(p, tx, ty, slow) {
     const dx = tx - p.x, dy = ty - p.y, n = Math.hypot(dx, dy) || 1, k = slow ? Math.min(1, n / slow) : 1;
     return [dx / n * k, dy / n * k];
@@ -657,6 +689,7 @@ class Component extends DCLogic {
     const sg = p.team === 0 ? 1 : -1, gx = p.team === 0 ? 60 : 0, ownX = 60 - gx, n = this.size();
     let maxV = D.spd, acc = 8, dx = 0, dy = 0;
     const own = g.own >= 0 ? g.ps[g.own] : null;
+    p.tdist = 99; p.parked = false;
     p.sprinting = false;
     if (this.props.tutorial) {
       if (own === p) { const [ax, ay] = this.seek(p, 4, 15); return [ax, ay, 2.4, 6]; }
@@ -717,7 +750,7 @@ class Component extends DCLogic {
       tx = this.clamp(tx, 4, 56); ty = this.clamp(ty, 2.5, 27.5);
       if (p.wantsBall > 0) { tx = ref.x + sg * 3; ty = ref.y + (ref.y < 15 ? 5 : -5); }
       if (p.defend > 0) { tx = (ref.x + ownX) / 2; ty = 15 + (ref.y - 15) * 0.3; }
-      [dx, dy] = this.seek(p, tx, ty, 1.5);
+      [dx, dy] = this.seekS(p, tx, ty, 1.5, dt);
       return [dx, dy, maxV * (run ? 0.98 : 0.9), acc];
     } else if (own || p.defend > 0) {
       const foes = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk' && q !== own)
@@ -735,13 +768,13 @@ class Component extends DCLogic {
         // spare man: cover the space between the ball and our goal
         tx = own.x + (ownX - own.x) * 0.45; ty = own.y + (15 - own.y) * 0.5;
       } else { tx = (b.x + ownX) / 2; ty = (b.y + 15) / 2; }
-      [dx, dy] = this.seek(p, tx, ty, 1);
+      [dx, dy] = this.seekS(p, tx, ty, 1, dt);
       return [dx, dy, maxV, acc];
     } else {
       tx = this.clamp(b.x * 0.6 + (ownX + sg * 20) * 0.4 + (p.slot === 0 ? sg * 3 : anchor ? -sg * 8 : -sg * 2), 4, 56);
       ty = lane * 0.7 + b.y * 0.3;
     }
-    [dx, dy] = this.seek(p, tx, ty, 2);
+    [dx, dy] = this.seekS(p, tx, ty, 2, dt);
     return [dx, dy, maxV * 0.92, acc];
   }
   meetPoint(p, v) {
@@ -1720,8 +1753,10 @@ class Component extends DCLogic {
     u.body.position.set(0, 0, 0); u.body.rotation.set(0, 0, 0); u.head.rotation.set(0, 0, 0);
     const sp = Math.hypot(p.vx, p.vy), amp = Math.min(1, sp / 6.5), sw = Math.min(1, sp / 1.2), ph = p.run;
     // locomotion: gait with knee flexion in swing, counter-swinging bent arms, bob, lean and twist
-    const A = sw * (0.22 + 0.62 * amp);
-    const hl = -Math.sin(ph) * A, hr = Math.sin(ph) * A;
+    const cf = Math.cos(p.face), sf = Math.sin(p.face), vf = p.vx * cf + p.vy * sf, vl = -p.vx * sf + p.vy * cf;
+    const backw = sp > 0.8 && vf < -0.4 * sp, side = sp > 0.8 && !backw && Math.abs(vl) > 0.7 * sp;
+    const A = sw * (0.22 + 0.62 * amp) * (backw ? 0.6 : side ? 0.3 : 1), dirS = backw ? -1 : 1;
+    const hl = -Math.sin(ph) * A * dirS, hr = Math.sin(ph) * A * dirS;
     const kb = (c) => sw * (0.12 + (0.35 + 0.95 * amp) * Math.pow(Math.max(0, c), 1.4));
     Lg.hip.rotation.x = hl; Rg.hip.rotation.x = hr;
     Lg.knee.rotation.x = kb(Math.cos(ph)); Rg.knee.rotation.x = kb(-Math.cos(ph));
@@ -1730,14 +1765,21 @@ class Component extends DCLogic {
     A1.elb.rotation.x = -sw * (0.35 + 0.85 * amp) - 0.3 * Math.max(0, -A1.sho.rotation.x);
     A0.sho.rotation.z = -(0.1 + 0.06 * amp); A1.sho.rotation.z = 0.1 + 0.06 * amp;
     u.body.position.y = sw * amp * (0.05 * Math.abs(Math.cos(ph)) - 0.035);
-    u.body.rotation.x = 0.05 * sw + 0.16 * amp;
+    u.body.rotation.x = backw ? 0.02 : 0.05 * sw + 0.16 * amp * (side ? 0.3 : 1);
     u.body.rotation.y = 0.1 * amp * Math.sin(ph);
+    if (side) {
+      // shuffle: legs open and close sideways, knees bent, low centre of gravity
+      const s2 = Math.sin(ph);
+      Lg.hip.rotation.z = -0.12 - 0.22 * Math.max(0, s2); Rg.hip.rotation.z = 0.12 + 0.22 * Math.max(0, -s2);
+      Lg.knee.rotation.x += 0.35; Rg.knee.rotation.x += 0.35; Lg.hip.rotation.x -= 0.2; Rg.hip.rotation.x -= 0.2;
+      u.body.position.y -= 0.05;
+    }
     u.body.rotation.z = this.clamp(p.turn * 0.07 * sw, -0.3, 0.3);
     // idle: athletic stance, breathing; deeper crouch when close to the ball
     const idle = 1 - sw, alert = this.dist(p, b) < 6 ? 1 : 0.4;
     Lg.hip.rotation.x += idle * -0.12 * alert; Rg.hip.rotation.x += idle * -0.12 * alert;
     Lg.knee.rotation.x += idle * 0.26 * alert; Rg.knee.rotation.x += idle * 0.26 * alert;
-    Lg.hip.rotation.z = -0.06 * idle; Rg.hip.rotation.z = 0.06 * idle;
+    if (!side) { Lg.hip.rotation.z = -0.06 * idle; Rg.hip.rotation.z = 0.06 * idle; }
     u.body.rotation.x += idle * 0.1 * alert;
     u.body.position.y += idle * (0.006 * Math.sin(now * 2.4 + i) - 0.03 * alert);
     A0.elb.rotation.x += idle * -0.35; A1.elb.rotation.x += idle * -0.35;
