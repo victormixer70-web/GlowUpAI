@@ -1269,8 +1269,39 @@ class Component extends DCLogic {
       for (let x = 20, i = 0; x < w; x += 340, i++) { c.fillStyle = i % 2 ? '#FFC53D' : '#22D3EE'; c.fillText(i % 2 ? 'ARENA MIX · ⚡' : 'ARENA MIX', x, h / 2 + 2); }
     });
     const ledMat = new T.MeshStandardMaterial({ map: adTexBig, emissive: 0xffffff, emissiveMap: adTexBig, emissiveIntensity: 0.85 });
-    const torsoGeo = new T.BoxGeometry(0.46, 0.62, 0.3), headGeo = new T.BoxGeometry(0.24, 0.26, 0.24);
-    torsoGeo.translate(0, 0.55, 0); headGeo.translate(0, 1.02, 0);
+    // crowd figures: low-poly people (legs, torso, shoulders, arms in three poses, head with hair).
+    // Vertex colours multiply the per-fan colour: white parts take the shirt colour, dark parts read as trousers/hair.
+    const part = (geo, shade, f) => { if (f) f(geo); const gg = geo.toNonIndexed(), n = gg.attributes.position.count, c = new Float32Array(n * 3).fill(shade); gg.setAttribute('color', new T.Float32BufferAttribute(c, 3)); gg.deleteAttribute('uv'); return gg; };
+    const merge = (parts) => {
+      let n = 0; parts.forEach((g2) => { n += g2.attributes.position.count; });
+      const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), colA = new Float32Array(n * 3);
+      let o = 0;
+      parts.forEach((g2) => { pos.set(g2.attributes.position.array, o * 3); nor.set(g2.attributes.normal.array, o * 3); colA.set(g2.attributes.color.array, o * 3); o += g2.attributes.position.count; });
+      const out = new T.BufferGeometry();
+      out.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); out.setAttribute('normal', new T.Float32BufferAttribute(nor, 3)); out.setAttribute('color', new T.Float32BufferAttribute(colA, 3));
+      return out;
+    };
+    const arm = (x, up, out) => part(new T.CylinderGeometry(0.052, 0.045, 0.58, 3, 1, true), 1, (g2) => {
+      g2.translate(0, -0.29, 0);
+      g2.rotateZ(up ? Math.PI - out * Math.sign(x) : 0.12 * Math.sign(x));
+      if (up) g2.rotateX(-0.25);
+      g2.translate(x, 0.86, 0.02);
+    });
+    const fanBase = () => [
+      part(new T.CylinderGeometry(0.15, 0.14, 0.36, 4, 1, true), 0.22, (g2) => { g2.scale(1, 1, 0.75); g2.translate(0, 0.18, 0); }),
+      part(new T.CylinderGeometry(0.21, 0.155, 0.52, 5, 1, true), 1, (g2) => { g2.scale(1, 1, 0.62); g2.translate(0, 0.62, 0); }),
+      part(new T.CylinderGeometry(0.07, 0.21, 0.12, 5, 1, true), 1, (g2) => { g2.scale(1, 1, 0.62); g2.translate(0, 0.94, 0); }),
+    ];
+    const fanPoses = [
+      merge(fanBase().concat([arm(-0.24, false), arm(0.24, false)])),
+      merge(fanBase().concat([arm(-0.22, true, 0.3), arm(0.22, true, 0.3)])),
+      merge(fanBase().concat([arm(-0.24, false), arm(0.22, true, 0.15)]))
+    ];
+    // head: skin colour below, hair painted on the top and back
+    const headGeo = merge([part(new T.SphereGeometry(0.118, 5, 3), 1, (g2) => { g2.scale(0.9, 1.1, 0.95); g2.translate(0, 1.07, 0); })]);
+    { const hp = headGeo.attributes.position, hc = headGeo.attributes.color; for (let k = 0; k < hp.count; k++) { if (hp.getY(k) > 1.1 || (hp.getZ(k) < -0.05 && hp.getY(k) > 1.02)) hc.setXYZ(k, 0.12, 0.12, 0.12); } }
+    const seatGeo = new T.BoxGeometry(0.46, 0.42, 0.07); seatGeo.translate(0, 0.21, -0.3);
+    const seatSpots = [], stepSpots = [];
     const skins = [0xc68a5e, 0xe0b48f, 0x8d5a3b, 0xf1c9a5, 0x6b4129, 0xb9794f];
     const sections = new Map();
     const put = (key, team, ultra, wx, wy, wz, rotY, colHex) => {
@@ -1295,9 +1326,13 @@ class Component extends DCLogic {
       S.add(g);
       const v = new T.Vector3();
       const seat = (x, y, z, ultraZone, row, gap) => {
+        const xm = (x + len / 2) % 9;
+        v.set(x, y, z + 0.35).applyMatrix4(g.matrixWorld);
+        if (!fanLimit(v)) return;
+        if (xm < 0.75) { if (xm < 0.66) stepSpots.push({ x: v.x, y: v.y, z: v.z, rotY }); return; } // aisle with steps
+        seatSpots.push({ x: v.x, y: v.y, z: v.z, rotY: rotY + Math.PI });
         if (Math.random() < gap) return;
         v.set(x + (Math.random() - 0.5) * 0.12, y, z + 0.35).applyMatrix4(g.matrixWorld);
-        if (!fanLimit(v)) return;
         const team = v.x < 0 ? 0 : 1, ultra = ultraZone(v);
         const band = Math.floor((x + len / 2) / 7);
         put(name + ':' + band + ':' + (ultra ? 'u' : 'n'), team, ultra, v.x, v.y, v.z, rotY + Math.PI, fanColor(team, ultra, row));
@@ -1314,20 +1349,38 @@ class Component extends DCLogic {
     const m4 = new T.Matrix4(), q = new T.Quaternion(), sc = new T.Vector3(1, 1, 1), pos = new T.Vector3(), col = new T.Color(), up = new T.Vector3(0, 1, 0);
     sections.forEach((sec) => {
       const n = sec.items.length, grp = new T.Group();
-      const bodies = new T.InstancedMesh(torsoGeo, new T.MeshStandardMaterial({ roughness: 0.85 }), n);
-      const heads = new T.InstancedMesh(headGeo, new T.MeshStandardMaterial({ roughness: 0.7 }), n);
+      // pose per fan: ultras mostly arms up, the rest mostly arms down
+      const poseOf = sec.items.map(() => { const r = Math.random(); return sec.ultra ? (r < 0.5 ? 1 : r < 0.75 ? 2 : 0) : (r < 0.76 ? 0 : r < 0.9 ? 2 : 1); });
+      const counts = [0, 0, 0]; poseOf.forEach((k) => counts[k]++);
+      const bodies = fanPoses.map((geo, k) => new T.InstancedMesh(geo, new T.MeshStandardMaterial({ roughness: 0.85, vertexColors: true }), Math.max(1, counts[k])));
+      const heads = new T.InstancedMesh(headGeo, new T.MeshStandardMaterial({ roughness: 0.7, vertexColors: true }), n);
+      const at = [0, 0, 0];
       sec.items.forEach((it, i) => {
         q.setFromAxisAngle(up, it.rotY + (Math.random() - 0.5) * 0.4);
-        const s = 0.9 + Math.random() * 0.2; sc.set(s, s, s);
+        const s = 0.9 + Math.random() * 0.2; sc.set(s, s * (0.94 + Math.random() * 0.12), s);
         m4.compose(pos.set(it.wx, it.wy, it.wz), q, sc);
-        bodies.setMatrixAt(i, m4); heads.setMatrixAt(i, m4);
-        bodies.setColorAt(i, col.set(it.col).convertSRGBToLinear());
+        const k = poseOf[i], bm = bodies[k], j = at[k]++;
+        bm.setMatrixAt(j, m4); heads.setMatrixAt(i, m4);
+        bm.setColorAt(j, col.set(it.col).convertSRGBToLinear());
         heads.setColorAt(i, col.setHex(it.skin).convertSRGBToLinear());
       });
-      grp.add(bodies); grp.add(heads); S.add(grp);
+      bodies.forEach((bm, k) => { bm.count = counts[k]; grp.add(bm); });
+      grp.add(heads); S.add(grp);
       grp.userData = { team: sec.team, ultra: sec.ultra, ph: Math.random() * 6.28, w: sec.ultra ? 6.5 + Math.random() : 1.5 + Math.random() };
       this.fanGroups.push(grp);
     });
+    {
+      const seats = new T.InstancedMesh(seatGeo, this.mat(0xffffff, { roughness: 0.6 }), seatSpots.length);
+      const steps = new T.InstancedMesh(new T.BoxGeometry(0.62, 0.05, 0.8), this.mat(0x8a90a3, { roughness: 0.9 }), stepSpots.length);
+      const seatCols = [new T.Color('#24304f'), new T.Color('#2b3a5e')].map((c) => c.convertSRGBToLinear());
+      seatSpots.forEach((s2, i) => {
+        q.setFromAxisAngle(up, s2.rotY); sc.set(1, 1, 1);
+        m4.compose(pos.set(s2.x, s2.y, s2.z), q, sc); seats.setMatrixAt(i, m4);
+        seats.setColorAt(i, seatCols[i % 2]);
+      });
+      stepSpots.forEach((s2, i) => { q.setFromAxisAngle(up, s2.rotY); m4.compose(pos.set(s2.x, s2.y + 0.02, s2.z), q, sc); steps.setMatrixAt(i, m4); });
+      S.add(seats); S.add(steps);
+    }
     // ultras' flags and striped banners behind each goal
     this.flags = [];
     [0, 1].forEach((team) => {
@@ -1518,7 +1571,7 @@ class Component extends DCLogic {
     // socks to the knee, low-cut boots. Joint pivots stay where animate() expects them.
     const T = THREE, g = new T.Group(), body = new T.Group();
     g.add(body);
-    const tones = [0xc68a5e, 0xe0b48f, 0x8d5a3b, 0xf1c9a5, 0x6b4129, 0xb9794f];
+    const tones = [0xd09a72, 0xb97e57, 0x8f5a3a, 0xe0ad86, 0x6a3f27, 0xa86f4a, 0xc78b62];
     const skinHex = o.skin || tones[Math.floor(Math.random() * tones.length)];
     const hairHex = o.hair || 0x241811;
     const skin = this.mat(skinHex, { roughness: 0.55, emissive: new T.Color(skinHex).multiplyScalar(0.1) });
@@ -1542,19 +1595,37 @@ class Component extends DCLogic {
     const lathe = (pts, m, seg) => new T.Mesh(new T.LatheGeometry(pts.map(([r, y]) => new T.Vector2(r, y)), seg || 20), m);
     const sph = (r, m, w, h) => new T.Mesh(new T.SphereGeometry(r, w || 18, h || 14), m);
     const tor = (r, t, m) => new T.Mesh(new T.TorusGeometry(r, t, 6, 22), m);
+    // a whole limb as one piece of skin that bends at the joint (no mannequin ball joints):
+    // profile is in the upper bone's space, weights blend between the two bones around jointY
+    let skinSk = null;
+    const limb = (pts, upper, lower, jointY, blend, ox, oy) => {
+      const geo = new T.LatheGeometry(pts.map(([r, y]) => new T.Vector2(r, y)), 20);
+      const pa = geo.attributes.position, n = pa.count, si = new Float32Array(n * 4), sw = new Float32Array(n * 4);
+      for (let k = 0; k < n; k++) {
+        const w = this.clamp((jointY + blend - pa.getY(k)) / (2 * blend), 0, 1);
+        si[k * 4] = 0; si[k * 4 + 1] = 1; sw[k * 4] = 1 - w; sw[k * 4 + 1] = w;
+      }
+      geo.translate(ox, oy, 0);
+      geo.setAttribute('skinIndex', new T.Uint16BufferAttribute(new Uint16Array(si), 4));
+      geo.setAttribute('skinWeight', new T.Float32BufferAttribute(sw, 4));
+      if (!skinSk) { skinSk = skin.clone(); skinSk.skinning = true; }
+      const m = new T.SkinnedMesh(geo, skinSk);
+      m.castShadow = true; m.frustumCulled = false;
+      body.add(m);
+      body.updateMatrixWorld(true);
+      m.bind(new T.Skeleton([upper, lower]));
+      return m;
+    };
     // ---- legs ----
     const legs = [];
     [-1, 1].forEach((s) => {
-      const hip = new T.Group(); hip.position.set(0.1 * s, 0.94, 0); body.add(hip);
-      // thigh: quads bulge, tapering to the knee
-      add(hip, lathe([[0.001, -0.47], [0.058, -0.465], [0.066, -0.42], [0.084, -0.32], [0.1, -0.2], [0.106, -0.08], [0.1, 0.02], [0.001, 0.04]], skin));
+      const hip = new T.Bone(); hip.position.set(0.1 * s, 0.94, 0); body.add(hip);
       // loose shorts leg, flaring towards the hem, with a side stripe
       add(hip, lathe([[0.128, 0.04], [0.132, -0.06], [0.14, -0.18], [0.146, -0.25]], shorts));
       add(hip, new T.Mesh(new T.BoxGeometry(0.014, 0.28, 0.035), trim), 0.135 * s, -0.11, 0).rotation.z = 0.03 * s;
-      const knee = new T.Group(); knee.position.y = -0.45; hip.add(knee);
-      add(knee, sph(0.06, skin), 0, 0, 0.004);
-      // shin and calf
-      add(knee, lathe([[0.001, -0.44], [0.04, -0.43], [0.043, -0.37], [0.056, -0.25], [0.068, -0.14], [0.062, -0.05], [0.058, 0], [0.001, 0.02]], skin));
+      const knee = new T.Bone(); knee.position.y = -0.45; hip.add(knee);
+      // thigh, knee, calf and shin as one skinned piece
+      limb([[0.001, -0.895], [0.04, -0.885], [0.043, -0.82], [0.056, -0.7], [0.068, -0.59], [0.063, -0.5], [0.06, -0.455], [0.063, -0.415], [0.072, -0.37], [0.086, -0.29], [0.1, -0.18], [0.106, -0.08], [0.1, 0.02], [0.001, 0.045]], hip, knee, -0.45, 0.06, 0.1 * s, 0.94);
       // socks pulled up under the knee, with shin pad and calf shape
       add(knee, lathe([[0.046, -0.425], [0.048, -0.37], [0.059, -0.25], [0.069, -0.14], [0.066, -0.085], [0.067, -0.07]], sock));
       add(knee, tor(0.064, 0.009, sock), 0, -0.075, 0).rotation.x = Math.PI / 2;
@@ -1615,17 +1686,21 @@ class Component extends DCLogic {
     // ---- arms ----
     const arms = [];
     [-1, 1].forEach((s) => {
-      const sho = new T.Group(); sho.position.set(0.228 * s, 1.555, 0); body.add(sho);
+      const sho = new T.Bone(); sho.position.set(0.228 * s, 1.555, 0); body.add(sho);
       add(sho, sph(0.076, shirtPlain), -0.012 * s, -0.002, 0).scale.set(0.95, 0.92, 0.9);
       // loose short sleeve, open at the end, with a trim cuff
       add(sho, lathe([[0.045, 0.06], [0.07, 0.02], [0.079, -0.05], [0.08, -0.13], [0.079, -0.17]], shirtPlain));
       add(sho, tor(0.079, 0.008, trim), 0, -0.168, 0).rotation.x = Math.PI / 2;
-      // upper arm with a bit of biceps
-      add(sho, lathe([[0.001, -0.3], [0.044, -0.295], [0.052, -0.23], [0.06, -0.14], [0.058, -0.05], [0.001, 0]], skin));
-      const elb = new T.Group(); elb.position.y = -0.3; sho.add(elb);
-      add(elb, sph(0.044, skin), 0, 0, 0);
-      add(elb, lathe([[0.001, -0.25], [0.031, -0.245], [0.034, -0.19], [0.046, -0.08], [0.044, -0.01], [0.001, 0.01]], skin));
-      add(elb, sph(o.gloves ? 0.068 : 0.042, hand), 0, -0.29, 0.004).scale.set(o.gloves ? 1 : 0.72, 1.2, o.gloves ? 0.7 : 0.52);
+      const elb = new T.Bone(); elb.position.y = -0.3; sho.add(elb);
+      // upper arm, elbow and forearm as one skinned piece
+      limb([[0.001, -0.548], [0.03, -0.543], [0.034, -0.49], [0.046, -0.38], [0.044, -0.32], [0.043, -0.295], [0.047, -0.265], [0.056, -0.2], [0.06, -0.12], [0.058, -0.04], [0.04, 0.02], [0.001, 0.03]], sho, elb, -0.3, 0.045, 0.228 * s, 1.555);
+      // hand: palm with closed fingers and a thumb
+      if (o.gloves) add(elb, sph(0.068, hand), 0, -0.29, 0.004).scale.set(1, 1.2, 0.7);
+      else {
+        add(elb, sph(0.04, hand, 12, 10), 0, -0.285, 0.004).scale.set(0.62, 1.15, 0.95);
+        add(elb, sph(0.034, hand, 10, 8), 0, -0.335, 0.012).scale.set(0.58, 0.9, 0.85);
+        add(elb, sph(0.014, hand, 8, 6), -0.012 * s, -0.275, 0.03).scale.set(1, 1.9, 1);
+      }
       if (o.gloves) add(elb, new T.Mesh(new T.CylinderGeometry(0.056, 0.05, 0.07, 14), trim), 0, -0.24, 0);
       sho.rotation.z = 0.1 * s;
       arms.push({ sho, elb, s });
