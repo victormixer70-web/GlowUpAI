@@ -73,10 +73,10 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <div aria-label="Zona del joystick: pon el pulgar en cualquier punto de la mitad izquierda y arrastra para moverte" onPointerDown="{{joyDown}}" onPointerMove="{{joyMove}}" onPointerUp="{{joyUp}}" onPointerCancel="{{joyUp}}" style="position: absolute; left: 0; top: 44px; width: 420px; bottom: 0; touch-action: none; -webkit-user-select: none"></div>
   <div style="{{joyBaseStyle}}"><span style="{{joyRingStyle}}"></span><span style="{{knobStyle}}"></span></div>
 
-  <button type="button" aria-label="{{mainAria}}" onPointerDown="{{mainDown}}" onPointerUp="{{mainUp}}" onPointerLeave="{{mainUp}}" onPointerCancel="{{mainUp}}" style="{{mainBtnStyle}}">{{mainLabel}}</button>
-  <button type="button" aria-label="{{passAria}}" onPointerDown="{{passDown}}" onPointerUp="{{passUp}}" onPointerLeave="{{passUp}}" onPointerCancel="{{passUp}}" style="{{passBtnStyle}}">{{passLabel}}</button>
-  <button type="button" aria-label="{{skillAria}}" onPointerDown="{{skillDown}}" onPointerUp="{{skillUp}}" onPointerLeave="{{skillUp}}" onPointerCancel="{{skillUp}}" style="{{skillBtnStyle}}">{{skillLabel}}</button>
-  <button type="button" aria-label="Sprint: mantén pulsado para correr más rápido" onPointerDown="{{sprintDown}}" onPointerUp="{{sprintUp}}" onPointerLeave="{{sprintUp}}" onPointerCancel="{{sprintUp}}" style="{{sprintBtnStyle}}">SPRINT</button>
+  <button type="button" aria-label="{{mainAria}}" onPointerDown="{{mainDown}}" onPointerUp="{{mainUp}}" onPointerCancel="{{mainUp}}" style="{{mainBtnStyle}}">{{mainLabel}}</button>
+  <button type="button" aria-label="{{passAria}}" onPointerDown="{{passDown}}" onPointerUp="{{passUp}}" onPointerCancel="{{passUp}}" style="{{passBtnStyle}}">{{passLabel}}</button>
+  <button type="button" aria-label="{{skillAria}}" onPointerDown="{{skillDown}}" onPointerUp="{{skillUp}}" onPointerCancel="{{skillUp}}" style="{{skillBtnStyle}}">{{skillLabel}}</button>
+  <button type="button" aria-label="Sprint: mantén pulsado para correr más rápido" onPointerDown="{{sprintDown}}" onPointerUp="{{sprintUp}}" onPointerCancel="{{sprintUp}}" style="{{sprintBtnStyle}}">SPRINT</button>
 
   <sc-if value="{{hasMates}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; left: 0; right: 0; bottom: 8px; display: flex; justify-content: center; align-items: center; gap: 6px; pointer-events: none">
@@ -125,8 +125,27 @@ class Component extends DCLogic {
   }
   componentDidMount() {
     if (this.props.autostart) this.start();
+    // inputs must never stay stuck: listen at window level for every way a finger can go away
+    this.onWinUp = (e) => this.releasePtr(e.pointerId);
+    this.onWinMove = (e) => { if (e.pointerId === this.joy.id) this.joySet(e); };
+    this.onTouchEnd = (e) => { if (!e.touches || e.touches.length === 0) this.releaseAll(); };
+    this.onHide = () => this.releaseAll();
+    window.addEventListener('pointerup', this.onWinUp, true);
+    window.addEventListener('pointercancel', this.onWinUp, true);
+    window.addEventListener('pointermove', this.onWinMove, true);
+    window.addEventListener('touchend', this.onTouchEnd, true);
+    window.addEventListener('touchcancel', this.onTouchEnd, true);
+    window.addEventListener('blur', this.onHide);
+    document.addEventListener('visibilitychange', this.onHide);
   }
   componentWillUnmount() {
+    window.removeEventListener('pointerup', this.onWinUp, true);
+    window.removeEventListener('pointercancel', this.onWinUp, true);
+    window.removeEventListener('pointermove', this.onWinMove, true);
+    window.removeEventListener('touchend', this.onTouchEnd, true);
+    window.removeEventListener('touchcancel', this.onTouchEnd, true);
+    window.removeEventListener('blur', this.onHide);
+    document.removeEventListener('visibilitychange', this.onHide);
     if (this.raf) cancelAnimationFrame(this.raf);
     this.raf = null;
     if (this.R) { this.R.dispose(); this.R = null; }
@@ -1393,23 +1412,26 @@ class Component extends DCLogic {
         else { this.newGame(); this.start(); }
       },
       joyDown: (e) => {
-        if (this.joy.id != null) return;
+        // a new thumb always takes over the stick, even if an old touch was never released
         e.preventDefault();
-        if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+        if (this.joy.id != null) this.releasePtr(this.joy.id);
+        this.zoneEl = e.currentTarget;
+        if (e.currentTarget.setPointerCapture) { try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {} }
         const pt = this.joyLocal(e);
         Object.assign(this.joy, { id: e.pointerId, on: true, bx: pt.x, by: pt.y, kx: 0, ky: 0 });
+        this.held[e.pointerId] = 'joy';
         this.forceUpdate();
       },
-      joyMove: (e) => { if (e.pointerId === this.joy.id) { e.preventDefault(); this.joySet(e); } },
-      joyUp: (e) => { if (e && e.pointerId !== this.joy.id) return; this.joyReset(); g.jx = 0; g.jy = 0; this.forceUpdate(); },
-      mainDown: (e) => { e.preventDefault(); if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId); this.mainPress(); },
-      mainUp: () => { if (g.charging) this.doKick(); },
-      passDown: (e) => { e.preventDefault(); if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId); this.passPress(); },
-      passUp: () => { if (!P.coach) g.press = false; },
-      skillDown: (e) => { e.preventDefault(); if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId); this.skillPress(); },
-      skillUp: () => { g.press = false; },
-      sprintDown: (e) => { e.preventDefault(); if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId); g.sprint = true; },
-      sprintUp: () => { g.sprint = false; },
+      joyMove: (e) => { if (e.pointerId === this.joy.id) e.preventDefault(); },
+      joyUp: (e) => this.releasePtr(e.pointerId),
+      mainDown: (e) => { this.hold(e, 'main'); this.mainPress(); },
+      mainUp: (e) => this.releasePtr(e.pointerId),
+      passDown: (e) => { this.hold(e, 'pass'); this.passPress(); },
+      passUp: (e) => this.releasePtr(e.pointerId),
+      skillDown: (e) => { this.hold(e, 'skill'); this.skillPress(); },
+      skillUp: (e) => this.releasePtr(e.pointerId),
+      sprintDown: (e) => { this.hold(e, 'sprint'); g.sprint = true; },
+      sprintUp: (e) => this.releasePtr(e.pointerId),
       onKeyDown: (e) => {
         const k = e.key.toLowerCase();
         const map = { arrowleft: 'l', a: 'l', arrowright: 'r', d: 'r', arrowup: 'u', w: 'u', arrowdown: 'd', s: 'd' };
@@ -1474,12 +1496,35 @@ class Component extends DCLogic {
     if (owner && owner.team === h.team && owner !== h) { owner.passReq = 1.5; owner.think = Math.min(owner.think, 0.08); }
     else this.flashMsg('Tu compañero aún no tiene el balón', 0.8);
   }
+  hold(e, kind) {
+    e.preventDefault();
+    if (e.currentTarget.setPointerCapture) { try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {} }
+    this.held[e.pointerId] = kind;
+  }
+  releasePtr(id) {
+    const kind = this.held && this.held[id], g = this.g;
+    if (!kind) return;
+    delete this.held[id];
+    if (kind === 'joy') { this.joyReset(); g.jx = 0; g.jy = 0; }
+    if (kind === 'main' && g.charging) this.doKick();
+    if (kind === 'sprint') g.sprint = false;
+    if (kind === 'skill' || (kind === 'pass' && !this.props.coach)) g.press = false;
+    this.forceUpdate();
+  }
+  releaseAll() {
+    Object.keys(this.held || {}).forEach((id) => this.releasePtr(Number(id)));
+    const g = this.g;
+    this.joyReset(); g.jx = 0; g.jy = 0; g.sprint = false; g.press = false;
+    if (g.charging) { g.charging = false; g.charge = 0; }
+    this.forceUpdate();
+  }
   joyReset() {
     this.JR = 80;
+    this.held = this.held || {};
     this.joy = { id: null, on: false, bx: 110, by: 290, kx: 0, ky: 0 };
   }
   joyLocal(e) {
-    const r = e.currentTarget.getBoundingClientRect(), k = 420 / (r.width || 420);
+    const el = this.zoneEl || e.currentTarget, r = el.getBoundingClientRect(), k = 420 / (r.width || 420);
     return { x: (e.clientX - r.left) * k, y: 44 + (e.clientY - r.top) * k };
   }
   joySet(e) {
