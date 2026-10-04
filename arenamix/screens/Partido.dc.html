@@ -61,6 +61,18 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <sc-if value="{{hasPing}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 14px; top: 26px; display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; color: #53D88E"><svg width="12" height="10" viewBox="0 0 12 10" fill="#53D88E"><rect x="0" y="7" width="2.5" height="3"/><rect x="3.2" y="5" width="2.5" height="5"/><rect x="6.4" y="2.5" width="2.5" height="7.5"/><rect x="9.6" y="0" width="2.4" height="10"/></svg>{{pingLabel}}</span></sc-if>
   </div>
 
+  <sc-if value="{{hasTutTarget}}" hint-placeholder-val="{{ false }}">
+    <div style="{{tutTargetStyle}}"><svg width="70" height="44" viewBox="-35 -22 70 44"><ellipse rx="30" ry="17" fill="#FFC53D" fill-opacity=".25" stroke="#FFC53D" stroke-width="3"/></svg></div>
+  </sc-if>
+  <sc-if value="{{isTut}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 50%; top: 52px; transform: translateX(-50%); width: 470px; padding: 10px 14px; border-radius: 14px; background: #0B0B14E6; border: 1.5px solid #FFC53D; display: flex; align-items: flex-start; gap: 12px; z-index: 3">
+      <span style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+        <span style="font-size: 10px; font-weight: 800; letter-spacing: 1.5px; color: #FFC53D">{{tutKicker}}</span>
+        <span style="font-size: 14px; font-weight: 700; line-height: 1.35">{{tutText}}</span>
+      </span>
+      <button type="button" onClick="{{tutSkip}}" style="flex: none; height: 30px; padding: 0 10px; border: 1px solid #2E2E52; border-radius: 8px; background: transparent; color: #CACAE0; font: 700 12px Manrope, sans-serif; cursor: pointer">Saltar</button>
+    </div>
+  </sc-if>
   <sc-if value="{{flash}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; left: 0; right: 0; top: 52px; display: flex; justify-content: center; pointer-events: none">
       <span style="padding: 4px 12px; border-radius: 8px; background: #0B0B14CC; font-weight: 800; font-size: 13px; color: #FFC53D">{{flashText}}</span>
@@ -114,7 +126,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 </section>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3,4],"default":3},"mates":{"editor":null},"label":{"editor":null},"rivals":{"editor":null},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3,4],"default":3},"mates":{"editor":null},"label":{"editor":null},"tutorial":{"editor":"bool","default":false},"rivals":{"editor":null},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -172,6 +184,7 @@ class Component extends DCLogic {
       ball: { x: 30, y: 15, z: 0, vx: 0, vy: 0, vz: 0, rot: 0, spin: 0 }, ps
     };
     this.kickoff(0);
+    if (this.props.tutorial) this.tutSetup(0);
   }
   loadStats() {
     try {
@@ -185,6 +198,7 @@ class Component extends DCLogic {
     return Math.max(0, Math.min(1, ((s[k] ?? 10) - 10) / 140));
   }
   diff(team) {
+    if (this.props.tutorial) return { spd: 6.5, steal: 0.12, keep: 1, slide: 0, think: 9, err: 0.1, react: 0.45, dive: 5, catchV: 12, save: 0.25, skill: 0, beat: 1, pot: 1, range: 0 };
     const comp = this.props.mode === 'comp';
     if (team === 1) return comp
       ? { spd: 7.3, steal: 0.8, keep: 0.8, slide: 0.5, think: 0.3, err: 0.2, react: 0.16, dive: 7.4, catchV: 16, save: 0.92, skill: 0.35, beat: 0.5, pot: 1.0, range: 19 }
@@ -284,6 +298,7 @@ class Component extends DCLogic {
   }
   doSkill(p, side) {
     const g = this.g, i = g.ps.indexOf(p);
+    if (g.tut && i === g.ctl && g.own === i) g.tut.skilled = true;
     if (g.own !== i || p.skillCd > 0 || (p.act && p.act.lock)) return false;
     const f = p.face, px = -Math.sin(f) * side, py = Math.cos(f) * side;
     p.act = { type: 'skill', t: 0, dur: 0.42, side };
@@ -319,6 +334,7 @@ class Component extends DCLogic {
   }
   goal(team) {
     const g = this.g;
+    if (g.tut && g.tut.i === 5 && team === 0) { g.tut.i = 6; g.tut.t = 0; this.flashMsg('¡GOLAZO! Último paso', 1.5); }
     g.score[team]++;
     g.phase = 'goal'; g.pt = 0; g.concede = 1 - team; g.own = -1;
     const sc = g.last >= 0 ? g.ps[g.last] : null;
@@ -434,7 +450,7 @@ class Component extends DCLogic {
     });
     if (g.phase === 'goal') { this.goalStep(dt); return; }
     if (g.phase !== 'play') return;
-    g.t -= dt;
+    if (!this.props.tutorial) g.t -= dt;
     if (g.t <= 0) { g.t = 0; g.phase = 'end'; g.pt = 0; g.charging = false; return; }
     if (g.charging) g.charge = Math.min(1, g.charge + dt * 1.15);
     if (g.recv) { g.recv.t -= dt; if (g.recv.t <= 0) g.recv = null; }
@@ -457,6 +473,7 @@ class Component extends DCLogic {
       if (d > 0 && d < 0.9) { const o = (0.9 - d) / 2, nx = dx / d, ny = dy / d; a.x -= nx * o; a.y -= ny * o; c.x += nx * o; c.y += ny * o; }
     }
     this.slideHits();
+    if (this.props.tutorial) this.tutStep(dt);
     this.ballStep(dt);
   }
   goalStep(dt) {
@@ -476,7 +493,7 @@ class Component extends DCLogic {
       if (sp > 0.5) p.face += this.ang(Math.atan2(p.vy, p.vx) - p.face) * Math.min(1, dt * 8);
       if (sp > 0.25) p.run += 2 * Math.PI * (0.9 + 0.09 * sp) * dt;
     });
-    if (g.pt > 3) { this.kickoff(g.concede); g.phase = 'play'; g.pt = 0; }
+    if (g.pt > 3) { if (this.props.tutorial) { this.tutSetup(6); g.phase = 'play'; g.pt = 0; return; } this.kickoff(g.concede); g.phase = 'play'; g.pt = 0; }
   }
   pickChasers() {
     const g = this.g, b = g.ball, set = new Set();
@@ -604,6 +621,11 @@ class Component extends DCLogic {
     let maxV = D.spd, acc = 8, dx = 0, dy = 0;
     const own = g.own >= 0 ? g.ps[g.own] : null;
     p.sprinting = false;
+    if (this.props.tutorial) {
+      if (own === p) { const [ax, ay] = this.seek(p, 4, 15); return [ax, ay, 2.4, 6]; }
+      if (g.recv && g.recv.i === i) { const [ax, ay] = this.seek(p, b.x + b.vx * 0.3, b.y + b.vy * 0.3, 0.6); return [ax, ay, 6, 9]; }
+      return [0, 0, 0, 8];
+    }
     if (own === p) {
       p.think -= dt;
       if (p.think <= 0 && !p.act) { p.think = D.think * (0.7 + 0.6 * Math.random()); this.aiDecide(p); }
@@ -741,6 +763,51 @@ class Component extends DCLogic {
     p.vx = 0;
     const dl = -s * Math.cos(p.face) > 0 ? 1 : -1;
     p.act = { type: 'dive', t: 0, dur: 0.9, lock: true, dl, s };
+  }
+  tutSteps() {
+    return [
+      'Mueve el joystick (mitad izquierda de la pantalla) y ve hasta el círculo amarillo.',
+      'Ve hasta el balón: al tocarlo empiezas a llevarlo.',
+      'Mantén SPRINT mientras corres con el balón. Ojo: corriendo, el balón se te adelanta más.',
+      'Pulsa PASE para pasársela a tu compañero (la flecha azul indica a quién).',
+      'Hay un rival delante: pulsa REGATE para dejarlo atrás.',
+      'Acércate al área y mantén CHUT para cargar; suelta para tirar. Con más de ¾ de potencia sale por alto.',
+      'Sin balón: pulsa ENTRADA para tirarte a por él, o mantén PRESIÓN para ir a robarlo.'
+    ];
+  }
+  tutSetup(k) {
+    const g = this.g, b = g.ball, h = g.ps[g.ctl];
+    const mate = g.ps.findIndex((q, j) => q.team === 0 && q.role !== 'gk' && j !== g.ctl);
+    const rival = g.ps.findIndex((q) => q.team === 1 && q.role !== 'gk');
+    g.tut = Object.assign(g.tut || {}, { i: k, t: 0, hold: 0, skilled: false, back: 0 });
+    g.ps.forEach((q) => { if (q.team === 1 && q.role !== 'gk' && g.ps.indexOf(q) !== rival) Object.assign(q, { x: 58, y: 1.5, vx: 0, vy: 0 }); });
+    if (k === 0) { Object.assign(h, { x: 26, y: 15, vx: 0, vy: 0 }); Object.assign(b, { x: 40, y: 20, z: 0, vx: 0, vy: 0, vz: 0 }); g.own = -1; Object.assign(g.ps[rival], { x: 57.5, y: 29 }); if (mate >= 0) Object.assign(g.ps[mate], { x: 22, y: 25 }); g.tut.target = { x: 34, y: 8 }; }
+    if (k === 6) { Object.assign(h, { x: 33, y: 15, vx: 0, vy: 0, act: null }); Object.assign(g.ps[rival], { x: 40, y: 15, vx: 0, vy: 0, act: null, cd: 0 }); Object.assign(b, { x: 39.4, y: 15, z: 0, vx: 0, vy: 0, vz: 0 }); g.own = rival; g.hold = -1; }
+  }
+  tutStep(dt) {
+    const g = this.g, T = g.tut, h = g.ps[g.ctl], b = g.ball;
+    if (!T || T.i >= 7) return;
+    T.t += dt;
+    const mate = g.ps.findIndex((q, j) => q.team === 0 && q.role !== 'gk' && j !== g.ctl);
+    const rival = g.ps.findIndex((q) => q.team === 1 && q.role !== 'gk');
+    const next = () => { T.i++; T.t = 0; T.hold = 0; if (T.i >= 7) { g.phase = 'end'; if (this.props.onEnd) setTimeout(() => this.props.onEnd({ tutorial: true }), 600); } else this.flashMsg('¡Bien hecho!', 0.9); };
+    // during the dribbling steps a lost ball comes back to you
+    if (T.i >= 2 && T.i <= 5 && g.own >= 0 && g.ps[g.own].team === 1) { T.back += dt; if (T.back > 0.8) { g.own = -1; g.hold = -1; Object.assign(b, { x: h.x + Math.cos(h.face) * 1.2, y: h.y + Math.sin(h.face) * 1.2, z: 0, vx: 0, vy: 0, vz: 0 }); T.back = 0; } }
+    if (g.hold >= 0 && g.ps[g.hold].team === 1 && T.i <= 5) { g.hold = -1; Object.assign(b, { x: 44, y: 15, z: 0, vx: 0, vy: 0, vz: 0 }); }
+    if (T.i === 0 && Math.hypot(h.x - T.target.x, h.y - T.target.y) < 1.8) next();
+    else if (T.i === 1 && g.own === g.ctl) next();
+    else if (T.i === 2) { if (g.own === g.ctl && h.sprinting) T.hold += dt; if (T.hold > 0.8) next(); }
+    else if (T.i === 3) {
+      if (mate >= 0 && T.t < 0.05) Object.assign(g.ps[mate], { x: this.clamp(h.x + 7, 6, 50), y: h.y > 15 ? h.y - 8 : h.y + 8, vx: 0, vy: 0 });
+      if (g.own === mate) { T.hold += dt; if (T.hold > 0.5) { this.passBall(g.ps[mate], h); next(); } }
+    }
+    else if (T.i === 4) {
+      if (g.own === g.ctl && !T.placed) { const r = g.ps[rival], f = Math.atan2(15 - h.y, 54 - h.x); Object.assign(r, { x: h.x + Math.cos(f) * 3.2, y: h.y + Math.sin(f) * 3.2, vx: 0, vy: 0, face: f + Math.PI }); T.placed = true; }
+      if (T.skilled) { T.placed = false; next(); }
+    }
+    else if (T.i === 5 && T.t < 0.05) { const r = g.ps[rival]; Object.assign(r, { x: 57.5, y: 29, vx: 0, vy: 0 }); }
+    else if (T.i === 6 && g.own >= 0 && g.ps[g.own].team === 0) next();
+    else if (T.i === 6 && g.own < 0 && T.t > 0.3 && this.dist(h, b) < 1.3) next();
   }
   slideHits() {
     const g = this.g, b = g.ball;
@@ -1506,6 +1573,7 @@ class Component extends DCLogic {
     const [ix, iy] = this.inp || [0, 0];
     const passQ = ctx === 'ball' ? this.pickPassTarget(h, Math.hypot(ix, iy) > 0.2 ? Math.atan2(iy, ix) : h.face, Math.hypot(ix, iy) <= 0.2) : null;
     const pm = passQ ? SP(passQ.x, passQ.y, 2.3) : { x: 0, y: 0 };
+    const tutI = P.tutorial && g.tut ? g.tut.i : -1, glow = (k) => (k ? 'outline: 4px solid #FFC53D; outline-offset: 4px; ' : '');
     const btn = (right, bottom, size, bg, sh, fs, extra) => 'position: absolute; right: ' + right + 'px; bottom: ' + bottom + 'px; width: ' + size + 'px; height: ' + size + 'px; border-radius: ' + (size / 2) + 'px; border: 0; padding: 0; touch-action: none; cursor: pointer; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + fs + 'px; letter-spacing: 0.5px; color: #0B0B14; background: ' + bg + '; box-shadow: 0 5px 0 ' + sh + '; ' + (extra || '');
     const sprintOn = g.sprint && h.stam > 0.04;
     return {
@@ -1523,7 +1591,7 @@ class Component extends DCLogic {
       s0: String(g.score[0]), s1: String(g.score[1]),
       clock: this.fmtClock(g.t),
       clockStyle: 'position: absolute; right: 14px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 22px; color: ' + (g.t <= 10 && g.phase === 'play' ? '#FF5C5C' : '#F4F4FA') + ';',
-      modeLabel: P.label ? P.label : P.coach ? 'MODO ENTRENADOR' : mode === 'comp' ? 'COMPETITIVO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA',
+      modeLabel: P.tutorial ? 'TUTORIAL' : P.label ? P.label : P.coach ? 'MODO ENTRENADOR' : mode === 'comp' ? 'COMPETITIVO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA',
       modeColor: mode === 'comp' ? '#E3A56E' : '#22D3EE',
       flash: g.flashT > 0, flashText: g.flash,
       stamStyle: 'display: block; height: 100%; width: ' + (h.stam * 100).toFixed(0) + '%; background: ' + (h.stam < 0.25 ? '#FF5C5C' : '#53D88E') + ';',
@@ -1532,15 +1600,21 @@ class Component extends DCLogic {
       knobStyle: 'position: absolute; left: -28px; top: -28px; width: 56px; height: 56px; border-radius: 28px; background: #22D3EE; box-shadow: 0 3px 0 #0E8FA3, 0 4px 14px #0008; transform: translate(' + this.joy.kx.toFixed(1) + 'px, ' + this.joy.ky.toFixed(1) + 'px);',
       mainLabel: atk ? 'CHUT' : 'ENTRADA',
       mainAria: atk ? 'Chutar: mantén pulsado para más potencia' : 'Entrada: tírate al suelo para robar el balón',
-      mainBtnStyle: btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : '#F4F4FA') : '#FF7A7A', atk ? '#A3A3C2' : '#B33A3A', atk ? 24 : 17, 'transform: scale(' + (g.charging ? 0.94 + g.charge * 0.1 : 1).toFixed(3) + ');'),
+      mainBtnStyle: glow(tutI === 5 || tutI === 6).length ? btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : '#F4F4FA') : '#FF7A7A', atk ? '#A3A3C2' : '#B33A3A', atk ? 24 : 17, glow(true)) : btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : '#F4F4FA') : '#FF7A7A', atk ? '#A3A3C2' : '#B33A3A', atk ? 24 : 17, 'transform: scale(' + (g.charging ? 0.94 + g.charge * 0.1 : 1).toFixed(3) + ');'),
       passLabel: ctx === 'ball' ? 'PASE' : ctx === 'team' ? 'PÍDELA' : P.coach ? 'CAMBIO' : 'PRESIÓN',
       passAria: ctx === 'ball' ? 'Pase al compañero señalado' : ctx === 'team' ? 'Pide el balón a tu compañero' : P.coach ? 'Cambiar al compañero más cercano al balón' : 'Presión: mantén pulsado para ir a por el balón',
-      passBtnStyle: ctx === 'def' && !P.coach ? btn(112, 14, 64, g.press ? '#FFC53D' : '#F4B860', '#A87420', 15) : btn(112, 14, 64, ctx === 'def' ? '#8CC5FF' : '#A78BFA', ctx === 'def' ? '#3B76B8' : '#6D28D9', ctx === 'ball' ? 19 : 16),
+      passBtnStyle: tutI === 3 || tutI === 6 ? btn(112, 14, 64, ctx === 'def' ? '#F4B860' : '#A78BFA', ctx === 'def' ? '#A87420' : '#6D28D9', ctx === 'ball' ? 19 : 15, glow(true)) : ctx === 'def' && !P.coach ? btn(112, 14, 64, g.press ? '#FFC53D' : '#F4B860', '#A87420', 15) : btn(112, 14, 64, ctx === 'def' ? '#8CC5FF' : '#A78BFA', ctx === 'def' ? '#3B76B8' : '#6D28D9', ctx === 'ball' ? 19 : 16),
       skillLabel: ctx === 'ball' ? 'REGATE' : 'PRESIÓN',
       skillAria: ctx === 'ball' ? 'Regate: deja atrás al rival que tienes delante' : 'Presión: mantén pulsado para ir a por el balón',
-      skillBtnStyle: btn(26, 120, 60, ctx === 'ball' ? (h.skillCd > 0 ? '#5E5E80' : '#53D88E') : (g.press ? '#FFC53D' : '#F4B860'), ctx === 'ball' ? '#2F8A57' : '#A87420', 15, ctx !== 'ball' && !P.coach ? 'display: none;' : ''),
-      sprintBtnStyle: btn(98, 92, 56, sprintOn ? '#FFC53D' : '#22D3EE', '#0E8FA3', 14),
+      skillBtnStyle: tutI === 4 ? btn(26, 120, 60, '#53D88E', '#2F8A57', 15, glow(true)) : btn(26, 120, 60, ctx === 'ball' ? (h.skillCd > 0 ? '#5E5E80' : '#53D88E') : (g.press ? '#FFC53D' : '#F4B860'), ctx === 'ball' ? '#2F8A57' : '#A87420', 15, ctx !== 'ball' && !P.coach ? 'display: none;' : ''),
+      sprintBtnStyle: btn(98, 92, 56, sprintOn ? '#FFC53D' : '#22D3EE', '#0E8FA3', 14, glow(tutI === 2)),
       showGoal: g.phase === 'goal', scorerText: g.scorer,
+      isTut: !!(P.tutorial && g.tut && g.tut.i < 7),
+      tutKicker: g.tut ? 'TUTORIAL · PASO ' + Math.min(7, g.tut.i + 1) + ' DE 7' : '',
+      tutText: g.tut && g.tut.i < 7 ? this.tutSteps()[g.tut.i] : '',
+      tutSkip: () => { if (P.onEnd) P.onEnd({ tutorial: true, skipped: true }); },
+      hasTutTarget: !!(P.tutorial && g.tut && g.tut.i === 0),
+      tutTargetStyle: (() => { const t = g.tut && g.tut.target ? SP(g.tut.target.x, g.tut.target.y) : { x: -99, y: -99 }; return 'position: absolute; left: 0; top: 0; pointer-events: none; transform: translate(' + (t.x - 35).toFixed(1) + 'px, ' + (t.y - 22).toFixed(1) + 'px);'; })(),
       goalStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 110px; line-height: 1; letter-spacing: 4px; color: #22D3EE; text-shadow: 0 6px 0 #0B0B14, 0 0 40px #22D3EE99; transform: scale(' + goalScale.toFixed(3) + ') rotate(-4deg);',
       showReady: g.phase === 'ready',
       readyTitle: (P.coach ? 'MODO ENTRENADOR' : mode === 'comp' ? 'PARTIDO CLASIFICATORIO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA') + ' · ' + n + ' VS ' + n,

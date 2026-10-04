@@ -4,7 +4,7 @@
   var h = preact.h, render = preact.render, PComponent = preact.Component;
 
   var SCREENS = ['Main', 'Idioma', 'Deportes', 'Modos', 'Rangos', 'Taquilla', 'Tienda', 'Estadisticas',
-    'Rapida', 'Competitivo', 'Privada', 'Entrenamiento',
+    'Rapida', 'Competitivo', 'Privada', 'Entrenamiento', 'Tutorial',
     'Baloncesto', 'Beisbol', 'Voley', 'Partido', 'Duelo', 'Avatar', 'RangosTabla'];
   var registry = {};
   var helmetDone = {};

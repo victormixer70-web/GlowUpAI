@@ -82,19 +82,19 @@ class Component extends DCLogic {
       futbol: { name: 'FÚTBOL', c1: '#145A33', c2: '#22914F', modes: teams(false).concat([
         { id: 'pens', title: 'TANDA DE PENALTIS', kind: 'duel', duel: 'pen', desc: '5 tiros y 5 paradas por turnos. Muerte súbita.' },
         { id: 'fk', title: 'TIROS LIBRES', kind: 'duel', duel: 'free', desc: '7 escenarios distintos, con barrera.' }]),
-        train: [{ id: 'train', title: 'PENALTIS Y FALTAS', href: 'Entrenamiento.dc.html', desc: 'Práctica libre con dianas y todos los escenarios.' }] },
+        train: [{ id: 'train', title: 'PENALTIS Y FALTAS', href: 'Entrenamiento.dc.html', desc: 'Práctica libre con dianas y todos los escenarios.' }, { id: 'tut', title: 'TUTORIAL', href: 'Tutorial.dc.html', desc: 'Repasa los controles paso a paso.' }] },
       baloncesto: { name: 'BALONCESTO', c1: '#7A3B12', c2: '#C2652A', modes: teams(true).concat([
         { id: 'three', title: 'CONCURSO DE TRIPLES', kind: 'mg', comp: 'Baloncesto', mode: 'three', unit: 'puntos', rival: [6, 16], desc: '15 balones en 5 posiciones y 60 segundos; el último de cada posición vale doble.' },
         { id: 'ft', title: 'TIROS LIBRES', kind: 'mg', comp: 'Baloncesto', mode: 'free', unit: 'puntos', rival: [4, 9], desc: '10 tiros libres. Gana quien meta más.' }]),
-        train: [{ id: 'train', title: 'PISTA LIBRE', href: 'Baloncesto.dc.html', desc: 'Triples y tiros libres sin presión.' }] },
+        train: [{ id: 'train', title: 'PISTA LIBRE', href: 'Baloncesto.dc.html', desc: 'Triples y tiros libres sin presión.' }, { id: 'tut', title: 'TUTORIAL', href: 'Tutorial.dc.html', desc: 'Repasa los controles paso a paso.' }] },
       beisbol: { name: 'BÉISBOL', c1: '#4A3216', c2: '#2F7A3E', modes: teams(true).concat([
         { id: 'derby', title: 'HOME RUN DERBY', kind: 'mg', comp: 'Beisbol', mode: 'hr', unit: 'home runs', rival: [1, 7], desc: 'Batea hasta 10 eliminaciones. Gana quien haga más home runs.' },
         { id: 'long', title: 'BATAZO MÁS LARGO', kind: 'mg', comp: 'Beisbol', mode: 'long', unit: 'metros', rival: [95, 145], desc: 'Gana el golpe más lejano dentro del campo.' }]),
-        train: [{ id: 'train', title: 'JAULA DE BATEO', href: 'Beisbol.dc.html', desc: 'Batea sin límite de tiempo.' }] },
+        train: [{ id: 'train', title: 'JAULA DE BATEO', href: 'Beisbol.dc.html', desc: 'Batea sin límite de tiempo.' }, { id: 'tut', title: 'TUTORIAL', href: 'Tutorial.dc.html', desc: 'Repasa los controles paso a paso.' }] },
       voley: { name: 'VÓLEY', c1: '#7A6430', c2: '#C9A85C', modes: teams(true).concat([
         { id: 'serve', title: 'DESAFÍO DE SAQUE', kind: 'mg', comp: 'Voley', mode: 'serve', unit: 'puntos', rival: [8, 22], desc: '10 saques. Las zonas marcadas valen 3.' },
         { id: 'spike', title: 'DESAFÍO DE REMATE', kind: 'mg', comp: 'Voley', mode: 'spike', unit: 'puntos', rival: [10, 24], desc: '10 remates contra el bloqueo.' }]),
-        train: [{ id: 'train', title: 'PISTA LIBRE', href: 'Voley.dc.html', desc: 'Saques y remates a tu ritmo.' }] }
+        train: [{ id: 'train', title: 'PISTA LIBRE', href: 'Voley.dc.html', desc: 'Saques y remates a tu ritmo.' }, { id: 'tut', title: 'TUTORIAL', href: 'Tutorial.dc.html', desc: 'Repasa los controles paso a paso.' }] }
     };
     return S[sport] || S.futbol;
   }
