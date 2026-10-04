@@ -187,9 +187,9 @@ class Component extends DCLogic {
   diff(team) {
     const comp = this.props.mode === 'comp';
     if (team === 1) return comp
-      ? { spd: 6.5, steal: 0.8, keep: 0.8, slide: 0.5, think: 0.3, err: 0.2, react: 0.16, dive: 7.4, catchV: 16, save: 0.92, skill: 0.35, beat: 0.5, pot: 1.0, range: 19 }
-      : { spd: 6.1, steal: 0.6, keep: 0.95, slide: 0.3, think: 0.42, err: 0.22, react: 0.21, dive: 6.6, catchV: 15, save: 0.86, skill: 0.2, beat: 0.4, pot: 0.95, range: 17 };
-    return { spd: 6.3, steal: 0.7, keep: 0.85, slide: 0.3, think: 0.35, err: 0.2, react: 0.16, dive: 7.4, catchV: 16, save: 0.9, skill: 0.25, beat: 0.45, pot: 1.0, range: 18 };
+      ? { spd: 7.3, steal: 0.8, keep: 0.8, slide: 0.5, think: 0.3, err: 0.2, react: 0.16, dive: 7.4, catchV: 16, save: 0.92, skill: 0.35, beat: 0.5, pot: 1.0, range: 19 }
+      : { spd: 6.9, steal: 0.6, keep: 0.95, slide: 0.3, think: 0.42, err: 0.22, react: 0.21, dive: 6.6, catchV: 15, save: 0.86, skill: 0.2, beat: 0.4, pot: 0.95, range: 17 };
+    return { spd: 7.1, steal: 0.7, keep: 0.85, slide: 0.3, think: 0.35, err: 0.2, react: 0.16, dive: 7.4, catchV: 16, save: 0.9, skill: 0.25, beat: 0.45, pot: 1.0, range: 18 };
   }
   kickoff(team) {
     const g = this.g, n = this.size();
@@ -580,7 +580,7 @@ class Component extends DCLogic {
   humanMove(p, i, dt) {
     const g = this.g, b = g.ball;
     let [dx, dy] = this.inp || [0, 0];
-    let maxV = (6.0 + 1.7 * this.tt('vel')) * (g.t < g.dur * 0.4 ? 1 - 0.1 * (1 - this.tt('res')) : 1);
+    let maxV = (7.0 + 1.7 * this.tt('vel')) * (g.t < g.dur * 0.4 ? 1 - 0.1 * (1 - this.tt('res')) : 1);
     const moving = Math.hypot(dx, dy) > 0.3;
     if (g.press && !moving && g.own !== i) {
       const t = Math.min(0.6, this.dist(p, b) / 8);

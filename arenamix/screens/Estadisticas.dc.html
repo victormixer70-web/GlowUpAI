@@ -100,7 +100,7 @@ class Component extends DCLogic {
     const pct = (a, b) => (v) => Math.round(a + (b - a) * t(v));
     return {
       futbol: { label: 'Fútbol', num: '10', stats: [
-        { id: 'vel', name: 'Velocidad', effect: (v) => 'Carrera ' + f1(6.2 + 2 * t(v)) + ' m/s' },
+        { id: 'vel', name: 'Velocidad', effect: (v) => 'Carrera ' + f1(7.0 + 1.7 * t(v)) + ' m/s' },
         { id: 'pot', name: 'Potencia de tiro', effect: (v) => 'Disparo máximo ' + Math.round((26 + 9 * t(v)) * 3.6) + ' km/h' },
         { id: 'pre', name: 'Precisión', effect: (v) => 'Desvío del tiro ±' + f1(0.9 * (1 - t(v))) + ' m' },
         { id: 'con', name: 'Control', effect: (v) => 'Balón pegado al pie ' + pct(50, 100)(v) + '%' },
