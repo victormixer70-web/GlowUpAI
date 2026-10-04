@@ -1,5 +1,5 @@
 /* Network-first so every update you publish reaches the phone; cache is the offline fallback. */
-const CACHE = 'arenamix-v17';
+const CACHE = 'arenamix-v18';
 const CORE = ['./', 'index.html', 'app.js', 'manifest.webmanifest', 'vendor/preact.min.js', 'vendor/three.min.js', 'icons/icon-192.png'];
 
 self.addEventListener('install', (e) => {

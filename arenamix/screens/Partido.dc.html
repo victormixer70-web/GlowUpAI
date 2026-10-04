@@ -948,9 +948,9 @@ class Component extends DCLogic {
     R.toneMapping = T.ACESFilmicToneMapping;
     R.toneMappingExposure = 1.1;
     this.R = R;
-    this.cam = new T.PerspectiveCamera(36, 844 / 390, 0.1, 500);
-    this.camPos = new T.Vector3(0, 10.5, 14.5);
-    this.camLook = new T.Vector3(0, 0, 1);
+    this.cam = new T.PerspectiveCamera(40, 844 / 390, 0.1, 700);
+    this.camPos = new T.Vector3(0, 8, 16);
+    this.camLook = new T.Vector3(0, 0, -2);
     this.buildScene();
     this.draw3D(0);
   }
@@ -965,8 +965,8 @@ class Component extends DCLogic {
   buildScene() {
     const T = THREE;
     const S = new T.Scene();
-    S.background = new T.Color(0x0b1430);
-    S.fog = new T.Fog(0x0b1430, 80, 190);
+    S.background = new T.Color(0x0d1840);
+    S.fog = new T.Fog(0x0d1840, 120, 260);
     this.S = S;
     S.add(new T.HemisphereLight(0xcfe0ff, 0x1d5a33, 0.75));
     const sun = new T.DirectionalLight(0xfff4e0, 1.2);
@@ -999,26 +999,113 @@ class Component extends DCLogic {
     pitch.rotation.x = -Math.PI / 2; pitch.receiveShadow = true; S.add(pitch);
     const apron = new T.Mesh(new T.PlaneGeometry(500, 500), this.mat(0x0f2a1a, { roughness: 1 }));
     apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; S.add(apron);
-    const standMat = this.mat(0x141b2d, { roughness: 0.9 });
-    const crowdColors = [0xff8a3d, 0xc8f031, 0x3ea6ff, 0xf2f5fa, 0xe5484d, 0x27335e, 0x27335e, 0x1c2540];
-    this.fans = [];
-    const addStand = (cx, cz, len, rotY) => {
-      const g = new T.Group();
-      for (let i = 0; i < 10; i++) { const st = new T.Mesh(new T.BoxGeometry(len, 0.9, 1.4), standMat); st.position.set(0, 0.45 + i * 0.9, i * 1.4); st.receiveShadow = true; g.add(st); }
-      const roof = new T.Mesh(new T.BoxGeometry(len + 2, 0.35, 8), this.mat(0x1c2540)); roof.position.set(0, 14.5, 10); g.add(roof);
-      const per = Math.floor(len / 0.62), n = per * 10;
-      const fan = new T.InstancedMesh(new T.BoxGeometry(0.42, 0.62, 0.32), new T.MeshStandardMaterial({ roughness: 0.8 }), n);
-      const m4 = new T.Matrix4(), col = new T.Color();
-      let idx = 0;
-      for (let row = 0; row < 10; row++) for (let i = 0; i < per; i++) {
-        if (Math.random() < 0.1) m4.makeScale(0.001, 0.001, 0.001);
-        else m4.makeTranslation(-len / 2 + 0.31 + i * 0.62, 1.2 + row * 0.9, row * 1.4 + 0.1);
-        fan.setMatrixAt(idx, m4); col.setHex(crowdColors[Math.floor(Math.random() * crowdColors.length)]).convertSRGBToLinear(); fan.setColorAt(idx, col); idx++;
-      }
-      g.add(fan); g.position.set(cx, 0, cz); g.rotation.y = rotY; S.add(g);
-      this.fans.push(fan);
+    // ---------- big open-air stadium: two tiers on three sides, ultras behind each goal ----------
+    const P = this.props;
+    const teamCols = [[P.homeColor ?? '#FF8A3D', P.homeTrim ?? '#0B0B14'], [P.awayColor ?? '#A78BFA', P.awayTrim ?? '#F4F4FA']];
+    const standMat = this.mat(0x2a3044, { roughness: 0.92 });
+    const seatMat = this.mat(0x1b2236, { roughness: 0.9 });
+    const LOW = 14, UP = 10;
+    const lowZ = (r) => r * 0.85, lowY = (r) => 0.6 + r * 0.48;
+    const upZ = (r) => 13 + r * 0.8, upY = (r) => 8.6 + r * 0.62;
+    const profile = () => {
+      const s = new T.Shape();
+      s.moveTo(-0.2, 0);
+      for (let r = 0; r < LOW; r++) { s.lineTo(lowZ(r), lowY(r)); s.lineTo(lowZ(r) + 0.85, lowY(r)); }
+      s.lineTo(12.2, lowY(LOW - 1)); s.lineTo(12.2, 7.4); s.lineTo(13, 7.4); s.lineTo(13, upY(0));
+      for (let r = 0; r < UP; r++) { s.lineTo(upZ(r), upY(r)); s.lineTo(upZ(r) + 0.8, upY(r)); }
+      s.lineTo(upZ(UP - 1) + 0.8, upY(UP - 1) + 1.6); s.lineTo(upZ(UP - 1) + 1.4, upY(UP - 1) + 1.6); s.lineTo(upZ(UP - 1) + 1.4, 0);
+      s.lineTo(-0.2, 0);
+      return s;
     };
-    addStand(0, -22, 96, Math.PI); addStand(-41, 0, 46, -Math.PI / 2); addStand(41, 0, 46, Math.PI / 2);
+    const adTexBig = this.canvasTex(2048, 64, (c, w, h) => {
+      c.fillStyle = '#0B0B14'; c.fillRect(0, 0, w, h);
+      c.font = 'italic 800 46px Barlow Condensed, Arial'; c.textBaseline = 'middle';
+      for (let x = 20, i = 0; x < w; x += 340, i++) { c.fillStyle = i % 2 ? '#FFC53D' : '#22D3EE'; c.fillText(i % 2 ? 'ARENA MIX · ⚡' : 'ARENA MIX', x, h / 2 + 2); }
+    });
+    const ledMat = new T.MeshStandardMaterial({ map: adTexBig, emissive: 0xffffff, emissiveMap: adTexBig, emissiveIntensity: 0.85 });
+    const torsoGeo = new T.BoxGeometry(0.46, 0.62, 0.3), headGeo = new T.BoxGeometry(0.24, 0.26, 0.24);
+    torsoGeo.translate(0, 0.55, 0); headGeo.translate(0, 1.02, 0);
+    const skins = [0xc68a5e, 0xe0b48f, 0x8d5a3b, 0xf1c9a5, 0x6b4129, 0xb9794f];
+    const sections = new Map();
+    const put = (key, team, ultra, wx, wy, wz, rotY, colHex) => {
+      if (!sections.has(key)) sections.set(key, { team, ultra, items: [] });
+      sections.get(key).items.push({ wx, wy, wz, rotY, col: colHex, skin: skins[Math.floor(Math.random() * skins.length)] });
+    };
+    const neutral = ['#2A3044', '#F2F5FA', '#1C2540'];
+    const fanColor = (team, ultra, row) => {
+      const [c1, c2] = teamCols[team];
+      if (ultra) return row % 2 ? c2 : c1;
+      const r = Math.random();
+      return r < 0.68 ? c1 : r < 0.86 ? c2 : neutral[Math.floor(Math.random() * neutral.length)];
+    };
+    const addStand = (name, cx, cz, len, rotY, fanLimit) => {
+      const g = new T.Group();
+      const geo = new T.ExtrudeGeometry(profile(), { depth: len, bevelEnabled: false });
+      geo.rotateY(-Math.PI / 2); geo.translate(len / 2, 0, 0);
+      const bowl = new T.Mesh(geo, standMat); bowl.receiveShadow = true; g.add(bowl);
+      const led = new T.Mesh(new T.PlaneGeometry(len, 0.9), ledMat); led.position.set(0, 7.9, 12.18); led.rotation.y = Math.PI; g.add(led);
+      const rim = new T.Mesh(new T.BoxGeometry(len, 0.5, 0.6), seatMat); rim.position.set(0, upY(UP - 1) + 1.85, upZ(UP - 1) + 1.1); g.add(rim);
+      g.position.set(cx, 0, cz); g.rotation.y = rotY; g.updateMatrixWorld(true);
+      S.add(g);
+      const v = new T.Vector3();
+      const seat = (x, y, z, ultraZone, row, gap) => {
+        if (Math.random() < gap) return;
+        v.set(x + (Math.random() - 0.5) * 0.12, y, z + 0.35).applyMatrix4(g.matrixWorld);
+        if (!fanLimit(v)) return;
+        const team = v.x < 0 ? 0 : 1, ultra = ultraZone(v);
+        const band = Math.floor((x + len / 2) / 7);
+        put(name + ':' + band + ':' + (ultra ? 'u' : 'n'), team, ultra, v.x, v.y, v.z, rotY + Math.PI, fanColor(team, ultra, row));
+      };
+      for (let r = 0; r < LOW; r++) for (let x = -len / 2 + 0.4; x < len / 2; x += 0.62) seat(x, lowY(r), lowZ(r), (w) => name !== 'far' && Math.abs(w.z) < 14, r, 0.04);
+      for (let r = 0; r < UP; r++) for (let x = -len / 2 + 0.4; x < len / 2; x += 0.66) seat(x, upY(r), upZ(r), () => false, r, 0.12);
+      return g;
+    };
+    addStand('far', 0, -19, 108, Math.PI, (w) => Math.abs(w.x) < 36.5);
+    addStand('west', -35.6, 0, 70, -Math.PI / 2, (w) => w.z > -18.5 && w.z < 21);
+    addStand('east', 35.6, 0, 70, Math.PI / 2, (w) => w.z > -18.5 && w.z < 21);
+    // crowd: one group per section so whole blocks can bounce cheaply
+    this.fanGroups = [];
+    const m4 = new T.Matrix4(), q = new T.Quaternion(), sc = new T.Vector3(1, 1, 1), pos = new T.Vector3(), col = new T.Color(), up = new T.Vector3(0, 1, 0);
+    sections.forEach((sec) => {
+      const n = sec.items.length, grp = new T.Group();
+      const bodies = new T.InstancedMesh(torsoGeo, new T.MeshStandardMaterial({ roughness: 0.85 }), n);
+      const heads = new T.InstancedMesh(headGeo, new T.MeshStandardMaterial({ roughness: 0.7 }), n);
+      sec.items.forEach((it, i) => {
+        q.setFromAxisAngle(up, it.rotY + (Math.random() - 0.5) * 0.4);
+        const s = 0.9 + Math.random() * 0.2; sc.set(s, s, s);
+        m4.compose(pos.set(it.wx, it.wy, it.wz), q, sc);
+        bodies.setMatrixAt(i, m4); heads.setMatrixAt(i, m4);
+        bodies.setColorAt(i, col.set(it.col).convertSRGBToLinear());
+        heads.setColorAt(i, col.setHex(it.skin).convertSRGBToLinear());
+      });
+      grp.add(bodies); grp.add(heads); S.add(grp);
+      grp.userData = { team: sec.team, ultra: sec.ultra, ph: Math.random() * 6.28, w: sec.ultra ? 6.5 + Math.random() : 1.5 + Math.random() };
+      this.fanGroups.push(grp);
+    });
+    // ultras' flags and striped banners behind each goal
+    this.flags = [];
+    [0, 1].forEach((team) => {
+      const [c1, c2] = teamCols[team], sx = team === 0 ? -1 : 1;
+      const flagTex = this.canvasTex(128, 80, (c, w, h) => { c.fillStyle = c1; c.fillRect(0, 0, w / 2, h); c.fillStyle = c2; c.fillRect(w / 2, 0, w / 2, h); });
+      const flagMat = new T.MeshStandardMaterial({ map: flagTex, side: T.DoubleSide, roughness: 0.8 });
+      for (let k = 0; k < 7; k++) {
+        const z = -12 + k * 4, x = sx * (35.6 + lowZ(4 + (k % 3) * 3)), y = lowY(4 + (k % 3) * 3) + 1.1;
+        const pole = new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 2.2, 5), this.mat(0xdddddd)); pole.position.set(x, y + 1.1, z); S.add(pole);
+        const fl = new T.Mesh(new T.PlaneGeometry(1.6, 1), flagMat); fl.position.set(x, y + 1.7, z + 0.8); S.add(fl);
+        this.flags.push({ m: fl, ph: Math.random() * 6.28, team, x, z });
+      }
+      const banTex = this.canvasTex(1024, 64, (c, w, h) => { for (let i = 0; i < 16; i++) { c.fillStyle = i % 2 ? c2 : c1; c.fillRect(i * w / 16, 0, w / 16, h); } });
+      const ban = new T.Mesh(new T.PlaneGeometry(28, 1.1), new T.MeshStandardMaterial({ map: banTex, roughness: 0.8, side: T.DoubleSide }));
+      ban.position.set(sx * 35.4, 1.05, 0); ban.rotation.y = sx * Math.PI / 2; S.add(ban);
+    });
+    // sky: open roof, night gradient with stars
+    const skyTex = this.canvasTex(16, 256, (c, w, h) => { const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#05060f'); gr.addColorStop(0.55, '#0d1840'); gr.addColorStop(1, '#2a2f6a'); c.fillStyle = gr; c.fillRect(0, 0, w, h); });
+    const sky = new T.Mesh(new T.SphereGeometry(320, 24, 12), new T.MeshBasicMaterial({ map: skyTex, side: T.BackSide, fog: false }));
+    S.add(sky);
+    const starPts = [];
+    for (let i = 0; i < 500; i++) { const a = Math.random() * Math.PI * 2, e = 0.15 + Math.random() * 1.3; starPts.push(Math.cos(a) * Math.cos(e) * 300, Math.sin(e) * 300, Math.sin(a) * Math.cos(e) * 300); }
+    const sg = new T.BufferGeometry(); sg.setAttribute('position', new T.Float32BufferAttribute(starPts, 3));
+    S.add(new T.Points(sg, new T.PointsMaterial({ color: 0xffffff, size: 1.4, sizeAttenuation: false, fog: false, transparent: true, opacity: 0.8 })));
     const adTex = this.canvasTex(2048, 64, (c, w, h) => {
       c.fillStyle = '#0B0B14'; c.fillRect(0, 0, w, h);
       c.fillStyle = '#22D3EE'; c.font = 'italic 800 44px Barlow Condensed, Arial'; c.textBaseline = 'middle';
@@ -1028,12 +1115,12 @@ class Component extends DCLogic {
     const b1 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); b1.position.set(0, 0.45, -17.5); S.add(b1);
     [-1, 1].forEach((s) => { const b = new T.Mesh(new T.BoxGeometry(0.15, 0.9, 34), adMat); b.position.set(34.5 * s, 0.45, 0); S.add(b); });
     const glowTex = this.canvasTex(128, 128, (c) => { const g = c.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(220,232,255,0.5)'); g.addColorStop(1, 'rgba(220,232,255,0)'); c.fillStyle = g; c.fillRect(0, 0, 128, 128); });
-    [[-40, -24], [40, -24], [-44, 26], [44, 26]].forEach(([x, z]) => {
-      const pole = new T.Mesh(new T.CylinderGeometry(0.3, 0.45, 30, 8), this.mat(0x2a3556)); pole.position.set(x, 15, z); S.add(pole);
+    [[-52, -40], [52, -40], [-54, 30], [54, 30]].forEach(([x, z]) => {
+      const pole = new T.Mesh(new T.CylinderGeometry(0.4, 0.7, 36, 8), this.mat(0x2a3556)); pole.position.set(x, 18, z); S.add(pole);
       const panel = new T.Mesh(new T.BoxGeometry(6, 3, 0.4), new T.MeshStandardMaterial({ color: 0xffffff, emissive: 0xf4f8ff, emissiveIntensity: 1.6 }));
-      panel.position.set(x, 30, z); panel.lookAt(0, 0, 0); S.add(panel);
+      panel.position.set(x, 36, z); panel.lookAt(0, 0, 0); S.add(panel);
       const sp = new T.Sprite(new T.SpriteMaterial({ map: glowTex, blending: T.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.85 }));
-      sp.scale.set(26, 26, 1); sp.position.set(x, 30, z); S.add(sp);
+      sp.scale.set(30, 30, 1); sp.position.set(x, 36, z); S.add(sp);
     });
     const white = this.mat(0xf4f6fa, { roughness: 0.35, metalness: 0.2 });
     const netMat = new T.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
@@ -1103,13 +1190,23 @@ class Component extends DCLogic {
     // follow the play all the way to both touchlines, keeping it above the on-screen buttons
     const tx = Math.max(-21, Math.min(21, fx - 30)), tz = Math.max(-15, Math.min(15, fz - 15));
     const goalZoom = g.phase === 'goal' ? Math.min(1, g.pt) : 0;
-    const want = new T.Vector3(tx * 0.95, 10.5 - goalZoom * 2.5, tz + 14.5 - goalZoom * 4);
-    const look = new T.Vector3(tx, 0, tz + 1);
+    const want = new T.Vector3(tx * 0.95, 8 - goalZoom * 2, tz + 16 - goalZoom * 4);
+    const look = new T.Vector3(tx, 0, tz - 2);
     const f = 1 - Math.exp(-4.5 * (dt || 1));
     this.camPos.lerp(want, f); this.camLook.lerp(look, f);
     this.cam.position.copy(this.camPos);
     this.cam.lookAt(this.camLook);
-    if (this.fans) this.fans.forEach((fn) => { fn.position.y = g.phase === 'goal' ? Math.abs(Math.sin(g.pt * 12)) * 0.25 : 0; });
+    const tnow = performance.now() / 1000, scoring = g.phase === 'goal' ? 1 - g.concede : -1;
+    (this.fanGroups || []).forEach((fg) => {
+      const u = fg.userData;
+      let y = u.ultra ? 0.17 * Math.max(0, Math.sin(tnow * u.w + u.ph)) : 0.035 * Math.max(0, Math.sin(tnow * u.w + u.ph));
+      if (u.team === scoring) y = 0.38 * Math.abs(Math.sin(tnow * 10 + u.ph));
+      fg.position.y = y;
+    });
+    (this.flags || []).forEach((f) => {
+      const k = f.team === scoring ? 3 : 1;
+      f.m.rotation.y = Math.sin(tnow * 2.2 * k + f.ph) * 0.9; f.m.rotation.z = Math.sin(tnow * 3.1 * k + f.ph) * 0.15;
+    });
     this.R.render(this.S, this.cam);
   }
   mat(color, o) {
