@@ -186,6 +186,13 @@
     });
     document.body.appendChild(tip);
     document.body.appendChild(btn);
+    var onMain = function () {
+      var main = !/^#\/[A-Za-z0-9]/.test(location.hash) || /^#\/Main\b/.test(location.hash);
+      btn.style.display = main ? '' : 'none';
+      if (!main) tip.style.display = 'none';
+    };
+    window.addEventListener('hashchange', onMain);
+    onMain();
   }
   window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; installUI(); });
   window.addEventListener('appinstalled', function () { var b = document.getElementById('install'); if (b) b.remove(); });
