@@ -216,14 +216,10 @@
   var hang = setTimeout(function () { stuck('La app está tardando demasiado en cargar.'); }, 15000);
   /* Loading screen: the bar follows the real loading of the screens, but never faster than ~2.5 s so it can be seen */
   var total = SCREENS.length, done = 0, t0 = Date.now(), MIN_MS = 2500, shown = 0, ready = false, finished = false;
-  var tips = ['TIP: Entrena, mejora tus habilidades y alcanza la cima en todos los deportes.', 'TIP: En los tiros libres, suelta CHUTAR en la zona verde.', 'TIP: Mantén SPRINT para correr más, pero vigila la energía.', 'TIP: Pídele el balón a tu compañero con ¡Pásala!', 'TIP: Cada 30 días empieza una temporada nueva con 5 clasificatorias.', 'TIP: Completa logros en tu perfil para ganar carrascos.'];
-  var tipEl = document.getElementById('ld-tip');
-  if (tipEl) tipEl.textContent = tips[Math.floor(Math.random() * tips.length)];
   function setProgress(p) {
-    var v = Math.round(p * 100), f = document.getElementById('ld-fill'), t = document.getElementById('ld-pct'), m = document.getElementById('ld-msg'), box = document.getElementById('loading');
-    if (!f || !t || !m) return;
-    f.style.width = v + '%'; t.textContent = v + '%';
-    m.textContent = v < 100 ? 'CARGANDO...' : '¡LISTO!';
+    var v = Math.round(p * 100), f = document.getElementById('ld-fill'), t = document.getElementById('ld-pct'), box = document.getElementById('loading');
+    if (!f || !t) return;
+    f.style.width = (36.04 * p).toFixed(2) + '%'; t.textContent = v + '%';
     if (box) box.setAttribute('aria-valuenow', String(v));
   }
   function pump() {
