@@ -1337,13 +1337,15 @@ class Component extends DCLogic {
         const band = Math.floor((x + len / 2) / 7);
         put(name + ':' + band + ':' + (ultra ? 'u' : 'n'), team, ultra, v.x, v.y, v.z, rotY + Math.PI, fanColor(team, ultra, row));
       };
-      for (let r = 0; r < LOW; r++) for (let x = -len / 2 + 0.4; x < len / 2; x += 0.62) seat(x, lowY(r), lowZ(r), (w) => name !== 'far' && Math.abs(w.z) < 14, r, 0.04);
+      for (let r = 0; r < LOW; r++) for (let x = -len / 2 + 0.4; x < len / 2; x += 0.62) seat(x, lowY(r), lowZ(r), (w) => (name === 'west' || name === 'east') && Math.abs(w.z) < 14, r, 0.04);
       for (let r = 0; r < UP; r++) for (let x = -len / 2 + 0.4; x < len / 2; x += 0.66) seat(x, upY(r), upZ(r), () => false, r, 0.12);
       return g;
     };
     addStand('far', 0, -19, 108, Math.PI, (w) => Math.abs(w.x) < 36.5);
     addStand('west', -35.6, 0, 70, -Math.PI / 2, (w) => w.z > -18.5 && w.z < 21);
     addStand('east', 35.6, 0, 70, Math.PI / 2, (w) => w.z > -18.5 && w.z < 21);
+    // the near touchline stand is behind the normal camera, so it is only built when it can be seen (goalkeeper view)
+    if (this.keeperMode()) addStand('near', 0, 19, 108, 0, (w) => Math.abs(w.x) < 36.5);
     // crowd: one group per section so whole blocks can bounce cheaply
     this.fanGroups = [];
     const m4 = new T.Matrix4(), q = new T.Quaternion(), sc = new T.Vector3(1, 1, 1), pos = new T.Vector3(), col = new T.Color(), up = new T.Vector3(0, 1, 0);
@@ -1412,6 +1414,7 @@ class Component extends DCLogic {
     });
     const adMat = new T.MeshStandardMaterial({ map: adTex, emissive: 0xffffff, emissiveMap: adTex, emissiveIntensity: 0.9 });
     const b1 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); b1.position.set(0, 0.45, -17.5); S.add(b1);
+    if (this.keeperMode()) { const b2 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); b2.position.set(0, 0.45, 17.5); S.add(b2); }
     [-1, 1].forEach((s) => { const b = new T.Mesh(new T.BoxGeometry(0.15, 0.9, 34), adMat); b.position.set(34.5 * s, 0.45, 0); S.add(b); });
     const glowTex = this.canvasTex(128, 128, (c) => { const g = c.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(220,232,255,0.5)'); g.addColorStop(1, 'rgba(220,232,255,0)'); c.fillStyle = g; c.fillRect(0, 0, 128, 128); });
     [[-52, -40], [52, -40], [-54, 30], [54, 30]].forEach(([x, z]) => {
