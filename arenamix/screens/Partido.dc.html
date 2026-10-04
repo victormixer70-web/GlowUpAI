@@ -626,25 +626,7 @@ class Component extends DCLogic {
       if (g.recv && g.recv.i === i) { const [ax, ay] = this.seek(p, b.x + b.vx * 0.3, b.y + b.vy * 0.3, 0.6); return [ax, ay, 6, 9]; }
       return [0, 0, 0, 8];
     }
-    if (own === p) {
-      p.think -= dt;
-      if (p.think <= 0 && !p.act) { p.think = D.think * (0.7 + 0.6 * Math.random()); this.aiDecide(p); }
-      [dx, dy] = this.seek(p, gx - sg * 1.5, 15 + (p.y - 15) * 0.35);
-      g.ps.forEach((q) => {
-        if (q.team === p.team) return;
-        const rx = q.x - p.x, ry = q.y - p.y, d = Math.hypot(rx, ry) || 1;
-        if (d < 4.5 && (rx * dx + ry * dy) / d > 0.1) {
-          let px = -dy, py = dx;
-          if (px * rx + py * ry > 0) { px = -px; py = -py; }
-          const w = (4.5 - d) / 4.5 * 1.4;
-          dx += px * w; dy += py * w;
-        }
-      });
-      if (p.y < 3) dy += 0.6; if (p.y > 27) dy -= 0.6;
-      const nn = Math.hypot(dx, dy) || 1; dx /= nn; dy /= nn;
-      maxV *= (p.act && p.act.type === 'windup') ? 0.45 : 0.92;
-      return [dx, dy, maxV, acc];
-    }
+    if (own === p) return this.aiCarry(p, i, dt, D);
     if (g.recv && g.recv.i === i) {
       const t = Math.min(0.6, this.dist(p, b) / 10);
       [dx, dy] = this.seek(p, b.x + b.vx * t, b.y + b.vy * t, 0.6);
@@ -652,14 +634,23 @@ class Component extends DCLogic {
     }
     if (chasers.has(p)) {
       if (own && own.team !== p.team) {
-        [dx, dy] = this.seek(p, b.x - sg * 0.5, b.y, 0.4);
-        const d = this.dist(p, b);
-        if (!p.act && p.cd <= 0 && d < 2.4 && d > 1.0 && Math.random() < D.slide * dt) this.slide(p, Math.atan2(b.y - p.y, b.x - p.x));
-        return [dx, dy, maxV * 1.08, 9];
+        // press goal-side: get between the carrier and our goal first, then step in to win it
+        const lead = 0.25, cx = own.x + own.vx * lead, cy = own.y + own.vy * lead;
+        const gxv = ownX - cx, gyv = 15 - cy, gn = Math.hypot(gxv, gyv) || 1;
+        const d = this.dist(p, own), behind = ((p.x - cx) * gxv + (p.y - cy) * gyv) / gn < 0.3;
+        let tx = cx + gxv / gn * (d > 3 ? 1.6 : 0.4), ty = cy + gyv / gn * (d > 3 ? 1.6 : 0.4);
+        if (!behind && d < 2.2) { tx = b.x; ty = b.y; }
+        [dx, dy] = this.seek(p, tx, ty, 0.3);
+        const db = this.dist(p, b), facing = Math.cos(this.ang(Math.atan2(b.y - p.y, b.x - p.x) - Math.atan2(own.vy, own.vx)));
+        if (!p.act && p.cd <= 0 && db < 2.3 && db > 0.9 && facing < 0.3 && Math.random() < D.slide * 2.2 * dt) this.slide(p, Math.atan2(b.y + b.vy * 0.15 - p.y, b.x + b.vx * 0.15 - p.x));
+        p.sprinting = d > 4;
+        return [dx, dy, maxV * (d > 4 ? 1.1 : 1.0), 10];
       }
-      const t = Math.min(0.8, this.dist(p, b) / 7);
-      [dx, dy] = this.seek(p, b.x + b.vx * t, b.y + b.vy * t, 0.5);
-      return [dx, dy, maxV * 1.1, 9];
+      // a loose ball: run to where we can actually meet it, not where it is now
+      const [ix, iy] = this.meetPoint(p, maxV * 1.1);
+      [dx, dy] = this.seek(p, ix, iy, 0.4);
+      p.sprinting = true;
+      return [dx, dy, maxV * 1.1, 10];
     }
     const lanes = n === 1 ? [15] : n === 2 ? [15, 22] : n === 3 ? [15, 7, 23] : [15, 7, 23, 15];
     const anchor = n === 4 && p.slot === 3;
@@ -669,24 +660,46 @@ class Component extends DCLogic {
     const mine = (own && own.team === p.team) || (g.hold >= 0 && g.ps[g.hold].team === p.team);
     if (mine) {
       const ref = own || g.ps[g.hold];
-      tx = anchor ? ref.x - sg * 9 : ref.x + sg * (p.slot === 0 ? 8 : 4.5);
-      ty = Math.abs(lane - ref.y) < 4 ? ref.y + (ref.y < 15 ? 7.5 : -7.5) : lane;
-      tx = this.clamp(tx, 4, 56);
-      g.ps.forEach((q) => { if (q.team !== p.team && Math.hypot(q.x - tx, q.y - ty) < 2.5) ty += q.y < ty ? 2.5 : -2.5; });
-      ty = this.clamp(ty, 2.5, 27.5);
-      if (anchor) ty = 15 + (ref.y - 15) * 0.4;
+      const defs = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk');
+      // the last defender line: runners attack the space just past it
+      const line = defs.length ? defs.reduce((m, q) => (sg > 0 ? Math.max(m, q.x) : Math.min(m, q.x)), sg > 0 ? -99 : 99) : gx - sg * 8;
+      const run = ((p.runT = (p.runT || 0) + dt) % 6) < 3.2;
+      if (anchor) { tx = ref.x - sg * 9; ty = 15 + (ref.y - 15) * 0.4; }
+      else {
+        tx = run ? (sg > 0 ? Math.min(gx - 7, line + 2.5) : Math.max(gx + 7, line - 2.5)) : ref.x + sg * 5;
+        if (sg > 0) tx = Math.max(tx, ref.x + 3); else tx = Math.min(tx, ref.x - 3);
+        // pick the free channel: try a few heights and take the one furthest from defenders and the carrier's line
+        let bestY = lane, bs = -1e9;
+        for (let yy = 4; yy <= 26; yy += 2.75) {
+          const space = defs.reduce((m, q) => Math.min(m, Math.hypot(q.x - tx, q.y - yy)), 12);
+          const sc = space * 1.0 - Math.abs(yy - lane) * 0.18 - (Math.abs(yy - ref.y) < 4 ? 3 : 0) - Math.abs(yy - 15) * 0.05;
+          if (sc > bs) { bs = sc; bestY = yy; }
+        }
+        ty = bestY;
+      }
+      tx = this.clamp(tx, 4, 56); ty = this.clamp(ty, 2.5, 27.5);
       if (p.wantsBall > 0) { tx = ref.x + sg * 3; ty = ref.y + (ref.y < 15 ? 5 : -5); }
       if (p.defend > 0) { tx = (ref.x + ownX) / 2; ty = 15 + (ref.y - 15) * 0.3; }
+      [dx, dy] = this.seek(p, tx, ty, 1.5);
+      return [dx, dy, maxV * (run ? 0.98 : 0.9), acc];
     } else if (own || p.defend > 0) {
       const foes = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk' && q !== own)
         .sort((u, v) => Math.abs(u.x - ownX) - Math.abs(v.x - ownX));
       const mates = g.ps.filter((q, k) => q.team === p.team && q.role !== 'gk' && !chasers.has(q) && (k !== g.ctl || this.autoplay))
         .sort((u, v) => u.slot - v.slot);
       const foe = foes[mates.indexOf(p)];
-      if (foe) {
+      if (foe && own) {
+        // mark goal-side, a bit towards the ball so the pass lane is covered
         const gxv = ownX - foe.x, gyv = 15 - foe.y, nn = Math.hypot(gxv, gyv) || 1;
-        tx = foe.x + gxv / nn * 2.2; ty = foe.y + gyv / nn * 2.2;
+        const bxv = own.x - foe.x, byv = own.y - foe.y, bn = Math.hypot(bxv, byv) || 1;
+        const tight = Math.abs(foe.x - ownX) < 22 ? 1.4 : 2.4;
+        tx = foe.x + gxv / nn * tight + bxv / bn * 1.2; ty = foe.y + gyv / nn * tight + byv / bn * 1.2;
+      } else if (own) {
+        // spare man: cover the space between the ball and our goal
+        tx = own.x + (ownX - own.x) * 0.45; ty = own.y + (15 - own.y) * 0.5;
       } else { tx = (b.x + ownX) / 2; ty = (b.y + 15) / 2; }
+      [dx, dy] = this.seek(p, tx, ty, 1);
+      return [dx, dy, maxV, acc];
     } else {
       tx = this.clamp(b.x * 0.6 + (ownX + sg * 20) * 0.4 + (p.slot === 0 ? sg * 3 : anchor ? -sg * 8 : -sg * 2), 4, 56);
       ty = lane * 0.7 + b.y * 0.3;
@@ -694,41 +707,113 @@ class Component extends DCLogic {
     [dx, dy] = this.seek(p, tx, ty, 2);
     return [dx, dy, maxV * 0.92, acc];
   }
-  aiDecide(p) {
-    const g = this.g, D = this.diff(p.team), sg = p.team === 0 ? 1 : -1, gx = p.team === 0 ? 60 : 0;
+  meetPoint(p, v) {
+    // earliest point on the rolling ball's path that this player can reach
+    const b = this.g.ball;
+    let x = b.x, y = b.y, vx = b.vx, vy = b.vy;
+    for (let t = 0.1; t <= 2.5; t += 0.1) {
+      const k = Math.exp(-0.9 * 0.1); vx *= k; vy *= k; x += vx * 0.1; y += vy * 0.1;
+      x = this.clamp(x, 0.5, 59.5); y = this.clamp(y, 0.5, 29.5);
+      if (Math.hypot(x - p.x, y - p.y) / v <= t + 0.1) return [x, y];
+    }
+    return [x, y];
+  }
+  aiCarry(p, i, dt, D) {
+    const g = this.g, sg = p.team === 0 ? 1 : -1, gx = p.team === 0 ? 60 : 0;
+    const foes = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk');
+    p.think -= dt;
+    const pressure = foes.reduce((m, q) => Math.min(m, this.dist(p, q)), 99);
+    if (pressure < 3 && p.think > 0.12) p.think = 0.12;
+    if (p.think <= 0 && !p.act) { p.think = D.think * (0.7 + 0.6 * Math.random()); this.aiDecide(p); }
+    if (g.own !== i) return [0, 0, D.spd, 8];
+    // choose a running line: towards goal, but through the gap with the most room
+    const base = Math.atan2(15 + (p.y - 15) * 0.35 - p.y, gx - sg * 1.5 - p.x);
+    let best = base, bs = -1e9;
+    for (let k = -4; k <= 4; k++) {
+      const a = base + k * 0.3;
+      const ax = Math.cos(a), ay = Math.sin(a);
+      let room = 8;
+      foes.forEach((q) => {
+        for (const L of [2, 4, 6.5]) {
+          const d = Math.hypot(p.x + ax * L - q.x, p.y + ay * L - q.y);
+          room = Math.min(room, d + (L - 2) * 0.35);
+        }
+      });
+      const ex = p.x + ax * 4, ey = p.y + ay * 4;
+      const edge = (ey < 2 || ey > 28 ? 3 : 0) + ((sg > 0 ? ex > 59 : ex < 1) ? 3 : 0);
+      const sc = Math.cos(a - base) * 2.2 + Math.min(room, 6) * 0.9 - edge - Math.abs(this.ang(a - (p.line ?? a))) * 0.6;
+      if (sc > bs) { bs = sc; best = a; }
+    }
+    p.line = best;
+    let dx = Math.cos(best), dy = Math.sin(best);
+    const open = bs > 5.5 && pressure > 3.2;
+    p.sprinting = open;
+    let maxV = D.spd * (open ? 1.02 : pressure < 2 ? 0.8 : 0.9);
+    if (p.act && p.act.type === 'windup') maxV *= 0.45;
+    return [dx, dy, maxV, 8];
+  }
+  shotQuality(p) {
+    const g = this.g, gx = p.team === 0 ? 60 : 0;
+    const gk = g.ps.find((q) => q.role === 'gk' && q.team !== p.team);
     const dg = Math.hypot(gx - p.x, 15 - p.y);
+    // visible goal mouth from here (angle) and which corner the keeper leaves open
+    const a1 = Math.atan2(12.4 - p.y, gx - p.x), a2 = Math.atan2(17.6 - p.y, gx - p.x);
+    const mouth = Math.abs(this.ang(a2 - a1));
+    const ty = gk ? (gk.y > 15 ? 12.85 : 17.15) : 15;
+    const tx = gx, ex = tx - p.x, ey = ty - p.y, L2 = ex * ex + ey * ey || 1;
+    let block = 0;
+    g.ps.forEach((o) => {
+      if (o.team === p.team || o.role === 'gk') return;
+      const t = ((o.x - p.x) * ex + (o.y - p.y) * ey) / L2;
+      if (t < 0 || t > 1) return;
+      const dl = Math.hypot(p.x + ex * t - o.x, p.y + ey * t - o.y);
+      if (dl < 1.2) block += 1 - dl / 1.2;
+    });
+    const gkOff = gk ? Math.abs(gk.y - ty) : 3;
+    const q = mouth * 6 + Math.min(gkOff, 4) * 0.12 - block * 0.9 - Math.max(0, dg - 12) * 0.05;
+    return { q, ty, dg, block };
+  }
+  aiDecide(p) {
+    const g = this.g, D = this.diff(p.team), sg = p.team === 0 ? 1 : -1;
     const foes = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk');
     const pressure = foes.reduce((m, q) => Math.min(m, this.dist(p, q)), 99);
-    const angOk = Math.abs(p.y - 15) < 9 || dg < 9;
     const caller = g.ps[g.ctl];
     if (p.passReq > 0 && caller.team === p.team && caller !== p) { p.passReq = 0; this.passBall(p, caller); this.say(p, '¡Toma!'); return; }
-    if (p.shootReq > 0 && dg < 30) { p.shootReq = 0; this.say(p, '¡Allá va!'); this.aiShoot(p); return; }
-    if (dg < D.range && angOk && Math.random() < (dg < 11 ? 0.8 : 0.4)) { this.aiShoot(p); return; }
+    const S = this.shotQuality(p);
+    if (p.shootReq > 0 && S.dg < 30) { p.shootReq = 0; this.say(p, '¡Allá va!'); this.aiShoot(p, S); return; }
+    // shoot when the chance is good: close and open, or a clear sight of goal within range
+    if (S.dg < D.range && (S.q > 1.7 || (S.dg < 9 && S.q > 1.1)) && S.block < 0.5) { this.aiShoot(p, S); return; }
+    // otherwise look for a pass that improves things
     let best = null, bs = -1e9;
     g.ps.forEach((q) => {
       if (q === p || q.team !== p.team || q.role === 'gk') return;
       const prog = (q.x - p.x) * sg, mark = foes.reduce((m, o) => Math.min(m, this.dist(o, q)), 99);
-      if (!this.laneOpen(p, q) || mark < 1.8) return;
-      const s = prog * 0.25 + Math.min(mark, 6) * 0.3 - this.dist(p, q) * 0.05 + (q === g.ps[g.ctl] ? 0.8 : 0);
+      if (!this.laneOpen(p, q) || mark < 1.6 || this.dist(p, q) < 3.5) return;
+      const qs = this.shotQuality(q);
+      const s = prog * 0.18 + Math.min(mark, 6) * 0.35 + Math.max(0, qs.q) * 1.6 - this.dist(p, q) * 0.04 + (q === caller && !this.autoplay ? 0.6 : 0);
       if (s > bs) { bs = s; best = q; }
     });
-    if (best && ((pressure < 2.4 && Math.random() < 0.6) || (bs > 2.2 && Math.random() < 0.3))) { this.passBall(p, best); return; }
-    if (pressure < 2.6 && p.skillCd <= 0 && Math.random() < D.skill) {
+    const mine = Math.max(0, S.q) * 1.6 + Math.min(pressure, 6) * 0.35;
+    if (best && (bs > mine + 0.6 || (pressure < 2.2 && bs > 1.2))) { this.passBall(p, best); return; }
+    if (pressure < 2.4 && p.skillCd <= 0 && Math.random() < D.skill * 1.5) {
       const q = foes.sort((u, v) => this.dist(p, u) - this.dist(p, v))[0];
       const c = Math.cos(p.face) * (q.y - p.y) - Math.sin(p.face) * (q.x - p.x);
       this.doSkill(p, c > 0 ? -1 : 1);
+      return;
     }
+    // hemmed in near goal with nothing on: have a go anyway
+    if (S.dg < 13 && pressure < 1.8 && S.q > 0.3) this.aiShoot(p, S);
   }
-  aiShoot(p) {
+  aiShoot(p, S) {
     const g = this.g, D = this.diff(p.team), gx = p.team === 0 ? 60 : 0, i = g.ps.indexOf(p);
-    const gk = g.ps.find((q) => q.role === 'gk' && q.team !== p.team);
-    const ty = gk && gk.y > 15 ? 12.8 + Math.random() * 1.8 : 15.4 + Math.random() * 1.8;
-    const dg = Math.hypot(gx - p.x, 15 - p.y);
-    p.act = { type: 'windup', t: 0, dur: 0.22, then: () => {
+    S = S || this.shotQuality(p);
+    const ty = S.ty + (Math.random() - 0.5) * 0.8;
+    const dg = S.dg;
+    p.act = { type: 'windup', t: 0, dur: 0.2, then: () => {
       if (g.own !== i || g.phase !== 'play') return;
-      const dir = Math.atan2(ty - p.y, gx - p.x) + (Math.random() - 0.5) * D.err;
-      const loft = dg > 20 && Math.random() < 0.3;
-      this.kick(p, 0.55 + Math.random() * 0.4, dir, loft, D.pot, (Math.random() - 0.5) * 0.3);
+      const dir = Math.atan2(ty - p.y, gx - p.x) + (Math.random() - 0.5) * D.err * (dg > 14 ? 1 : 0.7);
+      const loft = dg > 22 && Math.random() < 0.25;
+      this.kick(p, this.clamp(0.55 + dg / 45 + Math.random() * 0.2, 0.55, 1), dir, loft, D.pot, (ty > 15 ? 1 : -1) * (p.team === 0 ? 1 : -1) * Math.random() * 0.25);
     } };
   }
   gkMove(p, i, dt) {
