@@ -504,7 +504,7 @@ class Component extends DCLogic {
       if (g.own === i) {
         // a dribbler always adjusts his run to stay on top of the ball
         const t = 0.25, bx = b.x + b.vx * t - p.x, by = b.y + b.vy * t - p.y, bn = Math.hypot(bx, by) || 1;
-        const k = this.clamp((bn - 0.7) / 1.2, 0, 1) * 0.75, il = Math.hypot(dx, dy);
+        const il = Math.hypot(dx, dy), k = this.clamp((bn - 0.7) / 1.2, 0, 1) * (i === g.ctl && !this.autoplay ? (il > 0.2 ? 0.12 : 0.5) : 0.75);
         if (il > 0.1 || bn > 0.9) {
           dx = dx * (1 - k) + bx / bn * k * Math.max(il, 0.6); dy = dy * (1 - k) + by / bn * k * Math.max(il, 0.6);
         }
@@ -530,8 +530,9 @@ class Component extends DCLogic {
         const [ix, iy] = this.inp || [0, 0];
         if (i === g.ctl && !this.autoplay && Math.hypot(ix, iy) > 0.2) want = Math.atan2(iy, ix);
         else if (sp > 0.5) want = Math.atan2(p.vy, p.vx);
-        rate = i === g.ctl ? 6.5 + 5 * this.tt('con') : 7;
-      } else if (sp > 0.6) want = Math.atan2(p.vy, p.vx);
+        rate = i === g.ctl ? 14 + 6 * this.tt('con') : 7;
+      } else if (i === g.ctl && !this.autoplay && Math.hypot((this.inp || [0, 0])[0], (this.inp || [0, 0])[1]) > 0.2) { want = Math.atan2(this.inp[1], this.inp[0]); rate = 16; }
+      else if (sp > 0.6) want = Math.atan2(p.vy, p.vx);
       else { want = Math.atan2(b.y - p.y, b.x - p.x); rate = 4; }
       if (p.role === 'gk') {
         const base = p.team === 0 ? 0 : Math.PI;
@@ -558,7 +559,7 @@ class Component extends DCLogic {
     else p.stam = Math.min(1, p.stam + dt * (0.09 + 0.05 * this.tt('res')));
     p.sprinting = spr;
     if (g.own === i) maxV *= 0.93;
-    return [dx, dy, maxV, g.own === i ? 7 : 9];
+    return [dx, dy, maxV, g.own === i ? 11 : 14];
   }
   seek(p, tx, ty, slow) {
     const dx = tx - p.x, dy = ty - p.y, n = Math.hypot(dx, dy) || 1, k = slow ? Math.min(1, n / slow) : 1;
@@ -872,14 +873,20 @@ class Component extends DCLogic {
   }
   dribble(p, dt) {
     const g = this.g, b = g.ball, oi = g.own;
-    const fx = Math.cos(p.face), fy = Math.sin(p.face), sp = Math.hypot(p.vx, p.vy);
+    let fx = Math.cos(p.face), fy = Math.sin(p.face);
+    const sp = Math.hypot(p.vx, p.vy), inp = this.inp || [0, 0], il = Math.hypot(inp[0], inp[1]);
+    if (oi === g.ctl && !this.autoplay && il > 0.2) { fx = inp[0] / il; fy = inp[1] / il; }
     const rx = b.x - p.x, ry = b.y - p.y, d = Math.hypot(rx, ry);
     const ahead = rx * fx + ry * fy, side = -rx * fy + ry * fx;
     const ctrl = oi === g.ctl ? this.tt('con') : 0.45;
     p.touchT = Math.max(0, (p.touchT || 0) - dt);
     if (d > 2.6 || ahead < -1.0) { g.own = -1; return; }
     if (b.z > 0.5) return;
-    if (sp < 0.9) {
+    if (oi === g.ctl && !this.autoplay && il <= 0.2 && d < 2) {
+      // you let go of the stick: your player kills the ball under his foot
+      const tx = p.x + fx * 0.55, ty = p.y + fy * 0.55, k = Math.min(1, dt * 7);
+      b.vx += ((tx - b.x) * 3 - b.vx) * k; b.vy += ((ty - b.y) * 3 - b.vy) * k;
+    } else if (sp < 0.9) {
       // standing: trap the ball under the sole, a step in front
       const tx = p.x + fx * 0.55, ty = p.y + fy * 0.55, k = Math.min(1, dt * (5 + 4 * ctrl));
       b.vx += ((tx - b.x) * 5 - b.vx) * k; b.vy += ((ty - b.y) * 5 - b.vy) * k;
@@ -1537,7 +1544,7 @@ class Component extends DCLogic {
     const kd = Math.min(d, R);
     j.kx = d > 0 ? dx / d * kd : 0; j.ky = d > 0 ? dy / d * kd : 0;
     const dead = 8, m = d <= dead ? 0 : Math.min(1, (d - dead) / (R * 0.75 - dead));
-    const curve = m * (0.35 + 0.65 * m);
+    const curve = Math.min(1, 0.12 + m * 0.95) * (m > 0 ? 1 : 0);
     this.g.jx = d > 0 ? dx / d * curve : 0; this.g.jy = d > 0 ? dy / d * curve : 0;
   }
 
