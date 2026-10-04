@@ -21,9 +21,32 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <svg width="844" height="390" viewBox="0 0 844 390" style="position: absolute; left: 0; top: 0; pointer-events: none">
     <polyline points="{{ghostPts}}" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round" stroke-linejoin="round" opacity="{{ghostOp}}"/>
     <polyline points="{{swipePts}}" fill="none" stroke="#22D3EE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
+    <polyline points="{{trajPts}}" fill="none" stroke="{{trajCol}}" stroke-width="3.5" stroke-dasharray="1 9" stroke-linecap="round" stroke-linejoin="round" opacity="{{trajOp}}"/>
+    <g transform="{{retXf}}" opacity="{{trajOp}}">
+      <circle r="15" fill="none" stroke="{{trajCol}}" stroke-width="3"/>
+      <circle r="4" fill="{{trajCol}}"/>
+      <path d="M-24 0H-17M17 0H24M0 -24V-17M0 17V24" stroke="{{trajCol}}" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g transform="{{apexXf}}" opacity="{{trajOp}}"><circle r="4" fill="#FFC53D"/></g>
   </svg>
 
   <button type="button" aria-label="{{zoneLabel}}" onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pCancel}}" style="position: absolute; inset: 0; width: 844px; height: 390px; padding: 0; border: 0; background: transparent; touch-action: none; cursor: crosshair"></button>
+
+  <sc-if value="{{fkAim}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 12px; bottom: 12px; width: 236px; padding: 10px 12px; border-radius: 14px; background: #0B0B14D9; display: flex; flex-direction: column; gap: 6px">
+      <label for="fk-curve" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>EFECTO</span><span style="color: #F4F4FA">{{curveTxt}}</span></label>
+      <input id="fk-curve" type="range" min="-100" max="100" step="1" value="{{curveVal}}" onInput="{{onCurve}}" style="width: 100%; accent-color: #22D3EE">
+      <label for="fk-height" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>ALTURA</span><span style="color: #F4F4FA">{{heightTxt}}</span></label>
+      <input id="fk-height" type="range" min="0" max="100" step="1" value="{{heightVal}}" onInput="{{onHeight}}" style="width: 100%; accent-color: #FFC53D">
+    </div>
+    <div style="position: absolute; right: 14px; bottom: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px">
+      <div style="position: relative; width: 22px; height: 130px; border-radius: 11px; background: #0B0B14D9; border: 2px solid #2E2E52; overflow: hidden">
+        <div style="{{zoneStyle}}"></div>
+        <div style="{{meterStyle}}"></div>
+      </div>
+      <button type="button" aria-label="Chutar: mantén pulsado y suelta en la zona verde" onPointerDown="{{chargeDown}}" onPointerUp="{{chargeUp}}" onPointerCancel="{{chargeCancel}}" style="width: 96px; height: 96px; border-radius: 48px; border: 0; touch-action: none; cursor: pointer; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; color: #0B0B14; background: {{chutBg}}; box-shadow: 0 5px 0 #A3A3C2">CHUTAR</button>
+    </div>
+  </sc-if>
 
   <sc-if value="{{no3d}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 40px; text-align: center; font-weight: 700; color: #CACAE0">Tu navegador no permite gráficos 3D (WebGL) en esta vista.</div>
@@ -82,7 +105,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </sc-if>
   <sc-if value="{{showHint}}" hint-placeholder-val="{{ true }}">
-    <div style="position: absolute; left: 0; right: 0; bottom: 12px; display: flex; justify-content: center; pointer-events: none">
+    <div style="{{hintWrap}}">
       <span style="padding: 6px 14px; border-radius: 10px; background: #0B0B14CC; font-size: 12px; font-weight: 700; color: #CACAE0">{{hintText}}</span>
     </div>
   </sc-if>
@@ -168,6 +191,9 @@ class Component extends DCLogic {
   }
   resetShot() {
     this.b = { x: 0, y: 0.11, z: 0, vx: 0, vy: 0, vz: 0, curve: 0 };
+    // free kicks: target on goal, curve and height chosen by the player (EA FC style)
+    if (!this.aim || this.aim.fk !== this.fk) this.aim = { fk: this.fk, x: this.GX + (this.GX >= 1 ? -2.3 : 2.3), y: 1.75, s: 0.45, h: 0.45 };
+    this.plan = null; this.charge = null;
     this.k = { x: this.GX, y: 0, a: 0, aT: 0, xT: this.GX, decided: false, up: false, early: false };
     this.phase = this.turn === 'you' ? 'aim' : 'defend';
     this.pt = 0; this.result = null; this.trail = []; this.swipe = null; this.tap = null; this.pendingDive = null; this.pendingShot = null;
@@ -187,7 +213,7 @@ class Component extends DCLogic {
     this.camT = (this.camT || 0) + dt;
     this.draw3D(dt);
     this.forceUpdate();
-    const busy = ['defend', 'runup', 'flight', 'result'].includes(this.phase) || this.camT < 1.2;
+    const busy = ['defend', 'runup', 'flight', 'result'].includes(this.phase) || this.camT < 1.2 || !!this.charge;
     this.raf = busy ? requestAnimationFrame(this.tick) : null;
   }
   integrate(b, dt) {
@@ -770,6 +796,13 @@ class Component extends DCLogic {
     const out = new THREE.Vector3();
     return rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -z), out) ? out : null;
   }
+  setAim(e) {
+    const q = this.local(e), hit = this.fromScreen(q.x, q.y, this.D);
+    if (!hit) return;
+    this.aim.x = Math.max(this.GX - 5, Math.min(this.GX + 5, hit.x));
+    this.aim.y = Math.max(0.15, Math.min(3.3, hit.y));
+    this.forceUpdate();
+  }
   shoot() {
     const pts = this.swipe; this.swipe = null;
     if (!pts || pts.length < 2 || !this.cam) { this.forceUpdate(); return; }
@@ -785,6 +818,53 @@ class Component extends DCLogic {
     const v = this.solveShot(pts, tgt, speed);
     this.lastSwipe = { pts: pts.map((q) => ({ x: q.x, y: q.y })), t: 0 };
     this.queueShot(v, 0.9 * (1 - this.tt('pre')) / v.T);
+  }
+  fkMode() { return this.kind === 'free' && (this.turn === 'you' || this.practice); }
+  xSign() {
+    // which way +x goes on screen (the camera looks down the pitch, so it can be mirrored)
+    if (!this.cam) return 1;
+    return Math.sign(this.toScreen(this.GX + 1, 1, this.D).x - this.toScreen(this.GX, 1, this.D).x) || 1;
+  }
+  fkPlan() {
+    // the exact flight for the chosen target / curve / height: the dotted line is what the ball will do
+    const a = this.aim, key = [a.x, a.y, a.s, a.h, this.fk].map((v) => (+v).toFixed(3)).join('|');
+    if (this.plan && this.plan.key === key) return this.plan;
+    const speed = 31 - 14 * a.h, curve = a.s * 1.7 * this.xSign();
+    const sh = this.aimFor({ x: a.x, y: a.y }, speed, curve);
+    const path = [{ x: 0, y: 0.11, z: 0 }].concat(sh.path || []);
+    let apex = path[0];
+    path.forEach((q) => { if (q.y > apex.y) apex = q; });
+    let blocked = false;
+    for (let i = 1; i < path.length && this.WALL.length; i++) {
+      const p0 = path[i - 1], p1 = path[i];
+      if (p0.z < 9.15 && p1.z >= 9.15) {
+        const t = (9.15 - p0.z) / ((p1.z - p0.z) || 1), x = p0.x + (p1.x - p0.x) * t, y = p0.y + (p1.y - p0.y) * t;
+        blocked = x > this.WALL[0] - 0.4 && x < this.WALL[this.WALL.length - 1] + 0.4 && y < 1.95; // the wall jumps up to 0.3 m
+      }
+    }
+    this.plan = Object.assign(sh, { key, path, apex, blocked, speed });
+    return this.plan;
+  }
+  meter() {
+    // power bar: goes up and down while the button is held
+    if (!this.charge) return 0;
+    const t = (performance.now() - this.charge.t0) / 1000 / 0.75;
+    return 1 - Math.abs((t % 2) - 1);
+  }
+  zone() {
+    const w = 0.09 + 0.08 * this.tt('pre');
+    return [0.74 - w / 2, 0.74 + w / 2];
+  }
+  fkShoot() {
+    const m = this.meter(), [lo, hi] = this.zone();
+    this.charge = null;
+    const pl = this.fkPlan();
+    // outside the green zone: too soft drops the ball, too hard sends it high and wide
+    const dev = m < lo ? (m - lo) * 1.5 : m > hi ? m - hi : 0;
+    const v = { vx: pl.vx, vy: pl.vy * (1 + dev * 1.1) + dev * 5, vz: pl.vz * (1 + dev * 0.45), curve: pl.curve * (1 - Math.abs(dev)), T: pl.T };
+    this.lastTiming = dev === 0 ? 'perfect' : dev < 0 ? 'low' : 'high';
+    this.lastSwipe = null;
+    this.queueShot(v, (0.25 * (1 - this.tt('pre')) + Math.abs(dev) * 5) / v.T);
   }
   flight(vx, vy, vz, curve) {
     // the exact flight the game will play (same integrator), sampled until the goal line
@@ -887,7 +967,33 @@ class Component extends DCLogic {
     const cd = 2.4 - this.pt, won = this.winner === 'you';
     const k = this.k, f2 = (n) => n.toFixed(1);
     const tab = (on) => 'height: 36px; padding: 0 14px; border: 0; border-radius: 10px; font: 800 13px Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
+    const fkAim = this.fkMode() && this.phase === 'aim' && !!this.cam;
+    const showTraj = this.fkMode() && !!this.cam && (this.phase === 'aim' || this.phase === 'runup');
+    let trajPts = '', retXf = 'translate(-99 -99)', apexXf = 'translate(-99 -99)', trajCol = '#FFFFFF';
+    if (showTraj) {
+      const pl = this.fkPlan();
+      trajPts = pl.path.map((q) => { const s = this.toScreen(q.x, q.y, q.z); return f2(s.x) + ',' + f2(s.y); }).join(' ');
+      const rs = this.toScreen(this.aim.x, this.aim.y, this.D), ap = this.toScreen(pl.apex.x, pl.apex.y, pl.apex.z);
+      retXf = 'translate(' + f2(rs.x) + ' ' + f2(rs.y) + ')'; apexXf = 'translate(' + f2(ap.x) + ' ' + f2(ap.y) + ')';
+      const out = Math.abs(this.aim.x - this.GX) > 3.55 || this.aim.y > 2.33;
+      trajCol = pl.blocked ? '#FF8A3D' : out ? '#FF5C5C' : '#FFFFFF';
+    }
+    const m = this.meter(), [zlo, zhi] = this.zone();
+    const sAbs = Math.round(Math.abs(this.aim ? this.aim.s : 0) * 100);
     return {
+      fkAim, trajPts, retXf, apexXf, trajCol, trajOp: showTraj ? (this.phase === 'runup' ? '0.5' : '0.95') : '0',
+      curveVal: String(Math.round((this.aim ? this.aim.s : 0) * 100)), heightVal: String(Math.round((this.aim ? this.aim.h : 0) * 100)),
+      curveTxt: sAbs < 5 ? 'Recto' : (this.aim.s > 0 ? 'Derecha ' : 'Izquierda ') + sAbs + '%',
+      heightTxt: !this.aim ? '' : this.aim.h < 0.25 ? 'Tenso' : this.aim.h < 0.65 ? 'Medio' : 'Bombeado',
+      onCurve: (e) => { this.aim.s = +e.currentTarget.value / 100; this.forceUpdate(); },
+      onHeight: (e) => { this.aim.h = +e.currentTarget.value / 100; this.forceUpdate(); },
+      zoneStyle: 'position: absolute; left: 0; right: 0; bottom: ' + (zlo * 100).toFixed(1) + '%; height: ' + ((zhi - zlo) * 100).toFixed(1) + '%; background: #53D88E;',
+      meterStyle: 'position: absolute; left: 3px; right: 3px; bottom: ' + (m * 100).toFixed(1) + '%; height: 4px; margin-bottom: -2px; border-radius: 2px; background: #F4F4FA; box-shadow: 0 0 6px #FFFFFF;',
+      chutBg: this.charge ? (m >= zlo && m <= zhi ? '#53D88E' : '#FFC53D') : '#F4F4FA',
+      chargeDown: (e) => { if (!fkAim) return; e.preventDefault(); e.stopPropagation(); this.charge = { t0: performance.now() }; this.loop(); this.forceUpdate(); },
+      chargeUp: (e) => { if (!this.charge) return; e.preventDefault(); e.stopPropagation(); this.fkShoot(); },
+      chargeCancel: () => { this.charge = null; this.forceUpdate(); },
+      hintWrap: 'position: absolute; left: 0; right: 0; bottom: ' + (fkAim ? 150 : 12) + 'px; display: flex; justify-content: center; pointer-events: none;',
       canvasRef: this.canvasRef,
       no3d: !!this.no3d,
       ghostPts: this.lastSwipe && this.phase !== 'aim' ? this.lastSwipe.pts.map((q) => f2(q.x) + ',' + f2(q.y)).join(' ') : '',
@@ -909,8 +1015,8 @@ class Component extends DCLogic {
       showCount: this.phase === 'defend',
       countLabel: cd > 0.8 ? String(Math.ceil(cd - 0.8)) : '¡CHUTA!',
       countStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 60px; line-height: 1; color: #F4F4FA; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (1.3 - ((2.4 - cd) % 0.8) * 0.4).toFixed(2) + ');',
-      showHint: (this.phase === 'aim' && !this.swipe) || (this.phase === 'defend' && !this.tap) || (this.phase === 'flight' && !youTurn && !this.tap),
-      hintText: youTurn ? 'Desliza desde el balón hacia la portería · más rápido = más potencia · curva el gesto para dar efecto' : 'Toca la portería donde quieras lanzarte · si te tiras antes del disparo, el rival puede leerte',
+      showHint: (this.phase === 'aim' && !this.swipe && !this.charge && !this.dragAim) || (this.phase === 'defend' && !this.tap) || (this.phase === 'flight' && !youTurn && !this.tap),
+      hintText: this.fkMode() ? 'Arrastra la diana en la portería · ajusta efecto y altura · mantén CHUTAR y suelta en la zona verde' : youTurn ? 'Desliza desde el balón hacia la portería · más rápido = más potencia · curva el gesto para dar efecto' : 'Toca la portería donde quieras lanzarte · si te tiras antes del disparo, el rival puede leerte',
       zoneLabel: youTurn ? 'Zona de tiro: desliza desde el balón hacia la portería' : 'Portería: toca donde quieras que se lance el portero',
       showResult: this.phase === 'result' && !!R,
       resultText: rm[0],
@@ -932,6 +1038,11 @@ class Component extends DCLogic {
         if (youTurn || this.practice) {
           if (this.phase !== 'aim') return;
           e.preventDefault();
+          if (this.fkMode()) {
+            // move the target on the goal mouth
+            if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+            this.dragAim = true; this.setAim(e); return;
+          }
           if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
           this.swipe = [this.local(e)];
           this.forceUpdate();
@@ -950,12 +1061,13 @@ class Component extends DCLogic {
         }
       },
       pMove: (e) => {
+        if (this.dragAim) { this.setAim(e); return; }
         if (!this.swipe) return;
         const q = this.local(e), last = this.swipe[this.swipe.length - 1];
         if (Math.hypot(q.x - last.x, q.y - last.y) > 4 && this.swipe.length < 60) { this.swipe.push(q); this.forceUpdate(); }
       },
-      pUp: (e) => { if (this.swipe) { this.swipe.push(this.local(e)); this.shoot(); } },
-      pCancel: () => { this.swipe = null; this.forceUpdate(); }
+      pUp: (e) => { if (this.dragAim) { this.dragAim = false; this.forceUpdate(); return; } if (this.swipe) { this.swipe.push(this.local(e)); this.shoot(); } },
+      pCancel: () => { this.dragAim = false; this.swipe = null; this.forceUpdate(); }
     };
   }
 }
