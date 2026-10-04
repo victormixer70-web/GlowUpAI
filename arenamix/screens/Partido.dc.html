@@ -126,7 +126,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 </section>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3,4],"default":3},"mates":{"editor":null},"label":{"editor":null},"tutorial":{"editor":"bool","default":false},"rivals":{"editor":null},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"keeper":{"editor":"bool","default":false},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3,4],"default":3},"mates":{"editor":null},"label":{"editor":null},"tutorial":{"editor":"bool","default":false},"rivals":{"editor":null},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -171,11 +171,12 @@ class Component extends DCLogic {
     this.st = this.loadStats();
     const mates = Array.isArray(P.mates) ? P.mates : [P.mateName ?? 'Compañero', P.mate2Name ?? 'Compañero 2', 'Compañero 3'];
     const rivals = Array.isArray(P.rivals) ? P.rivals : [P.awayName ?? 'Rival', P.away2Name ?? 'Rival 2', P.away3Name ?? 'Rival 3', 'Rival 4'];
-    const homeNames = [P.homeName ?? 'Tú'].concat(mates), awayNames = rivals;
+    const keeper = this.keeperMode();
+    const homeNames = keeper ? mates.concat(['Compañero 4', 'Compañero 5']) : [P.homeName ?? 'Tú'].concat(mates), awayNames = rivals;
     const ps = [];
-    for (let k = 0; k < n; k++) ps.push({ team: 0, role: k ? 'mate' : 'human', slot: k, name: homeNames[k] });
+    for (let k = 0; k < n; k++) ps.push({ team: 0, role: k || keeper ? 'mate' : 'human', slot: k, name: homeNames[k] });
     for (let k = 0; k < n; k++) ps.push({ team: 1, role: 'ai', slot: k, name: awayNames[k] });
-    ps.push({ team: 0, role: 'gk', slot: -1, name: 'Portero' }, { team: 1, role: 'gk', slot: -1, name: 'Portero' });
+    ps.push({ team: 0, role: 'gk', slot: -1, name: keeper ? (P.homeName ?? 'Tú') : 'Portero' }, { team: 1, role: 'gk', slot: -1, name: 'Portero' });
     ps.forEach((p) => Object.assign(p, { x: 30, y: 15, vx: 0, vy: 0, face: p.team ? Math.PI : 0, run: Math.random() * 6, cd: 0, inv: 0, skillCd: 0, stam: 1, think: 0, turn: 0, act: null, react: 0 }));
     this.g = {
       t: dur, dur, score: [0, 0], phase: 'ready', pt: 0, charging: false, charge: 0,
@@ -218,7 +219,20 @@ class Component extends DCLogic {
       Object.assign(p, { x, y });
     });
     g.own = -1; g.hold = -1; g.recv = null; g.charging = false; g.charge = 0;
-    g.ctl = g.ps.findIndex((p) => p.team === 0 && p.slot === 0);
+    g.ctl = this.keeperMode() ? g.ps.findIndex((p) => p.team === 0 && p.role === 'gk') : g.ps.findIndex((p) => p.team === 0 && p.slot === 0);
+  }
+  keeperMode() {
+    // 4vs4: you can play in goal, with a camera from behind your own goal
+    return !!this.props.keeper && this.size() === 4 && !this.props.tutorial;
+  }
+  keeperDive() {
+    const g = this.g, p = g.ps[g.ctl], b = g.ball;
+    if (p.act || g.hold >= 0) return;
+    const D = this.diff(0), vTo = -b.vx;
+    let iy, t;
+    if (g.own < 0 && vTo > 4) { t = this.clamp(Math.abs(b.x - p.x) / vTo, 0.15, 0.6); iy = b.y + b.vy * t; }
+    else { const [, iy0] = this.inp || [0, 0]; t = 0.35; iy = p.y + (Math.abs(iy0) > 0.2 ? Math.sign(iy0) : (b.y >= p.y ? 1 : -1)) * 2.6; }
+    this.dive(p, this.clamp(iy, 10.5, 19.5), t, D);
   }
   start() {
     if (this.g.phase === 'end') this.newGame();
@@ -376,6 +390,7 @@ class Component extends DCLogic {
   /* ---------- human ---------- */
   ctx() {
     const g = this.g, p = g.ps[g.ctl], b = g.ball;
+    if (this.keeperMode()) return g.hold === g.ctl ? 'gkball' : 'gk';
     if (g.own === g.ctl) return 'ball';
     if (g.own < 0 && g.hold < 0 && this.dist(p, b) < 2.2 && b.z < 1.4) return 'ball';
     if (g.own >= 0 && g.ps[g.own].team === 0) return 'team';
@@ -385,6 +400,14 @@ class Component extends DCLogic {
   doKick() {
     const g = this.g, p = g.ps[g.ctl];
     if (g.phase !== 'play') { g.charging = false; g.charge = 0; return; }
+    if (g.hold === g.ctl) {
+      // a punt from the hands, aimed with the stick
+      const [ix, iy] = this.inp || [0, 0], dir = Math.hypot(ix, iy) > 0.2 ? Math.atan2(iy, ix) : 0;
+      g.hold = -1; p.cd = 0; g.ball.z = 0.5;
+      this.kick(p, 0.55 + g.charge * 0.45, this.clamp(dir, -1.2, 1.2), true, 1, 0);
+      p.cd = 0.8; g.charging = false; g.charge = 0;
+      return;
+    }
     const [ix, iy] = this.inp || [0, 0];
     let dir = Math.hypot(ix, iy) > 0.2 ? Math.atan2(iy, ix) : p.face;
     const pre = this.tt('pre');
@@ -402,6 +425,14 @@ class Component extends DCLogic {
   humanPass() {
     const g = this.g, p = g.ps[g.ctl], b = g.ball;
     if (g.phase !== 'play') return;
+    if (g.hold === g.ctl) {
+      const [ix, iy] = this.inp || [0, 0], aimed = Math.hypot(ix, iy) > 0.2;
+      const q = this.pickPassTarget(p, aimed ? Math.atan2(iy, ix) : 0, !aimed);
+      if (!q) return;
+      g.hold = -1; p.cd = 0;
+      this.passBall(p, q); b.vz = 2.2; p.cd = 0.8;
+      return;
+    }
     if (this.dist(p, b) > (g.own === g.ctl ? 1.7 : 1.5) || b.z > 1.4) { this.flashMsg('Demasiado lejos del balón', 0.8); return; }
     const [ix, iy] = this.inp || [0, 0];
     const aimed = Math.hypot(ix, iy) > 0.2, dir = aimed ? Math.atan2(iy, ix) : p.face;
@@ -410,6 +441,7 @@ class Component extends DCLogic {
   }
   switchPlayer() {
     const g = this.g, b = g.ball;
+    if (this.keeperMode()) return;
     let best = -1, bd = 1e9;
     g.ps.forEach((q, i) => {
       if (q.team !== 0 || q.role === 'gk' || i === g.ctl) return;
@@ -463,7 +495,8 @@ class Component extends DCLogic {
     sm[0] += (ix - sm[0]) * al; sm[1] += (iy - sm[1]) * al;
     if (Math.hypot(ix, iy) < 0.01 && Math.hypot(sm[0], sm[1]) < 0.05) { sm[0] = 0; sm[1] = 0; }
     this.inpS = sm;
-    this.inp = [sm[0], sm[1]];
+    // behind-the-goal camera: up on the stick is up the pitch
+    this.inp = this.keeperMode() ? [-sm[1], sm[0]] : [sm[0], sm[1]];
     const chasers = this.pickChasers();
     g.ps.forEach((p, i) => this.movePlayer(p, i, dt, chasers));
     for (let i = 0; i < g.ps.length; i++) for (let j = i + 1; j < g.ps.length; j++) {
@@ -521,7 +554,11 @@ class Component extends DCLogic {
       p.vx *= Math.exp(-k * dt); p.vy *= Math.exp(-k * dt);
     } else {
       let dx, dy;
-      if (i === g.ctl && !this.autoplay) [dx, dy, maxV, acc] = this.humanMove(p, i, dt);
+      if (i === g.ctl && !this.autoplay && p.role === 'gk') {
+        const [ix, iy] = this.inp || [0, 0];
+        if (Math.hypot(ix, iy) > 0.2 || g.press) { [dx, dy, maxV, acc] = this.humanMove(p, i, dt); maxV = Math.min(maxV, 7); acc = 14; }
+        else { this.noAutoDive = true; [dx, dy, maxV, acc] = this.gkMove(p, i, dt); this.noAutoDive = false; }
+      } else if (i === g.ctl && !this.autoplay) [dx, dy, maxV, acc] = this.humanMove(p, i, dt);
       else if (p.role === 'gk') [dx, dy, maxV, acc] = this.gkMove(p, i, dt);
       else [dx, dy, maxV, acc] = this.aiMove(p, i, dt, chasers);
       if (g.own === i) {
@@ -541,8 +578,9 @@ class Component extends DCLogic {
     }
     p.x += p.vx * dt; p.y += p.vy * dt;
     if (p.role === 'gk') {
-      p.x = p.team === 0 ? this.clamp(p.x, 0.6, 5) : this.clamp(p.x, 55, 59.4);
-      p.y = this.clamp(p.y, 9.5, 20.5);
+      const big = i === g.ctl && this.keeperMode();
+      p.x = p.team === 0 ? this.clamp(p.x, 0.6, big ? 9 : 5) : this.clamp(p.x, 55, 59.4);
+      p.y = this.clamp(p.y, big ? 6 : 9.5, big ? 24 : 20.5);
     } else {
       p.x = this.clamp(p.x, 0.6, 59.4);
       p.y = this.clamp(p.y, 0.6, 29.4);
@@ -834,7 +872,7 @@ class Component extends DCLogic {
           p.react += dt;
           if (p.react > D.react) {
             ty = this.clamp(iy, 11.6, 18.4); maxV = 6.5; acc = 14;
-            if (!p.act && t < 0.55 && Math.abs(iy - p.y) > 0.8 && b.z < 2.2) this.dive(p, iy, t, D);
+            if (!this.noAutoDive && !p.act && t < 0.55 && Math.abs(iy - p.y) > 0.8 && b.z < 2.2) this.dive(p, iy, t, D);
           }
         }
       } else p.react = 0;
@@ -884,7 +922,7 @@ class Component extends DCLogic {
     else if (T.i === 2) { if (g.own === g.ctl && h.sprinting) T.hold += dt; if (T.hold > 0.8) next(); }
     else if (T.i === 3) {
       if (mate >= 0 && T.t < 0.05) Object.assign(g.ps[mate], { x: this.clamp(h.x + 7, 6, 50), y: h.y > 15 ? h.y - 8 : h.y + 8, vx: 0, vy: 0 });
-      if (g.own === mate) { T.hold += dt; if (T.hold > 0.5) { this.passBall(g.ps[mate], h); next(); } }
+      if (g.own === mate) { T.hold += dt; if (T.hold > 0.5 && this.passBall(g.ps[mate], h)) next(); }
     }
     else if (T.i === 4) {
       if (g.own === g.ctl && !T.placed) { const r = g.ps[rival], f = Math.atan2(15 - h.y, 54 - h.x); Object.assign(r, { x: h.x + Math.cos(f) * 3.2, y: h.y + Math.sin(f) * 3.2, vx: 0, vy: 0, face: f + Math.PI }); T.placed = true; }
@@ -916,7 +954,7 @@ class Component extends DCLogic {
     if (g.hold >= 0) {
       const k = g.ps[g.hold];
       b.x = k.x + Math.cos(k.face) * 0.35; b.y = k.y + Math.sin(k.face) * 0.35; b.z = 0.9; b.vx = b.vy = b.vz = 0;
-      g.holdT -= dt;
+      g.holdT -= g.hold === g.ctl && this.keeperMode() ? dt / 6 : dt;
       if (g.holdT <= 0 && !(k.act && k.act.lock)) {
         g.hold = -1;
         const foes = g.ps.filter((q) => q.team !== k.team && q.role !== 'gk');
@@ -1065,9 +1103,17 @@ class Component extends DCLogic {
     const ahead = rx * fx + ry * fy, side = -rx * fy + ry * fx;
     const ctrl = oi === g.ctl ? this.tt('con') : 0.45;
     p.touchT = Math.max(0, (p.touchT || 0) - dt);
-    if (d > 2.6 || ahead < -1.0) { g.own = -1; return; }
+    if (d > 2.6) { g.own = -1; return; }
     if (b.z > 0.5) return;
-    if (oi === g.ctl && !this.autoplay && il <= 0.2 && d < 2) {
+    const turning = d > 0.25 && ahead / d < 0.55 && !(oi === g.ctl && !this.autoplay && il <= 0.2);
+    if (turning || p.turnHold > 0) {
+      // turning with the ball: drag it round with the sole so it stays at the feet through the turn
+      if (turning) p.turnHold = 0.18;
+      p.turnHold = Math.max(0, (p.turnHold || 0) - dt);
+      const tx = p.x + fx * 0.6 + p.vx * 0.1, ty = p.y + fy * 0.6 + p.vy * 0.1, k = Math.min(1, dt * 14);
+      b.vx += ((tx - b.x) * 6 + p.vx - b.vx) * k; b.vy += ((ty - b.y) * 6 + p.vy - b.vy) * k;
+      p.touchT = Math.max(p.touchT, 0.08);
+    } else if (oi === g.ctl && !this.autoplay && il <= 0.2 && d < 2) {
       // you let go of the stick: your player kills the ball under his foot
       const tx = p.x + fx * 0.55, ty = p.y + fy * 0.55, k = Math.min(1, dt * 7);
       b.vx += ((tx - b.x) * 3 - b.vx) * k; b.vy += ((ty - b.y) * 3 - b.vy) * k;
@@ -1368,6 +1414,16 @@ class Component extends DCLogic {
       this.ball3.quaternion.premultiply(this.qTmp);
     }
     const c = g.ps[g.ctl];
+    if (this.keeperMode()) {
+      // goalkeeper's view: from just behind your goal, looking up the pitch at the ball
+      const want = new T.Vector3(-35, 5.8, (c.y - 15) * 0.55 + (b.y - 15) * 0.15);
+      const look = new T.Vector3(this.clamp(b.x - 30, -24, 6) * 0.8 - 4, 0, (b.y - 15) * 0.75);
+      const f = 1 - Math.exp(-4.5 * (dt || 1));
+      if (this.cam.fov !== 58) { this.cam.fov = 58; this.cam.updateProjectionMatrix(); this.camPos.copy(want); this.camLook.copy(look); }
+      this.camPos.lerp(want, f); this.camLook.lerp(look, f);
+      this.cam.position.copy(this.camPos);
+      this.cam.lookAt(this.camLook);
+    } else {
     const fx = b.x * 0.75 + c.x * 0.25, fz = b.y * 0.75 + c.y * 0.25;
     // follow the play all the way to both touchlines, keeping it above the on-screen buttons
     const tx = Math.max(-21, Math.min(21, fx - 30)), tz = Math.max(-15, Math.min(15, fz - 15));
@@ -1378,6 +1434,7 @@ class Component extends DCLogic {
     this.camPos.lerp(want, f); this.camLook.lerp(look, f);
     this.cam.position.copy(this.camPos);
     this.cam.lookAt(this.camLook);
+    }
     const tnow = performance.now() / 1000, scoring = g.phase === 'goal' ? 1 - g.concede : -1;
     (this.fanGroups || []).forEach((fg) => {
       const u = fg.userData;
@@ -1654,7 +1711,7 @@ class Component extends DCLogic {
       };
     });
     const ctx = g.phase === 'play' ? this.ctx() : 'ball';
-    const atk = ctx === 'ball' || ctx === 'team';
+    const atk = ctx === 'ball' || ctx === 'team' || ctx === 'gkball', gkc = ctx === 'gk' || ctx === 'gkball';
     const [ix, iy] = this.inp || [0, 0];
     const passQ = ctx === 'ball' ? this.pickPassTarget(h, Math.hypot(ix, iy) > 0.2 ? Math.atan2(iy, ix) : h.face, Math.hypot(ix, iy) <= 0.2) : null;
     const pm = passQ ? SP(passQ.x, passQ.y, 2.3) : { x: 0, y: 0 };
@@ -1683,15 +1740,15 @@ class Component extends DCLogic {
       joyBaseStyle: 'position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none; transform: translate(' + this.joy.bx.toFixed(1) + 'px, ' + this.joy.by.toFixed(1) + 'px); opacity: ' + (this.joy.on ? 1 : 0.45) + ';',
       joyRingStyle: 'position: absolute; left: -' + this.JR + 'px; top: -' + this.JR + 'px; width: ' + (this.JR * 2) + 'px; height: ' + (this.JR * 2) + 'px; border-radius: 50%; box-sizing: border-box; background: #0B0B1466; border: 2px solid ' + (this.joy.on ? '#22D3EE99' : '#2E2E52') + ';',
       knobStyle: 'position: absolute; left: -28px; top: -28px; width: 56px; height: 56px; border-radius: 28px; background: #22D3EE; box-shadow: 0 3px 0 #0E8FA3, 0 4px 14px #0008; transform: translate(' + this.joy.kx.toFixed(1) + 'px, ' + this.joy.ky.toFixed(1) + 'px);',
-      mainLabel: atk ? 'CHUT' : 'ENTRADA',
+      mainLabel: ctx === 'gk' ? 'ESTIRADA' : ctx === 'gkball' ? 'PATADA' : atk ? 'CHUT' : 'ENTRADA',
       mainAria: atk ? 'Chutar: mantén pulsado para más potencia' : 'Entrada: tírate al suelo para robar el balón',
       mainBtnStyle: glow(tutI === 5 || tutI === 6).length ? btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : '#F4F4FA') : '#FF7A7A', atk ? '#A3A3C2' : '#B33A3A', atk ? 24 : 17, glow(true)) : btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : '#F4F4FA') : '#FF7A7A', atk ? '#A3A3C2' : '#B33A3A', atk ? 24 : 17, 'transform: scale(' + (g.charging ? 0.94 + g.charge * 0.1 : 1).toFixed(3) + ');'),
-      passLabel: ctx === 'ball' ? 'PASE' : ctx === 'team' ? 'PÍDELA' : P.coach ? 'CAMBIO' : 'PRESIÓN',
+      passLabel: ctx === 'gk' ? 'SALIR' : ctx === 'gkball' ? 'SAQUE' : ctx === 'ball' ? 'PASE' : ctx === 'team' ? 'PÍDELA' : P.coach ? 'CAMBIO' : 'PRESIÓN',
       passAria: ctx === 'ball' ? 'Pase al compañero señalado' : ctx === 'team' ? 'Pide el balón a tu compañero' : P.coach ? 'Cambiar al compañero más cercano al balón' : 'Presión: mantén pulsado para ir a por el balón',
       passBtnStyle: tutI === 3 || tutI === 6 ? btn(112, 14, 64, ctx === 'def' ? '#F4B860' : '#A78BFA', ctx === 'def' ? '#A87420' : '#6D28D9', ctx === 'ball' ? 19 : 15, glow(true)) : ctx === 'def' && !P.coach ? btn(112, 14, 64, g.press ? '#FFC53D' : '#F4B860', '#A87420', 15) : btn(112, 14, 64, ctx === 'def' ? '#8CC5FF' : '#A78BFA', ctx === 'def' ? '#3B76B8' : '#6D28D9', ctx === 'ball' ? 19 : 16),
       skillLabel: ctx === 'ball' ? 'REGATE' : 'PRESIÓN',
       skillAria: ctx === 'ball' ? 'Regate: deja atrás al rival que tienes delante' : 'Presión: mantén pulsado para ir a por el balón',
-      skillBtnStyle: tutI === 4 ? btn(26, 120, 60, '#53D88E', '#2F8A57', 15, glow(true)) : btn(26, 120, 60, ctx === 'ball' ? (h.skillCd > 0 ? '#5E5E80' : '#53D88E') : (g.press ? '#FFC53D' : '#F4B860'), ctx === 'ball' ? '#2F8A57' : '#A87420', 15, ctx !== 'ball' && !P.coach ? 'display: none;' : ''),
+      skillBtnStyle: gkc ? 'display: none;' : tutI === 4 ? btn(26, 120, 60, '#53D88E', '#2F8A57', 15, glow(true)) : btn(26, 120, 60, ctx === 'ball' ? (h.skillCd > 0 ? '#5E5E80' : '#53D88E') : (g.press ? '#FFC53D' : '#F4B860'), ctx === 'ball' ? '#2F8A57' : '#A87420', 15, ctx !== 'ball' && !P.coach ? 'display: none;' : ''),
       sprintBtnStyle: btn(98, 92, 56, sprintOn ? '#FFC53D' : '#22D3EE', '#0E8FA3', 14, glow(tutI === 2)),
       showGoal: g.phase === 'goal', scorerText: g.scorer,
       isTut: !!(P.tutorial && g.tut && g.tut.i < 7),
@@ -1763,14 +1820,16 @@ class Component extends DCLogic {
     const g = this.g;
     if (g.phase !== 'play') return;
     const c = this.ctx();
-    if (c === 'ball' || c === 'team') { if (!g.charging) { g.charging = true; g.charge = 0; } }
+    if (c === 'ball' || c === 'team' || c === 'gkball') { if (!g.charging) { g.charging = true; g.charge = 0; } }
+    else if (c === 'gk') this.keeperDive();
     else this.humanSlide();
   }
   passPress() {
     const g = this.g;
     if (g.phase !== 'play') return;
     const c = this.ctx();
-    if (c === 'ball') this.humanPass();
+    if (c === 'ball' || c === 'gkball') this.humanPass();
+    else if (c === 'gk') g.press = true;
     else if (c === 'team') this.callForBall();
     else if (this.props.coach) this.switchPlayer();
     else g.press = true;

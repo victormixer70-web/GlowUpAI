@@ -57,6 +57,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <div style="display: flex; flex-wrap: wrap; gap: 8px">
           <sc-for list="{{chips}}" as="c" hint-placeholder-count="3"><span style="{{c.style}}">{{c.text}}</span></sc-for>
         </div>
+        <sc-if value="{{canKeep}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">TU POSICIÓN</span><div style="display: flex; gap: 3px; padding: 3px; border-radius: 11px; background: #17172A"><button type="button" onClick="{{setField}}" style="{{fieldStyle}}">CAMPO</button><button type="button" onClick="{{setKeeper}}" style="{{keeperStyle}}">PORTERO</button></div></div></sc-if>
         <button type="button" onClick="{{search}}" style="margin-top: 4px; height: 56px; border: 0; border-radius: 16px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 6px 0 #0E8FA3">BUSCAR PARTIDA</button>
         <sc-if value="{{showNotice}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: #2A2410; border: 1px solid #FFC53D"><span style="flex: 1; font-size: 12px; font-weight: 700; color: #FFE38A">{{noticeText}}</span><button type="button" onClick="{{closeNotice}}" style="border: 0; background: transparent; color: #FFE38A; font-weight: 800; font-size: 13px; cursor: pointer">OK</button></div></sc-if>
         <span style="font-size: 11px; color: #8686A6">El online aún no está activo: de momento los demás jugadores los controla la IA.</span>
@@ -96,7 +97,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 
   <sc-if value="{{isTeamMatch}}" hint-placeholder-val="{{ false }}">
-    <dc-import name="Partido" label="{{matchLabel}}" mode="{{matchMode}}" duration="{{duration}}" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Invitado_4821" mates="{{mates}}" rivals="{{rivals}}" away-name="{{oppName}}" home-color="#FF8A3D" home-trim="#0B0B14" away-color="{{oppColor}}" away-trim="{{oppTrim}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
+    <dc-import name="Partido" keeper="{{asKeeper}}" label="{{matchLabel}}" mode="{{matchMode}}" duration="{{duration}}" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Invitado_4821" mates="{{mates}}" rivals="{{rivals}}" away-name="{{oppName}}" home-color="#FF8A3D" home-trim="#0B0B14" away-color="{{oppColor}}" away-trim="{{oppTrim}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isDuelMatch}}" hint-placeholder-val="{{ false }}">
     <dc-import name="Duelo" kind="{{duelKind}}" rival-name="{{oppName}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
@@ -350,7 +351,12 @@ class Component extends DCLogic {
     const teamB = m ? m.rivals.map((x, i) => row(x, tagOf(m.rivalMmr[i]), false, true)) : [];
     const sp = this.sport, mg = pl.kind === 'mg';
     const won2 = won, xp = won2 ? 120 : lost ? 50 : 80, coins = won2 ? 40 : lost ? 10 : 20;
+    const segS = (on) => 'height: 30px; padding: 0 12px; border: 0; border-radius: 8px; font: 800 12px Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
     return {
+      canKeep: n === 4,
+      fieldStyle: segS(!s.keeper), keeperStyle: segS(!!s.keeper),
+      setField: () => this.setState({ keeper: false }), setKeeper: () => this.setState({ keeper: true }),
+      asKeeper: n === 4 && !!s.keeper,
       showBg: s.phase !== 'match', ranked: !casual && !placing, casual, placing, deltaShown: !casual && !placing && !s.justPlaced,
       placeTitle: s.phase === 'result' ? 'CLASIFICATORIA ' + pc.g + ' DE 5' : 'CLASIFICATORIA ' + (pc.g + 1) + ' DE 5',
       placeDots: [0, 1, 2, 3, 4].map((k) => { const x = pc.res[k]; return { style: 'width: 22px; height: 22px; border-radius: 11px; box-sizing: border-box; ' + (x === 'w' ? 'background: #53D88E;' : x === 'l' ? 'background: #FF5C5C;' : x === 'd' ? 'background: #A3A3C2;' : 'border: 2px solid #4C4C78;') }; }),
