@@ -25,6 +25,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <div style="{{r.style}}">
       <svg width="44" height="44" viewBox="-22 -22 44 44">
         <ellipse rx="15" ry="9" fill="none" stroke="#22D3EE" stroke-width="2.5"/>
+        <g transform="scale(1 0.6) rotate({{r.arrowDeg}})" opacity="{{r.arrowOp}}"><path d="M17 -6L27 0L17 6Z" fill="#22D3EE" stroke="#0B0B14" stroke-width="1"/></g>
         <circle r="19" fill="none" stroke="#FFC53D" stroke-width="3.5" stroke-linecap="round" pathLength="100" stroke-dasharray="{{r.charge}}" transform="rotate(-90)"/>
       </svg>
     </div>
@@ -441,7 +442,12 @@ class Component extends DCLogic {
     let iy = g.jy + (g.keys.d ? 1 : 0) - (g.keys.u ? 1 : 0);
     const il = Math.hypot(ix, iy);
     if (il > 1) { ix /= il; iy /= il; }
-    this.inp = [ix, iy];
+    // a touch of smoothing (≈25 ms) so finger tremor can't jerk the direction around
+    const sm = this.inpS || [0, 0], al = 1 - Math.exp(-dt / 0.025);
+    sm[0] += (ix - sm[0]) * al; sm[1] += (iy - sm[1]) * al;
+    if (Math.hypot(ix, iy) < 0.01 && Math.hypot(sm[0], sm[1]) < 0.05) { sm[0] = 0; sm[1] = 0; }
+    this.inpS = sm;
+    this.inp = [sm[0], sm[1]];
     const chasers = this.pickChasers();
     g.ps.forEach((p, i) => this.movePlayer(p, i, dt, chasers));
     for (let i = 0; i < g.ps.length; i++) for (let j = i + 1; j < g.ps.length; j++) {
@@ -504,7 +510,7 @@ class Component extends DCLogic {
       if (g.own === i) {
         // a dribbler always adjusts his run to stay on top of the ball
         const t = 0.25, bx = b.x + b.vx * t - p.x, by = b.y + b.vy * t - p.y, bn = Math.hypot(bx, by) || 1;
-        const il = Math.hypot(dx, dy), k = this.clamp((bn - 0.7) / 1.2, 0, 1) * (i === g.ctl && !this.autoplay ? (il > 0.2 ? 0.12 : 0.5) : 0.75);
+        const il = Math.hypot(dx, dy), k = this.clamp((bn - 0.7) / 1.2, 0, 1) * (i === g.ctl && !this.autoplay ? (il > 0.2 ? ((bx * dx + by * dy) / (bn * il) > 0.5 ? 0.12 : 0.55) : 0) : 0.75);
         if (il > 0.1 || bn > 0.9) {
           dx = dx * (1 - k) + bx / bn * k * Math.max(il, 0.6); dy = dy * (1 - k) + by / bn * k * Math.max(il, 0.6);
         }
@@ -890,7 +896,7 @@ class Component extends DCLogic {
       // standing: trap the ball under the sole, a step in front
       const tx = p.x + fx * 0.55, ty = p.y + fy * 0.55, k = Math.min(1, dt * (5 + 4 * ctrl));
       b.vx += ((tx - b.x) * 5 - b.vx) * k; b.vy += ((ty - b.y) * 5 - b.vy) * k;
-    } else if (p.touchT <= 0 && ahead < 0.85 && d < 1.5) {
+    } else if (p.touchT <= 0 && ahead < 0.85 && d < (ahead < 0.3 ? 2.1 : 1.5)) {
       // a touch: push the ball ahead along the running line, correcting sideways drift
       const push = sp * (p.sprinting ? 1.32 : 1.1 - 0.06 * ctrl) + 0.6;
       const tx = fx * push - (-fy) * side * (2.2 + 1.5 * ctrl), ty = fy * push - fx * side * (2.2 + 1.5 * ctrl);
@@ -1344,7 +1350,9 @@ class Component extends DCLogic {
     const hs = SP(h.x, h.y);
     const rings = [{
       style: 'position: absolute; left: 0; top: 0; width: 44px; height: 44px; pointer-events: none; transform: translate(' + (hs.x - 22).toFixed(1) + 'px, ' + (hs.y - 22).toFixed(1) + 'px);',
-      charge: g.charging ? (g.charge * 100).toFixed(0) + ' 100' : '0 100'
+      charge: g.charging ? (g.charge * 100).toFixed(0) + ' 100' : '0 100',
+      arrowDeg: (Math.atan2((this.inp || [0, 0])[1], (this.inp || [0, 0])[0]) * 57.2958).toFixed(0),
+      arrowOp: Math.hypot((this.inp || [0, 0])[0], (this.inp || [0, 0])[1]) > 0.15 ? '1' : '0'
     }];
     let kickFxStyle = 'display: none;';
     if (g.fx) {
@@ -1421,7 +1429,12 @@ class Component extends DCLogic {
       joyDown: (e) => {
         // a new thumb always takes over the stick, even if an old touch was never released
         e.preventDefault();
-        if (this.joy.id != null) this.releasePtr(this.joy.id);
+        if (this.joy.id != null) {
+          const quiet = performance.now() - (this.joy.lastMove || 0) > 700;
+          const pt0 = this.joyLocal(e), far = Math.hypot(pt0.x - this.joy.bx, pt0.y - this.joy.by) > this.JR * 1.2;
+          if (!(quiet && far)) return;
+          this.releasePtr(this.joy.id);
+        }
         this.zoneEl = e.currentTarget;
         if (e.currentTarget.setPointerCapture) { try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {} }
         const pt = this.joyLocal(e);
@@ -1537,13 +1550,14 @@ class Component extends DCLogic {
   joySet(e) {
     // floating stick: the base follows the thumb if it is dragged past the rim
     const j = this.joy, R = this.JR, pt = this.joyLocal(e);
+    j.lastMove = performance.now();
     let dx = pt.x - j.bx, dy = pt.y - j.by, d = Math.hypot(dx, dy);
     // lots of travel: the base only starts following when the thumb is far past the rim
     const far = R * 1.8;
     if (d > far) { j.bx += dx / d * (d - far); j.by += dy / d * (d - far); dx = dx / d * far; dy = dy / d * far; d = far; }
     const kd = Math.min(d, R);
     j.kx = d > 0 ? dx / d * kd : 0; j.ky = d > 0 ? dy / d * kd : 0;
-    const dead = 8, m = d <= dead ? 0 : Math.min(1, (d - dead) / (R * 0.75 - dead));
+    const dead = 14, m = d <= dead ? 0 : Math.min(1, (d - dead) / (R * 0.75 - dead));
     const curve = Math.min(1, 0.12 + m * 0.95) * (m > 0 ? 1 : 0);
     this.g.jx = d > 0 ? dx / d * curve : 0; this.g.jy = d > 0 ? dy / d * curve : 0;
   }
