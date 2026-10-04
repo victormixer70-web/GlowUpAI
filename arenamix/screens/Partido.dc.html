@@ -75,7 +75,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </button>
 
   <button type="button" aria-label="{{mainAria}}" onPointerDown="{{mainDown}}" onPointerUp="{{mainUp}}" onPointerLeave="{{mainUp}}" onPointerCancel="{{mainUp}}" style="{{mainBtnStyle}}">{{mainLabel}}</button>
-  <button type="button" aria-label="{{passAria}}" onPointerDown="{{passDown}}" style="{{passBtnStyle}}">{{passLabel}}</button>
+  <button type="button" aria-label="{{passAria}}" onPointerDown="{{passDown}}" onPointerUp="{{passUp}}" onPointerLeave="{{passUp}}" onPointerCancel="{{passUp}}" style="{{passBtnStyle}}">{{passLabel}}</button>
   <button type="button" aria-label="{{skillAria}}" onPointerDown="{{skillDown}}" onPointerUp="{{skillUp}}" onPointerLeave="{{skillUp}}" onPointerCancel="{{skillUp}}" style="{{skillBtnStyle}}">{{skillLabel}}</button>
   <button type="button" aria-label="Sprint: mantén pulsado para correr más rápido" onPointerDown="{{sprintDown}}" onPointerUp="{{sprintUp}}" onPointerLeave="{{sprintUp}}" onPointerCancel="{{sprintUp}}" style="{{sprintBtnStyle}}">SPRINT</button>
 
@@ -97,7 +97,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{showReady}}" hint-placeholder-val="{{ true }}">
     <div style="position: absolute; inset: 0; background: #0B0B14B3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 40px; letter-spacing: 1px">{{readyTitle}}</span>
-      <span style="font-size: 13px; color: #CACAE0; text-align: center; max-width: 520px; line-height: 1.5">Con balón: CHUT (mantén para potencia), PASE al compañero que señala la flecha, REGATE para dejar atrás al rival y SPRINT. Sin balón: ENTRADA, CAMBIO de jugador y PRESIÓN.</span>
+      <span style="font-size: 13px; color: #CACAE0; text-align: center; max-width: 520px; line-height: 1.5">Con balón: CHUT (mantén para potencia), PASE al compañero que señala la flecha, REGATE para dejar atrás al rival y SPRINT. Sin balón: ENTRADA y PRESIÓN; si lo tiene un compañero, PÍDELA.</span>
       <button type="button" onClick="{{start}}" style="height: 54px; padding: 0 40px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 6px 0 #0E8FA3">SAQUE INICIAL</button>
     </div>
   </sc-if>
@@ -112,7 +112,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 </section>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3],"default":3},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3],"default":3},"coach":{"editor":"bool","default":false},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -406,7 +406,7 @@ class Component extends DCLogic {
     if (g.flashT > 0) g.flashT -= dt;
     g.ps.forEach((p) => {
       p.cd = Math.max(0, p.cd - dt); p.inv = Math.max(0, p.inv - dt); p.skillCd = Math.max(0, p.skillCd - dt);
-      p.wantsBall = Math.max(0, (p.wantsBall || 0) - dt); p.defend = Math.max(0, (p.defend || 0) - dt);
+      p.wantsBall = Math.max(0, (p.wantsBall || 0) - dt); p.passReq = Math.max(0, (p.passReq || 0) - dt); p.defend = Math.max(0, (p.defend || 0) - dt);
       if (p.act) { p.act.t += dt; if (p.act.t >= p.act.dur) { const a = p.act; p.act = null; if (a.then) a.then(); } }
     });
     if (g.phase === 'goal') { this.goalStep(dt); return; }
@@ -610,13 +610,15 @@ class Component extends DCLogic {
     const foes = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk');
     const pressure = foes.reduce((m, q) => Math.min(m, this.dist(p, q)), 99);
     const angOk = Math.abs(p.y - 15) < 9 || dg < 9;
+    const caller = g.ps[g.ctl];
+    if (p.passReq > 0 && caller.team === p.team && caller !== p) { p.passReq = 0; this.passBall(p, caller); this.say(p, '¡Toma!'); return; }
     if (dg < D.range && angOk && Math.random() < (dg < 11 ? 0.8 : 0.4)) { this.aiShoot(p); return; }
     let best = null, bs = -1e9;
     g.ps.forEach((q) => {
       if (q === p || q.team !== p.team || q.role === 'gk') return;
       const prog = (q.x - p.x) * sg, mark = foes.reduce((m, o) => Math.min(m, this.dist(o, q)), 99);
       if (!this.laneOpen(p, q) || mark < 1.8) return;
-      const s = prog * 0.25 + Math.min(mark, 6) * 0.3 - this.dist(p, q) * 0.05;
+      const s = prog * 0.25 + Math.min(mark, 6) * 0.3 - this.dist(p, q) * 0.05 + (q === g.ps[g.ctl] ? 0.8 : 0);
       if (s > bs) { bs = s; best = q; }
     });
     if (best && ((pressure < 2.4 && Math.random() < 0.6) || (bs > 2.2 && Math.random() < 0.3))) { this.passBall(p, best); return; }
@@ -731,7 +733,7 @@ class Component extends DCLogic {
         if (Math.random() < rate * dt) {
           this.stumble(p, 0.35);
           g.own = qi; g.last = qi; q.cd = 0;
-          if (q.team === 0) g.ctl = qi;
+          if (q.team === 0 && this.props.coach) g.ctl = qi;
           if (qi === g.ctl) this.flashMsg('¡Balón recuperado!', 0.8);
           else if (oi === g.ctl) this.flashMsg('Te han robado el balón', 0.8);
           return;
@@ -828,7 +830,7 @@ class Component extends DCLogic {
       const p = g.ps[best];
       g.own = best; g.last = best; b.z = 0; b.vz = 0; b.spin = 0;
       if (g.recv && g.recv.i === best) g.recv = null;
-      if (p.team === 0 && best !== g.ctl) { g.ctl = best; g.charging = false; }
+      if (p.team === 0 && best !== g.ctl && this.props.coach) { g.ctl = best; g.charging = false; }
     }
   }
   fmtClock(t) {
@@ -1290,7 +1292,7 @@ class Component extends DCLogic {
       s0: String(g.score[0]), s1: String(g.score[1]),
       clock: this.fmtClock(g.t),
       clockStyle: 'position: absolute; right: 14px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 22px; color: ' + (g.t <= 10 && g.phase === 'play' ? '#FF5C5C' : '#F4F4FA') + ';',
-      modeLabel: mode === 'comp' ? 'COMPETITIVO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA',
+      modeLabel: P.coach ? 'MODO ENTRENADOR' : mode === 'comp' ? 'COMPETITIVO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA',
       modeColor: mode === 'comp' ? '#E3A56E' : '#22D3EE',
       flash: g.flashT > 0, flashText: g.flash,
       stamStyle: 'display: block; height: 100%; width: ' + (h.stam * 100).toFixed(0) + '%; background: ' + (h.stam < 0.25 ? '#FF5C5C' : '#53D88E') + ';',
@@ -1298,17 +1300,17 @@ class Component extends DCLogic {
       mainLabel: atk ? 'CHUT' : 'ENTRADA',
       mainAria: atk ? 'Chutar: mantén pulsado para más potencia' : 'Entrada: tírate al suelo para robar el balón',
       mainBtnStyle: btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : '#F4F4FA') : '#FF7A7A', atk ? '#A3A3C2' : '#B33A3A', atk ? 24 : 17, 'transform: scale(' + (g.charging ? 0.94 + g.charge * 0.1 : 1).toFixed(3) + ');'),
-      passLabel: atk ? 'PASE' : 'CAMBIO',
-      passAria: atk ? 'Pase al compañero señalado' : 'Cambiar al compañero más cercano al balón',
-      passBtnStyle: btn(112, 14, 64, atk ? '#A78BFA' : '#8CC5FF', atk ? '#6D28D9' : '#3B76B8', atk ? 19 : 16),
-      skillLabel: atk ? 'REGATE' : 'PRESIÓN',
-      skillAria: atk ? 'Regate: deja atrás al rival que tienes delante' : 'Presión: mantén pulsado para ir a por el balón',
-      skillBtnStyle: btn(26, 120, 60, atk ? (h.skillCd > 0 ? '#5E5E80' : '#53D88E') : (g.press ? '#FFC53D' : '#F4B860'), atk ? '#2F8A57' : '#A87420', 15),
+      passLabel: ctx === 'ball' ? 'PASE' : ctx === 'team' ? 'PÍDELA' : P.coach ? 'CAMBIO' : 'PRESIÓN',
+      passAria: ctx === 'ball' ? 'Pase al compañero señalado' : ctx === 'team' ? 'Pide el balón a tu compañero' : P.coach ? 'Cambiar al compañero más cercano al balón' : 'Presión: mantén pulsado para ir a por el balón',
+      passBtnStyle: ctx === 'def' && !P.coach ? btn(112, 14, 64, g.press ? '#FFC53D' : '#F4B860', '#A87420', 15) : btn(112, 14, 64, ctx === 'def' ? '#8CC5FF' : '#A78BFA', ctx === 'def' ? '#3B76B8' : '#6D28D9', ctx === 'ball' ? 19 : 16),
+      skillLabel: ctx === 'ball' ? 'REGATE' : 'PRESIÓN',
+      skillAria: ctx === 'ball' ? 'Regate: deja atrás al rival que tienes delante' : 'Presión: mantén pulsado para ir a por el balón',
+      skillBtnStyle: btn(26, 120, 60, ctx === 'ball' ? (h.skillCd > 0 ? '#5E5E80' : '#53D88E') : (g.press ? '#FFC53D' : '#F4B860'), ctx === 'ball' ? '#2F8A57' : '#A87420', 15, ctx !== 'ball' && !P.coach ? 'display: none;' : ''),
       sprintBtnStyle: btn(98, 92, 56, sprintOn ? '#FFC53D' : '#22D3EE', '#0E8FA3', 14),
       showGoal: g.phase === 'goal', scorerText: g.scorer,
       goalStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 110px; line-height: 1; letter-spacing: 4px; color: #22D3EE; text-shadow: 0 6px 0 #0B0B14, 0 0 40px #22D3EE99; transform: scale(' + goalScale.toFixed(3) + ') rotate(-4deg);',
       showReady: g.phase === 'ready',
-      readyTitle: (mode === 'comp' ? 'PARTIDO CLASIFICATORIO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA') + ' · ' + n + ' VS ' + n,
+      readyTitle: (P.coach ? 'MODO ENTRENADOR' : mode === 'comp' ? 'PARTIDO CLASIFICATORIO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA') + ' · ' + n + ' VS ' + n,
       showEnd: g.phase === 'end',
       endText: won ? '¡VICTORIA!' : lost ? 'DERROTA' : 'EMPATE',
       endStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 2px; color: ' + (won ? '#22D3EE' : lost ? '#FF5C5C' : '#F4F4FA') + ';',
@@ -1328,6 +1330,7 @@ class Component extends DCLogic {
       mainDown: (e) => { e.preventDefault(); this.mainPress(); },
       mainUp: () => { if (g.charging) this.doKick(); },
       passDown: (e) => { e.preventDefault(); this.passPress(); },
+      passUp: () => { if (!P.coach) g.press = false; },
       skillDown: (e) => { e.preventDefault(); this.skillPress(); },
       skillUp: () => { g.press = false; },
       sprintDown: (e) => { e.preventDefault(); g.sprint = true; },
@@ -1347,7 +1350,7 @@ class Component extends DCLogic {
         const map = { arrowleft: 'l', a: 'l', arrowright: 'r', d: 'r', arrowup: 'u', w: 'u', arrowdown: 'd', s: 'd' };
         if (map[k]) g.keys[map[k]] = false;
         if ((k === ' ' || k === 'spacebar') && g.charging) this.doKick();
-        if (k === 'f') g.press = false;
+        if (k === 'f' || k === 'e') g.press = false;
         if (k === 'shift') g.sprint = false;
       }
     };
@@ -1363,13 +1366,24 @@ class Component extends DCLogic {
     const g = this.g;
     if (g.phase !== 'play') return;
     const c = this.ctx();
-    if (c === 'ball' || c === 'team') this.humanPass(); else this.switchPlayer();
+    if (c === 'ball') this.humanPass();
+    else if (c === 'team') this.callForBall();
+    else if (this.props.coach) this.switchPlayer();
+    else g.press = true;
   }
   skillPress() {
     const g = this.g;
     if (g.phase !== 'play') return;
     const c = this.ctx();
-    if (c === 'ball' || c === 'team') this.humanSkill(); else g.press = true;
+    if (c === 'ball') this.humanSkill();
+    else if (this.props.coach) g.press = true;
+  }
+  callForBall() {
+    const g = this.g, h = g.ps[g.ctl];
+    const owner = g.own >= 0 ? g.ps[g.own] : null;
+    this.say(h, '¡Pásala!');
+    if (owner && owner.team === h.team && owner !== h) { owner.passReq = 1.5; owner.think = Math.min(owner.think, 0.08); }
+    else this.flashMsg('Tu compañero aún no tiene el balón', 0.8);
   }
   joySet(e) {
     const r = e.currentTarget.getBoundingClientRect();

@@ -92,6 +92,7 @@ input::placeholder{color:#8686A6}
           <sc-if value="{{m.isFriends}}" hint-placeholder-val="{{ false }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14a5 5 0 0 1 5 5"/></svg></sc-if>
           <sc-if value="{{m.isPens}}" hint-placeholder-val="{{ false }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 20V6h18v14"/><path d="M3 10h18M8 6v14M16 6v14" stroke-width="1" opacity=".6"/><circle cx="12" cy="17" r="2.2" fill="currentColor"/></svg></sc-if>
           <sc-if value="{{m.isFree}}" hint-placeholder-val="{{ false }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20Q8 4 20 6"/><circle cx="4" cy="20" r="2" fill="currentColor"/><path d="M9 14v6M12 13v7M15 14v6"/></svg></sc-if>
+          <sc-if value="{{m.isCoach}}" hint-placeholder-val="{{ false }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3h6v3H9z"/><circle cx="9" cy="11" r="1.2" fill="currentColor"/><path d="M13 10l3 3M16 10l-3 3M9.5 17l5-3"/></svg></sc-if>
           <sc-if value="{{m.isOnline}}" hint-placeholder-val="{{ false }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/></svg></sc-if>
         </span>
         <span style="flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left">
@@ -120,6 +121,7 @@ class Component extends DCLogic {
       { id: 'pens', title: 'PENALTIS 1VS1', tag: 'Tanda', desc: 'Tiras y paras por turnos. Muerte súbita.' },
       { id: 'free', title: 'TIROS LIBRES 1VS1', tag: 'Con barrera', desc: 'Duelo de faltas a 22 metros.' },
       { id: 'quick', title: 'PARTIDA RÁPIDA', tag: '3v3', desc: 'Partidos cortos sin afectar a tu MMR.' },
+      { id: 'coach', title: 'ENTRENADOR', tag: '3v3', desc: 'Modo entrenador: controla a todo tu equipo.' },
       { id: 'train', title: 'ENTRENAMIENTO', tag: 'Sin rival', desc: 'Penaltis, regates y tiros libres a tu ritmo.' },
       { id: 'friends', title: 'CON AMIGOS', tag: 'Privada', desc: 'Crea una sala e invita con un código.' }
     ];
@@ -128,7 +130,7 @@ class Component extends DCLogic {
       const on = m.id === sel;
       return {
         ...m,
-        isQuick: m.id === 'quick', isTrain: m.id === 'train', isFriends: m.id === 'friends', isPens: m.id === 'pens', isFree: m.id === 'free', isOnline: m.id === 'online',
+        isQuick: m.id === 'quick', isTrain: m.id === 'train', isFriends: m.id === 'friends', isPens: m.id === 'pens', isFree: m.id === 'free', isOnline: m.id === 'online', isCoach: m.id === 'coach',
         cardStyle: 'display: flex; align-items: center; gap: 10px; width: 100%; height: 100%; padding: 10px; box-sizing: border-box; border-radius: 16px; font-family: Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #1E1A3A; border: 2px solid #22D3EE;' : 'background: #17172A; border: 2px solid #26264A;'),
         iconStyle: 'flex: none; width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: #21213A; color: #CACAE0;'),
         tagStyle: 'font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; ' + (on ? 'background: #0E3340; color: #22D3EE;' : 'background: #21213A; color: #A3A3C2;'),
@@ -141,7 +143,7 @@ class Component extends DCLogic {
       pickComp: () => this.setState({ mode: 'comp' }),
       compCardStyle: 'display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: 18px; ' + (compOn ? 'background: #1F1A1A; border: 2px solid #22D3EE;' : 'background: #17172A; border: 2px solid #26264A;'),
       selectedTitle: compOn ? 'COMPETITIVO' : list.find((m) => m.id === sel).title,
-      playHref: ({ comp: 'Competitivo.dc.html', quick: 'Rapida.dc.html', train: 'Entrenamiento.dc.html', friends: 'Online2v2.dc.html', online: 'Online2v2.dc.html', pens: 'Penaltis1v1.dc.html', free: 'TirosLibres1v1.dc.html' })[sel]
+      playHref: ({ comp: 'Competitivo.dc.html', quick: 'Rapida.dc.html', coach: 'Entrenador.dc.html', train: 'Entrenamiento.dc.html', friends: 'Online2v2.dc.html', online: 'Online2v2.dc.html', pens: 'Penaltis1v1.dc.html', free: 'TirosLibres1v1.dc.html' })[sel]
     };
   }
 }
