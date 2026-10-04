@@ -165,6 +165,32 @@
     } else if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function () {});
   });
 
+  /* ---------- install button ---------- */
+  var standalone = window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: fullscreen)').matches || navigator.standalone;
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var deferred = null;
+  function installUI(mode) {
+    if (standalone || document.getElementById('install')) return;
+    var btn = document.createElement('button');
+    btn.id = 'install';
+    btn.type = 'button';
+    btn.textContent = 'Instalar app';
+    btn.setAttribute('style', 'position:fixed;right:12px;bottom:12px;z-index:20;height:44px;padding:0 18px;border:0;border-radius:22px;background:#22D3EE;color:#0B0B14;font:800 15px system-ui,sans-serif;box-shadow:0 4px 0 #0E8FA3,0 8px 24px #0008;cursor:pointer');
+    var tip = document.createElement('div');
+    tip.setAttribute('style', 'display:none;position:fixed;right:12px;bottom:66px;z-index:20;max-width:260px;padding:12px 14px;border-radius:14px;background:#17172A;border:1px solid #2E2E52;color:#F4F4FA;font:600 13px/1.45 system-ui,sans-serif');
+    tip.innerHTML = isIOS ? 'En iPhone: toca el botón <b>Compartir</b> (cuadrado con flecha) y elige <b>Añadir a pantalla de inicio</b>.' : 'Abre el menú del navegador <b>⋮</b> y elige <b>Instalar aplicación</b> o <b>Añadir a pantalla de inicio</b>.';
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (deferred) { deferred.prompt(); deferred.userChoice.then(function () { deferred = null; btn.remove(); tip.remove(); }); }
+      else tip.style.display = tip.style.display === 'none' ? 'block' : 'none';
+    });
+    document.body.appendChild(tip);
+    document.body.appendChild(btn);
+  }
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; installUI(); });
+  window.addEventListener('appinstalled', function () { var b = document.getElementById('install'); if (b) b.remove(); });
+  setTimeout(function () { installUI(); }, 2500);
+
   window.addEventListener('resize', fit);
   fit();
   Promise.all(SCREENS.map(load)).then(function () {
