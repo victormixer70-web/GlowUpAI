@@ -2018,7 +2018,13 @@ class Component extends DCLogic {
     const passQ = ctx === 'ball' ? this.pickPassTarget(h, Math.hypot(ix, iy) > 0.2 ? Math.atan2(iy, ix) : h.face, Math.hypot(ix, iy) <= 0.2) : null;
     const pm = passQ ? SP(passQ.x, passQ.y, 2.3) : { x: 0, y: 0 };
     const tutI = P.tutorial && g.tut ? g.tut.i : -1, glow = (k) => (k ? 'outline: 4px solid #FFC53D; outline-offset: 4px; ' : '');
-    const btn = (right, bottom, size, bg, sh, fs, extra) => 'position: absolute; right: ' + right + 'px; bottom: ' + bottom + 'px; width: ' + size + 'px; height: ' + size + 'px; border-radius: ' + (size / 2) + 'px; border: 0; padding: 0; touch-action: none; cursor: pointer; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + fs + 'px; letter-spacing: 0.5px; color: #0B0B14; background: ' + bg + '; box-shadow: 0 5px 0 ' + sh + '; ' + (extra || '');
+    const CFG = this.cfg || this.controls(), SLOT = { '14,20': 'main', '112,14': 'pass', '26,120': 'skill', '98,92': 'sprint' };
+    const btn0 = (right, bottom, size, bg, sh, fs, extra) => 'position: absolute; right: ' + right + 'px; bottom: ' + bottom + 'px; width: ' + size + 'px; height: ' + size + 'px; border-radius: ' + (size / 2) + 'px; border: 0; padding: 0; touch-action: none; cursor: pointer; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + fs + 'px; letter-spacing: 0.5px; color: #0B0B14; background: ' + bg + '; box-shadow: 0 5px 0 ' + sh + '; ' + (extra || '');
+    const btn = (right, bottom, size, bg, sh, fs, extra) => {
+      const key = SLOT[right + ',' + bottom], p = key && CFG.pos[key];
+      const k = CFG.size;
+      return btn0(p ? p[0] : right, p ? p[1] : bottom, Math.round(size * k), bg, sh, Math.round(fs * Math.min(k, 1.25)), (extra || '') + (CFG.alpha < 1 ? 'opacity: ' + CFG.alpha + ';' : ''));
+    };
     const sprintOn = g.sprint && h.stam > 0.04;
     return {
       tags, hasMates: n > 1, hasPing: online, pingLabel: (P.ping ?? '') + ' ms',
@@ -2041,7 +2047,7 @@ class Component extends DCLogic {
       stamStyle: 'display: block; height: 100%; width: ' + (h.stam * 100).toFixed(0) + '%; background: ' + (h.stam < 0.25 ? '#FF5C5C' : '#53D88E') + ';',
       joyBaseStyle: 'position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none; transform: translate(' + this.joy.bx.toFixed(1) + 'px, ' + this.joy.by.toFixed(1) + 'px); opacity: ' + (this.joy.on ? 1 : 0.45) + ';',
       joyRingStyle: 'position: absolute; left: -' + this.JR + 'px; top: -' + this.JR + 'px; width: ' + (this.JR * 2) + 'px; height: ' + (this.JR * 2) + 'px; border-radius: 50%; box-sizing: border-box; background: #0B0B1466; border: 2px solid ' + (this.joy.on ? '#22D3EE99' : '#2E2E52') + ';',
-      knobStyle: 'position: absolute; left: -28px; top: -28px; width: 56px; height: 56px; border-radius: 28px; background: #22D3EE; box-shadow: 0 3px 0 #0E8FA3, 0 4px 14px #0008; transform: translate(' + this.joy.kx.toFixed(1) + 'px, ' + this.joy.ky.toFixed(1) + 'px);',
+      knobStyle: 'position: absolute; left: -' + Math.round(28 * this.cfg.joy) + 'px; top: -' + Math.round(28 * this.cfg.joy) + 'px; width: ' + Math.round(56 * this.cfg.joy) + 'px; height: ' + Math.round(56 * this.cfg.joy) + 'px; border-radius: 50%; background: #22D3EE; box-shadow: 0 3px 0 #0E8FA3, 0 4px 14px #0008; transform: translate(' + this.joy.kx.toFixed(1) + 'px, ' + this.joy.ky.toFixed(1) + 'px);',
       mainLabel: ctx === 'gk' ? 'ESTIRADA' : ctx === 'gkball' ? 'PATADA' : atk ? 'CHUT' : 'ENTRADA',
       mainAria: atk ? 'Chutar: mantén pulsado para más potencia' : 'Entrada: tírate al suelo para robar el balón',
       mainBtnStyle: glow(tutI === 5 || tutI === 6).length ? btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : '#F4F4FA') : '#FF7A7A', atk ? '#A3A3C2' : '#B33A3A', atk ? 24 : 17, glow(true)) : btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : '#F4F4FA') : '#FF7A7A', atk ? '#A3A3C2' : '#B33A3A', atk ? 24 : 17, 'transform: scale(' + (g.charging ? 0.94 + g.charge * 0.1 : 1).toFixed(3) + ');'),
@@ -2205,10 +2211,18 @@ class Component extends DCLogic {
     if (g.charging) { g.charging = false; g.charge = 0; }
     this.forceUpdate();
   }
+  controls() {
+    // player's control layout from Perfil > Configuración (sizes, transparency and button positions)
+    let c = null;
+    try { c = JSON.parse(localStorage.getItem('arenamix.controls.v1') || 'null'); } catch (e) {}
+    c = c || {};
+    return { size: c.size || 1, joy: c.joy || 1, alpha: c.alpha || 1, pos: c.pos || {} };
+  }
   joyReset() {
-    this.JR = 80;
+    this.cfg = this.controls();
+    this.JR = Math.round(80 * this.cfg.joy);
     this.held = this.held || {};
-    this.joy = { id: null, on: false, bx: 110, by: 290, kx: 0, ky: 0 };
+    this.joy = { id: null, on: false, bx: Math.max(this.JR + 20, 110), by: Math.min(390 - this.JR - 14, 290), kx: 0, ky: 0 };
   }
   joyLocal(e) {
     const el = this.zoneEl || e.currentTarget, r = el.getBoundingClientRect(), k = 420 / (r.width || 420);

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Configuración</title>
+<script src="./support.js"></script>
+<script src="/_blob/de0c1b42c380e04fabb186f97a299f57"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#22D3EE}a:hover{color:#67E8F9}
+</style>
+</helmet>
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; display: flex; gap: 14px; padding: 12px 14px; box-sizing: border-box; user-select: none; -webkit-user-select: none">
+  <div style="flex: none; width: 236px; display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <a href="Perfil.dc.html" aria-label="Volver al perfil" style="flex: none; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 22px; letter-spacing: .5px">CONFIGURACIÓN</span>
+    </div>
+    <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE">CONTROLES DEL PARTIDO</span>
+    <div style="display: flex; flex-direction: column; gap: 5px; padding: 10px; border-radius: 14px; background: #17172A; border: 1px solid #26264A">
+      <label for="cf-size" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>TAMAÑO DE BOTONES</span><span style="color: #F4F4FA">{{sizeTxt}}</span></label>
+      <input id="cf-size" type="range" min="60" max="140" step="5" value="{{sizeVal}}" onInput="{{onSize}}" style="width: 100%; accent-color: #22D3EE">
+      <label for="cf-joy" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>TAMAÑO DEL JOYSTICK</span><span style="color: #F4F4FA">{{joyTxt}}</span></label>
+      <input id="cf-joy" type="range" min="60" max="140" step="5" value="{{joyVal}}" onInput="{{onJoy}}" style="width: 100%; accent-color: #22D3EE">
+      <label for="cf-alpha" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>OPACIDAD</span><span style="color: #F4F4FA">{{alphaTxt}}</span></label>
+      <input id="cf-alpha" type="range" min="40" max="100" step="5" value="{{alphaVal}}" onInput="{{onAlpha}}" style="width: 100%; accent-color: #22D3EE">
+    </div>
+    <span style="font-size: 11px; line-height: 1.45; color: #A3A3C2">Arrastra los botones en la vista previa para colocarlos donde quieras. Se guarda solo.</span>
+    <button type="button" onClick="{{resetAll}}" style="margin-top: auto; height: 40px; border-radius: 12px; border: 1px solid #FF8A8E; background: transparent; color: #FF8A8E; font: 800 13px Manrope, sans-serif; cursor: pointer">Restablecer controles</button>
+  </div>
+  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+    <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">VISTA PREVIA · ARRASTRA PARA MOVER</span>
+    <div onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" style="position: relative; width: 562px; height: 260px; border-radius: 14px; overflow: hidden; border: 1px solid #2E2E52; background: linear-gradient(180deg, #0B0B14 0%, #0B0B14 11%, #1E7A3E 11%, #23874A 60%, #1E7A3E 100%); touch-action: none">
+      <div style="position: absolute; left: 0; right: 0; top: 0; height: 29px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; color: #F4F4FA">0 – 0</div>
+      <div style="position: absolute; left: 50%; top: 29px; bottom: 0; width: 2px; background: #FFFFFF66"></div>
+      <div style="position: absolute; left: 50%; top: 50%; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 2px solid #FFFFFF66"></div>
+      <div style="{{joyStyle}}"><div style="{{knobStyle}}"></div></div>
+      <sc-for list="{{btns}}" as="b" hint-placeholder-count="4">
+        <button type="button" aria-label="{{b.aria}}" onPointerDown="{{b.down}}" style="{{b.style}}">{{b.label}}</button>
+      </sc-for>
+    </div>
+    <span style="font-size: 11px; color: #6E6E90">El joystick aparece donde pongas el pulgar en la mitad izquierda; aquí se ve su tamaño.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.S = 562 / 844;
+    this.DEF = { main: [14, 20, 88, 'CHUT', '#F4F4FA', '#A3A3C2', 24], pass: [112, 14, 64, 'PASE', '#A78BFA', '#6D28D9', 19], skill: [26, 120, 60, 'REGATE', '#53D88E', '#2F8A57', 15], sprint: [98, 92, 56, 'SPRINT', '#22D3EE', '#0E8FA3', 14] };
+    this.state = { cfg: this.load(), drag: null };
+  }
+  load() {
+    let c = null;
+    try { c = JSON.parse(localStorage.getItem('arenamix.controls.v1') || 'null'); } catch (e) {}
+    c = c || {};
+    return { size: c.size || 1, joy: c.joy || 1, alpha: c.alpha || 1, pos: c.pos || {} };
+  }
+  save(cfg) {
+    try { localStorage.setItem('arenamix.controls.v1', JSON.stringify(cfg)); } catch (e) {}
+    this.setState({ cfg });
+  }
+  posOf(k) { const p = this.state.cfg.pos[k], d = this.DEF[k]; return p ? p.slice() : [d[0], d[1]]; }
+  renderVals() {
+    const s = this.state, c = s.cfg, S = this.S;
+    const btns = Object.keys(this.DEF).map((k) => {
+      const d = this.DEF[k], [r, b] = this.posOf(k), size = Math.round(d[2] * c.size), on = s.drag && s.drag.k === k;
+      return {
+        label: d[3], aria: 'Mover el botón ' + d[3],
+        style: 'position: absolute; right: ' + (r * S).toFixed(1) + 'px; bottom: ' + (b * S).toFixed(1) + 'px; width: ' + (size * S).toFixed(1) + 'px; height: ' + (size * S).toFixed(1) + 'px; border-radius: 50%; border: 0; padding: 0; touch-action: none; cursor: grab; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + (d[6] * Math.min(c.size, 1.25) * S).toFixed(1) + 'px; color: #0B0B14; background: ' + d[4] + '; box-shadow: 0 3px 0 ' + d[5] + (on ? ', 0 0 0 3px #FFC53D' : '') + '; opacity: ' + c.alpha + ';',
+        down: (e) => {
+          e.preventDefault();
+          const box = e.currentTarget.parentNode.getBoundingClientRect();
+          this.setState({ drag: { k, x: e.clientX, y: e.clientY, r, b, sc: box.width / 562 } });
+        }
+      };
+    });
+    const JR = 80 * c.joy;
+    return {
+      btns,
+      sizeVal: String(Math.round(c.size * 100)), sizeTxt: Math.round(c.size * 100) + '%',
+      joyVal: String(Math.round(c.joy * 100)), joyTxt: Math.round(c.joy * 100) + '%',
+      alphaVal: String(Math.round(c.alpha * 100)), alphaTxt: Math.round(c.alpha * 100) + '%',
+      onSize: (e) => this.save({ ...c, size: +e.currentTarget.value / 100 }),
+      onJoy: (e) => this.save({ ...c, joy: +e.currentTarget.value / 100 }),
+      onAlpha: (e) => this.save({ ...c, alpha: +e.currentTarget.value / 100 }),
+      resetAll: () => this.save({ size: 1, joy: 1, alpha: 1, pos: {} }),
+      joyStyle: 'position: absolute; left: ' + ((Math.max(JR + 20, 110) - JR) * S).toFixed(1) + 'px; top: ' + ((Math.min(390 - JR - 14, 290) - JR) * S).toFixed(1) + 'px; width: ' + (JR * 2 * S).toFixed(1) + 'px; height: ' + (JR * 2 * S).toFixed(1) + 'px; border-radius: 50%; box-sizing: border-box; background: #0B0B1466; border: 2px solid #2E2E52; display: flex; align-items: center; justify-content: center; opacity: ' + c.alpha + ';',
+      knobStyle: 'width: ' + (56 * c.joy * S).toFixed(1) + 'px; height: ' + (56 * c.joy * S).toFixed(1) + 'px; border-radius: 50%; background: #22D3EE; box-shadow: 0 2px 0 #0E8FA3;',
+      pMove: (e) => {
+        const dg = s.drag;
+        if (!dg) return;
+        const d = this.DEF[dg.k], size = d[2] * c.size, k = 1 / (S * dg.sc);
+        const r = Math.max(4, Math.min(844 - size - 4, dg.r - (e.clientX - dg.x) * k));
+        const b = Math.max(4, Math.min(390 - 44 - size, dg.b - (e.clientY - dg.y) * k));
+        const pos = { ...c.pos, [dg.k]: [Math.round(r), Math.round(b)] };
+        this.setState({ cfg: { ...c, pos } });
+      },
+      pUp: () => { if (s.drag) { this.save(this.state.cfg); this.setState({ drag: null }); } }
+    };
+  }
+}
+</script>
+</body>
+</html>
