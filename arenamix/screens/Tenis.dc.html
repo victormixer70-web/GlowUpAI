@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Tenis 3D</title>
+<script src="./support.js"></script>
+<script src="/_blob/de0c1b42c380e04fabb186f97a299f57"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#22D3EE}a:hover{color:#67E8F9}
+</style>
+</helmet>
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0E0E1C; color: #F4F4FA; font-family: Manrope, sans-serif; user-select: none; -webkit-user-select: none">
+  <canvas ref="{{canvasRef}}" width="844" height="390" style="position: absolute; left: 0; top: 0; width: 844px; height: 390px; display: block"></canvas>
+  <svg width="844" height="390" viewBox="0 0 844 390" style="position: absolute; left: 0; top: 0; pointer-events: none">
+    <polyline points="{{swipePts}}" fill="none" stroke="#C8F031" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+  </svg>
+  <button type="button" aria-label="{{zoneLabel}}" onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pCancel}}" style="position: absolute; inset: 0; width: 844px; height: 390px; padding: 0; border: 0; background: transparent; touch-action: none; cursor: crosshair"></button>
+  <sc-if value="{{no3d}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #CACAE0">Tu navegador no permite gráficos 3D (WebGL) en esta vista.</div></sc-if>
+
+  <div style="position: absolute; left: 12px; top: 10px; z-index: 2; display: flex; align-items: center; gap: 8px">
+    <a href="Modos.dc.html" aria-label="Volver a modos" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #0B0B14CC; color: #F4F4FA">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
+    </a>
+    <span style="padding: 8px 12px; border-radius: 12px; background: #0B0B14CC; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1px">TENIS</span>
+    <div style="{{tabsStyle}}">
+      <button type="button" onClick="{{setServe}}" style="{{serveTab}}">Saque</button>
+      <button type="button" onClick="{{setRally}}" style="{{rallyTab}}">Peloteo</button>
+    </div>
+  </div>
+  <div style="position: absolute; right: 12px; top: 10px; display: flex; gap: 6px">
+    <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">BOLA</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1">{{ballLabel}}</span></span>
+    <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">PUNTOS</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; color: #C8F031">{{ptsLabel}}</span></span>
+  </div>
+  <sc-if value="{{showHint}}" hint-placeholder-val="{{ true }}">
+    <div style="position: absolute; left: 0; right: 0; bottom: 12px; display: flex; justify-content: center; pointer-events: none">
+      <span style="padding: 6px 14px; border-radius: 10px; background: #0B0B14CC; font-size: 12px; font-weight: 700; color: #CACAE0">{{hintText}}</span>
+    </div>
+  </sc-if>
+  <sc-if value="{{showResult}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 0; right: 0; top: 60px; display: flex; flex-direction: column; align-items: center; pointer-events: none">
+      <span style="{{resultStyle}}">{{resultText}}</span>
+      <span style="font-size: 13px; font-weight: 800; text-shadow: 0 2px 0 #0B0B14">{{resultSub}}</span>
+    </div>
+  </sc-if>
+  <sc-if value="{{showStart}}" hint-placeholder-val="{{ true }}">
+    <div style="position: absolute; inset: 0; background: #0B0B14B3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px">
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 40px">{{startTitle}}</span>
+      <span style="font-size: 13px; color: #CACAE0; text-align: center; max-width: 480px; line-height: 1.5">{{startText}}</span>
+      <button type="button" onClick="{{start}}" style="height: 54px; padding: 0 40px; border: 0; border-radius: 14px; background: #C8F031; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 6px 0 #7FA012">EMPEZAR</button>
+    </div>
+  </sc-if>
+  <sc-if value="{{showDone}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; background: #0B0B14D9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
+      <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">{{startTitle}}</span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 64px; line-height: 1; color: #C8F031">{{ptsLabel}} <span style="font-size: 26px; color: #A3A3C2">puntos</span></span>
+      <span style="font-size: 14px; font-weight: 700">{{doneSub}}</span>
+      <button type="button" onClick="{{doneAction}}" style="margin-top: 8px; height: 50px; padding: 0 30px; border: 0; border-radius: 14px; background: #C8F031; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #7FA012">{{doneBtn}}</button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":null},"locked":{"editor":null},"onEnd":{"editor":null},"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { f: 0 };
+    this.tick = this.tick.bind(this);
+    this.canvasRef = (el) => { if (el && el !== this.cv) { this.cv = el; this.init3D(); } };
+    this.mode = props.mode === 'rally' ? 'rally' : 'serve';
+    this.best = { serve: 0, rally: 0 };
+    this.reset();
+  }
+  componentWillUnmount() {
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = null;
+    if (this.R) { this.R.dispose(); this.R = null; }
+  }
+  clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  // court: singles 8.23 x 23.77 m, net at z = 0 (0.914 m in the middle), my half is z > 0
+  reset() {
+    this.st = this.loadSportStats('tenis');
+    this.n = 0; this.pts = 0; this.good = 0;
+    this.phase = 'start';
+    this.newBall();
+  }
+  newBall() {
+    this.result = null; this.swipe = null; this.pt = 0; this.swingT = null; this.bounces = 0; this.hit = false;
+    const side = this.n % 2 === 0 ? 1 : -1;
+    this.side = side;
+    this.rec = { x: -side * 2.4, z: -12.4, react: 99, tried: false };
+    if (this.mode === 'serve') {
+      // the target box is crosscourt; the marked zone is the T or the wide corner of that box
+      this.box = { x0: side > 0 ? -4.115 : 0, x1: side > 0 ? 0 : 4.115, z0: -6.4, z1: 0 };
+      const wide = Math.random() < 0.5;
+      this.zone = { x: side > 0 ? (wide ? -3.3 : -0.8) : (wide ? 3.3 : 0.8), z: -5.2, w: 1.6, d: 2.4 };
+      this.me = { x: side * 0.9, z: 12.2 };
+      this.b = { x: this.me.x + 0.35, y: 1.3, z: 12.0, vx: 0, vy: 0, vz: 0, spin: 0 };
+      this.phase = this.phase === 'start' ? 'start' : 'toss';
+    } else {
+      this.box = { x0: -4.115, x1: 4.115, z0: -11.885, z1: 0 };
+      this.zone = { x: [-2.8, 0, 2.8][Math.floor(Math.random() * 3)], z: -9.4, w: 2.4, d: 3.4 };
+      this.me = { x: 0, z: 12.6 };
+      this.rec = { x: 0, z: -12.6, react: 99, tried: false };
+      this.feed = { x: (Math.random() - 0.5) * 3, z: -12.2 };
+      this.b = { x: this.feed.x, y: 1.0, z: this.feed.z, vx: 0, vy: 0, vz: 0, spin: 0 };
+      this.phase = this.phase === 'start' ? 'start' : 'feed';
+    }
+  }
+  loop() {
+    if (this.raf) return;
+    this.last = performance.now();
+    this.raf = requestAnimationFrame(this.tick);
+  }
+  tick(now) {
+    const dt = Math.min(0.033, Math.max(0, (now - this.last) / 1000));
+    this.last = now;
+    for (let i = 0; i < 5; i++) this.step(dt / 5);
+    this.draw3D(dt);
+    this.forceUpdate();
+    this.raf = this.phase !== 'start' && this.phase !== 'done' ? requestAnimationFrame(this.tick) : null;
+  }
+  fly(b, dt) {
+    const sp = Math.hypot(b.vx, b.vy, b.vz);
+    b.vy -= 9.81 * dt;
+    b.vx -= 0.012 * sp * b.vx * dt; b.vy -= 0.012 * sp * b.vy * dt; b.vz -= 0.012 * sp * b.vz * dt;
+    b.vy -= (b.spin || 0) * 0.0018 * sp * sp * dt; // topspin dips the ball
+    b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
+  }
+  bounce(b) {
+    b.y = 0.035; b.vy = Math.abs(b.vy) * 0.72; b.vx *= 0.82; b.vz *= 0.82;
+    if (b.spin > 0) { b.vz *= 1.06; b.vy *= 0.9; }
+  }
+  solve(from, tx, tz, speed, spin) {
+    // find the launch angle that lands on (tx, tz) and clears the net
+    let best = null;
+    for (let a = -0.25; a <= 0.6; a += 0.004) {
+      const d = Math.hypot(tx - from.x, tz - from.z), ux = (tx - from.x) / d, uz = (tz - from.z) / d;
+      const s = { x: from.x, y: from.y, z: from.z, vx: ux * Math.cos(a) * speed, vy: Math.sin(a) * speed, vz: uz * Math.cos(a) * speed, spin };
+      let clear = true;
+      for (let i = 0; i < 1500 && s.y > 0.035; i++) { const pz = s.z; this.fly(s, 1 / 240); if ((pz > 0) !== (s.z > 0) && s.y < 0.914 + 0.06 + Math.abs(s.x) * 0.02) clear = false; }
+      const err = Math.hypot(s.x - tx, s.z - tz) + (clear ? 0 : 50);
+      if (!best || err < best.err - 0.01) best = { err, vx: ux * Math.cos(a) * speed, vy: Math.sin(a) * speed, vz: uz * Math.cos(a) * speed };
+    }
+    return best;
+  }
+  launchTo(tx, tz, speed, spin, err) {
+    const sol = this.solve(this.b, tx, tz, speed, spin);
+    Object.assign(this.b, { vx: sol.vx + (Math.random() * 2 - 1) * err, vy: sol.vy + (Math.random() * 2 - 1) * err * 0.35, vz: sol.vz, spin });
+    this.phase = 'flight'; this.pt = 0; this.bounces = 0; this.hit = true;
+    this.rec.react = 0.3; this.rec.tried = false;
+  }
+  racket() {
+    // the hitting point to the right of my player
+    return { x: this.me.x + 0.75, y: 1.0, z: this.me.z - 0.2 };
+  }
+  step(dt) {
+    this.pt += dt;
+    const b = this.b;
+    if (this.phase === 'toss') {
+      if (this.pt < 0.05) { b.vy = 6.6; b.vx = 0; b.vz = -0.3; }
+      this.fly(b, dt);
+      if (b.y < 1.3 && b.vy < 0) { this.result = { kind: 'fallo', sub: 'No has golpeado el saque' }; this.finishBall(0); }
+      return;
+    }
+    if (this.phase === 'feed') {
+      // the ball machine sends a ball to my half; my player runs to meet it after the bounce
+      if (this.pt < 0.02) {
+        const tx = (Math.random() - 0.5) * 6, tz = 6 + Math.random() * 4;
+        const sol = this.solve(b, tx, tz, 17 + Math.random() * 6, 0.6);
+        Object.assign(b, { vx: sol.vx, vy: sol.vy, vz: sol.vz, spin: 0.6 });
+        // predict where the ball will be at a comfortable height after the bounce
+        const s = { ...b }; let bn = 0, aim = null;
+        for (let i = 0; i < 2400; i++) { this.fly(s, 1 / 240); if (s.y <= 0.035) { this.bounce(s); bn++; } if (bn === 1 && s.vy < 0 && s.y < 1.05) { aim = { x: s.x, z: s.z }; break; } }
+        this.aim = aim || { x: tx, z: tz + 3 };
+      }
+      this.fly(b, dt);
+      if (b.y <= 0.035) { this.bounce(b); this.bounces++; }
+      const v = 6.2 + 1.8 * this.tt('vel');
+      const tx = this.aim.x - 0.75, tz = this.aim.z + 0.2, dx = tx - this.me.x, dz = tz - this.me.z, d = Math.hypot(dx, dz);
+      if (d > 0.02) { const m = Math.min(d, v * dt); this.me.x += dx / d * m; this.me.z += dz / d * m; this.me.run = (this.me.run || 0) + m * 2.2; }
+      if (this.bounces >= 2 || b.z > this.me.z + 1.4) { this.result = { kind: 'fallo', sub: this.swingT != null ? 'Golpe a destiempo' : 'No has devuelto la bola' }; this.finishBall(0); }
+      return;
+    }
+    if (this.phase === 'flight' || this.phase === 'result') {
+      const pz = b.z, py = b.y;
+      this.fly(b, dt);
+      // rival tries to get to the ball
+      const r = this.rec;
+      if (this.phase === 'flight') {
+        r.react -= dt;
+        if (r.react <= 0) {
+          const s = { ...b }; let bn = 0;
+          for (let i = 0; i < 900; i++) { this.fly(s, 1 / 240); if (s.y <= 0.035) { this.bounce(s); bn++; } if (bn === 1 && s.y < 1.0 && s.vy < 0) break; }
+          const dx = s.x - r.x, dz = Math.max(-14, s.z) - r.z, d = Math.hypot(dx, dz);
+          if (d > 0.05) { const v = Math.min(7, d * 6); r.x += dx / d * v * dt; r.z += dz / d * v * dt; }
+        }
+      }
+      if (this.phase === 'flight' && pz > 0 && b.z <= 0) {
+        const t = pz / ((pz - b.z) || 1e-6), cy = py + (b.y - py) * t;
+        if (cy < 0.914 + 0.035 + Math.abs(b.x) * 0.02 && Math.abs(b.x) < 5.5) { b.z = 0.08; b.vz = Math.abs(b.vz) * 0.2; b.vx *= 0.3; this.result = { kind: 'red', sub: 'La bola se queda en la red' }; this.finishBall(0); return; }
+      }
+      if (this.phase === 'flight' && b.y <= 0.035) {
+        if (this.bounces === 0) {
+          const inBox = b.x >= this.box.x0 - 0.05 && b.x <= this.box.x1 + 0.05 && b.z >= this.box.z0 - 0.05 && b.z <= this.box.z1;
+          if (!inBox) { this.result = { kind: 'fuera', sub: this.mode === 'serve' ? 'Falta: fuera del cuadro de saque' : 'Fuera de la pista' }; this.finishBall(0); this.bounce(b); return; }
+          this.inZone = Math.abs(b.x - this.zone.x) < this.zone.w / 2 && Math.abs(b.z - this.zone.z) < this.zone.d / 2;
+        }
+        this.bounce(b); this.bounces++;
+      }
+      if (this.phase === 'flight' && this.bounces >= 1) {
+        // the rival tries to return it when it reaches them; fast balls are harder
+        if (!r.tried && Math.hypot(b.x - r.x, b.z - r.z) < 1.3 && b.y < 1.9) {
+          r.tried = true;
+          const sp = Math.hypot(b.vx, b.vy, b.vz), chance = (sp < 16 ? 0.65 : sp < 22 ? 0.42 : sp < 28 ? 0.24 : 0.1) * (this.inZone ? 0.6 : 1);
+          if (Math.random() < chance) { b.vz = 10; b.vy = 4; b.vx = (Math.random() - 0.5) * 3; this.result = { kind: 'devuelta', sub: this.mode === 'serve' ? 'El rival resta tu saque' : 'El rival la devuelve · +1' }; this.finishBall(this.mode === 'rally' ? 1 : 0); return; }
+        }
+        if (this.bounces >= 2 || b.z < r.z - 1.2 || this.pt > 3) {
+          const p = this.inZone ? 3 : 1;
+          this.result = { kind: this.mode === 'serve' ? 'ace' : 'winner', sub: this.inZone ? '¡En la zona marcada! +' + p : '+' + p };
+          this.finishBall(p);
+        }
+      }
+      if (this.phase === 'result') {
+        if (b.y <= 0.035) this.bounce(b);
+        if (this.pt > 1.8) { this.n++; if (this.n >= 10) { this.phase = 'done'; this.best[this.mode] = Math.max(this.best[this.mode], this.pts); } else { this.newBall(); this.phase = this.mode === 'serve' ? 'toss' : 'feed'; } }
+      }
+      return;
+    }
+    if (this.phase === 'result') {
+      this.fly(b, dt); if (b.y <= 0.035) this.bounce(b);
+      if (this.pt > 1.8) { this.n++; if (this.n >= 10) { this.phase = 'done'; this.best[this.mode] = Math.max(this.best[this.mode], this.pts); } else { this.newBall(); this.phase = this.mode === 'serve' ? 'toss' : 'feed'; } }
+    }
+  }
+  finishBall(p) {
+    this.pts += p; if (p > 0) this.good++;
+    this.phase = 'result'; this.pt = 0;
+  }
+  hitFromSwipe() {
+    const pts = this.swipe; this.swipe = null;
+    if (!pts || pts.length < 2 || !this.cam) return;
+    const p0 = pts[0], p1 = pts[pts.length - 1];
+    const len = Math.hypot(p1.x - p0.x, p1.y - p0.y);
+    if (len < 30 || p1.y > p0.y - 10) return;
+    const dur = Math.max(0.06, (p1.t - p0.t) / 1000);
+    const b = this.b, tgt = this.ground(p1.x, p1.y);
+    if (!tgt) return;
+    const flick = len / dur;
+    if (this.mode === 'serve') {
+      if (this.phase !== 'toss' || b.y < 2.2) return;
+      const vmax = (150 + 70 * this.tt('saq')) / 3.6;
+      const speed = Math.min(vmax, 22 + flick / 70);
+      this.launchTo(tgt.x, Math.min(-0.5, tgt.z), speed, flick > 1500 ? 1 : 0.4, 0.5 * (1 - this.tt('pre')));
+      this.swingT = 0;
+    } else {
+      if (this.phase !== 'feed' || this.bounces < 1) return;
+      const rk = this.racket();
+      const reach = 0.85 + 0.35 * this.tt('ref');
+      this.swingT = 0;
+      if (Math.hypot(b.x - rk.x, b.z - rk.z) > reach || b.y > 1.9 || b.y < 0.15) return;
+      const speed = Math.min((100 + 60 * this.tt('gol')) / 3.6, 16 + flick / 90);
+      this.launchTo(tgt.x, Math.min(-1, tgt.z), speed, 1.2, 0.6 * (1 - this.tt('pre')));
+    }
+  }
+  ground(sx, sy) {
+    const ndc = new THREE.Vector2(sx / 844 * 2 - 1, -(sy / 390 * 2 - 1));
+    const rc = new THREE.Raycaster(); rc.setFromCamera(ndc, this.cam);
+    const out = new THREE.Vector3();
+    return rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), out) ? out : null;
+  }
+
+  mat(color, o) {
+    const m = new THREE.MeshStandardMaterial(Object.assign({ roughness: 0.75, metalness: 0.02 }, o || {}));
+    m.color = new THREE.Color(color).convertSRGBToLinear();
+    if (o && o.emissive != null) m.emissive = new THREE.Color(o.emissive).convertSRGBToLinear();
+    return m;
+  }
+  canvasTex(w, h, draw) {
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    draw(c.getContext('2d'), w, h);
+    const t = new THREE.CanvasTexture(c);
+    t.encoding = THREE.sRGBEncoding;
+    t.anisotropy = 4;
+    return t;
+  }
+  pose(p, o) {
+    const u = p.userData, run = o.run || 0, amp = o.amp || 0;
+    u.legs[0].hip.rotation.x = Math.sin(run) * 0.7 * amp;
+    u.legs[1].hip.rotation.x = -Math.sin(run) * 0.7 * amp;
+    u.legs[0].knee.rotation.x = Math.max(0, -Math.sin(run)) * 0.9 * amp;
+    u.legs[1].knee.rotation.x = Math.max(0, Math.sin(run)) * 0.9 * amp;
+    u.arms[0].sho.rotation.x = -Math.sin(run) * 0.6 * amp;
+    u.arms[1].sho.rotation.x = Math.sin(run) * 0.6 * amp;
+    if (o.kick != null) {
+      const k = o.kick;
+      u.legs[1].hip.rotation.x = k < 0.6 ? 0.9 * (k / 0.6) : 0.9 - 2.2 * Math.min(1, (k - 0.6) / 0.25);
+      u.legs[1].knee.rotation.x = k < 0.6 ? 1.3 * (k / 0.6) : 1.3 * (1 - Math.min(1, (k - 0.6) / 0.2));
+      u.arms[0].sho.rotation.z = -0.9; u.arms[1].sho.rotation.z = 0.5;
+    }
+    if (o.armsUp != null) {
+      const a = o.armsUp;
+      u.arms[0].sho.rotation.z = -0.25 - 2.5 * a; u.arms[1].sho.rotation.z = 0.25 + 2.5 * a;
+      u.arms[0].elb.rotation.z = 0; u.arms[1].elb.rotation.z = 0;
+    }
+    if (o.ready) {
+      u.arms[0].sho.rotation.z = -0.75; u.arms[1].sho.rotation.z = 0.75;
+      u.arms[0].sho.rotation.x = -0.3; u.arms[1].sho.rotation.x = -0.3;
+      u.legs[0].hip.rotation.z = -0.15; u.legs[1].hip.rotation.z = 0.15;
+      u.legs[0].knee.rotation.x = 0.35; u.legs[1].knee.rotation.x = 0.35;
+      u.legs[0].hip.rotation.x = -0.25; u.legs[1].hip.rotation.x = -0.25;
+    }
+    if (o.hold) {
+      u.arms[0].sho.rotation.x = -1.25; u.arms[1].sho.rotation.x = -1.25;
+      u.arms[0].sho.rotation.z = 0.35; u.arms[1].sho.rotation.z = -0.35;
+      u.arms[0].elb.rotation.x = -0.9; u.arms[1].elb.rotation.x = -0.9;
+    }
+    if (o.wall) {
+      u.arms[0].sho.rotation.x = -0.4; u.arms[1].sho.rotation.x = -0.4;
+      u.arms[0].sho.rotation.z = 0.35; u.arms[1].sho.rotation.z = -0.35;
+    }
+  }
+  initRenderer(fov) {
+    if (typeof THREE === 'undefined') { this.no3d = true; return false; }
+    if (this.R) return false;
+    const T = THREE;
+    let R;
+    try { R = new T.WebGLRenderer({ canvas: this.cv, antialias: true }); } catch (e) { this.no3d = true; return false; }
+    R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    R.setSize(844, 390, false);
+    R.shadowMap.enabled = true;
+    R.shadowMap.type = T.PCFSoftShadowMap;
+    R.outputEncoding = T.sRGBEncoding;
+    R.toneMapping = T.ACESFilmicToneMapping;
+    R.toneMappingExposure = 1.1;
+    this.R = R;
+    this.cam = new T.PerspectiveCamera(fov, 844 / 390, 0.05, 600);
+    return true;
+  }
+  addCrowd(S, cx, cz, len, rows, rotY, colors) {
+    const T = THREE, g = new T.Group(), standMat = this.mat(0x141b2d, { roughness: 0.9 });
+    for (let i = 0; i < rows; i++) { const st = new T.Mesh(new T.BoxGeometry(len, 0.9, 1.4), standMat); st.position.set(0, 0.45 + i * 0.9, i * 1.4); st.receiveShadow = true; g.add(st); }
+    const per = Math.floor(len / 0.62);
+    const fan = new T.InstancedMesh(new T.BoxGeometry(0.42, 0.62, 0.32), new T.MeshStandardMaterial({ roughness: 0.8 }), per * rows);
+    const m4 = new T.Matrix4(), col = new T.Color();
+    let idx = 0;
+    for (let row = 0; row < rows; row++) for (let i = 0; i < per; i++) {
+      if (Math.random() < 0.1) m4.makeScale(0.001, 0.001, 0.001);
+      else m4.makeTranslation(-len / 2 + 0.31 + i * 0.62, 1.2 + row * 0.9, row * 1.4 + 0.1);
+      fan.setMatrixAt(idx, m4); col.setHex(colors[Math.floor(Math.random() * colors.length)]).convertSRGBToLinear(); fan.setColorAt(idx, col); idx++;
+    }
+    g.add(fan); g.position.set(cx, 0, cz); g.rotation.y = rotY; S.add(g);
+    return fan;
+  }
+  loadSportStats(sport) {
+    try {
+      const j = JSON.parse(localStorage.getItem('arenamix.stats.v2') || 'null');
+      if (j && j[sport] && j[sport].stats) return j[sport].stats;
+    } catch (e) {}
+    return {};
+  }
+  tt(k) {
+    const s = this.st || {};
+    return Math.max(0, Math.min(1, ((s[k] ?? 10) - 10) / 140));
+  }
+  local(e) {
+    const r = e.currentTarget.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * 844 / r.width, y: (e.clientY - r.top) * 390 / r.height, t: performance.now() };
+  }
+  kitTex(base, trimCss, seed) {
+    // shirt fabric: base colour, soft fold shading, darker side panels and a V-neck in the trim colour
+    return this.canvasTex(256, 256, (c, w, h) => {
+      const col = '#' + base.getHexString();
+      c.fillStyle = col; c.fillRect(0, 0, w, h);
+      let r = seed || 1;
+      const rnd = () => { r = (r * 16807) % 2147483647; return r / 2147483647; };
+      for (let k = 0; k < 26; k++) {
+        const x = rnd() * w, wd = 4 + rnd() * 14;
+        const gr = c.createLinearGradient(x - wd, 0, x + wd, 0);
+        const dark = rnd() < 0.6;
+        gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(0.5, dark ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.06)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+        c.fillStyle = gr; c.fillRect(x - wd, h * (0.05 + rnd() * 0.2), wd * 2, h * (0.4 + rnd() * 0.5));
+      }
+      // side panels (u = 0.25 and 0.75 are the flanks)
+      c.globalAlpha = 0.85; c.fillStyle = trimCss;
+      [0.25, 0.75].forEach((u) => { c.fillRect(u * w - 5, h * 0.27, 10, h * 0.62); });
+      c.globalAlpha = 1;
+      // V-neck at the front (u = 0 wraps to u = 1)
+      [0, w].forEach((x0) => {
+        c.fillStyle = trimCss;
+        c.fillRect(x0 - 40, 0, 80, h * 0.2);
+        c.beginPath(); c.moveTo(x0 - 26, h * 0.2); c.lineTo(x0 + 26, h * 0.2); c.lineTo(x0, h * 0.33); c.closePath(); c.fill();
+        c.fillStyle = '#' + new THREE.Color(base).multiplyScalar(0.6).getHexString();
+        c.beginPath(); c.moveTo(x0 - 19, h * 0.2); c.lineTo(x0 + 19, h * 0.2); c.lineTo(x0, h * 0.3); c.closePath(); c.fill();
+      });
+      // hem shading
+      const hg = c.createLinearGradient(0, h, 0, h * 0.85);
+      hg.addColorStop(0, 'rgba(0,0,0,0.18)'); hg.addColorStop(1, 'rgba(0,0,0,0)');
+      c.fillStyle = hg; c.fillRect(0, h * 0.85, w, h * 0.15);
+    });
+  }
+  makePlayer(o) {
+    // athletic, realistically proportioned footballer: tapered torso, loose sleeves and shorts,
+    // socks to the knee, low-cut boots. Joint pivots stay where animate() expects them.
+    const T = THREE, g = new T.Group(), body = new T.Group();
+    g.add(body);
+    const tones = [0xd09a72, 0xb97e57, 0x8f5a3a, 0xe0ad86, 0x6a3f27, 0xa86f4a, 0xc78b62];
+    const skinHex = o.skin || tones[Math.floor(Math.random() * tones.length)];
+    const hairHex = o.hair || 0x241811;
+    // skin and hair get a texture so they read as skin and hair, not painted plastic
+    const skinTex = this.canvasTex(64, 64, (c, w, h) => {
+      const base = new T.Color(skinHex);
+      c.fillStyle = '#' + base.getHexString(); c.fillRect(0, 0, w, h);
+      for (let k = 0; k < 700; k++) {
+        const v = (Math.random() - 0.5) * 0.09, col = base.clone().offsetHSL(Math.random() * 0.01, 0, v);
+        c.fillStyle = '#' + col.getHexString(); c.fillRect(Math.random() * w, Math.random() * h, 2, 2);
+      }
+    });
+    const skin = this.mat(0xffffff, { roughness: 0.6, map: skinTex, emissive: new T.Color(skinHex).multiplyScalar(0.1) });
+    const skinDark = this.mat(new T.Color(skinHex).multiplyScalar(0.7), { roughness: 0.6 });
+    const stubble = Math.random() < 0.35;
+    const jawM = stubble ? this.mat(new T.Color(skinHex).lerp(new T.Color(hairHex), 0.35), { roughness: 0.75 }) : skin;
+    const trimCss = o.trimCss || '#0B0B14', trimCol = new T.Color(trimCss);
+    const shirtCol = new T.Color(o.shirt);
+    const shirt = this.mat(0xffffff, { roughness: 0.74, map: this.kitTex(shirtCol, trimCss, 1 + Math.floor(Math.random() * 9999)) });
+    const shirtPlain = this.mat(shirtCol, { roughness: 0.74, side: T.DoubleSide });
+    const shorts = this.mat(o.shorts, { roughness: 0.74, side: T.DoubleSide });
+    const trim = this.mat(trimCol, { roughness: 0.6 });
+    const sock = this.mat(o.socks, { roughness: 0.85, side: T.DoubleSide });
+    const bootCol = new T.Color(o.boot || 0x22d3ee);
+    const boot = this.mat(bootCol, { roughness: 0.3, metalness: 0.15 });
+    const bootTrim = this.mat(bootCol.clone().getHSL({}).l > 0.6 ? 0x17172a : 0xf4f4fa, { roughness: 0.4 });
+    const sole = this.mat(0x1a1a1a, { roughness: 0.6 });
+    const hairTex = this.canvasTex(128, 128, (c, w, h) => {
+      const base = new T.Color(hairHex);
+      c.fillStyle = '#' + base.getHexString(); c.fillRect(0, 0, w, h);
+      c.lineWidth = 1.2;
+      for (let k = 0; k < 420; k++) {
+        const x = Math.random() * w, y = Math.random() * h, len = 6 + Math.random() * 16, a = Math.PI / 2 + (Math.random() - 0.5) * 0.7;
+        c.strokeStyle = '#' + base.clone().offsetHSL(0, 0, (Math.random() - 0.4) * 0.16).getHexString();
+        c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a) * len, y + Math.sin(a) * len); c.stroke();
+      }
+    });
+    const hairM = this.mat(0xffffff, { roughness: 0.85, map: hairTex });
+    const hand = o.gloves ? this.mat(0xf2f5fa, { roughness: 0.5 }) : skin;
+    const add = (parent, mesh, x, y, z) => { mesh.position.set(x || 0, y || 0, z || 0); mesh.castShadow = true; parent.add(mesh); return mesh; };
+    const lathe = (pts, m, seg) => new T.Mesh(new T.LatheGeometry(pts.map(([r, y]) => new T.Vector2(r, y)), seg || 20), m);
+    const sph = (r, m, w, h) => new T.Mesh(new T.SphereGeometry(r, w || 18, h || 14), m);
+    const tor = (r, t, m) => new T.Mesh(new T.TorusGeometry(r, t, 6, 22), m);
+    // a whole limb as one piece of skin that bends at the joint (no mannequin ball joints):
+    // profile is in the upper bone's space, weights blend between the two bones around jointY
+    let skinSk = null;
+    const limb = (pts, upper, lower, jointY, blend, ox, oy) => {
+      const geo = new T.LatheGeometry(pts.map(([r, y]) => new T.Vector2(r, y)), 20);
+      const pa = geo.attributes.position, n = pa.count, si = new Float32Array(n * 4), sw = new Float32Array(n * 4);
+      for (let k = 0; k < n; k++) {
+        const w = this.clamp((jointY + blend - pa.getY(k)) / (2 * blend), 0, 1);
+        si[k * 4] = 0; si[k * 4 + 1] = 1; sw[k * 4] = 1 - w; sw[k * 4 + 1] = w;
+      }
+      geo.translate(ox, oy, 0);
+      geo.setAttribute('skinIndex', new T.Uint16BufferAttribute(new Uint16Array(si), 4));
+      geo.setAttribute('skinWeight', new T.Float32BufferAttribute(sw, 4));
+      if (!skinSk) { skinSk = skin.clone(); skinSk.skinning = true; }
+      const m = new T.SkinnedMesh(geo, skinSk);
+      m.castShadow = true; m.frustumCulled = false;
+      body.add(m);
+      body.updateMatrixWorld(true);
+      m.bind(new T.Skeleton([upper, lower]));
+      return m;
+    };
+    // ---- legs ----
+    const legs = [];
+    [-1, 1].forEach((s) => {
+      const hip = new T.Bone(); hip.position.set(0.1 * s, 0.94, 0); body.add(hip);
+      // loose shorts leg, flaring towards the hem, with a side stripe
+      add(hip, lathe([[0.128, 0.04], [0.132, -0.06], [0.14, -0.18], [0.146, -0.25]], shorts));
+      add(hip, new T.Mesh(new T.BoxGeometry(0.014, 0.28, 0.035), trim), 0.135 * s, -0.11, 0).rotation.z = 0.03 * s;
+      const knee = new T.Bone(); knee.position.y = -0.45; hip.add(knee);
+      // thigh, knee, calf and shin as one skinned piece
+      limb([[0.001, -0.895], [0.04, -0.885], [0.043, -0.82], [0.056, -0.7], [0.068, -0.59], [0.063, -0.5], [0.06, -0.455], [0.063, -0.415], [0.072, -0.37], [0.086, -0.29], [0.1, -0.18], [0.106, -0.08], [0.1, 0.02], [0.001, 0.045]], hip, knee, -0.45, 0.06, 0.1 * s, 0.94);
+      // socks pulled up under the knee, with shin pad and calf shape
+      add(knee, lathe([[0.046, -0.425], [0.048, -0.37], [0.059, -0.25], [0.069, -0.14], [0.066, -0.085], [0.067, -0.07]], sock));
+      add(knee, tor(0.064, 0.009, sock), 0, -0.075, 0).rotation.x = Math.PI / 2;
+      add(knee, sph(0.05, sock), 0, -0.23, 0.026).scale.set(0.85, 1.9, 0.6);
+      add(knee, sph(0.05, sock), 0, -0.17, -0.03).scale.set(0.9, 1.5, 0.75);
+      // low-cut boot: tapered toe, heel counter, contrast stripe, sole
+      add(knee, sph(0.062, boot, 20, 12), 0, -0.448, 0.06).scale.set(0.82, 0.58, 1.75);
+      add(knee, sph(0.052, boot, 16, 10), 0, -0.44, -0.035).scale.set(0.95, 0.8, 0.95);
+      add(knee, sph(0.062, sole, 18, 8), 0, -0.474, 0.045).scale.set(0.82, 0.16, 2.35);
+      add(knee, new T.Mesh(new T.BoxGeometry(0.006, 0.02, 0.13), bootTrim), 0.052 * s, -0.445, 0.04).rotation.x = -0.25;
+      legs.push({ hip, knee });
+    });
+    // ---- pelvis, shorts waist, shirt ----
+    add(body, lathe([[0.001, -0.02], [0.1, -0.015], [0.16, 0.01], [0.19, 0.08], [0.188, 0.19], [0.001, 0.2]], shorts), 0, 0.8, 0).scale.z = 0.76;
+    // tapered torso: slim waist, wide chest and shoulders; the shirt hangs loose over the shorts
+    const torso = add(body, lathe([[0.001, 0], [0.205, 0], [0.198, 0.06], [0.184, 0.2], [0.198, 0.34], [0.232, 0.48], [0.238, 0.56], [0.2, 0.63], [0.1, 0.675], [0.072, 0.685], [0.001, 0.686]], shirt, 28), 0, 0.965, 0);
+    torso.scale.z = 0.62;
+    add(body, tor(0.075, 0.012, trim), 0, 1.648, 0.004).rotation.x = Math.PI / 2;
+    if (o.number) {
+      const mkNum = (size) => this.canvasTex(128, 128, (c) => { c.fillStyle = trimCss; c.font = '800 ' + size + 'px Barlow Condensed, Arial'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(o.number, 64, 70); });
+      const back = new T.Mesh(new T.PlaneGeometry(0.26, 0.26), new T.MeshStandardMaterial({ map: mkNum(96), transparent: true, roughness: 0.8 }));
+      back.position.set(0, 1.36, -0.152); back.rotation.y = Math.PI; body.add(back);
+      const front = new T.Mesh(new T.PlaneGeometry(0.1, 0.1), new T.MeshStandardMaterial({ map: mkNum(96), transparent: true, roughness: 0.8 }));
+      front.position.set(0.085, 1.47, 0.152); front.rotation.x = -0.2; body.add(front);
+    }
+    // ---- neck and head ----
+    add(body, lathe([[0.062, 0], [0.056, 0.07], [0.058, 0.14], [0.001, 0.15]], skin), 0, 1.62, -0.005);
+    const head = new T.Group(); head.position.y = 1.84; body.add(head);
+    add(head, sph(0.104, skin, 24, 18)).scale.set(0.9, 1.04, 1);
+    add(head, sph(0.088, jawM, 20, 14), 0, -0.042, 0.004).scale.set(0.9, 0.9, 0.95);
+    [-1, 1].forEach((s) => {
+      add(head, sph(0.028, skinDark, 10, 8), 0.094 * s, -0.012, -0.004).scale.set(0.42, 1, 0.72);
+      add(head, sph(0.01, this.mat(0x1d140e, { roughness: 0.25 }), 8, 6), 0.034 * s, 0.006, 0.09);
+      add(head, sph(0.02, skin, 10, 8), 0.034 * s, 0.017, 0.084).scale.set(1.2, 0.4, 0.6);
+      const brow = add(head, new T.Mesh(new T.BoxGeometry(0.036, 0.009, 0.012), hairM), 0.036 * s, 0.033, 0.093);
+      brow.rotation.z = -0.1 * s;
+    });
+    const nose = add(head, new T.Mesh(new T.ConeGeometry(0.013, 0.04, 8), skin), 0, -0.014, 0.098);
+    nose.rotation.x = Math.PI / 2 + 0.25;
+    add(head, sph(0.012, skin, 8, 6), 0, -0.03, 0.104);
+    add(head, new T.Mesh(new T.BoxGeometry(0.036, 0.006, 0.008), this.mat(new T.Color(skinHex).multiplyScalar(0.55), { roughness: 0.6 })), 0, -0.062, 0.088);
+    const style = o.hairStyle != null ? o.hairStyle : Math.floor(Math.random() * 5);
+    if (style === 0) { // short crop
+      add(head, sph(0.108, hairM, 22, 12), 0, 0.03, -0.01).scale.set(0.95, 0.78, 1.02);
+    } else if (style === 1) { // short curls on top, faded sides
+      add(head, sph(0.106, hairM, 22, 12), 0, 0.02, -0.012).scale.set(0.93, 0.7, 1);
+      for (let k = 0; k < 14; k++) { const a = k / 14 * Math.PI * 2; add(head, sph(0.03, hairM, 8, 6), Math.cos(a) * 0.06, 0.088 + (k % 2) * 0.01, Math.sin(a) * 0.065 - 0.005); }
+      add(head, sph(0.06, hairM, 12, 8), 0, 0.1, -0.005);
+    } else if (style === 2) { // quiff
+      add(head, sph(0.107, hairM, 22, 12), 0, 0.025, -0.012).scale.set(0.94, 0.7, 1);
+      add(head, sph(0.055, hairM, 14, 10), 0, 0.092, 0.045).scale.set(1.25, 0.55, 1.3);
+    } else if (style === 3) { // buzz cut
+      add(head, sph(0.106, hairM, 22, 12), 0, 0.012, -0.008).scale.set(0.92, 0.88, 1.0);
+    } else { // longer hair tied back
+      add(head, sph(0.11, hairM, 22, 12), 0, 0.022, -0.016).scale.set(0.97, 0.85, 1.04);
+      add(head, sph(0.04, hairM, 10, 8), 0, 0.02, -0.12);
+    }
+    // ---- arms ----
+    const arms = [];
+    [-1, 1].forEach((s) => {
+      const sho = new T.Bone(); sho.position.set(0.228 * s, 1.555, 0); body.add(sho);
+      add(sho, sph(0.076, shirtPlain), -0.012 * s, -0.002, 0).scale.set(0.95, 0.92, 0.9);
+      // loose short sleeve, open at the end, with a trim cuff
+      add(sho, lathe([[0.045, 0.06], [0.07, 0.02], [0.079, -0.05], [0.08, -0.13], [0.079, -0.17]], shirtPlain));
+      add(sho, tor(0.079, 0.008, trim), 0, -0.168, 0).rotation.x = Math.PI / 2;
+      const elb = new T.Bone(); elb.position.y = -0.3; sho.add(elb);
+      // upper arm, elbow and forearm as one skinned piece
+      limb([[0.001, -0.548], [0.03, -0.543], [0.034, -0.49], [0.046, -0.38], [0.044, -0.32], [0.043, -0.295], [0.047, -0.265], [0.056, -0.2], [0.06, -0.12], [0.058, -0.04], [0.04, 0.02], [0.001, 0.03]], sho, elb, -0.3, 0.045, 0.228 * s, 1.555);
+      // hand: palm with closed fingers and a thumb
+      if (o.gloves) add(elb, sph(0.068, hand), 0, -0.29, 0.004).scale.set(1, 1.2, 0.7);
+      else {
+        add(elb, sph(0.04, hand, 12, 10), 0, -0.285, 0.004).scale.set(0.62, 1.15, 0.95);
+        add(elb, sph(0.034, hand, 10, 8), 0, -0.335, 0.012).scale.set(0.58, 0.9, 0.85);
+        add(elb, sph(0.014, hand, 8, 6), -0.012 * s, -0.275, 0.03).scale.set(1, 1.9, 1);
+      }
+      if (o.gloves) add(elb, new T.Mesh(new T.CylinderGeometry(0.056, 0.05, 0.07, 14), trim), 0, -0.24, 0);
+      sho.rotation.z = 0.1 * s;
+      arms.push({ sho, elb, s });
+    });
+    g.userData = { body, legs, arms, head };
+    return g;
+  }
+  init3D() {
+    if (!this.initRenderer(46)) return;
+    this.camPos = new THREE.Vector3(0, 4.4, 19); this.camLook = new THREE.Vector3(0, 1, -4);
+    this.buildScene();
+    this.draw3D(0);
+  }
+  buildScene() {
+    const T = THREE, S = new T.Scene();
+    this.S = S;
+    S.background = new T.Color(0x0b1430);
+    S.fog = new T.Fog(0x0b1430, 60, 140);
+    S.add(new T.HemisphereLight(0xdfeaff, 0x24314f, 0.75));
+    const key = new T.DirectionalLight(0xffffff, 1.1);
+    key.position.set(-10, 24, 12); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
+    Object.assign(key.shadow.camera, { left: -10, right: 10, top: 18, bottom: -18, near: 2, far: 80 });
+    key.shadow.bias = -0.0005; key.shadow.normalBias = 0.04;
+    S.add(key);
+    // hard court: blue inside, green around, white lines
+    const ppm = 32, W = 18, L = 36;
+    const floor = this.canvasTex(W * ppm, L * ppm, (c, w, h) => {
+      const X = (x) => (x + W / 2) * ppm, Z = (z) => (z + L / 2) * ppm;
+      c.fillStyle = '#1E7A4A'; c.fillRect(0, 0, w, h);
+      c.fillStyle = '#2563C9'; c.fillRect(X(-5.485), Z(-11.885), 10.97 * ppm, 23.77 * ppm);
+      c.strokeStyle = '#F4F4F6'; c.lineWidth = 0.05 * ppm;
+      c.strokeRect(X(-5.485), Z(-11.885), 10.97 * ppm, 23.77 * ppm);
+      c.strokeRect(X(-4.115), Z(-11.885), 8.23 * ppm, 23.77 * ppm);
+      [-6.4, 6.4].forEach((z) => { c.beginPath(); c.moveTo(X(-4.115), Z(z)); c.lineTo(X(4.115), Z(z)); c.stroke(); });
+      c.beginPath(); c.moveTo(X(0), Z(-6.4)); c.lineTo(X(0), Z(6.4)); c.stroke();
+      [-11.885, 11.885].forEach((z) => { c.beginPath(); c.moveTo(X(0), Z(z)); c.lineTo(X(0), Z(z - Math.sign(z) * 0.2)); c.stroke(); });
+      c.fillStyle = 'rgba(244,244,246,0.16)'; c.font = 'italic 800 ' + (1.2 * ppm) + 'px Barlow Condensed, Arial'; c.textAlign = 'center';
+      c.fillText('ARENA MIX', X(0), Z(15.5));
+    });
+    const fl = new T.Mesh(new T.PlaneGeometry(W, L), new T.MeshStandardMaterial({ map: floor, roughness: 0.55 }));
+    fl.rotation.x = -Math.PI / 2; fl.receiveShadow = true; S.add(fl);
+    const outer = new T.Mesh(new T.PlaneGeometry(220, 220), this.mat(0x14532d, { roughness: 0.95 })); outer.rotation.x = -Math.PI / 2; outer.position.y = -0.01; S.add(outer);
+    // net with white tape, sagging to 0.914 m in the middle
+    const pts = [];
+    const hAt = (x) => 0.914 + (1.07 - 0.914) * Math.pow(Math.abs(x) / 6.4, 2);
+    for (let x = -6.4; x <= 6.401; x += 0.08) pts.push(x, 0.02, 0, x, hAt(x) - 0.03, 0);
+    for (let y = 0.1; y <= 1.0; y += 0.08) for (let x = -6.4; x < 6.4; x += 0.4) { const x2 = x + 0.4; if (y < hAt(x) && y < hAt(x2)) pts.push(x, y, 0, x2, y, 0); }
+    const ng = new T.BufferGeometry(); ng.setAttribute('position', new T.Float32BufferAttribute(pts, 3));
+    S.add(new T.LineSegments(ng, new T.LineBasicMaterial({ color: 0x0a0f1c, transparent: true, opacity: 0.8 })));
+    const tape = []; for (let x = -6.4; x <= 6.401; x += 0.2) tape.push(new T.Vector3(x, hAt(x), 0));
+    S.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(tape), 64, 0.03, 6), this.mat(0xf4f4f6)));
+    [-6.4, 6.4].forEach((x) => { const p = new T.Mesh(new T.CylinderGeometry(0.05, 0.05, 1.1, 12), this.mat(0x1f2937, { metalness: 0.4, roughness: 0.4 })); p.position.set(x, 0.55, 0); p.castShadow = true; S.add(p); });
+    const colors = [0xf2f5fa, 0xf2f5fa, 0xc8f031, 0x3ea6ff, 0xe5484d, 0x27335e, 0x1c2540];
+    this.fans = [this.addCrowd(S, -10, 0, 40, 10, -Math.PI / 2, colors), this.addCrowd(S, 10, 0, 40, 10, Math.PI / 2, colors), this.addCrowd(S, 0, -20, 22, 10, Math.PI, colors)];
+    const jt = this.canvasTex(512, 128, (c, w, h) => { c.fillStyle = '#0B0B14'; c.fillRect(0, 0, w, h); c.fillStyle = '#C8F031'; c.font = 'italic 800 80px Barlow Condensed, Arial'; c.textAlign = 'center'; c.fillText('ARENA MIX', w / 2, 95); });
+    const ad = new T.Mesh(new T.BoxGeometry(16, 0.9, 0.12), new T.MeshStandardMaterial({ map: jt, emissive: 0xffffff, emissiveMap: jt, emissiveIntensity: 0.8 })); ad.position.set(0, 0.45, -16.5); S.add(ad);
+    // target zone and service box highlight
+    this.boxMesh = new T.Mesh(new T.PlaneGeometry(1, 1), new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2, depthWrite: false }));
+    this.boxMesh.rotation.x = -Math.PI / 2; S.add(this.boxMesh);
+    this.zoneMesh = new T.Mesh(new T.PlaneGeometry(1, 1), new T.MeshBasicMaterial({ color: 0xc8f031, transparent: true, opacity: 0.55, depthWrite: false }));
+    this.zoneMesh.rotation.x = -Math.PI / 2; S.add(this.zoneMesh);
+    // felt tennis ball with its white seam
+    const bt = this.canvasTex(256, 128, (c, w, h) => {
+      c.fillStyle = '#D4F33A'; c.fillRect(0, 0, w, h);
+      for (let i = 0; i < 1600; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.12)' : 'rgba(90,110,0,0.12)'; c.fillRect(Math.random() * w, Math.random() * h, 2, 2); }
+      c.strokeStyle = '#F4F4EE'; c.lineWidth = 5; c.beginPath();
+      for (let x = 0; x <= w; x += 2) { const y = h / 2 + Math.sin(x / w * Math.PI * 4) * h * 0.28; x ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke();
+    });
+    this.ball = new T.Mesh(new T.SphereGeometry(0.06, 20, 14), new T.MeshStandardMaterial({ map: bt, roughness: 0.85 }));
+    this.ball.castShadow = true; S.add(this.ball);
+    // players with rackets
+    const kit = (shirt, shorts, hair) => this.makePlayer({ shirt, shorts, socks: 0xf2f5fa, trimCss: '#0B0B14', boot: 0xf2f5fa, hair });
+    this.player = kit(0xf4f4f6, 0x1e3a8a); S.add(this.player);
+    this.rival = kit(0xe5484d, 0xf4f4f6, 0x141b2d); S.add(this.rival);
+    [this.player, this.rival].forEach((p) => p.userData.arms[1].elb.add(this.makeRacket()));
+    this.machine = new T.Group();
+    const mb = new T.Mesh(new T.BoxGeometry(0.7, 0.8, 0.7), this.mat(0x334155, { roughness: 0.5 })); mb.position.y = 0.4; this.machine.add(mb);
+    const mt = new T.Mesh(new T.CylinderGeometry(0.1, 0.12, 0.5, 12), this.mat(0x111827)); mt.rotation.x = Math.PI / 2; mt.position.set(0, 0.9, 0.3); this.machine.add(mt);
+    S.add(this.machine);
+  }
+  makeRacket() {
+    const T = THREE, g = new T.Group();
+    const frame = this.mat(0x111827, { roughness: 0.35, metalness: 0.2 }), grip = this.mat(0xf4f4f6, { roughness: 0.8 });
+    const handle = new T.Mesh(new T.CylinderGeometry(0.016, 0.018, 0.22, 10), grip); handle.position.y = -0.1; g.add(handle);
+    const throat = new T.Mesh(new T.CylinderGeometry(0.012, 0.012, 0.16, 8), frame); throat.position.y = -0.27; g.add(throat);
+    const head = new T.Mesh(new T.TorusGeometry(0.13, 0.011, 8, 32), frame); head.scale.set(0.8, 1.1, 1); head.position.y = -0.48; g.add(head);
+    const strings = new T.Mesh(new T.CircleGeometry(0.128, 24), new T.MeshBasicMaterial({ color: 0xd9d9d9, transparent: true, opacity: 0.35, side: T.DoubleSide })); strings.scale.set(0.8, 1.1, 1); strings.position.y = -0.48; g.add(strings);
+    g.position.set(0, -0.27, 0.02); g.rotation.x = -0.4;
+    return g;
+  }
+  draw3D(dt) {
+    if (!this.R || !this.S) return;
+    const T = THREE, b = this.b, me = this.me;
+    this.ball.position.set(b.x, Math.max(0.06, b.y), b.z);
+    this.ball.rotation.x -= (b.spin || 0.3) * 20 * (dt || 0);
+    const bx = this.box, z = this.zone;
+    this.boxMesh.position.set((bx.x0 + bx.x1) / 2, 0.012, (bx.z0 + bx.z1) / 2); this.boxMesh.scale.set(bx.x1 - bx.x0, bx.z1 - bx.z0, 1);
+    this.zoneMesh.position.set(z.x, 0.014, z.z); this.zoneMesh.scale.set(z.w, z.d, 1);
+    // me
+    this.player.position.set(me.x, 0, me.z);
+    this.player.rotation.y = Math.PI;
+    if (this.swingT != null) this.swingT += dt || 0;
+    const swinging = this.swingT != null && this.swingT < 0.3;
+    const running = this.mode === 'rally' && this.phase === 'feed';
+    this.pose(this.player, this.mode === 'serve' ? (this.phase === 'toss' || swinging ? { armsUp: 1 } : { ready: true }) : running ? { run: me.run || 0, amp: 1 } : { ready: true });
+    const arm = this.player.userData.arms[1];
+    if (this.mode === 'serve' && swinging) arm.sho.rotation.x = -2.8 + this.swingT * 11;
+    else if (this.mode === 'rally') { const k = swinging ? Math.min(1, this.swingT / 0.25) : 0; arm.sho.rotation.set(-0.5, 0, 1.1 - 2.0 * k); this.player.userData.body.rotation.y = (swinging ? -0.9 + 1.8 * k : 0.6); }
+    // rival
+    const r = this.rec;
+    this.rival.position.set(r.x, 0, r.z); this.rival.rotation.y = 0; this.pose(this.rival, { ready: true });
+    this.rival.visible = this.mode === 'serve' || this.phase === 'flight' || this.phase === 'result';
+    this.machine.visible = this.mode === 'rally';
+    if (this.feed) this.machine.position.set(this.feed.x, 0, this.feed.z - 0.6);
+    // camera behind my baseline
+    const want = new T.Vector3(me.x * 0.5, 4.2, me.z + 7);
+    const look = new T.Vector3(me.x * 0.3, 0.8, -6);
+    if (this.phase === 'flight' || this.phase === 'result') look.lerp(new T.Vector3(b.x, 0.5, Math.min(0, b.z)), 0.3);
+    const f = 1 - Math.exp(-4 * (dt || 1));
+    this.camPos.lerp(want, f); this.camLook.lerp(look, f);
+    this.cam.position.copy(this.camPos); this.cam.lookAt(this.camLook);
+    if (this.fans) this.fans.forEach((fn) => { fn.position.y = this.result && ['ace', 'winner'].includes(this.result.kind) ? Math.abs(Math.sin(this.pt * 12)) * 0.2 : 0; });
+    this.R.render(this.S, this.cam);
+  }
+  renderVals() {
+    const R = this.result;
+    const map = { ace: ['¡ACE!', '#C8F031'], winner: ['¡GANADOR!', '#C8F031'], fuera: ['FUERA', '#FF8A8E'], red: ['RED', '#FF8A8E'], devuelta: ['DEVUELTA', '#FFC53D'], fallo: ['FALLO', '#FF8A8E'] };
+    const rm = R ? map[R.kind] : ['', '#fff'];
+    const rs = Math.min(1, this.pt / 0.25);
+    const tab = (on) => 'height: 36px; padding: 0 14px; border: 0; border-radius: 10px; font: 800 13px Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #C8F031; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
+    const setMode = (m) => { this.mode = m; this.reset(); this.forceUpdate(); if (this.R) this.draw3D(0); };
+    const serve = this.mode === 'serve';
+    return {
+      canvasRef: this.canvasRef, no3d: !!this.no3d,
+      swipePts: this.swipe ? this.swipe.map((q) => q.x.toFixed(1) + ',' + q.y.toFixed(1)).join(' ') : '',
+      serveTab: tab(serve), rallyTab: tab(!serve),
+      setServe: () => setMode('serve'), setRally: () => setMode('rally'),
+      ballLabel: Math.min(this.n + 1, 10) + '/10', ptsLabel: String(this.pts),
+      zoneLabel: serve ? 'Saque: cuando la bola esté arriba, desliza hacia el cuadro de saque' : 'Peloteo: cuando la bola llegue a tu raqueta, desliza hacia la pista rival',
+      showHint: this.phase === 'toss' || this.phase === 'feed',
+      hintText: serve ? 'Cuando la bola esté arriba, desliza hacia el cuadro iluminado · más rápido = saque más fuerte' : 'Tu jugador corre solo: cuando la bola bote y llegue a tu raqueta, desliza hacia la pista rival',
+      showResult: this.phase === 'result' && !!R,
+      resultText: rm[0], resultSub: R ? R.sub : '',
+      resultStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 68px; line-height: 1; letter-spacing: 2px; color: ' + rm[1] + '; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (0.4 + rs * 0.6).toFixed(2) + ');',
+      showStart: this.phase === 'start', showDone: this.phase === 'done',
+      tabsStyle: this.props.locked ? 'display: none;' : 'display: flex; padding: 4px; gap: 4px; border-radius: 14px; background: #0B0B14CC',
+      doneBtn: this.props.onEnd ? 'CONTINUAR' : 'OTRA RONDA',
+      doneAction: () => { if (this.props.onEnd) { this.props.onEnd(this.pts); return; } this.reset(); this.newBall(); this.phase = serve ? 'toss' : 'feed'; this.pt = 0; this.loop(); this.forceUpdate(); },
+      startTitle: serve ? 'DESAFÍO DE SAQUE' : 'DESAFÍO DE PELOTEO',
+      startText: serve ? '10 saques, alternando lados. 1 punto si entra en el cuadro de saque, 3 si cae en la zona marcada. El rival intentará restar: los saques rápidos son más difíciles de devolver.' : '10 bolas de la máquina. Tu jugador corre solo hacia la bola: cuando bote y llegue a tu raqueta, desliza hacia la pista rival. 1 punto si entra, 3 en la zona marcada.',
+      doneSub: this.good + ' de 10 con éxito · récord ' + this.best[this.mode],
+      start: () => { if (this.phase === 'done') this.reset(); this.newBall(); this.phase = serve ? 'toss' : 'feed'; this.pt = 0; this.loop(); this.forceUpdate(); },
+      pDown: (e) => {
+        if (!(this.phase === 'toss' || this.phase === 'feed')) return;
+        e.preventDefault();
+        if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+        this.swipe = [this.local(e)];
+      },
+      pMove: (e) => {
+        if (!this.swipe) return;
+        const q = this.local(e), l = this.swipe[this.swipe.length - 1];
+        if (Math.hypot(q.x - l.x, q.y - l.y) > 4 && this.swipe.length < 60) this.swipe.push(q);
+      },
+      pUp: (e) => { if (this.swipe) { this.swipe.push(this.local(e)); this.hitFromSwipe(); this.forceUpdate(); } },
+      pCancel: () => { this.swipe = null; }
+    };
+  }
+}
+</script>
+</body>
+</html>

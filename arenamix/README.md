@@ -1,6 +1,6 @@
 # ARENA MIX
 
-Minijuegos de deportes (fútbol, baloncesto, béisbol y vóley) como app web instalable (PWA).
+Minijuegos de deportes (fútbol, baloncesto, tenis y vóley) como app web instalable (PWA).
 
 ## Instalar en el móvil
 

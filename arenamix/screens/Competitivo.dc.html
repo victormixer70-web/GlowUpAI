@@ -105,8 +105,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{isBasket}}" hint-placeholder-val="{{ false }}">
     <dc-import name="Baloncesto" mode="{{mgMode}}" locked="{{ true }}" on-end="{{onScore}}" hint-size="844px,390px"></dc-import>
   </sc-if>
-  <sc-if value="{{isBeis}}" hint-placeholder-val="{{ false }}">
-    <dc-import name="Beisbol" mode="{{mgMode}}" locked="{{ true }}" on-end="{{onScore}}" hint-size="844px,390px"></dc-import>
+  <sc-if value="{{isTenis}}" hint-placeholder-val="{{ false }}">
+    <dc-import name="Tenis" mode="{{mgMode}}" locked="{{ true }}" on-end="{{onScore}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isVoley}}" hint-placeholder-val="{{ false }}">
     <dc-import name="Voley" mode="{{mgMode}}" locked="{{ true }}" on-end="{{onScore}}" hint-size="844px,390px"></dc-import>
@@ -196,10 +196,10 @@ class Component extends DCLogic {
         { id: 'three', title: 'CONCURSO DE TRIPLES', kind: 'mg', comp: 'Baloncesto', mode: 'three', unit: 'puntos', rival: [6, 16], desc: '15 balones en 5 posiciones y 60 segundos; el último de cada posición vale doble.' },
         { id: 'ft', title: 'TIROS LIBRES', kind: 'mg', comp: 'Baloncesto', mode: 'free', unit: 'puntos', rival: [4, 9], desc: '10 tiros libres. Gana quien meta más.' }]),
         train: [{ id: 'train', title: 'PISTA LIBRE', href: 'Baloncesto.dc.html', desc: 'Triples y tiros libres sin presión.' }, { id: 'tut', title: 'TUTORIAL', href: 'Tutorial.dc.html', desc: 'Repasa los controles paso a paso.' }] },
-      beisbol: { name: 'BÉISBOL', c1: '#4A3216', c2: '#2F7A3E', modes: teams(true).concat([
-        { id: 'derby', title: 'HOME RUN DERBY', kind: 'mg', comp: 'Beisbol', mode: 'hr', unit: 'home runs', rival: [1, 7], desc: 'Batea hasta 10 eliminaciones. Gana quien haga más home runs.' },
-        { id: 'long', title: 'BATAZO MÁS LARGO', kind: 'mg', comp: 'Beisbol', mode: 'long', unit: 'metros', rival: [95, 145], desc: 'Gana el golpe más lejano dentro del campo.' }]),
-        train: [{ id: 'train', title: 'JAULA DE BATEO', href: 'Beisbol.dc.html', desc: 'Batea sin límite de tiempo.' }, { id: 'tut', title: 'TUTORIAL', href: 'Tutorial.dc.html', desc: 'Repasa los controles paso a paso.' }] },
+      tenis: { name: 'TENIS', c1: '#1E3A8A', c2: '#2563C9', modes: teams(true).slice(0, 2).concat([
+        { id: 'serve', title: 'DESAFÍO DE SAQUE', kind: 'mg', comp: 'Tenis', mode: 'serve', unit: 'puntos', rival: [6, 16], desc: '10 saques alternando lados. 1 punto en el cuadro, 3 en la zona marcada.' },
+        { id: 'rally', title: 'DESAFÍO DE PELOTEO', kind: 'mg', comp: 'Tenis', mode: 'rally', unit: 'puntos', rival: [6, 16], desc: '10 bolas de la máquina: devuélvelas dentro; 3 puntos en la zona marcada.' }]),
+        train: [{ id: 'train', title: 'PISTA DE TENIS', href: 'Tenis.dc.html', desc: 'Saques y peloteo sin presión.' }, { id: 'tut', title: 'TUTORIAL', href: 'Tutorial.dc.html', desc: 'Repasa los controles paso a paso.' }] },
       voley: { name: 'VÓLEY', c1: '#7A6430', c2: '#C9A85C', modes: teams(true).concat([
         { id: 'serve', title: 'DESAFÍO DE SAQUE', kind: 'mg', comp: 'Voley', mode: 'serve', unit: 'puntos', rival: [8, 22], desc: '10 saques. Las zonas marcadas valen 3.' },
         { id: 'spike', title: 'DESAFÍO DE REMATE', kind: 'mg', comp: 'Voley', mode: 'spike', unit: 'puntos', rival: [10, 24], desc: '10 remates contra el bloqueo.' }]),
@@ -426,7 +426,7 @@ class Component extends DCLogic {
       headColor: casual ? '#22D3EE' : R.text,
       isLobby: s.phase === 'lobby', isSearch: s.phase === 'search', isFound: s.phase === 'found', isResult: s.phase === 'result',
       isTeamMatch: s.phase === 'match' && pl.kind === 'team', isDuelMatch: s.phase === 'match' && pl.kind === 'duel',
-      isBasket: s.phase === 'match' && mg && pl.comp === 'Baloncesto', isBeis: s.phase === 'match' && mg && pl.comp === 'Beisbol', isVoley: s.phase === 'match' && mg && pl.comp === 'Voley',
+      isBasket: s.phase === 'match' && mg && pl.comp === 'Baloncesto', isTenis: s.phase === 'match' && mg && pl.comp === 'Tenis', isVoley: s.phase === 'match' && mg && pl.comp === 'Voley',
       plTitle: pl.title, plDesc: pl.desc, chips,
       myC1: R.c1, myC2: R.c2, myText: R.text, myWings: !!R.wings, myRank: R.label.toUpperCase(),
       pip1: pip(0), pip2: pip(1), pip3: pip(2), mmrLabel: String(shownMmr),

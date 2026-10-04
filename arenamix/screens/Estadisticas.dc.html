@@ -113,13 +113,13 @@ class Component extends DCLogic {
         { id: 'bot', name: 'Bote', effect: (v) => 'Pérdidas al botar −' + pct(0, 70)(v) + '%' },
         { id: 'def', name: 'Defensa', effect: (v) => 'Robos y tapones ' + pct(5, 30)(v) + '% de éxito' },
         { id: 'res', name: 'Resistencia', effect: (v) => 'Cansancio en el último cuarto −' + Math.round(15 * (1 - t(v))) + '%' }] },
-      beisbol: { label: 'Béisbol', num: '7', stats: [
-        { id: 'bat', name: 'Potencia de bateo', effect: (v) => 'Salida de bola ' + pct(110, 175)(v) + ' km/h' },
-        { id: 'cto', name: 'Contacto', effect: (v) => 'Ventana para batear ' + pct(60, 140)(v) + ' ms' },
-        { id: 'lan', name: 'Velocidad de lanzamiento', effect: (v) => 'Recta ' + pct(120, 165)(v) + ' km/h' },
-        { id: 'clan', name: 'Control de lanzamiento', effect: (v) => 'Desvío del lanzamiento ±' + pct(30, 3)(v) + ' cm' },
-        { id: 'car', name: 'Carrera entre bases', effect: (v) => 'De base a base en ' + f1(4.6 - 1.2 * t(v)) + ' s' },
-        { id: 'fil', name: 'Fildeo', effect: (v) => 'Atrapadas difíciles ' + pct(10, 65)(v) + '%' }] },
+      tenis: { label: 'Tenis', num: '7', stats: [
+        { id: 'saq', name: 'Potencia de saque', effect: (v) => 'Saque a ' + pct(150, 220)(v) + ' km/h' },
+        { id: 'pre', name: 'Precisión', effect: (v) => 'Desvío del golpe ±' + pct(60, 8)(v) + ' cm' },
+        { id: 'gol', name: 'Golpe de fondo', effect: (v) => 'Derecha a ' + pct(100, 160)(v) + ' km/h' },
+        { id: 'vel', name: 'Velocidad en pista', effect: (v) => f1(6.2 + 1.8 * t(v)) + ' m/s' },
+        { id: 'ref', name: 'Reflejos', effect: (v) => 'Alcance de la raqueta ' + pct(85, 120)(v) + ' cm' },
+        { id: 'res', name: 'Resistencia', effect: (v) => 'Sin bajón hasta el set ' + Math.round(1 + 2 * t(v)) }] },
       voley: { label: 'Vóley', num: '4', stats: [
         { id: 'sal', name: 'Salto', effect: (v) => 'Alcance de remate ' + f1(2.9 + 0.6 * t(v)) + ' m' },
         { id: 'rem', name: 'Potencia de remate', effect: (v) => 'Remate ' + pct(60, 115)(v) + ' km/h' },
@@ -130,7 +130,7 @@ class Component extends DCLogic {
     };
   }
   fresh() {
-    const D = this.defs(), lv = { futbol: 12, basket: 5, beisbol: 3, voley: 4 }, out = {};
+    const D = this.defs(), lv = { futbol: 12, basket: 5, tenis: 3, voley: 4 }, out = {};
     Object.keys(D).forEach((k) => {
       const st = {}; D[k].stats.forEach((x) => { st[x.id] = 10; });
       out[k] = { stats: st, pm: lv[k] * 3, level: lv[k] };
@@ -185,8 +185,8 @@ class Component extends DCLogic {
       sports: Object.keys(D).map((k) => ({ label: D[k].label, style: tab(k === sp), pick: () => this.setState({ sport: k }) })),
       rows, overall: String(overall), pmLabel: String(pm),
       level: String(cur.level), num: def.num,
-      sportName: { futbol: 'fútbol', basket: 'baloncesto', beisbol: 'béisbol', voley: 'vóley' }[sp],
-      sportUpper: { futbol: 'FÚTBOL', basket: 'BALONCESTO', beisbol: 'BÉISBOL', voley: 'VÓLEY' }[sp],
+      sportName: { futbol: 'fútbol', basket: 'baloncesto', tenis: 'tenis', voley: 'vóley' }[sp],
+      sportUpper: { futbol: 'FÚTBOL', basket: 'BALONCESTO', tenis: 'TENIS', voley: 'VÓLEY' }[sp],
       tier: tr[1],
       tierStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1px; color: ' + tr[2] + ';',
       reset: () => {

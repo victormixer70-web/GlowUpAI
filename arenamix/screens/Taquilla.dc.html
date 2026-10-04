@@ -151,14 +151,14 @@ class Component extends DCLogic {
     this.state = {
       sport: 'futbol',
       cat: 'equipos',
-      league: { futbol: 0, basket: 0, beisbol: 0, voley: 0 },
+      league: { futbol: 0, basket: 0, tenis: 0, voley: 0 },
       preview: null,
       coins: (() => { try { const W = JSON.parse(localStorage.getItem('arenamix.wallet.v1') || 'null'); return W && typeof W.coins === 'number' ? W.coins : 2450; } catch (e) { return 2450; } })(),
       bought: [],
       equip: {
         futbol: { equipos: 'futbol-0-0', cabeza: 'h0', cara: 'f0', calzado: 's1' },
         basket: { equipos: 'basket-0-0', cabeza: 'h9', cara: 'f0', calzado: 's2' },
-        beisbol: { equipos: 'beisbol-0-0', cabeza: 'h1', cara: 'f1', calzado: 's2' },
+        tenis: { equipos: 'tenis-0-0', cabeza: 'h0', cara: 'f0', calzado: 's1' },
         voley: { equipos: 'voley-0-0', cabeza: 'h0', cara: 'f0', calzado: 's1' }
       }
     };
@@ -278,51 +278,14 @@ class Component extends DCLogic {
           ['Trabzon Granate', '#8B1F3F', '#5DADE2', 'halves', '#8B1F3F', W], ['Bursa Verde', '#00843D', W, 'solid', '#00843D', W],
           ['Mersin Azul', '#003DA5', '#E30613', 'solid', '#003DA5', W], ['Esenler Rojo', '#E30613', W, 'solid', '#E30613', W]] }
       ],
-      beisbol: [
-        { name: 'Liga EE. UU.', country: 'EE. UU. y Canadá', teams: [
-          ['Arizona Granate', W, '#A71930', 'solid', W, '#A71930'], ['Atlanta Marino', W, '#13274F', 'solid', W, '#CE1141'],
-          ['Baltimore Naranja', W, '#DF4601', 'solid', W, K], ['Boston Rojo', W, '#BD3039', 'solid', W, '#BD3039'],
-          ['Chicago Azul', W, '#0E3386', 'pin', W, '#0E3386'], ['Chicago Negro', W, K, 'pin', W, K],
-          ['Cincinnati Rojo', W, '#C6011F', 'solid', W, '#C6011F'], ['Cleveland Marino', W, '#0C2340', 'solid', W, '#E31937'],
-          ['Colorado Púrpura', W, '#33006F', 'pin', W, K], ['Detroit Marino', W, '#0C2340', 'solid', W, '#0C2340'],
-          ['Houston Naranja', W, '#EB6E1F', 'solid', W, '#002D62'], ['Kansas City Azul', W, '#004687', 'solid', W, '#004687'],
-          ['Anaheim Rojo', W, '#BA0021', 'solid', W, '#BA0021'], ['Los Angeles Azul', W, '#005A9C', 'solid', W, '#005A9C'],
-          ['Miami Celeste', W, '#00A3E0', 'solid', W, K], ['Milwaukee Azul', W, '#12284B', 'solid', W, '#FFC52F'],
-          ['Minnesota Marino', W, '#002B5C', 'pin', W, '#D31145'], ['Nueva York Rayas', W, '#0C2340', 'pin', W, '#0C2340'],
-          ['Nueva York Naranja', W, '#002D72', 'pin', W, '#FF5910'], ['Sacramento Verde', W, '#003831', 'solid', W, '#EFB21E'],
-          ['Filadelfia Rojo', W, '#E81828', 'pin', W, '#E81828'], ['Pittsburgh Oro', W, K, 'solid', W, '#FDB827'],
-          ['San Diego Marrón', W, '#2F241D', 'pin', W, '#FFC425'], ['San Francisco Naranja', '#EFE6D2', '#FD5A1E', 'solid', '#EFE6D2', K],
-          ['Seattle Turquesa', W, '#005C5C', 'solid', W, '#0C2C56'], ['St. Louis Rojo', W, '#C41E3A', 'solid', W, '#C41E3A'],
-          ['Tampa Azul', W, '#092C5C', 'solid', W, '#8FBCE6'], ['Texas Azul', W, '#003278', 'solid', W, '#C0111F'],
-          ['Toronto Azul', W, '#134A8E', 'solid', W, '#134A8E'], ['Washington Rojo', W, '#AB0003', 'solid', W, '#14225A']] },
-        { name: 'Liga Japón', country: 'Japón', teams: [
-          ['Tokio Naranja', W, '#F97709', 'solid', W, K], ['Osaka Rayas', W, K, 'pin', W, '#FFE201'],
-          ['Yokohama Azul', W, '#0055A5', 'solid', W, '#0055A5'], ['Hiroshima Rojo', W, '#E60033', 'solid', W, '#E60033'],
-          ['Tokio Verde', W, '#00AB5C', 'solid', W, '#0B2B5C'], ['Nagoya Azul', W, '#002569', 'solid', W, '#002569'],
-          ['Fukuoka Amarillo', W, '#F9C304', 'solid', W, K], ['Hokkaidō Azul', W, '#006298', 'solid', W, '#006298'],
-          ['Osaka Marino', W, '#000E4A', 'solid', W, '#B08F26'], ['Chiba Negro', W, K, 'pin', W, K],
-          ['Sendai Carmesí', W, '#860010', 'solid', W, '#860010'], ['Saitama Azul', W, '#1F366A', 'solid', W, '#1F366A']] },
-        { name: 'Liga Corea', country: 'Corea del Sur', teams: [
-          ['Seúl Granate', W, '#C30452', 'pin', W, K], ['Seúl Marino', W, '#131230', 'solid', W, '#131230'],
-          ['Seúl Borgoña', W, '#820024', 'solid', W, '#820024'], ['Incheon Rojo', W, '#CE0E2D', 'solid', W, '#FFB81C'],
-          ['Suwon Negro', W, K, 'solid', W, '#EB1C24'], ['Daejeon Naranja', W, '#FC4E00', 'solid', W, K],
-          ['Daegu Azul', W, '#074CA1', 'solid', W, '#074CA1'], ['Changwon Azul', W, '#315288', 'solid', W, '#AF917B'],
-          ['Busan Marino', W, '#041E42', 'solid', W, '#D00F31'], ['Gwangju Rojo', W, '#EA0029', 'solid', W, K]] },
-        { name: 'Liga Taiwán', country: 'Taiwán', teams: [
-          ['Taichung Amarillo', '#FFD100', K, 'solid', W, K], ['Tainan Naranja', '#F5821F', W, 'solid', W, '#F5821F'],
-          ['Taoyuan Carmesí', '#85002A', W, 'solid', W, '#85002A'], ['Xinzhuang Azul', '#004B97', W, 'solid', W, '#004B97'],
-          ['Tianmu Rojo', '#E50012', W, 'solid', W, '#E50012'], ['Kaohsiung Verde', '#00563F', W, 'solid', W, '#00563F']] },
-        { name: 'Liga México', country: 'México', teams: [
-          ['Monterrey Azul', '#002D72', '#E31837', 'solid', W, '#002D72'], ['Monclova Púrpura', '#4B2E83', W, 'solid', W, '#4B2E83'],
-          ['Tijuana Negro', K, '#C8102E', 'solid', W, K], ['Torreón Verde', '#00843D', W, 'solid', W, '#00843D'],
-          ['Chihuahua Oro', '#C9A227', K, 'solid', W, K], ['Jalisco Azul', '#00205B', '#C9A227', 'solid', W, '#00205B'],
-          ['Laredo Rojo', '#C8102E', '#002D72', 'solid', W, '#C8102E'], ['Aguascalientes Azul', '#0055A5', '#E30613', 'solid', W, '#0055A5'],
-          ['Saltillo Rojiazul', '#002D72', '#E31837', 'pin', W, '#E31837'], ['Durango Naranja', '#F28C00', K, 'solid', W, K],
-          ['Ciudad de México Rojo', '#E31837', K, 'solid', W, '#E31837'], ['Yucatán Rojo', '#E31837', '#FFD100', 'solid', W, '#E31837'],
-          ['Puebla Verde', '#00843D', W, 'solid', W, '#00843D'], ['Tabasco Rojo', '#C8102E', '#00843D', 'solid', W, '#C8102E'],
-          ['Campeche Negro', K, '#E31837', 'solid', W, K], ['Oaxaca Granate', '#7A1C2C', W, 'solid', W, '#7A1C2C'],
-          ['Cancún Naranja', '#F28C00', '#002D72', 'solid', W, '#F28C00'], ['Veracruz Azul', '#003DA5', '#E31837', 'solid', W, '#003DA5'],
-          ['León Marino', '#14225A', '#E31837', 'solid', W, '#14225A'], ['Querétaro Morado', '#5A2D81', W, 'solid', W, '#5A2D81']] }
+      tenis: [
+        { name: 'Circuito profesional', country: 'Ropa de pista', teams: [
+          ['Clásico blanco', W, '#1E3A8A', 'solid', W, W], ['Pista dura', '#2563C9', W, 'solid', K, W],
+          ['Tierra batida', '#C2552D', W, 'solid', W, W], ['Hierba', '#1E7A4A', W, 'solid', W, W],
+          ['Lima eléctrica', '#C8F031', K, 'solid', K, W], ['Noche', K, '#C8F031', 'solid', K, K],
+          ['Rosa pro', '#FF5C8A', W, 'solid', K, W], ['Turquesa', '#22D3EE', K, 'solid', W, W],
+          ['Naranja', '#FF8A3D', K, 'solid', K, W], ['Morado', '#7C3AED', W, 'solid', W, W],
+          ['Rayas marino', '#1E3A8A', W, 'pin', W, W], ['Rojo', '#E5484D', W, 'solid', W, W]] }
       ],
       voley: [
         { name: 'Liga Italia', country: 'Italia', teams: [
@@ -470,7 +433,7 @@ class Component extends DCLogic {
 
     const SPORTS = [
       { id: 'futbol', label: 'Fútbol', num: '10' }, { id: 'basket', label: 'Basket', num: '23' },
-      { id: 'beisbol', label: 'Béisbol', num: '7' }, { id: 'voley', label: 'Vóley', num: '4' }
+      { id: 'tenis', label: 'Tenis', num: '7' }, { id: 'voley', label: 'Vóley', num: '4' }
     ];
     const CATS = [
       { id: 'equipos', label: 'Equipos' }, { id: 'cabeza', label: 'Cabeza' },

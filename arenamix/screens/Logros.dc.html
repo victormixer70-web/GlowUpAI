@@ -56,7 +56,7 @@ class Component extends DCLogic {
     // goals for the Logros screen: progress comes from the saved match record and the ranks
     const R = this.store('arenamix.record.v1', {}), all = R.all || {}, mmr = this.store('arenamix.mmr.v1', {});
     const top = Object.keys(mmr).reduce((m, k) => Math.max(m, mmr[k] || 0), 0);
-    const sports = ['futbol', 'baloncesto', 'beisbol', 'voley'].filter((s) => R[s] && R[s].played > 0).length;
+    const sports = ['futbol', 'baloncesto', 'tenis', 'voley'].filter((s) => R[s] && R[s].played > 0).length;
     const g = (k) => all[k] || 0;
     const A = (id, icon, title, desc, cur, goal, reward) => ({ id, icon, title, desc, cur: Math.min(cur, goal), goal, reward });
     return [

@@ -1,7 +1,7 @@
 {
   "name": "ARENA MIX",
   "short_name": "ARENA MIX",
-  "description": "Minijuegos de deportes: fútbol, baloncesto, béisbol y vóley.",
+  "description": "Minijuegos de deportes: fútbol, baloncesto, tenis y vóley.",
   "lang": "es",
   "id": "/GlowUpAI/arenamix/",
   "start_url": "./",

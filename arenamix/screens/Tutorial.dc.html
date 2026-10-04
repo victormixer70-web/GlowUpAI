@@ -43,7 +43,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <dc-import name="Partido" tutorial="{{ true }}" mode="quick" team-size="2" duration="600" autostart="{{ true }}" home-name="Invitado_4821" mates="{{mates}}" rivals="{{rivals}}" away-name="Entrenador" home-color="#FF8A3D" home-trim="#0B0B14" away-color="#3EA6FF" away-trim="#0B0B14" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isBasket}}" hint-placeholder-val="{{ false }}"><dc-import name="Baloncesto" mode="three" locked="{{ true }}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import></sc-if>
-  <sc-if value="{{isBeis}}" hint-placeholder-val="{{ false }}"><dc-import name="Beisbol" mode="hr" locked="{{ true }}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import></sc-if>
+  <sc-if value="{{isTenis}}" hint-placeholder-val="{{ false }}"><dc-import name="Tenis" mode="serve" locked="{{ true }}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import></sc-if>
   <sc-if value="{{isVoley}}" hint-placeholder-val="{{ false }}"><dc-import name="Voley" mode="serve" locked="{{ true }}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import></sc-if>
   <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: radial-gradient(circle at 50% 40%, #12304A, #0B0B14 70%)">
@@ -75,7 +75,7 @@ class Component extends DCLogic {
     return {
       futbol: { name: 'FÚTBOL', bg: '#145A33', text: 'Un partido de práctica guiado, paso a paso. Unos 2 minutos.', steps: ['Moverte con el joystick', 'Coger el balón y esprintar', 'Pasar a un compañero', 'Regatear a un rival', 'Chutar a puerta y recuperar el balón'] },
       baloncesto: { name: 'BALONCESTO', bg: '#7A3B12', text: 'Una ronda de práctica del concurso de triples.', steps: ['Desliza el dedo hacia arriba para tirar', 'La longitud del gesto es la fuerza: busca la zona verde', 'La dirección del gesto es el apunte', 'El último balón de cada posición vale doble'] },
-      beisbol: { name: 'BÉISBOL', bg: '#4A3216', text: 'Una ronda de práctica de bateo.', steps: ['Toca la pantalla cuando la bola llegue al bateador', 'Toca a la altura de la bola', 'Más abajo = bola más elevada', 'Batea hasta 10 eliminaciones'] },
+      tenis: { name: 'TENIS', bg: '#1E3A8A', text: 'Una ronda de práctica de saques.', steps: ['Espera a que la bola esté arriba', 'Desliza hacia el cuadro de saque iluminado', 'Más rápido = saque más fuerte', 'La zona verde vale 3 puntos'] },
       voley: { name: 'VÓLEY', bg: '#7A6430', text: 'Una ronda de práctica de saques.', steps: ['Desliza hacia la pista rival para sacar', 'Más rápido = saque más fuerte', 'Las zonas marcadas valen 3 puntos', '10 saques en total'] }
     }[this.sport] || null;
   }
@@ -87,7 +87,7 @@ class Component extends DCLogic {
       introBg: 'position: absolute; inset: 0; background: linear-gradient(120deg, ' + I.bg + ' 0%, #0B0B14 60%);',
       steps: I.steps.map((t, k) => ({ n: String(k + 1), text: t })),
       isIntro: s.phase === 'intro', isDone: s.phase === 'done',
-      isFoot: play && this.sport === 'futbol', isBasket: play && this.sport === 'baloncesto', isBeis: play && this.sport === 'beisbol', isVoley: play && this.sport === 'voley',
+      isFoot: play && this.sport === 'futbol', isBasket: play && this.sport === 'baloncesto', isTenis: play && this.sport === 'tenis', isVoley: play && this.sport === 'voley',
       mates: ['Compañero'], rivals: ['Rival', 'Rival 2'],
       play: () => this.setState({ phase: 'play' }),
       skip: () => this.markDone(),

@@ -64,7 +64,7 @@ class Component extends DCLogic {
     // goals for the Logros screen: progress comes from the saved match record and the ranks
     const R = this.store('arenamix.record.v1', {}), all = R.all || {}, mmr = this.store('arenamix.mmr.v1', {});
     const top = Object.keys(mmr).reduce((m, k) => Math.max(m, mmr[k] || 0), 0);
-    const sports = ['futbol', 'baloncesto', 'beisbol', 'voley'].filter((s) => R[s] && R[s].played > 0).length;
+    const sports = ['futbol', 'baloncesto', 'tenis', 'voley'].filter((s) => R[s] && R[s].played > 0).length;
     const g = (k) => all[k] || 0;
     const A = (id, icon, title, desc, cur, goal, reward) => ({ id, icon, title, desc, cur: Math.min(cur, goal), goal, reward });
     return [
@@ -102,7 +102,7 @@ class Component extends DCLogic {
       tile('EMPATES', r.drawn, '#CACAE0'), tile('% VICTORIAS', pct(r.won) + '%', '#22D3EE'), tile('MEJOR RACHA', r.best, '#FFC53D'),
       tile('GOLES MARCADOS', goals ? r.gf : '—'), tile('GOLES ENCAJADOS', goals ? r.ga : '—'), tile('PORTERÍAS A CERO', goals ? r.clean : '—')
     ];
-    const labels = { all: 'Todos', futbol: 'Fútbol', baloncesto: 'Baloncesto', beisbol: 'Béisbol', voley: 'Vóley' };
+    const labels = { all: 'Todos', futbol: 'Fútbol', baloncesto: 'Baloncesto', tenis: 'Tenis', voley: 'Vóley' };
     const tabs = Object.keys(labels).map((k) => ({ label: labels[k], pick: () => this.setState({ sport: k }), style: 'flex: 1; height: 34px; border: 0; border-radius: 10px; font: 800 12px Manrope, sans-serif; cursor: pointer; ' + (k === s.sport ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;') }));
     const cl = this.claimed(), ready = this.achievements().filter((a) => a.cur >= a.goal && !cl[a.id]).length;
     const mmr = this.store('arenamix.mmr.v1', {}), top = Object.keys(mmr).reduce((m, k) => Math.max(m, mmr[k] || 0), 0);
