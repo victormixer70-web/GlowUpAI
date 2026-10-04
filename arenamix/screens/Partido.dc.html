@@ -1581,6 +1581,7 @@ class Component extends DCLogic {
       m.position.copy(this.W(p.x, p.y, 0));
       m.rotation.y = Math.atan2(Math.cos(p.face), Math.sin(p.face));
       this.animate(p, m, i);
+      if (m.userData.anim) this.mocap(p, m, i, dt || 0);
     });
     this.ball3.position.copy(this.W(b.x, b.y, b.z + 0.2));
     this.ball3.visible = g.phase !== 'winners';
@@ -1844,6 +1845,66 @@ class Component extends DCLogic {
     });
     g.userData = { body, legs, arms, head };
     return g;
+  }
+  /* Mixamo characters: real mocap clips (Soccer Game Pack) for running, shots, passes, tackles and
+     the goalkeeper; the procedural pose (from animate) stays for skills, celebrations and the rest. */
+  mocap(p, m, i, dt) {
+    const A = window.AMChars, u = m.userData;
+    if (!A || !A.clip('jogF')) return;
+    const g = this.g, a = p.act, gk = p.role === 'gk';
+    const st = u.mc || (u.mc = { ph: Math.random(), idle: Math.random() * 8, w: {}, act: null, on: 0 });
+    // velocity in the model's own frame: +z forward, +x its left
+    const ry = m.rotation.y, c = Math.cos(ry), sn = Math.sin(ry);
+    const lx = p.vx * c - p.vy * sn, lz = p.vx * sn + p.vy * c, sp = Math.hypot(p.vx, p.vy);
+    const want = {};
+    // one-shot clip for the current action: [game action] -> [clip, from, to] (seconds into the clip)
+    const charging = i === g.ctl && g.charging;
+    let act = null;
+    if (charging) act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.7 + 0.3 * g.charge : 0.2 + 0.22 * g.charge, key: 'charge' };
+    else if (a) {
+      const k = Math.min(1, a.t / a.dur);
+      if (a.type === 'windup') act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.75 + 0.3 * k : 0.22 + 0.22 * k, key: a };
+      else if (a.type === 'kick') act = gk ? { id: 'gkKick', t: 2.05 + 0.6 * k, key: a } : { id: 'shot', t: 0.47 + 0.5 * k, key: a };
+      else if (a.type === 'pass') act = { id: 'pass', t: 0.28 + 0.22 * k, key: a };
+      else if (a.type === 'throw') act = { id: 'gkThrow', t: 1.3 + 0.6 * k, key: a };
+      else if (a.type === 'slide') act = { id: 'slide', t: 0.2 + 0.75 * k, key: a };
+      else if (a.type === 'dive') act = { id: a.dl > 0 ? 'diveL' : 'diveR', t: 0.95 + 0.95 * k, key: a };
+    } else if (gk && g.hold === i) act = { id: 'catch', t: 0.8, key: 'hold' };
+    // poses only the procedural rig has (skills, stumbles, celebrations): clips fade out
+    const procOnly = a && !act && a.type !== 'windup';
+    st.on += ((procOnly ? 0 : 1) - st.on) * Math.min(1, dt * 10);
+    if (act) {
+      if (!st.act || st.act.id !== act.id || (st.act.key !== act.key && act.key !== 'hold' && st.act.key !== 'charge')) st.act = { id: act.id, t: act.t, w: st.act && st.act.id === act.id ? st.act.w : 0, key: act.key };
+      st.act.t = act.t; st.act.key = act.key; st.act.live = true;
+    } else if (st.act) {
+      // finished: let the clip play on while it fades into the run/idle cycle
+      st.act.live = false; st.act.t += dt;
+    }
+    if (st.act) {
+      st.act.w += ((st.act.live ? 1 : 0) - st.act.w) * Math.min(1, dt * (st.act.live ? 14 : 6));
+      if (!st.act.live && st.act.w < 0.02) st.act = null;
+    }
+    const aw = st.act ? st.act.w : 0;
+    // locomotion: idle / jog forward / back / strafe, blended by direction, one shared stride phase
+    const move = this.clamp((sp - 0.35) / 1.4, 0, 1);
+    const f = Math.max(0, lz), b = Math.max(0, -lz), l = Math.max(0, lx), r = Math.max(0, -lx), tot = f + b + l + r || 1;
+    const stepL = gk && !a ? 'gkStepL' : 'strafeL', stepR = gk && !a ? 'gkStepR' : 'strafeR';
+    want[gk ? 'gkIdle' : 'idle'] = 1 - move;
+    want.jogF = move * f / tot; want.jogB = move * b / tot;
+    want[stepL] = (want[stepL] || 0) + move * l / tot; want[stepR] = (want[stepR] || 0) + move * r / tot;
+    st.ph = (st.ph + dt * this.clamp(sp / 2.1, 0.55, 2.3)) % 1;
+    st.idle += dt;
+    const layers = [];
+    const ids = new Set(Object.keys(want).concat(Object.keys(st.w)));
+    ids.forEach((id) => {
+      const w0 = st.w[id] || 0, w1 = w0 + ((want[id] || 0) - w0) * Math.min(1, dt * 9);
+      st.w[id] = w1;
+      if (w1 < 0.01) { if (!want[id]) delete st.w[id]; return; }
+      const info = A.clip(id), t = id === 'idle' || id === 'gkIdle' ? st.idle : st.ph * info.dur;
+      layers.push({ id, t, w: w1 * (1 - aw) * st.on });
+    });
+    if (st.act) layers.push({ id: st.act.id, t: st.act.t, w: aw * st.on });
+    u.anim.layers = st.on > 0.01 ? layers : [];
   }
   animate(p, m, i) {
     const u = m.userData, g = this.g, b = g.ball, now = g.pt;

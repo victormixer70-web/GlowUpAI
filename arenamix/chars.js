@@ -10,7 +10,7 @@
     { id: 'granny', name: 'Granny', file: 'assets/chars/granny.glb' }
   ];
   var KEY = 'arenamix.char.v1', HEIGHT = 1.86;
-  var tpl = {}, loading = null, waiters = [];
+  var tpl = {}, loading = null, waiters = [], ANIM = null;
 
   function pref() {
     try { var v = JSON.parse(localStorage.getItem(KEY) || '{}'); if (v && v.pick) return v.pick; } catch (e) {}
@@ -21,11 +21,27 @@
   }
   function ready() { return LIST.every(function (c) { return tpl[c.id]; }); }
 
+  /* Mocap clips (Mixamo "Soccer Game Pack"), baked as per-bone world rotations relative to the
+     T-pose, so one set of clips fits every character whatever its bone orientations. */
+  function loadAnims() {
+    return fetch('assets/chars/anims.json').then(function (r) { return r.json(); }).then(function (j) {
+      var raw = atob(j.data), buf = new Uint8Array(raw.length);
+      for (var i = 0; i < raw.length; i++) buf[i] = raw.charCodeAt(i);
+      var clips = {};
+      j.clips.forEach(function (c) {
+        clips[c.id] = { fps: c.fps, n: c.n, loop: c.loop, dur: (c.n - 1) / c.fps,
+          q: new Int16Array(buf.buffer, c.qOff, c.n * j.bones.length * 4), p: new Int16Array(buf.buffer, c.pOff, c.n * 3) };
+      });
+      ANIM = { bones: j.bones, clips: clips };
+    }).catch(function () { ANIM = null; });
+  }
+  function clipInfo(id) { var c = ANIM && ANIM.clips[id]; return c ? { dur: c.dur, loop: c.loop } : null; }
+
   function load(onStep) {
     if (loading) return loading;
     if (!T || !T.GLTFLoader || !T.SkeletonUtils) return (loading = Promise.resolve(false));
     var loader = new T.GLTFLoader();
-    loading = Promise.all(LIST.map(function (c) {
+    loading = Promise.all([loadAnims()].concat(LIST.map(function (c) {
       return new Promise(function (res) {
         loader.load(c.file, function (gl) {
           var root = gl.scene;
@@ -41,7 +57,7 @@
           res(true);
         }, null, function () { if (onStep) onStep(); res(false); });
       });
-    })).then(function () {
+    }))).then(function () {
       var ok = ready();
       if (ok) waiters.splice(0).forEach(function (f) { try { f(); } catch (e) {} });
       return ok;
@@ -139,36 +155,83 @@
     socket(arms[0].elb, by[BONES.rFore], rz(Math.PI / 2), false); socket(arms[1].elb, by[BONES.lFore], rz(Math.PI / 2 * -1), false);
     socket(arms[0].sho, by[BONES.rArm], rz(Math.PI / 2), false); socket(arms[1].sho, by[BONES.lArm], rz(-Math.PI / 2), false);
 
-    var wn = new Map(), qa = new T.Quaternion(), qb = new T.Quaternion(), v = new T.Vector3(), lastFrame = -1;
+    // clip bone index for every model bone (-1: not animated by the clips)
+    var aIdx = new Map();
+    if (ANIM) bones.forEach(function (b) { aIdx.set(b, ANIM.bones.indexOf(b.name)); });
+    var anim = { layers: [] };
+    var wn = new Map(), dn = new Map(), qa = new T.Quaternion(), qb = new T.Quaternion(), qc = new T.Quaternion(), v = new T.Vector3(), vc = new T.Vector3(), lastFrame = -1;
+    var acc = new Float32Array(4), pc = new Float32Array(3);
+    // the layers' clip pose for one bone (k = clip bone index): weighted, sign-aligned quaternion sum
+    function sampleBone(k, out) {
+      var L = anim.layers, tw = 0;
+      acc[0] = acc[1] = acc[2] = acc[3] = 0;
+      for (var i = 0; i < L.length; i++) {
+        var l = L[i], c = ANIM.clips[l.id];
+        if (!c || !(l.w > 0)) continue;
+        var f = l.t * c.fps, n = c.n;
+        if (c.loop) { f %= (n - 1); if (f < 0) f += n - 1; } else f = Math.max(0, Math.min(n - 1, f));
+        var f0 = Math.floor(f), f1 = Math.min(n - 1, f0 + 1), u = f - f0, nb = ANIM.bones.length;
+        var a = (f0 * nb + k) * 4, b = (f1 * nb + k) * 4, q = c.q;
+        var s1 = (q[a] * q[b] + q[a + 1] * q[b + 1] + q[a + 2] * q[b + 2] + q[a + 3] * q[b + 3]) < 0 ? -1 : 1;
+        var x = q[a] + (s1 * q[b] - q[a]) * u, y = q[a + 1] + (s1 * q[b + 1] - q[a + 1]) * u, z = q[a + 2] + (s1 * q[b + 2] - q[a + 2]) * u, ww = q[a + 3] + (s1 * q[b + 3] - q[a + 3]) * u;
+        var len = Math.sqrt(x * x + y * y + z * z + ww * ww) || 1, s2 = (tw > 0 && acc[0] * x + acc[1] * y + acc[2] * z + acc[3] * ww < 0) ? -1 : 1, k2 = s2 * l.w / len;
+        acc[0] += x * k2; acc[1] += y * k2; acc[2] += z * k2; acc[3] += ww * k2; tw += l.w;
+      }
+      out.set(acc[0], acc[1], acc[2], acc[3]).normalize();
+      return Math.min(1, tw);
+    }
+    function samplePos() {
+      var L = anim.layers, tw = 0;
+      pc[0] = pc[1] = pc[2] = 0;
+      for (var i = 0; i < L.length; i++) {
+        var l = L[i], c = ANIM.clips[l.id];
+        if (!c || !(l.w > 0)) continue;
+        var f = l.t * c.fps, n = c.n;
+        if (c.loop) { f %= (n - 1); if (f < 0) f += n - 1; } else f = Math.max(0, Math.min(n - 1, f));
+        var f0 = Math.floor(f), f1 = Math.min(n - 1, f0 + 1), u = f - f0;
+        for (var j = 0; j < 3; j++) pc[j] += (c.p[f0 * 3 + j] + (c.p[f1 * 3 + j] - c.p[f0 * 3 + j]) * u) / 8000 * l.w;
+        tw += l.w;
+      }
+      if (tw > 0) { pc[0] /= tw; pc[1] /= tw; pc[2] /= tw; }
+      return Math.min(1, tw);
+    }
     function apply() {
+      var useClip = ANIM && anim.layers.length > 0;
       bones.forEach(function (b) {
-        var r = info.get(b), pw = r.parentBone ? wn.get(r.parentBone) : null;
-        var m = mapOf.get(b), w = wn.get(b) || new T.Quaternion();
+        var r = info.get(b), pw = r.parentBone ? wn.get(r.parentBone) : null, pd = r.parentBone ? dn.get(r.parentBone) : null;
+        var m = mapOf.get(b), w = wn.get(b) || new T.Quaternion(), d = dn.get(b) || new T.Quaternion();
+        // procedural world rotation change from the T-pose: proxies for rig joints, inherited otherwise
         if (m) {
-          qa.identity();
-          m.chain.forEach(function (px) { qb.setFromEuler(px.rotation); qa.multiply(qb); });
-          w.copy(qa).multiply(m.rest).multiply(r.wq);
-          var parentW = pw || hipsParent.q;
-          b.quaternion.copy(parentW).invert().multiply(w);
-        } else {
-          w.copy(pw || hipsParent.q).multiply(r.lq);
-          b.quaternion.copy(r.lq);
+          d.identity();
+          m.chain.forEach(function (px) { qb.setFromEuler(px.rotation); d.multiply(qb); });
+          d.multiply(m.rest);
+        } else if (pd) d.copy(pd); else d.identity();
+        if (useClip) {
+          var k = aIdx.get(b);
+          if (k >= 0) { var cw = sampleBone(k, qc); if (cw > 0) d.slerp(qc, cw); }
+          else if (pd) d.copy(pd);
         }
-        wn.set(b, w);
+        w.copy(d).multiply(r.wq);
+        b.quaternion.copy(pw || hipsParent.q).invert().multiply(w);
+        wn.set(b, w); dn.set(b, d);
       });
       // body offset, plus the procedural body pivoting at the feet instead of the hips
       qb.setFromEuler(body.rotation);
       v.copy(hipsW).applyQuaternion(qb).sub(hipsW).add(body.position);
+      if (useClip) {
+        var pw2 = samplePos();
+        if (pw2 > 0) { vc.set(pc[0] * hipsW.y, pc[1] * hipsW.y - hipsW.y, pc[2] * hipsW.y); v.lerp(vc, pw2); }
+      }
       v.applyQuaternion(qa.copy(hipsParent.q).invert()).multiplyScalar(1 / hipsParent.s);
       hips.position.copy(hipsBindPos).add(v);
     }
     model.traverse(function (m) {
       if (m.isMesh) m.onBeforeRender = function (r) { var f = r.info.render.frame; if (f !== lastFrame) { lastFrame = f; apply(); model.updateMatrixWorld(true); } };
     });
-    g.userData = { body: body, legs: legs, arms: arms, head: head, mixamo: id, apply: apply };
+    g.userData = { body: body, legs: legs, arms: arms, head: head, mixamo: id, apply: apply, anim: anim };
     apply();
     return g;
   }
 
-  window.AMChars = { list: LIST, pref: pref, setPref: setPref, load: load, ready: ready, onReady: onReady, make: make };
+  window.AMChars = { list: LIST, pref: pref, setPref: setPref, load: load, ready: ready, onReady: onReady, make: make, clip: clipInfo };
 })();

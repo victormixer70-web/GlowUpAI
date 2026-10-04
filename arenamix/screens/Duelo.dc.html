@@ -611,6 +611,15 @@ class Component extends DCLogic {
     return g;
   }
   clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  /* Mixamo characters: play clip `id` at time t, cross-fading from the previous clip */
+  mc(m, id, t, dt) {
+    const an = m.userData.anim;
+    if (!an || !window.AMChars || !window.AMChars.clip(id)) return;
+    const st = m.userData.mc || (m.userData.mc = { cur: null, prev: null, f: 1 });
+    if (!st.cur || st.cur.id !== id) { st.prev = st.cur; st.cur = { id }; st.f = 0; }
+    st.cur.t = t; st.f = Math.min(1, st.f + (dt || 0.016) / 0.15);
+    an.layers = (st.prev && st.f < 1 ? [{ id: st.prev.id, t: st.prev.t, w: 1 - st.f }] : []).concat([{ id, t, w: st.f }]);
+  }
   pose(p, o) {
     const u = p.userData, run = o.run || 0, amp = o.amp || 0;
     u.legs[0].hip.rotation.x = Math.sin(run) * 0.7 * amp;
@@ -850,6 +859,10 @@ class Component extends DCLogic {
     this.keeperInner.rotation.z = k.a;
     if (Math.abs(k.a) > 0.15 || k.up) this.pose(this.keeper, { armsUp: Math.min(1, Math.abs(k.a) * 1.3 + (k.up ? 0.6 : 0)) });
     else this.pose(this.keeper, { ready: true });
+    // Mixamo keeper: real diving-save clip instead of tilting the whole body
+    const now = performance.now() / 1000;
+    if (Math.abs(k.a) > 0.15) { this.keeperInner.rotation.z = 0; this.mc(this.keeper, k.a > 0 ? 'diveR' : 'diveL', 0.95 + 0.65 * Math.min(1, (Math.abs(k.a) - 0.15) / 1.1), dt); }
+    else this.mc(this.keeper, 'gkIdle', now, dt);
     // shooters
     const shooter = youShoot ? this.shooterYou : this.shooterRival, other = youShoot ? this.shooterRival : this.shooterYou;
     other.visible = false; shooter.visible = true;
@@ -858,9 +871,15 @@ class Component extends DCLogic {
       const t = this.phase === 'runup' ? this.pt / 0.55 : (this.pt - 1.85) / 0.55;
       sx = -1.25 + 0.95 * t; sz = -1.9 + 1.55 * t; run = t * 9; amp = 1; kt = t > 0.55 ? (t - 0.55) / 0.45 * 0.6 : null;
     } else if (this.phase === 'flight' || this.phase === 'result') { sx = -0.3; sz = -0.35; kt = Math.min(1, 0.6 + this.pt * 3); }
-    shooter.position.set(sx, 0, sz);
-    shooter.rotation.y = 0.25;
+    // the Mixamo clip strikes with the right foot, so that shooter runs in from the other side of the ball
+    const mxs = !!shooter.userData.anim;
+    shooter.position.set(mxs ? -sx - 0.05 : sx, 0, sz);
+    shooter.rotation.y = mxs ? -0.25 : 0.25;
     this.pose(shooter, { run, amp, kick: kt });
+    // Mixamo shooter: the penalty-kick clip, its strike (0.73 s) lined up with the ball leaving the foot
+    if (this.phase === 'runup' || (this.phase === 'defend' && this.pt > 1.85)) this.mc(shooter, 'penalty', 0.73 * Math.min(1, this.phase === 'runup' ? this.pt / 0.55 : (this.pt - 1.85) / 0.55), dt);
+    else if (this.phase === 'flight' || this.phase === 'result') this.mc(shooter, 'penalty', Math.min(1.5, 0.73 + this.pt), dt);
+    else this.mc(shooter, 'idle', now, dt);
     // wall jump
     (this.wallMen || []).forEach((w) => { w.position.y = this.wallJ; });
     // net bulge
