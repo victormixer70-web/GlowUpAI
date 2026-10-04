@@ -39,9 +39,9 @@ input::placeholder{color:#8686A6}
       <span style="font-size: 12px; line-height: 1.4; color: #BABAD6">{{selDesc}}</span>
       <sc-if value="{{showRank}}" hint-placeholder-val="{{ true }}">
         <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 2px">
-          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800"><span style="color: {{rankColor}}">{{rankLabel}}</span><span style="color: #A3A3C2">{{mmrLabel}} MMR</span></div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800"><span style="color: {{rankColor}}">{{rankLabel}}</span><span style="color: #A3A3C2">{{mmrLabel}}</span></div>
           <div style="height: 6px; border-radius: 3px; background: #26264A"><div style="{{rankBar}}"></div></div>
-          <a href="Rangos.dc.html" style="font-size: 11px; font-weight: 700">Ver los 8 rangos</a>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700"><span style="color: #FFC53D">{{seasonLabel}}</span><a href="Rangos.dc.html">Ver rangos</a></div>
         </div>
       </sc-if>
     </div>
@@ -127,6 +127,28 @@ class Component extends DCLogic {
     } catch (e) {}
     return null;
   }
+  season() {
+    // Temporadas de 30 días (la 1 empieza el 1/10/2026). Al cambiar, se reinician los rangos y hay 5 clasificatorias por modo.
+    const EPOCH = Date.UTC(2026, 9, 1), LEN = 30 * 864e5, now = Date.now();
+    const n = Math.max(0, Math.floor((now - EPOCH) / LEN));
+    let S = this.store('arenamix.season.v1');
+    if (!S || S.n !== n) {
+      const old = this.store('arenamix.mmr.v1') || {};
+      S = { n, placed: {}, prev: old, notice: Object.keys(old).length > 0 };
+      this.store('arenamix.mmr.v1', {});
+      this.store('arenamix.season.v1', S);
+    }
+    S.num = n + 1;
+    S.daysLeft = Math.max(1, Math.ceil((EPOCH + (n + 1) * LEN - now) / 864e5));
+    return S;
+  }
+  placeOf(S, key) { return S.placed[key] || { g: 0, w: 0, d: 0, res: [] }; }
+  placementMmr(p, prev) {
+    // Rango inicial según las 5 clasificatorias (+ un poco del rango de la temporada anterior). Nunca pasa de Oro 3.
+    const pts = p.w + p.d * 0.5;
+    const base = [0, 120, 300, 480, 700, 900][Math.min(5, Math.floor(pts))] + Math.round((pts % 1) * 90);
+    return Math.min(1150, base + Math.min(200, Math.round((prev || 0) * 0.12)));
+  }
   mmrOf(sport, id) {
     const all = this.store('arenamix.mmr.v1') || {};
     return all[sport + ':' + id] || 0;
@@ -137,18 +159,20 @@ class Component extends DCLogic {
     if (s.cat === 'train') list = C.train;
     else list = C.modes.concat(s.cat === 'casual' ? [{ id: 'private', title: 'PARTIDA PRIVADA', kind: 'private', desc: 'Invita a tus amigos con un código. Los huecos los rellena la IA y le puedes dar órdenes.' }] : []);
     let cur = list.find((m) => m.id === s.id && !m.soon) || list.find((m) => !m.soon);
-    const comp = s.cat === 'comp';
+    const comp = s.cat === 'comp', S = this.season();
+    const placingOf = (m) => this.placeOf(S, s.sport + ':' + m.id).g < 5;
     const cards = list.map((m) => {
       const on = m === cur, mmr = comp && !m.soon ? this.mmrOf(s.sport, m.id) : 0, R = this.rankOf(mmr);
-      const tag = m.soon ? 'PRÓXIMAMENTE' : comp ? R.label : s.cat === 'casual' ? (m.kind === 'private' ? 'Amigos' : 'Sin rango') : 'Libre';
+      const tag = m.soon ? 'PRÓXIMAMENTE' : comp ? (placingOf(m) ? 'Clasif. ' + this.placeOf(S, s.sport + ':' + m.id).g + '/5' : R.label) : s.cat === 'casual' ? (m.kind === 'private' ? 'Amigos' : 'Sin rango') : 'Libre';
       return {
         title: m.title, desc: m.desc, tag,
         style: 'display: flex; flex-direction: column; gap: 6px; min-height: 84px; padding: 10px; box-sizing: border-box; border-radius: 14px; font-family: Manrope, sans-serif; color: #F4F4FA; cursor: ' + (m.soon ? 'default' : 'pointer') + '; opacity: ' + (m.soon ? 0.45 : 1) + '; ' + (on ? 'background: #10303A; border: 2px solid #22D3EE;' : 'background: #17172A; border: 2px solid #26264A;'),
-        tagStyle: 'flex: none; font-size: 10px; font-weight: 800; padding: 3px 7px; border-radius: 6px; white-space: nowrap; ' + (comp && !m.soon ? 'background: #0B0B14; color: ' + R.text + ';' : 'background: #21213A; color: #A3A3C2;'),
+        tagStyle: 'flex: none; font-size: 10px; font-weight: 800; padding: 3px 7px; border-radius: 6px; white-space: nowrap; ' + (comp && !m.soon ? 'background: #0B0B14; color: ' + (placingOf(m) ? '#A3A3C2' : R.text) + ';' : 'background: #21213A; color: #A3A3C2;'),
         pick: () => { if (!m.soon) this.setState({ id: m.id }); }
       };
     });
     const mmr = cur && comp ? this.mmrOf(s.sport, cur.id) : 0, R = this.rankOf(mmr);
+    const curPlacing = cur && comp && placingOf(cur), curPc = cur ? this.placeOf(S, s.sport + ':' + cur.id) : null;
     const tab = (on) => 'flex: 1; height: 36px; border: 0; border-radius: 10px; font: 800 12px Manrope, sans-serif; letter-spacing: .5px; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
     const href = !cur ? '#' : s.cat === 'train' ? cur.href : cur.kind === 'private' ? 'Privada.dc.html' : comp ? 'Competitivo.dc.html' : 'Rapida.dc.html';
     const catName = { comp: 'COMPETITIVO', casual: 'INFORMAL', train: 'ENTRENAMIENTO' }[s.cat];
@@ -159,7 +183,9 @@ class Component extends DCLogic {
       catColor: comp ? '#E3A56E' : s.cat === 'casual' ? '#22D3EE' : '#53D88E',
       selTitle: cur ? cur.title : '', selDesc: cur ? cur.desc : '',
       showRank: comp && !!cur,
-      rankLabel: R.label, rankColor: R.text, mmrLabel: String(mmr),
+      rankLabel: curPlacing ? 'Sin clasificar' : R.label, rankColor: curPlacing ? '#A3A3C2' : R.text,
+      mmrLabel: curPlacing ? 'Clasificatorias ' + curPc.g + '/5' : mmr + ' MMR',
+      seasonLabel: 'Temporada ' + S.num + ' · termina en ' + S.daysLeft + (S.daysLeft === 1 ? ' día' : ' días'),
       rankBar: 'height: 6px; border-radius: 3px; background: ' + R.text + '; width: ' + (Math.max(0, Math.min(1, (mmr - R.lo) / (R.hi - R.lo))) * 100).toFixed(1) + '%;',
       cards,
       compTab: tab(comp), casualTab: tab(s.cat === 'casual'), trainTab: tab(s.cat === 'train'),
