@@ -510,7 +510,7 @@ class Component extends DCLogic {
       if (g.own === i) {
         // a dribbler always adjusts his run to stay on top of the ball
         const t = 0.25, bx = b.x + b.vx * t - p.x, by = b.y + b.vy * t - p.y, bn = Math.hypot(bx, by) || 1;
-        const il = Math.hypot(dx, dy), k = this.clamp((bn - 0.7) / 1.2, 0, 1) * (i === g.ctl && !this.autoplay ? (il > 0.2 ? ((bx * dx + by * dy) / (bn * il) > 0.5 ? 0.12 : 0.55) : 0) : 0.75);
+        const il = Math.hypot(dx, dy), k = this.clamp((bn - 0.7) / 1.2, 0, 1) * (i === g.ctl && !this.autoplay ? (il > 0.2 ? ((bx * dx + by * dy) / (bn * il) > 0.5 ? 0.08 : (bn < 2.2 ? 0.25 : 0)) : 0) : 0.75);
         if (il > 0.1 || bn > 0.9) {
           dx = dx * (1 - k) + bx / bn * k * Math.max(il, 0.6); dy = dy * (1 - k) + by / bn * k * Math.max(il, 0.6);
         }
@@ -1535,7 +1535,8 @@ class Component extends DCLogic {
         this.zoneEl = e.currentTarget;
         if (e.currentTarget.setPointerCapture) { try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {} }
         const pt = this.joyLocal(e);
-        Object.assign(this.joy, { id: e.pointerId, on: true, bx: pt.x, by: pt.y, kx: 0, ky: 0 });
+        const zr = e.currentTarget.getBoundingClientRect();
+        Object.assign(this.joy, { id: e.pointerId, on: true, bx: pt.x, by: pt.y, kx: 0, ky: 0, sx: this.scrX(e), sy: this.scrY(e), k: 420 / (zr.width || 420) });
         this.held[e.pointerId] = 'joy';
         this.forceUpdate();
       },
@@ -1644,14 +1645,18 @@ class Component extends DCLogic {
     const el = this.zoneEl || e.currentTarget, r = el.getBoundingClientRect(), k = 420 / (r.width || 420);
     return { x: (e.clientX - r.left) * k, y: 44 + (e.clientY - r.top) * k };
   }
+  scrX(e) { return e.screenX || e.clientX; }
+  scrY(e) { return e.screenY || e.clientY; }
   joySet(e) {
     // floating stick: the base follows the thumb if it is dragged past the rim
-    const j = this.joy, R = this.JR, pt = this.joyLocal(e);
+    // measured as the thumb's movement on the physical screen since it landed: when the browser
+    // moves or rescales the page mid-drag (address bar, going fullscreen) the stick doesn't jump
+    const j = this.joy, R = this.JR;
     j.lastMove = performance.now();
-    let dx = pt.x - j.bx, dy = pt.y - j.by, d = Math.hypot(dx, dy);
+    let dx = (this.scrX(e) - j.sx) * j.k, dy = (this.scrY(e) - j.sy) * j.k, d = Math.hypot(dx, dy);
     // lots of travel: the base only starts following when the thumb is far past the rim
     const far = R * 1.8;
-    if (d > far) { j.bx += dx / d * (d - far); j.by += dy / d * (d - far); dx = dx / d * far; dy = dy / d * far; d = far; }
+    if (d > far) { const mx = dx / d * (d - far), my = dy / d * (d - far); j.bx += mx; j.by += my; j.sx += mx / j.k; j.sy += my / j.k; dx = dx / d * far; dy = dy / d * far; d = far; }
     const kd = Math.min(d, R);
     j.kx = d > 0 ? dx / d * kd : 0; j.ky = d > 0 ? dy / d * kd : 0;
     const dead = 14, m = d <= dead ? 0 : Math.min(1, (d - dead) / (R * 0.75 - dead));
