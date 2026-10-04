@@ -193,11 +193,28 @@
 
   window.addEventListener('resize', fit);
   fit();
+  /* If startup fails or hangs, show why and offer a clean restart (drops old caches and service worker). */
+  function stuck(msg) {
+    var box = document.getElementById('loading');
+    if (!box) return;
+    box.setAttribute('style', 'position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;color:#F4F4FA;font:600 15px system-ui,sans-serif;background:#0B0B14');
+    box.innerHTML = '<div>' + msg + '</div><button type="button" style="height:44px;padding:0 22px;border:0;border-radius:22px;background:#22D3EE;color:#0B0B14;font:800 15px system-ui,sans-serif">Reintentar</button>';
+    box.querySelector('button').onclick = function () {
+      var jobs = [];
+      if (window.caches) jobs.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }));
+      if (navigator.serviceWorker) jobs.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); }));
+      Promise.all(jobs).then(function () { location.replace(location.pathname + '?r=' + Date.now()); }, function () { location.reload(); });
+    };
+  }
+  var hang = setTimeout(function () { stuck('La app está tardando demasiado en cargar.'); }, 15000);
   Promise.all(SCREENS.map(load)).then(function () {
-    document.getElementById('loading').remove();
+    clearTimeout(hang);
+    var box = document.getElementById('loading');
+    if (box) box.remove();
     render(h(App), document.getElementById('stage'));
   }).catch(function (err) {
-    document.getElementById('loading').textContent = 'No se pudo cargar la app: ' + err.message;
+    clearTimeout(hang);
+    stuck('No se pudo cargar la app (' + err.message + ').');
   });
 
   if ('serviceWorker' in navigator) {

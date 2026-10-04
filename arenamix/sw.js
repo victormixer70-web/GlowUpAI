@@ -1,5 +1,5 @@
 /* Network-first so every update you publish reaches the phone; cache is the offline fallback. */
-const CACHE = 'arenamix-v2';
+const CACHE = 'arenamix-v3';
 const CORE = ['./', 'index.html', 'app.js', 'manifest.webmanifest', 'vendor/preact.min.js', 'vendor/three.min.js', 'icons/icon-192.png'];
 
 self.addEventListener('install', (e) => {
@@ -12,7 +12,9 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   e.respondWith(
-    fetch(new URL(req.url).origin === location.origin ? new Request(req, { cache: 'no-store' }) : req).then((res) => {
+    // A navigation Request can't be copied with options, so page loads are fetched by URL.
+    (req.mode === 'navigate' ? fetch(req.url, { cache: 'no-store' })
+      : new URL(req.url).origin === location.origin ? fetch(new Request(req, { cache: 'no-store' })) : fetch(req)).then((res) => {
       if (res.ok && (new URL(req.url).origin === location.origin || req.url.includes('fonts.g'))) {
         const copy = res.clone();
         caches.open(CACHE).then((c) => c.put(req, copy));
