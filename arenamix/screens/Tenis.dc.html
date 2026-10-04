@@ -405,6 +405,9 @@ class Component extends DCLogic {
     });
   }
   makePlayer(o) {
+    // Mixamo character when they are loaded and chosen in Configuración; procedural player otherwise
+    const mx = window.AMChars && window.AMChars.make(o);
+    if (mx) return mx;
     // athletic, realistically proportioned footballer: tapered torso, loose sleeves and shorts,
     // socks to the knee, low-cut boots. Joint pivots stay where animate() expects them.
     const T = THREE, g = new T.Group(), body = new T.Group();
@@ -629,8 +632,8 @@ class Component extends DCLogic {
     this.ball = new T.Mesh(new T.SphereGeometry(0.06, 20, 14), new T.MeshStandardMaterial({ map: bt, roughness: 0.85 }));
     this.ball.castShadow = true; S.add(this.ball);
     // players with rackets
-    const kit = (shirt, shorts, hair) => this.makePlayer({ shirt, shorts, socks: 0xf2f5fa, trimCss: '#0B0B14', boot: 0xf2f5fa, hair });
-    this.player = kit(0xf4f4f6, 0x1e3a8a); S.add(this.player);
+    const kit = (shirt, shorts, hair, you) => this.makePlayer({ you, shirt, shorts, socks: 0xf2f5fa, trimCss: '#0B0B14', boot: 0xf2f5fa, hair });
+    this.player = kit(0xf4f4f6, 0x1e3a8a, undefined, true); S.add(this.player);
     this.rival = kit(0xe5484d, 0xf4f4f6, 0x141b2d); S.add(this.rival);
     [this.player, this.rival].forEach((p) => p.userData.arms[1].elb.add(this.makeRacket()));
     this.machine = new T.Group();

@@ -44,7 +44,12 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <button type="button" aria-label="{{b.aria}}" onPointerDown="{{b.down}}" style="{{b.style}}">{{b.label}}</button>
       </sc-for>
     </div>
-    <span style="font-size: 11px; color: #6E6E90">El joystick aparece donde pongas el pulgar en la mitad izquierda; aquí se ve su tamaño.</span>
+    <div role="radiogroup" aria-label="Tu personaje" style="display: flex; align-items: center; gap: 6px; margin-top: 2px">
+      <span style="flex: none; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE">TU PERSONAJE</span>
+      <sc-for list="{{chars}}" as="c" hint-placeholder-count="4">
+        <button type="button" role="radio" aria-checked="{{c.on}}" onClick="{{c.pick}}" style="{{c.style}}"><img src="{{c.img}}" alt="" style="{{c.imgStyle}}"><span>{{c.name}}</span></button>
+      </sc-for>
+    </div>
   </div>
 </div>
 </x-dc>
@@ -54,7 +59,7 @@ class Component extends DCLogic {
     super(props);
     this.S = 562 / 844;
     this.DEF = { main: [14, 20, 88, 'CHUT', '#F4F4FA', '#A3A3C2', 24], pass: [112, 14, 64, 'PASE', '#A78BFA', '#6D28D9', 19], skill: [26, 120, 60, 'REGATE', '#53D88E', '#2F8A57', 15], sprint: [98, 92, 56, 'SPRINT', '#22D3EE', '#0E8FA3', 14] };
-    this.state = { cfg: this.load(), drag: null };
+    this.state = { cfg: this.load(), drag: null, char: window.AMChars ? window.AMChars.pref() : 'clasico' };
   }
   load() {
     let c = null;
@@ -81,9 +86,18 @@ class Component extends DCLogic {
         }
       };
     });
-    const JR = 80 * c.joy;
+    const JR = 80 * c.joy, A = window.AMChars, pick = s.char;
+    const chars = (A ? A.list : []).map((x) => ({ id: x.id, name: x.name, img: 'assets/chars/' + x.id + '.png' })).concat([{ id: 'clasico', name: 'Clásico', img: '' }]).map((x) => {
+      const on = x.id === pick;
+      return {
+        name: x.name, img: x.img, on: on ? 'true' : 'false',
+        pick: () => { if (A) A.setPref(x.id); this.setState({ char: x.id }); },
+        style: 'flex: 1; min-width: 0; height: 40px; display: flex; align-items: center; gap: 5px; padding: 0 6px 0 3px; border-radius: 12px; cursor: pointer; overflow: hidden; white-space: nowrap; font: 800 11px Manrope, sans-serif; color: ' + (on ? '#0B0B14' : '#F4F4FA') + '; background: ' + (on ? '#22D3EE' : '#17172A') + '; border: 1px solid ' + (on ? '#22D3EE' : '#26264A') + ';',
+        imgStyle: x.img ? 'flex: none; width: 34px; height: 34px; border-radius: 10px; background: ' + (on ? '#0E8FA3' : '#26264A') + ';' : 'display: none;'
+      };
+    });
     return {
-      btns,
+      btns, chars,
       sizeVal: String(Math.round(c.size * 100)), sizeTxt: Math.round(c.size * 100) + '%',
       joyVal: String(Math.round(c.joy * 100)), joyTxt: Math.round(c.joy * 100) + '%',
       alphaVal: String(Math.round(c.alpha * 100)), alphaTxt: Math.round(c.alpha * 100) + '%',

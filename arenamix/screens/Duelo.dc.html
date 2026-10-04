@@ -447,6 +447,9 @@ class Component extends DCLogic {
     });
   }
   makePlayer(o) {
+    // Mixamo character when they are loaded and chosen in Configuración; procedural player otherwise
+    const mx = window.AMChars && window.AMChars.make(o);
+    if (mx) return mx;
     // athletic, realistically proportioned footballer: tapered torso, loose sleeves and shorts,
     // socks to the knee, low-cut boots. Joint pivots stay where animate() expects them.
     const T = THREE, g = new T.Group(), body = new T.Group();
@@ -676,7 +679,8 @@ class Component extends DCLogic {
       c.fillStyle = '#f4f8f4'; c.beginPath(); c.arc(X(GX), Z(D - 11), 0.15 * ppm, 0, Math.PI * 2); c.fill();
       ln(-34, D, -34, zMin); ln(34, D, 34, zMin);
     });
-    const pitch = new T.Mesh(new T.PlaneGeometry(W, L), new T.MeshStandardMaterial({ map: tex, roughness: 0.95 }));
+    // real lawn texture tiled under the painted stripes and lines
+    const pitch = new T.Mesh(new T.PlaneGeometry(W, L), window.AMGrass ? window.AMGrass.material(tex, W, L) : new T.MeshStandardMaterial({ map: tex, roughness: 0.95 }));
     pitch.rotation.x = -Math.PI / 2;
     pitch.position.set(0, 0, (zMin + zMax) / 2);
     pitch.receiveShadow = true;
@@ -789,7 +793,7 @@ class Component extends DCLogic {
     this.keeperInner = this.keeper.userData.body;
     this.keeper.rotation.y = Math.PI;
     S.add(this.keeper);
-    this.shooterYou = this.makePlayer({ shirt: 0xff8a3d, shorts: 0x141b2d, socks: 0xf2f5fa, number: '10', trimCss: '#0B0B14' });
+    this.shooterYou = this.makePlayer({ you: true, shirt: 0xff8a3d, shorts: 0x141b2d, socks: 0xf2f5fa, number: '10', trimCss: '#0B0B14' });
     this.shooterRival = this.makePlayer({ shirt: 0x3ea6ff, shorts: 0xf2f5fa, socks: 0x3ea6ff, number: '9', trimCss: '#F4F4FA', hair: 0xc9a227, boot: 0xf2f5fa });
     S.add(this.shooterYou); S.add(this.shooterRival);
     this.wallMen = this.WALL.map((x, i) => {

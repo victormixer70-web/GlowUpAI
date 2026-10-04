@@ -237,7 +237,12 @@
     requestAnimationFrame(pump);
   }
   requestAnimationFrame(pump);
-  Promise.all(SCREENS.map(function (n) { return load(n).then(function () { done++; }); })).then(function () {
+  /* the 3D characters count towards the bar too, but a slow connection never blocks the app on them */
+  var chars = window.AMChars ? (total += 3, new Promise(function (res) {
+    var got = 0, t = setTimeout(function () { done += 3 - got; got = 3; res(); }, 9000);
+    window.AMChars.load(function () { if (got < 3) { got++; done++; } }).then(function () { clearTimeout(t); res(); });
+  })) : Promise.resolve();
+  Promise.all(SCREENS.map(function (n) { return load(n).then(function () { done++; }); }).concat([chars])).then(function () {
     clearTimeout(hang);
     render(h(App), document.getElementById('stage'));
     ready = true;

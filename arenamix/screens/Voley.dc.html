@@ -278,6 +278,9 @@ class Component extends DCLogic {
     return t;
   }
   makePlayer(o) {
+    // Mixamo character when they are loaded and chosen in Configuración; procedural player otherwise
+    const mx = window.AMChars && window.AMChars.make(o);
+    if (mx) return mx;
     const T = THREE, g = new T.Group(), body = new T.Group();
     g.add(body);
     const tones = [0xc68a5e, 0xe0b48f, 0x8d5a3b, 0xf1c9a5, 0x6b4129, 0xb9794f];
@@ -503,8 +506,8 @@ class Component extends DCLogic {
     this.ball = new T.Mesh(new T.SphereGeometry(0.105, 28, 20), new T.MeshStandardMaterial({ map: bt, roughness: 0.55 }));
     this.ball.castShadow = true; S.add(this.ball);
     // players
-    const kit = (shirt, shorts, num) => this.makePlayer({ shirt, shorts, socks: 0xf2f5fa, number: num, trimCss: '#0B0B14', boot: 0xf2f5fa });
-    this.player = kit(0x3ea6ff, 0x141b2d, '4'); S.add(this.player);
+    const kit = (shirt, shorts, num, you) => this.makePlayer({ you, shirt, shorts, socks: 0xf2f5fa, number: num, trimCss: '#0B0B14', boot: 0xf2f5fa });
+    this.player = kit(0x3ea6ff, 0x141b2d, '4', true); S.add(this.player);
     this.setter = kit(0x3ea6ff, 0x141b2d, '1'); S.add(this.setter);
     this.rivals = [kit(0xe5484d, 0xf4f4f6, '7'), kit(0xe5484d, 0xf4f4f6, '11'), kit(0xe5484d, 0xf4f4f6, '3')];
     this.rivals.forEach((r) => { r.rotation.y = 0; S.add(r); });

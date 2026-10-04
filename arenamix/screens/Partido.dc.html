@@ -1269,6 +1269,8 @@ class Component extends DCLogic {
     this.camPos = new T.Vector3(0, 8, 16);
     this.camLook = new T.Vector3(0, 0, -2);
     this.buildScene();
+    // characters still downloading: swap them in as soon as they arrive
+    if (window.AMChars && !window.AMChars.ready()) window.AMChars.onReady(() => { this.meshFor = null; });
     this.draw3D(0);
   }
   updateConfetti(dt) {
@@ -1340,7 +1342,8 @@ class Component extends DCLogic {
       c.fillStyle = '#f4f8f4';
       [[30, 15], [7, 15], [53, 15]].forEach(([x, y]) => { c.beginPath(); c.arc(X(x), Y(y), 0.2 * ppm, 0, Math.PI * 2); c.fill(); });
     });
-    const pitch = new T.Mesh(new T.PlaneGeometry(PW, PH), new T.MeshStandardMaterial({ map: tex, roughness: 0.95 }));
+    // real lawn texture tiled under the painted stripes and lines
+    const pitch = new T.Mesh(new T.PlaneGeometry(PW, PH), window.AMGrass ? window.AMGrass.material(tex, PW, PH) : new T.MeshStandardMaterial({ map: tex, roughness: 0.95 }));
     pitch.rotation.x = -Math.PI / 2; pitch.receiveShadow = true; S.add(pitch);
     const apron = new T.Mesh(new T.PlaneGeometry(500, 500), this.mat(0x0c2a14, { roughness: 1 }));
     apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; S.add(apron);
@@ -1553,9 +1556,10 @@ class Component extends DCLogic {
     (this.pMeshes || []).forEach((m) => this.S.remove(m));
     const hc = P.homeColor ?? '#FF8A3D', ht = P.homeTrim ?? '#0B0B14', ac = P.awayColor ?? '#A78BFA', at = P.awayTrim ?? '#F4F4FA';
     const nums = [['10', '8', '7', '4'], ['9', '11', '6', '5']];
-    this.pMeshes = g.ps.map((p) => {
+    this.pMeshes = g.ps.map((p, idx) => {
       const gk = p.role === 'gk', home = p.team === 0;
       const m = this.makePlayer({
+        you: idx === g.ctl,
         shirt: new THREE.Color(gk ? (home ? '#FFC53D' : '#2FBF71') : home ? hc : ac),
         shorts: new THREE.Color(home ? '#17172A' : '#F4F4F6'),
         socks: new THREE.Color(gk ? '#17172A' : home ? hc : ac),
@@ -1678,6 +1682,9 @@ class Component extends DCLogic {
     });
   }
   makePlayer(o) {
+    // Mixamo character when they are loaded and chosen in Configuración; procedural player otherwise
+    const mx = window.AMChars && window.AMChars.make(o);
+    if (mx) return mx;
     // athletic, realistically proportioned footballer: tapered torso, loose sleeves and shorts,
     // socks to the knee, low-cut boots. Joint pivots stay where animate() expects them.
     const T = THREE, g = new T.Group(), body = new T.Group();
