@@ -70,7 +70,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <span style="font-size: 9px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">ENERGÍA</span>
     <span style="height: 6px; border-radius: 3px; background: #0B0B14B3; border: 1px solid #2E2E52; overflow: hidden"><span style="{{stamStyle}}"></span></span>
   </div>
-  <div aria-label="Zona del joystick: pon el pulgar en cualquier punto de la mitad izquierda y arrastra para moverte" onPointerDown="{{joyDown}}" onPointerMove="{{joyMove}}" onPointerUp="{{joyUp}}" onPointerCancel="{{joyUp}}" style="position: absolute; left: 0; top: 44px; width: 400px; bottom: 0; touch-action: none; -webkit-user-select: none"></div>
+  <div aria-label="Zona del joystick: pon el pulgar en cualquier punto de la mitad izquierda y arrastra para moverte" onPointerDown="{{joyDown}}" onPointerMove="{{joyMove}}" onPointerUp="{{joyUp}}" onPointerCancel="{{joyUp}}" style="position: absolute; left: 0; top: 44px; width: 420px; bottom: 0; touch-action: none; -webkit-user-select: none"></div>
   <div style="{{joyBaseStyle}}"><span style="{{joyRingStyle}}"></span><span style="{{knobStyle}}"></span></div>
 
   <button type="button" aria-label="{{mainAria}}" onPointerDown="{{mainDown}}" onPointerUp="{{mainUp}}" onPointerLeave="{{mainUp}}" onPointerCancel="{{mainUp}}" style="{{mainBtnStyle}}">{{mainLabel}}</button>
@@ -1367,7 +1367,7 @@ class Component extends DCLogic {
       stamStyle: 'display: block; height: 100%; width: ' + (h.stam * 100).toFixed(0) + '%; background: ' + (h.stam < 0.25 ? '#FF5C5C' : '#53D88E') + ';',
       joyBaseStyle: 'position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none; transform: translate(' + this.joy.bx.toFixed(1) + 'px, ' + this.joy.by.toFixed(1) + 'px); opacity: ' + (this.joy.on ? 1 : 0.45) + ';',
       joyRingStyle: 'position: absolute; left: -' + this.JR + 'px; top: -' + this.JR + 'px; width: ' + (this.JR * 2) + 'px; height: ' + (this.JR * 2) + 'px; border-radius: 50%; box-sizing: border-box; background: #0B0B1466; border: 2px solid ' + (this.joy.on ? '#22D3EE99' : '#2E2E52') + ';',
-      knobStyle: 'position: absolute; left: -24px; top: -24px; width: 48px; height: 48px; border-radius: 24px; background: #22D3EE; box-shadow: 0 3px 0 #0E8FA3, 0 4px 14px #0008; transform: translate(' + this.joy.kx.toFixed(1) + 'px, ' + this.joy.ky.toFixed(1) + 'px);',
+      knobStyle: 'position: absolute; left: -28px; top: -28px; width: 56px; height: 56px; border-radius: 28px; background: #22D3EE; box-shadow: 0 3px 0 #0E8FA3, 0 4px 14px #0008; transform: translate(' + this.joy.kx.toFixed(1) + 'px, ' + this.joy.ky.toFixed(1) + 'px);',
       mainLabel: atk ? 'CHUT' : 'ENTRADA',
       mainAria: atk ? 'Chutar: mantén pulsado para más potencia' : 'Entrada: tírate al suelo para robar el balón',
       mainBtnStyle: btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : '#F4F4FA') : '#FF7A7A', atk ? '#A3A3C2' : '#B33A3A', atk ? 24 : 17, 'transform: scale(' + (g.charging ? 0.94 + g.charge * 0.1 : 1).toFixed(3) + ');'),
@@ -1474,20 +1474,23 @@ class Component extends DCLogic {
     else this.flashMsg('Tu compañero aún no tiene el balón', 0.8);
   }
   joyReset() {
-    this.JR = 58;
-    this.joy = { id: null, on: false, bx: 92, by: 300, kx: 0, ky: 0 };
+    this.JR = 80;
+    this.joy = { id: null, on: false, bx: 110, by: 290, kx: 0, ky: 0 };
   }
   joyLocal(e) {
-    const r = e.currentTarget.getBoundingClientRect(), k = 400 / (r.width || 400);
+    const r = e.currentTarget.getBoundingClientRect(), k = 420 / (r.width || 420);
     return { x: (e.clientX - r.left) * k, y: 44 + (e.clientY - r.top) * k };
   }
   joySet(e) {
     // floating stick: the base follows the thumb if it is dragged past the rim
     const j = this.joy, R = this.JR, pt = this.joyLocal(e);
     let dx = pt.x - j.bx, dy = pt.y - j.by, d = Math.hypot(dx, dy);
-    if (d > R) { j.bx += dx / d * (d - R); j.by += dy / d * (d - R); dx = dx / d * R; dy = dy / d * R; d = R; }
-    j.kx = dx; j.ky = dy;
-    const dead = 7, m = d <= dead ? 0 : Math.min(1, (d - dead) / (R * 0.8 - dead));
+    // lots of travel: the base only starts following when the thumb is far past the rim
+    const far = R * 1.8;
+    if (d > far) { j.bx += dx / d * (d - far); j.by += dy / d * (d - far); dx = dx / d * far; dy = dy / d * far; d = far; }
+    const kd = Math.min(d, R);
+    j.kx = d > 0 ? dx / d * kd : 0; j.ky = d > 0 ? dy / d * kd : 0;
+    const dead = 8, m = d <= dead ? 0 : Math.min(1, (d - dead) / (R * 0.75 - dead));
     const curve = m * (0.35 + 0.65 * m);
     this.g.jx = d > 0 ? dx / d * curve : 0; this.g.jy = d > 0 ? dy / d * curve : 0;
   }
