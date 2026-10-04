@@ -1610,7 +1610,16 @@ class Component extends DCLogic {
     const tones = [0xd09a72, 0xb97e57, 0x8f5a3a, 0xe0ad86, 0x6a3f27, 0xa86f4a, 0xc78b62];
     const skinHex = o.skin || tones[Math.floor(Math.random() * tones.length)];
     const hairHex = o.hair || 0x241811;
-    const skin = this.mat(skinHex, { roughness: 0.55, emissive: new T.Color(skinHex).multiplyScalar(0.1) });
+    // skin and hair get a texture so they read as skin and hair, not painted plastic
+    const skinTex = this.canvasTex(64, 64, (c, w, h) => {
+      const base = new T.Color(skinHex);
+      c.fillStyle = '#' + base.getHexString(); c.fillRect(0, 0, w, h);
+      for (let k = 0; k < 700; k++) {
+        const v = (Math.random() - 0.5) * 0.09, col = base.clone().offsetHSL(Math.random() * 0.01, 0, v);
+        c.fillStyle = '#' + col.getHexString(); c.fillRect(Math.random() * w, Math.random() * h, 2, 2);
+      }
+    });
+    const skin = this.mat(0xffffff, { roughness: 0.6, map: skinTex, emissive: new T.Color(skinHex).multiplyScalar(0.1) });
     const skinDark = this.mat(new T.Color(skinHex).multiplyScalar(0.7), { roughness: 0.6 });
     const stubble = Math.random() < 0.35;
     const jawM = stubble ? this.mat(new T.Color(skinHex).lerp(new T.Color(hairHex), 0.35), { roughness: 0.75 }) : skin;
@@ -1625,7 +1634,17 @@ class Component extends DCLogic {
     const boot = this.mat(bootCol, { roughness: 0.3, metalness: 0.15 });
     const bootTrim = this.mat(bootCol.clone().getHSL({}).l > 0.6 ? 0x17172a : 0xf4f4fa, { roughness: 0.4 });
     const sole = this.mat(0x1a1a1a, { roughness: 0.6 });
-    const hairM = this.mat(hairHex, { roughness: 0.9 });
+    const hairTex = this.canvasTex(128, 128, (c, w, h) => {
+      const base = new T.Color(hairHex);
+      c.fillStyle = '#' + base.getHexString(); c.fillRect(0, 0, w, h);
+      c.lineWidth = 1.2;
+      for (let k = 0; k < 420; k++) {
+        const x = Math.random() * w, y = Math.random() * h, len = 6 + Math.random() * 16, a = Math.PI / 2 + (Math.random() - 0.5) * 0.7;
+        c.strokeStyle = '#' + base.clone().offsetHSL(0, 0, (Math.random() - 0.4) * 0.16).getHexString();
+        c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a) * len, y + Math.sin(a) * len); c.stroke();
+      }
+    });
+    const hairM = this.mat(0xffffff, { roughness: 0.85, map: hairTex });
     const hand = o.gloves ? this.mat(0xf2f5fa, { roughness: 0.5 }) : skin;
     const add = (parent, mesh, x, y, z) => { mesh.position.set(x || 0, y || 0, z || 0); mesh.castShadow = true; parent.add(mesh); return mesh; };
     const lathe = (pts, m, seg) => new T.Mesh(new T.LatheGeometry(pts.map(([r, y]) => new T.Vector2(r, y)), seg || 20), m);
@@ -1691,7 +1710,7 @@ class Component extends DCLogic {
     add(body, lathe([[0.062, 0], [0.056, 0.07], [0.058, 0.14], [0.001, 0.15]], skin), 0, 1.62, -0.005);
     const head = new T.Group(); head.position.y = 1.84; body.add(head);
     add(head, sph(0.104, skin, 24, 18)).scale.set(0.9, 1.04, 1);
-    add(head, sph(0.08, jawM, 20, 14), 0, -0.05, 0.01).scale.set(0.9, 0.85, 0.96);
+    add(head, sph(0.088, jawM, 20, 14), 0, -0.042, 0.004).scale.set(0.9, 0.9, 0.95);
     [-1, 1].forEach((s) => {
       add(head, sph(0.028, skinDark, 10, 8), 0.094 * s, -0.012, -0.004).scale.set(0.42, 1, 0.72);
       add(head, sph(0.01, this.mat(0x1d140e, { roughness: 0.25 }), 8, 6), 0.034 * s, 0.006, 0.09);
