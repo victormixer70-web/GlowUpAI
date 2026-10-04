@@ -214,12 +214,39 @@
     };
   }
   var hang = setTimeout(function () { stuck('La app está tardando demasiado en cargar.'); }, 15000);
-  Promise.all(SCREENS.map(load)).then(function () {
+  /* Loading screen: the bar follows the real loading of the screens, but never faster than ~2.5 s so it can be seen */
+  var total = SCREENS.length, done = 0, t0 = Date.now(), MIN_MS = 2500, shown = 0, ready = false, finished = false;
+  var tips = ['Consejo: en los tiros libres, suelta CHUTAR en la zona verde.', 'Consejo: mantén SPRINT para correr más, pero vigila la energía.', 'Consejo: pídele el balón a tu compañero con ¡Pásala!', 'Cada 30 días empieza una temporada nueva con 5 clasificatorias.'];
+  var tipEl = document.getElementById('ld-tip');
+  if (tipEl) tipEl.textContent = tips[Math.floor(Math.random() * tips.length)];
+  function setProgress(p) {
+    var v = Math.round(p * 100), f = document.getElementById('ld-fill'), t = document.getElementById('ld-pct'), m = document.getElementById('ld-msg'), box = document.getElementById('loading');
+    if (!f || !t || !m) return;
+    f.style.width = v + '%'; t.textContent = v + '%';
+    m.textContent = v < 30 ? 'Abriendo el estadio…' : v < 60 ? 'Llenando la grada…' : v < 95 ? 'Calentando a los jugadores…' : '¡Saltamos al campo!';
+    if (box) box.setAttribute('aria-valuenow', String(v));
+  }
+  function pump() {
+    if (finished) return;
+    var target = Math.min(done / total, Math.min(1, (Date.now() - t0) / MIN_MS));
+    shown += (target - shown) * 0.18;
+    if (target >= 1 && shown > 0.995) shown = 1;
+    setProgress(shown);
+    if (shown >= 1 && ready) {
+      finished = true;
+      var box = document.getElementById('loading');
+      if (box) { box.classList.add('out'); setTimeout(function () { if (box.parentNode) box.remove(); }, 450); }
+      return;
+    }
+    requestAnimationFrame(pump);
+  }
+  requestAnimationFrame(pump);
+  Promise.all(SCREENS.map(function (n) { return load(n).then(function () { done++; }); })).then(function () {
     clearTimeout(hang);
-    var box = document.getElementById('loading');
-    if (box) box.remove();
     render(h(App), document.getElementById('stage'));
+    ready = true;
   }).catch(function (err) {
+    finished = true;
     clearTimeout(hang);
     stuck('No se pudo cargar la app (' + err.message + ').');
   });
