@@ -41,6 +41,12 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </sc-if>
   </div>
 
+  <sc-if value="{{isFree}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 12px; top: 62px; display: flex; align-items: center; gap: 6px">
+      <span style="padding: 5px 10px; border-radius: 10px; background: #0B0B14CC; font-size: 12px; font-weight: 800; color: #FFC53D">{{fkLabel}}</span>
+      <sc-if value="{{isPractice}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{nextFK}}" style="height: 30px; padding: 0 12px; border: 1px solid #2E2E52; border-radius: 10px; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Manrope, sans-serif; cursor: pointer">Cambiar escenario ›</button></sc-if>
+    </div>
+  </sc-if>
   <sc-if value="{{isDuel}}" hint-placeholder-val="{{ true }}">
     <div style="position: absolute; right: 12px; top: 10px; padding: 6px 12px; border-radius: 12px; background: #0B0B14CC; display: flex; flex-direction: column; gap: 4px">
       <div style="display: flex; align-items: center; gap: 6px">
@@ -99,7 +105,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","options":["pen","free"],"default":"pen"},"mode":{"editor":"enum","options":["duel","practice"],"default":"duel"},"rivalName":{"editor":"text","default":"Kai_Striker"},"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","options":["pen","free"],"default":"pen"},"mode":{"editor":"enum","options":["duel","practice"],"default":"duel"},"rivalName":{"editor":"text","default":"Kai_Striker"},"onEnd":{"editor":null},"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -132,14 +138,32 @@ class Component extends DCLogic {
   }
   setup(init) {
     this.st = this.loadStats();
-    this.D = this.kind === 'pen' ? 11 : 22;
-    this.GX = this.kind === 'pen' ? 0 : 2.5;
-    this.WALL = this.kind === 'pen' ? [] : [-0.45, 0.1, 0.65];
+    if (this.kind === 'pen') { this.D = 11; this.GX = 0; this.WALL = []; }
+    else this.applyFK(this.practice ? (this.fk || 0) : Math.floor(Math.random() * this.FKS().length), false);
     this.sh = { you: [], rival: [] };
     this.pts = 0;
     this.turn = 'you'; this.winner = null;
     this.resetShot();
     if (!init) { if (this.R) this.buildScene(); this.camSnap = true; this.forceUpdate(); this.loop(); }
+  }
+  FKS() {
+    return [
+      { name: 'Frontal · 20 m', D: 20, GX: 0.6, n: 4 },
+      { name: 'Escorada · 22 m', D: 22, GX: 2.5, n: 3 },
+      { name: 'Desde la izquierda · 18 m', D: 17, GX: 6.5, n: 2 },
+      { name: 'Desde la derecha · 18 m', D: 17, GX: -6.5, n: 2 },
+      { name: 'Borde del área · 17 m', D: 16.8, GX: -1.2, n: 5 },
+      { name: 'Lejana · 30 m', D: 29, GX: 1.5, n: 3 },
+      { name: 'Casi sin ángulo · 14 m', D: 12, GX: 10, n: 2 }
+    ];
+  }
+  applyFK(i, rebuild) {
+    const L = this.FKS(), f = L[((i % L.length) + L.length) % L.length];
+    this.fk = L.indexOf(f);
+    this.D = f.D; this.GX = f.GX;
+    const sg = f.GX >= 0 ? 1 : -1, cx = (f.GX - sg * 1.2) * 9.15 / f.D;
+    this.WALL = Array.from({ length: f.n }, (_, k) => +(cx + (k - (f.n - 1) / 2) * 0.55).toFixed(2));
+    if (rebuild && this.R) { this.buildScene(); this.camSnap = true; }
   }
   resetShot() {
     this.b = { x: 0, y: 0.11, z: 0, vx: 0, vy: 0, vz: 0, curve: 0 };
@@ -320,6 +344,7 @@ class Component extends DCLogic {
       this.winner = this.checkWinner();
       if (this.winner) { this.phase = 'done'; return; }
       this.turn = this.turn === 'you' ? 'rival' : 'you';
+      if (this.kind === 'free' && this.sh.you.length === this.sh.rival.length) this.applyFK(this.fk + 1 + Math.floor(Math.random() * (this.FKS().length - 1)), true);
       this.resetShot();
     }
   }
@@ -814,8 +839,11 @@ class Component extends DCLogic {
       doneStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 44px; line-height: 1; letter-spacing: 2px; color: ' + (this.practice || won ? '#22D3EE' : '#FF5C5C') + ';',
       doneScore: this.practice ? 'Récord: ' + this.best : yg + ' – ' + rg,
       doneReward: this.practice ? (yg >= 3 ? '+1 PM de fútbol por 3 goles o más' : 'Marca 3 goles para ganar 1 PM') : won ? '+30 carrascos · +90 XP' : '+10 carrascos · +40 XP',
-      rematchLabel: this.practice ? 'OTRA RONDA' : 'REVANCHA',
-      rematch: () => this.setup(false),
+      rematchLabel: this.props.onEnd && !this.practice ? 'CONTINUAR' : this.practice ? 'OTRA RONDA' : 'REVANCHA',
+      rematch: () => { if (this.props.onEnd && !this.practice) this.props.onEnd({ home: yg, away: rg }); else this.setup(false); },
+      isFree: this.kind === 'free',
+      fkLabel: this.kind === 'free' ? this.FKS()[this.fk || 0].name : '',
+      nextFK: () => { this.applyFK((this.fk || 0) + 1, true); this.resetShot(); this.forceUpdate(); },
       pDown: (e) => {
         if (!this.cam) return;
         if (youTurn || this.practice) {

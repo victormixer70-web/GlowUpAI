@@ -24,11 +24,11 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{no3d}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #CACAE0">Tu navegador no permite gráficos 3D (WebGL) en esta vista.</div></sc-if>
 
   <div style="position: absolute; left: 12px; top: 10px; display: flex; align-items: center; gap: 8px">
-    <a href="Deportes.dc.html" aria-label="Volver a deportes" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #0B0B14CC; color: #F4F4FA">
+    <a href="Modos.dc.html" aria-label="Volver a modos" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #0B0B14CC; color: #F4F4FA">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
     </a>
     <span style="padding: 8px 12px; border-radius: 12px; background: #0B0B14CC; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1px">VÓLEY</span>
-    <div style="display: flex; padding: 4px; gap: 4px; border-radius: 14px; background: #0B0B14CC">
+    <div style="{{tabsStyle}}">
       <button type="button" onClick="{{setServe}}" style="{{serveTab}}">Saque</button>
       <button type="button" onClick="{{setSpike}}" style="{{spikeTab}}">Remate</button>
     </div>
@@ -63,19 +63,19 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">{{startTitle}}</span>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 64px; line-height: 1; color: #A78BFA">{{ptsLabel}} <span style="font-size: 26px; color: #A3A3C2">puntos</span></span>
       <span style="font-size: 14px; font-weight: 700">{{doneSub}}</span>
-      <button type="button" onClick="{{start}}" style="margin-top: 8px; height: 50px; padding: 0 30px; border: 0; border-radius: 14px; background: #A78BFA; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #6D28D9">OTRA RONDA</button>
+      <button type="button" onClick="{{doneAction}}" style="margin-top: 8px; height: 50px; padding: 0 30px; border: 0; border-radius: 14px; background: #A78BFA; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #6D28D9">{{doneBtn}}</button>
     </div>
   </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":null},"locked":{"editor":null},"onEnd":{"editor":null},"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
     this.state = { f: 0 };
     this.tick = this.tick.bind(this);
     this.canvasRef = (el) => { if (el && el !== this.cv) { this.cv = el; this.init3D(); } };
-    this.mode = 'serve';
+    this.mode = props.mode === 'spike' ? 'spike' : 'serve';
     this.best = { serve: 0, spike: 0 };
     this.reset();
   }
@@ -568,6 +568,9 @@ class Component extends DCLogic {
       resultText: rm[0], resultSub: R ? R.sub : '',
       resultStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 68px; line-height: 1; letter-spacing: 2px; color: ' + rm[1] + '; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (0.4 + rs * 0.6).toFixed(2) + ');',
       showStart: this.phase === 'start', showDone: this.phase === 'done',
+      tabsStyle: this.props.locked ? 'display: none;' : 'display: flex; padding: 4px; gap: 4px; border-radius: 14px; background: #0B0B14CC',
+      doneBtn: this.props.onEnd ? 'CONTINUAR' : 'OTRA RONDA',
+      doneAction: () => { if (this.props.onEnd) { this.props.onEnd(this.pts); return; } this.reset(); this.newBall(); this.phase = serve ? 'toss' : 'set'; this.pt = 0; this.loop(); this.forceUpdate(); },
       startTitle: serve ? 'DESAFÍO DE SAQUE' : 'DESAFÍO DE REMATE',
       startText: serve ? '10 saques. 1 punto si entra, 3 si cae en la zona marcada. El receptor rival intentará defenderlo: los saques fuertes y en salto son más difíciles de recibir.' : '10 remates. Tu colocador te pasa el balón: salta a tiempo y remata por encima del bloqueo rival. 2 puntos por punto, 3 en la zona marcada.',
       doneSub: this.good + ' de 10 con éxito · récord ' + this.best[this.mode],

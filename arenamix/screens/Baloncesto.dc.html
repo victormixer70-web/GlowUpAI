@@ -24,11 +24,11 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{no3d}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #CACAE0">Tu navegador no permite gráficos 3D (WebGL) en esta vista.</div></sc-if>
 
   <div style="position: absolute; left: 12px; top: 10px; display: flex; align-items: center; gap: 8px">
-    <a href="Deportes.dc.html" aria-label="Volver a deportes" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #0B0B14CC; color: #F4F4FA">
+    <a href="Modos.dc.html" aria-label="Volver a modos" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #0B0B14CC; color: #F4F4FA">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
     </a>
     <span style="padding: 8px 12px; border-radius: 12px; background: #0B0B14CC; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1px">BALONCESTO</span>
-    <div style="display: flex; padding: 4px; gap: 4px; border-radius: 14px; background: #0B0B14CC">
+    <div style="{{tabsStyle}}">
       <button type="button" onClick="{{setThree}}" style="{{threeTab}}">Triples</button>
       <button type="button" onClick="{{setFree}}" style="{{freeTab}}">Tiros libres</button>
     </div>
@@ -70,19 +70,19 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">{{doneKicker}}</span>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 64px; line-height: 1; color: #FF8A3D">{{ptsLabel}} <span style="font-size: 26px; color: #A3A3C2">puntos</span></span>
       <span style="font-size: 14px; font-weight: 700">{{doneSub}}</span>
-      <button type="button" onClick="{{start}}" style="margin-top: 8px; height: 50px; padding: 0 30px; border: 0; border-radius: 14px; background: #FF8A3D; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #9C4A16">OTRA RONDA</button>
+      <button type="button" onClick="{{doneAction}}" style="margin-top: 8px; height: 50px; padding: 0 30px; border: 0; border-radius: 14px; background: #FF8A3D; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #9C4A16">{{doneBtn}}</button>
     </div>
   </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":null},"locked":{"editor":null},"onEnd":{"editor":null},"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
     this.state = { f: 0 };
     this.tick = this.tick.bind(this);
     this.canvasRef = (el) => { if (el && el !== this.cv) { this.cv = el; this.init3D(); } };
-    this.mode = 'three';
+    this.mode = props.mode === 'free' ? 'free' : 'three';
     this.best = { three: 0, free: 0 };
     this.reset();
   }
@@ -595,6 +595,9 @@ class Component extends DCLogic {
       startTitle: this.mode === 'three' ? 'CONCURSO DE TRIPLES' : 'TIROS LIBRES',
       startText: this.mode === 'three' ? '5 posiciones, 3 balones en cada una y 60 segundos. El último balón de cada posición es dorado y vale 2 puntos.' : '10 tiros libres. Intenta meter el máximo; el swish (sin tocar aro) se celebra más.',
       showDone: this.phase === 'done',
+      tabsStyle: this.props.locked ? 'display: none;' : 'display: flex; padding: 4px; gap: 4px; border-radius: 14px; background: #0B0B14CC',
+      doneBtn: this.props.onEnd ? 'CONTINUAR' : 'OTRA RONDA',
+      doneAction: () => { if (this.props.onEnd) this.props.onEnd(this.pts); else { this.reset(); this.phase = 'aim'; this.pt = 0; this.camSnap = true; this.loop(); this.forceUpdate(); } },
       doneKicker: this.mode === 'three' ? 'CONCURSO DE TRIPLES' : 'TIROS LIBRES',
       doneSub: this.made + ' canastas de ' + Math.min(this.idx + (this.phase === 'done' && this.idx < this.list.length ? 0 : 0), this.list.length) + ' tiros · récord ' + this.best[this.mode],
       start: () => { if (this.phase === 'done') this.reset(); this.phase = 'aim'; this.pt = 0; this.camSnap = true; this.loop(); this.forceUpdate(); },

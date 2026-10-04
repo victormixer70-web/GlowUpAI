@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Partida rápida</title>
+<title>Informal</title>
 <script src="./support.js"></script>
 <script src="/_blob/de0c1b42c380e04fabb186f97a299f57"></script>
 </head>
@@ -15,127 +15,14 @@ body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif">
-  <sc-if value="{{isIntro}}" hint-placeholder-val="{{ true }}">
-    <svg width="844" height="390" viewBox="0 0 844 390" style="position: absolute; left: 0; top: 0">
-      <defs>
-        <linearGradient id="rq-l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FF8A3D" stop-opacity=".35"/><stop offset="1" stop-color="#FF8A3D" stop-opacity="0"/></linearGradient>
-        <linearGradient id="rq-r" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="{{oppColor}}" stop-opacity=".35"/><stop offset="1" stop-color="{{oppColor}}" stop-opacity="0"/></linearGradient>
-      </defs>
-      <path d="M0 0H470L370 390H0Z" fill="url(#rq-l)"/>
-      <path d="M844 0H474L374 390H844Z" fill="url(#rq-r)"/>
-      <path d="M470 0L370 390" stroke="#22D3EE" stroke-width="3"/>
-    </svg>
-    <a href="Modos.dc.html" aria-label="Volver a modos" style="position: absolute; left: 12px; top: 12px; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
-    </a>
-    <span style="position: absolute; left: 0; right: 0; top: 20px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 2px">PARTIDA RÁPIDA</span>
-    <div style="position: absolute; left: 70px; top: 70px; display: flex; flex-direction: column; align-items: center; gap: 6px">
-      <dc-import name="Avatar" primary="#FF8A3D" secondary="#0B0B14" pattern="solid" shorts="#17172A" socks="#F4F4FA" shoe="#22D3EE" number="10" hat="band" hat-color="#22D3EE" face="none" w="120" hint-size="120px,212px"></dc-import>
-      <span style="font-weight: 800; font-size: 15px">Invitado_4821</span>
-    </div>
-    <div style="position: absolute; right: 70px; top: 70px; display: flex; flex-direction: column; align-items: center; gap: 6px">
-      <dc-import name="Avatar" primary="{{oppColor}}" secondary="{{oppTrim}}" pattern="stripes" shorts="#17172A" socks="{{oppColor}}" shoe="#F4F4FA" number="7" hat="none" face="sun" w="120" hint-size="120px,212px"></dc-import>
-      <span style="font-weight: 800; font-size: 15px">{{oppName}}</span>
-    </div>
-    <div style="position: absolute; left: 272px; width: 300px; top: 92px; display: flex; flex-direction: column; align-items: center; gap: 12px">
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 64px; line-height: 1; color: #22D3EE; text-shadow: 0 4px 0 #0B0B14">VS</span>
-      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 6px">
-        <span style="padding: 5px 10px; border-radius: 8px; background: #17172A; font-size: 12px; font-weight: 700">3 vs 3 + porteros</span>
-        <span style="padding: 5px 10px; border-radius: 8px; background: #17172A; font-size: 12px; font-weight: 700">1:30 min</span>
-        <span style="padding: 5px 10px; border-radius: 8px; background: #17172A; font-size: 12px; font-weight: 700; color: #A3A3C2">No afecta a tu MMR</span>
-      </div>
-      <button type="button" onClick="{{play}}" style="margin-top: 6px; height: 56px; padding: 0 42px; border: 0; border-radius: 16px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 6px 0 #0E8FA3">EMPEZAR</button>
-    </div>
-  </sc-if>
-
-  <sc-if value="{{isMatch}}" hint-placeholder-val="{{ false }}">
-    <dc-import name="Partido" mode="quick" duration="90" autostart="{{ true }}" home-name="Invitado_4821" away-name="{{oppName}}" home-color="#FF8A3D" home-trim="#0B0B14" away-color="{{oppColor}}" away-trim="{{oppTrim}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
-  </sc-if>
-
-  <sc-if value="{{isResult}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 48px; padding: 0 40px">
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 260px">
-        <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">PARTIDA RÁPIDA</span>
-        <span style="{{titleStyle}}">{{title}}</span>
-        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 52px; line-height: 1">{{scoreLabel}}</span>
-        <span style="font-size: 13px; color: #A3A3C2">contra {{oppName}}</span>
-      </div>
-      <div style="flex: 1; max-width: 380px; display: flex; flex-direction: column; gap: 10px">
-        <span style="font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">RECOMPENSAS</span>
-        <div style="padding: 12px 14px; border-radius: 14px; background: #17172A; display: flex; flex-direction: column; gap: 8px">
-          <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 14px"><span>Experiencia</span><span style="color: #22D3EE">+{{xpShown}} XP</span></div>
-          <div style="height: 8px; border-radius: 4px; background: #26264A"><div style="{{xpBar}}"></div></div>
-          <span style="font-size: 11px; color: #A3A3C2">Nivel 12</span>
-        </div>
-        <div style="padding: 12px 14px; border-radius: 14px; background: #17172A; display: flex; align-items: center; gap: 10px">
-          <svg width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">C</text></svg>
-          <span style="flex: 1; font-weight: 800; font-size: 14px">Carrascos</span>
-          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 24px; color: #FFC53D">+{{coinsShown}}</span>
-        </div>
-        <div style="padding: 12px 14px; border-radius: 14px; background: #17172A; display: flex; align-items: center; gap: 10px">
-          <svg width="30" height="28" viewBox="0 0 54 50"><path d="M5 22h44v20a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" fill="#C26020"/><path d="M5 22a22 14 0 0 1 44 0z" fill="#FF8A3D"/><rect x="23" y="20" width="8" height="12" rx="2" fill="#FFC53D"/></svg>
-          <span style="flex: 1; font-weight: 800; font-size: 14px">{{chestLabel}}</span>
-          <span style="font-weight: 800; font-size: 14px; color: {{chestColor}}">{{chestCount}}</span>
-        </div>
-        <div style="display: flex; gap: 8px; margin-top: 4px">
-          <button type="button" onClick="{{again}}" style="flex: 1; height: 50px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1.5px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">JUGAR OTRA</button>
-          <a href="Modos.dc.html" style="display: flex; align-items: center; justify-content: center; height: 50px; padding: 0 18px; border-radius: 14px; border: 1.5px solid #F4F4FA; color: #F4F4FA; text-decoration: none; font-weight: 800; font-size: 14px">Volver</a>
-        </div>
-      </div>
-    </div>
-  </sc-if>
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0B0B14">
+  <dc-import name="Competitivo" casual="{{ true }}" hint-size="844px,390px"></dc-import>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
-  constructor(props) {
-    super(props);
-    this.state = { phase: 'intro', res: null, wins: 2, opp: this.pickOpp() };
-    this.tick = this.tick.bind(this);
-    this.t = 0;
-  }
-  componentWillUnmount() { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; }
-  pickOpp() {
-    const names = ['Kai_Striker', 'LunaGol_09', 'ToroVeloz', 'Mika10', 'Zeta_FC', 'Nico_Volea'];
-    const kits = [['#A78BFA', '#F4F4FA'], ['#E5484D', '#17172A'], ['#2FBF71', '#F4F4FA'], ['#5B2A86', '#FFC53D']];
-    const k = kits[Math.floor(Math.random() * kits.length)];
-    return { name: names[Math.floor(Math.random() * names.length)], color: k[0], trim: k[1] };
-  }
-  tick(now) {
-    this.t = Math.min(1, this.t + Math.min(0.05, (now - this.last) / 1000) / 1.4);
-    this.last = now;
-    this.forceUpdate();
-    this.raf = this.t < 1 ? requestAnimationFrame(this.tick) : null;
-  }
   renderVals() {
-    const s = this.state, r = s.res;
-    const won = r && r.home > r.away, lost = r && r.home < r.away;
-    const xp = won ? 120 : lost ? 50 : 80, coins = won ? 40 : lost ? 10 : 20;
-    const e = 1 - Math.pow(1 - this.t, 3);
-    const winsNow = Math.min(3, s.wins + (won ? 1 : 0));
-    return {
-      isIntro: s.phase === 'intro', isMatch: s.phase === 'match', isResult: s.phase === 'result',
-      oppName: s.opp.name, oppColor: s.opp.color, oppTrim: s.opp.trim,
-      title: won ? '¡VICTORIA!' : lost ? 'DERROTA' : 'EMPATE',
-      titleStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 48px; line-height: 1; letter-spacing: 2px; color: ' + (won ? '#22D3EE' : lost ? '#FF5C5C' : '#F4F4FA') + '; transform: scale(' + (0.6 + Math.min(1, this.t * 3) * 0.4).toFixed(2) + ');',
-      scoreLabel: r ? r.home + ' – ' + r.away : '',
-      xpShown: String(Math.round(xp * e)), coinsShown: String(Math.round(coins * e)),
-      xpBar: 'height: 8px; border-radius: 4px; background: #22D3EE; width: ' + (64 + (xp / 400) * 100 * e).toFixed(1) + '%;',
-      chestLabel: winsNow >= 3 ? '¡Cofre listo para abrir!' : 'Recompensa asegurada',
-      chestCount: winsNow + '/3 victorias',
-      chestColor: winsNow >= 3 ? '#22D3EE' : '#CACAE0',
-      play: () => this.setState({ phase: 'match' }),
-      onEnd: (res) => {
-        this.t = 0; this.last = performance.now();
-        this.setState({ phase: 'result', res });
-        if (!this.raf) this.raf = requestAnimationFrame(this.tick);
-      },
-      again: () => {
-        const won2 = r && r.home > r.away;
-        this.setState({ phase: 'intro', res: null, opp: this.pickOpp(), wins: won2 ? (s.wins + 1) % 4 : s.wins });
-      }
-    };
+    return {};
   }
 }
 </script>

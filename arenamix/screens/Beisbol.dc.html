@@ -21,7 +21,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{no3d}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #CACAE0">Tu navegador no permite gráficos 3D (WebGL) en esta vista.</div></sc-if>
 
   <div style="position: absolute; left: 12px; top: 10px; display: flex; align-items: center; gap: 8px">
-    <a href="Deportes.dc.html" aria-label="Volver a deportes" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #0B0B14CC; color: #F4F4FA">
+    <a href="Modos.dc.html" aria-label="Volver a modos" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #0B0B14CC; color: #F4F4FA">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
     </a>
     <span style="padding: 8px 12px; border-radius: 12px; background: #0B0B14CC; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1px">BÉISBOL · HOME RUN DERBY</span>
@@ -55,14 +55,14 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{showDone}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; inset: 0; background: #0B0B14D9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
       <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">FIN DE LA RONDA</span>
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 64px; line-height: 1; color: #22D3EE">{{hrLabel}} <span style="font-size: 26px; color: #A3A3C2">home runs</span></span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 64px; line-height: 1; color: #22D3EE">{{doneBig}} <span style="font-size: 26px; color: #A3A3C2">{{doneUnit}}</span></span>
       <span style="font-size: 14px; font-weight: 700">Más largo: {{longLabel}} · récord {{bestLabel}} HR</span>
-      <button type="button" onClick="{{start}}" style="margin-top: 8px; height: 50px; padding: 0 30px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">OTRA RONDA</button>
+      <button type="button" onClick="{{doneAction}}" style="margin-top: 8px; height: 50px; padding: 0 30px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">{{doneBtn}}</button>
     </div>
   </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":null},"locked":{"editor":null},"onEnd":{"editor":null},"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -80,7 +80,7 @@ class Component extends DCLogic {
   }
   reset() {
     this.st = this.loadSportStats('beisbol');
-    this.outs = 0; this.hr = 0; this.longest = 0;
+    this.outs = 0; this.hr = 0; this.longest = 0; this.far = 0;
     this.newPitch();
   }
   fence(phi) {
@@ -192,6 +192,7 @@ class Component extends DCLogic {
       }
       if (b.y <= 0.04 || dist > 170) {
         const d = Math.round(dist);
+        if (!foul) this.far = Math.max(this.far, d);
         if (foul) this.setResult('foul', 'Foul · ' + d + ' m');
         else if (this.hrFlag || dist >= this.fence(phi)) { this.hr++; this.longest = Math.max(this.longest, d); this.setResult('hr', d + ' m · salida ' + Math.round(this.ev * 3.6) + ' km/h · ángulo ' + Math.round(this.la * 57.3) + '°'); }
         else this.setResult('out', (this.la < 0.17 ? 'Rodado' : 'Elevado') + ' · ' + d + ' m');
@@ -542,6 +543,9 @@ class Component extends DCLogic {
       resultText: rm[0], resultSub: R ? R.sub + (R.kind !== 'strike' && R.kind !== 'bola' ? timing : '') : '',
       resultStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 70px; line-height: 1; letter-spacing: 2px; color: ' + rm[1] + '; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (0.4 + rs * 0.6).toFixed(2) + ');',
       showStart: this.phase === 'start', showDone: this.phase === 'done',
+      doneBtn: this.props.onEnd ? 'CONTINUAR' : 'OTRA RONDA',
+      doneBig: this.props.mode === 'long' ? String(this.far) : String(this.hr), doneUnit: this.props.mode === 'long' ? 'metros' : 'home runs',
+      doneAction: () => { if (this.props.onEnd) { this.props.onEnd(this.props.mode === 'long' ? this.far : this.hr); return; } this.reset(); this.loop(); this.forceUpdate(); },
       start: () => { this.reset(); this.loop(); this.forceUpdate(); },
       swing: (e) => {
         if (this.swung || !(this.phase === 'pitch' || (this.phase === 'windup' && this.pt > 1.0))) return;

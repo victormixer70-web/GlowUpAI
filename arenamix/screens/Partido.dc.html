@@ -79,11 +79,13 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <button type="button" aria-label="{{skillAria}}" onPointerDown="{{skillDown}}" onPointerUp="{{skillUp}}" onPointerLeave="{{skillUp}}" onPointerCancel="{{skillUp}}" style="{{skillBtnStyle}}">{{skillLabel}}</button>
   <button type="button" aria-label="Sprint: mantén pulsado para correr más rápido" onPointerDown="{{sprintDown}}" onPointerUp="{{sprintUp}}" onPointerLeave="{{sprintUp}}" onPointerCancel="{{sprintUp}}" style="{{sprintBtnStyle}}">SPRINT</button>
 
-  <sc-if value="{{isOnline}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; left: 0; right: 0; bottom: 8px; display: flex; justify-content: center; gap: 6px">
-      <button type="button" onClick="{{chatPass}}" style="height: 34px; padding: 0 12px; border-radius: 17px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Manrope, sans-serif; cursor: pointer">¡Pásala!</button>
-      <button type="button" onClick="{{chatBack}}" style="height: 34px; padding: 0 12px; border-radius: 17px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Manrope, sans-serif; cursor: pointer">¡Atrás!</button>
-      <button type="button" onClick="{{chatNice}}" style="height: 34px; padding: 0 12px; border-radius: 17px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Manrope, sans-serif; cursor: pointer">¡Bien jugado!</button>
+  <sc-if value="{{hasMates}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 0; right: 0; bottom: 8px; display: flex; justify-content: center; align-items: center; gap: 6px; pointer-events: none">
+      <span style="font-size: 9px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">ÓRDENES</span>
+      <button type="button" aria-label="Orden a tus compañeros: ¡Pásala!" onPointerDown="{{ordPass}}" style="pointer-events: auto; height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Manrope, sans-serif; cursor: pointer; touch-action: none">¡Pásala!</button>
+      <button type="button" aria-label="Orden a tus compañeros: ¡Chuta!" onPointerDown="{{ordShoot}}" style="pointer-events: auto; height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Manrope, sans-serif; cursor: pointer; touch-action: none">¡Chuta!</button>
+      <button type="button" aria-label="Orden a tus compañeros: ¡Atrás!" onPointerDown="{{ordBack}}" style="pointer-events: auto; height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Manrope, sans-serif; cursor: pointer; touch-action: none">¡Atrás!</button>
+      <button type="button" aria-label="Orden a tus compañeros: ¡Presiona!" onPointerDown="{{ordPress}}" style="pointer-events: auto; height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Manrope, sans-serif; cursor: pointer; touch-action: none">¡Presiona!</button>
     </div>
   </sc-if>
 
@@ -112,7 +114,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 </section>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3],"default":3},"coach":{"editor":"bool","default":false},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3,4],"default":3},"mates":{"editor":null},"label":{"editor":null},"rivals":{"editor":null},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -130,13 +132,14 @@ class Component extends DCLogic {
     if (this.R) { this.R.dispose(); this.R = null; }
   }
   size() {
-    return Math.max(1, Math.min(3, Number(this.props.teamSize ?? 3)));
+    return Math.max(1, Math.min(4, Number(this.props.teamSize ?? 3)));
   }
   newGame() {
     const P = this.props, dur = Number(P.duration ?? 90), n = this.size();
     this.st = this.loadStats();
-    const homeNames = [P.homeName ?? 'Tú', P.mateName ?? 'Compañero', P.mate2Name ?? 'Compañero 2'];
-    const awayNames = [P.awayName ?? 'Rival', P.away2Name ?? 'Rival 2', P.away3Name ?? 'Rival 3'];
+    const mates = Array.isArray(P.mates) ? P.mates : [P.mateName ?? 'Compañero', P.mate2Name ?? 'Compañero 2', 'Compañero 3'];
+    const rivals = Array.isArray(P.rivals) ? P.rivals : [P.awayName ?? 'Rival', P.away2Name ?? 'Rival 2', P.away3Name ?? 'Rival 3', 'Rival 4'];
+    const homeNames = [P.homeName ?? 'Tú'].concat(mates), awayNames = rivals;
     const ps = [];
     for (let k = 0; k < n; k++) ps.push({ team: 0, role: k ? 'mate' : 'human', slot: k, name: homeNames[k] });
     for (let k = 0; k < n; k++) ps.push({ team: 1, role: 'ai', slot: k, name: awayNames[k] });
@@ -171,7 +174,7 @@ class Component extends DCLogic {
   kickoff(team) {
     const g = this.g, n = this.size();
     Object.assign(g.ball, { x: 30, y: 15, z: 0, vx: 0, vy: 0, vz: 0, spin: 0 });
-    const slots = n === 1 ? [[0, 15]] : n === 2 ? [[0, 15], [19, 22]] : [[0, 15], [19, 7], [19, 23]];
+    const slots = n === 1 ? [[0, 15]] : n === 2 ? [[0, 15], [19, 22]] : n === 3 ? [[0, 15], [19, 7], [19, 23]] : [[0, 15], [19, 6], [19, 24], [11, 15]];
     g.ps.forEach((p) => {
       Object.assign(p, { vx: 0, vy: 0, act: null, inv: 0, react: 0, cd: p.team === team ? 0 : 0.8, face: p.team ? Math.PI : 0 });
       if (p.role === 'gk') { Object.assign(p, { x: p.team ? 58.8 : 1.2, y: 15 }); return; }
@@ -406,7 +409,7 @@ class Component extends DCLogic {
     if (g.flashT > 0) g.flashT -= dt;
     g.ps.forEach((p) => {
       p.cd = Math.max(0, p.cd - dt); p.inv = Math.max(0, p.inv - dt); p.skillCd = Math.max(0, p.skillCd - dt);
-      p.wantsBall = Math.max(0, (p.wantsBall || 0) - dt); p.passReq = Math.max(0, (p.passReq || 0) - dt); p.defend = Math.max(0, (p.defend || 0) - dt);
+      p.wantsBall = Math.max(0, (p.wantsBall || 0) - dt); p.passReq = Math.max(0, (p.passReq || 0) - dt); p.shootReq = Math.max(0, (p.shootReq || 0) - dt); p.pressReq = Math.max(0, (p.pressReq || 0) - dt); p.defend = Math.max(0, (p.defend || 0) - dt);
       if (p.act) { p.act.t += dt; if (p.act.t >= p.act.dur) { const a = p.act; p.act = null; if (a.then) a.then(); } }
     });
     if (g.phase === 'goal') { this.goalStep(dt); return; }
@@ -461,6 +464,7 @@ class Component extends DCLogic {
       outs.sort((u, v) => d(u) - d(v));
       if (g.recv && g.ps[g.recv.i].team === tm) return;
       const human = g.ps[g.ctl];
+      outs.forEach((q) => { if (q.pressReq > 0) set.add(q); });
       if (!this.autoplay && tm === human.team && !(d(outs[0]) < d(human) - 1.5)) return;
       set.add(outs[0]);
     });
@@ -574,19 +578,22 @@ class Component extends DCLogic {
       [dx, dy] = this.seek(p, b.x + b.vx * t, b.y + b.vy * t, 0.5);
       return [dx, dy, maxV * 1.1, 9];
     }
-    const lanes = n === 1 ? [15] : n === 2 ? [15, 22] : [15, 7, 23];
+    const lanes = n === 1 ? [15] : n === 2 ? [15, 22] : n === 3 ? [15, 7, 23] : [15, 7, 23, 15];
+    const anchor = n === 4 && p.slot === 3;
     let lane = lanes[p.slot] ?? 15;
     if (p.team === 1) lane = 30 - lane;
     let tx, ty;
     const mine = (own && own.team === p.team) || (g.hold >= 0 && g.ps[g.hold].team === p.team);
     if (mine) {
       const ref = own || g.ps[g.hold];
-      tx = ref.x + sg * (p.slot === 0 ? 8 : 4.5);
+      tx = anchor ? ref.x - sg * 9 : ref.x + sg * (p.slot === 0 ? 8 : 4.5);
       ty = Math.abs(lane - ref.y) < 4 ? ref.y + (ref.y < 15 ? 7.5 : -7.5) : lane;
       tx = this.clamp(tx, 4, 56);
       g.ps.forEach((q) => { if (q.team !== p.team && Math.hypot(q.x - tx, q.y - ty) < 2.5) ty += q.y < ty ? 2.5 : -2.5; });
       ty = this.clamp(ty, 2.5, 27.5);
+      if (anchor) ty = 15 + (ref.y - 15) * 0.4;
       if (p.wantsBall > 0) { tx = ref.x + sg * 3; ty = ref.y + (ref.y < 15 ? 5 : -5); }
+      if (p.defend > 0) { tx = (ref.x + ownX) / 2; ty = 15 + (ref.y - 15) * 0.3; }
     } else if (own || p.defend > 0) {
       const foes = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk' && q !== own)
         .sort((u, v) => Math.abs(u.x - ownX) - Math.abs(v.x - ownX));
@@ -598,7 +605,7 @@ class Component extends DCLogic {
         tx = foe.x + gxv / nn * 2.2; ty = foe.y + gyv / nn * 2.2;
       } else { tx = (b.x + ownX) / 2; ty = (b.y + 15) / 2; }
     } else {
-      tx = this.clamp(b.x * 0.6 + (ownX + sg * 20) * 0.4 + (p.slot === 0 ? sg * 3 : -sg * 2), 4, 56);
+      tx = this.clamp(b.x * 0.6 + (ownX + sg * 20) * 0.4 + (p.slot === 0 ? sg * 3 : anchor ? -sg * 8 : -sg * 2), 4, 56);
       ty = lane * 0.7 + b.y * 0.3;
     }
     [dx, dy] = this.seek(p, tx, ty, 2);
@@ -612,6 +619,7 @@ class Component extends DCLogic {
     const angOk = Math.abs(p.y - 15) < 9 || dg < 9;
     const caller = g.ps[g.ctl];
     if (p.passReq > 0 && caller.team === p.team && caller !== p) { p.passReq = 0; this.passBall(p, caller); this.say(p, '¡Toma!'); return; }
+    if (p.shootReq > 0 && dg < 30) { p.shootReq = 0; this.say(p, '¡Allá va!'); this.aiShoot(p); return; }
     if (dg < D.range && angOk && Math.random() < (dg < 11 ? 0.8 : 0.4)) { this.aiShoot(p); return; }
     let best = null, bs = -1e9;
     g.ps.forEach((q) => {
@@ -968,7 +976,7 @@ class Component extends DCLogic {
     if (this.meshFor === g.ps) return;
     (this.pMeshes || []).forEach((m) => this.S.remove(m));
     const hc = P.homeColor ?? '#FF8A3D', ht = P.homeTrim ?? '#0B0B14', ac = P.awayColor ?? '#A78BFA', at = P.awayTrim ?? '#F4F4FA';
-    const nums = [['10', '8', '7'], ['9', '11', '6']];
+    const nums = [['10', '8', '7', '4'], ['9', '11', '6', '5']];
     this.pMeshes = g.ps.map((p) => {
       const gk = p.role === 'gk', home = p.team === 0;
       const m = this.makePlayer({
@@ -1275,14 +1283,14 @@ class Component extends DCLogic {
     const [ix, iy] = this.inp || [0, 0];
     const passQ = ctx === 'ball' ? this.pickPassTarget(h, Math.hypot(ix, iy) > 0.2 ? Math.atan2(iy, ix) : h.face, Math.hypot(ix, iy) <= 0.2) : null;
     const pm = passQ ? SP(passQ.x, passQ.y, 2.3) : { x: 0, y: 0 };
-    const mateP = g.ps.find((q) => q.role === 'mate');
     const btn = (right, bottom, size, bg, sh, fs, extra) => 'position: absolute; right: ' + right + 'px; bottom: ' + bottom + 'px; width: ' + size + 'px; height: ' + size + 'px; border-radius: ' + (size / 2) + 'px; border: 0; padding: 0; touch-action: none; cursor: pointer; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + fs + 'px; letter-spacing: 0.5px; color: #0B0B14; background: ' + bg + '; box-shadow: 0 5px 0 ' + sh + '; ' + (extra || '');
     const sprintOn = g.sprint && h.stam > 0.04;
     return {
-      tags, isOnline: online, hasPing: online, pingLabel: (P.ping ?? '') + ' ms',
-      chatPass: () => { this.say(h, '¡Pásala!'); if (mateP) { mateP.wantsBall = 2.5; setTimeout(() => this.say(mateP, '¡Voy!'), 500); } this.forceUpdate(); },
-      chatBack: () => { this.say(h, '¡Atrás!'); if (mateP) { mateP.defend = 5; setTimeout(() => this.say(mateP, '¡Defiendo!'), 500); } this.forceUpdate(); },
-      chatNice: () => { this.say(h, '¡Bien jugado!'); if (mateP) setTimeout(() => this.say(mateP, '¡Gracias!'), 600); this.forceUpdate(); },
+      tags, hasMates: n > 1, hasPing: online, pingLabel: (P.ping ?? '') + ' ms',
+      ordPass: (e) => { e.preventDefault(); if (g.phase === 'play') this.order('pass'); },
+      ordShoot: (e) => { e.preventDefault(); if (g.phase === 'play') this.order('shoot'); },
+      ordBack: (e) => { e.preventDefault(); if (g.phase === 'play') this.order('back'); },
+      ordPress: (e) => { e.preventDefault(); if (g.phase === 'play') this.order('press'); },
       canvasRef: this.canvasRef, no3d: !!this.no3d,
       rings, kickFxStyle,
       hasPassMark: !!passQ && g.phase === 'play',
@@ -1292,7 +1300,7 @@ class Component extends DCLogic {
       s0: String(g.score[0]), s1: String(g.score[1]),
       clock: this.fmtClock(g.t),
       clockStyle: 'position: absolute; right: 14px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 22px; color: ' + (g.t <= 10 && g.phase === 'play' ? '#FF5C5C' : '#F4F4FA') + ';',
-      modeLabel: P.coach ? 'MODO ENTRENADOR' : mode === 'comp' ? 'COMPETITIVO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA',
+      modeLabel: P.label ? P.label : P.coach ? 'MODO ENTRENADOR' : mode === 'comp' ? 'COMPETITIVO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA',
       modeColor: mode === 'comp' ? '#E3A56E' : '#22D3EE',
       flash: g.flashT > 0, flashText: g.flash,
       stamStyle: 'display: block; height: 100%; width: ' + (h.stam * 100).toFixed(0) + '%; background: ' + (h.stam < 0.25 ? '#FF5C5C' : '#53D88E') + ';',
@@ -1377,6 +1385,20 @@ class Component extends DCLogic {
     const c = this.ctx();
     if (c === 'ball') this.humanSkill();
     else if (this.props.coach) g.press = true;
+  }
+  order(kind) {
+    const g = this.g, h = g.ps[g.ctl];
+    const mates = g.ps.filter((q, k) => q.team === h.team && q.role !== 'gk' && k !== g.ctl);
+    if (!mates.length) return;
+    if (kind === 'pass') { this.callForBall(); return; }
+    const texts = { shoot: ['¡Chuta!', '¡Vale!'], back: ['¡Atrás!', '¡Defiendo!'], press: ['¡Presiona!', '¡Voy!'] }[kind];
+    this.say(h, texts[0]);
+    mates.forEach((m, k) => {
+      if (kind === 'shoot') { m.shootReq = 3; m.think = Math.min(m.think, 0.08); }
+      if (kind === 'back') { m.defend = 6; m.pressReq = 0; }
+      if (kind === 'press') { m.pressReq = 6; m.defend = 0; }
+      setTimeout(() => this.say(m, texts[1]), 350 + k * 250);
+    });
   }
   callForBall() {
     const g = this.g, h = g.ps[g.ctl];

@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Partida privada</title>
+<script src="./support.js"></script>
+<script src="/_blob/de0c1b42c380e04fabb186f97a299f57"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#22D3EE}a:hover{color:#67E8F9}
+</style>
+</helmet>
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif">
+  <sc-if value="{{isRoom}}" hint-placeholder-val="{{ true }}">
+    <a href="Modos.dc.html" aria-label="Volver a modos" style="position: absolute; left: 12px; top: 12px; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
+    </a>
+    <span style="position: absolute; left: 66px; top: 14px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px">PARTIDA PRIVADA · {{sportName}}</span>
+    <span style="position: absolute; left: 66px; top: 44px; font-size: 12px; color: #A3A3C2">Código de sala <b style="color: #FFC53D; letter-spacing: 2px">{{code}}</b></span>
+    <div style="position: absolute; right: 14px; top: 12px; display: flex; gap: 6px">
+      <button type="button" onClick="{{invite}}" style="height: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: #A78BFA; color: #0B0B14; font: 800 13px Manrope, sans-serif; cursor: pointer">Invitar amigos</button>
+      <button type="button" onClick="{{toggleJoin}}" style="height: 40px; padding: 0 14px; border: 1px solid #2E2E52; border-radius: 12px; background: #17172A; color: #F4F4FA; font: 800 13px Manrope, sans-serif; cursor: pointer">Unirse con código</button>
+    </div>
+    <sc-if value="{{showJoin}}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; right: 14px; top: 58px; z-index: 2; width: 300px; padding: 12px; border-radius: 14px; background: #17172A; border: 1px solid #2E2E52; display: flex; flex-direction: column; gap: 8px">
+        <label for="pv-code" style="font-size: 12px; font-weight: 800">Código de la sala de tu amigo</label>
+        <input id="pv-code" value="{{joinCode}}" onInput="{{onJoinInput}}" maxlength="6" placeholder="Ej. K7Q2PX" style="height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid #2E2E52; background: #0B0B14; color: #F4F4FA; font: 800 16px Manrope, sans-serif; letter-spacing: 3px; text-transform: uppercase">
+        <button type="button" onClick="{{join}}" style="height: 38px; border: 0; border-radius: 10px; background: #22D3EE; color: #0B0B14; font: 800 13px Manrope, sans-serif; cursor: pointer">Unirse</button>
+      </div>
+    </sc-if>
+    <div style="position: absolute; left: 14px; top: 72px; right: 14px; display: flex; gap: 6px; flex-wrap: wrap">
+      <sc-for list="{{formats}}" as="f" hint-placeholder-count="6"><button type="button" onClick="{{f.pick}}" style="{{f.style}}">{{f.title}}</button></sc-for>
+    </div>
+    <div style="position: absolute; left: 14px; top: 116px; right: 14px; bottom: 74px; display: flex; gap: 14px">
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE">EQUIPO NARANJA</span>
+        <sc-for list="{{teamA}}" as="p" hint-placeholder-count="2">
+          <button type="button" onClick="{{p.tap}}" style="{{p.style}}"><span>{{p.name}}</span><span style="{{p.tagStyle}}">{{p.tag}}</span></button>
+        </sc-for>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #FF8A8E">EQUIPO RIVAL</span>
+        <sc-for list="{{teamB}}" as="p" hint-placeholder-count="2">
+          <button type="button" onClick="{{p.tap}}" style="{{p.style}}"><span>{{p.name}}</span><span style="{{p.tagStyle}}">{{p.tag}}</span></button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="position: absolute; left: 14px; right: 14px; bottom: 12px; display: flex; align-items: center; gap: 14px">
+      <span style="flex: 1; font-size: 11px; line-height: 1.45; color: #A3A3C2">{{note}}</span>
+      <button type="button" onClick="{{startMatch}}" style="flex: none; height: 52px; padding: 0 34px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">EMPEZAR</button>
+    </div>
+    <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; left: 0; right: 0; top: 160px; display: flex; justify-content: center; pointer-events: none"><span style="max-width: 460px; padding: 10px 16px; border-radius: 12px; background: #F4F4FA; color: #0B0B14; font-size: 13px; font-weight: 800; text-align: center">{{toastText}}</span></div>
+    </sc-if>
+  </sc-if>
+
+  <sc-if value="{{isTeamMatch}}" hint-placeholder-val="{{ false }}">
+    <dc-import name="Partido" label="PARTIDA PRIVADA" mode="quick" duration="120" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Invitado_4821" mates="{{mates}}" rivals="{{rivals}}" away-name="Equipo rival" home-color="#FF8A3D" home-trim="#0B0B14" away-color="#3EA6FF" away-trim="#0B0B14" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
+  </sc-if>
+  <sc-if value="{{isDuelMatch}}" hint-placeholder-val="{{ false }}">
+    <dc-import name="Duelo" kind="{{duelKind}}" rival-name="{{rivalName}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
+  </sc-if>
+  <sc-if value="{{isBasket}}" hint-placeholder-val="{{ false }}"><dc-import name="Baloncesto" mode="{{mgMode}}" locked="{{ true }}" on-end="{{onScore}}" hint-size="844px,390px"></dc-import></sc-if>
+  <sc-if value="{{isBeis}}" hint-placeholder-val="{{ false }}"><dc-import name="Beisbol" mode="{{mgMode}}" locked="{{ true }}" on-end="{{onScore}}" hint-size="844px,390px"></dc-import></sc-if>
+  <sc-if value="{{isVoley}}" hint-placeholder-val="{{ false }}"><dc-import name="Voley" mode="{{mgMode}}" locked="{{ true }}" on-end="{{onScore}}" hint-size="844px,390px"></dc-import></sc-if>
+
+  <sc-if value="{{isResult}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
+      <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">PARTIDA PRIVADA · {{fmtTitle}}</span>
+      <span style="{{resTitleStyle}}">{{resTitle}}</span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 56px; line-height: 1">{{scoreLabel}}</span>
+      <div style="display: flex; gap: 8px; margin-top: 8px">
+        <button type="button" onClick="{{backRoom}}" style="height: 48px; padding: 0 24px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1.5px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">VOLVER A LA SALA</button>
+        <a href="Modos.dc.html" style="display: flex; align-items: center; height: 48px; padding: 0 18px; border-radius: 14px; border: 1.5px solid #F4F4FA; color: #F4F4FA; text-decoration: none; font-weight: 800; font-size: 14px">Salir</a>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const sel = this.store('arenamix.sel') || {};
+    this.sport = sel.sport || this.store('arenamix.sport') || 'futbol';
+    this.C = this.catalog(this.sport);
+    const fm = this.C.modes.filter((m) => !m.soon);
+    const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    this.code = Array.from({ length: 6 }, () => abc[Math.floor(Math.random() * abc.length)]).join('');
+    const first = fm.find((m) => m.id === 'm2') || fm[0];
+    this.state = { fmt: first.id, slots: {}, phase: 'room', res: null, showJoin: false, joinCode: '', toast: '', target: 0 };
+  }
+  catalog(sport) {
+    const team = (n, soon) => ({ id: 'm' + n, title: n + 'VS' + n, kind: 'team', n, soon, desc: soon ? 'Partido por equipos. Lo estamos preparando.' : n === 1 ? 'Tú contra otro jugador, con porteros.' : n + ' contra ' + n + ', con porteros.' });
+    const teams = (soon) => [1, 2, 3, 4].map((n) => team(n, soon));
+    const S = {
+      futbol: { name: 'FÚTBOL', c1: '#145A33', c2: '#22914F', modes: teams(false).concat([
+        { id: 'pens', title: 'TANDA DE PENALTIS', kind: 'duel', duel: 'pen', desc: '5 tiros y 5 paradas por turnos. Muerte súbita.' },
+        { id: 'fk', title: 'TIROS LIBRES', kind: 'duel', duel: 'free', desc: '7 escenarios distintos, con barrera.' }]),
+        train: [{ id: 'train', title: 'PENALTIS Y FALTAS', href: 'Entrenamiento.dc.html', desc: 'Práctica libre con dianas y todos los escenarios.' }] },
+      baloncesto: { name: 'BALONCESTO', c1: '#7A3B12', c2: '#C2652A', modes: teams(true).concat([
+        { id: 'three', title: 'CONCURSO DE TRIPLES', kind: 'mg', comp: 'Baloncesto', mode: 'three', unit: 'puntos', rival: [6, 16], desc: '15 balones en 5 posiciones y 60 segundos; el último de cada posición vale doble.' },
+        { id: 'ft', title: 'TIROS LIBRES', kind: 'mg', comp: 'Baloncesto', mode: 'free', unit: 'puntos', rival: [4, 9], desc: '10 tiros libres. Gana quien meta más.' }]),
+        train: [{ id: 'train', title: 'PISTA LIBRE', href: 'Baloncesto.dc.html', desc: 'Triples y tiros libres sin presión.' }] },
+      beisbol: { name: 'BÉISBOL', c1: '#4A3216', c2: '#2F7A3E', modes: teams(true).concat([
+        { id: 'derby', title: 'HOME RUN DERBY', kind: 'mg', comp: 'Beisbol', mode: 'hr', unit: 'home runs', rival: [1, 7], desc: 'Batea hasta 10 eliminaciones. Gana quien haga más home runs.' },
+        { id: 'long', title: 'BATAZO MÁS LARGO', kind: 'mg', comp: 'Beisbol', mode: 'long', unit: 'metros', rival: [95, 145], desc: 'Gana el golpe más lejano dentro del campo.' }]),
+        train: [{ id: 'train', title: 'JAULA DE BATEO', href: 'Beisbol.dc.html', desc: 'Batea sin límite de tiempo.' }] },
+      voley: { name: 'VÓLEY', c1: '#7A6430', c2: '#C9A85C', modes: teams(true).concat([
+        { id: 'serve', title: 'DESAFÍO DE SAQUE', kind: 'mg', comp: 'Voley', mode: 'serve', unit: 'puntos', rival: [8, 22], desc: '10 saques. Las zonas marcadas valen 3.' },
+        { id: 'spike', title: 'DESAFÍO DE REMATE', kind: 'mg', comp: 'Voley', mode: 'spike', unit: 'puntos', rival: [10, 24], desc: '10 remates contra el bloqueo.' }]),
+        train: [{ id: 'train', title: 'PISTA LIBRE', href: 'Voley.dc.html', desc: 'Saques y remates a tu ritmo.' }] }
+    };
+    return S[sport] || S.futbol;
+  }
+  tiers() {
+    return [
+      { name: 'Bronce', c1: '#C07A3E', c2: '#7A4520', text: '#E3A56E', wins: 4, start: 0 },
+      { name: 'Plata', c1: '#C9D2DF', c2: '#6D788A', text: '#DCE3EE', wins: 6, start: 300 },
+      { name: 'Oro', c1: '#F2C14E', c2: '#A8771A', text: '#F2C14E', wins: 8, start: 750 },
+      { name: 'Platino', c1: '#5FD3C6', c2: '#24786F', text: '#7FE3D7', wins: 10, start: 1350 },
+      { name: 'Diamante', c1: '#6FB6FF', c2: '#2A5FB0', text: '#8CC5FF', wins: 13, start: 2100 },
+      { name: 'Campeón', c1: '#B57BFF', c2: '#5E2FA8', text: '#C79BFF', wins: 16, start: 3075, wings: true },
+      { name: 'Super campeón', c1: '#FF5C8A', c2: '#A3204A', text: '#FF86A6', wins: 20, start: 4275, wings: true },
+      { name: 'Élite', c1: '#FFE38A', c2: '#2A2410', text: '#FFE38A', wins: 25, start: 5775, wings: true }
+    ];
+  }
+  rankOf(m) {
+    const T = this.tiers();
+    let i = T.length - 1;
+    while (i > 0 && m < T[i].start) i--;
+    const t = T[i], step = t.wins * 25;
+    const div = Math.min(2, Math.floor((m - t.start) / step));
+    const lo = t.start + div * step;
+    const hi = div < 2 ? lo + step : (i < T.length - 1 ? T[i + 1].start : lo + step);
+    return { ...t, div, label: t.name + ' ' + (div + 1), lo, hi, idx: i * 3 + div };
+  }
+  store(key, val) {
+    try {
+      if (val === undefined) return JSON.parse(localStorage.getItem(key) || 'null');
+      localStorage.setItem(key, JSON.stringify(val));
+    } catch (e) {}
+    return null;
+  }
+  mmrOf(sport, id) {
+    const all = this.store('arenamix.mmr.v1') || {};
+    return all[sport + ':' + id] || 0;
+  }
+  say(t) {
+    this.setState({ toast: t });
+    clearTimeout(this.toastT);
+    this.toastT = setTimeout(() => this.setState({ toast: '' }), 3200);
+  }
+  componentWillUnmount() { clearTimeout(this.toastT); }
+  fmtObj() { return this.C.modes.find((m) => m.id === this.state.fmt); }
+  size() { const f = this.fmtObj(); return f.kind === 'team' ? f.n : 1; }
+  slotKind(key) { return this.state.slots[key] || 'ai'; }
+  finish(r) { this.setState({ phase: 'result', res: r }); }
+  renderVals() {
+    const s = this.state, f = this.fmtObj(), n = this.size();
+    const formats = this.C.modes.filter((m) => !m.soon).map((m) => ({
+      title: m.title,
+      style: 'height: 36px; padding: 0 12px; border-radius: 10px; font: 800 12px Manrope, sans-serif; cursor: pointer; ' + (m.id === s.fmt ? 'background: #22D3EE; color: #0B0B14; border: 0;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E52;'),
+      pick: () => this.setState({ fmt: m.id })
+    }));
+    const slot = (team, i) => {
+      const key = team + i, you = team === 'A' && i === 0, kind = you ? 'you' : this.slotKind(key);
+      const name = you ? 'Invitado_4821 (tú)' : kind === 'friend' ? 'Amigo invitado' : 'IA ' + (team === 'A' ? 'compañera' : 'rival') + (n > 1 ? ' ' + (team === 'A' ? i : i + 1) : '');
+      const tag = you ? 'ANFITRIÓN' : kind === 'friend' ? 'ESPERANDO…' : 'IA · toca para invitar';
+      return {
+        name, tag,
+        style: 'display: flex; justify-content: space-between; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; font: 800 13px Manrope, sans-serif; color: #F4F4FA; text-align: left; cursor: ' + (you ? 'default' : 'pointer') + '; ' + (you ? 'background: #10303A; border: 1px solid #22D3EE;' : kind === 'friend' ? 'background: #1E1A3A; border: 1px dashed #A78BFA;' : 'background: #17172A; border: 1px solid #26264A;'),
+        tagStyle: 'font-size: 10px; letter-spacing: .5px; color: ' + (you ? '#22D3EE' : kind === 'friend' ? '#A78BFA' : '#8686A6') + ';',
+        tap: () => { if (you) return; const slots = { ...s.slots, [key]: kind === 'friend' ? 'ai' : 'friend' }; this.setState({ slots }); if (kind !== 'friend') this.say('Hueco reservado para un amigo. Pásale el código ' + this.code + '.'); }
+      };
+    };
+    const teamA = Array.from({ length: n }, (_, i) => slot('A', i)), teamB = Array.from({ length: n }, (_, i) => slot('B', i));
+    const res = s.res, won = res && res.home > res.away, lost = res && res.home < res.away;
+    const live = s.phase === 'match';
+    const mates = teamA.slice(1).map((p) => p.name.replace(' (tú)', '')).map((x) => (x === 'Amigo invitado' ? 'IA (amigo)' : x));
+    const rivals = teamB.map((p) => (p.name === 'Amigo invitado' ? 'IA (amigo)' : p.name));
+    return {
+      sportName: this.C.name, code: this.code,
+      isRoom: s.phase === 'room', isResult: s.phase === 'result',
+      isTeamMatch: live && f.kind === 'team', isDuelMatch: live && f.kind === 'duel',
+      isBasket: live && f.kind === 'mg' && f.comp === 'Baloncesto', isBeis: live && f.kind === 'mg' && f.comp === 'Beisbol', isVoley: live && f.kind === 'mg' && f.comp === 'Voley',
+      formats, teamA, teamB,
+      note: f.kind === 'team' && n > 1 ? 'Los huecos libres los juega la IA. En el partido puedes darle órdenes: ¡Pásala!, ¡Chuta!, ¡Atrás! y ¡Presiona!. El online aún no está activo: los amigos invitados también los juega la IA de momento.' : 'El online aún no está activo: de momento tu rival lo juega la IA.',
+      showJoin: s.showJoin, joinCode: s.joinCode,
+      toggleJoin: () => this.setState({ showJoin: !s.showJoin }),
+      onJoinInput: (e) => this.setState({ joinCode: e.currentTarget.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) }),
+      join: () => { this.setState({ showJoin: false }); this.say(s.joinCode.length === 6 ? 'Unirse a salas estará disponible cuando activemos el online.' : 'El código tiene 6 caracteres.'); },
+      invite: () => {
+        const text = 'Únete a mi partida de ARENA MIX con el código ' + this.code + ': ' + location.href.split('#')[0];
+        if (navigator.share) navigator.share({ title: 'ARENA MIX', text }).catch(() => {});
+        else if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => this.say('Invitación copiada. Pégala en un chat con tus amigos.'), () => this.say('Código de sala: ' + this.code));
+        else this.say('Código de sala: ' + this.code);
+      },
+      toast: !!s.toast, toastText: s.toast,
+      startMatch: () => {
+        let target = 0;
+        if (f.kind === 'mg') { const [lo, hi] = f.rival; target = Math.round(lo + (hi - lo) * (0.3 + Math.random() * 0.5)); }
+        this.setState({ phase: 'match', res: null, target });
+      },
+      teamSize: n, mates, rivals, rivalName: rivals[0], duelKind: f.duel || 'pen', mgMode: f.mode || '',
+      onEnd: (r) => this.finish(r),
+      onScore: (score) => this.finish({ home: score, away: s.target }),
+      fmtTitle: f.title,
+      resTitle: won ? '¡VICTORIA!' : lost ? 'DERROTA' : 'EMPATE',
+      resTitleStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 48px; line-height: 1; letter-spacing: 2px; color: ' + (won ? '#22D3EE' : lost ? '#FF5C5C' : '#F4F4FA') + ';',
+      scoreLabel: res ? res.home + ' – ' + res.away : '',
+      backRoom: () => this.setState({ phase: 'room', res: null })
+    };
+  }
+}
+</script>
+</body>
+</html>
