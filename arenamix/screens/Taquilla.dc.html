@@ -48,9 +48,20 @@ input::placeholder{color:#8686A6}
       <ellipse cx="179" cy="194" rx="96" ry="18" fill="url(#tq-pod)"/>
       <ellipse cx="179" cy="190" rx="96" ry="18" fill="#21213A" stroke="#22D3EE" stroke-opacity=".5" stroke-width="2"/>
     </svg>
-    <div style="position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%)">
-      <dc-import name="Avatar" primary="{{kit.primary}}" secondary="{{kit.secondary}}" pattern="{{kit.pattern}}" shorts="{{kit.shorts}}" socks="{{kit.socks}}" shoe="{{shoe}}" number="{{number}}" crest="{{kit.crest}}" crest-shape="{{kit.crestShape}}" crest-mark="{{kit.crestMark}}" hat="{{hat}}" hat-color="{{hatColor}}" face="{{face}}" w="150" hint-size="150px,266px"></dc-import>
+    <sc-if value="{{show3d}}" hint-placeholder-val="{{ false }}">
+      <canvas ref="{{canvasRef}}" role="img" aria-label="{{viewerLabel}}" onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab"></canvas>
+      <span style="position: absolute; left: 50%; bottom: 52px; transform: translateX(-50%); display: flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 10px; background: #0B0B14B3; font-size: 10px; font-weight: 800; letter-spacing: .5px; color: #A3A3C2; pointer-events: none; white-space: nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/></svg>DESLIZA PARA GIRAR</span>
+    </sc-if>
+    <div role="radiogroup" aria-label="Personaje" style="position: absolute; left: 8px; right: 8px; bottom: 8px; display: flex; gap: 5px">
+      <sc-for list="{{charChips}}" as="ch" hint-placeholder-count="4">
+        <button type="button" role="radio" aria-checked="{{ch.on}}" aria-label="{{ch.name}}" onClick="{{ch.pick}}" style="{{ch.style}}"><img src="{{ch.img}}" alt="" style="{{ch.imgStyle}}"><span style="{{ch.textStyle}}">{{ch.short}}</span></button>
+      </sc-for>
     </div>
+    <sc-if value="{{show2d}}" hint-placeholder-val="{{ true }}">
+    <div style="position: absolute; left: 50%; bottom: 46px; transform: translateX(-50%)">
+      <dc-import name="Avatar" primary="{{kit.primary}}" secondary="{{kit.secondary}}" pattern="{{kit.pattern}}" shorts="{{kit.shorts}}" socks="{{kit.socks}}" shoe="{{shoe}}" number="{{number}}" crest="{{kit.crest}}" crest-shape="{{kit.crestShape}}" crest-mark="{{kit.crestMark}}" hat="{{hat}}" hat-color="{{hatColor}}" face="{{face}}" w="132" hint-size="132px,234px"></dc-import>
+    </div>
+    </sc-if>
     <div style="position: absolute; left: 12px; top: 10px; display: flex; flex-direction: column; gap: 2px; max-width: 150px; padding: 6px 8px; border-radius: 8px; background: #0B0B14B3">
       <span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">EQUIPACIÓN</span>
       <span style="font-size: 12px; font-weight: 800; line-height: 1.2">{{kitName}}</span>
@@ -171,6 +182,70 @@ class Component extends DCLogic {
       }
     } catch (e) {}
     this.saveLocker(this.state.equip, this.state.bought);
+    this.state.char = window.AMChars ? window.AMChars.pref() : 'clasico';
+    this.rotY = 0.35; this.spin = 0; this.drag = null;
+    this.canvasRef = (el) => { if (el && el !== this.cv) { this.cv = el; this.init3D(); } else if (!el && this.cv) { this.stop3D(); } };
+  }
+  componentWillUnmount() { this.stop3D(); }
+  /* ---------- 3D locker room: your character in the kit you are looking at, turned with a finger ---------- */
+  init3D() {
+    const T = window.THREE, A = window.AMChars;
+    if (!T || !A || !this.cv) return;
+    this.stop3D();
+    const R = new T.WebGLRenderer({ canvas: this.cv, antialias: true, alpha: true });
+    R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.15;
+    R.setClearColor(0x000000, 0);
+    this.R = R;
+    const S = new T.Scene();
+    S.add(new T.HemisphereLight(0xdfe8ff, 0x2a2440, 0.9));
+    const key = new T.DirectionalLight(0xffffff, 1.1); key.position.set(2, 4, 4); S.add(key);
+    const rim = new T.DirectionalLight(0x22d3ee, 0.6); rim.position.set(-3, 2.5, -3); S.add(rim);
+    this.S = S;
+    this.cam = new T.PerspectiveCamera(28, 1, 0.1, 50);
+    if (window.AMSky) window.AMSky.env(R).then((e) => { if (e && this.R === R) { S.environment = e; } });
+    this.modelKey = ''; this.model = null; this.t0 = performance.now();
+    A.load().then(() => { if (this.R === R) this.modelKey = ''; });
+    const loop = () => {
+      if (this.R !== R) return;
+      this.raf = requestAnimationFrame(loop);
+      this.frame3D();
+    };
+    this.raf = requestAnimationFrame(loop);
+  }
+  stop3D() {
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = null;
+    if (this.R) { this.R.dispose(); this.R = null; }
+    this.model = null; this.modelKey = '';
+  }
+  frame3D() {
+    const T = window.THREE, A = window.AMChars, R = this.R, cv = this.cv;
+    if (!R || !cv || !this.want) return;
+    const w = cv.clientWidth, h = cv.clientHeight;
+    if (!w || !h) return;
+    if (this.sz !== w + 'x' + h) { this.sz = w + 'x' + h; R.setSize(w, h, false); this.cam.aspect = w / h; this.cam.updateProjectionMatrix(); }
+    // rebuild the character when the character or the outfit being looked at changes
+    const key = this.want.char + '|' + JSON.stringify(this.want.kit);
+    if (key !== this.modelKey && A.ready()) {
+      if (this.model) this.S.remove(this.model);
+      this.model = A.make({ char: this.want.char, kit: this.want.kit, noRing: true });
+      if (this.model) this.S.add(this.model);
+      this.modelKey = key;
+    }
+    const now = performance.now(), dt = Math.min(0.05, (now - (this.tPrev || now)) / 1000);
+    this.tPrev = now;
+    if (!this.drag) { this.rotY += this.spin * dt; this.spin *= Math.pow(0.04, dt); if (Math.abs(this.spin) < 0.05) this.spin = 0; }
+    if (this.model) {
+      this.model.rotation.y = this.rotY;
+      const an = this.model.userData.anim;
+      if (an && A.clip('idle')) an.layers = [{ id: 'idle', t: (now - this.t0) / 1000, w: 1 }];
+    }
+    // frame the whole body, a little lower than centre so the chips below don't cover the feet
+    const fit = Math.max(2.95 / (2 * Math.tan(this.cam.fov * Math.PI / 360)), 1.1 / (2 * Math.tan(this.cam.fov * Math.PI / 360) * this.cam.aspect));
+    this.cam.position.set(0, 1.2, fit);
+    this.cam.lookAt(0, 0.98, 0);
+    R.render(this.S, this.cam);
   }
   /* saves the locker, plus the resolved outfit per sport that the games dress your character in
      (arenamix.outfit.v1: { futbol: { primary, secondary, pattern, shorts, socks, shoe, name } ... }) */
@@ -519,7 +594,33 @@ class Component extends DCLogic {
     const sportObj = SPORTS.find((x) => x.id === sport);
     const league = L[sport][Number(kitItem.id.split('-')[1])];
 
+    const A = window.AMChars, charId = s.char || 'clasico', show3d = !!(A && window.THREE && charId !== 'clasico');
+    this.want = { char: charId, kit: { primary: kitItem.primary, secondary: kitItem.secondary, pattern: kitItem.pattern, shorts: kitItem.shorts, socks: kitItem.socks, shoe: shoeItem.color } };
+    const chars = (A ? A.list : []).concat([{ id: 'clasico', name: 'Clásico' }]);
+    const charChips = chars.map((c) => {
+      const on = c.id === charId;
+      return {
+        name: c.name, short: c.id === 'granny' ? 'Granny' : c.id === 'vegas' ? 'Vegas' : c.name, on: on ? 'true' : 'false',
+        img: c.id === 'clasico' ? '' : 'assets/chars/' + c.id + '.png',
+        pick: () => { if (A) A.setPref(c.id); this.setState({ char: c.id }); },
+        style: 'flex: 1; min-width: 0; height: 38px; display: flex; align-items: center; justify-content: center; gap: 3px; padding: 0 4px 0 2px; border-radius: 11px; cursor: pointer; overflow: hidden; white-space: nowrap; border: 1px solid ' + (on ? '#22D3EE' : '#2E2E52') + '; background: ' + (on ? '#22D3EE' : '#0B0B14CC') + '; color: ' + (on ? '#0B0B14' : '#F4F4FA') + ';',
+        imgStyle: c.id === 'clasico' ? 'display: none;' : 'flex: none; width: 30px; height: 30px; border-radius: 9px; background: ' + (on ? '#0E8FA3' : '#26264A') + ';',
+        textStyle: c.id === 'clasico' ? 'font: 800 10px Manrope, sans-serif;' : 'display: none;'
+      };
+    });
     return {
+      show3d, show2d: !show3d, charChips, canvasRef: this.canvasRef,
+      viewerLabel: 'Tu personaje con la equipación ' + kitItem.name + '. Desliza para girarlo.',
+      pDown: (e) => { e.preventDefault(); try { e.currentTarget.setPointerCapture(e.pointerId); } catch (er) {} this.drag = { id: e.pointerId, x: e.clientX, t: performance.now() }; this.spin = 0; },
+      pMove: (e) => {
+        const d = this.drag;
+        if (!d || d.id !== e.pointerId) return;
+        const now = performance.now(), dx = e.clientX - d.x;
+        this.rotY += dx * 0.013;
+        this.spin = dx * 0.013 / Math.max(0.008, (now - d.t) / 1000);
+        d.x = e.clientX; d.t = now;
+      },
+      pUp: (e) => { if (this.drag && this.drag.id === e.pointerId) { if (performance.now() - this.drag.t > 80) this.spin = 0; this.drag = null; } },
       coinsLabel: this.fmt(s.coins),
       sports, cats, leagues, items,
       isTeams: s.cat === 'equipos',

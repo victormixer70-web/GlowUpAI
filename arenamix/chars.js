@@ -110,7 +110,7 @@
           u -= Math.floor(u); w2 -= Math.floor(w2);
           var o = (Math.min(Hh - 1, Math.floor(w2 * Hh)) * W + Math.min(W - 1, Math.floor(u * W))) * 4;
           var r = Math.pow(px[o] / 255, 2.2), g = Math.pow(px[o + 1] / 255, 2.2), b = Math.pow(px[o + 2] / 255, 2.2);
-          if (z === 1 && isSkin(px[o] / 255, px[o + 1] / 255, px[o + 2] / 255)) continue;
+          if (z === 1 && /elvis/i.test(m.name) && isSkin(px[o] / 255, px[o + 1] / 255, px[o + 2] / 255)) continue;
           sum[z] += 0.2126 * r + 0.7152 * g + 0.0722 * b; cnt[z]++;
         }
       }
@@ -118,6 +118,7 @@
       var lum = [1, 1, 1, 1, 1].map(function (d, z) { return cnt[z] ? Math.max(0.02, sum[z] / cnt[z]) : 0.2; });
       m.userData.kitLum = [lum[1], lum[2], lum[3], lum[4]];
       m.userData.kitable = true;
+      m.userData.keepSkin = /elvis/i.test(m.name) ? 1 : 0;
     });
   }
   var PAT = { solid: 0, stripes: 1, pin: 2, hoops: 3, halves: 4, centre: 5, sash: 6, diag: 7, band: 8 };
@@ -125,12 +126,12 @@
     if (c == null) return new T.Color(fb);
     return (c.isColor ? c.clone() : new T.Color(c)).convertSRGBToLinear();
   }
-  function kitMaterial(base, kit, lum) {
+  function kitMaterial(base, kit, lum, keepSkin) {
     var m = base.clone();
     var U = {
       uKitA: { value: col(kit.primary, '#ffffff') }, uKitB: { value: col(kit.secondary, '#141B2D') },
       uShorts: { value: col(kit.shorts, '#141B2D') }, uSocks: { value: col(kit.socks, '#ffffff') }, uShoes: { value: col(kit.shoe, '#F2F5FA') },
-      uPat: { value: PAT[kit.pattern] || 0 }, uLum: { value: lum }
+      uPat: { value: PAT[kit.pattern] || 0 }, uLum: { value: lum }, uKeepSkin: { value: keepSkin || 0 }
     };
     m.onBeforeCompile = function (sh) {
       Object.keys(U).forEach(function (k) { sh.uniforms[k] = U[k]; });
@@ -140,7 +141,7 @@
       sh.fragmentShader = sh.fragmentShader
         .replace('#include <common>', ['#include <common>', 'varying vec4 vZone;', 'varying vec2 vKitP;',
           'uniform vec3 uKitA; uniform vec3 uKitB; uniform vec3 uShorts; uniform vec3 uSocks; uniform vec3 uShoes;',
-          'uniform float uPat; uniform vec4 uLum;',
+          'uniform float uPat; uniform vec4 uLum; uniform float uKeepSkin;',
           'float kitPattern(vec2 p) {',
           '  if (uPat < 0.5) return 0.0;',
           '  if (uPat < 1.5) return step(0.5, fract(p.x * 14.0 + 0.25));',
@@ -156,7 +157,7 @@
           '{',
           '  vec3 c = diffuseColor.rgb, sc = pow(max(c, vec3(0.0)), vec3(1.0 / 2.2));',
           '  float lum = dot(c, vec3(0.2126, 0.7152, 0.0722));',
-          '  float skin = step(0.2, sc.r) * step(sc.g, sc.r * 0.95) * step(sc.r * 0.45, sc.g) * step(sc.r * 0.25, sc.b) * step(sc.b, sc.g);',
+          '  float skin = uKeepSkin * step(0.2, sc.r) * step(sc.g, sc.r * 0.95) * step(sc.r * 0.45, sc.g) * step(sc.r * 0.25, sc.b) * step(sc.b, sc.g);',
           '  vec3 shirt = mix(uKitA, uKitB, kitPattern(vKitP));',
           '  float zl = dot(vZone, uLum) + 0.0001;',
           '  vec3 kitC = shirt * vZone.x + uShorts * vZone.y + uSocks * vZone.z + uShoes * vZone.w;',
@@ -199,7 +200,7 @@
     // dress the character: an explicit kit, your Taquilla outfit, or the team colours the game passes
     var kit = o.kit || (o.you && !o.noOutfit ? outfit(o.sport) : null);
     if (!kit && o.shirt != null) kit = { primary: o.shirt, secondary: o.trimCss, pattern: 'solid', shorts: o.shorts, socks: o.socks, shoe: o.boot };
-    if (kit) model.traverse(function (m) { if (m.isSkinnedMesh && m.userData.kitable) m.material = kitMaterial(m.material, kit, new T.Vector4().fromArray(m.userData.kitLum)); });
+    if (kit) model.traverse(function (m) { if (m.isSkinnedMesh && m.userData.kitable) m.material = kitMaterial(m.material, kit, new T.Vector4().fromArray(m.userData.kitLum), m.userData.keepSkin); });
     // team colour ring under the feet, so sides can be told apart whatever the outfit
     if (o.shirt != null && !o.noRing) {
       var ring = new T.Mesh(new T.RingGeometry(0.42, 0.55, 40), new T.MeshBasicMaterial({ color: new T.Color(o.shirt), transparent: true, opacity: 0.85, depthWrite: false }));
