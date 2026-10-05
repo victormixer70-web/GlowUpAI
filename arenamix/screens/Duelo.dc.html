@@ -656,6 +656,143 @@ class Component extends DCLogic {
       u.arms[0].sho.rotation.z = 0.35; u.arms[1].sho.rotation.z = -0.35;
     }
   }
+  /* Same open-air stadium as the match (two tiers, low-poly fans, seats, aisles, LED ribbon).
+     stands: [name, x, z, length, rotY, fanLimit(worldPos), ultraZone(worldPos)] */
+  buildStadium(S, stands, teamCols, teamOf) {
+    const T = THREE;
+    const standMat = this.mat(0x2a3044, { roughness: 0.92 });
+    const seatMat = this.mat(0x1b2236, { roughness: 0.9 });
+    const LOW = 14, UP = 10;
+    const lowZ = (r) => r * 0.85, lowY = (r) => 0.6 + r * 0.48;
+    const upZ = (r) => 13 + r * 0.8, upY = (r) => 8.6 + r * 0.62;
+    const profile = () => {
+      const s = new T.Shape();
+      s.moveTo(-0.2, 0);
+      for (let r = 0; r < LOW; r++) { s.lineTo(lowZ(r), lowY(r)); s.lineTo(lowZ(r) + 0.85, lowY(r)); }
+      s.lineTo(12.2, lowY(LOW - 1)); s.lineTo(12.2, 7.4); s.lineTo(13, 7.4); s.lineTo(13, upY(0));
+      for (let r = 0; r < UP; r++) { s.lineTo(upZ(r), upY(r)); s.lineTo(upZ(r) + 0.8, upY(r)); }
+      s.lineTo(upZ(UP - 1) + 0.8, upY(UP - 1) + 1.6); s.lineTo(upZ(UP - 1) + 1.4, upY(UP - 1) + 1.6); s.lineTo(upZ(UP - 1) + 1.4, 0);
+      s.lineTo(-0.2, 0);
+      return s;
+    };
+    const adTexBig = this.canvasTex(2048, 64, (c, w, h) => {
+      c.fillStyle = '#0B0B14'; c.fillRect(0, 0, w, h);
+      c.font = 'italic 800 46px Barlow Condensed, Arial'; c.textBaseline = 'middle';
+      for (let x = 20, i = 0; x < w; x += 340, i++) { c.fillStyle = i % 2 ? '#FFC53D' : '#22D3EE'; c.fillText(i % 2 ? 'ARENA MIX · ⚡' : 'ARENA MIX', x, h / 2 + 2); }
+    });
+    const ledMat = new T.MeshStandardMaterial({ map: adTexBig, emissive: 0xffffff, emissiveMap: adTexBig, emissiveIntensity: 0.85 });
+    // crowd figures: low-poly people (legs, torso, shoulders, arms in three poses, head with hair).
+    // Vertex colours multiply the per-fan colour: white parts take the shirt colour, dark parts read as trousers/hair.
+    const part = (geo, shade, f) => { if (f) f(geo); const gg = geo.toNonIndexed(), n = gg.attributes.position.count, c = new Float32Array(n * 3).fill(shade); gg.setAttribute('color', new T.Float32BufferAttribute(c, 3)); gg.deleteAttribute('uv'); return gg; };
+    const merge = (parts) => {
+      let n = 0; parts.forEach((g2) => { n += g2.attributes.position.count; });
+      const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), colA = new Float32Array(n * 3);
+      let o = 0;
+      parts.forEach((g2) => { pos.set(g2.attributes.position.array, o * 3); nor.set(g2.attributes.normal.array, o * 3); colA.set(g2.attributes.color.array, o * 3); o += g2.attributes.position.count; });
+      const out = new T.BufferGeometry();
+      out.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); out.setAttribute('normal', new T.Float32BufferAttribute(nor, 3)); out.setAttribute('color', new T.Float32BufferAttribute(colA, 3));
+      return out;
+    };
+    const arm = (x, up, out) => part(new T.CylinderGeometry(0.052, 0.045, 0.58, 3, 1, true), 1, (g2) => {
+      g2.translate(0, -0.29, 0);
+      g2.rotateZ(up ? Math.PI - out * Math.sign(x) : 0.12 * Math.sign(x));
+      if (up) g2.rotateX(-0.25);
+      g2.translate(x, 0.86, 0.02);
+    });
+    const fanBase = () => [
+      part(new T.CylinderGeometry(0.15, 0.14, 0.36, 4, 1, true), 0.22, (g2) => { g2.scale(1, 1, 0.75); g2.translate(0, 0.18, 0); }),
+      part(new T.CylinderGeometry(0.21, 0.155, 0.52, 5, 1, true), 1, (g2) => { g2.scale(1, 1, 0.62); g2.translate(0, 0.62, 0); }),
+      part(new T.CylinderGeometry(0.07, 0.21, 0.12, 5, 1, true), 1, (g2) => { g2.scale(1, 1, 0.62); g2.translate(0, 0.94, 0); }),
+    ];
+    const fanPoses = [
+      merge(fanBase().concat([arm(-0.24, false), arm(0.24, false)])),
+      merge(fanBase().concat([arm(-0.22, true, 0.3), arm(0.22, true, 0.3)])),
+      merge(fanBase().concat([arm(-0.24, false), arm(0.22, true, 0.15)]))
+    ];
+    // head: skin colour below, hair painted on the top and back
+    const headGeo = merge([part(new T.SphereGeometry(0.118, 5, 3), 1, (g2) => { g2.scale(0.9, 1.1, 0.95); g2.translate(0, 1.07, 0); })]);
+    { const hp = headGeo.attributes.position, hc = headGeo.attributes.color; for (let k = 0; k < hp.count; k++) { if (hp.getY(k) > 1.1 || (hp.getZ(k) < -0.05 && hp.getY(k) > 1.02)) hc.setXYZ(k, 0.12, 0.12, 0.12); } }
+    const seatGeo = new T.BoxGeometry(0.46, 0.42, 0.07); seatGeo.translate(0, 0.21, -0.3);
+    const seatSpots = [], stepSpots = [];
+    const skins = [0xc68a5e, 0xe0b48f, 0x8d5a3b, 0xf1c9a5, 0x6b4129, 0xb9794f];
+    const sections = new Map();
+    const put = (key, team, ultra, wx, wy, wz, rotY, colHex) => {
+      if (!sections.has(key)) sections.set(key, { team, ultra, items: [] });
+      sections.get(key).items.push({ wx, wy, wz, rotY, col: colHex, skin: skins[Math.floor(Math.random() * skins.length)] });
+    };
+    const neutral = ['#2A3044', '#F2F5FA', '#1C2540'];
+    const fanColor = (team, ultra, row) => {
+      const [c1, c2] = teamCols[team];
+      if (ultra) return row % 2 ? c2 : c1;
+      const r = Math.random();
+      return r < 0.68 ? c1 : r < 0.86 ? c2 : neutral[Math.floor(Math.random() * neutral.length)];
+    };
+    const addStand = (name, cx, cz, len, rotY, fanLimit, ultraOf) => {
+      const g = new T.Group();
+      const geo = new T.ExtrudeGeometry(profile(), { depth: len, bevelEnabled: false });
+      geo.rotateY(-Math.PI / 2); geo.translate(len / 2, 0, 0);
+      const bowl = new T.Mesh(geo, standMat); bowl.receiveShadow = true; g.add(bowl);
+      const led = new T.Mesh(new T.PlaneGeometry(len, 0.9), ledMat); led.position.set(0, 7.9, 12.18); led.rotation.y = Math.PI; g.add(led);
+      const rim = new T.Mesh(new T.BoxGeometry(len, 0.5, 0.6), seatMat); rim.position.set(0, upY(UP - 1) + 1.85, upZ(UP - 1) + 1.1); g.add(rim);
+      g.position.set(cx, 0, cz); g.rotation.y = rotY; g.updateMatrixWorld(true);
+      S.add(g);
+      const v = new T.Vector3();
+      const seat = (x, y, z, ultraZone, row, gap) => {
+        const xm = (x + len / 2) % 9;
+        v.set(x, y, z + 0.35).applyMatrix4(g.matrixWorld);
+        if (!fanLimit(v)) return;
+        if (xm < 0.75) { if (xm < 0.66) stepSpots.push({ x: v.x, y: v.y, z: v.z, rotY }); return; } // aisle with steps
+        seatSpots.push({ x: v.x, y: v.y, z: v.z, rotY: rotY + Math.PI });
+        if (Math.random() < gap) return;
+        v.set(x + (Math.random() - 0.5) * 0.12, y, z + 0.35).applyMatrix4(g.matrixWorld);
+        const team = teamOf(v), ultra = ultraZone(v);
+        const band = Math.floor((x + len / 2) / 7);
+        put(name + ':' + band + ':' + (ultra ? 'u' : 'n'), team, ultra, v.x, v.y, v.z, rotY + Math.PI, fanColor(team, ultra, row));
+      };
+      for (let r = 0; r < LOW; r++) for (let x = -len / 2 + 0.4; x < len / 2; x += 0.62) seat(x, lowY(r), lowZ(r), ultraOf || (() => false), r, 0.04);
+      for (let r = 0; r < UP; r++) for (let x = -len / 2 + 0.4; x < len / 2; x += 0.66) seat(x, upY(r), upZ(r), () => false, r, 0.12);
+      return g;
+    };
+    stands.forEach((st) => addStand.apply(null, st));
+    // crowd: one group per section so whole blocks can bounce cheaply
+    const fanGroups = [];
+    const m4 = new T.Matrix4(), q = new T.Quaternion(), sc = new T.Vector3(1, 1, 1), pos = new T.Vector3(), col = new T.Color(), up = new T.Vector3(0, 1, 0);
+    sections.forEach((sec) => {
+      const n = sec.items.length, grp = new T.Group();
+      // pose per fan: ultras mostly arms up, the rest mostly arms down
+      const poseOf = sec.items.map(() => { const r = Math.random(); return sec.ultra ? (r < 0.5 ? 1 : r < 0.75 ? 2 : 0) : (r < 0.76 ? 0 : r < 0.9 ? 2 : 1); });
+      const counts = [0, 0, 0]; poseOf.forEach((k) => counts[k]++);
+      const bodies = fanPoses.map((geo, k) => new T.InstancedMesh(geo, new T.MeshStandardMaterial({ roughness: 0.85, vertexColors: true }), Math.max(1, counts[k])));
+      const heads = new T.InstancedMesh(headGeo, new T.MeshStandardMaterial({ roughness: 0.7, vertexColors: true }), n);
+      const at = [0, 0, 0];
+      sec.items.forEach((it, i) => {
+        q.setFromAxisAngle(up, it.rotY + (Math.random() - 0.5) * 0.4);
+        const s = 0.9 + Math.random() * 0.2; sc.set(s, s * (0.94 + Math.random() * 0.12), s);
+        m4.compose(pos.set(it.wx, it.wy, it.wz), q, sc);
+        const k = poseOf[i], bm = bodies[k], j = at[k]++;
+        bm.setMatrixAt(j, m4); heads.setMatrixAt(i, m4);
+        bm.setColorAt(j, col.set(it.col).convertSRGBToLinear());
+        heads.setColorAt(i, col.setHex(it.skin).convertSRGBToLinear());
+      });
+      bodies.forEach((bm, k) => { bm.count = counts[k]; grp.add(bm); });
+      grp.add(heads); S.add(grp);
+      grp.userData = { team: sec.team, ultra: sec.ultra, ph: Math.random() * 6.28, w: sec.ultra ? 6.5 + Math.random() : 1.5 + Math.random() };
+      fanGroups.push(grp);
+    });
+    {
+      const seats = new T.InstancedMesh(seatGeo, this.mat(0xffffff, { roughness: 0.6 }), seatSpots.length);
+      const steps = new T.InstancedMesh(new T.BoxGeometry(0.62, 0.05, 0.8), this.mat(0x8a90a3, { roughness: 0.9 }), stepSpots.length);
+      const seatCols = [new T.Color('#24304f'), new T.Color('#2b3a5e')].map((c) => c.convertSRGBToLinear());
+      seatSpots.forEach((s2, i) => {
+        q.setFromAxisAngle(up, s2.rotY); sc.set(1, 1, 1);
+        m4.compose(pos.set(s2.x, s2.y, s2.z), q, sc); seats.setMatrixAt(i, m4);
+        seats.setColorAt(i, seatCols[i % 2]);
+      });
+      stepSpots.forEach((s2, i) => { q.setFromAxisAngle(up, s2.rotY); m4.compose(pos.set(s2.x, s2.y + 0.02, s2.z), q, sc); steps.setMatrixAt(i, m4); });
+      S.add(seats); S.add(steps);
+    }
+    return fanGroups;
+  }
   buildScene() {
     const T = THREE, D = this.D, GX = this.GX;
     const S = new T.Scene();
@@ -707,35 +844,13 @@ class Component extends DCLogic {
     const apron = new T.Mesh(new T.PlaneGeometry(400, 400), this.mat(0x0f2a1a, { roughness: 1 }));
     apron.rotation.x = -Math.PI / 2; apron.position.y = -0.01; S.add(apron);
 
-    // stands + crowd
-    const standMat = this.mat(0x141b2d, { roughness: 0.9 });
-    const crowdColors = [0xff8a3d, 0xc8f031, 0x3ea6ff, 0xf2f5fa, 0xe5484d, 0x27335e, 0x27335e, 0x1c2540];
-    const addStand = (cx, cz, len, rotY) => {
-      const g = new T.Group();
-      for (let i = 0; i < 9; i++) {
-        const step = new T.Mesh(new T.BoxGeometry(len, 0.9, 1.4), standMat);
-        step.position.set(0, 0.45 + i * 0.9, i * 1.4); step.receiveShadow = true; g.add(step);
-      }
-      const back = new T.Mesh(new T.BoxGeometry(len, 3, 0.5), this.mat(0x0d1430)); back.position.set(0, 9.2, 12.8); g.add(back);
-      const roof = new T.Mesh(new T.BoxGeometry(len + 2, 0.35, 8), this.mat(0x1c2540)); roof.position.set(0, 13.5, 9); g.add(roof);
-      const n = Math.floor(len / 0.62) * 9;
-      const fan = new T.InstancedMesh(new T.BoxGeometry(0.42, 0.62, 0.32), new T.MeshStandardMaterial({ roughness: 0.8 }), n);
-      const m4 = new T.Matrix4(), col = new T.Color();
-      let idx = 0;
-      for (let row = 0; row < 9; row++) for (let i = 0; i < Math.floor(len / 0.62); i++) {
-        if (Math.random() < 0.12) { m4.makeScale(0.001, 0.001, 0.001); }
-        else { m4.makeTranslation(-len / 2 + 0.31 + i * 0.62 + (Math.random() - 0.5) * 0.1, 1.2 + row * 0.9, row * 1.4 + 0.1); }
-        fan.setMatrixAt(idx, m4);
-        col.setHex(crowdColors[Math.floor(Math.random() * crowdColors.length)]).convertSRGBToLinear();
-        fan.setColorAt(idx, col);
-        idx++;
-      }
-      g.add(fan);
-      g.position.set(cx, 0, cz); g.rotation.y = rotY;
-      S.add(g);
-      return fan;
-    };
-    this.fans = [addStand(0, D + 16, 90, 0), addStand(-46, D - 20, 80, Math.PI / 2), addStand(46, D - 20, 80, -Math.PI / 2)];
+    // stadium: stand behind the goal (ultras in the middle) and both touchline stands
+    const teamCols = [['#FF8A3D', '#0B0B14'], ['#3EA6FF', '#F4F4FA']];
+    this.fans = this.buildStadium(S, [
+      ['goal', 0, D + 9, 104, 0, (w) => Math.abs(w.x) < 40.5, (w) => Math.abs(w.x) < 15],
+      ['west', -40.5, D - 26, 70, -Math.PI / 2, (w) => w.z < D + 9.5],
+      ['east', 40.5, D - 26, 70, Math.PI / 2, (w) => w.z < D + 9.5]
+    ], teamCols, (w) => (w.x < 0 ? 0 : 1));
 
     // ad boards
     const adTex = this.canvasTex(2048, 64, (c, w, h) => {
@@ -750,12 +865,12 @@ class Component extends DCLogic {
 
     // floodlights
     const glowTex = this.canvasTex(128, 128, (c) => { const g = c.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(220,232,255,0.5)'); g.addColorStop(1, 'rgba(220,232,255,0)'); c.fillStyle = g; c.fillRect(0, 0, 128, 128); });
-    [[-38, D + 22], [38, D + 22], [-44, -8], [44, -8]].forEach(([x, z]) => {
-      const pole = new T.Mesh(new T.CylinderGeometry(0.3, 0.45, 30, 8), this.mat(0x2a3556)); pole.position.set(x, 15, z); S.add(pole);
+    [[-66, D + 30], [66, D + 30], [-66, D - 50], [66, D - 50]].forEach(([x, z]) => {
+      const pole = new T.Mesh(new T.CylinderGeometry(0.4, 0.7, 36, 8), this.mat(0x2a3556)); pole.position.set(x, 18, z); S.add(pole);
       const panel = new T.Mesh(new T.BoxGeometry(6, 3, 0.4), new T.MeshStandardMaterial({ color: 0xffffff, emissive: 0xf4f8ff, emissiveIntensity: 1.6 }));
-      panel.position.set(x, 30, z); panel.lookAt(0, 0, D / 2); S.add(panel);
+      panel.position.set(x, 36, z); panel.lookAt(0, 0, D / 2); S.add(panel);
       const sp = new T.Sprite(new T.SpriteMaterial({ map: glowTex, blending: T.AdditiveBlending, depthWrite: false, transparent: true, opacity: SKY ? 0.3 : 0.85 }));
-      sp.scale.set(26, 26, 1); sp.position.set(x, 30, z); S.add(sp);
+      sp.scale.set(30, 30, 1); sp.position.set(x, 36, z); S.add(sp);
     });
 
     // goal
@@ -905,9 +1020,14 @@ class Component extends DCLogic {
     if (this.tap) { this.tapRing.visible = true; this.tapRing.position.set(this.tap.x, this.tap.y, D - 0.4); this.tapRing.rotation.y = 0; }
     else this.tapRing.visible = false;
     // crowd bounce on goal
-    if (this.result && (this.result.kind === 'gol' || this.result.kind === 'diana') && this.fans) {
-      this.fans[0].position.y = Math.abs(Math.sin(this.pt * 12)) * 0.25 * Math.max(0, 1 - this.pt / 2);
-    } else if (this.fans) this.fans[0].position.y = 0;
+    // crowd: everyone sways a little; on a goal the whole stadium jumps, ultras behind the goal the most
+    if (this.fans) {
+      const goal = this.result && (this.result.kind === 'gol' || this.result.kind === 'diana'), now = performance.now() / 1000;
+      this.fans.forEach((f) => {
+        const u = f.userData, jump = goal ? Math.abs(Math.sin(this.pt * (u.ultra ? 12 : 9) + u.ph)) * (u.ultra ? 0.3 : 0.18) * Math.max(0, 1 - this.pt / 2.5) : 0;
+        f.position.y = jump + (u.ultra ? Math.abs(Math.sin(now * u.w + u.ph)) * 0.05 : 0);
+      });
+    }
     this.R.render(this.S, this.cam);
   }
   ray(e, z) {
