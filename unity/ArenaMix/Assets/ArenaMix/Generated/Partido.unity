@@ -14,12 +14,12 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_FogMode: 3
+  m_Fog: 1
+  m_FogColor: {r: 0.6, g: 0.64, b: 0.68, a: 1}
+  m_FogMode: 1
   m_FogDensity: 0.01
-  m_LinearFogStart: 0
-  m_LinearFogEnd: 300
+  m_LinearFogStart: 250
+  m_LinearFogEnd: 1400
   m_AmbientSkyColor: {r: 0.78, g: 0.84, b: 0.95, a: 1}
   m_AmbientEquatorColor: {r: 0.5, g: 0.56, b: 0.55, a: 1}
   m_AmbientGroundColor: {r: 0.22, g: 0.32, b: 0.2, a: 1}
@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &310670220
+--- !u!1 &44824561
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,9 +127,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 310670223}
-  - component: {fileID: 310670222}
-  - component: {fileID: 310670221}
+  - component: {fileID: 44824565}
+  - component: {fileID: 44824564}
+  - component: {fileID: 44824563}
+  - component: {fileID: 44824562}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -137,21 +138,65 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &310670221
+--- !u!114 &44824562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44824561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 1
+  m_Antialiasing: 2
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
+--- !u!81 &44824563
 AudioListener:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 310670220}
+  m_GameObject: {fileID: 44824561}
   m_Enabled: 1
---- !u!20 &310670222
+--- !u!20 &44824564
 Camera:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 310670220}
+  m_GameObject: {fileID: 44824561}
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
@@ -177,8 +222,8 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 42
+  far clip plane: 3000
+  field of view: 24
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -196,22 +241,22 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!4 &310670223
+--- !u!4 &44824565
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 310670220}
+  m_GameObject: {fileID: 44824561}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.2419219, y: 0, z: 0, w: 0.9702957}
-  m_LocalPosition: {x: 0, y: 14, z: -31}
+  m_LocalRotation: {x: 0.15643448, y: 0, z: 0, w: 0.98768836}
+  m_LocalPosition: {x: 0, y: 24, z: -70}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &790184032
+--- !u!1 &1001898845
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -219,71 +264,39 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 790184035}
-  - component: {fileID: 790184034}
-  - component: {fileID: 790184033}
+  - component: {fileID: 1001898847}
+  - component: {fileID: 1001898846}
   m_Layer: 0
-  m_Name: Match
+  m_Name: PostFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &790184033
+--- !u!114 &1001898846
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 790184032}
+  m_GameObject: {fileID: 1001898845}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d78204dc74ecb284c956a528a30b7197, type: 3}
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ArenaMix.MatchManager
-  length: 50
-  width: 32
-  goalWidth: 7.2
-  goalHeight: 2.44
-  matchSeconds: 180
-  characterModels:
-  - {fileID: 919132149155446097, guid: 74b907b9980b9644f858a84575e5f3e9, type: 3}
-  - {fileID: 919132149155446097, guid: 95f49cf31e5e8144b86352414ed3ce33, type: 3}
-  - {fileID: 919132149155446097, guid: 02c1dbc8e6eeddb418e917107ecfdb01, type: 3}
-  controller: {fileID: 9100000, guid: 0e6dca907fa721240b67fa40af2fa357, type: 2}
-  characterHeight: 1.85
-  pitchLight: {fileID: 2100000, guid: 8f957a4c2490a1b46a2cdfc974257e3c, type: 2}
-  pitchDark: {fileID: 2100000, guid: 2876a94ad13e57d449bc146a71f407f5, type: 2}
-  lineMat: {fileID: 2100000, guid: 5f280196fa8c5a547975819f1bc61278, type: 2}
-  postMat: {fileID: 2100000, guid: dd9f7e3f392a76d44a6cc75d1b1a7f53, type: 2}
-  netMat: {fileID: 2100000, guid: 03e299740500d0847b237229879738fe, type: 2}
-  boardMat: {fileID: 2100000, guid: 9bfee591754e7ce4f9c5f44c5220d723, type: 2}
-  standMat: {fileID: 2100000, guid: b5d6c89b4423d4c4caf17d0abd5268c6, type: 2}
-  ballMat: {fileID: 2100000, guid: a67afdee64ba7f742a50c0d4091f7d23, type: 2}
-  ringMat: {fileID: 2100000, guid: daf609f7e05942e42bc967987b1d4ad3, type: 2}
-  homeColor: {r: 1, g: 0.54, b: 0.24, a: 1}
-  awayColor: {r: 0.24, g: 0.65, b: 1, a: 1}
---- !u!114 &790184034
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 790184032}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4166c32eaf43faf4dbca30777b3a6c31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ArenaMix.GameInput
-  HasBall: 0
-  Charge: 0
---- !u!4 &790184035
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 10
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 26fae823fb98f6244b2c505c2f1df001, type: 2}
+--- !u!4 &1001898847
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 790184032}
+  m_GameObject: {fileID: 1001898845}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -292,7 +305,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &985464655
+--- !u!1 &1391415804
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -300,9 +313,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 985464658}
-  - component: {fileID: 985464657}
-  - component: {fileID: 985464656}
+  - component: {fileID: 1391415807}
+  - component: {fileID: 1391415806}
+  - component: {fileID: 1391415805}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -310,13 +323,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &985464656
+--- !u!114 &1391415805
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 985464655}
+  m_GameObject: {fileID: 1391415804}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
@@ -339,18 +352,18 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!108 &985464657
+--- !u!108 &1391415806
 Light:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 985464655}
+  m_GameObject: {fileID: 1391415804}
   m_Enabled: 1
   serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 0.96, b: 0.9, a: 1}
-  m_Intensity: 1.35
+  m_Intensity: 1.15
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -404,13 +417,13 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
---- !u!4 &985464658
+--- !u!4 &1391415807
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 985464655}
+  m_GameObject: {fileID: 1391415804}
   serializedVersion: 2
   m_LocalRotation: {x: 0.418082, y: -0.27027258, z: 0.13182074, w: 0.85719514}
   m_LocalPosition: {x: 0, y: 3, z: 0}
@@ -419,10 +432,109 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &2007237617
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2007237620}
+  - component: {fileID: 2007237619}
+  - component: {fileID: 2007237618}
+  m_Layer: 0
+  m_Name: Match
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2007237618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007237617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d78204dc74ecb284c956a528a30b7197, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArenaMix.MatchManager
+  teamSize: 1
+  matchSeconds: 180
+  length: 40
+  width: 26
+  goalWidth: 5.5
+  goalHeight: 2.2
+  characterModels:
+  - {fileID: 1117241229758336119, guid: 584f27cf2dced2f499155f85fe35960d, type: 3}
+  - {fileID: 6908402254565544159, guid: 0c414aeb73ac6bd4c8f8f94f41b475b3, type: 3}
+  - {fileID: 8234655027104547658, guid: 0d8b4fd499a81684e8d853d0566bb429, type: 3}
+  - {fileID: 5073749678180075472, guid: 0735fa75d50e2cc408cc2d76311798ee, type: 3}
+  - {fileID: 8499019850386278728, guid: c8defdb7d3d2a2b43a2bb8175addd2a1, type: 3}
+  - {fileID: 6918561761214085102, guid: 4a1ca32d8fca9de4c8f967a0c9581e4d, type: 3}
+  - {fileID: 1886145672571047138, guid: 733cb50e0c3bde843adc67e8ec5b5444, type: 3}
+  controller: {fileID: 9100000, guid: 0e6dca907fa721240b67fa40af2fa357, type: 2}
+  characterHeight: 1.85
+  pitchLight: {fileID: 2100000, guid: 8f957a4c2490a1b46a2cdfc974257e3c, type: 2}
+  pitchDark: {fileID: 2100000, guid: 2876a94ad13e57d449bc146a71f407f5, type: 2}
+  lineMat: {fileID: 2100000, guid: 5f280196fa8c5a547975819f1bc61278, type: 2}
+  postMat: {fileID: 2100000, guid: dd9f7e3f392a76d44a6cc75d1b1a7f53, type: 2}
+  netMat: {fileID: 2100000, guid: 03e299740500d0847b237229879738fe, type: 2}
+  boardMat: {fileID: 2100000, guid: 9bfee591754e7ce4f9c5f44c5220d723, type: 2}
+  standMat: {fileID: 2100000, guid: b5d6c89b4423d4c4caf17d0abd5268c6, type: 2}
+  ballMat: {fileID: 2100000, guid: a67afdee64ba7f742a50c0d4091f7d23, type: 2}
+  ringMat: {fileID: 2100000, guid: daf609f7e05942e42bc967987b1d4ad3, type: 2}
+  seatMat: {fileID: 2100000, guid: dd2e8f372a38c064a853ecda27715641, type: 2}
+  roofMat: {fileID: 2100000, guid: dd9005e3ffb6b4e4aab16dc9134190f4, type: 2}
+  glowMat: {fileID: 2100000, guid: f979a1ac83cbf914a9e83fb8442b7384, type: 2}
+  skinMat: {fileID: 2100000, guid: 62133724b7bffed46a0cb4d5afa55c99, type: 2}
+  apronMat: {fileID: 2100000, guid: e9f66b9b25b09c94cbab5cb7898cf6ac, type: 2}
+  glassMat: {fileID: 2100000, guid: a5157f38f3b495c4189b1b4fbc34de1a, type: 2}
+  accentMat: {fileID: 2100000, guid: 08fc1fcfbd90cf94e8427a675dc87244, type: 2}
+  tunnelMat: {fileID: 2100000, guid: 89aef7adb46c1d246a143c7ca12e8384, type: 2}
+  roofUnderMat: {fileID: 2100000, guid: 446e9fd9639799a44a9f55973e8ce1d4, type: 2}
+  ribMat: {fileID: 2100000, guid: c056152eda87a0644bc9c1aaeeea7480, type: 2}
+  photoStadium: 0
+  homeColor: {r: 1, g: 0.54, b: 0.24, a: 1}
+  awayColor: {r: 0.24, g: 0.65, b: 1, a: 1}
+--- !u!114 &2007237619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007237617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4166c32eaf43faf4dbca30777b3a6c31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArenaMix.GameInput
+  HasBall: 0
+  Charge: 0
+  ShowPass: 0
+--- !u!4 &2007237620
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007237617}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 310670223}
-  - {fileID: 985464658}
-  - {fileID: 790184035}
+  - {fileID: 44824565}
+  - {fileID: 1391415807}
+  - {fileID: 2007237620}
+  - {fileID: 1001898847}
