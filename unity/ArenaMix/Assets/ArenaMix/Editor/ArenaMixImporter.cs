@@ -86,6 +86,13 @@ namespace ArenaMix.EditorTools
             string name = Path.GetFileNameWithoutExtension(assetPath).ToLowerInvariant();
             if (name.Contains("normal")) ti.textureType = TextureImporterType.NormalMap;
             if (assetPath.Contains("/Environment/new_football_map/")) { ti.maxTextureSize = 4096; ti.alphaIsTransparency = true; }
+            // the web version downloads everything: smaller textures there (characters and goal at 1024, the rest at 2048)
+            bool small = assetPath.Contains("/Characters/") || assetPath.Contains("/porteria/");
+            ti.SetPlatformTextureSettings(new TextureImporterPlatformSettings
+            {
+                name = "WebGL", overridden = true, maxTextureSize = small ? 1024 : 2048,
+                format = TextureImporterFormat.Automatic, textureCompression = TextureImporterCompression.Compressed
+            });
             if (assetPath.Contains("/Generated/"))
             {
                 ti.alphaIsTransparency = true;

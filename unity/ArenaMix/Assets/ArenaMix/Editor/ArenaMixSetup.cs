@@ -64,6 +64,39 @@ namespace ArenaMix.EditorTools
             }
         }
 
+        /// <summary>
+        /// Builds the game for the browser (WebGL) into arenamix/futbol3d of the repository, ready for GitHub Pages:
+        /// gzip with decompression fallback (Pages does not send the compression headers), browser data caching.
+        /// Needs the "Web Build Support" module from Unity Hub.
+        /// </summary>
+        [MenuItem("ArenaMix/Exportar para la web (arenamix/futbol3d)", priority = 2)]
+        public static void ExportWeb()
+        {
+            string scene = Gen + "/Partido.unity";
+            if (!File.Exists(scene)) { EditorUtility.DisplayDialog("ArenaMix", "Primero usa ArenaMix → Preparar proyecto.", "Vale"); return; }
+            if (!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.WebGL, BuildTarget.WebGL))
+            {
+                EditorUtility.DisplayDialog("ArenaMix", "Falta el módulo \"Web Build Support\".\n\nÁbrelo en Unity Hub → Installs → tu versión de Unity → ⚙ → Add modules → Web Build Support, y vuelve a probar.", "Vale");
+                return;
+            }
+            string outDir = Path.GetFullPath(Path.Combine(Application.dataPath, "../../../arenamix/futbol3d"));
+            PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;
+            PlayerSettings.WebGL.decompressionFallback = true;
+            PlayerSettings.WebGL.dataCaching = true;
+            PlayerSettings.WebGL.nameFilesAsHashes = false;
+            var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
+            {
+                scenes = new[] { scene },
+                locationPathName = outDir,
+                target = BuildTarget.WebGL,
+                options = BuildOptions.None
+            });
+            bool ok = report.summary.result == UnityEditor.Build.Reporting.BuildResult.Succeeded;
+            EditorUtility.DisplayDialog("ArenaMix", ok
+                ? "Exportado a arenamix/futbol3d.\n\nAhora en GitHub Desktop: Commit y Push origin. En unos minutos estará en la web, en Fútbol → Informal → FÚTBOL 3D."
+                : "La exportación ha fallado. Mira la ventana Console y mándame una captura.", "Vale");
+        }
+
         // ---------------- animations ----------------
         static AnimationClip Clip(string file)
         {

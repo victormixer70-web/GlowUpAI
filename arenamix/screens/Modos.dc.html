@@ -158,6 +158,8 @@ class Component extends DCLogic {
     let list;
     if (s.cat === 'train') list = C.train;
     else list = C.modes.concat(s.cat === 'casual' ? [{ id: 'private', title: 'PARTIDA PRIVADA', kind: 'private', desc: 'Invita a tus amigos con un código. Los huecos los rellena la IA y le puedes dar órdenes.' }] : []);
+    // the new 3D football (Unity, exported to futbol3d/) as the first casual mode
+    if (s.cat === 'casual' && s.sport === 'futbol') list = [{ id: 'f3d', title: 'FÚTBOL 3D', kind: 'ext', href: 'futbol3d/index.html', desc: 'Nuevo: estadio 3D, pases y saques de puerta.' }].concat(list);
     let cur = list.find((m) => m.id === s.id && !m.soon) || list.find((m) => !m.soon);
     const comp = s.cat === 'comp', S = this.season();
     const placingOf = (m) => this.placeOf(S, s.sport + ':' + m.id).g < 5;
@@ -174,7 +176,7 @@ class Component extends DCLogic {
     const mmr = cur && comp ? this.mmrOf(s.sport, cur.id) : 0, R = this.rankOf(mmr);
     const curPlacing = cur && comp && placingOf(cur), curPc = cur ? this.placeOf(S, s.sport + ':' + cur.id) : null;
     const tab = (on) => 'flex: 1; height: 36px; border: 0; border-radius: 10px; font: 800 12px Manrope, sans-serif; letter-spacing: .5px; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
-    const href = !cur ? '#' : s.cat === 'train' ? cur.href : cur.kind === 'private' ? 'Privada.dc.html' : comp ? 'Competitivo.dc.html' : 'Rapida.dc.html';
+    const href = !cur ? '#' : s.cat === 'train' || cur.kind === 'ext' ? cur.href : cur.kind === 'private' ? 'Privada.dc.html' : comp ? 'Competitivo.dc.html' : 'Rapida.dc.html';
     const catName = { comp: 'COMPETITIVO', casual: 'INFORMAL', train: 'ENTRENAMIENTO' }[s.cat];
     return {
       sportName: C.name, sportSize: C.name.length > 7 ? 32 : 40,
