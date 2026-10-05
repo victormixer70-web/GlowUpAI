@@ -662,7 +662,17 @@ class Component extends DCLogic {
     S.background = new T.Color(0x0b1430);
     S.fog = new T.Fog(0x0b1430, 70, 170);
     this.S = S;
-    S.add(new T.HemisphereLight(0xcfe0ff, 0x1d5a33, 0.75));
+    const hemi = new T.HemisphereLight(0xcfe0ff, 0x1d5a33, 0.75);
+    S.add(hemi);
+    // real stadium HDRI: daylight sky behind the stands and image-based light on players and pitch
+    const SKY = window.AMSky;
+    if (SKY) {
+      S.background = new T.Color(SKY.fog); S.fog = new T.Fog(SKY.fog, 80, 200);
+      const sky = new T.Mesh(new T.SphereGeometry(190, 32, 16), new T.MeshBasicMaterial({ map: SKY.bg(), side: T.BackSide, fog: false, toneMapped: false }));
+      sky.scale.x = -1; S.add(sky);
+      const R0 = this.R;
+      if (R0) SKY.env(R0).then((e) => { if (!e || this.R !== R0) return; S.environment = e; hemi.intensity = 0.3; });
+    }
     const sun = new T.DirectionalLight(0xfff4e0, 1.25);
     sun.position.set(-18, 32, D - 18);
     sun.target.position.set(GX * 0.5, 0, D * 0.6);
@@ -744,7 +754,7 @@ class Component extends DCLogic {
       const pole = new T.Mesh(new T.CylinderGeometry(0.3, 0.45, 30, 8), this.mat(0x2a3556)); pole.position.set(x, 15, z); S.add(pole);
       const panel = new T.Mesh(new T.BoxGeometry(6, 3, 0.4), new T.MeshStandardMaterial({ color: 0xffffff, emissive: 0xf4f8ff, emissiveIntensity: 1.6 }));
       panel.position.set(x, 30, z); panel.lookAt(0, 0, D / 2); S.add(panel);
-      const sp = new T.Sprite(new T.SpriteMaterial({ map: glowTex, blending: T.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.85 }));
+      const sp = new T.Sprite(new T.SpriteMaterial({ map: glowTex, blending: T.AdditiveBlending, depthWrite: false, transparent: true, opacity: SKY ? 0.3 : 0.85 }));
       sp.scale.set(26, 26, 1); sp.position.set(x, 30, z); S.add(sp);
     });
 
