@@ -364,6 +364,53 @@ namespace ArenaMix.EditorTools
             }
         }
 
+        /// <summary>The goal model from Environment/porteria with URP materials made from its textures.</summary>
+        static GameObject GoalPrefab()
+        {
+            string dir = Root + "/Environment/porteria";
+            if (!AssetDatabase.IsValidFolder(dir)) return null;
+            string fbx = AssetDatabase.FindAssets("t:Model", new[] { dir }).Select(AssetDatabase.GUIDToAssetPath).FirstOrDefault();
+            var src = fbx != null ? AssetDatabase.LoadAssetAtPath<GameObject>(fbx) : null;
+            if (src == null) return null;
+            Texture2D T(string file)
+            {
+                foreach (var ext in new[] { ".png", ".jpeg", ".jpg" })
+                {
+                    var t = AssetDatabase.LoadAssetAtPath<Texture2D>($"{dir}/textures/{file}{ext}");
+                    if (t != null) return t;
+                }
+                return null;
+            }
+            Material Make(string name, string baseTex, string normal, string metal, float smooth)
+            {
+                var m = Mat("Goal" + name, Lit, Color.white);
+                var b = T(baseTex); if (b != null) m.SetTexture("_BaseMap", b);
+                var n = T(normal); if (n != null) { m.SetTexture("_BumpMap", n); m.EnableKeyword("_NORMALMAP"); }
+                var me = T(metal); if (me != null) { m.SetTexture("_MetallicGlossMap", me); m.EnableKeyword("_METALLICSPECGLOSSMAP"); }
+                m.SetFloat("_Smoothness", smooth);
+                return m;
+            }
+            var frame = Make("Frame", "Bar_Base_Color", "Bar_Normal", "Bar_Metallic", 0.6f);
+            var cage = Make("Case", "Case_Base_Color", "Case_Normal", "Case_Metallic", 0.4f);
+            var net = Make("Net", "Fabric_Diffuse", "Fabric_Texture_Normal", null, 0.2f);
+            net.SetFloat("_Cull", 0f);
+            var inst = (GameObject)PrefabUtility.InstantiatePrefab(src);
+            try
+            {
+                foreach (var r in inst.GetComponentsInChildren<Renderer>(true))
+                {
+                    string n = (r.name + " " + string.Join(" ", r.sharedMaterials.Where(x => x != null).Select(x => x.name))).ToLowerInvariant();
+                    var m = n.Contains("bar") ? frame : n.Contains("case") ? cage : net;
+                    r.sharedMaterials = Enumerable.Repeat(m, Mathf.Max(1, r.sharedMaterials.Length)).ToArray();
+                }
+                return PrefabUtility.SaveAsPrefabAsset(inst, Gen + "/Goal.prefab");
+            }
+            finally
+            {
+                Object.DestroyImmediate(inst);
+            }
+        }
+
         // ---------------- image quality ----------------
         static void CameraQuality(Camera cam)
         {
@@ -454,6 +501,7 @@ namespace ArenaMix.EditorTools
                 .Select(CharacterPrefab)
                 .Where(g => g != null).ToArray();
             mm.controller = controller;
+            mm.goalModel = GoalPrefab();
             mm.pitchLight = mats.pitchLight; mm.pitchDark = mats.pitchDark; mm.lineMat = mats.line;
             mm.postMat = mats.post; mm.netMat = mats.net; mm.boardMat = mats.board; mm.standMat = mats.stand;
             mm.ballMat = mats.ball; mm.ringMat = mats.ring;

@@ -27,6 +27,9 @@ namespace ArenaMix
         public RuntimeAnimatorController controller;
         public float characterHeight = 1.85f;
 
+        [Header("Goal model (optional, Environment/porteria)")]
+        public GameObject goalModel;
+
         [Header("Materials (created by ArenaMix > Preparar proyecto)")]
         public Material pitchLight, pitchDark, lineMat, postMat, netMat, boardMat, standMat, ballMat, ringMat;
         public Material seatMat, roofMat, glowMat, skinMat, apronMat;
@@ -313,6 +316,8 @@ namespace ArenaMix
             var root = new GameObject(side < 0 ? "GoalWest" : "GoalEast").transform;
             float gx = length * 0.5f * side, hw = goalWidth * 0.5f, h = goalHeight, depth = 1.8f, r = 0.06f;
             root.position = new Vector3(gx, 0f, 0f);
+            // the 3D goal model, fitted to this mode's goal size; the simple posts below stay as invisible colliders
+            bool model = goalModel != null && FitGoalModel(root, side, ref depth);
             foreach (float z in new[] { -hw, hw })
             {
                 var p = Prim(PrimitiveType.Cylinder, "Post", root, new Vector3(0f, h * 0.5f, z), new Vector3(r * 2f, h * 0.5f, r * 2f), postMat, true);
@@ -344,6 +349,52 @@ namespace ArenaMix
             var gt = trig.AddComponent<GoalTrigger>();
             gt.match = this;
             gt.scoringTeam = side > 0 ? 0 : 1;
+            if (model)
+                foreach (Transform c in root)
+                    if (c.name == "Post" || c.name == "Crossbar" || c.name == "Net") c.GetComponent<Renderer>().enabled = false;
+        }
+
+        /// <summary>
+        /// Places the goal model on the goal line: turned so the frame faces the pitch, scaled so the opening is
+        /// goalWidth x goalHeight. Returns false if the model has nothing to show.
+        /// </summary>
+        bool FitGoalModel(Transform root, int side, ref float depth)
+        {
+            var holder = new GameObject("GoalModel").transform;
+            holder.SetParent(root, false);
+            var g = Instantiate(goalModel, holder);
+            g.transform.localPosition = Vector3.zero;
+            Bounds B(System.Func<Renderer, bool> pick)
+            {
+                Bounds b = new Bounds(); bool any = false;
+                foreach (var r in g.GetComponentsInChildren<Renderer>())
+                {
+                    if (!pick(r)) continue;
+                    if (!any) { b = r.bounds; any = true; } else b.Encapsulate(r.bounds);
+                }
+                return b;
+            }
+            bool IsFrame(Renderer r) => r.name.ToLowerInvariant().Contains("bar");
+            var all = B(_ => true);
+            if (all.size.sqrMagnitude < 1e-6f) { Destroy(holder.gameObject); return false; }
+            // width along z
+            if (all.size.x > all.size.z) { g.transform.localRotation = Quaternion.Euler(0f, 90f, 0f) * g.transform.localRotation; all = B(_ => true); }
+            // the frame (posts and crossbar) at the front, facing the centre of the pitch
+            var frame = B(IsFrame);
+            if (frame.size.sqrMagnitude < 1e-6f) frame = all;
+            float front = Mathf.Sign(frame.center.x - all.center.x);
+            if (front != 0f && front != -side) { g.transform.localRotation = Quaternion.Euler(0f, 180f, 0f) * g.transform.localRotation; all = B(_ => true); frame = B(IsFrame); if (frame.size.sqrMagnitude < 1e-6f) frame = all; }
+            // scale: opening = goal size, depth in proportion
+            float sh = goalHeight / Mathf.Max(0.01f, frame.size.y), sw = goalWidth / Mathf.Max(0.01f, frame.size.z);
+            holder.localScale = new Vector3(sh, sh, sw);
+            all = B(_ => true); frame = B(IsFrame); if (frame.size.sqrMagnitude < 1e-6f) frame = all;
+            // frame front on the goal line, standing on the grass, centred
+            Vector3 off = new Vector3(root.position.x - (side > 0 ? frame.min.x : frame.max.x), -all.min.y, root.position.z - frame.center.z);
+            holder.position += off;
+            depth = Mathf.Clamp(all.size.x, 1.2f, 3f);
+            foreach (var r in g.GetComponentsInChildren<Renderer>()) r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            foreach (var c in g.GetComponentsInChildren<Collider>()) Destroy(c);
+            return true;
         }
 
         void BuildBoardsAndStands()
