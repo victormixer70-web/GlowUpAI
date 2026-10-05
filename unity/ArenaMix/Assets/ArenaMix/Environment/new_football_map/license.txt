@@ -1,0 +1,11 @@
+Model Information:
+* title:	New Football Map
+* source:	https://sketchfab.com/3d-models/new-football-map-5993a290e7df41b9ac554c205ff22199
+* author:	kyrox (https://sketchfab.com/kyroxffx)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "New Football Map" (https://sketchfab.com/3d-models/new-football-map-5993a290e7df41b9ac554c205ff22199) by kyrox (https://sketchfab.com/kyroxffx) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
