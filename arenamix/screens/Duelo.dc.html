@@ -753,7 +753,27 @@ class Component extends DCLogic {
       for (let r = 0; r < UP; r++) for (let x = -len / 2 + 0.4; x < len / 2; x += 0.66) seat(x, upY(r), upZ(r), () => false, r, 0.12);
       return g;
     };
-    stands.forEach((st) => addStand.apply(null, st));
+    // corner stands: the same two-tier profile turned through a quarter circle around the pitch corner,
+    // so the straight stands join up with no empty gaps; fans face the pitch
+    const cornerMat = standMat.clone(); cornerMat.side = T.DoubleSide;
+    const addCorner = (name, cx, cz, phi0) => {
+      const pts = profile().getPoints().map((p) => new T.Vector2(Math.max(0, p.x), p.y));
+      const bowl = new T.Mesh(new T.LatheGeometry(pts, 14, phi0, Math.PI / 2), cornerMat);
+      bowl.position.set(cx, 0, cz); bowl.receiveShadow = true; S.add(bowl);
+      const row = (rad, y, gap, r) => {
+        const n = Math.floor(rad * Math.PI / 2 / 0.64);
+        for (let i = 0; i < n; i++) {
+          const ph = phi0 + (i + 0.5) / n * Math.PI / 2, wx = cx + Math.sin(ph) * rad, wz = cz + Math.cos(ph) * rad;
+          seatSpots.push({ x: wx, y, z: wz, rotY: ph + Math.PI });
+          if (Math.random() < gap) continue;
+          const team = teamOf({ x: wx, z: wz });
+          put(name + ':' + Math.floor(i / Math.max(1, n / 3)), team, false, wx, y, wz, ph + Math.PI, fanColor(team, false, r));
+        }
+      };
+      for (let r = 1; r < LOW; r++) row(lowZ(r) + 0.35, lowY(r), 0.06, r);
+      for (let r = 0; r < UP; r++) row(upZ(r) + 0.35, upY(r), 0.14, r);
+    };
+    stands.forEach((st) => (st[0] === 'corner' ? addCorner(st[1], st[2], st[3], st[4]) : addStand.apply(null, st)));
     // crowd: one group per section so whole blocks can bounce cheaply
     const fanGroups = [];
     const m4 = new T.Matrix4(), q = new T.Quaternion(), sc = new T.Vector3(1, 1, 1), pos = new T.Vector3(), col = new T.Color(), up = new T.Vector3(0, 1, 0);
@@ -847,9 +867,11 @@ class Component extends DCLogic {
     // stadium: stand behind the goal (ultras in the middle) and both touchline stands
     const teamCols = [['#FF8A3D', '#0B0B14'], ['#3EA6FF', '#F4F4FA']];
     this.fans = this.buildStadium(S, [
-      ['goal', 0, D + 9, 104, 0, (w) => Math.abs(w.x) < 40.5, (w) => Math.abs(w.x) < 15],
-      ['west', -40.5, D - 26, 70, -Math.PI / 2, (w) => w.z < D + 9.5],
-      ['east', 40.5, D - 26, 70, Math.PI / 2, (w) => w.z < D + 9.5]
+      ['goal', 0, D + 9, 81, 0, () => true, (w) => Math.abs(w.x) < 15],
+      ['west', -40.5, D - 26, 70, -Math.PI / 2, () => true],
+      ['east', 40.5, D - 26, 70, Math.PI / 2, () => true],
+      ['corner', 'cw', -40.5, D + 9, Math.PI * 1.5],
+      ['corner', 'ce', 40.5, D + 9, 0]
     ], teamCols, (w) => (w.x < 0 ? 0 : 1));
 
     // ad boards
