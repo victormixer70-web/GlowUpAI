@@ -25,6 +25,7 @@ namespace ArenaMix
 
         [Header("Materials (created by ArenaMix > Preparar proyecto)")]
         public Material pitchLight, pitchDark, lineMat, postMat, netMat, boardMat, standMat, ballMat, ringMat;
+        public Material seatMat, roofMat, glowMat, skinMat, apronMat;
 
         [Header("Look")]
         public Color homeColor = new Color(1f, 0.54f, 0.24f);
@@ -41,6 +42,7 @@ namespace ArenaMix
         readonly Footballer[] field = new Footballer[2];
         readonly Keeper[] keepers = new Keeper[2];
         GameInput input;
+        StadiumBuilder stadium;
         string flash; float flashTime;
         int lastScorer;
 
@@ -86,6 +88,11 @@ namespace ArenaMix
             postMat = M(postMat, lit, Color.white);
             netMat = M(netMat, unlit, new Color(1f, 1f, 1f, 0.5f));
             boardMat = M(boardMat, unlit, new Color(0.05f, 0.05f, 0.09f));
+            seatMat = M(seatMat, lit, new Color(0.13f, 0.2f, 0.42f));
+            roofMat = M(roofMat, lit, new Color(0.78f, 0.8f, 0.84f));
+            glowMat = M(glowMat, unlit, new Color(1f, 0.98f, 0.92f));
+            skinMat = M(skinMat, lit, new Color(0.78f, 0.58f, 0.44f));
+            apronMat = M(apronMat, lit, new Color(0.06f, 0.3f, 0.08f));
             standMat = M(standMat, lit, new Color(0.16f, 0.19f, 0.27f));
             ballMat = M(ballMat, lit, Color.white);
             if (ringMat == null)
@@ -250,14 +257,16 @@ namespace ArenaMix
             Wall(new Vector3(-hx - 0.3f, 8f, 0f), new Vector3(0.4f, 16f, hz * 2f + 2f));
             Wall(new Vector3(hx + 0.3f, 8f, 0f), new Vector3(0.4f, 16f, hz * 2f + 2f));
             Wall(new Vector3(0f, 16f, 0f), new Vector3(hx * 2f + 2f, 0.4f, hz * 2f + 2f));
-            // stepped stands on the far side and behind both goals
-            for (int i = 0; i < 9; i++)
+            // the stadium bowl: stands, corners, roof and crowd
+            var apron = Prim(PrimitiveType.Quad, "Apron", root, new Vector3(0f, -0.02f, 0f), new Vector3(length + 120f, width + 120f, 1f), apronMat);
+            apron.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            stadium = new StadiumBuilder
             {
-                float y = 0.6f + i * 0.75f, d = 2.5f + i * 1.1f;
-                Prim(PrimitiveType.Cube, "StandFar", root, new Vector3(0f, y * 0.5f, hz + d), new Vector3(hx * 2f + 16f, y, 1.1f), standMat);
-                Prim(PrimitiveType.Cube, "StandW", root, new Vector3(-hx - d, y * 0.5f, 0f), new Vector3(1.1f, y, hz * 2f), standMat);
-                Prim(PrimitiveType.Cube, "StandE", root, new Vector3(hx + d, y * 0.5f, 0f), new Vector3(1.1f, y, hz * 2f), standMat);
-            }
+                concrete = standMat, seat = seatMat, roof = roofMat, glow = glowMat, skin = skinMat,
+                homeColors = new[] { homeColor, Color.Lerp(homeColor, Color.white, 0.25f), Color.Lerp(homeColor, Color.black, 0.3f) },
+                awayColors = new[] { awayColor, Color.Lerp(awayColor, Color.white, 0.25f), Color.Lerp(awayColor, Color.black, 0.3f) }
+            };
+            stadium.Build(root, length * 0.5f + 5.5f, width * 0.5f + 5f);
         }
 
         void SpawnBall()

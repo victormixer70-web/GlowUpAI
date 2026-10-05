@@ -5,6 +5,7 @@ using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace ArenaMix.EditorTools
 {
@@ -18,8 +19,13 @@ namespace ArenaMix.EditorTools
         const string Root = ArenaMixImporter.Root;
         const string Gen = Root + "/Generated";
 
-        // character files in Assets/ArenaMix/Characters (first one is yours by default)
-        static readonly string[] Characters = { "Ty", "Big_Vegas", "Sporty_Granny" };
+        /// <summary>Every model in Assets/ArenaMix/Characters (Ty first: he is yours by default).
+        /// Drop more Mixamo characters (FBX for Unity, with skin) in that folder and run the menu again.</summary>
+        static string[] Characters() => AssetDatabase.FindAssets("t:Model", new[] { Root + "/Characters" })
+            .Select(AssetDatabase.GUIDToAssetPath)
+            .Where(p => p.EndsWith(".fbx", System.StringComparison.OrdinalIgnoreCase))
+            .OrderBy(p => Path.GetFileNameWithoutExtension(p) == "Ty" ? 0 : 1).ThenBy(p => p)
+            .ToArray();
 
         [MenuItem("ArenaMix/Preparar proyecto (crear escena del partido)", priority = 1)]
         public static void Setup()
@@ -31,6 +37,7 @@ namespace ArenaMix.EditorTools
                 AssetDatabase.ImportAsset(Root + "/Characters", ImportAssetOptions.ImportRecursive | ImportAssetOptions.ForceUpdate);
                 AssetDatabase.ImportAsset(Root + "/Animations", ImportAssetOptions.ImportRecursive | ImportAssetOptions.ForceUpdate);
                 AssetDatabase.Refresh();
+                foreach (var fbx in Characters()) CharacterMaterials(fbx);
 
                 EditorUtility.DisplayProgressBar("ArenaMix", "Creando el controlador de animaciones...", 0.4f);
                 var controller = BuildController();
@@ -142,7 +149,7 @@ namespace ArenaMix.EditorTools
         }
 
         // ---------------- materials ----------------
-        class Mats { public Material pitchLight, pitchDark, line, post, net, board, stand, ball, ring, sky; }
+        class Mats { public Material pitchLight, pitchDark, line, post, net, board, stand, ball, ring, sky, seat, roof, glow, skin, apron; }
 
         static Shader Lit => Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
         static Shader Unlit => Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Unlit/Texture");
@@ -201,16 +208,27 @@ namespace ArenaMix.EditorTools
                 p.SetFloat("_Smoothness", 0.12f);
                 return p;
             }
-            m.pitchLight = Pitch("PitchLight", new Color(0.42f, 1f, 0.36f));
-            m.pitchDark = Pitch("PitchDark", new Color(0.34f, 0.86f, 0.3f));
+            m.pitchLight = Pitch("PitchLight", new Color(0.62f, 0.95f, 0.5f));
+            m.pitchDark = Pitch("PitchDark", new Color(0.5f, 0.8f, 0.4f));
+            m.apron = Pitch("Apron", new Color(0.36f, 0.6f, 0.3f));
             m.line = Mat("Lines", Unlit, new Color(0.96f, 0.98f, 0.96f));
             m.post = Mat("Posts", Lit, Color.white); m.post.SetFloat("_Smoothness", 0.7f);
             m.net = Mat("Net", Unlit, new Color(1f, 1f, 1f, 1f));
             m.net.SetTexture("_BaseMap", SavePng("net", NetTexture()));
             m.net.SetTextureScale("_BaseMap", new Vector2(14f, 14f));
             AlphaClip(m.net, true);
-            m.board = Mat("Boards", Unlit, new Color(0.05f, 0.06f, 0.12f));
-            m.stand = Mat("Stands", Lit, new Color(0.17f, 0.2f, 0.29f));
+            // LED advertising boards
+            m.board = Mat("Boards", Unlit, Color.white);
+            var ads = AssetDatabase.LoadAssetAtPath<Texture2D>(Root + "/Environment/ads.png");
+            if (ads != null) { m.board.SetTexture("_BaseMap", ads); m.board.SetTextureScale("_BaseMap", new Vector2(4f, 1f)); }
+            m.stand = Mat("Stands", Lit, new Color(0.55f, 0.56f, 0.6f));
+            m.stand.SetFloat("_Smoothness", 0.15f);
+            m.seat = Mat("Seats", Lit, new Color(0.1f, 0.22f, 0.55f));
+            m.seat.SetFloat("_Smoothness", 0.45f);
+            m.roof = Mat("Roof", Lit, new Color(0.85f, 0.87f, 0.9f));
+            m.roof.SetFloat("_Metallic", 0.4f); m.roof.SetFloat("_Smoothness", 0.5f);
+            m.glow = Mat("FloodlightStrip", Unlit, new Color(1f, 0.98f, 0.92f));
+            m.skin = Mat("CrowdSkin", Lit, new Color(0.8f, 0.6f, 0.46f));
             m.ball = Mat("Ball", Lit, Color.white);
             var ballTex = AssetDatabase.LoadAssetAtPath<Texture2D>(Root + "/Environment/ball.png");
             if (ballTex != null) m.ball.SetTexture("_BaseMap", ballTex);
@@ -225,6 +243,108 @@ namespace ArenaMix.EditorTools
             m.sky.SetFloat("_ImageType", 0f);
             m.sky.SetFloat("_Exposure", 1f);
             return m;
+        }
+
+        // ---------------- character materials ----------------
+        static string Norm(string s) => new string(s.ToLowerInvariant().Where(char.IsLetterOrDigit).ToArray()).TrimEnd("0123456789".ToCharArray());
+
+        static Texture2D FindTex(string[] paths, string key, string suffix)
+        {
+            foreach (var p in paths)
+            {
+                string f = Path.GetFileNameWithoutExtension(p);
+                if (!f.EndsWith(suffix)) continue;
+                if (Norm(f.Substring(0, f.Length - suffix.Length)) == key) return AssetDatabase.LoadAssetAtPath<Texture2D>(p);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gives every material of a character a proper URP material with its texture: the PNGs in
+        /// Characters/Textures/&lt;name&gt; (named after the material) or, for new characters, the textures
+        /// embedded in the FBX, extracted on the first run.
+        /// </summary>
+        static void CharacterMaterials(string fbx)
+        {
+            var mi = AssetImporter.GetAtPath(fbx) as ModelImporter;
+            if (mi == null) return;
+            string name = Path.GetFileNameWithoutExtension(fbx);
+            string texDir = $"{Root}/Characters/Textures/{name}";
+            if (!AssetDatabase.IsValidFolder(texDir))
+            {
+                Directory.CreateDirectory(texDir);
+                mi.ExtractTextures(texDir);
+                AssetDatabase.Refresh();
+            }
+            var texPaths = AssetDatabase.FindAssets("t:Texture2D", new[] { texDir }).Select(AssetDatabase.GUIDToAssetPath).ToArray();
+            string matDir = Gen + "/Characters";
+            Directory.CreateDirectory(matDir);
+            bool changed = false;
+            foreach (var src in AssetDatabase.LoadAllAssetsAtPath(fbx).OfType<Material>().ToArray())
+            {
+                string key = Norm(src.name);
+                Texture2D col = FindTex(texPaths, key, "_color");
+                if (col == null) col = src.mainTexture as Texture2D;
+                Texture2D nrm = FindTex(texPaths, key, "_normal");
+                string lower = src.name.ToLowerInvariant();
+                bool face = lower.Contains("eye") || lower.Contains("brow") || lower.Contains("mouth") || lower.Contains("lash");
+                bool lens = lower.Contains("lens") || lower.Contains("glass");
+                var m = Mat($"Characters/{name}_{src.name}", Lit, Color.white);
+                if (col != null) m.SetTexture("_BaseMap", col);
+                if (nrm != null) { m.SetTexture("_BumpMap", nrm); m.EnableKeyword("_NORMALMAP"); }
+                m.SetFloat("_Smoothness", 0.28f);
+                if (face) AlphaClip(m, false);
+                if (lens) { m.color = new Color(1f, 1f, 1f, 0f); AlphaClip(m, false); }
+                mi.AddRemap(new AssetImporter.SourceAssetIdentifier(src), m);
+                changed = true;
+            }
+            if (changed) mi.SaveAndReimport();
+        }
+
+        // ---------------- image quality ----------------
+        static void CameraQuality(Camera cam)
+        {
+            var data = cam.GetUniversalAdditionalCameraData();
+            if (data == null) return;
+            data.renderPostProcessing = true;
+            data.antialiasing = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
+            data.antialiasingQuality = AntialiasingQuality.High;
+        }
+
+        /// <summary>Film-like look: ACES tonemapping, soft bloom on the floodlights, a touch of contrast and vignette.</summary>
+        static void PostFX()
+        {
+            string path = Gen + "/PostFX.asset";
+            AssetDatabase.DeleteAsset(path);
+            var profile = ScriptableObject.CreateInstance<VolumeProfile>();
+            AssetDatabase.CreateAsset(profile, path);
+            var tm = profile.Add<Tonemapping>(true); tm.mode.Override(TonemappingMode.ACES);
+            var bloom = profile.Add<Bloom>(true); bloom.intensity.Override(0.45f); bloom.threshold.Override(1.05f); bloom.scatter.Override(0.65f);
+            var ca = profile.Add<ColorAdjustments>(true); ca.postExposure.Override(0.35f); ca.contrast.Override(14f); ca.saturation.Override(6f);
+            var vg = profile.Add<Vignette>(true); vg.intensity.Override(0.2f); vg.smoothness.Override(0.45f);
+            foreach (var c in profile.components) { c.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy; AssetDatabase.AddObjectToAsset(c, profile); }
+            EditorUtility.SetDirty(profile);
+            var go = new GameObject("PostFX");
+            var vol = go.AddComponent<Volume>();
+            vol.isGlobal = true;
+            vol.priority = 10f;
+            vol.sharedProfile = profile;
+        }
+
+        /// <summary>Longer, sharper shadows, HDR and 4x MSAA on the URP quality assets.</summary>
+        static void PipelineQuality()
+        {
+            foreach (var guid in AssetDatabase.FindAssets("t:UniversalRenderPipelineAsset"))
+            {
+                var a = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(AssetDatabase.GUIDToAssetPath(guid));
+                if (a == null) continue;
+                bool mobile = a.name.ToLowerInvariant().Contains("mobile");
+                a.supportsHDR = true;
+                a.shadowDistance = mobile ? 70f : 110f;
+                a.shadowCascadeCount = mobile ? 2 : 4;
+                a.msaaSampleCount = mobile ? 2 : 4;
+                EditorUtility.SetDirty(a);
+            }
         }
 
         // ---------------- scene ----------------
@@ -244,9 +364,10 @@ namespace ArenaMix.EditorTools
                 var cam = go.GetComponent<Camera>();
                 if (cam != null)
                 {
-                    cam.transform.position = new Vector3(0f, 14f, -31f);
-                    cam.transform.rotation = Quaternion.Euler(28f, 0f, 0f);
-                    cam.fieldOfView = 42f;
+                    cam.transform.position = new Vector3(0f, 11.5f, -35f);
+                    cam.transform.rotation = Quaternion.Euler(20f, 0f, 0f);
+                    cam.fieldOfView = 30f;
+                    CameraQuality(cam);
                 }
             }
             RenderSettings.skybox = mats.sky;
@@ -258,13 +379,16 @@ namespace ArenaMix.EditorTools
             var match = new GameObject("Match");
             match.AddComponent<GameInput>();
             var mm = match.AddComponent<MatchManager>();
-            mm.characterModels = Characters
-                .Select(n => AssetDatabase.LoadAssetAtPath<GameObject>($"{Root}/Characters/{n}.fbx"))
+            mm.characterModels = Characters()
+                .Select(AssetDatabase.LoadAssetAtPath<GameObject>)
                 .Where(g => g != null).ToArray();
             mm.controller = controller;
             mm.pitchLight = mats.pitchLight; mm.pitchDark = mats.pitchDark; mm.lineMat = mats.line;
             mm.postMat = mats.post; mm.netMat = mats.net; mm.boardMat = mats.board; mm.standMat = mats.stand;
             mm.ballMat = mats.ball; mm.ringMat = mats.ring;
+            mm.seatMat = mats.seat; mm.roofMat = mats.roof; mm.glowMat = mats.glow; mm.skinMat = mats.skin; mm.apronMat = mats.apron;
+            PostFX();
+            PipelineQuality();
             if (mm.characterModels.Length == 0) Debug.LogWarning("ArenaMix: no encuentro los personajes en " + Root + "/Characters");
 
             string path = Gen + "/Partido.unity";

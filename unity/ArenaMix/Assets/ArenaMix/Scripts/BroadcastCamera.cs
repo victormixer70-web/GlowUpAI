@@ -9,9 +9,9 @@ namespace ArenaMix
     public class BroadcastCamera : MonoBehaviour
     {
         public MatchManager match;
-        public float height = 14f;
-        public float distance = 15f;
-        public float fov = 42f;
+        public float height = 11.5f;
+        public float distance = 19f;
+        public float fov = 30f;
 
         Vector3 vel, lookVel, look;
 
@@ -27,10 +27,10 @@ namespace ArenaMix
         {
             Vector3 b = match.Ball.transform.position;
             Vector3 bv = match.Ball.Body.GetVelocity().Flat();
-            float hx = match.length * 0.5f - 9f;
-            float x = Mathf.Clamp(b.x + bv.x * 0.25f, -hx, hx);
-            float z = b.z * 0.35f;
-            lookAt = new Vector3(x, 0.5f, b.z * 0.6f);
+            float hx = match.length * 0.5f - 5f;
+            float x = Mathf.Clamp(b.x + bv.x * 0.3f, -hx, hx);
+            float z = b.z * 0.3f;
+            lookAt = new Vector3(x, 0.6f, b.z * 0.7f - 1f);
             return new Vector3(x, height, -match.width * 0.5f - distance + z);
         }
 
