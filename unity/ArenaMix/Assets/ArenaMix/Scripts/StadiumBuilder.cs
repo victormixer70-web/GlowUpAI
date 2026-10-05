@@ -12,14 +12,16 @@ namespace ArenaMix
     public class StadiumBuilder
     {
         // stand profile (depth from the front edge, height): lower tier, concourse, upper tier, back wall
-        const int LowRows = 14, UpRows = 12;
-        const float RowDepth = 0.82f, LowRise = 0.42f, UpRise = 0.62f, FrontWall = 1.1f;
+        // real-size bowl: 24 + 20 rows, about 28 m high
+        const int LowRows = 24, UpRows = 20;
+        const float RowDepth = 0.8f, LowRise = 0.45f, UpRise = 0.65f, FrontWall = 1.1f;
         static float LowY(int r) => FrontWall + r * LowRise;
-        static float UpBaseD => LowRows * RowDepth + 2.6f;
-        static float UpBaseY => LowY(LowRows) + 2.8f;
+        static float UpBaseD => LowRows * RowDepth + 3f;
+        static float UpBaseY => LowY(LowRows) + 3f;
         static float UpY(int r) => UpBaseY + r * UpRise;
         static float BackD => UpBaseD + UpRows * RowDepth;
         static float TopY => UpY(UpRows) + 1.4f;
+        const float RoofFront = 9f;   // the roof covers the upper tier and part of the lower one
 
         public Material concrete, seat, roof, glow, skin, ads;
         public Color[] homeColors, awayColors;
@@ -94,7 +96,7 @@ namespace ArenaMix
         void RoofSide(MeshBuilder rmb, Matrix4x4 m, float a, float b)
         {
             Vector3 P(float x, float d, float y) => m.MultiplyPoint3x4(new Vector3(x, y, d));
-            float y0 = TopY + 0.4f, y1 = TopY + 2.2f, front = 3f;
+            float y0 = TopY + 0.4f, y1 = TopY + 2.2f, front = RoofFront;
             rmb.Quad(0, P(a, BackD + 0.6f, y0), P(b, BackD + 0.6f, y0), P(b, front, y1), P(a, front, y1), (b - a) / 6f);   // top
             rmb.Quad(0, P(a, front, y1 - 0.5f), P(b, front, y1 - 0.5f), P(b, BackD + 0.6f, y0 - 0.5f), P(a, BackD + 0.6f, y0 - 0.5f), (b - a) / 6f); // underside
             rmb.Quad(0, P(a, front, y1), P(b, front, y1), P(b, front, y1 - 0.5f), P(a, front, y1 - 0.5f), 1f);                     // fascia
@@ -112,8 +114,8 @@ namespace ArenaMix
                 for (int i = 0; i < prof.Count - 1; i++)
                     mb.Quad(0, P(a1, prof[i]), P(a0, prof[i]), P(a0, prof[i + 1]), P(a1, prof[i + 1]), 1f);
                 float y0 = TopY + 0.4f, y1 = TopY + 2.2f;
-                rmb.Quad(0, P(a1, new Vector2(BackD + 0.6f, y0)), P(a0, new Vector2(BackD + 0.6f, y0)), P(a0, new Vector2(3f, y1)), P(a1, new Vector2(3f, y1)), 1f);
-                rmb.Quad(0, P(a1, new Vector2(3f, y1 - 0.5f)), P(a0, new Vector2(3f, y1 - 0.5f)), P(a0, new Vector2(BackD + 0.6f, y0 - 0.5f)), P(a1, new Vector2(BackD + 0.6f, y0 - 0.5f)), 1f);
+                rmb.Quad(0, P(a1, new Vector2(BackD + 0.6f, y0)), P(a0, new Vector2(BackD + 0.6f, y0)), P(a0, new Vector2(RoofFront, y1)), P(a1, new Vector2(RoofFront, y1)), 1f);
+                rmb.Quad(0, P(a1, new Vector2(RoofFront, y1 - 0.5f)), P(a0, new Vector2(RoofFront, y1 - 0.5f)), P(a0, new Vector2(BackD + 0.6f, y0 - 0.5f)), P(a1, new Vector2(BackD + 0.6f, y0 - 0.5f)), 1f);
             }
             var fans = new List<(Vector3, float)>();
             void Row(float rad, float y, float spacing)
@@ -208,7 +210,8 @@ namespace ArenaMix
                     new Vector3(-h.x, -h.y, -h.z), new Vector3(h.x, -h.y, -h.z), new Vector3(h.x, h.y, -h.z), new Vector3(-h.x, h.y, -h.z),
                     new Vector3(-h.x, -h.y, h.z), new Vector3(h.x, -h.y, h.z), new Vector3(h.x, h.y, h.z), new Vector3(-h.x, h.y, h.z)
                 };
-                int[][] faces = { new[] { 0, 3, 2, 1 }, new[] { 4, 5, 6, 7 }, new[] { 0, 4, 7, 3 }, new[] { 1, 2, 6, 5 }, new[] { 3, 7, 6, 2 }, new[] { 0, 1, 5, 4 } };
+                // the bottom face is never seen
+                int[][] faces = { new[] { 0, 3, 2, 1 }, new[] { 4, 5, 6, 7 }, new[] { 0, 4, 7, 3 }, new[] { 1, 2, 6, 5 }, new[] { 3, 7, 6, 2 } };
                 foreach (var f in faces)
                 {
                     int i = v.Count;

@@ -366,9 +366,10 @@ namespace ArenaMix.EditorTools
                 var cam = go.GetComponent<Camera>();
                 if (cam != null)
                 {
-                    cam.transform.position = new Vector3(0f, 6.5f, -29f);
-                    cam.transform.rotation = Quaternion.Euler(10f, 0f, 0f);
-                    cam.fieldOfView = 38f;
+                    // TV gantry in the main stand of the full-size stadium
+                    cam.transform.position = new Vector3(0f, 24f, -70f);
+                    cam.transform.rotation = Quaternion.Euler(18f, 0f, 0f);
+                    cam.fieldOfView = 24f;
                     cam.farClipPlane = 3000f;
                     CameraQuality(cam);
                 }
@@ -382,8 +383,8 @@ namespace ArenaMix.EditorTools
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
             RenderSettings.fogColor = new Color(0.6f, 0.64f, 0.68f);
-            RenderSettings.fogStartDistance = 70f;
-            RenderSettings.fogEndDistance = 420f;
+            RenderSettings.fogStartDistance = 250f;
+            RenderSettings.fogEndDistance = 1400f;
 
             var match = new GameObject("Match");
             match.AddComponent<GameInput>();

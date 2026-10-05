@@ -12,9 +12,9 @@ namespace ArenaMix
     public class MatchManager : MonoBehaviour
     {
         [Header("Pitch (metres)")]
-        public float length = 50f;
-        public float width = 32f;
-        public float goalWidth = 7.2f;
+        public float length = 105f;   // real pitch: 105 x 68 m
+        public float width = 68f;
+        public float goalWidth = 7.32f;
         public float goalHeight = 2.44f;
         public float matchSeconds = 180f;
 
@@ -29,7 +29,7 @@ namespace ArenaMix
 
         [Header("Stadium")]
         [Tooltip("On: the real stadium photo (HDRI sky) behind the 3D pitch, like a TV picture. Off: the 3D stands with crowd.")]
-        public bool photoStadium = true;
+        public bool photoStadium = false;
 
         [Header("Look")]
         public Color homeColor = new Color(1f, 0.54f, 0.24f);
@@ -142,9 +142,9 @@ namespace ArenaMix
         void BuildPitch()
         {
             var root = new GameObject("Pitch").transform;
-            float L = length, W = width, margin = 5f;
+            float L = length, W = width, margin = 8f;
             // mowing stripes across the pitch, plus a margin around it
-            int stripes = 10;
+            int stripes = Mathf.Max(10, Mathf.RoundToInt((length + 16f) / 5.5f));
             float total = L + margin * 2f, sw = total / stripes;
             for (int i = 0; i < stripes; i++)
             {
@@ -157,7 +157,7 @@ namespace ArenaMix
             ground.transform.SetParent(root, false);
             var gc = ground.AddComponent<BoxCollider>();
             gc.center = new Vector3(0f, -0.5f, 0f);
-            gc.size = new Vector3(L + 40f, 1f, W + 40f);
+            gc.size = new Vector3(L + 80f, 1f, W + 80f);
             Compat.SetBounce(gc, 0.45f, 0.6f);
 
             // lines
@@ -175,23 +175,38 @@ namespace ArenaMix
             Line(new Vector3(-hx, 0, -hz), new Vector3(-hx, 0, hz));
             Line(new Vector3(hx, 0, -hz), new Vector3(hx, 0, hz));
             Line(new Vector3(0, 0, -hz), new Vector3(0, 0, hz));
+            // arcs as short straight pieces
+            void Arc(Vector3 c, float r, float from, float to, int seg)
+            {
+                for (int i = 0; i < seg; i++)
+                {
+                    float a0 = Mathf.Lerp(from, to, i / (float)seg), a1 = Mathf.Lerp(from, to, (i + 1) / (float)seg);
+                    Line(c + new Vector3(Mathf.Cos(a0), 0, Mathf.Sin(a0)) * r, c + new Vector3(Mathf.Cos(a1), 0, Mathf.Sin(a1)) * r);
+                }
+            }
+            void Spot(Vector3 c) => Arc(c, 0.11f, 0f, Mathf.PI * 2f, 6);
+            // regulation markings: penalty area 16.5 x 40.32, goal area 5.5 x 18.32, spot at 11 m, arcs of 9.15 m
             foreach (float s in new[] { -1f, 1f })
             {
-                float gx = hx * s, bx = gx - s * 11f, sx = gx - s * 4f;
-                Line(new Vector3(gx, 0, -10f), new Vector3(bx, 0, -10f));
-                Line(new Vector3(gx, 0, 10f), new Vector3(bx, 0, 10f));
-                Line(new Vector3(bx, 0, -10f), new Vector3(bx, 0, 10f));
-                Line(new Vector3(gx, 0, -5.5f), new Vector3(sx, 0, -5.5f));
-                Line(new Vector3(gx, 0, 5.5f), new Vector3(sx, 0, 5.5f));
-                Line(new Vector3(sx, 0, -5.5f), new Vector3(sx, 0, 5.5f));
+                float gx = hx * s, bx = gx - s * 16.5f, sx = gx - s * 5.5f, pb = 20.16f, ps = 9.16f;
+                Line(new Vector3(gx, 0, -pb), new Vector3(bx, 0, -pb));
+                Line(new Vector3(gx, 0, pb), new Vector3(bx, 0, pb));
+                Line(new Vector3(bx, 0, -pb), new Vector3(bx, 0, pb));
+                Line(new Vector3(gx, 0, -ps), new Vector3(sx, 0, -ps));
+                Line(new Vector3(gx, 0, ps), new Vector3(sx, 0, ps));
+                Line(new Vector3(sx, 0, -ps), new Vector3(sx, 0, ps));
+                var spot = new Vector3(gx - s * 11f, 0, 0);
+                Spot(spot);
+                float half = Mathf.Acos(5.5f / 9.15f);   // the part of the 9.15 m circle outside the area
+                float mid = s > 0 ? Mathf.PI : 0f;
+                Arc(spot, 9.15f, mid - half, mid + half, 16);
+                // corner arcs
+                Arc(new Vector3(gx, 0, -hz), 1f, s > 0 ? Mathf.PI * 0.5f : 0f, s > 0 ? Mathf.PI : Mathf.PI * 0.5f, 5);
+                Arc(new Vector3(gx, 0, hz), 1f, s > 0 ? Mathf.PI : Mathf.PI * 1.5f, s > 0 ? Mathf.PI * 1.5f : Mathf.PI * 2f, 5);
             }
-            // centre circle
-            const int seg = 48;
-            for (int i = 0; i < seg; i++)
-            {
-                float a0 = i * Mathf.PI * 2f / seg, a1 = (i + 1) * Mathf.PI * 2f / seg;
-                Line(new Vector3(Mathf.Cos(a0), 0, Mathf.Sin(a0)) * 6f, new Vector3(Mathf.Cos(a1), 0, Mathf.Sin(a1)) * 6f);
-            }
+            // centre circle and spot
+            Arc(Vector3.zero, 9.15f, 0f, Mathf.PI * 2f, 64);
+            Spot(Vector3.zero);
         }
 
         void BuildGoal(int side)
@@ -235,7 +250,7 @@ namespace ArenaMix
         void BuildBoardsAndStands()
         {
             var root = new GameObject("Stadium").transform;
-            float hx = length * 0.5f + 3f, hz = width * 0.5f + 2.5f, bh = 0.9f;
+            float hx = length * 0.5f + 5f, hz = width * 0.5f + 4f, bh = 0.9f;
             // advertising boards: the ball bounces off them (arcade style, no throw-ins)
             void Board(Vector3 c, Vector3 s)
             {
@@ -263,7 +278,7 @@ namespace ArenaMix
             Wall(new Vector3(0f, 16f, 0f), new Vector3(hx * 2f + 2f, 0.4f, hz * 2f + 2f));
             // the stadium bowl: stands, corners, roof and crowd
             // grass all the way to the horizon, where it melts into the stadium photo
-            float apronSize = photoStadium ? 2400f : 120f;
+            float apronSize = photoStadium ? 2400f : 160f;
             var apron = Prim(PrimitiveType.Quad, "Apron", root, new Vector3(0f, -0.02f, 0f), new Vector3(length + apronSize, width + apronSize, 1f), apronMat);
             apron.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
             if (photoStadium)
@@ -279,7 +294,7 @@ namespace ArenaMix
                 homeColors = new[] { homeColor, Color.Lerp(homeColor, Color.white, 0.25f), Color.Lerp(homeColor, Color.black, 0.3f) },
                 awayColors = new[] { awayColor, Color.Lerp(awayColor, Color.white, 0.25f), Color.Lerp(awayColor, Color.black, 0.3f) }
             };
-            stadium.Build(root, length * 0.5f + 5.5f, width * 0.5f + 5f);
+            stadium.Build(root, length * 0.5f + 8f, width * 0.5f + 7f);
         }
 
         void SpawnBall()
@@ -365,6 +380,7 @@ namespace ArenaMix
                 if (bc == null) bc = cam.gameObject.AddComponent<BroadcastCamera>();
                 bc.match = this;
                 if (photoStadium) { bc.height = 6.5f; bc.distance = 13f; bc.fov = 38f; bc.lookHeight = 1.6f; }
+                else { bc.height = 24f; bc.distance = 36f; bc.fov = 24f; bc.lookHeight = 0.6f; }  // TV gantry in the main stand
             }
         }
 
