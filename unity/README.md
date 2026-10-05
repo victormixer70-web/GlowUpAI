@@ -10,7 +10,7 @@ Proyecto de Unity 6 (URP) del juego. La versión web sigue en `arenamix/`.
 
 ## Controles
 - **Móvil:** joystick en la mitad izquierda; botones CHUT (mantén para más fuerza), SPRINT y REGATE/ENTRADA.
-- **Teclado:** WASD o flechas para moverte, Espacio para chutar (mantén), Shift para esprintar, E para regate o entrada.
+- **Teclado:** WASD o flechas para moverte, Espacio para chutar (mantén), Shift para esprintar, E para regate o entrada, Q para pasar (modos 2 vs 2 a 4 vs 4).
 
 ## Qué hay
 - `Assets/ArenaMix/Scripts`: el juego (balón, jugadores, portero, rival, partido, cámara, controles).

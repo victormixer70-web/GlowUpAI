@@ -55,8 +55,8 @@ namespace ArenaMix.EditorTools
                 PlayerSettings.allowedAutorotateToLandscapeLeft = true;
                 PlayerSettings.allowedAutorotateToLandscapeRight = true;
                 AssetDatabase.SaveAssets();
-                Debug.Log("ArenaMix: listo. Pulsa Play para jugar el partido 1 contra 1.");
-                EditorUtility.DisplayDialog("ArenaMix", "Listo. Se ha abierto la escena Partido.\n\nPulsa Play para jugar.\n\nTeclado: WASD o flechas para moverte, Espacio para chutar (mantén para más fuerza), Shift para esprintar, E para regate o entrada.", "Vale");
+                Debug.Log("ArenaMix: listo. Pulsa Play y elige el modo (1 vs 1 a 4 vs 4).");
+                EditorUtility.DisplayDialog("ArenaMix", "Listo. Se ha abierto la escena Partido.\n\nPulsa Play para jugar.\n\nTeclado: WASD o flechas para moverte, Espacio para chutar (mantén para más fuerza), Shift para esprintar, E para regate o entrada, Q para pasar.", "Vale");
             }
             finally
             {
@@ -149,7 +149,7 @@ namespace ArenaMix.EditorTools
         }
 
         // ---------------- materials ----------------
-        class Mats { public Material pitchLight, pitchDark, line, post, net, board, stand, ball, ring, sky, seat, roof, glow, skin, apron; }
+        class Mats { public Material pitchLight, pitchDark, line, post, net, board, stand, ball, ring, sky, seat, roof, glow, skin, apron, glass, accent, tunnel, roofUnder, rib; }
 
         static Shader Lit => Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
         static Shader Unlit => Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Unlit/Texture");
@@ -221,12 +221,22 @@ namespace ArenaMix.EditorTools
             m.board = Mat("Boards", Unlit, Color.white);
             var ads = AssetDatabase.LoadAssetAtPath<Texture2D>(Root + "/Environment/ads.png");
             if (ads != null) { m.board.SetTexture("_BaseMap", ads); m.board.SetTextureScale("_BaseMap", new Vector2(4f, 1f)); }
-            m.stand = Mat("Stands", Lit, new Color(0.55f, 0.56f, 0.6f));
-            m.stand.SetFloat("_Smoothness", 0.15f);
-            m.seat = Mat("Seats", Lit, new Color(0.1f, 0.22f, 0.55f));
-            m.seat.SetFloat("_Smoothness", 0.45f);
-            m.roof = Mat("Roof", Lit, new Color(0.85f, 0.87f, 0.9f));
-            m.roof.SetFloat("_Metallic", 0.4f); m.roof.SetFloat("_Smoothness", 0.5f);
+            // Orlando Stadium look: grey concrete, blue-grey seats, glass boxes with a blue stripe, dark roof with white ribs
+            m.stand = Mat("Stands", Lit, new Color(0.6f, 0.6f, 0.61f));
+            m.stand.SetFloat("_Smoothness", 0.12f);
+            m.seat = Mat("Seats", Lit, new Color(0.25f, 0.31f, 0.42f));
+            m.seat.SetFloat("_Smoothness", 0.4f);
+            m.glass = Mat("BoxGlass", Lit, new Color(0.12f, 0.17f, 0.22f));
+            m.glass.SetFloat("_Metallic", 0.6f); m.glass.SetFloat("_Smoothness", 0.9f);
+            m.accent = Mat("BlueStripe", Unlit, new Color(0.1f, 0.45f, 0.95f));
+            m.tunnel = Mat("Tunnels", Lit, new Color(0.03f, 0.03f, 0.04f));
+            m.tunnel.SetFloat("_Smoothness", 0f);
+            m.roof = Mat("Roof", Lit, new Color(0.3f, 0.31f, 0.33f));
+            m.roof.SetFloat("_Metallic", 0.3f); m.roof.SetFloat("_Smoothness", 0.35f);
+            m.roofUnder = Mat("RoofUnder", Lit, new Color(0.17f, 0.18f, 0.2f));
+            m.roofUnder.SetFloat("_Smoothness", 0.2f);
+            m.rib = Mat("RoofRibs", Lit, new Color(0.93f, 0.94f, 0.96f));
+            m.rib.SetFloat("_Smoothness", 0.5f);
             m.glow = Mat("FloodlightStrip", Unlit, new Color(1f, 0.98f, 0.92f));
             m.skin = Mat("CrowdSkin", Lit, new Color(0.8f, 0.6f, 0.46f));
             m.ball = Mat("Ball", Lit, Color.white);
@@ -301,6 +311,57 @@ namespace ArenaMix.EditorTools
                 changed = true;
             }
             if (changed) mi.SaveAndReimport();
+        }
+
+        /// <summary>
+        /// A prefab of the character with its URP materials put on every renderer directly, so the textures
+        /// show even if the FBX material remap did not take.
+        /// </summary>
+        static GameObject CharacterPrefab(string fbx)
+        {
+            var src = AssetDatabase.LoadAssetAtPath<GameObject>(fbx);
+            if (src == null) return null;
+            string name = Path.GetFileNameWithoutExtension(fbx);
+            string texDir = $"{Root}/Characters/Textures/{name}";
+            var texPaths = AssetDatabase.IsValidFolder(texDir)
+                ? AssetDatabase.FindAssets("t:Texture2D", new[] { texDir }).Select(AssetDatabase.GUIDToAssetPath).ToArray()
+                : new string[0];
+            var inst = (GameObject)PrefabUtility.InstantiatePrefab(src);
+            try
+            {
+                foreach (var r in inst.GetComponentsInChildren<Renderer>(true))
+                {
+                    var ms = r.sharedMaterials;
+                    for (int i = 0; i < ms.Length; i++)
+                    {
+                        if (ms[i] == null) continue;
+                        string mname = ms[i].name.Replace(" (Instance)", "");
+                        if (mname.StartsWith(name + "_")) mname = mname.Substring(name.Length + 1);
+                        string key = Norm(mname);
+                        Texture2D col = FindTex(texPaths, key, "_color");
+                        if (col == null) col = ms[i].HasProperty("_BaseMap") ? ms[i].GetTexture("_BaseMap") as Texture2D : ms[i].mainTexture as Texture2D;
+                        Texture2D nrm = FindTex(texPaths, key, "_normal");
+                        string lower = mname.ToLowerInvariant();
+                        bool face = lower.Contains("eye") || lower.Contains("brow") || lower.Contains("mouth") || lower.Contains("lash");
+                        bool lens = lower.Contains("lens") || lower.Contains("glass");
+                        var m = Mat($"Characters/{name}_{mname}", Lit, Color.white);
+                        if (col != null) m.SetTexture("_BaseMap", col);
+                        else Debug.LogWarning($"ArenaMix: sin textura para {name} / {mname}");
+                        if (nrm != null) { m.SetTexture("_BumpMap", nrm); m.EnableKeyword("_NORMALMAP"); }
+                        m.SetFloat("_Smoothness", 0.28f);
+                        if (face) AlphaClip(m, false);
+                        if (lens) { m.color = new Color(1f, 1f, 1f, 0f); AlphaClip(m, false); }
+                        ms[i] = m;
+                    }
+                    r.sharedMaterials = ms;
+                }
+                string path = $"{Gen}/Characters/{name}.prefab";
+                return PrefabUtility.SaveAsPrefabAsset(inst, path);
+            }
+            finally
+            {
+                Object.DestroyImmediate(inst);
+            }
         }
 
         // ---------------- image quality ----------------
@@ -390,13 +451,14 @@ namespace ArenaMix.EditorTools
             match.AddComponent<GameInput>();
             var mm = match.AddComponent<MatchManager>();
             mm.characterModels = Characters()
-                .Select(AssetDatabase.LoadAssetAtPath<GameObject>)
+                .Select(CharacterPrefab)
                 .Where(g => g != null).ToArray();
             mm.controller = controller;
             mm.pitchLight = mats.pitchLight; mm.pitchDark = mats.pitchDark; mm.lineMat = mats.line;
             mm.postMat = mats.post; mm.netMat = mats.net; mm.boardMat = mats.board; mm.standMat = mats.stand;
             mm.ballMat = mats.ball; mm.ringMat = mats.ring;
             mm.seatMat = mats.seat; mm.roofMat = mats.roof; mm.glowMat = mats.glow; mm.skinMat = mats.skin; mm.apronMat = mats.apron;
+            mm.glassMat = mats.glass; mm.accentMat = mats.accent; mm.tunnelMat = mats.tunnel; mm.roofUnderMat = mats.roofUnder; mm.ribMat = mats.rib;
             PostFX();
             PipelineQuality();
             if (mm.characterModels.Length == 0) Debug.LogWarning("ArenaMix: no encuentro los personajes en " + Root + "/Characters");

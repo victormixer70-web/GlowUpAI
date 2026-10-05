@@ -15,11 +15,12 @@ namespace ArenaMix
         public bool shootHeld;    // held: charging a shot
         public bool shootUp;      // released this frame: strike
         public bool actionDown;   // pressed this frame: skill move with the ball, slide tackle without it
+        public bool passDown;     // pressed this frame: pass to a teammate
     }
 
     /// <summary>
     /// Touch controls (floating joystick on the left half, CHUT / SPRINT / REGATE buttons on the right)
-    /// plus keyboard for testing on the computer: WASD or arrows, Space to shoot, Shift to sprint, E for the action.
+    /// plus keyboard for testing on the computer: WASD or arrows, Space to shoot, Shift to sprint, E for the action, Q to pass.
     /// Drawn with IMGUI so it needs no UI setup in the scene.
     /// </summary>
     public class GameInput : MonoBehaviour
@@ -27,6 +28,7 @@ namespace ArenaMix
         public Intent Current;
         public bool HasBall;          // shows REGATE or ENTRADA on the action button
         public float Charge;          // 0..1, drawn around the shoot button
+        public bool ShowPass;         // team modes (2v2 and up) have a PASE button
 
         struct Ptr { public int id; public Vector2 pos; public bool began; }
 
@@ -41,6 +43,7 @@ namespace ArenaMix
         static readonly Vector3 BtnShoot = new Vector3(0.16f, 0.22f, 0.13f);
         static readonly Vector3 BtnSprint = new Vector3(0.40f, 0.13f, 0.085f);
         static readonly Vector3 BtnAction = new Vector3(0.12f, 0.50f, 0.085f);
+        static readonly Vector3 BtnPass = new Vector3(0.40f, 0.40f, 0.085f);
 
         void Awake()
         {
@@ -123,6 +126,7 @@ namespace ArenaMix
                 if (Inside(p.pos, BtnShoot)) shoot = true;
                 if (Inside(p.pos, BtnSprint)) it.sprint = true;
                 if (p.began && Inside(p.pos, BtnAction)) it.actionDown = true;
+                if (ShowPass && p.began && Inside(p.pos, BtnPass)) it.passDown = true;
             }
 
 #if ENABLE_INPUT_SYSTEM
@@ -137,6 +141,7 @@ namespace ArenaMix
                 if (k != Vector2.zero) it.move = k.normalized;
                 if (kb.leftShiftKey.isPressed) it.sprint = true;
                 if (kb.eKey.wasPressedThisFrame) it.actionDown = true;
+                if (kb.qKey.wasPressedThisFrame) it.passDown = true;
                 bool sk = kb.spaceKey.isPressed;
                 if (sk) shoot = true;
             }
@@ -145,6 +150,7 @@ namespace ArenaMix
             if (k != Vector2.zero) it.move = Vector2.ClampMagnitude(k, 1f);
             if (Input.GetKey(KeyCode.LeftShift)) it.sprint = true;
             if (Input.GetKeyDown(KeyCode.E)) it.actionDown = true;
+            if (Input.GetKeyDown(KeyCode.Q)) it.passDown = true;
             if (Input.GetKey(KeyCode.Space)) shoot = true;
 #endif
             it.shootHeld = shoot;
@@ -172,6 +178,7 @@ namespace ArenaMix
                 DrawCircle(ring, c, BtnShoot.z * s * (1.05f + 0.25f * Charge), Color.Lerp(new Color(0.3f, 0.9f, 0.4f), new Color(1f, 0.35f, 0.2f), Charge));
             }
             Button(BtnSprint, "SPRINT", new Color(0.13f, 0.83f, 0.93f, 0.92f), Current.sprint);
+            if (ShowPass) Button(BtnPass, "PASE", new Color(1f, 0.82f, 0.3f, 0.92f), false);
             Button(BtnAction, HasBall ? "REGATE" : "ENTRADA", HasBall ? new Color(0.33f, 0.85f, 0.56f, 0.92f) : new Color(1f, 0.45f, 0.45f, 0.92f), false);
         }
 

@@ -5,59 +5,66 @@ using UnityEngine.Rendering;
 namespace ArenaMix
 {
     /// <summary>
-    /// Builds a full football stadium around the pitch: four two-tier stands joined by curved corners,
-    /// a roof with floodlight strips, coloured seats, thousands of fans in both teams' colours and LED
-    /// advertising boards. Everything is merged into a handful of meshes so it stays fast on phones.
+    /// Builds a big two-tier football stadium around the pitch, styled after the Orlando Stadium photo:
+    /// grey concrete bowl with blue-grey seats, a band of glass hospitality boxes and a blue stripe between
+    /// the tiers, dark tunnel mouths in the lower tier, curved corners and a dark roof with white ribs and a
+    /// wavy front edge lined with floodlights. Fans fill most seats in both teams' colours.
+    /// Everything is merged into a handful of meshes so it stays fast.
     /// </summary>
     public class StadiumBuilder
     {
-        // stand profile (depth from the front edge, height): lower tier, concourse, upper tier, back wall
-        // real-size bowl: 24 + 20 rows, about 28 m high
-        const int LowRows = 24, UpRows = 20;
-        const float RowDepth = 0.8f, LowRise = 0.45f, UpRise = 0.65f, FrontWall = 1.1f;
+        // profile: lower tier, concourse with the glass boxes, upper tier, back wall
+        const int LowRows = 22, UpRows = 18;
+        const float RowDepth = 0.8f, LowRise = 0.45f, UpRise = 0.66f, FrontWall = 1.2f;
         static float LowY(int r) => FrontWall + r * LowRise;
-        static float UpBaseD => LowRows * RowDepth + 3f;
-        static float UpBaseY => LowY(LowRows) + 3f;
+        static float BoxD => LowRows * RowDepth + 1.4f;     // front of the glass boxes
+        static float UpBaseD => BoxD + 1.6f;
+        static float UpBaseY => LowY(LowRows) + 3.4f;
         static float UpY(int r) => UpBaseY + r * UpRise;
         static float BackD => UpBaseD + UpRows * RowDepth;
-        static float TopY => UpY(UpRows) + 1.4f;
-        const float RoofFront = 9f;   // the roof covers the upper tier and part of the lower one
+        static float TopY => UpY(UpRows) + 1.2f;
+        const float RoofFront = 7f;
 
-        public Material concrete, seat, roof, glow, skin, ads;
+        /// <summary>Height of the lower-tier seating at a depth (metres back from the front of a stand).</summary>
+        public static float StandHeightAt(float depth) => LowY(Mathf.Clamp(Mathf.CeilToInt(depth / RowDepth), 0, LowRows));
+        const float VomSpacing = 16f, VomWidth = 3f;          // tunnel mouths in the lower tier
+        const int VomRow0 = 8, VomRows = 4;
+
+        // materials: bowl concrete, seats, glass boxes, blue stripe, dark tunnels; roof top, underside, ribs, light strip; crowd skin
+        public Material concrete, seat, glass, accent, dark, roof, roofUnder, ribs, glow, skin;
         public Color[] homeColors, awayColors;
+        [Range(0f, 1f)] public float crowdDensity = 0.72f;
         public readonly List<Transform> crowdBlocks = new List<Transform>();
 
-        /// <summary>half sizes of the rectangle where the stands start (front edge of each stand)</summary>
         float hx, hz;
         readonly System.Random rng = new System.Random(7);
+        readonly List<List<(Vector3 pos, float yaw)>> pendingFans = new List<List<(Vector3, float)>>();
 
         public void Build(Transform root, float halfX, float halfZ)
         {
             hx = halfX; hz = halfZ;
-            var bowl = new MeshBuilder(2);    // 0 concrete, 1 seats
-            var roofMb = new MeshBuilder(2);  // 0 roof, 1 light strips
-            // straight stands: far (+z), near (-z), west (-x), east (+x)
+            var bowl = new MeshBuilder(5);   // 0 concrete, 1 seats, 2 glass, 3 accent, 4 dark
+            var roofMb = new MeshBuilder(4); // 0 top, 1 underside, 2 ribs, 3 light strip
             Side(bowl, roofMb, new Vector3(0, 0, hz), Quaternion.identity, hx * 2f);
             Side(bowl, roofMb, new Vector3(0, 0, -hz), Quaternion.Euler(0, 180, 0), hx * 2f);
             Side(bowl, roofMb, new Vector3(-hx, 0, 0), Quaternion.Euler(0, -90, 0), hz * 2f);
             Side(bowl, roofMb, new Vector3(hx, 0, 0), Quaternion.Euler(0, 90, 0), hz * 2f);
-            // curved corners
             Corner(bowl, roofMb, new Vector3(hx, 0, hz), 0f);
             Corner(bowl, roofMb, new Vector3(-hx, 0, hz), 270f);
             Corner(bowl, roofMb, new Vector3(-hx, 0, -hz), 180f);
             Corner(bowl, roofMb, new Vector3(hx, 0, -hz), 90f);
-            bowl.Create("Stands", root, concrete, seat);
-            roofMb.Create("Roof", root, roof, glow, false);
+            bowl.Create("Stands", root, true, concrete, seat, glass, accent, dark);
+            roofMb.Create("Roof", root, true, roof, roofUnder, ribs, glow);
             BuildCrowd(root);
         }
 
-        // ---------- stand geometry ----------
+        // ---------- profile ----------
         static List<Vector2> Profile()
         {
             var p = new List<Vector2> { new Vector2(0, 0), new Vector2(0, FrontWall) };
             for (int r = 0; r < LowRows; r++) { p.Add(new Vector2(r * RowDepth, LowY(r))); p.Add(new Vector2((r + 1) * RowDepth, LowY(r))); p.Add(new Vector2((r + 1) * RowDepth, LowY(r + 1))); }
-            p.Add(new Vector2(UpBaseD - 0.6f, LowY(LowRows)));
-            p.Add(new Vector2(UpBaseD - 0.6f, UpBaseY));
+            p.Add(new Vector2(BoxD, LowY(LowRows)));
+            p.Add(new Vector2(BoxD, UpBaseY));
             p.Add(new Vector2(UpBaseD, UpBaseY));
             for (int r = 0; r < UpRows; r++) { p.Add(new Vector2(UpBaseD + r * RowDepth, UpY(r))); p.Add(new Vector2(UpBaseD + (r + 1) * RowDepth, UpY(r))); p.Add(new Vector2(UpBaseD + (r + 1) * RowDepth, UpY(r + 1))); }
             p.Add(new Vector2(BackD, TopY));
@@ -66,23 +73,41 @@ namespace ArenaMix
             return p;
         }
 
+        static float Wave(float s) => Mathf.Sin(s * Mathf.PI * 2f / 38f) * 1.6f;   // wavy roof edge
+
+        bool InTunnel(float along, int row) => row >= VomRow0 && row < VomRow0 + VomRows && Mathf.Abs(Mathf.Repeat(along + VomSpacing * 0.5f, VomSpacing) - VomSpacing * 0.5f) < VomWidth * 0.5f + 0.3f;
+
+        // ---------- straight stands ----------
         void Side(MeshBuilder mb, MeshBuilder rmb, Vector3 front, Quaternion rot, float len)
         {
             var prof = Profile();
             var m = Matrix4x4.TRS(front, rot, Vector3.one);
-            Vector3 P(float x, Vector2 q) => m.MultiplyPoint3x4(new Vector3(x, q.y, q.x));
+            Vector3 P(float x, float d, float y) => m.MultiplyPoint3x4(new Vector3(x, y, d));
             float a = -len * 0.5f, b = len * 0.5f;
             for (int i = 0; i < prof.Count - 1; i++)
-                mb.Quad(0, P(a, prof[i]), P(b, prof[i]), P(b, prof[i + 1]), P(a, prof[i + 1]), len / 4f);
-            // seat strips on every tread
+                mb.Quad(0, P(a, prof[i].x, prof[i].y), P(b, prof[i].x, prof[i].y), P(b, prof[i + 1].x, prof[i + 1].y), P(a, prof[i + 1].x, prof[i + 1].y), len / 4f);
+            // seats (rows of backs)
             for (int r = 0; r < LowRows; r++) SeatStrip(mb, m, a, b, r * RowDepth + 0.45f, LowY(r));
             for (int r = 0; r < UpRows; r++) SeatStrip(mb, m, a, b, UpBaseD + r * RowDepth + 0.45f, UpY(r));
-            RoofSide(rmb, m, a, b);
+            // glass hospitality boxes with mullions, blue stripe above them
+            float gy0 = LowY(LowRows) + 0.5f, gy1 = UpBaseY - 0.9f;
+            mb.Quad(2, P(a, BoxD - 0.02f, gy0), P(b, BoxD - 0.02f, gy0), P(b, BoxD - 0.02f, gy1), P(a, BoxD - 0.02f, gy1), len / 4f);
+            for (float x = a; x <= b; x += 4f) mb.Quad(0, P(x - 0.08f, BoxD - 0.04f, gy0), P(x + 0.08f, BoxD - 0.04f, gy0), P(x + 0.08f, BoxD - 0.04f, gy1), P(x - 0.08f, BoxD - 0.04f, gy1), 1f);
+            mb.Quad(3, P(a, BoxD - 0.03f, gy1 + 0.15f), P(b, BoxD - 0.03f, gy1 + 0.15f), P(b, BoxD - 0.03f, gy1 + 0.55f), P(a, BoxD - 0.03f, gy1 + 0.55f), len / 4f);
+            // tunnel mouths
+            for (float c = Mathf.Ceil(a / VomSpacing) * VomSpacing; c < b; c += VomSpacing)
+            {
+                if (c - VomWidth < a || c + VomWidth > b) continue;
+                float d0 = VomRow0 * RowDepth, d1 = (VomRow0 + VomRows) * RowDepth;
+                float y0 = LowY(VomRow0) - 0.1f, y1 = LowY(VomRow0 + VomRows) + 0.2f;
+                mb.Quad(4, P(c - VomWidth * 0.5f, d0 - 0.05f, y0), P(c + VomWidth * 0.5f, d0 - 0.05f, y0), P(c + VomWidth * 0.5f, d1, y1), P(c - VomWidth * 0.5f, d1, y1), 1f);
+            }
+            Roof(rmb, (s, d, y) => P(s, d, y), a, b, true);
             // fans
             var fans = new List<(Vector3 pos, float yaw)>();
             float yaw = rot.eulerAngles.y + 180f;
-            for (int r = 1; r < LowRows; r++) for (float x = a + 0.4f; x < b - 0.3f; x += 0.62f) fans.Add((P(x, new Vector2(r * RowDepth + 0.5f, LowY(r))), yaw));
-            for (int r = 0; r < UpRows; r++) for (float x = a + 0.4f; x < b - 0.3f; x += 0.64f) fans.Add((P(x, new Vector2(UpBaseD + r * RowDepth + 0.5f, UpY(r))), yaw));
+            for (int r = 1; r < LowRows; r++) for (float x = a + 0.4f; x < b - 0.3f; x += 0.62f) if (!InTunnel(x, r)) fans.Add((P(x, r * RowDepth + 0.5f, LowY(r)), yaw));
+            for (int r = 0; r < UpRows; r++) for (float x = a + 0.4f; x < b - 0.3f; x += 0.64f) fans.Add((P(x, UpBaseD + r * RowDepth + 0.5f, UpY(r)), yaw));
             pendingFans.Add(fans);
         }
 
@@ -93,30 +118,47 @@ namespace ArenaMix
             mb.Quad(1, P(a, d + 0.25f, y + 0.42f), P(b, d + 0.25f, y + 0.42f), P(b, d + 0.32f, y + 0.85f), P(a, d + 0.32f, y + 0.85f), (b - a) / 0.62f);
         }
 
-        void RoofSide(MeshBuilder rmb, Matrix4x4 m, float a, float b)
+        /// <summary>Roof over a run of stand: P(along, depth, height). Segmented so the front edge can wave.</summary>
+        void Roof(MeshBuilder rmb, System.Func<float, float, float, Vector3> P, float a, float b, bool ribsOn)
         {
-            Vector3 P(float x, float d, float y) => m.MultiplyPoint3x4(new Vector3(x, y, d));
-            float y0 = TopY + 0.4f, y1 = TopY + 2.2f, front = RoofFront;
-            rmb.Quad(0, P(a, BackD + 0.6f, y0), P(b, BackD + 0.6f, y0), P(b, front, y1), P(a, front, y1), (b - a) / 6f);   // top
-            rmb.Quad(0, P(a, front, y1 - 0.5f), P(b, front, y1 - 0.5f), P(b, BackD + 0.6f, y0 - 0.5f), P(a, BackD + 0.6f, y0 - 0.5f), (b - a) / 6f); // underside
-            rmb.Quad(0, P(a, front, y1), P(b, front, y1), P(b, front, y1 - 0.5f), P(a, front, y1 - 0.5f), 1f);                     // fascia
-            rmb.Quad(1, P(a, front + 0.6f, y1 - 0.52f), P(b, front + 0.6f, y1 - 0.52f), P(b, front + 1.1f, y1 - 0.53f), P(a, front + 1.1f, y1 - 0.53f), 1f); // light strip
+            float y0 = TopY + 0.4f, y1 = TopY + 2.6f, back = BackD + 0.6f;
+            int segs = Mathf.Max(1, Mathf.CeilToInt((b - a) / 3f));
+            for (int i = 0; i < segs; i++)
+            {
+                float s0 = Mathf.Lerp(a, b, i / (float)segs), s1 = Mathf.Lerp(a, b, (i + 1) / (float)segs);
+                float w0 = y1 + Wave(s0), w1 = y1 + Wave(s1);
+                rmb.Quad(0, P(s0, back, y0), P(s1, back, y0), P(s1, RoofFront, w1), P(s0, RoofFront, w0), 1f);
+                rmb.Quad(1, P(s0, RoofFront, w0 - 0.6f), P(s1, RoofFront, w1 - 0.6f), P(s1, back, y0 - 0.6f), P(s0, back, y0 - 0.6f), 1f);
+                rmb.Quad(0, P(s0, RoofFront, w0), P(s1, RoofFront, w1), P(s1, RoofFront, w1 - 0.6f), P(s0, RoofFront, w0 - 0.6f), 1f);
+                rmb.Quad(3, P(s0, RoofFront + 0.5f, w0 - 0.62f), P(s1, RoofFront + 0.5f, w1 - 0.62f), P(s1, RoofFront + 1.1f, w1 - 0.63f), P(s0, RoofFront + 1.1f, w0 - 0.63f), 1f);
+            }
+            if (!ribsOn) return;
+            // white ribs under the roof, like the trusses in the photo
+            for (float s = Mathf.Ceil(a / 7f) * 7f; s < b; s += 7f)
+            {
+                float w = y1 + Wave(s) - 0.62f;
+                rmb.Quad(2, P(s - 0.18f, RoofFront + 0.2f, w - 0.02f), P(s + 0.18f, RoofFront + 0.2f, w - 0.02f), P(s + 0.18f, back, y0 - 0.62f), P(s - 0.18f, back, y0 - 0.62f), 1f);
+            }
         }
 
+        // ---------- corners ----------
         void Corner(MeshBuilder mb, MeshBuilder rmb, Vector3 c, float startDeg)
         {
             var prof = Profile();
-            const int segs = 12;
-            Vector3 P(float ang, Vector2 q) { float r = q.x; float t = (startDeg + ang) * Mathf.Deg2Rad; return c + new Vector3(Mathf.Sin(t) * r, q.y, Mathf.Cos(t) * r); }
+            const int segs = 14;
+            Vector3 P(float ang, float d, float y) { float t = (startDeg + ang) * Mathf.Deg2Rad; return c + new Vector3(Mathf.Sin(t) * d, y, Mathf.Cos(t) * d); }
             for (int s = 0; s < segs; s++)
             {
                 float a0 = 90f * s / segs, a1 = 90f * (s + 1) / segs;
                 for (int i = 0; i < prof.Count - 1; i++)
-                    mb.Quad(0, P(a1, prof[i]), P(a0, prof[i]), P(a0, prof[i + 1]), P(a1, prof[i + 1]), 1f);
-                float y0 = TopY + 0.4f, y1 = TopY + 2.2f;
-                rmb.Quad(0, P(a1, new Vector2(BackD + 0.6f, y0)), P(a0, new Vector2(BackD + 0.6f, y0)), P(a0, new Vector2(RoofFront, y1)), P(a1, new Vector2(RoofFront, y1)), 1f);
-                rmb.Quad(0, P(a1, new Vector2(RoofFront, y1 - 0.5f)), P(a0, new Vector2(RoofFront, y1 - 0.5f)), P(a0, new Vector2(BackD + 0.6f, y0 - 0.5f)), P(a1, new Vector2(BackD + 0.6f, y0 - 0.5f)), 1f);
+                    mb.Quad(0, P(a1, prof[i].x, prof[i].y), P(a0, prof[i].x, prof[i].y), P(a0, prof[i + 1].x, prof[i + 1].y), P(a1, prof[i + 1].x, prof[i + 1].y), 1f);
+                float gy0 = LowY(LowRows) + 0.5f, gy1 = UpBaseY - 0.9f;
+                mb.Quad(2, P(a1, BoxD - 0.02f, gy0), P(a0, BoxD - 0.02f, gy0), P(a0, BoxD - 0.02f, gy1), P(a1, BoxD - 0.02f, gy1), 1f);
+                mb.Quad(3, P(a1, BoxD - 0.03f, gy1 + 0.15f), P(a0, BoxD - 0.03f, gy1 + 0.15f), P(a0, BoxD - 0.03f, gy1 + 0.55f), P(a1, BoxD - 0.03f, gy1 + 0.55f), 1f);
             }
+            // roof: the "along" coordinate is the angle mapped to metres at the roof front, so the wave continues
+            float arc = RoofFront * Mathf.PI * 0.5f;
+            Roof(rmb, (s, d, y) => P(s / arc * 90f, d, y), 0f, arc, false);
             var fans = new List<(Vector3, float)>();
             void Row(float rad, float y, float spacing)
             {
@@ -124,7 +166,7 @@ namespace ArenaMix
                 for (int i = 0; i < n; i++)
                 {
                     float ang = 90f * (i + 0.5f) / n;
-                    fans.Add((P(ang, new Vector2(rad, y)), startDeg + ang + 180f));
+                    fans.Add((P(ang, rad, y), startDeg + ang + 180f));
                 }
             }
             for (int r = 2; r < LowRows; r++) Row(r * RowDepth + 0.5f, LowY(r), 0.64f);
@@ -133,8 +175,6 @@ namespace ArenaMix
         }
 
         // ---------- crowd ----------
-        readonly List<List<(Vector3 pos, float yaw)>> pendingFans = new List<List<(Vector3, float)>>();
-
         void BuildCrowd(Transform root)
         {
             var palette = new List<Color>();
@@ -152,13 +192,13 @@ namespace ArenaMix
                 var mb = new MeshBuilder(mats.Length);
                 foreach (var (pos, yaw) in list)
                 {
-                    if (rng.NextDouble() < 0.1) continue;
+                    if (rng.NextDouble() > crowdDensity) continue;
                     // your fans on the left half (x < 0), the rival's on the right, a few neutral shirts
                     bool homeSide = pos.x < 0f;
                     int c = rng.NextDouble() < 0.12 ? home + away + rng.Next(neutral) : (homeSide ? rng.Next(home) : home + rng.Next(away));
                     Fan(mb, pos, yaw, c, palette.Count, (float)rng.NextDouble());
                 }
-                var t = mb.Create("Crowd" + block++, root, mats);
+                var t = mb.Create("Crowd" + block++, root, true, mats);
                 if (t != null) crowdBlocks.Add(t);
             }
         }
@@ -167,10 +207,9 @@ namespace ArenaMix
         {
             var q = Quaternion.Euler(0f, yaw + (rnd - 0.5f) * 20f, 0f);
             float s = 0.92f + rnd * 0.16f;
-            bool armsUp = rnd > 0.8f;
-            mb.Box(shirt, p + Vector3.up * 0.62f * s, q, new Vector3(0.42f, 0.56f, 0.26f) * s);                  // torso
-            mb.Box(skinIdx, p + Vector3.up * 1.04f * s, q, new Vector3(0.2f, 0.24f, 0.21f) * s);                  // head
-            if (armsUp)
+            mb.Box(shirt, p + Vector3.up * 0.62f * s, q, new Vector3(0.42f, 0.56f, 0.26f) * s);
+            mb.Box(skinIdx, p + Vector3.up * 1.04f * s, q, new Vector3(0.2f, 0.24f, 0.21f) * s);
+            if (rnd > 0.82f)
             {
                 mb.Box(shirt, p + q * new Vector3(-0.25f, 1.12f, 0f) * s, q, new Vector3(0.1f, 0.48f, 0.1f) * s);
                 mb.Box(shirt, p + q * new Vector3(0.25f, 1.12f, 0f) * s, q, new Vector3(0.1f, 0.48f, 0.1f) * s);
@@ -198,7 +237,7 @@ namespace ArenaMix
                 v.Add(a); v.Add(b); v.Add(c); v.Add(d);
                 n.Add(nn); n.Add(nn); n.Add(nn); n.Add(nn);
                 uv.Add(new Vector2(0, 0)); uv.Add(new Vector2(uRepeat, 0)); uv.Add(new Vector2(uRepeat, 1)); uv.Add(new Vector2(0, 1));
-                // both windings: stands are seen from every side
+                // both windings: the bowl is seen from every side
                 tris[sub].AddRange(new[] { i, i + 2, i + 1, i, i + 3, i + 2, i, i + 1, i + 2, i, i + 2, i + 3 });
             }
 
@@ -224,11 +263,7 @@ namespace ArenaMix
                 }
             }
 
-            public Transform Create(string name, Transform parent, params Material[] mats) => Create(name, parent, mats, true);
-
-            public Transform Create(string name, Transform parent, Material a, Material b, bool shadows) => Create(name, parent, new[] { a, b }, shadows);
-
-            Transform Create(string name, Transform parent, Material[] mats, bool shadows)
+            public Transform Create(string name, Transform parent, bool shadows, params Material[] mats)
             {
                 if (v.Count == 0) return null;
                 var mesh = new Mesh { name = name, indexFormat = IndexFormat.UInt32 };

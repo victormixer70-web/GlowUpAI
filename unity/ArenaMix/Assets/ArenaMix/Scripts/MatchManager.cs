@@ -4,19 +4,23 @@ using UnityEngine;
 namespace ArenaMix
 {
     /// <summary>
-    /// A 1 vs 1 match with goalkeepers: builds the pitch, goals, boards and stands, spawns the players
-    /// with their Mixamo characters, runs kick-offs, goals, the clock and the scoreboard (IMGUI HUD).
-    /// Team 0 is you and attacks towards +x; team 1 is the CPU.
+    /// A match of 1 vs 1 up to 4 vs 4 plus goalkeepers: builds a pitch sized for the mode, goals, boards
+    /// and the stadium, spawns the players with their Mixamo characters, runs kick-offs, goals, the clock,
+    /// the mode menu and the scoreboard (IMGUI HUD). Team 0 is you and attacks towards +x; team 1 is the CPU.
+    /// You control one player of your team and switch automatically to the one nearest the play.
     /// </summary>
     [DefaultExecutionOrder(-40)]
     public class MatchManager : MonoBehaviour
     {
-        [Header("Pitch (metres)")]
-        public float length = 105f;   // real pitch: 105 x 68 m
-        public float width = 68f;
-        public float goalWidth = 7.32f;
-        public float goalHeight = 2.44f;
+        [Header("Mode")]
+        [Range(1, 4)] public int teamSize = 1;   // players per team besides the goalkeeper (saved in PlayerPrefs)
         public float matchSeconds = 180f;
+
+        [Header("Pitch (metres, set from the mode)")]
+        public float length = 40f;
+        public float width = 26f;
+        public float goalWidth = 5.5f;
+        public float goalHeight = 2.2f;
 
         [Header("Characters (Mixamo FBX, imported as Humanoid)")]
         public GameObject[] characterModels;
@@ -26,6 +30,7 @@ namespace ArenaMix
         [Header("Materials (created by ArenaMix > Preparar proyecto)")]
         public Material pitchLight, pitchDark, lineMat, postMat, netMat, boardMat, standMat, ballMat, ringMat;
         public Material seatMat, roofMat, glowMat, skinMat, apronMat;
+        public Material glassMat, accentMat, tunnelMat, roofUnderMat, ribMat;
 
         [Header("Stadium")]
         [Tooltip("On: the real stadium photo (HDRI sky) behind the 3D pitch, like a TV picture. Off: the 3D stands with crowd.")]
@@ -39,12 +44,16 @@ namespace ArenaMix
         public bool Playing => state == State.Play;
         public float HalfWidth => width * 0.5f;
 
-        enum State { Kickoff, Play, Goal, End }
-        State state = State.Kickoff;
+        enum State { Menu, Kickoff, Play, Goal, End }
+        State state = State.Menu;
         float stateTime, clock;
         int[] score = new int[2];
-        readonly Footballer[] field = new Footballer[2];
+        readonly List<Footballer>[] teams = { new List<Footballer>(), new List<Footballer>() };
         readonly Keeper[] keepers = new Keeper[2];
+        Footballer controlled;
+        float switchLock;
+        Transform selector;
+        static bool menuShown;
         GameInput input;
         StadiumBuilder stadium;
         string flash; float flashTime;
@@ -53,7 +62,85 @@ namespace ArenaMix
         // ---------------- public helpers ----------------
         /// <summary>Centre of the goal that team t defends (team 0 defends -x).</summary>
         public Vector3 GoalCenter(int t) => new Vector3(t == 0 ? -length * 0.5f : length * 0.5f, 0f, 0f);
-        public Footballer FieldPlayer(int team) => field[team];
+        public IReadOnlyList<Footballer> Players(int team) => teams[team];
+        public Footballer Controlled => controlled;
+        public int Slot(Footballer f) => teams[f.Team].IndexOf(f);
+
+        /// <summary>Pitch, goal and penalty area sizes for each mode: small for 1 vs 1, bigger with more players.</summary>
+        public static void Dims(int n, out float L, out float W, out float gw, out float gh)
+        {
+            switch (Mathf.Clamp(n, 1, 4))
+            {
+                case 1: L = 40f; W = 26f; gw = 5.5f; gh = 2.2f; break;
+                case 2: L = 52f; W = 34f; gw = 6.4f; gh = 2.3f; break;
+                case 3: L = 64f; W = 42f; gw = 7.32f; gh = 2.44f; break;
+                default: L = 76f; W = 50f; gw = 7.32f; gh = 2.44f; break;
+            }
+        }
+
+        public Footballer NearestPlayer(int team, Vector3 p, Footballer except = null)
+        {
+            Footballer best = null; float bd = float.MaxValue;
+            foreach (var f in teams[team])
+            {
+                if (f == except) continue;
+                float d = (f.transform.position - p).Flat().sqrMagnitude;
+                if (d < bd) { bd = d; best = f; }
+            }
+            return best;
+        }
+
+        /// <summary>Distance from p to the nearest opponent of team.</summary>
+        public float Pressure(int team, Vector3 p)
+        {
+            float bd = 99f;
+            foreach (var f in teams[1 - team]) bd = Mathf.Min(bd, (f.transform.position - p).Flat().magnitude);
+            return bd;
+        }
+
+        /// <summary>The teammate a pass in direction aim should go to (null when alone).</summary>
+        public Footballer PassTarget(Footballer from, Vector3 aim)
+        {
+            Footballer best = null; float bs = float.MinValue;
+            foreach (var f in teams[from.Team])
+            {
+                if (f == from) continue;
+                Vector3 to = (f.transform.position - from.transform.position).Flat();
+                float d = to.magnitude;
+                float sc = Vector3.Dot(aim, to / Mathf.Max(0.1f, d)) * 3f - d / 25f + Mathf.Min(Pressure(from.Team, f.transform.position), 6f) * 0.12f;
+                if (sc > bs) { bs = sc; best = f; }
+            }
+            return best;
+        }
+
+        /// <summary>The best-placed teammate to receive from a goalkeeper: free of markers, not too far.</summary>
+        public Footballer OpenTeammate(int team, Vector3 from)
+        {
+            Footballer best = null; float bs = float.MinValue;
+            foreach (var f in teams[team])
+            {
+                float sc = Mathf.Min(Pressure(team, f.transform.position), 8f) - (f.transform.position - from).Flat().magnitude / 12f;
+                if (sc > bs) { bs = sc; best = f; }
+            }
+            return best;
+        }
+
+        /// <summary>True when an opponent stands in the way of a ground pass from a to b.</summary>
+        public bool LaneBlocked(Footballer from, Vector3 a, Vector3 b)
+        {
+            Vector3 ab = (b - a).Flat();
+            float len = ab.magnitude;
+            if (len < 0.5f) return false;
+            Vector3 dir = ab / len;
+            foreach (var o in teams[1 - from.Team])
+            {
+                Vector3 ao = (o.transform.position - a).Flat();
+                float t = Vector3.Dot(ao, dir);
+                if (t < 1f || t > len - 0.5f) continue;
+                if ((ao - dir * t).magnitude < 1.3f) return true;
+            }
+            return false;
+        }
 
         public Vector3 ClampToField(Vector3 p, float margin)
         {
@@ -69,6 +156,8 @@ namespace ArenaMix
         void Awake()
         {
             Application.targetFrameRate = 60;
+            teamSize = Mathf.Clamp(PlayerPrefs.GetInt("ArenaMix.TeamSize", teamSize), 1, 4);
+            Dims(teamSize, out length, out width, out goalWidth, out goalHeight);
             EnsureMaterials();
             BuildPitch();
             BuildGoal(-1); BuildGoal(1);
@@ -79,6 +168,8 @@ namespace ArenaMix
             SpawnPlayers();
             clock = matchSeconds;
             Kickoff(0);
+            // the mode menu shows when the game starts; after choosing, the scene reloads straight into the match
+            if (!menuShown) { state = State.Menu; Time.timeScale = 1f; }
         }
 
         void EnsureMaterials()
@@ -97,7 +188,12 @@ namespace ArenaMix
             glowMat = M(glowMat, unlit, new Color(1f, 0.98f, 0.92f));
             skinMat = M(skinMat, lit, new Color(0.78f, 0.58f, 0.44f));
             apronMat = M(apronMat, lit, new Color(0.06f, 0.3f, 0.08f));
-            standMat = M(standMat, lit, new Color(0.16f, 0.19f, 0.27f));
+            standMat = M(standMat, lit, new Color(0.55f, 0.56f, 0.58f));
+            glassMat = M(glassMat, lit, new Color(0.16f, 0.22f, 0.28f));
+            accentMat = M(accentMat, unlit, new Color(0.1f, 0.42f, 0.9f));
+            tunnelMat = M(tunnelMat, lit, new Color(0.04f, 0.04f, 0.05f));
+            roofUnderMat = M(roofUnderMat, lit, new Color(0.2f, 0.21f, 0.23f));
+            ribMat = M(ribMat, lit, new Color(0.92f, 0.93f, 0.95f));
             ballMat = M(ballMat, lit, Color.white);
             if (ringMat == null)
             {
@@ -185,27 +281,30 @@ namespace ArenaMix
                 }
             }
             void Spot(Vector3 c) => Arc(c, 0.11f, 0f, Mathf.PI * 2f, 6);
-            // regulation markings: penalty area 16.5 x 40.32, goal area 5.5 x 18.32, spot at 11 m, arcs of 9.15 m
+            // markings scaled to the pitch (regulation sizes on a full pitch)
+            float areaD = Mathf.Min(16.5f, L * 0.157f), areaW = Mathf.Min(40.32f, W * 0.59f);
+            float boxD = Mathf.Min(5.5f, L * 0.052f), boxW = Mathf.Min(18.32f, W * 0.27f);
+            float spotD = areaD * 0.667f, circle = Mathf.Min(9.15f, W * 0.135f);
             foreach (float s in new[] { -1f, 1f })
             {
-                float gx = hx * s, bx = gx - s * 16.5f, sx = gx - s * 5.5f, pb = 20.16f, ps = 9.16f;
+                float gx = hx * s, bx = gx - s * areaD, sx = gx - s * boxD, pb = areaW * 0.5f, ps = boxW * 0.5f;
                 Line(new Vector3(gx, 0, -pb), new Vector3(bx, 0, -pb));
                 Line(new Vector3(gx, 0, pb), new Vector3(bx, 0, pb));
                 Line(new Vector3(bx, 0, -pb), new Vector3(bx, 0, pb));
                 Line(new Vector3(gx, 0, -ps), new Vector3(sx, 0, -ps));
                 Line(new Vector3(gx, 0, ps), new Vector3(sx, 0, ps));
                 Line(new Vector3(sx, 0, -ps), new Vector3(sx, 0, ps));
-                var spot = new Vector3(gx - s * 11f, 0, 0);
+                var spot = new Vector3(gx - s * spotD, 0, 0);
                 Spot(spot);
-                float half = Mathf.Acos(5.5f / 9.15f);   // the part of the 9.15 m circle outside the area
+                float half = Mathf.Acos(Mathf.Clamp01((areaD - spotD) / circle));   // the part of the circle outside the area
                 float mid = s > 0 ? Mathf.PI : 0f;
-                Arc(spot, 9.15f, mid - half, mid + half, 16);
+                Arc(spot, circle, mid - half, mid + half, 16);
                 // corner arcs
                 Arc(new Vector3(gx, 0, -hz), 1f, s > 0 ? Mathf.PI * 0.5f : 0f, s > 0 ? Mathf.PI : Mathf.PI * 0.5f, 5);
                 Arc(new Vector3(gx, 0, hz), 1f, s > 0 ? Mathf.PI : Mathf.PI * 1.5f, s > 0 ? Mathf.PI * 1.5f : Mathf.PI * 2f, 5);
             }
             // centre circle and spot
-            Arc(Vector3.zero, 9.15f, 0f, Mathf.PI * 2f, 64);
+            Arc(Vector3.zero, circle, 0f, Mathf.PI * 2f, 64);
             Spot(Vector3.zero);
         }
 
@@ -250,7 +349,7 @@ namespace ArenaMix
         void BuildBoardsAndStands()
         {
             var root = new GameObject("Stadium").transform;
-            float hx = length * 0.5f + 5f, hz = width * 0.5f + 4f, bh = 0.9f;
+            float hx = length * 0.5f + 4f, hz = width * 0.5f + 3f, bh = 0.9f;
             // advertising boards: the ball bounces off them (arcade style, no throw-ins)
             void Board(Vector3 c, Vector3 s)
             {
@@ -278,7 +377,7 @@ namespace ArenaMix
             Wall(new Vector3(0f, 16f, 0f), new Vector3(hx * 2f + 2f, 0.4f, hz * 2f + 2f));
             // the stadium bowl: stands, corners, roof and crowd
             // grass all the way to the horizon, where it melts into the stadium photo
-            float apronSize = photoStadium ? 2400f : 160f;
+            float apronSize = photoStadium ? 2400f : 30f;
             var apron = Prim(PrimitiveType.Quad, "Apron", root, new Vector3(0f, -0.02f, 0f), new Vector3(length + apronSize, width + apronSize, 1f), apronMat);
             apron.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
             if (photoStadium)
@@ -290,12 +389,16 @@ namespace ArenaMix
             }
             stadium = new StadiumBuilder
             {
-                concrete = standMat, seat = seatMat, roof = roofMat, glow = glowMat, skin = skinMat,
+                concrete = standMat, seat = seatMat, glass = glassMat, accent = accentMat, dark = tunnelMat,
+                roof = roofMat, roofUnder = roofUnderMat, ribs = ribMat, glow = glowMat, skin = skinMat,
                 homeColors = new[] { homeColor, Color.Lerp(homeColor, Color.white, 0.25f), Color.Lerp(homeColor, Color.black, 0.3f) },
                 awayColors = new[] { awayColor, Color.Lerp(awayColor, Color.white, 0.25f), Color.Lerp(awayColor, Color.black, 0.3f) }
             };
-            stadium.Build(root, length * 0.5f + 8f, width * 0.5f + 7f);
+            stadium.Build(root, length * 0.5f + StandGap, width * 0.5f + StandGap);
         }
+
+        /// <summary>Distance from the touchlines to the front of the stands.</summary>
+        const float StandGap = 6f;
 
         void SpawnBall()
         {
@@ -355,24 +458,37 @@ namespace ArenaMix
         void SpawnPlayers()
         {
             int mine = PlayerPrefs.GetInt("ArenaMix.Char", 0);
-            int n = characterModels != null ? Mathf.Max(1, characterModels.Length) : 1;
             for (int t = 0; t < 2; t++)
             {
                 Color col = t == 0 ? homeColor : awayColor;
-                // field player
-                var fp = new GameObject(t == 0 ? "Tú" : "Rival");
-                var body = Body(t == 0 ? mine : mine + 1, fp.transform, col);
-                var f = fp.AddComponent<Footballer>();
-                f.Init(this, t, t == 0, body.GetComponent<Animator>());
-                if (t == 1) fp.AddComponent<RivalBrain>().Init(this, f);
-                field[t] = f;
-                // goalkeeper
+                for (int i = 0; i < teamSize; i++)
+                {
+                    var fp = new GameObject(t == 0 ? (i == 0 ? "Tú" : "Compañero " + i) : "Rival " + (i + 1));
+                    var body = Body(mine + t + i * 2, fp.transform, col);
+                    var f = fp.AddComponent<Footballer>();
+                    f.Init(this, t, false, body.GetComponent<Animator>());
+                    fp.AddComponent<TeamBrain>().Init(this, f);
+                    teams[t].Add(f);
+                }
                 var gk = new GameObject(t == 0 ? "Portero" : "Portero rival");
-                var kb = Body(mine + 2 + t, gk.transform, Color.Lerp(col, Color.yellow, 0.6f));
+                var kb = Body(mine + 5 + t, gk.transform, Color.Lerp(col, Color.yellow, 0.6f));
                 var k = gk.AddComponent<Keeper>();
                 k.Init(this, t, GoalCenter(t).x, kb.GetComponent<Animator>());
                 keepers[t] = k;
             }
+            // marker under the player you control
+            var sel = Prim(PrimitiveType.Quad, "Selector", null, new Vector3(0f, 0.03f, 0f), Vector3.one * 1.7f, ringMat);
+            sel.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            var sr = sel.GetComponent<Renderer>();
+            var mpb = new MaterialPropertyBlock();
+            mpb.SetColor("_BaseColor", new Color(1f, 0.9f, 0.2f));
+            mpb.SetColor("_Color", new Color(1f, 0.9f, 0.2f));
+            sr.SetPropertyBlock(mpb);
+            sr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            selector = sel.transform;
+            SetControlled(teams[0][0]);
+            if (input != null) input.ShowPass = teamSize > 1;
+
             var cam = Camera.main;
             if (cam != null)
             {
@@ -380,8 +496,39 @@ namespace ArenaMix
                 if (bc == null) bc = cam.gameObject.AddComponent<BroadcastCamera>();
                 bc.match = this;
                 if (photoStadium) { bc.height = 6.5f; bc.distance = 13f; bc.fov = 38f; bc.lookHeight = 1.6f; }
-                else { bc.height = 24f; bc.distance = 36f; bc.fov = 24f; bc.lookHeight = 0.6f; }  // TV gantry in the main stand
+                else
+                {
+                    // TV gantry in the lower tier of the main stand, a few rows up, so nothing blocks the view
+                    float gantry = 4f + width * 0.2f;
+                    bc.distance = StandGap + gantry;
+                    bc.height = StadiumBuilder.StandHeightAt(gantry) + 4f;
+                    bc.fov = 30f; bc.lookHeight = 0.6f;
+                }
             }
+        }
+
+        void SetControlled(Footballer f)
+        {
+            if (f == controlled || f == null) return;
+            if (controlled != null) { controlled.SetHuman(false); controlled.Intent = new Intent(); }
+            controlled = f;
+            f.SetHuman(true);
+            switchLock = 0.35f;
+        }
+
+        /// <summary>Switch to the teammate who has the ball, or the one nearest to it when defending.</summary>
+        void AutoSwitch(float dt)
+        {
+            switchLock -= dt;
+            var team = teams[0];
+            if (team.Count < 2 || controlled == null) return;
+            var owner = Ball.Owner;
+            if (owner != null && owner.Team == 0) { if (owner != controlled) SetControlled(owner); return; }
+            if (switchLock > 0f || Ball.LastTouch == controlled && Ball.Body.GetVelocity().magnitude > 4f && owner == null) return;
+            Vector3 bp = Ball.transform.position + Ball.Body.GetVelocity().Flat() * 0.3f;
+            var near = NearestPlayer(0, bp);
+            if (near != controlled && (near.transform.position - bp).Flat().magnitude + 2f < (controlled.transform.position - bp).Flat().magnitude)
+                SetControlled(near);
         }
 
         // ---------------- flow ----------------
@@ -391,16 +538,37 @@ namespace ArenaMix
             stateTime = 0f;
             Time.timeScale = 1f;
             Ball.ResetAt(new Vector3(0f, Ball.Radius, 0f));
+            float circle = Mathf.Min(9.15f, width * 0.135f);
             for (int t = 0; t < 2; t++)
             {
                 float s = t == 0 ? -1f : 1f;
-                var f = field[t];
-                f.ResetState();
-                f.transform.position = new Vector3(s * (t == team ? 0.7f : 7f), 0f, 0f);
-                f.transform.rotation = Quaternion.LookRotation(new Vector3(-s, 0f, 0f));
+                for (int i = 0; i < teams[t].Count; i++)
+                {
+                    var f = teams[t][i];
+                    f.ResetState();
+                    Vector2 fp = Formation(teamSize, i);
+                    float x = fp.x * length * 0.5f;
+                    if (i == 0) x = t == team ? 0.7f : Mathf.Max(x, circle + 0.8f);
+                    else if (t != team) x = Mathf.Max(x, circle + 0.8f);
+                    f.transform.position = new Vector3(s * x, 0f, fp.y * width * 0.5f);
+                    f.transform.rotation = Quaternion.LookRotation(new Vector3(-s, 0f, 0f));
+                }
                 keepers[t].ResetState();
             }
+            if (teams[0].Count > 0) { controlled = null; foreach (var f in teams[0]) f.SetHuman(false); SetControlled(teams[0][0]); }
             Flash("¡A JUGAR!", 1.2f);
+        }
+
+        /// <summary>Kick-off spot of player i (x: fraction of the half length back from the centre, y: fraction of the half width).</summary>
+        public static Vector2 Formation(int n, int i)
+        {
+            switch (n)
+            {
+                case 2: return i == 0 ? new Vector2(0f, 0f) : new Vector2(0.45f, 0.35f);
+                case 3: return i == 0 ? new Vector2(0f, 0f) : new Vector2(0.4f, i == 1 ? -0.45f : 0.45f);
+                case 4: return i == 0 ? new Vector2(0f, 0f) : i == 3 ? new Vector2(0.62f, 0f) : new Vector2(0.32f, i == 1 ? -0.5f : 0.5f);
+                default: return Vector2.zero;
+            }
         }
 
         public void OnGoal(int scoringTeam)
@@ -421,15 +589,19 @@ namespace ArenaMix
             flashTime -= dt;
 
             // your player follows the touch / keyboard controls
-            if (input != null && field[0] != null)
+            if (Playing) AutoSwitch(Time.deltaTime);
+            if (selector != null && controlled != null) selector.position = controlled.transform.position + Vector3.up * 0.03f;
+            if (input != null && controlled != null)
             {
-                field[0].Intent = Playing ? input.Current : new Intent();
-                input.HasBall = field[0].HasBall;
-                input.Charge = field[0].Charge;
+                controlled.Intent = Playing ? input.Current : new Intent();
+                input.HasBall = controlled.HasBall;
+                input.Charge = controlled.Charge;
             }
 
             switch (state)
             {
+                case State.Menu:
+                    break;
                 case State.Kickoff:
                     if (stateTime > 1.2f) state = State.Play;
                     break;
@@ -449,7 +621,7 @@ namespace ArenaMix
         void Separate()
         {
             var all = new List<Transform>();
-            foreach (var f in field) if (f != null) all.Add(f.transform);
+            foreach (var team in teams) foreach (var f in team) if (f != null) all.Add(f.transform);
             foreach (var k in keepers) if (k != null) all.Add(k.transform);
             for (int i = 0; i < all.Count; i++)
                 for (int j = i + 1; j < all.Count; j++)
@@ -470,12 +642,15 @@ namespace ArenaMix
             score[0] = score[1] = 0;
             clock = matchSeconds;
             Kickoff(0);
+            // the mode menu shows when the game starts; after choosing, the scene reloads straight into the match
+            if (!menuShown) { state = State.Menu; Time.timeScale = 1f; }
         }
 
         // ---------------- HUD ----------------
         void OnGUI()
         {
             float s = Mathf.Min(Screen.width, Screen.height) / 400f;
+            if (state == State.Menu) { ModeMenu(s, "ARENA MIX  ·  FÚTBOL"); return; }
             var box = new GUIStyle(GUI.skin.box) { fontSize = Mathf.RoundToInt(18 * s), fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
             box.normal.textColor = Color.white;
             int m = Mathf.CeilToInt(clock) / 60, sec = Mathf.CeilToInt(clock) % 60;
@@ -496,8 +671,48 @@ namespace ArenaMix
                 string res = score[0] > score[1] ? "¡VICTORIA!" : score[0] < score[1] ? "DERROTA" : "EMPATE";
                 GUI.Label(new Rect(0, Screen.height * 0.28f, Screen.width, 60 * s), res + $"   {score[0]} - {score[1]}", big);
                 var btn = new GUIStyle(GUI.skin.button) { fontSize = Mathf.RoundToInt(20 * s), fontStyle = FontStyle.Bold };
-                if (GUI.Button(new Rect(Screen.width * 0.5f - 110 * s, Screen.height * 0.5f, 220 * s, 50 * s), "JUGAR OTRA VEZ", btn)) Restart();
+                if (GUI.Button(new Rect(Screen.width * 0.5f - 230 * s, Screen.height * 0.5f, 220 * s, 50 * s), "JUGAR OTRA VEZ", btn)) Restart();
+                if (GUI.Button(new Rect(Screen.width * 0.5f + 10 * s, Screen.height * 0.5f, 220 * s, 50 * s), "CAMBIAR MODO", btn)) { state = State.Menu; menuShown = false; }
             }
+        }
+
+        /// <summary>Choose 1 vs 1 up to 4 vs 4; a different mode rebuilds the stadium for its pitch size.</summary>
+        void ModeMenu(float s, string title)
+        {
+            GUI.color = new Color(0f, 0f, 0f, 0.55f);
+            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+            var big = new GUIStyle(GUI.skin.label) { fontSize = Mathf.RoundToInt(34 * s), fontStyle = FontStyle.BoldAndItalic, alignment = TextAnchor.MiddleCenter };
+            big.normal.textColor = Color.white;
+            GUI.Label(new Rect(0, Screen.height * 0.16f, Screen.width, 50 * s), title, big);
+            var small = new GUIStyle(big) { fontSize = Mathf.RoundToInt(15 * s), fontStyle = FontStyle.Normal };
+            GUI.Label(new Rect(0, Screen.height * 0.16f + 48 * s, Screen.width, 26 * s), "Elige el modo", small);
+            var btn = new GUIStyle(GUI.skin.button) { fontSize = Mathf.RoundToInt(22 * s), fontStyle = FontStyle.Bold };
+            var sub = new GUIStyle(GUI.skin.label) { fontSize = Mathf.RoundToInt(11 * s), alignment = TextAnchor.UpperCenter };
+            sub.normal.textColor = new Color(1f, 1f, 1f, 0.75f);
+            float w = 120 * s, h = 70 * s, gap = 14 * s, x0 = Screen.width * 0.5f - (w * 4 + gap * 3) * 0.5f, y = Screen.height * 0.45f;
+            for (int n = 1; n <= 4; n++)
+            {
+                Dims(n, out float L, out float W, out _, out _);
+                var r = new Rect(x0 + (n - 1) * (w + gap), y, w, h);
+                if (n == teamSize) { GUI.color = new Color(1f, 0.85f, 0.3f); GUI.DrawTexture(new Rect(r.x - 3 * s, r.y - 3 * s, r.width + 6 * s, r.height + 6 * s), Texture2D.whiteTexture); GUI.color = Color.white; }
+                if (GUI.Button(r, $"{n} vs {n}", btn)) StartMode(n);
+                GUI.Label(new Rect(r.x, r.yMax + 4 * s, w, 20 * s), $"campo {L:0} × {W:0} m", sub);
+            }
+        }
+
+        void StartMode(int n)
+        {
+            menuShown = true;
+            if (n != teamSize)
+            {
+                PlayerPrefs.SetInt("ArenaMix.TeamSize", n);
+                PlayerPrefs.Save();
+                Time.timeScale = 1f;
+                UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+                return;
+            }
+            Restart();
         }
     }
 }

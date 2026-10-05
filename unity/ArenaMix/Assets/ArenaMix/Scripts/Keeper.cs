@@ -66,7 +66,7 @@ namespace ArenaMix
                     throwTimer -= dt;
                     if (throwTimer <= 0f) Distribute(ball);
                 }
-                Face((match.FieldPlayer(Team).transform.position - pos).Flat());
+                Face((match.NearestPlayer(Team, pos).transform.position - pos).Flat());
                 Animate(dt);
                 return;
             }
@@ -92,10 +92,11 @@ namespace ArenaMix
             float dist = toBall.magnitude;
             float advance = Mathf.Clamp(0.7f + (24f - dist) * 0.06f, 0.6f, 2.2f);
             Vector3 target = goalC + (dist > 0.01f ? toBall / dist : new Vector3(facing, 0f, 0f)) * advance;
-            target.z = Mathf.Clamp(target.z, -3.1f, 3.1f);
+            float gz = match.goalWidth * 0.5f - 0.56f;
+            target.z = Mathf.Clamp(target.z, -gz, gz);
             // loose ball close to goal: go and get it
             bool loose = ball.Owner == null && ball.HeldBy == null;
-            if (loose && Mathf.Abs(bp.x - goalX) < 7f && Mathf.Abs(bp.z) < 8f && bv.magnitude < 6f) target = bp.Flat();
+            if (loose && Mathf.Abs(bp.x - goalX) < 7f && Mathf.Abs(bp.z) < match.goalWidth * 0.5f + 4.3f && bv.magnitude < 6f) target = bp.Flat();
             Vector3 want = (target - pos).Flat();
             float maxSp = recover > 0f ? 0f : (want.magnitude > 2f ? 6f : 4.5f);
             Velocity = Vector3.MoveTowards(Velocity, Vector3.ClampMagnitude(want * 4f, maxSp), 30f * dt);
@@ -179,7 +180,7 @@ namespace ArenaMix
 
         void Distribute(Ball ball)
         {
-            Footballer mate = match.FieldPlayer(Team);
+            Footballer mate = match.OpenTeammate(Team, transform.position);
             Vector3 to = (mate.transform.position + mate.Velocity * 0.5f - transform.position).Flat();
             float dist = Mathf.Max(4f, to.magnitude);
             float h = Mathf.Clamp(dist * 1.1f, 8f, 17f);
@@ -191,7 +192,7 @@ namespace ArenaMix
         {
             float lo = facing > 0 ? goalX + 0.2f : goalX - 7f, hi = facing > 0 ? goalX + 7f : goalX - 0.2f;
             p.x = Mathf.Clamp(p.x, lo, hi);
-            p.z = Mathf.Clamp(p.z, -6f, 6f);
+            p.z = Mathf.Clamp(p.z, -match.goalWidth * 0.5f - 2.3f, match.goalWidth * 0.5f + 2.3f);
             p.y = 0f;
             return p;
         }

@@ -27,7 +27,7 @@ namespace ArenaMix
         bool charging;
         float actionLock, stunned, burst, lunge, kickTimer, kickPower;
         Vector3 kickDir, lungeDir;
-        float kickCurve;
+        float kickCurve, kickSpeed, kickLift;
 
         static readonly int MoveX = Animator.StringToHash("MoveX");
         static readonly int MoveZ = Animator.StringToHash("MoveZ");
@@ -39,6 +39,8 @@ namespace ArenaMix
             match = m; Team = team; IsHuman = human; anim = a;
             if (anim != null) anim.SetBool(KeeperParam, false);
         }
+
+        public void SetHuman(bool human) => IsHuman = human;
 
         public void Stun(float t)
         {
@@ -115,13 +117,14 @@ namespace ArenaMix
                     Vector3 b = (ball.transform.position - transform.position).Flat();
                     if (b.magnitude < 1.9f && ball.HeldBy == null && (ball.Owner == null || ball.Owner == this))
                     {
-                        float speed = 13f + 19f * kickPower;
-                        float lift = 0.8f + 5.2f * kickPower * kickPower;
-                        ball.Kick(this, kickDir, speed, lift, kickCurve);
+                        ball.Kick(this, kickDir, kickSpeed, kickLift, kickCurve);
                     }
                     Charge = 0f;
                 }
             }
+
+            // pass to a teammate
+            if (Intent.passDown && HasBall && actionLock <= 0f && stunned <= 0f && !charging) Pass();
 
             // skill burst with the ball, slide tackle without it
             if (Intent.actionDown && actionLock <= 0f && stunned <= 0f)
@@ -150,20 +153,47 @@ namespace ArenaMix
             Vector3 goal = match.GoalCenter(1 - Team);
             Vector3 toGoal = (goal - transform.position).Flat();
             Vector3 stick = new Vector3(Intent.move.x, 0f, Intent.move.y);
-            if (Vector3.Dot(dir, toGoal.normalized) > 0.25f && toGoal.magnitude < 32f)
+            if (Vector3.Dot(dir, toGoal.normalized) > 0.25f && toGoal.magnitude < Mathf.Min(32f, match.length * 0.45f))
             {
                 // towards goal: the stick picks the side of the net
-                float side = Mathf.Clamp(stick.z * 3.1f + Random.Range(-0.7f, 0.7f) * (1.2f - Charge), -3.3f, 3.3f);
+                float gh = match.goalWidth * 0.5f;
+                float side = Mathf.Clamp(stick.z * (gh - 0.55f) + Random.Range(-0.7f, 0.7f) * (1.2f - Charge) * gh / 3.66f, -(gh - 0.35f), gh - 0.35f);
                 dir = (new Vector3(goal.x, 0f, side) - transform.position).Flat().normalized;
             }
             else if (stick.sqrMagnitude > 0.04f) dir = stick.normalized;
             kickDir = dir;
+            kickSpeed = 13f + 19f * kickPower;
+            kickLift = 0.8f + 5.2f * kickPower * kickPower;
             kickCurve = Vector3.Dot(Vector3.Cross(Vector3.up, dir), stick) * 5f;
             transform.rotation = Quaternion.LookRotation(dir);
             kickTimer = 0.14f;
             actionLock = 0.45f;
             Play("Shoot", 0.3f);
         }
+
+        /// <summary>Pass to the teammate the stick (or the body) points at, along the ground if the lane is clear.</summary>
+        void Pass()
+        {
+            Vector3 stick = new Vector3(Intent.move.x, 0f, Intent.move.y);
+            Vector3 aim = stick.sqrMagnitude > 0.04f ? stick.normalized : transform.forward;
+            Footballer mate = match.PassTarget(this, aim);
+            if (mate == null) return;
+            Vector3 lead = mate.transform.position + mate.Velocity * 0.45f;
+            Vector3 to = (lead - transform.position).Flat();
+            float dist = to.magnitude;
+            kickDir = to.normalized;
+            bool blocked = match.LaneBlocked(this, transform.position, lead);
+            kickSpeed = Mathf.Clamp(6f + dist * 0.95f, 9f, 24f) * (blocked ? 0.8f : 1f);
+            kickLift = blocked ? Mathf.Clamp(dist * 0.35f, 3f, 7f) : 0.3f;
+            kickCurve = 0f;
+            transform.rotation = Quaternion.LookRotation(kickDir);
+            kickTimer = 0.1f;
+            actionLock = 0.35f;
+            Play("Pass", 0.35f);
+        }
+
+        /// <summary>CPU teammates call this to pass.</summary>
+        public void PassTo(Vector3 dir) { Intent.move = new Vector2(dir.x, dir.z); Intent.passDown = true; }
 
         void TryTackle(Ball ball, Vector3 feetToBall)
         {
