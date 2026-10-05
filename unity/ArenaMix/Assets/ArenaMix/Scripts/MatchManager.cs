@@ -659,6 +659,27 @@ namespace ArenaMix
             }
         }
 
+        /// <summary>Ball over the goal line but not in the goal: goal kick, the keeper restarts with the ball in hand.</summary>
+        void CheckGoalLine()
+        {
+            if (Ball.HeldBy != null) return;
+            Vector3 bp = Ball.transform.position;
+            float hx = length * 0.5f;
+            if (Mathf.Abs(bp.x) < hx + Ball.Radius + 0.05f) return;
+            if (Mathf.Abs(bp.z) < goalWidth * 0.5f && bp.y < goalHeight) return;   // going in: the goal trigger decides
+            int team = bp.x < 0f ? 0 : 1;
+            var k = keepers[team];
+            if (k == null) return;
+            foreach (var t in teams) foreach (var f in t) f.Stun(0.2f);
+            float inward = team == 0 ? 1f : -1f;
+            k.ResetState();
+            k.transform.position = new Vector3(GoalCenter(team).x + inward * Mathf.Min(4f, length * 0.06f), 0f, Mathf.Clamp(bp.z, -goalWidth * 0.5f, goalWidth * 0.5f));
+            k.transform.rotation = Quaternion.LookRotation(new Vector3(inward, 0f, 0f));
+            Ball.ResetAt(k.HandsPosition);
+            Ball.Hold(k);
+            Flash("SAQUE DE PUERTA", 1.2f);
+        }
+
         public void OnGoal(int scoringTeam)
         {
             if (state != State.Play) return;
@@ -694,6 +715,7 @@ namespace ArenaMix
                     if (stateTime > 1.2f) state = State.Play;
                     break;
                 case State.Play:
+                    CheckGoalLine();
                     clock -= Time.deltaTime;
                     if (clock <= 0f) { clock = 0f; state = State.End; stateTime = 0f; Time.timeScale = 1f; }
                     break;

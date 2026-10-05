@@ -9,7 +9,7 @@ namespace ArenaMix
     [RequireComponent(typeof(Rigidbody))]
     public class Ball : MonoBehaviour
     {
-        public const float Radius = 0.11f;
+        public const float Radius = 0.16f;   // a bit bigger than a real ball (0.11) so it reads well on a phone
 
         public Footballer Owner { get; private set; }
         public Keeper HeldBy { get; private set; }

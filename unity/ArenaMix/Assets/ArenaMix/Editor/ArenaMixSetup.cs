@@ -237,7 +237,7 @@ namespace ArenaMix.EditorTools
             m.roofUnder.SetFloat("_Smoothness", 0.2f);
             m.rib = Mat("RoofRibs", Lit, new Color(0.93f, 0.94f, 0.96f));
             m.rib.SetFloat("_Smoothness", 0.5f);
-            m.glow = Mat("FloodlightStrip", Unlit, new Color(1f, 0.98f, 0.92f));
+            m.glow = Mat("FloodlightStrip", Unlit, new Color(0.85f, 0.84f, 0.8f));
             m.skin = Mat("CrowdSkin", Lit, new Color(0.8f, 0.6f, 0.46f));
             m.ball = Mat("Ball", Lit, Color.white);
             var ballTex = AssetDatabase.LoadAssetAtPath<Texture2D>(Root + "/Environment/ball.png");
@@ -459,8 +459,8 @@ namespace ArenaMix.EditorTools
             var profile = ScriptableObject.CreateInstance<VolumeProfile>();
             AssetDatabase.CreateAsset(profile, path);
             var tm = profile.Add<Tonemapping>(true); tm.mode.Override(TonemappingMode.ACES);
-            var bloom = profile.Add<Bloom>(true); bloom.intensity.Override(0.45f); bloom.threshold.Override(1.05f); bloom.scatter.Override(0.65f);
-            var ca = profile.Add<ColorAdjustments>(true); ca.postExposure.Override(0.35f); ca.contrast.Override(14f); ca.saturation.Override(6f);
+            var bloom = profile.Add<Bloom>(true); bloom.intensity.Override(0.12f); bloom.threshold.Override(1.5f); bloom.scatter.Override(0.45f);
+            var ca = profile.Add<ColorAdjustments>(true); ca.postExposure.Override(0.15f); ca.contrast.Override(14f); ca.saturation.Override(6f);
             var vg = profile.Add<Vignette>(true); vg.intensity.Override(0.2f); vg.smoothness.Override(0.45f);
             foreach (var c in profile.components) { c.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy; AssetDatabase.AddObjectToAsset(c, profile); }
             EditorUtility.SetDirty(profile);
@@ -496,10 +496,13 @@ namespace ArenaMix.EditorTools
                 var light = go.GetComponent<Light>();
                 if (light != null && light.type == LightType.Directional)
                 {
-                    light.intensity = 1.15f;
-                    light.color = new Color(1f, 0.96f, 0.9f);
+                    // high sun from behind the TV camera: the stands don't throw the pitch into shade
+                    // and the players are lit from the front; soft shadows
+                    light.intensity = 1.35f;
+                    light.color = new Color(1f, 0.97f, 0.92f);
                     light.shadows = LightShadows.Soft;
-                    go.transform.rotation = Quaternion.Euler(52f, -35f, 0f);
+                    light.shadowStrength = 0.6f;
+                    go.transform.rotation = Quaternion.Euler(68f, 20f, 0f);
                 }
                 var cam = go.GetComponent<Camera>();
                 if (cam != null)
@@ -515,7 +518,7 @@ namespace ArenaMix.EditorTools
             RenderSettings.skybox = mats.sky;
             RenderSettings.ambientMode = AmbientMode.Trilight;
             RenderSettings.ambientSkyColor = new Color(0.78f, 0.84f, 0.95f);
-            RenderSettings.ambientEquatorColor = new Color(0.5f, 0.56f, 0.55f);
+            RenderSettings.ambientEquatorColor = new Color(0.6f, 0.64f, 0.62f);
             RenderSettings.ambientGroundColor = new Color(0.22f, 0.32f, 0.2f);
             // haze that blends the far grass into the stadium photo
             RenderSettings.fog = true;
@@ -533,6 +536,8 @@ namespace ArenaMix.EditorTools
             mm.controller = controller;
             mm.goalModel = GoalPrefab();
             mm.stadiumModel = StadiumPrefab();
+            if (mm.stadiumModel == null) Debug.LogWarning("ArenaMix: no encuentro " + Root + "/Environment/Estadio/estadio.obj; uso el estadio hecho por código");
+            else Debug.Log("ArenaMix: estadio 3D cargado (New Football Map)");
             mm.pitchLight = mats.pitchLight; mm.pitchDark = mats.pitchDark; mm.lineMat = mats.line;
             mm.postMat = mats.post; mm.netMat = mats.net; mm.boardMat = mats.board; mm.standMat = mats.stand;
             mm.ballMat = mats.ball; mm.ringMat = mats.ring;
