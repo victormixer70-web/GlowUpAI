@@ -19,3 +19,9 @@ La app se abre a pantalla completa y en horizontal. Cada vez que se publica un c
 - `manifest.webmanifest` + `icons/` — lo necesario para instalarla como app.
 
 Para probarla en local: `python3 -m http.server` dentro de esta carpeta y abre `http://localhost:8000`.
+
+## Créditos
+
+- Estadio: "New Football Map" (https://sketchfab.com/3d-models/new-football-map-5993a290e7df41b9ac554c205ff22199) de kyrox, licencia CC BY 4.0. Convertido a `assets/stadium/stadium.glb` (centrado en el campo, sin sus porterías ni vallas).
+- Cielo e iluminación: HDRI "Orlando Stadium" de Poly Haven (CC0).
+- Personajes y animaciones: Mixamo.

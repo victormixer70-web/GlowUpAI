@@ -7,7 +7,11 @@
   var LIST = [
     { id: 'ty', name: 'Ty', file: 'assets/chars/ty.glb' },
     { id: 'vegas', name: 'Big Vegas', file: 'assets/chars/vegas.glb' },
-    { id: 'granny', name: 'Granny', file: 'assets/chars/granny.glb' }
+    { id: 'granny', name: 'Granny', file: 'assets/chars/granny.glb' },
+    { id: 'remy', name: 'Remy', file: 'assets/chars/remy.glb' },
+    { id: 'leo', name: 'Leo', file: 'assets/chars/leo.glb' },
+    { id: 'nico', name: 'Nico', file: 'assets/chars/nico.glb' },
+    { id: 'dani', name: 'Dani', file: 'assets/chars/dani.glb' }
   ];
   var KEY = 'arenamix.char.v1', HEIGHT = 1.86;
   var tpl = {}, loading = null, waiters = [], ANIM = null;
@@ -71,7 +75,8 @@
      Every vertex of the clothing meshes gets a zone from the bone that moves it most (torso and arms:
      shirt, hips and thighs: shorts, shins: socks, feet: boots; head and hands keep their look) and its
      T-pose position, for patterns. The shader keeps the texture's folds and shading. */
-  var SKIP_MESH = /hair|head|hand|eye|brow|mouth|lens|scarf|teeth|tongue/i;
+  // a mesh called just "Body" (Remy, Ch23...) is the bare skin under the clothes: never painted
+  var SKIP_MESH = /hair|head|hand|eye|brow|mouth|lens|scarf|teeth|tongue|(^|_)body$/i;
   function zoneOf(name) {
     var n = name.replace('mixamorig', '');
     if (/Hand|Head|Neck|Eye|Hair|Visor|Whistle|Scart/.test(n)) return 0;

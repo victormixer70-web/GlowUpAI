@@ -158,8 +158,6 @@ class Component extends DCLogic {
     let list;
     if (s.cat === 'train') list = C.train;
     else list = C.modes.concat(s.cat === 'casual' ? [{ id: 'private', title: 'PARTIDA PRIVADA', kind: 'private', desc: 'Invita a tus amigos con un código. Los huecos los rellena la IA y le puedes dar órdenes.' }] : []);
-    // the new 3D football (Unity, exported to futbol3d/) as the first casual mode
-    if (s.cat === 'casual' && s.sport === 'futbol') list = [{ id: 'f3d', title: 'FÚTBOL 3D', kind: 'ext', href: 'futbol3d/index.html', desc: 'Nuevo: estadio 3D, pases y saques de puerta.' }].concat(list);
     let cur = list.find((m) => m.id === s.id && !m.soon) || list.find((m) => !m.soon);
     const comp = s.cat === 'comp', S = this.season();
     const placingOf = (m) => this.placeOf(S, s.sport + ':' + m.id).g < 5;

@@ -1079,13 +1079,17 @@ class Component extends DCLogic {
     if (b.y < 0.35) { b.y = 0.35; b.vy = Math.abs(b.vy) * 0.6; }
     if (b.y > 29.65) { b.y = 29.65; b.vy = -Math.abs(b.vy) * 0.6; }
     const inMouth = b.y > 12.25 && b.y < 17.75 && b.z < 2.3;
+    // over the goal line but not in the goal: goal kick (the tutorial keeps the old bounce)
+    const kicks = !this.props.tutorial;
     if (b.x < 0.35) {
       if (inMouth) { if (b.x < -0.3) { this.goal(1); return; } }
-      else if (b.x > -0.2) { b.x = 0.35; b.vx = Math.abs(b.vx) * 0.6; }
+      else if (kicks && b.x < -0.15) { this.goalKick(0); return; }
+      else if (!kicks && b.x > -0.2) { b.x = 0.35; b.vx = Math.abs(b.vx) * 0.6; }
     }
     if (b.x > 59.65) {
       if (inMouth) { if (b.x > 60.3) { this.goal(0); return; } }
-      else if (b.x < 60.2) { b.x = 59.65; b.vx = -Math.abs(b.vx) * 0.6; }
+      else if (kicks && b.x > 60.15) { this.goalKick(1); return; }
+      else if (!kicks && b.x < 60.2) { b.x = 59.65; b.vx = -Math.abs(b.vx) * 0.6; }
     }
     if (b.x < -1.3) { b.x = -1.3; b.vx = Math.abs(b.vx) * 0.15; }
     if (b.x > 61.3) { b.x = 61.3; b.vx = -Math.abs(b.vx) * 0.15; }
@@ -1182,6 +1186,21 @@ class Component extends DCLogic {
       if (g.recv && g.recv.i === best) g.recv = null;
       if (p.team === 0 && best !== g.ctl && this.props.coach) { g.ctl = best; g.charging = false; }
     }
+  }
+  // the keeper of team takes the ball in hand on the edge of the six-yard box and plays it out;
+  // the attackers step back out of the area first
+  goalKick(team) {
+    const g = this.g, b = g.ball, i = g.ps.findIndex((p) => p.team === team && p.role === 'gk');
+    if (i < 0) return;
+    const k = g.ps[i];
+    Object.assign(k, { x: team ? 57.4 : 2.6, y: this.clamp(b.y, 12.5, 17.5), vx: 0, vy: 0, act: null, face: team ? Math.PI : 0 });
+    g.ps.forEach((p) => {
+      if (p.team === team || p.role === 'gk') return;
+      if (team ? p.x > 50 : p.x < 10) p.x = team ? 50 : 10;
+    });
+    g.own = -1; g.hold = i; g.holdT = 1.4; g.last = i; g.recv = null; g.charging = false; g.charge = 0;
+    Object.assign(b, { vx: 0, vy: 0, vz: 0, spin: 0 });
+    this.flashMsg('SAQUE DE PUERTA', 1.2);
   }
   dribble(p, dt) {
     const g = this.g, b = g.ball, oi = g.own;
@@ -1473,12 +1492,28 @@ class Component extends DCLogic {
     };
     // straight stands end at the corners of the pitch; quarter-circle stands fill each corner
     const kv = this.keeperMode();
+    // the 3D stadium model when it has loaded (stadium.js); otherwise the stands built here
+    const STAD = window.AMStadium && window.AMStadium.ready() ? window.AMStadium : null;
+    if (STAD) {
+      const model = STAD.model();
+      model.position.y = -0.03;
+      S.add(model);
+      // fans in the model's seats, facing the pitch; ultras behind the goals
+      STAD.seats().forEach(([wx, wy, wz]) => {
+        if (Math.random() < 0.07) return;
+        const tx = Math.max(-26, Math.min(26, wx)), rotY = Math.atan2(tx - wx, -wz);
+        const team = wx < 0 ? 0 : 1, ultra = Math.abs(wx) > 34, row = Math.round(wy / 0.5);
+        const key = (wz < -20 ? 'far' : Math.abs(wx) > 34 ? (wx < 0 ? 'west' : 'east') : 'side') + ':' + Math.floor((wx + 60) / 8) + ':' + (ultra ? 'u' : 'n');
+        put(key, team, ultra, wx, wy - 0.02, wz, rotY, fanColor(team, ultra, row));
+      });
+    } else {
     addStand('far', 0, -19, 71.2, Math.PI, () => true);
     addStand('west', -35.6, kv ? 0 : 8, kv ? 38 : 54, -Math.PI / 2, () => true);
     addStand('east', 35.6, kv ? 0 : 8, kv ? 38 : 54, Math.PI / 2, () => true);
     addCorner('cw', -35.6, -19, Math.PI); addCorner('ce', 35.6, -19, Math.PI / 2);
     // the near touchline stand is behind the normal camera, so it is only built when it can be seen (goalkeeper view)
     if (kv) { addStand('near', 0, 19, 71.2, 0, () => true); addCorner('nw', -35.6, 19, Math.PI * 1.5); addCorner('ne', 35.6, 19, 0); }
+    }
     // crowd: one group per section so whole blocks can bounce cheaply
     this.fanGroups = [];
     const m4 = new T.Matrix4(), q = new T.Quaternion(), sc = new T.Vector3(1, 1, 1), pos = new T.Vector3(), col = new T.Color(), up = new T.Vector3(0, 1, 0);
@@ -1504,7 +1539,7 @@ class Component extends DCLogic {
       grp.userData = { team: sec.team, ultra: sec.ultra, ph: Math.random() * 6.28, w: sec.ultra ? 6.5 + Math.random() : 1.5 + Math.random() };
       this.fanGroups.push(grp);
     });
-    {
+    if (seatSpots.length) {
       const seats = new T.InstancedMesh(seatGeo, this.mat(0xffffff, { roughness: 0.6 }), seatSpots.length);
       const steps = new T.InstancedMesh(new T.BoxGeometry(0.62, 0.05, 0.8), this.mat(0x8a90a3, { roughness: 0.9 }), stepSpots.length);
       const seatCols = [new T.Color('#24304f'), new T.Color('#2b3a5e')].map((c) => c.convertSRGBToLinear());
@@ -1518,7 +1553,7 @@ class Component extends DCLogic {
     }
     // ultras' flags and striped banners behind each goal
     this.flags = [];
-    [0, 1].forEach((team) => {
+    if (!STAD) [0, 1].forEach((team) => {
       const [c1, c2] = teamCols[team], sx = team === 0 ? -1 : 1;
       const flagTex = this.canvasTex(128, 80, (c, w, h) => { c.fillStyle = c1; c.fillRect(0, 0, w / 2, h); c.fillStyle = c2; c.fillRect(w / 2, 0, w / 2, h); });
       const flagMat = new T.MeshStandardMaterial({ map: flagTex, side: T.DoubleSide, roughness: 0.8 });
@@ -1551,7 +1586,7 @@ class Component extends DCLogic {
     if (this.keeperMode()) { const b2 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); b2.position.set(0, 0.45, 17.5); S.add(b2); }
     [-1, 1].forEach((s) => { const b = new T.Mesh(new T.BoxGeometry(0.15, 0.9, 34), adMat); b.position.set(34.5 * s, 0.45, 0); S.add(b); });
     const glowTex = this.canvasTex(128, 128, (c) => { const g = c.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(220,232,255,0.5)'); g.addColorStop(1, 'rgba(220,232,255,0)'); c.fillStyle = g; c.fillRect(0, 0, 128, 128); });
-    [[-52, -40], [52, -40], [-54, 30], [54, 30]].forEach(([x, z]) => {
+    if (!STAD) [[-52, -40], [52, -40], [-54, 30], [54, 30]].forEach(([x, z]) => {
       const pole = new T.Mesh(new T.CylinderGeometry(0.4, 0.7, 36, 8), this.mat(0x2a3556)); pole.position.set(x, 18, z); S.add(pole);
       const panel = new T.Mesh(new T.BoxGeometry(6, 3, 0.4), new T.MeshStandardMaterial({ color: 0xffffff, emissive: 0xf4f8ff, emissiveIntensity: 1.6 }));
       panel.position.set(x, 36, z); panel.lookAt(0, 0, 0); S.add(panel);
@@ -1560,6 +1595,33 @@ class Component extends DCLogic {
     });
     const white = this.mat(0xf4f6fa, { roughness: 0.35, metalness: 0.2 });
     const netMat = new T.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
+    // the downloaded goal: its frame, with a light textured net (same shape as the net the ball hits)
+    const GOAL = STAD && STAD.goal(6.14, 2.51, 1.6, 1) ? STAD : null;
+    if (GOAL) {
+      const netTex = this.canvasTex(128, 128, (c, w, h) => {
+        c.clearRect(0, 0, w, h); c.strokeStyle = '#ffffff'; c.lineWidth = 5;
+        c.beginPath(); c.moveTo(0, 0); c.lineTo(w, h); c.moveTo(w, 0); c.lineTo(0, h); c.stroke();
+      });
+      netTex.wrapS = netTex.wrapT = T.RepeatWrapping;
+      const cell = 0.16;
+      const netM = new T.MeshStandardMaterial({ map: netTex, alphaTest: 0.4, transparent: false, side: T.DoubleSide, roughness: 0.9 });
+      const quad = (pts) => {
+        // pts: four corners [x, y, z]; UVs in metres so the mesh cells keep their size
+        const g2 = new T.BufferGeometry(), pos = [], uv = [];
+        const [a0, b0, c0, d0] = pts.map((q) => new T.Vector3(...q));
+        const wU = a0.distanceTo(b0) / cell, wV = a0.distanceTo(d0) / cell;
+        [[a0, 0, 0], [b0, wU, 0], [c0, wU, wV], [a0, 0, 0], [c0, wU, wV], [d0, 0, wV]].forEach(([v, u, w2]) => { pos.push(v.x, v.y, v.z); uv.push(u, w2); });
+        g2.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g2.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); g2.computeVertexNormals();
+        return new T.Mesh(g2, netM);
+      };
+      [-1, 1].forEach((s) => {
+        const gx = 30 * s, bx = gx + 1.6 * s, hw = 3;
+        const frame = GOAL.goal(6.14, 2.51, 1.6, s); frame.position.set(gx, 0, 0); S.add(frame);
+        S.add(quad([[bx, 0, -hw], [bx, 0, hw], [bx, 2.0, hw], [bx, 2.0, -hw]]));
+        S.add(quad([[gx, 2.44, -hw], [gx, 2.44, hw], [bx, 2.0, hw], [bx, 2.0, -hw]]));
+        [-hw, hw].forEach((z) => S.add(quad([[gx, 0, z], [bx, 0, z], [bx, 2.0, z], [gx, 2.44, z]])));
+      });
+    } else
     [-1, 1].forEach((s) => {
       const gx = 30 * s, back = gx + 1.6 * s;
       [-3, 3].forEach((z) => { const p = new T.Mesh(new T.CylinderGeometry(0.07, 0.07, 2.44, 14), white); p.position.set(gx, 1.22, z); p.castShadow = true; S.add(p); });
@@ -1577,7 +1639,7 @@ class Component extends DCLogic {
       [[64, 128], [192, 128], [320, 128], [448, 128]].forEach(([x, y]) => pent(x, y, 30));
       [[0, 40], [128, 40], [256, 40], [384, 40], [512, 40], [64, 225], [192, 225], [320, 225], [448, 225]].forEach(([x, y]) => pent(x, y, 24));
     });
-    this.ball3 = new T.Mesh(new T.SphereGeometry(0.2, 40, 28), window.AMBall ? window.AMBall.material() : new T.MeshStandardMaterial({ map: ballTex, roughness: 0.45 }));
+    this.ball3 = new T.Mesh(new T.SphereGeometry(0.27, 40, 28), window.AMBall ? window.AMBall.material() : new T.MeshStandardMaterial({ map: ballTex, roughness: 0.45 }));
     this.ball3.castShadow = true;
     S.add(this.ball3);
     this.meshFor = null;
@@ -1634,13 +1696,13 @@ class Component extends DCLogic {
       this.animate(p, m, i);
       if (m.userData.anim) this.mocap(p, m, i, dt || 0);
     });
-    this.ball3.position.copy(this.W(b.x, b.y, b.z + 0.2));
+    this.ball3.position.copy(this.W(b.x, b.y, b.z + 0.27));
     this.ball3.visible = g.phase !== 'winners';
     const bsp = Math.hypot(b.vx, b.vy);
     if (bsp > 0.01 && dt) {
       if (!this.qTmp) { this.qTmp = new T.Quaternion(); this.aTmp = new T.Vector3(); }
       this.aTmp.set(b.vy / bsp, 0, -b.vx / bsp);
-      this.qTmp.setFromAxisAngle(this.aTmp, bsp * dt / 0.2);
+      this.qTmp.setFromAxisAngle(this.aTmp, bsp * dt / 0.27);
       this.ball3.quaternion.premultiply(this.qTmp);
     }
     const c = g.ps[g.ctl];

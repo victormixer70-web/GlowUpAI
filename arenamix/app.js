@@ -238,11 +238,17 @@
   }
   requestAnimationFrame(pump);
   /* the 3D characters count towards the bar too, but a slow connection never blocks the app on them */
-  var chars = window.AMChars ? (total += 3, new Promise(function (res) {
-    var got = 0, t = setTimeout(function () { done += 3 - got; got = 3; res(); }, 9000);
-    window.AMChars.load(function () { if (got < 3) { got++; done++; } }).then(function () { clearTimeout(t); res(); });
+  var NC = window.AMChars ? window.AMChars.list.length : 0;
+  var chars = window.AMChars ? (total += NC, new Promise(function (res) {
+    var got = 0, t = setTimeout(function () { done += NC - got; got = NC; res(); }, 12000);
+    window.AMChars.load(function () { if (got < NC) { got++; done++; } }).then(function () { clearTimeout(t); done += NC - got; got = NC; res(); });
   })) : Promise.resolve();
-  Promise.all(SCREENS.map(function (n) { return load(n).then(function () { done++; }); }).concat([chars])).then(function () {
+  /* the 3D stadium too, with the same rule */
+  var stad = window.AMStadium ? (total += 1, new Promise(function (res) {
+    var t = setTimeout(function () { done++; res(); }, 9000);
+    window.AMStadium.load().then(function () { clearTimeout(t); done++; res(); }, function () { clearTimeout(t); done++; res(); });
+  })) : Promise.resolve();
+  Promise.all(SCREENS.map(function (n) { return load(n).then(function () { done++; }); }).concat([chars, stad])).then(function () {
     clearTimeout(hang);
     render(h(App), document.getElementById('stage'));
     ready = true;
