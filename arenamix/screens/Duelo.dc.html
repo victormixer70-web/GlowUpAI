@@ -823,8 +823,8 @@ class Component extends DCLogic {
     const zMin = -30, zMax = D + 14, W = 100, L = zMax - zMin, ppm = 20;
     const tex = this.canvasTex(W * ppm, L * ppm, (c, w, h) => {
       const X = (x) => (x + 50) * ppm, Z = (z) => (z - zMin) * ppm;
-      c.fillStyle = '#1d7a43'; c.fillRect(0, 0, w, h);
-      for (let z = Math.floor(zMin / 5) * 5, i = 0; z < zMax; z += 5, i++) if (i % 2) { c.fillStyle = '#23894c'; c.fillRect(0, Z(z), w, 5 * ppm); }
+      c.fillStyle = '#095c04'; c.fillRect(0, 0, w, h);
+      for (let z = Math.floor(zMin / 5) * 5, i = 0; z < zMax; z += 5, i++) if (i % 2) { c.fillStyle = '#0b6c05'; c.fillRect(0, Z(z), w, 5 * ppm); }
       for (let i = 0; i < 6000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.035)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
       c.strokeStyle = '#f4f8f4'; c.lineWidth = 0.12 * ppm; c.lineCap = 'round';
       const ln = (x1, z1, x2, z2) => { c.beginPath(); c.moveTo(X(x1), Z(z1)); c.lineTo(X(x2), Z(z2)); c.stroke(); };
@@ -841,7 +841,7 @@ class Component extends DCLogic {
     pitch.position.set(0, 0, (zMin + zMax) / 2);
     pitch.receiveShadow = true;
     S.add(pitch);
-    const apron = new T.Mesh(new T.PlaneGeometry(400, 400), this.mat(0x0f2a1a, { roughness: 1 }));
+    const apron = new T.Mesh(new T.PlaneGeometry(400, 400), this.mat(0x0a3a0c, { roughness: 1 }));
     apron.rotation.x = -Math.PI / 2; apron.position.y = -0.01; S.add(apron);
 
     // stadium: stand behind the goal (ultras in the middle) and both touchline stands

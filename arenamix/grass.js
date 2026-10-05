@@ -28,7 +28,8 @@
       x[0].repeat.copy(rep);
       if (x[1].image) x[0].needsUpdate = true; else wait.get(x[1]).push(x[0]);
     });
-    var m = new T.MeshStandardMaterial({ map: c, normalMap: n, normalScale: new T.Vector2(0.55, 0.55), roughnessMap: r, roughness: 1, metalness: 0 });
+    var m = new T.MeshStandardMaterial({ map: c, normalMap: n, normalScale: new T.Vector2(0.55, 0.55), roughness: 1, metalness: 0, envMapIntensity: 0.45 });
+    r.dispose();
     m.onBeforeCompile = function (sh) {
       sh.uniforms.pitchMap = { value: pitchTex };
       sh.vertexShader = sh.vertexShader
@@ -40,7 +41,7 @@
           'vec4 gC = mapTexelToLinear(texture2D(map, vUv));',
           'vec4 pC = mapTexelToLinear(texture2D(pitchMap, vPitchUv));',
           'float lr = dot(gC.rgb, vec3(0.2126, 0.7152, 0.0722)) / ' + MEAN_LUM + ';',
-          'vec3 det = mix(vec3(lr), clamp(gC.rgb / ' + MEAN + ', 0.0, 3.0), 0.25);',
+          'vec3 det = mix(vec3(lr), clamp(gC.rgb / ' + MEAN + ', 0.0, 3.0), 0.08);',
           'diffuseColor.rgb *= pC.rgb * mix(vec3(1.0), det, 0.85);'
         ].join('\n'));
     };
