@@ -52,6 +52,7 @@
           });
           root.updateMatrixWorld(true);
           var box = new T.Box3().setFromObject(root);
+          prepKit(root, box);
           tpl[c.id] = { root: root, box: box };
           if (onStep) onStep();
           res(true);
@@ -65,6 +66,112 @@
     return loading;
   }
   function onReady(f) { if (ready()) f(); else waiters.push(f); }
+
+  /* ---------- kits: the outfit chosen in Taquilla painted over each character's own clothes ----------
+     Every vertex of the clothing meshes gets a zone from the bone that moves it most (torso and arms:
+     shirt, hips and thighs: shorts, shins: socks, feet: boots; head and hands keep their look) and its
+     T-pose position, for patterns. The shader keeps the texture's folds and shading. */
+  var SKIP_MESH = /hair|head|hand|eye|brow|mouth|lens|scarf|teeth|tongue/i;
+  function zoneOf(name) {
+    var n = name.replace('mixamorig', '');
+    if (/Hand|Head|Neck|Eye|Hair|Visor|Whistle|Scart/.test(n)) return 0;
+    if (/Foot|Toe/.test(n)) return 4;
+    if (/UpLeg|Hips|Butt/.test(n)) return 2;
+    if (/Leg/.test(n)) return 3;
+    if (/Spine|Shoulder|Arm|Cape|Peck|Collar|Belly|Sleeve|Breast|Hood/.test(n)) return 1;
+    return 0;
+  }
+  // skin-coloured texels stay as they are (open shirts, bare arms)
+  function isSkin(r, g, b) { return r > 0.2 && g < r * 0.95 && g > r * 0.45 && b > r * 0.25 && b < g; }
+  function prepKit(root, box) {
+    var H = box.max.y - box.min.y, cx = (box.min.x + box.max.x) / 2, cz = (box.min.z + box.max.z) / 2, v = new T.Vector3();
+    root.traverse(function (m) {
+      if (!m.isSkinnedMesh || SKIP_MESH.test(m.name)) return;
+      var mt = m.material;
+      if (Array.isArray(mt) || mt.transparent || !mt.map) return;
+      var geo = m.geometry, pos = geo.attributes.position, si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight, uv = geo.attributes.uv;
+      if (!si || !sw) return;
+      var n = pos.count, kit = new Float32Array(n * 3), names = m.skeleton.bones.map(function (b) { return b.name; });
+      // texture pixels, to know each zone's average brightness (the recolour keeps relative shading)
+      var px = null, W = 128, Hh = 128;
+      try {
+        var cv = document.createElement('canvas'); cv.width = W; cv.height = Hh;
+        var cx2 = cv.getContext('2d'); cx2.drawImage(mt.map.image, 0, 0, W, Hh); px = cx2.getImageData(0, 0, W, Hh).data;
+      } catch (e) { px = null; }
+      var sum = [0, 0, 0, 0, 0], cnt = [0, 0, 0, 0, 0];
+      for (var i = 0; i < n; i++) {
+        var best = 0, bw = -1;
+        for (var k = 0; k < 4; k++) { var w = sw.array[i * 4 + k]; if (w > bw) { bw = w; best = si.array[i * 4 + k]; } }
+        var z = zoneOf(names[best] || '');
+        v.fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld);
+        kit[i * 3] = z; kit[i * 3 + 1] = (v.x - cx) / H; kit[i * 3 + 2] = (v.y - box.min.y) / H;
+        if (px && uv && z) {
+          var u = uv.getX(i), w2 = uv.getY(i);
+          u -= Math.floor(u); w2 -= Math.floor(w2);
+          var o = (Math.min(Hh - 1, Math.floor(w2 * Hh)) * W + Math.min(W - 1, Math.floor(u * W))) * 4;
+          var r = Math.pow(px[o] / 255, 2.2), g = Math.pow(px[o + 1] / 255, 2.2), b = Math.pow(px[o + 2] / 255, 2.2);
+          if (z === 1 && isSkin(px[o] / 255, px[o + 1] / 255, px[o + 2] / 255)) continue;
+          sum[z] += 0.2126 * r + 0.7152 * g + 0.0722 * b; cnt[z]++;
+        }
+      }
+      geo.setAttribute('aKit', new T.Float32BufferAttribute(kit, 3));
+      var lum = [1, 1, 1, 1, 1].map(function (d, z) { return cnt[z] ? Math.max(0.02, sum[z] / cnt[z]) : 0.2; });
+      m.userData.kitLum = [lum[1], lum[2], lum[3], lum[4]];
+      m.userData.kitable = true;
+    });
+  }
+  var PAT = { solid: 0, stripes: 1, pin: 2, hoops: 3, halves: 4, centre: 5, sash: 6, diag: 7, band: 8 };
+  function col(c, fb) {
+    if (c == null) return new T.Color(fb);
+    return (c.isColor ? c.clone() : new T.Color(c)).convertSRGBToLinear();
+  }
+  function kitMaterial(base, kit, lum) {
+    var m = base.clone();
+    var U = {
+      uKitA: { value: col(kit.primary, '#ffffff') }, uKitB: { value: col(kit.secondary, '#141B2D') },
+      uShorts: { value: col(kit.shorts, '#141B2D') }, uSocks: { value: col(kit.socks, '#ffffff') }, uShoes: { value: col(kit.shoe, '#F2F5FA') },
+      uPat: { value: PAT[kit.pattern] || 0 }, uLum: { value: lum }
+    };
+    m.onBeforeCompile = function (sh) {
+      Object.keys(U).forEach(function (k) { sh.uniforms[k] = U[k]; });
+      sh.vertexShader = sh.vertexShader
+        .replace('#include <common>', '#include <common>\nattribute vec3 aKit;\nvarying vec4 vZone;\nvarying vec2 vKitP;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\nvZone = vec4(step(0.5, aKit.x) * step(aKit.x, 1.5), step(1.5, aKit.x) * step(aKit.x, 2.5), step(2.5, aKit.x) * step(aKit.x, 3.5), step(3.5, aKit.x));\nvKitP = aKit.yz;');
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', ['#include <common>', 'varying vec4 vZone;', 'varying vec2 vKitP;',
+          'uniform vec3 uKitA; uniform vec3 uKitB; uniform vec3 uShorts; uniform vec3 uSocks; uniform vec3 uShoes;',
+          'uniform float uPat; uniform vec4 uLum;',
+          'float kitPattern(vec2 p) {',
+          '  if (uPat < 0.5) return 0.0;',
+          '  if (uPat < 1.5) return step(0.5, fract(p.x * 14.0 + 0.25));',
+          '  if (uPat < 2.5) return step(0.82, fract(p.x * 20.0));',
+          '  if (uPat < 3.5) return step(0.5, fract(p.y * 14.0));',
+          '  if (uPat < 4.5) return step(0.0, p.x);',
+          '  if (uPat < 5.5) return step(abs(p.x), 0.045);',
+          '  if (uPat < 6.5) return step(abs(p.x + (p.y - 0.62) * 0.9), 0.05);',
+          '  if (uPat < 7.5) return step(0.0, p.x + (p.y - 0.62));',
+          '  return step(abs(p.y - 0.66), 0.03);',
+          '}'].join('\n'))
+        .replace('#include <map_fragment>', ['#include <map_fragment>',
+          '{',
+          '  vec3 c = diffuseColor.rgb, sc = pow(max(c, vec3(0.0)), vec3(1.0 / 2.2));',
+          '  float lum = dot(c, vec3(0.2126, 0.7152, 0.0722));',
+          '  float skin = step(0.2, sc.r) * step(sc.g, sc.r * 0.95) * step(sc.r * 0.45, sc.g) * step(sc.r * 0.25, sc.b) * step(sc.b, sc.g);',
+          '  vec3 shirt = mix(uKitA, uKitB, kitPattern(vKitP));',
+          '  float zl = dot(vZone, uLum) + 0.0001;',
+          '  vec3 kitC = shirt * vZone.x + uShorts * vZone.y + uSocks * vZone.z + uShoes * vZone.w;',
+          '  float w = clamp(vZone.x * (1.0 - skin) + vZone.y + vZone.z + vZone.w, 0.0, 1.0);',
+          '  vec3 painted = kitC * clamp(lum / zl, 0.35, 1.6);',
+          '  diffuseColor.rgb = mix(c, painted, w);',
+          '}'].join('\n'));
+    };
+    m.customProgramCacheKey = function () { return 'amkit1'; };
+    return m;
+  }
+  // the outfit equipped in Taquilla for a sport (null if none saved yet)
+  function outfit(sport) {
+    try { var o = JSON.parse(localStorage.getItem('arenamix.outfit.v1') || 'null'); return o && o[sport || 'futbol'] || null; } catch (e) { return null; }
+  }
 
   var BONES = {
     hips: 'mixamorigHips', neck: 'mixamorigNeck',
@@ -89,6 +196,10 @@
     holder.scale.setScalar(s);
     holder.position.set(-(t.box.min.x + t.box.max.x) / 2 * s, -t.box.min.y * s, -(t.box.min.z + t.box.max.z) / 2 * s);
     holder.add(model); g.add(holder);
+    // dress the character: an explicit kit, your Taquilla outfit, or the team colours the game passes
+    var kit = o.kit || (o.you && !o.noOutfit ? outfit(o.sport) : null);
+    if (!kit && o.shirt != null) kit = { primary: o.shirt, secondary: o.trimCss, pattern: 'solid', shorts: o.shorts, socks: o.socks, shoe: o.boot };
+    if (kit) model.traverse(function (m) { if (m.isSkinnedMesh && m.userData.kitable) m.material = kitMaterial(m.material, kit, new T.Vector4().fromArray(m.userData.kitLum)); });
     // team colour ring under the feet, so sides can be told apart whatever the outfit
     if (o.shirt != null && !o.noRing) {
       var ring = new T.Mesh(new T.RingGeometry(0.42, 0.55, 40), new T.MeshBasicMaterial({ color: new T.Color(o.shirt), transparent: true, opacity: 0.85, depthWrite: false }));
@@ -233,5 +344,5 @@
     return g;
   }
 
-  window.AMChars = { list: LIST, pref: pref, setPref: setPref, load: load, ready: ready, onReady: onReady, make: make, clip: clipInfo };
+  window.AMChars = { list: LIST, pref: pref, setPref: setPref, load: load, ready: ready, onReady: onReady, make: make, clip: clipInfo, outfit: outfit };
 })();

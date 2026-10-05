@@ -1277,7 +1277,7 @@ class Component extends DCLogic {
     const T = THREE, g = this.g;
     if (!this.confetti) {
       const N = 420, pos = new Float32Array(N * 3), col = new Float32Array(N * 3), vel = [];
-      const P = this.props, cols = g.win && g.win.team === 1 ? [P.awayColor ?? '#A78BFA', P.awayTrim ?? '#F4F4FA', '#FFC53D'] : g.win && g.win.team === 0 ? [P.homeColor ?? '#FF8A3D', P.homeTrim ?? '#0B0B14', '#FFC53D'] : ['#FFC53D', '#F4F4FA', '#22D3EE'];
+      const P = this.props, cols = g.win && g.win.team === 1 ? [this.awayCol(), P.awayTrim ?? '#F4F4FA', '#FFC53D'] : g.win && g.win.team === 0 ? [P.homeColor ?? this.homeKit().primary, P.homeTrim ?? this.homeKit().secondary, '#FFC53D'] : ['#FFC53D', '#F4F4FA', '#22D3EE'];
       const cc = cols.map((h) => new T.Color(h));
       for (let i = 0; i < N; i++) {
         pos[i * 3] = (Math.random() - 0.5) * 18; pos[i * 3 + 1] = 2 + Math.random() * 9; pos[i * 3 + 2] = (Math.random() - 0.5) * 8;
@@ -1357,7 +1357,7 @@ class Component extends DCLogic {
     apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; S.add(apron);
     // ---------- big open-air stadium: two tiers on three sides, ultras behind each goal ----------
     const P = this.props;
-    const teamCols = [[P.homeColor ?? '#FF8A3D', P.homeTrim ?? '#0B0B14'], [P.awayColor ?? '#A78BFA', P.awayTrim ?? '#F4F4FA']];
+    const teamCols = [[P.homeColor ?? this.homeKit().primary, P.homeTrim ?? this.homeKit().secondary], [this.awayCol(), P.awayTrim ?? '#F4F4FA']];
     const standMat = this.mat(0x2a3044, { roughness: 0.92 });
     const seatMat = this.mat(0x1b2236, { roughness: 0.9 });
     const LOW = 14, UP = 10;
@@ -1559,20 +1559,39 @@ class Component extends DCLogic {
     S.add(this.ball3);
     this.meshFor = null;
   }
+  // rival colour, swapped for another when it is too close to your kit
+  awayCol() {
+    if (!this._awayCol) {
+      const P = this.props, want = P.awayColor ?? '#A78BFA', home = new THREE.Color(P.homeColor ?? this.homeKit().primary);
+      const far = (c) => { const x = new THREE.Color(c); return Math.abs(x.r - home.r) + Math.abs(x.g - home.g) + Math.abs(x.b - home.b) > 0.55; };
+      this._awayCol = far(want) ? want : ['#F4F4FA', '#3EA6FF', '#FFC53D', '#2FBF71', '#E5484D', '#17172A'].find(far) || want;
+    }
+    return this._awayCol;
+  }
+  // your team wears the kit equipped in Taquilla (unless the mode sets the colours)
+  homeKit() {
+    if (!this._homeKit) {
+      const o = window.AMChars && window.AMChars.outfit('futbol');
+      this._homeKit = o || { primary: '#FF8A3D', secondary: '#0B0B14', pattern: 'solid', shorts: '#17172A', socks: '#FF8A3D', shoe: '#C8F031' };
+    }
+    return this._homeKit;
+  }
   syncPlayers() {
     const g = this.g, P = this.props;
     if (this.meshFor === g.ps) return;
     (this.pMeshes || []).forEach((m) => this.S.remove(m));
-    const hc = P.homeColor ?? '#FF8A3D', ht = P.homeTrim ?? '#0B0B14', ac = P.awayColor ?? '#A78BFA', at = P.awayTrim ?? '#F4F4FA';
+    const hc = P.homeColor ?? this.homeKit().primary, ht = P.homeTrim ?? this.homeKit().secondary, ac = this.awayCol(), at = P.awayTrim ?? '#F4F4FA';
     const nums = [['10', '8', '7', '4'], ['9', '11', '6', '5']];
     this.pMeshes = g.ps.map((p, idx) => {
       const gk = p.role === 'gk', home = p.team === 0;
       const m = this.makePlayer({
-        you: idx === g.ctl,
+        you: idx === g.ctl, noOutfit: true,
+        // field players: your team in your Taquilla kit, rivals in theirs
+        kit: gk ? null : home ? (P.homeColor ? null : this.homeKit()) : { primary: ac, secondary: at, pattern: 'solid', shorts: '#F4F4F6', socks: ac, shoe: '#F2F5FA' },
         shirt: new THREE.Color(gk ? (home ? '#FFC53D' : '#2FBF71') : home ? hc : ac),
-        shorts: new THREE.Color(home ? '#17172A' : '#F4F4F6'),
-        socks: new THREE.Color(gk ? '#17172A' : home ? hc : ac),
-        boot: home ? 0xc8f031 : 0xf2f5fa, gloves: gk, number: gk ? '1' : nums[p.team][p.slot],
+        shorts: new THREE.Color(home ? (P.homeColor ? '#17172A' : this.homeKit().shorts) : '#F4F4F6'),
+        socks: new THREE.Color(gk ? '#17172A' : home ? (P.homeColor ? hc : this.homeKit().socks) : ac),
+        boot: home ? (P.homeColor ? 0xc8f031 : this.homeKit().shoe) : 0xf2f5fa, gloves: gk, number: gk ? '1' : nums[p.team][p.slot],
         trimCss: gk ? '#17172A' : home ? ht : at,
         hair: [0x241811, 0xc9a227, 0x3a2418, 0x141b2d][Math.floor(Math.random() * 4)]
       });
@@ -2059,8 +2078,8 @@ class Component extends DCLogic {
   renderVals() {
     const g = this.g, b = g.ball, P = this.props;
     const SP = (x, y, z) => this.scr(x, y, z || 0);
-    const hc = P.homeColor ?? '#FF8A3D', ht = P.homeTrim ?? '#0B0B14';
-    const ac = P.awayColor ?? '#A78BFA', at = P.awayTrim ?? '#F4F4FA';
+    const hc = P.homeColor ?? this.homeKit().primary, ht = P.homeTrim ?? this.homeKit().secondary;
+    const ac = this.awayCol(), at = P.awayTrim ?? '#F4F4FA';
     const h = g.ps[g.ctl];
     const hs = SP(h.x, h.y);
     const rings = [{

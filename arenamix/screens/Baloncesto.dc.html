@@ -504,7 +504,7 @@ class Component extends DCLogic {
     this.moneyMat = new T.MeshStandardMaterial({ color: 0xffc53d, map: bt, roughness: 0.5, emissive: 0x332200 });
     this.ball = new T.Mesh(new T.SphereGeometry(0.12, 32, 24), this.ballMat); this.ball.castShadow = true; S.add(this.ball);
     // player
-    this.player = this.makePlayer({ you: true, shirt: 0xff8a3d, shorts: 0xff8a3d, socks: 0xf2f5fa, number: '23', trimCss: '#0B0B14', boot: 0xf2f5fa });
+    this.player = this.makePlayer({ you: true, sport: 'basket', shirt: 0xff8a3d, shorts: 0xff8a3d, socks: 0xf2f5fa, number: '23', trimCss: '#0B0B14', boot: 0xf2f5fa });
     S.add(this.player);
     this.rack = new T.Group(); S.add(this.rack);
     this.updateRack();

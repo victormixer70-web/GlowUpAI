@@ -162,6 +162,30 @@ class Component extends DCLogic {
         voley: { equipos: 'voley-0-0', cabeza: 'h0', cara: 'f0', calzado: 's1' }
       }
     };
+    // what you equipped and bought stays saved between visits
+    try {
+      const k = JSON.parse(localStorage.getItem('arenamix.locker.v1') || 'null');
+      if (k && k.equip) {
+        Object.keys(this.state.equip).forEach((sp) => { if (k.equip[sp]) this.state.equip[sp] = { ...this.state.equip[sp], ...k.equip[sp] }; });
+        if (Array.isArray(k.bought)) this.state.bought = k.bought;
+      }
+    } catch (e) {}
+    this.saveLocker(this.state.equip, this.state.bought);
+  }
+  /* saves the locker, plus the resolved outfit per sport that the games dress your character in
+     (arenamix.outfit.v1: { futbol: { primary, secondary, pattern, shorts, socks, shoe, name } ... }) */
+  saveLocker(equip, bought) {
+    try {
+      const L = this.leagues(), X = this.extras(), out = {};
+      Object.keys(equip).forEach((sp) => {
+        const e = equip[sp], [, li, ti] = e.equipos.split('-');
+        if (!L[sp] || !L[sp][Number(li)]) return;
+        const t = this.teamItem(sp, Number(li), Number(ti), L), shoe = X.calzado.find((i) => i.id === e.calzado);
+        out[sp] = { name: t.name, primary: t.primary, secondary: t.secondary, pattern: t.pattern, shorts: t.shorts, socks: t.socks, shoe: shoe ? shoe.color : '#F2F5FA' };
+      });
+      localStorage.setItem('arenamix.locker.v1', JSON.stringify({ equip, bought }));
+      localStorage.setItem('arenamix.outfit.v1', JSON.stringify(out));
+    } catch (e) {}
   }
   leagues() {
     const W = '#F4F4F6', K = '#141B2D';
@@ -489,6 +513,7 @@ class Component extends DCLogic {
 
     const equipNow = (extra) => {
       const equip = { ...s.equip, [sport]: { ...s.equip[sport], [s.cat]: selItem.id } };
+      this.saveLocker(equip, (extra && extra.bought) || s.bought);
       this.setState({ equip, preview: null, ...(extra || {}) });
     };
     const sportObj = SPORTS.find((x) => x.id === sport);
