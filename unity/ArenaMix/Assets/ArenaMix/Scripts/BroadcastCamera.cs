@@ -13,6 +13,8 @@ namespace ArenaMix
         public float distance = 19f;
         public float fov = 30f;
         public float lookHeight = 0.6f;
+        public float maxX = 999f;            // how far along the pitch the camera may travel
+        public bool avoidGeometry;           // stay in front of the stadium model (its mesh colliders)
 
         Vector3 vel, lookVel, look;
 
@@ -28,11 +30,22 @@ namespace ArenaMix
         {
             Vector3 b = match.Ball.transform.position;
             Vector3 bv = match.Ball.Body.GetVelocity().Flat();
-            float hx = match.length * 0.5f - 5f;
+            float hx = Mathf.Min(match.length * 0.5f - 5f, maxX);
             float x = Mathf.Clamp(b.x + bv.x * 0.3f, -hx, hx);
             float z = b.z * 0.3f;
-            lookAt = new Vector3(x, lookHeight, b.z * 0.7f - 1f);
-            return new Vector3(x, height, -match.width * 0.5f - distance + z);
+            float lx = Mathf.Clamp(b.x + bv.x * 0.3f, -match.length * 0.5f + 4f, match.length * 0.5f - 4f);
+            lookAt = new Vector3(lx, lookHeight, b.z * 0.7f - 1f);
+            var pos = new Vector3(x, height, -match.width * 0.5f - distance + z);
+            if (avoidGeometry)
+            {
+                // something of the stadium between the play and the camera: move in front of it
+                Vector3 d = pos - lookAt;
+                float best = d.magnitude;
+                foreach (var h in Physics.RaycastAll(lookAt, d.normalized, best, ~0, QueryTriggerInteraction.Ignore))
+                    if (h.collider is MeshCollider && h.distance < best) best = h.distance;
+                if (best < d.magnitude) pos = lookAt + d.normalized * Mathf.Max(4f, best - 0.8f);
+            }
+            return pos;
         }
 
         void Snap()

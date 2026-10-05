@@ -26,6 +26,16 @@ namespace ArenaMix.EditorTools
             if (!assetPath.StartsWith(Root + "/")) return;
             var mi = assetImporter as ModelImporter;
             if (mi == null) return;
+            if (assetPath.Contains("/Environment/Estadio/"))
+            {
+                // static stadium: readable for the mesh colliders, materials set by the setup
+                mi.isReadable = true;
+                mi.materialImportMode = ModelImporterMaterialImportMode.None;
+                mi.importAnimation = false;
+                mi.importCameras = false;
+                mi.importLights = false;
+                return;
+            }
             bool isChar = assetPath.Contains("/Characters/"), isAnim = assetPath.Contains("/Animations/");
             if (!isChar && !isAnim) return;
             mi.animationType = ModelImporterAnimationType.Human;
@@ -75,6 +85,7 @@ namespace ArenaMix.EditorTools
             if (ti == null) return;
             string name = Path.GetFileNameWithoutExtension(assetPath).ToLowerInvariant();
             if (name.Contains("normal")) ti.textureType = TextureImporterType.NormalMap;
+            if (assetPath.Contains("/Environment/new_football_map/")) { ti.maxTextureSize = 4096; ti.alphaIsTransparency = true; }
             if (assetPath.Contains("/Generated/"))
             {
                 ti.alphaIsTransparency = true;

@@ -364,6 +364,36 @@ namespace ArenaMix.EditorTools
             }
         }
 
+        /// <summary>
+        /// The stadium model (Environment/Estadio/estadio.obj, converted from "New Football Map" by kyrox, CC BY 4.0)
+        /// with a URP material made from its texture atlas.
+        /// </summary>
+        static GameObject StadiumPrefab()
+        {
+            string obj = Root + "/Environment/Estadio/estadio.obj";
+            var src = AssetDatabase.LoadAssetAtPath<GameObject>(obj);
+            if (src == null) return null;
+            var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(Root + "/Environment/new_football_map/textures/material_atlas_00002_1_baseColor.png");
+            var m = Mat("StadiumModel", Lit, Color.white);
+            if (tex != null) m.SetTexture("_BaseMap", tex);
+            m.SetFloat("_Smoothness", 0.15f);
+            AlphaClip(m, true);
+            var inst = (GameObject)PrefabUtility.InstantiatePrefab(src);
+            try
+            {
+                foreach (var r in inst.GetComponentsInChildren<Renderer>(true))
+                {
+                    r.sharedMaterials = Enumerable.Repeat(m, Mathf.Max(1, r.sharedMaterials.Length)).ToArray();
+                    r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+                }
+                return PrefabUtility.SaveAsPrefabAsset(inst, Gen + "/Stadium.prefab");
+            }
+            finally
+            {
+                Object.DestroyImmediate(inst);
+            }
+        }
+
         /// <summary>The goal model from Environment/porteria with URP materials made from its textures.</summary>
         static GameObject GoalPrefab()
         {
@@ -502,6 +532,7 @@ namespace ArenaMix.EditorTools
                 .Where(g => g != null).ToArray();
             mm.controller = controller;
             mm.goalModel = GoalPrefab();
+            mm.stadiumModel = StadiumPrefab();
             mm.pitchLight = mats.pitchLight; mm.pitchDark = mats.pitchDark; mm.lineMat = mats.line;
             mm.postMat = mats.post; mm.netMat = mats.net; mm.boardMat = mats.board; mm.standMat = mats.stand;
             mm.ballMat = mats.ball; mm.ringMat = mats.ring;
