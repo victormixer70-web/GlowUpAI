@@ -12,13 +12,14 @@ namespace ArenaMix
         public float height = 11.5f;
         public float distance = 19f;
         public float fov = 30f;
+        public float lookHeight = 0.6f;
 
         Vector3 vel, lookVel, look;
 
         void Start()
         {
             var cam = GetComponent<Camera>();
-            if (cam != null) { cam.fieldOfView = fov; cam.nearClipPlane = 0.3f; cam.farClipPlane = 600f; }
+            if (cam != null) { cam.fieldOfView = fov; cam.nearClipPlane = 0.3f; cam.farClipPlane = 3000f; }
             if (match != null && match.Ball != null) look = match.Ball.transform.position;
             Snap();
         }
@@ -30,7 +31,7 @@ namespace ArenaMix
             float hx = match.length * 0.5f - 5f;
             float x = Mathf.Clamp(b.x + bv.x * 0.3f, -hx, hx);
             float z = b.z * 0.3f;
-            lookAt = new Vector3(x, 0.6f, b.z * 0.7f - 1f);
+            lookAt = new Vector3(x, lookHeight, b.z * 0.7f - 1f);
             return new Vector3(x, height, -match.width * 0.5f - distance + z);
         }
 

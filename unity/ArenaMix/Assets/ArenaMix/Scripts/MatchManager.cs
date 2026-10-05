@@ -27,6 +27,10 @@ namespace ArenaMix
         public Material pitchLight, pitchDark, lineMat, postMat, netMat, boardMat, standMat, ballMat, ringMat;
         public Material seatMat, roofMat, glowMat, skinMat, apronMat;
 
+        [Header("Stadium")]
+        [Tooltip("On: the real stadium photo (HDRI sky) behind the 3D pitch, like a TV picture. Off: the 3D stands with crowd.")]
+        public bool photoStadium = true;
+
         [Header("Look")]
         public Color homeColor = new Color(1f, 0.54f, 0.24f);
         public Color awayColor = new Color(0.24f, 0.65f, 1f);
@@ -258,8 +262,17 @@ namespace ArenaMix
             Wall(new Vector3(hx + 0.3f, 8f, 0f), new Vector3(0.4f, 16f, hz * 2f + 2f));
             Wall(new Vector3(0f, 16f, 0f), new Vector3(hx * 2f + 2f, 0.4f, hz * 2f + 2f));
             // the stadium bowl: stands, corners, roof and crowd
-            var apron = Prim(PrimitiveType.Quad, "Apron", root, new Vector3(0f, -0.02f, 0f), new Vector3(length + 120f, width + 120f, 1f), apronMat);
+            // grass all the way to the horizon, where it melts into the stadium photo
+            float apronSize = photoStadium ? 2400f : 120f;
+            var apron = Prim(PrimitiveType.Quad, "Apron", root, new Vector3(0f, -0.02f, 0f), new Vector3(length + apronSize, width + apronSize, 1f), apronMat);
             apron.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            if (photoStadium)
+            {
+                var ar = apron.GetComponent<Renderer>();
+                ar.material.SetTextureScale("_BaseMap", new Vector2((length + apronSize) / 3f, (width + apronSize) / 3f));
+                ar.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                return;
+            }
             stadium = new StadiumBuilder
             {
                 concrete = standMat, seat = seatMat, roof = roofMat, glow = glowMat, skin = skinMat,
@@ -351,6 +364,7 @@ namespace ArenaMix
                 var bc = cam.GetComponent<BroadcastCamera>();
                 if (bc == null) bc = cam.gameObject.AddComponent<BroadcastCamera>();
                 bc.match = this;
+                if (photoStadium) { bc.height = 6.5f; bc.distance = 13f; bc.fov = 38f; bc.lookHeight = 1.6f; }
             }
         }
 

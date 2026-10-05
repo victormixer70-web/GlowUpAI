@@ -242,6 +242,8 @@ namespace ArenaMix.EditorTools
             m.sky.SetFloat("_Mapping", 1f);
             m.sky.SetFloat("_ImageType", 0f);
             m.sky.SetFloat("_Exposure", 1f);
+            // turn the photo so a long stand faces the TV camera (adjust Rotation on the Sky material if you like)
+            m.sky.SetFloat("_Rotation", 90f);
             return m;
         }
 
@@ -356,7 +358,7 @@ namespace ArenaMix.EditorTools
                 var light = go.GetComponent<Light>();
                 if (light != null && light.type == LightType.Directional)
                 {
-                    light.intensity = 1.35f;
+                    light.intensity = 1.15f;
                     light.color = new Color(1f, 0.96f, 0.9f);
                     light.shadows = LightShadows.Soft;
                     go.transform.rotation = Quaternion.Euler(52f, -35f, 0f);
@@ -364,9 +366,10 @@ namespace ArenaMix.EditorTools
                 var cam = go.GetComponent<Camera>();
                 if (cam != null)
                 {
-                    cam.transform.position = new Vector3(0f, 11.5f, -35f);
-                    cam.transform.rotation = Quaternion.Euler(20f, 0f, 0f);
-                    cam.fieldOfView = 30f;
+                    cam.transform.position = new Vector3(0f, 6.5f, -29f);
+                    cam.transform.rotation = Quaternion.Euler(10f, 0f, 0f);
+                    cam.fieldOfView = 38f;
+                    cam.farClipPlane = 3000f;
                     CameraQuality(cam);
                 }
             }
@@ -375,6 +378,12 @@ namespace ArenaMix.EditorTools
             RenderSettings.ambientSkyColor = new Color(0.78f, 0.84f, 0.95f);
             RenderSettings.ambientEquatorColor = new Color(0.5f, 0.56f, 0.55f);
             RenderSettings.ambientGroundColor = new Color(0.22f, 0.32f, 0.2f);
+            // haze that blends the far grass into the stadium photo
+            RenderSettings.fog = true;
+            RenderSettings.fogMode = FogMode.Linear;
+            RenderSettings.fogColor = new Color(0.6f, 0.64f, 0.68f);
+            RenderSettings.fogStartDistance = 70f;
+            RenderSettings.fogEndDistance = 420f;
 
             var match = new GameObject("Match");
             match.AddComponent<GameInput>();
