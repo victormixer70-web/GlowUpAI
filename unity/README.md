@@ -17,3 +17,7 @@ Proyecto de Unity 6 (URP) del juego. La versión web sigue en `arenamix/`.
 - `Assets/ArenaMix/Editor`: el importador y el menú «Preparar proyecto».
 - `Assets/ArenaMix/Characters`, `Animations`, `Environment`: personajes y animaciones de Mixamo, césped, cielo y balón.
 - `Assets/ArenaMix/Generated`: lo crea el menú (controlador de animaciones, materiales y la escena `Partido`).
+
+## Créditos
+
+- Estadio: "New Football Map" (https://sketchfab.com/3d-models/new-football-map-5993a290e7df41b9ac554c205ff22199) de kyrox (https://sketchfab.com/kyroxffx), licencia CC BY 4.0. Convertido a `Environment/Estadio/estadio.obj` (centrado en el campo, sin sus porterías ni vallas).

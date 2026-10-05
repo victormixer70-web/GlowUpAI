@@ -27,12 +27,18 @@ namespace ArenaMix
         public RuntimeAnimatorController controller;
         public float characterHeight = 1.85f;
 
+        [Header("Goal model (optional, Environment/porteria)")]
+        public GameObject goalModel;
+
         [Header("Materials (created by ArenaMix > Preparar proyecto)")]
         public Material pitchLight, pitchDark, lineMat, postMat, netMat, boardMat, standMat, ballMat, ringMat;
         public Material seatMat, roofMat, glowMat, skinMat, apronMat;
         public Material glassMat, accentMat, tunnelMat, roofUnderMat, ribMat;
 
         [Header("Stadium")]
+        [Tooltip("3D stadium model (Environment/Estadio). Empty: the stadium built in code.")]
+        public GameObject stadiumModel;
+        public bool useStadiumModel = true;
         [Tooltip("On: the real stadium photo (HDRI sky) behind the 3D pitch, like a TV picture. Off: the 3D stands with crowd.")]
         public bool photoStadium = false;
 
@@ -43,6 +49,10 @@ namespace ArenaMix
         public Ball Ball { get; private set; }
         public bool Playing => state == State.Play;
         public float HalfWidth => width * 0.5f;
+        public bool UsingModel { get; private set; }
+        public float StadiumScale { get; private set; } = 1f;
+        // the open area of the stadium model (pitch + running track) at scale 1, and its own pitch, in metres
+        const float ModelTrackHalfW = 21.4f, ModelTrackHalfL = 36f, ModelPitchHalfL = 28.5f, ModelPitchHalfW = 15.5f;
 
         enum State { Menu, Kickoff, Play, Goal, End }
         State state = State.Menu;
@@ -158,6 +168,9 @@ namespace ArenaMix
             Application.targetFrameRate = 60;
             teamSize = Mathf.Clamp(PlayerPrefs.GetInt("ArenaMix.TeamSize", teamSize), 1, 4);
             Dims(teamSize, out length, out width, out goalWidth, out goalHeight);
+            UsingModel = useStadiumModel && stadiumModel != null && !photoStadium;
+            // the model's running track fits our pitch plus boards; grow it for the bigger modes
+            if (UsingModel) StadiumScale = Mathf.Max(1f, (width * 0.5f + 3f) / ModelTrackHalfW, (length * 0.5f + 4f) / ModelTrackHalfL);
             EnsureMaterials();
             BuildPitch();
             BuildGoal(-1); BuildGoal(1);
@@ -238,13 +251,19 @@ namespace ArenaMix
         void BuildPitch()
         {
             var root = new GameObject("Pitch").transform;
-            float L = length, W = width, margin = 8f;
+            float L = length, W = width, margin = 8f, marginZ = 8f;
+            if (UsingModel)
+            {
+                // cover the model's own pitch, leave its running track in view
+                margin = Mathf.Max(3f, ModelPitchHalfL * StadiumScale - L * 0.5f + 0.5f);
+                marginZ = Mathf.Max(3f, ModelPitchHalfW * StadiumScale - W * 0.5f);
+            }
             // mowing stripes across the pitch, plus a margin around it
-            int stripes = Mathf.Max(10, Mathf.RoundToInt((length + 16f) / 5.5f));
+            int stripes = Mathf.Max(10, Mathf.RoundToInt((length + margin * 2f) / 5.5f));
             float total = L + margin * 2f, sw = total / stripes;
             for (int i = 0; i < stripes; i++)
             {
-                var q = Prim(PrimitiveType.Quad, "Stripe" + i, root, new Vector3(-total * 0.5f + sw * (i + 0.5f), 0f, 0f), new Vector3(sw, W + margin * 2f, 1f), i % 2 == 0 ? pitchLight : pitchDark);
+                var q = Prim(PrimitiveType.Quad, "Stripe" + i, root, new Vector3(-total * 0.5f + sw * (i + 0.5f), 0f, 0f), new Vector3(sw, W + marginZ * 2f, 1f), i % 2 == 0 ? pitchLight : pitchDark);
                 q.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
                 q.GetComponent<Renderer>().receiveShadows = true;
             }
@@ -313,6 +332,8 @@ namespace ArenaMix
             var root = new GameObject(side < 0 ? "GoalWest" : "GoalEast").transform;
             float gx = length * 0.5f * side, hw = goalWidth * 0.5f, h = goalHeight, depth = 1.8f, r = 0.06f;
             root.position = new Vector3(gx, 0f, 0f);
+            // the 3D goal model, fitted to this mode's goal size; the simple posts below stay as invisible colliders
+            bool model = goalModel != null && FitGoalModel(root, side, ref depth);
             foreach (float z in new[] { -hw, hw })
             {
                 var p = Prim(PrimitiveType.Cylinder, "Post", root, new Vector3(0f, h * 0.5f, z), new Vector3(r * 2f, h * 0.5f, r * 2f), postMat, true);
@@ -344,6 +365,52 @@ namespace ArenaMix
             var gt = trig.AddComponent<GoalTrigger>();
             gt.match = this;
             gt.scoringTeam = side > 0 ? 0 : 1;
+            if (model)
+                foreach (Transform c in root)
+                    if (c.name == "Post" || c.name == "Crossbar" || c.name == "Net") c.GetComponent<Renderer>().enabled = false;
+        }
+
+        /// <summary>
+        /// Places the goal model on the goal line: turned so the frame faces the pitch, scaled so the opening is
+        /// goalWidth x goalHeight. Returns false if the model has nothing to show.
+        /// </summary>
+        bool FitGoalModel(Transform root, int side, ref float depth)
+        {
+            var holder = new GameObject("GoalModel").transform;
+            holder.SetParent(root, false);
+            var g = Instantiate(goalModel, holder);
+            g.transform.localPosition = Vector3.zero;
+            Bounds B(System.Func<Renderer, bool> pick)
+            {
+                Bounds b = new Bounds(); bool any = false;
+                foreach (var r in g.GetComponentsInChildren<Renderer>())
+                {
+                    if (!pick(r)) continue;
+                    if (!any) { b = r.bounds; any = true; } else b.Encapsulate(r.bounds);
+                }
+                return b;
+            }
+            bool IsFrame(Renderer r) => r.name.ToLowerInvariant().Contains("bar");
+            var all = B(_ => true);
+            if (all.size.sqrMagnitude < 1e-6f) { Destroy(holder.gameObject); return false; }
+            // width along z
+            if (all.size.x > all.size.z) { g.transform.localRotation = Quaternion.Euler(0f, 90f, 0f) * g.transform.localRotation; all = B(_ => true); }
+            // the frame (posts and crossbar) at the front, facing the centre of the pitch
+            var frame = B(IsFrame);
+            if (frame.size.sqrMagnitude < 1e-6f) frame = all;
+            float front = Mathf.Sign(frame.center.x - all.center.x);
+            if (front != 0f && front != -side) { g.transform.localRotation = Quaternion.Euler(0f, 180f, 0f) * g.transform.localRotation; all = B(_ => true); frame = B(IsFrame); if (frame.size.sqrMagnitude < 1e-6f) frame = all; }
+            // scale: opening = goal size, depth in proportion
+            float sh = goalHeight / Mathf.Max(0.01f, frame.size.y), sw = goalWidth / Mathf.Max(0.01f, frame.size.z);
+            holder.localScale = new Vector3(sh, sh, sw);
+            all = B(_ => true); frame = B(IsFrame); if (frame.size.sqrMagnitude < 1e-6f) frame = all;
+            // frame front on the goal line, standing on the grass, centred
+            Vector3 off = new Vector3(root.position.x - (side > 0 ? frame.min.x : frame.max.x), -all.min.y, root.position.z - frame.center.z);
+            holder.position += off;
+            depth = Mathf.Clamp(all.size.x, 1.2f, 3f);
+            foreach (var r in g.GetComponentsInChildren<Renderer>()) r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            foreach (var c in g.GetComponentsInChildren<Collider>()) Destroy(c);
+            return true;
         }
 
         void BuildBoardsAndStands()
@@ -375,6 +442,18 @@ namespace ArenaMix
             Wall(new Vector3(-hx - 0.3f, 8f, 0f), new Vector3(0.4f, 16f, hz * 2f + 2f));
             Wall(new Vector3(hx + 0.3f, 8f, 0f), new Vector3(0.4f, 16f, hz * 2f + 2f));
             Wall(new Vector3(0f, 16f, 0f), new Vector3(hx * 2f + 2f, 0.4f, hz * 2f + 2f));
+            if (UsingModel)
+            {
+                // the 3D stadium: turned so its open side is behind the TV camera, a touch below our grass
+                var st = Instantiate(stadiumModel, root);
+                st.name = "Estadio";
+                st.transform.localPosition = new Vector3(0f, -0.03f, 0f);
+                st.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+                st.transform.localScale = Vector3.one * StadiumScale;
+                foreach (var mf in st.GetComponentsInChildren<MeshFilter>())
+                    if (mf.sharedMesh != null && mf.GetComponent<Collider>() == null) mf.gameObject.AddComponent<MeshCollider>().sharedMesh = mf.sharedMesh;
+                return;
+            }
             // the stadium bowl: stands, corners, roof and crowd
             // grass all the way to the horizon, where it melts into the stadium photo
             float apronSize = photoStadium ? 2400f : 30f;
@@ -496,6 +575,15 @@ namespace ArenaMix
                 if (bc == null) bc = cam.gameObject.AddComponent<BroadcastCamera>();
                 bc.match = this;
                 if (photoStadium) { bc.height = 6.5f; bc.distance = 13f; bc.fov = 38f; bc.lookHeight = 1.6f; }
+                else if (UsingModel)
+                {
+                    // in the open side of the stadium, at the edge of the running track
+                    bc.distance = Mathf.Max(2f, ModelTrackHalfW * StadiumScale - width * 0.5f - 1.5f);
+                    bc.height = 6.5f + 1.5f * StadiumScale;
+                    bc.fov = 40f; bc.lookHeight = 2.2f;   // a bit lower and wider so the stands show behind the play
+                    bc.maxX = 8f * StadiumScale;
+                    bc.avoidGeometry = true;
+                }
                 else
                 {
                     // TV gantry in the lower tier of the main stand, a few rows up, so nothing blocks the view
@@ -571,6 +659,27 @@ namespace ArenaMix
             }
         }
 
+        /// <summary>Ball over the goal line but not in the goal: goal kick, the keeper restarts with the ball in hand.</summary>
+        void CheckGoalLine()
+        {
+            if (Ball.HeldBy != null) return;
+            Vector3 bp = Ball.transform.position;
+            float hx = length * 0.5f;
+            if (Mathf.Abs(bp.x) < hx + Ball.Radius + 0.05f) return;
+            if (Mathf.Abs(bp.z) < goalWidth * 0.5f && bp.y < goalHeight) return;   // going in: the goal trigger decides
+            int team = bp.x < 0f ? 0 : 1;
+            var k = keepers[team];
+            if (k == null) return;
+            foreach (var t in teams) foreach (var f in t) f.Stun(0.2f);
+            float inward = team == 0 ? 1f : -1f;
+            k.ResetState();
+            k.transform.position = new Vector3(GoalCenter(team).x + inward * Mathf.Min(4f, length * 0.06f), 0f, Mathf.Clamp(bp.z, -goalWidth * 0.5f, goalWidth * 0.5f));
+            k.transform.rotation = Quaternion.LookRotation(new Vector3(inward, 0f, 0f));
+            Ball.ResetAt(k.HandsPosition);
+            Ball.Hold(k);
+            Flash("SAQUE DE PUERTA", 1.2f);
+        }
+
         public void OnGoal(int scoringTeam)
         {
             if (state != State.Play) return;
@@ -606,6 +715,7 @@ namespace ArenaMix
                     if (stateTime > 1.2f) state = State.Play;
                     break;
                 case State.Play:
+                    CheckGoalLine();
                     clock -= Time.deltaTime;
                     if (clock <= 0f) { clock = 0f; state = State.End; stateTime = 0f; Time.timeScale = 1f; }
                     break;
@@ -687,6 +797,12 @@ namespace ArenaMix
             GUI.Label(new Rect(0, Screen.height * 0.16f, Screen.width, 50 * s), title, big);
             var small = new GUIStyle(big) { fontSize = Mathf.RoundToInt(15 * s), fontStyle = FontStyle.Normal };
             GUI.Label(new Rect(0, Screen.height * 0.16f + 48 * s, Screen.width, 26 * s), "Elige el modo", small);
+            if (UsingModel)
+            {
+                var credit = new GUIStyle(small) { fontSize = Mathf.RoundToInt(9 * s) };
+                credit.normal.textColor = new Color(1f, 1f, 1f, 0.6f);
+                GUI.Label(new Rect(0, Screen.height - 24 * s, Screen.width, 20 * s), "Estadio: \"New Football Map\" de kyrox (Sketchfab), licencia CC BY 4.0", credit);
+            }
             var btn = new GUIStyle(GUI.skin.button) { fontSize = Mathf.RoundToInt(22 * s), fontStyle = FontStyle.Bold };
             var sub = new GUIStyle(GUI.skin.label) { fontSize = Mathf.RoundToInt(11 * s), alignment = TextAnchor.UpperCenter };
             sub.normal.textColor = new Color(1f, 1f, 1f, 0.75f);
