@@ -242,6 +242,23 @@ class Component extends DCLogic {
     if (b.res && b.vz > 0) { const r = this.resAt(b.res, b.z); b.x += r - (b.resR || 0); b.resR = r; }
     if (b.y < 0.11) { b.y = 0.11; if (b.vy < -1) { b.vy = -b.vy * 0.6; b.vx *= 0.8; b.vz *= 0.8; } else b.vy = 0; }
   }
+  // in the goal: the side nets and the roof stop the ball, and the back of the net stretches, slows it down
+  // and drops it, so it stays in the goal (it never goes through)
+  netBall(b, dt) {
+    const D = this.D, GX = this.GX ?? 0, R = 0.11, back = D + 2 - R;
+    b.curve = 0; b.res = null;
+    if (Math.abs(b.x - GX) > 3.66 - R) { b.x = GX + Math.sign(b.x - GX) * (3.66 - R); b.vx = -b.vx * 0.15; b.vz *= 0.7; }
+    const top = 2.44 - 0.17 * Math.min(b.z - D, 2) - R;
+    if (b.y > top) { b.y = top; if (b.vy > 0) b.vy = -b.vy * 0.1; }
+    const pen = b.z - back;
+    if (pen > 0) {
+      b.vz += (-420 * pen - 24 * b.vz) * dt;
+      b.vx *= Math.exp(-4 * dt);
+      if (pen > 0.8) { b.z = back + 0.8; b.vz = Math.min(b.vz, 0); }
+    }
+    if (b.z < D + 0.4 && b.vz < 0) { b.z = D + 0.4; b.vz = 0; }
+    if (b.y <= 0.11 && b.vy === 0) { const f = Math.exp(-1.8 * dt); b.vx *= f; b.vz *= f; }
+  }
   predict() {
     const b = { ...this.b }, kz = this.D - 0.4;
     for (let i = 0; i < 400 && b.z < kz; i++) this.integrate(b, 1 / 240);
@@ -421,7 +438,7 @@ class Component extends DCLogic {
         this.trailAcc = (this.trailAcc || 0) + dt;
         if (this.trailAcc > 0.02) { this.trailAcc = 0; this.trail.push([b.x, b.y, b.z]); if (this.trail.length > 16) this.trail.shift(); }
       }
-      if (this.result && (this.result.kind === 'gol' || this.result.kind === 'diana') && b.z > D + 1.7) { b.z = D + 1.7; b.vz = -Math.abs(b.vz) * 0.1; b.vx *= 0.3; b.curve = 0; b.res = null; }
+      if (this.result && (this.result.kind === 'gol' || this.result.kind === 'diana') && b.z > D) this.netBall(b, dt);
     }
     if (this.phase === 'result' && this.result && this.result.kind === 'parada') this.integrate(b, dt);
     // a goal: show it again in slow motion before the next shot
@@ -982,9 +999,10 @@ class Component extends DCLogic {
     const st = 0.16, backPts = [];
     for (let x = -3.66; x <= 3.661; x += st) backPts.push(GX + x, 0, D + 2, GX + x, 2.1, D + 2);
     for (let y = 0; y <= 2.101; y += st) backPts.push(GX - 3.66, y, D + 2, GX + 3.66, y, D + 2);
-    this.backNet = grid(backPts);
-    this.backBase = Float32Array.from(backPts);
-    S.add(this.backNet);
+    // the back of the net gives when the ball hits it
+    this.net = window.AMNet ? window.AMNet(7.32, 2.1) : null;
+    if (this.net) { this.net.mesh.position.set(GX, 0, D + 2); S.add(this.net.mesh); }
+    else S.add(grid(backPts));
     [-1, 1].forEach((s) => {
       const pts = [], x = GX + 3.66 * s;
       for (let z = 0; z <= 2.001; z += st) { const top = 2.44 - 0.17 * z; pts.push(x, 0, D + z, x, top, D + z); }
@@ -1132,15 +1150,12 @@ class Component extends DCLogic {
     else this.mc(shooter, 'idle', now, dt);
     // wall jump
     (this.wallMen || []).forEach((w) => { w.position.y = this.wallJ; });
-    // net bulge
-    const pos = this.backNet.geometry.attributes.position, base = this.backBase;
-    const bul = this.bulgeT > 0 && this.bulgeAt ? Math.sin((0.9 - this.bulgeT) * 14) * this.bulgeT * 0.9 : 0;
-    for (let i = 0; i < pos.count; i++) {
-      const x = base[i * 3], y = base[i * 3 + 1];
-      const w = this.bulgeAt ? Math.exp(-((x - this.bulgeAt.x) ** 2 + (y - this.bulgeAt.y) ** 2) / 0.9) : 0;
-      pos.setZ(i, base[i * 3 + 2] + bul * w);
+    // the net wraps round the ball pressing into it, then springs back
+    if (this.net) {
+      const GX = this.GX ?? 0;
+      if (b.z > D && Math.abs(b.x - GX) < 3.66) this.net.push(b.x - GX, b.y, b.z - (D + 2 - 0.11));
+      this.net.step(dt || 0);
     }
-    pos.needsUpdate = true;
     // tap ring
     if (this.tap) { this.tapRing.visible = true; this.tapRing.position.set(this.tap.x, this.tap.y, D - 0.4); this.tapRing.rotation.y = 0; }
     else this.tapRing.visible = false;

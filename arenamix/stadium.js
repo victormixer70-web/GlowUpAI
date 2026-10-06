@@ -51,4 +51,53 @@
   };
   window.AMStadium = api;
   load();
+
+  /* A goal's back net that gives: a grid w wide and h high in its local x/y plane, pushed out along +z.
+     Each frame, push() it where the ball is pressing into it (how far past its rest plane), then step():
+     while the ball presses, the net wraps round it; when the ball drops away, it springs back and wobbles. */
+  var netTex = null;
+  window.AMNet = function (w, h, mat) {
+    var cell = 0.16, nx = Math.ceil(w / 0.12), ny = Math.ceil(h / 0.12);
+    if (!mat) {
+      if (!netTex) {
+        var cv = document.createElement('canvas'); cv.width = cv.height = 128;
+        var c = cv.getContext('2d'); c.strokeStyle = '#ffffff'; c.lineWidth = 5;
+        c.beginPath(); c.moveTo(0, 0); c.lineTo(128, 128); c.moveTo(128, 0); c.lineTo(0, 128); c.stroke();
+        netTex = new T.CanvasTexture(cv); netTex.wrapS = netTex.wrapT = T.RepeatWrapping; netTex.anisotropy = 4;
+      }
+      mat = new T.MeshStandardMaterial({ map: netTex, alphaTest: 0.4, side: T.DoubleSide, roughness: 0.9 });
+    }
+    var geo = new T.PlaneGeometry(w, h, nx, ny);
+    geo.translate(0, h / 2, 0);
+    var uv = geo.attributes.uv, pos = geo.attributes.position, base = Float32Array.from(pos.array);
+    for (var i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * w / cell, uv.getY(i) * h / cell);
+    // edges are tied to the frame and the ground, so the bulge fades to nothing there
+    var win = new Float32Array(pos.count);
+    for (i = 0; i < pos.count; i++) {
+      var u = (base[i * 3] + w / 2) / w, v = base[i * 3 + 1] / h;
+      win[i] = Math.pow(Math.max(0, Math.sin(Math.PI * u)), 0.5) * Math.pow(Math.max(0, Math.sin(Math.PI * Math.min(1, v * 1.15))), 0.5);
+    }
+    var mesh = new T.Mesh(geo, mat);
+    var d = 0, vd = 0, cx = 0, cy = h / 2, pushed = -1, lastT = 0;
+    return {
+      mesh: mesh,
+      push: function (x, y, depth) { if (depth > 0 && depth > pushed) { pushed = depth; cx = x; cy = y; } },
+      step: function (dt) {
+        dt = Math.min(0.05, Math.max(0, dt));
+        if (pushed > 0) { vd = dt > 0 ? (pushed + 0.06 - d) / Math.max(dt, 0.008) : 0; d = pushed + 0.06; }
+        else if (Math.abs(d) > 0.001 || Math.abs(vd) > 0.01) {
+          var om = 16, z = 0.16; vd += (-om * om * d - 2 * z * om * vd) * dt; d += vd * dt;
+        } else { d = 0; vd = 0; }
+        pushed = -1;
+        if (d === 0 && lastT === 0) return;
+        lastT = d;
+        var s2 = 2 * 0.6 * 0.6;
+        for (var i = 0; i < pos.count; i++) {
+          var dx = base[i * 3] - cx, dy = base[i * 3 + 1] - cy;
+          pos.array[i * 3 + 2] = d * win[i] * Math.exp(-(dx * dx + dy * dy) / s2);
+        }
+        pos.needsUpdate = true;
+      }
+    };
+  };
 })();

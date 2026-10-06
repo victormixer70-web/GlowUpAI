@@ -553,10 +553,8 @@ class Component extends DCLogic {
     this.ballStep(dt);
   }
   goalStep(dt) {
-    const g = this.g, b = g.ball;
-    b.vx *= Math.exp(-6 * dt); b.vy *= Math.exp(-6 * dt);
-    b.x += b.vx * dt; b.y += b.vy * dt;
-    if (b.z > 0 || b.vz > 0) { b.vz -= 9.81 * dt; b.z = Math.max(0, b.z + b.vz * dt); if (b.z === 0) b.vz = 0; }
+    const g = this.g;
+    this.netBall(dt);
     g.ps.forEach((p) => {
       let tvx = 0, tvy = 0;
       if (p.act && p.act.type === 'celebrate') {
@@ -570,6 +568,41 @@ class Component extends DCLogic {
       if (sp > 0.25) p.run += 2 * Math.PI * (0.9 + 0.09 * sp) * dt;
     });
     if (g.pt > 3) { if (this.props.tutorial) { this.tutSetup(6); g.phase = 'play'; g.pt = 0; return; } this.kickoff(g.concede); g.phase = 'play'; g.pt = 0; }
+  }
+  // after a goal the ball flies on into the goal: the side nets and the roof stop it, and the back of the
+  // net stretches, slows it down and drops it, so it stays in the goal (it never goes through)
+  netBall(dt) {
+    const b = this.g.ball, s = b.x < 30 ? -1 : 1, R = 0.27, back = 1.6 - R;
+    if (b.z > 0 || b.vz > 0) {
+      b.vz -= 9.81 * dt;
+      const drag = 1 - 0.012 * Math.hypot(b.vx, b.vy, b.vz) * dt;
+      b.vx *= drag; b.vy *= drag; b.vz *= drag;
+    }
+    b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
+    if (b.z <= 0) {
+      b.z = 0;
+      if (b.vz < -1.2) { b.vz = -b.vz * 0.45; b.vx *= 0.8; b.vy *= 0.8; } else b.vz = 0;
+    }
+    if (b.z === 0 && b.vz === 0) { const f = Math.exp(-1.8 * dt); b.vx *= f; b.vy *= f; }
+    let dep = s < 0 ? -b.x : b.x - 60, vout = s * b.vx;
+    if (dep > 0) {
+      // side netting
+      if (b.y < 12 + R) { b.y = 12 + R; b.vy = Math.abs(b.vy) * 0.15; b.vx *= 0.7; }
+      if (b.y > 18 - R) { b.y = 18 - R; b.vy = -Math.abs(b.vy) * 0.15; b.vx *= 0.7; }
+      // roof, sloping down from the crossbar to the back
+      const top = 2.44 - 0.275 * Math.min(dep, 1.6) - R;
+      if (b.z > top) { b.z = top; if (b.vz > 0) b.vz = -b.vz * 0.1; b.vx *= 0.9; }
+    }
+    // the back of the net: a stiff, well-damped spring that can stretch up to 0.8 m
+    const pen = dep - back;
+    if (pen > 0) {
+      vout += (-420 * pen - 24 * vout) * dt;
+      const f = Math.exp(-4 * dt); b.vy *= f;
+      if (pen > 0.8) { dep = back + 0.8; vout = Math.min(vout, 0); }
+    }
+    // it can come back off the net a little, but not roll back out over the line
+    if (dep < 0.4 && vout < 0) { dep = 0.4; vout = 0; }
+    b.x = s < 0 ? -dep : 60 + dep; b.vx = s * vout;
   }
   pickChasers() {
     const g = this.g, b = g.ball, set = new Set();
@@ -1607,6 +1640,7 @@ class Component extends DCLogic {
     const netMat = new T.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
     // the downloaded goal: its frame, with a light textured net (same shape as the net the ball hits)
     const GOAL = STAD && STAD.goal(6.14, 2.51, 1.6, 1) ? STAD : null;
+    this.nets = {};
     if (GOAL) {
       const netTex = this.canvasTex(128, 128, (c, w, h) => {
         c.clearRect(0, 0, w, h); c.strokeStyle = '#ffffff'; c.lineWidth = 5;
@@ -1627,7 +1661,10 @@ class Component extends DCLogic {
       [-1, 1].forEach((s) => {
         const gx = 30 * s, bx = gx + 1.6 * s, hw = 3;
         const frame = GOAL.goal(6.14, 2.51, 1.6, s); frame.position.set(gx, 0, 0); S.add(frame);
-        S.add(quad([[bx, 0, -hw], [bx, 0, hw], [bx, 2.0, hw], [bx, 2.0, -hw]]));
+        // the back of the net gives when the ball hits it
+        const net = window.AMNet ? window.AMNet(6, 2.0, netM) : null;
+        if (net) { net.mesh.position.set(bx, 0, 0); net.mesh.rotation.y = s * Math.PI / 2; S.add(net.mesh); this.nets[s] = net; }
+        else S.add(quad([[bx, 0, -hw], [bx, 0, hw], [bx, 2.0, hw], [bx, 2.0, -hw]]));
         S.add(quad([[gx, 2.44, -hw], [gx, 2.44, hw], [bx, 2.0, hw], [bx, 2.0, -hw]]));
         [-hw, hw].forEach((z) => S.add(quad([[gx, 0, z], [bx, 0, z], [bx, 2.0, z], [gx, 2.44, z]])));
       });
@@ -1720,6 +1757,12 @@ class Component extends DCLogic {
       if (m.userData.anim) this.mocap(p, m, i, dt || 0);
     });
     this.ball3.position.copy(this.W(b.x, b.y, b.z + 0.27));
+    // the net wraps round the ball pressing into it, then springs back
+    if (this.nets) {
+      const ns = b.x < 30 ? -1 : 1, dep = ns < 0 ? -b.x : b.x - 60, net = this.nets[ns];
+      if (net && dep > 0 && b.y > 12 && b.y < 18) net.push(-ns * (b.y - 15), b.z + 0.27, dep - 1.33);
+      for (const k in this.nets) this.nets[k].step(dt || 0);
+    }
     this.ball3.visible = g.phase !== 'winners';
     const bsp = Math.hypot(b.vx, b.vy);
     if (bsp > 0.01 && dt) {
