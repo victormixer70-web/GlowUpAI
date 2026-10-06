@@ -1229,7 +1229,10 @@ class Component extends DCLogic {
       if (turning) p.turnHold = 0.18;
       p.turnHold = Math.max(0, (p.turnHold || 0) - dt);
       const tx = p.x + fx * 0.6 + p.vx * 0.1, ty = p.y + fy * 0.6 + p.vy * 0.1, k = Math.min(1, dt * 14);
-      b.vx += ((tx - b.x) * 6 + p.vx - b.vx) * k; b.vy += ((ty - b.y) * 6 + p.vy - b.vy) * k;
+      // pull it round, but never faster than a couple of metres a second on top of the runner
+      let wx = (tx - b.x) * 6, wy = (ty - b.y) * 6; const wl = Math.hypot(wx, wy), cap = 2.5;
+      if (wl > cap) { wx *= cap / wl; wy *= cap / wl; }
+      b.vx += (wx + p.vx - b.vx) * k; b.vy += (wy + p.vy - b.vy) * k;
       p.touchT = Math.max(p.touchT, 0.08);
     } else if (oi === g.ctl && !this.autoplay && il <= 0.2 && d < 2) {
       // you let go of the stick: your player kills the ball under his foot
@@ -1239,10 +1242,10 @@ class Component extends DCLogic {
       // standing: trap the ball under the sole, a step in front
       const tx = p.x + fx * 0.55, ty = p.y + fy * 0.55, k = Math.min(1, dt * (5 + 4 * ctrl));
       b.vx += ((tx - b.x) * 5 - b.vx) * k; b.vy += ((ty - b.y) * 5 - b.vy) * k;
-    } else if (p.touchT <= 0 && ahead < 0.85 && d < (ahead < 0.3 ? 2.1 : 1.5)) {
-      // a touch: push the ball ahead along the running line, correcting sideways drift
-      // close touches when jogging, long knock-ons when sprinting; good control keeps it tighter
-      const push = p.sprinting ? sp * 1.22 + 1.1 : sp * (1.0 - 0.05 * ctrl) + 0.45;
+    } else if (p.touchT <= 0 && ahead < (p.sprinting ? 0.8 : 0.5) && d < (ahead < 0.3 ? 2.1 : 1.5)) {
+      // a touch: push the ball ahead along the running line, correcting sideways drift; the ball is
+      // touched again as soon as the feet catch up with it, so it stays close even at full sprint
+      const push = p.sprinting ? sp * (1.07 - 0.03 * ctrl) + 0.8 : sp * (1.04 - 0.03 * ctrl) + 0.9;
       const tx = fx * push - (-fy) * side * (2.2 + 1.5 * ctrl), ty = fy * push - fx * side * (2.2 + 1.5 * ctrl);
       const n = Math.hypot(tx, ty) || 1;
       b.vx = tx / n * push; b.vy = ty / n * push; b.vz = 0;
@@ -1251,8 +1254,14 @@ class Component extends DCLogic {
       b.vx = vx * c - b.vy * s; b.vy = vx * s + b.vy * c;
       // one touch per step when jogging, one per stride when sprinting, with the foot that is swinging through
       const cyc = 1 / (0.9 + 0.09 * sp);
-      p.touchT = cyc * (p.sprinting ? 1 : 0.5);
+      p.touchT = Math.min(0.3, cyc * (p.sprinting ? 0.6 : 0.4));
       p.kickFoot = Math.cos(p.run) > 0 ? 1 : 0; p.touchAnim = 0.22;
+    }
+    // a ball under control never runs away from its runner: if it gets well ahead while he is still
+    // running after it, it slows to his pace (the small touches the animation does not show)
+    if (!turning && sp > 2 && ahead > 1.15 && d < 2.6) {
+      const bs = b.vx * fx + b.vy * fy, want = sp + 0.3;
+      if (bs > want) { const k = Math.min(1, dt * 5), dv = (bs - want) * k; b.vx -= fx * dv; b.vy -= fy * dv; }
     }
     // poke-away chances for a defender close to the ball (the body bounce handles direct contact)
     for (let qi = 0; qi < g.ps.length; qi++) {
