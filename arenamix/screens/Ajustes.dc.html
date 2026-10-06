@@ -101,6 +101,7 @@ class Component extends DCLogic {
   savePlay(play) {
     try { localStorage.setItem('arenamix.play.v1', JSON.stringify(play)); } catch (e) {}
     this.setState({ play });
+    if (window.AMMusic) window.AMMusic.update();
   }
   posOf(k) { const p = this.state.cfg.pos[k], d = this.DEF[k]; return p ? p.slice() : [d[0], d[1]]; }
   renderVals() {
@@ -132,6 +133,7 @@ class Component extends DCLogic {
     const pl = s.play || {};
     // personal settings only: they change what you see, never the rules everybody plays by online
     const OPTS = [
+      { key: 'music', title: 'MÚSICA DE LOS MENÚS', desc: 'La música que suena fuera del partido.', choices: [[0.9, 'Alta'], [0.6, 'Media'], [0.3, 'Baja'], [0, 'No']] },
       { key: 'cam', title: 'CÁMARA DEL PARTIDO', desc: 'Más cerca para ver los detalles, más lejos para ver más campo.', choices: [['cerca', 'Cerca'], ['normal', 'Normal'], ['lejos', 'Lejos']] },
       { key: 'gfx', title: 'CALIDAD GRÁFICA', desc: 'Baja si tu móvil va lento o se calienta (menos nitidez, sin sombras).', choices: [['alta', 'Alta'], ['media', 'Media'], ['baja', 'Baja']] },
       { key: 'names', title: 'NOMBRES SOBRE LOS JUGADORES', desc: 'Con No, solo ves el TÚ encima de tu jugador.', choices: [[true, 'Sí'], [false, 'No']] },
@@ -154,7 +156,7 @@ class Component extends DCLogic {
       showPlay: play, showCtrl: !play, playSel: play ? 'true' : 'false', ctrlSel: play ? 'false' : 'true',
       playTab: tabSt(play), ctrlTab: tabSt(!play),
       tabPlay: () => this.setState({ tab: 'play' }), tabCtrl: () => this.setState({ tab: 'ctrl' }),
-      opts, resetPlay: () => this.savePlay({ cam: 'normal', names: true, gfx: 'alta', passMark: true }),
+      opts, resetPlay: () => this.savePlay({ music: 0.6, cam: 'normal', names: true, gfx: 'alta', passMark: true }),
       backHref: 'Deportes.dc.html',
       btns, chars,
       sizeVal: String(Math.round(c.size * 100)), sizeTxt: Math.round(c.size * 100) + '%',
