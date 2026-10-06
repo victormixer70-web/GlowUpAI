@@ -220,9 +220,9 @@ class Component extends DCLogic {
     const sp = Math.hypot(b.vx, b.vy, b.vz);
     b.vy -= 9.81 * dt;
     b.vx -= 0.0125 * sp * b.vx * dt; b.vy -= 0.0125 * sp * b.vy * dt; b.vz -= 0.0125 * sp * b.vz * dt;
-    // swerve builds up as the ball travels (it bends most near the goal, like a real free kick)
+    // swerve (Magnus effect): a steady sideways push proportional to the speed, so it fades as the ball slows
     b.age = (b.age || 0) + dt;
-    b.vx += b.curve * 0.16 * Math.hypot(b.vx, b.vz) * (0.35 + 1.3 * Math.min(1, b.age / 0.9)) * dt;
+    b.vx += b.curve * 0.16 * Math.hypot(b.vx, b.vz) * dt;
     b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
     if (b.res && b.vz > 0) { const r = this.resAt(b.res, b.z); b.x += r - (b.resR || 0); b.resR = r; }
     if (b.y < 0.11) { b.y = 0.11; if (b.vy < -1) { b.vy = -b.vy * 0.6; b.vx *= 0.8; b.vz *= 0.8; } else b.vy = 0; }
@@ -277,7 +277,7 @@ class Component extends DCLogic {
     const yt = pen ? 0.3 + Math.random() * 1.9 : 1.0 + Math.random() * 1.6;
     if (this.k.early && Math.random() < 0.5) xt = GX - (this.k.aimX - GX) * (0.8 + Math.random() * 0.4);
     if (Math.random() < (pen ? 0.08 : 0.22)) xt = GX + side * (3.8 + Math.random() * 0.6);
-    const speed = pen ? 22 + Math.random() * 6 : 18 + Math.random() * 4;
+    const speed = pen ? 16 + Math.random() * 4.8 : 18 + Math.random() * 4;
     const curve = pen ? (Math.random() - 0.5) * 0.3 : -Math.sign(xt - 0.6) * (0.4 + Math.random() * 0.5);
     this.launchPendingDirect(this.velFor(xt, yt, speed, curve), pen ? 0.35 : 1.1);
   }
@@ -1004,7 +1004,7 @@ class Component extends DCLogic {
     // ball
     this.ball.position.set(b.x, b.y, b.z);
     const sp = Math.hypot(b.vx, b.vz);
-    this.ball.rotation.x += sp * (dt || 0) / 0.11;
+    this.ball.rotation.x += sp * (dt || 0) / 0.11 * 0.3;
     this.ball.rotation.y += b.curve * 25 * (dt || 0);
     const tp = this.trailLine.geometry.attributes.position;
     for (let i = 0; i < 16; i++) { const q = this.trail[Math.min(i, this.trail.length - 1)] || [b.x, b.y, b.z]; tp.setXYZ(i, q[0], q[1], q[2]); }
@@ -1129,7 +1129,9 @@ class Component extends DCLogic {
     if (p1.y > gm.y) { const t = (gm.y - p0.y) / (p1.y - p0.y); p1 = { x: p0.x + (p1.x - p0.x) * t, y: gm.y }; }
     const tgt = this.fromScreen(p1.x, p1.y, this.D);
     if (!tgt) { this.forceUpdate(); return; }
-    const speed = Math.max(17, Math.min(26 + 9 * this.tt('pot'), 15 + (len / dur) / 95));
+    const speed = this.kind === 'pen'
+      ? Math.max(14, Math.min(21 + 4 * this.tt('pot'), 13 + (len / dur) / 110))
+      : Math.max(17, Math.min(26 + 9 * this.tt('pot'), 15 + (len / dur) / 95));
     const v = this.solveShot(pts, tgt, speed);
     this.lastSwipe = { pts: pts.map((q) => ({ x: q.x, y: q.y })), t: 0 };
     this.queueShot(v, 0.9 * (1 - this.tt('pre')) / v.T);
@@ -1225,7 +1227,8 @@ class Component extends DCLogic {
   solveShot(pts, tgt, speed) {
     // pick the spin whose real flight best traces the stroke (golden-section search), aimed exactly at the target
     const f = (c) => { const sh = this.aimFor(tgt, speed, c); sh.gap = this.strokeGap(pts, sh.path); return sh; };
-    let lo = -6, hi = 6, g = 0.618;
+    const cmax = this.kind === 'pen' ? 1.2 : 3.5;
+    let lo = -cmax, hi = cmax, g = 0.618;
     let c1 = hi - g * (hi - lo), c2 = lo + g * (hi - lo), s1 = f(c1), s2 = f(c2);
     for (let it = 0; it < 18; it++) {
       if (s1.gap < s2.gap) { hi = c2; c2 = c1; s2 = s1; c1 = hi - g * (hi - lo); s1 = f(c1); }
@@ -1233,7 +1236,7 @@ class Component extends DCLogic {
     }
     const best = s1.gap < s2.gap ? s1 : s2, straight = f(0);
     const sh = straight.gap <= best.gap + 1.5 ? straight : best;
-    sh.res = this.residual(pts, sh.path);
+    sh.res = null;
     return sh;
   }
   residual(pts, path) {
