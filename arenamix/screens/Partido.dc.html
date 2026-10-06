@@ -671,7 +671,7 @@ class Component extends DCLogic {
     // and can only turn so sharply at speed (a curve, or brake-and-plant for a reversal)
     const g = this.g, human = i === g.ctl && !this.autoplay, ball = g.own === i;
     const agil = human ? this.tt('vel') : 0.3;
-    const aAcc = (ball ? 9 : 11.5) + 2.5 * agil, aBrake = 21, aLat = (ball ? 14 : 17) + 3.5 * agil;
+    const aAcc = (ball ? 10.5 : 11.5) + 2.5 * agil, aBrake = 21, aLat = (ball ? 16 : 17) + 3.5 * agil;
     const sp = Math.hypot(p.vx, p.vy);
     let ex = tvx - p.vx, ey = tvy - p.vy;
     if (sp < 0.4) {
@@ -1228,51 +1228,30 @@ class Component extends DCLogic {
     const sp = Math.hypot(p.vx, p.vy), inp = this.inp || [0, 0], il = Math.hypot(inp[0], inp[1]);
     if (oi === g.ctl && !this.autoplay && il > 0.2) { fx = inp[0] / il; fy = inp[1] / il; }
     const rx = b.x - p.x, ry = b.y - p.y, d = Math.hypot(rx, ry);
-    const ahead = rx * fx + ry * fy, side = -rx * fy + ry * fx;
     const ctrl = oi === g.ctl ? this.tt('con') : 0.45;
     p.touchT = Math.max(0, (p.touchT || 0) - dt);
-    if (d > (p.turnHold > 0 || ahead / (d || 1) < 0.55 ? 3.0 : 2.6)) { g.own = -1; return; }
+    if (d > 2.6) { g.own = -1; return; }
     if (b.z > 0.5) return;
-    const turning = d > 0.25 && ahead / d < 0.55 && !(oi === g.ctl && !this.autoplay && il <= 0.2);
-    if (turning || p.turnHold > 0) {
-      // turning with the ball: drag it round with the sole so it stays at the feet through the turn
-      if (turning) p.turnHold = 0.18;
-      p.turnHold = Math.max(0, (p.turnHold || 0) - dt);
-      const tx = p.x + fx * 0.6 + p.vx * 0.1, ty = p.y + fy * 0.6 + p.vy * 0.1, k = Math.min(1, dt * 14);
-      // pull it round, but never faster than a couple of metres a second on top of the runner
-      let wx = (tx - b.x) * 6, wy = (ty - b.y) * 6; const wl = Math.hypot(wx, wy), cap = 2.5;
-      if (wl > cap) { wx *= cap / wl; wy *= cap / wl; }
-      b.vx += (wx + p.vx - b.vx) * k; b.vy += (wy + p.vy - b.vy) * k;
-      p.touchT = Math.max(p.touchT, 0.08);
-    } else if (oi === g.ctl && !this.autoplay && il <= 0.2 && d < 2) {
-      // you let go of the stick: your player kills the ball under his foot
-      const tx = p.x + fx * 0.55, ty = p.y + fy * 0.55, k = Math.min(1, dt * 7);
-      b.vx += ((tx - b.x) * 3 - b.vx) * k; b.vy += ((ty - b.y) * 3 - b.vy) * k;
-    } else if (sp < 0.9) {
-      // standing: trap the ball under the sole, a step in front
-      const tx = p.x + fx * 0.55, ty = p.y + fy * 0.55, k = Math.min(1, dt * (5 + 4 * ctrl));
-      b.vx += ((tx - b.x) * 5 - b.vx) * k; b.vy += ((ty - b.y) * 5 - b.vy) * k;
-    } else if (p.touchT <= 0 && ahead < (p.sprinting ? 0.8 : 0.5) && d < (ahead < 0.3 ? 2.1 : 1.5)) {
-      // a touch: push the ball ahead along the running line, correcting sideways drift; the ball is
-      // touched again as soon as the feet catch up with it, so it stays close even at full sprint
-      const push = p.sprinting ? sp * (1.07 - 0.03 * ctrl) + 0.8 : sp * (1.04 - 0.03 * ctrl) + 0.9;
-      const tx = fx * push - (-fy) * side * (2.2 + 1.5 * ctrl), ty = fy * push - fx * side * (2.2 + 1.5 * ctrl);
-      const n = Math.hypot(tx, ty) || 1;
-      b.vx = tx / n * push; b.vy = ty / n * push; b.vz = 0;
-      const err = (1 - ctrl) * 0.06 * (p.sprinting ? 2 : 1);
-      const a = (Math.random() - 0.5) * err, c = Math.cos(a), s = Math.sin(a), vx = b.vx;
-      b.vx = vx * c - b.vy * s; b.vy = vx * s + b.vy * c;
-      // one touch per step when jogging, one per stride when sprinting, with the foot that is swinging through
+    // close control: the ball is kept on a short leash in front of the runner, worked in polar terms round
+    // his feet, so in a turn it is dragged round him (never through him) and at a sprint it is pushed a
+    // little ahead with each touch and caught up again, but never runs off on its own
+    const moving = sp > 0.9;
+    if (moving && p.touchT <= 0) {
       const cyc = 1 / (0.9 + 0.09 * sp);
-      p.touchT = Math.min(0.3, cyc * (p.sprinting ? 0.6 : 0.4));
+      p.touchT = cyc * (p.sprinting ? 0.6 : 0.4); p.touchP = p.touchT;
       p.kickFoot = Math.cos(p.run) > 0 ? 1 : 0; p.touchAnim = 0.22;
     }
-    // a ball under control never runs away from its runner: if it gets well ahead while he is still
-    // running after it, it slows to his pace (the small touches the animation does not show)
-    if (!turning && sp > 2 && ahead > 1.15 && d < 2.6) {
-      const bs = b.vx * fx + b.vy * fy, want = sp + 0.3;
-      if (bs > want) { const k = Math.min(1, dt * 5), dv = (bs - want) * k; b.vx -= fx * dv; b.vy -= fy * dv; }
-    }
+    const ph = moving && p.touchP ? this.clamp(1 - p.touchT / p.touchP, 0, 1) : 1;   // 0 at the touch, 1 when the feet catch up
+    const amp = moving ? (p.sprinting ? 0.32 + 0.16 * (1 - ctrl) : 0.16) : 0;
+    const want = Math.atan2(fy, fx), cur = d > 0.05 ? Math.atan2(ry, rx) : want;
+    const da = this.ang(want - cur), om = (9 + 5 * ctrl) * dt;
+    const a = cur + this.clamp(da, -om, om);
+    // the ball tucks in under the sole while it is being dragged round behind him
+    const R = Math.abs(da) > 1.4 ? 0.4 : 0.5 + (moving ? 0.08 : 0) + amp * Math.sin(Math.PI * ph);
+    const tx = p.x + Math.cos(a) * R + p.vx * dt, ty = p.y + Math.sin(a) * R + p.vy * dt;
+    let cx = (tx - b.x) * 14, cy = (ty - b.y) * 14; const cl = Math.hypot(cx, cy), cap = 7 + 0.5 * sp;
+    if (cl > cap) { cx *= cap / cl; cy *= cap / cl; }
+    b.vx = p.vx + cx; b.vy = p.vy + cy; b.vz = 0; b.spin = 0;
     // poke-away chances for a defender close to the ball (the body bounce handles direct contact)
     for (let qi = 0; qi < g.ps.length; qi++) {
       const q = g.ps[qi];
