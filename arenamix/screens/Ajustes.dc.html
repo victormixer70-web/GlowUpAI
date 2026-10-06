@@ -41,7 +41,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       </sc-for>
     </div>
     <div style="flex: none; display: flex; align-items: center; gap: 10px">
-      <span style="font-size: 10px; color: #6E6E8F">Se guarda solo y se aplica en el próximo partido. Estadio: "New Football Map" de kyrox (Sketchfab), CC BY 4.0. Cielo: "Orlando Stadium" de Poly Haven.</span>
+      <span style="font-size: 10px; color: #6E6E8F">Solo cambia lo que ves tú: las reglas del partido son iguales para todos. Se guarda solo. Estadio: "New Football Map" de kyrox (Sketchfab), CC BY 4.0. Cielo: "Orlando Stadium" de Poly Haven.</span>
       <button type="button" onClick="{{resetPlay}}" style="margin-left: auto; flex: none; height: 34px; padding: 0 14px; border-radius: 12px; border: 1px solid #FF8A8E; background: transparent; color: #FF8A8E; font: 800 12px Manrope, sans-serif; cursor: pointer">Restablecer</button>
     </div>
   </sc-if>
@@ -130,13 +130,12 @@ class Component extends DCLogic {
     });
     // ---- gameplay options ----
     const pl = s.play || {};
+    // personal settings only: they change what you see, never the rules everybody plays by online
     const OPTS = [
-      { key: 'diff', title: 'DIFICULTAD DE LA IA', desc: 'Lo buenos que son los rivales y sus porteros.', choices: [['facil', 'Fácil'], ['normal', 'Normal'], ['dificil', 'Difícil']] },
-      { key: 'aim', title: 'AYUDA AL TIRO', desc: 'Cuánto te corrige la puntería hacia la portería.', choices: [['alta', 'Alta'], ['media', 'Media'], ['baja', 'Sin ayuda']] },
-      { key: 'dur', title: 'DURACIÓN (INFORMAL Y PRIVADA)', desc: 'Lo que dura cada partido. Competitivo tiene la suya.', choices: [[0, 'Normal'], [180, '3 min'], [300, '5 min']] },
-      { key: 'cam', title: 'CÁMARA DEL PARTIDO', desc: 'Más cerca para ver los detalles, más lejos para ver el campo.', choices: [['cerca', 'Cerca'], ['normal', 'Normal'], ['lejos', 'Lejos']] },
-      { key: 'replays', title: 'REPETICIONES DE GOL', desc: 'En penaltis y tiros libres, cada gol a cámara lenta.', choices: [[true, 'Sí'], [false, 'No']] },
-      { key: 'names', title: 'NOMBRES SOBRE LOS JUGADORES', desc: 'Si se ven los nombres encima de cada jugador.', choices: [[true, 'Sí'], [false, 'No']] }
+      { key: 'cam', title: 'CÁMARA DEL PARTIDO', desc: 'Más cerca para ver los detalles, más lejos para ver más campo.', choices: [['cerca', 'Cerca'], ['normal', 'Normal'], ['lejos', 'Lejos']] },
+      { key: 'gfx', title: 'CALIDAD GRÁFICA', desc: 'Baja si tu móvil va lento o se calienta (menos nitidez, sin sombras).', choices: [['alta', 'Alta'], ['media', 'Media'], ['baja', 'Baja']] },
+      { key: 'names', title: 'NOMBRES SOBRE LOS JUGADORES', desc: 'Con No, solo ves el TÚ encima de tu jugador.', choices: [[true, 'Sí'], [false, 'No']] },
+      { key: 'passMark', title: 'INDICADOR DE PASE', desc: 'La flecha encima del compañero al que irá tu pase.', choices: [[true, 'Sí'], [false, 'No']] }
     ];
     const opts = OPTS.map((o) => ({
       title: o.title, desc: o.desc,
@@ -155,7 +154,7 @@ class Component extends DCLogic {
       showPlay: play, showCtrl: !play, playSel: play ? 'true' : 'false', ctrlSel: play ? 'false' : 'true',
       playTab: tabSt(play), ctrlTab: tabSt(!play),
       tabPlay: () => this.setState({ tab: 'play' }), tabCtrl: () => this.setState({ tab: 'ctrl' }),
-      opts, resetPlay: () => this.savePlay({ diff: 'normal', dur: 0, aim: 'media', cam: 'normal', replays: true, names: true }),
+      opts, resetPlay: () => this.savePlay({ cam: 'normal', names: true, gfx: 'alta', passMark: true }),
       backHref: 'Deportes.dc.html',
       btns, chars,
       sizeVal: String(Math.round(c.size * 100)), sizeTxt: Math.round(c.size * 100) + '%',

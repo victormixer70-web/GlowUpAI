@@ -91,7 +91,8 @@
 
   /* ---------- gameplay settings (Configuración > Jugabilidad), read by the match screens ---------- */
   window.AMPlay = function () {
-    var d = { diff: 'normal', dur: 0, aim: 'media', cam: 'normal', replays: true, names: true };
+    // only personal settings (what you see): the rules of a match are the same for everybody online
+    var d = { cam: 'normal', names: true, gfx: 'alta', passMark: true };
     try { var v = JSON.parse(localStorage.getItem('arenamix.play.v1') || 'null'); if (v) for (var k in d) if (v[k] != null) d[k] = v[k]; } catch (e) {}
     return d;
   };
