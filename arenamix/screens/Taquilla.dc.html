@@ -542,7 +542,8 @@ class Component extends DCLogic {
     const chip = (on) => 'min-height: 40px; padding: 0 4px; border-radius: 20px; font: 700 12px Manrope, sans-serif; cursor: pointer; background: transparent; ' + (on ? 'color: #F4F4FA; border: 1.5px solid #F4F4FA;' : 'color: #A3A3C2; border: 1.5px solid #2E2E52;');
     const lchip = (on) => 'flex: none; min-height: 36px; padding: 0 12px; border-radius: 18px; font: 700 12px Manrope, sans-serif; cursor: pointer; white-space: nowrap; ' + (on ? 'background: #1E1A3A; color: #22D3EE; border: 1.5px solid #22D3EE;' : 'background: #17172A; color: #CACAE0; border: 1.5px solid #26264A;');
 
-    const sports = SPORTS.map((sp) => ({ label: sp.label, style: tab(sp.id === sport), pick: () => this.setState({ sport: sp.id, preview: null }) }));
+    // only football for now: the other sports' kits come back with their own game
+    const sports = SPORTS.filter((sp) => sp.id === 'futbol').map((sp) => ({ label: sp.label, style: tab(sp.id === sport), pick: () => this.setState({ sport: sp.id, preview: null }) }));
     const cats = CATS.map((c) => ({ label: c.label, style: chip(c.id === s.cat), pick: () => this.setState({ cat: c.id, preview: null }) }));
     const li = s.league[sport];
     const leagues = L[sport].map((lg, i) => ({ name: lg.name, style: lchip(i === li), pick: () => this.setState({ league: { ...s.league, [sport]: i }, preview: null }) }));

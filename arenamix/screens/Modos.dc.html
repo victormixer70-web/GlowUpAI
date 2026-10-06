@@ -72,7 +72,8 @@ class Component extends DCLogic {
   constructor(props) {
     super(props);
     const sel = this.store('arenamix.sel') || {};
-    const sport = this.store('arenamix.sport') || sel.sport || 'futbol';
+    // ARENA MIX is the football game (the other sports are kept for a later game)
+    const sport = 'futbol';
     this.state = { sport, cat: sel.sport === sport && sel.cat ? sel.cat : 'comp', id: sel.sport === sport && sel.id ? sel.id : null };
   }
   catalog(sport) {
