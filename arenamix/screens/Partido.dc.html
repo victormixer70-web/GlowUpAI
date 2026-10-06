@@ -188,7 +188,10 @@ class Component extends DCLogic {
     return Math.max(1, Math.min(4, Number(this.props.teamSize ?? 3)));
   }
   newGame() {
-    const P = this.props, dur = Number(P.duration ?? 90), n = this.size();
+    // gameplay settings (Configuración > Jugabilidad)
+    this.play = window.AMPlay ? window.AMPlay() : { diff: 'normal', dur: 0, aim: 'media', cam: 'normal', names: true };
+    const P = this.props, n = this.size();
+    const dur = P.mode !== 'comp' && !P.tutorial && this.play.dur ? Number(this.play.dur) : Number(P.duration ?? 90);
     this.st = this.loadStats();
     const mates = Array.isArray(P.mates) ? P.mates : [P.mateName ?? 'Compañero', P.mate2Name ?? 'Compañero 2', 'Compañero 3'];
     const rivals = Array.isArray(P.rivals) ? P.rivals : [P.awayName ?? 'Rival', P.away2Name ?? 'Rival 2', P.away3Name ?? 'Rival 3', 'Rival 4'];
@@ -220,6 +223,12 @@ class Component extends DCLogic {
     return Math.max(0, Math.min(1, ((s[k] ?? 10) - 10) / 140));
   }
   diff(team) {
+    const base = this.diffBase(team), lv = team === 1 && !this.props.tutorial && this.play ? this.play.diff : 'normal';
+    if (lv === 'facil') return Object.assign({}, base, { spd: base.spd * 0.92, steal: base.steal * 0.6, keep: base.keep * 0.85, slide: base.slide * 0.5, think: base.think + 0.15, err: base.err + 0.1, react: base.react + 0.08, dive: base.dive * 0.9, save: base.save - 0.14, skill: base.skill * 0.5 });
+    if (lv === 'dificil') return Object.assign({}, base, { spd: base.spd * 1.06, steal: base.steal * 1.3, keep: Math.min(1, base.keep * 1.1), slide: base.slide * 1.3, think: Math.max(0.15, base.think - 0.08), err: Math.max(0.05, base.err - 0.07), react: Math.max(0.1, base.react - 0.04), save: Math.min(0.95, base.save + 0.06), skill: base.skill * 1.4 });
+    return base;
+  }
+  diffBase(team) {
     if (this.props.tutorial) return { spd: 6.5, steal: 0.12, keep: 1, slide: 0, think: 9, err: 0.1, react: 0.45, dive: 5, catchV: 12, save: 0.25, skill: 0, beat: 1, pot: 1, range: 0 };
     const comp = this.props.mode === 'comp';
     if (team === 1) return comp
@@ -454,10 +463,12 @@ class Component extends DCLogic {
     if (Math.cos(dir) > 0.2 && p.x > 26) {
       const yInt = p.y + Math.tan(dir) * (60 - p.x);
       const ty = this.clamp(yInt, 12.7, 17.3);
-      dir += this.ang(Math.atan2(ty - p.y, 60 - p.x) - dir) * (0.45 + 0.45 * pre);
+      const help = this.play && this.play.aim === 'alta' ? 1.5 : this.play && this.play.aim === 'baja' ? 0.35 : 1;
+      dir += this.ang(Math.atan2(ty - p.y, 60 - p.x) - dir) * Math.min(0.95, (0.45 + 0.45 * pre) * help);
     }
     const power = Math.max(0.15, g.charge);
-    dir += (Math.random() - 0.5) * 0.16 * (1 - pre) * (0.6 + power * 0.6);
+    const wob = this.play && this.play.aim === 'alta' ? 0.6 : this.play && this.play.aim === 'baja' ? 1.4 : 1;
+    dir += (Math.random() - 0.5) * 0.16 * (1 - pre) * (0.6 + power * 0.6) * wob;
     const spin = Math.hypot(ix, iy) > 0.2 ? this.clamp(this.ang(Math.atan2(iy, ix) - dir) * 0.8, -0.35, 0.35) : 0;
     if (!this.kick(p, power, dir, power > 0.75, 0.93 + 0.25 * this.tt('pot'), spin)) this.flashMsg('Demasiado lejos del balón', 0.8);
     g.charging = false; g.charge = 0;
@@ -1768,7 +1779,8 @@ class Component extends DCLogic {
     // follow the play all the way to both touchlines, keeping it above the on-screen buttons
     const tx = Math.max(-21, Math.min(21, fx - 30)), tz = Math.max(-15, Math.min(15, fz - 15));
     const goalZoom = g.phase === 'goal' ? Math.min(1, g.pt) : 0;
-    const want = new T.Vector3(tx * 0.95, 8 - goalZoom * 2, tz + 16 - goalZoom * 4);
+    const cf = this.play && this.play.cam === 'cerca' ? 0.8 : this.play && this.play.cam === 'lejos' ? 1.25 : 1;
+    const want = new T.Vector3(tx * 0.95, (8 - goalZoom * 2) * cf, tz + (16 - goalZoom * 4) * cf);
     const look = new T.Vector3(tx, 0, tz - 2);
     const f = 1 - Math.exp(-4.5 * (dt || 1));
     this.camPos.lerp(want, f); this.camLook.lerp(look, f);
@@ -2236,7 +2248,8 @@ class Component extends DCLogic {
     const won = g.score[0] > g.score[1], lost = g.score[0] < g.score[1];
     const chip = (c, t) => 'width: 22px; height: 22px; border-radius: 6px; background: ' + c + '; border: 3px solid ' + t + '; box-sizing: border-box;';
     const online = !!P.ping;
-    const tags = g.phase === 'winners' ? [] : g.ps.filter((q, k) => q.role !== 'gk' && (online || k === g.ctl || n > 1)).map((q) => {
+    const showNames = !this.play || this.play.names !== false;
+    const tags = g.phase === 'winners' ? [] : g.ps.filter((q, k) => q.role !== 'gk' && (k === g.ctl || (showNames && (online || n > 1)))).map((q) => {
       const c = g.chat.find((m) => m.p === q), me = q === h, s = SP(q.x, q.y, 2.3);
       return {
         name: me ? 'TÚ' : q.name,

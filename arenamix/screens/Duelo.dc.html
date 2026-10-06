@@ -292,7 +292,8 @@ class Component extends DCLogic {
     const yt = pen ? 0.3 + Math.random() * 1.9 : 1.0 + Math.random() * 1.6;
     if (this.k.early && Math.random() < 0.5) xt = GX - (this.k.aimX - GX) * (0.8 + Math.random() * 0.4);
     if (Math.random() < (pen ? 0.08 : 0.22)) xt = GX + side * (3.8 + Math.random() * 0.6);
-    const speed = pen ? 12.5 + Math.random() * 4.2 : 18 + Math.random() * 4;
+    const lv = window.AMPlay ? window.AMPlay().diff : 'normal', dv = lv === 'facil' ? -1.5 : lv === 'dificil' ? 2 : 0;
+    const speed = (pen ? 12.5 + Math.random() * 4.2 : 18 + Math.random() * 4) + dv;
     const curve = pen ? (Math.random() - 0.5) * 0.3 : -Math.sign(xt - 0.6) * (0.4 + Math.random() * 0.5);
     this.launchPendingDirect(this.velFor(xt, yt, speed, curve), pen ? 0.35 : 1.1);
   }
@@ -369,7 +370,9 @@ class Component extends DCLogic {
       if (this.turn === 'you' && !k.decided && this.phase === 'flight' && this.pt > (this.kind === 'pen' ? 0.32 : 0.62)) {
         const pr = this.predict();
         let px = pr.x;
-        if (Math.random() < (this.kind === 'pen' ? 0.35 : 0.25)) px = GX - (px - GX);
+        // the rival keeper guesses the wrong side more often on easy, less on hard (Configuración)
+        const lv = window.AMPlay ? window.AMPlay().diff : 'normal', wrong = (this.kind === 'pen' ? 0.35 : 0.25) + (lv === 'facil' ? 0.15 : lv === 'dificil' ? -0.12 : 0);
+        if (Math.random() < wrong) px = GX - (px - GX);
         this.aimKeeper(px, pr.y);
       }
       if (k.decided) {
@@ -425,7 +428,7 @@ class Component extends DCLogic {
     }
     if (this.phase === 'result' && this.result && this.result.kind === 'parada') this.integrate(b, dt);
     // a goal: show it again in slow motion before the next shot
-    if (this.phase === 'result' && this.pt > 1.5 && !this.replaying && this.result && (this.result.kind === 'gol' || this.result.kind === 'diana') && this.rec && this.rec.length > 20 && !this.replayDone) {
+    if (this.phase === 'result' && this.pt > 1.5 && !this.replaying && (!window.AMPlay || window.AMPlay().replays !== false) && this.result && (this.result.kind === 'gol' || this.result.kind === 'diana') && this.rec && this.rec.length > 20 && !this.replayDone) {
       this.replayDone = true; this.startReplay(); return;
     }
     if (this.phase === 'result' && this.pt > 2.0) {

@@ -15,52 +15,78 @@ body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; display: flex; gap: 14px; padding: 12px 14px; box-sizing: border-box; user-select: none; -webkit-user-select: none">
-  <div style="flex: none; width: 236px; display: flex; flex-direction: column; gap: 8px">
-    <div style="display: flex; align-items: center; gap: 10px">
-      <a href="Perfil.dc.html" aria-label="Volver al perfil" style="flex: none; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 22px; letter-spacing: .5px">CONFIGURACIÓN</span>
-    </div>
-    <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE">CONTROLES DEL PARTIDO</span>
-    <div style="display: flex; flex-direction: column; gap: 5px; padding: 10px; border-radius: 14px; background: #17172A; border: 1px solid #26264A">
-      <label for="cf-size" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>TAMAÑO DE BOTONES</span><span style="color: #F4F4FA">{{sizeTxt}}</span></label>
-      <input id="cf-size" type="range" min="60" max="140" step="5" value="{{sizeVal}}" onInput="{{onSize}}" style="width: 100%; accent-color: #22D3EE">
-      <label for="cf-joy" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>TAMAÑO DEL JOYSTICK</span><span style="color: #F4F4FA">{{joyTxt}}</span></label>
-      <input id="cf-joy" type="range" min="60" max="140" step="5" value="{{joyVal}}" onInput="{{onJoy}}" style="width: 100%; accent-color: #22D3EE">
-      <label for="cf-alpha" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>OPACIDAD</span><span style="color: #F4F4FA">{{alphaTxt}}</span></label>
-      <input id="cf-alpha" type="range" min="40" max="100" step="5" value="{{alphaVal}}" onInput="{{onAlpha}}" style="width: 100%; accent-color: #22D3EE">
-    </div>
-    <span style="font-size: 11px; line-height: 1.45; color: #A3A3C2">Arrastra los botones en la vista previa para colocarlos donde quieras. Se guarda solo.</span>
-    <span style="font-size: 9px; line-height: 1.35; color: #6E6E8F">Estadio: "New Football Map" de kyrox (Sketchfab), CC BY 4.0. Cielo: "Orlando Stadium" de Poly Haven.</span>
-    <button type="button" onClick="{{resetAll}}" style="margin-top: auto; height: 40px; border-radius: 12px; border: 1px solid #FF8A8E; background: transparent; color: #FF8A8E; font: 800 13px Manrope, sans-serif; cursor: pointer">Restablecer controles</button>
-  </div>
-  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
-    <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">VISTA PREVIA · ARRASTRA PARA MOVER</span>
-    <div onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" style="position: relative; width: 562px; height: 260px; border-radius: 14px; overflow: hidden; border: 1px solid #2E2E52; background: linear-gradient(180deg, #0B0B14 0%, #0B0B14 11%, #1E7A3E 11%, #23874A 60%, #1E7A3E 100%); touch-action: none">
-      <div style="position: absolute; left: 0; right: 0; top: 0; height: 29px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; color: #F4F4FA">0 – 0</div>
-      <div style="position: absolute; left: 50%; top: 29px; bottom: 0; width: 2px; background: #FFFFFF66"></div>
-      <div style="position: absolute; left: 50%; top: 50%; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 2px solid #FFFFFF66"></div>
-      <div style="{{joyStyle}}"><div style="{{knobStyle}}"></div></div>
-      <sc-for list="{{btns}}" as="b" hint-placeholder-count="4">
-        <button type="button" aria-label="{{b.aria}}" onPointerDown="{{b.down}}" style="{{b.style}}">{{b.label}}</button>
-      </sc-for>
-    </div>
-    <div role="radiogroup" aria-label="Tu personaje" style="display: flex; align-items: center; gap: 6px; margin-top: 2px">
-      <span style="flex: none; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE">TU PERSONAJE</span>
-      <sc-for list="{{chars}}" as="c" hint-placeholder-count="4">
-        <button type="button" role="radio" aria-checked="{{c.on}}" onClick="{{c.pick}}" style="{{c.style}}"><img src="{{c.img}}" alt="" style="{{c.imgStyle}}"><span>{{c.name}}</span></button>
-      </sc-for>
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; display: flex; flex-direction: column; gap: 8px; padding: 10px 14px; box-sizing: border-box; user-select: none; -webkit-user-select: none">
+  <div style="flex: none; display: flex; align-items: center; gap: 10px">
+    <a href="{{backHref}}" aria-label="Volver" style="flex: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 20px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></a>
+    <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: .5px">CONFIGURACIÓN</span>
+    <div role="tablist" style="margin-left: auto; display: flex; gap: 4px; padding: 4px; border-radius: 14px; background: #17172A">
+      <button type="button" role="tab" aria-selected="{{playSel}}" onClick="{{tabPlay}}" style="{{playTab}}">JUGABILIDAD</button>
+      <button type="button" role="tab" aria-selected="{{ctrlSel}}" onClick="{{tabCtrl}}" style="{{ctrlTab}}">CONTROLES</button>
     </div>
   </div>
+  <sc-if value="{{showPlay}}" hint-placeholder-val="{{ true }}">
+    <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start">
+      <sc-for list="{{opts}}" as="o" hint-placeholder-count="6">
+        <div style="padding: 9px 11px; border-radius: 14px; background: #17172A; border: 1px solid #26264A; display: flex; flex-direction: column; gap: 7px">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 12px; font-weight: 800; letter-spacing: 1px">{{o.title}}</span>
+            <span style="font-size: 10.5px; line-height: 1.3; color: #A3A3C2">{{o.desc}}</span>
+          </div>
+          <div role="radiogroup" aria-label="{{o.title}}" style="display: flex; gap: 5px">
+            <sc-for list="{{o.choices}}" as="ch" hint-placeholder-count="3">
+              <button type="button" role="radio" aria-checked="{{ch.on}}" onClick="{{ch.pick}}" style="{{ch.style}}">{{ch.label}}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="flex: none; display: flex; align-items: center; gap: 10px">
+      <span style="font-size: 10px; color: #6E6E8F">Se guarda solo y se aplica en el próximo partido. Estadio: "New Football Map" de kyrox (Sketchfab), CC BY 4.0. Cielo: "Orlando Stadium" de Poly Haven.</span>
+      <button type="button" onClick="{{resetPlay}}" style="margin-left: auto; flex: none; height: 34px; padding: 0 14px; border-radius: 12px; border: 1px solid #FF8A8E; background: transparent; color: #FF8A8E; font: 800 12px Manrope, sans-serif; cursor: pointer">Restablecer</button>
+    </div>
+  </sc-if>
+  <sc-if value="{{showCtrl}}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; min-height: 0; display: flex; gap: 14px">
+      <div style="flex: none; width: 236px; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; flex-direction: column; gap: 5px; padding: 10px; border-radius: 14px; background: #17172A; border: 1px solid #26264A">
+          <label for="cf-size" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>TAMAÑO DE BOTONES</span><span style="color: #F4F4FA">{{sizeTxt}}</span></label>
+          <input id="cf-size" type="range" min="60" max="140" step="5" value="{{sizeVal}}" onInput="{{onSize}}" style="width: 100%; accent-color: #22D3EE">
+          <label for="cf-joy" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>TAMAÑO DEL JOYSTICK</span><span style="color: #F4F4FA">{{joyTxt}}</span></label>
+          <input id="cf-joy" type="range" min="60" max="140" step="5" value="{{joyVal}}" onInput="{{onJoy}}" style="width: 100%; accent-color: #22D3EE">
+          <label for="cf-alpha" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>OPACIDAD</span><span style="color: #F4F4FA">{{alphaTxt}}</span></label>
+          <input id="cf-alpha" type="range" min="40" max="100" step="5" value="{{alphaVal}}" onInput="{{onAlpha}}" style="width: 100%; accent-color: #22D3EE">
+        </div>
+        <span style="font-size: 11px; line-height: 1.45; color: #A3A3C2">Arrastra los botones en la vista previa para colocarlos donde quieras. Se guarda solo.</span>
+        <button type="button" onClick="{{resetAll}}" style="margin-top: auto; height: 38px; border-radius: 12px; border: 1px solid #FF8A8E; background: transparent; color: #FF8A8E; font: 800 13px Manrope, sans-serif; cursor: pointer">Restablecer controles</button>
+      </div>
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+        <div onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" style="position: relative; width: 500px; height: 231px; border-radius: 14px; overflow: hidden; border: 1px solid #2E2E52; background: linear-gradient(180deg, #0B0B14 0%, #0B0B14 11%, #1E7A3E 11%, #23874A 60%, #1E7A3E 100%); touch-action: none">
+          <div style="position: absolute; left: 0; right: 0; top: 0; height: 26px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 16px; color: #F4F4FA">0 – 0</div>
+          <div style="position: absolute; left: 50%; top: 26px; bottom: 0; width: 2px; background: #FFFFFF66"></div>
+          <div style="position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px; border-radius: 50%; border: 2px solid #FFFFFF66"></div>
+          <div style="{{joyStyle}}"><div style="{{knobStyle}}"></div></div>
+          <sc-for list="{{btns}}" as="b" hint-placeholder-count="4">
+            <button type="button" aria-label="{{b.aria}}" onPointerDown="{{b.down}}" style="{{b.style}}">{{b.label}}</button>
+          </sc-for>
+        </div>
+        <div role="radiogroup" aria-label="Tu personaje" style="display: flex; align-items: center; gap: 6px">
+          <span style="flex: none; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE">TU PERSONAJE</span>
+          <sc-for list="{{chars}}" as="c" hint-placeholder-count="4">
+            <button type="button" role="radio" aria-checked="{{c.on}}" onClick="{{c.pick}}" style="{{c.style}}"><img src="{{c.img}}" alt="{{c.name}}" style="{{c.imgStyle}}"><span style="{{c.nameStyle}}">{{c.name}}</span></button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.S = 562 / 844;
+    this.S = 500 / 844;
     this.DEF = { main: [14, 20, 88, 'CHUT', '#F4F4FA', '#A3A3C2', 24], pass: [112, 14, 64, 'PASE', '#A78BFA', '#6D28D9', 19], skill: [26, 120, 60, 'REGATE', '#53D88E', '#2F8A57', 15], sprint: [98, 92, 56, 'SPRINT', '#22D3EE', '#0E8FA3', 14] };
-    this.state = { cfg: this.load(), drag: null, char: window.AMChars ? window.AMChars.pref() : 'clasico' };
+    this.state = { cfg: this.load(), drag: null, char: window.AMChars ? window.AMChars.pref() : 'clasico', tab: 'play', play: window.AMPlay ? window.AMPlay() : {} };
   }
   load() {
     let c = null;
@@ -71,6 +97,10 @@ class Component extends DCLogic {
   save(cfg) {
     try { localStorage.setItem('arenamix.controls.v1', JSON.stringify(cfg)); } catch (e) {}
     this.setState({ cfg });
+  }
+  savePlay(play) {
+    try { localStorage.setItem('arenamix.play.v1', JSON.stringify(play)); } catch (e) {}
+    this.setState({ play });
   }
   posOf(k) { const p = this.state.cfg.pos[k], d = this.DEF[k]; return p ? p.slice() : [d[0], d[1]]; }
   renderVals() {
@@ -83,7 +113,7 @@ class Component extends DCLogic {
         down: (e) => {
           e.preventDefault();
           const box = e.currentTarget.parentNode.getBoundingClientRect();
-          this.setState({ drag: { k, x: e.clientX, y: e.clientY, r, b, sc: box.width / 562 } });
+          this.setState({ drag: { k, x: e.clientX, y: e.clientY, r, b, sc: box.width / 500 } });
         }
       };
     });
@@ -93,11 +123,40 @@ class Component extends DCLogic {
       return {
         name: x.name, img: x.img, on: on ? 'true' : 'false',
         pick: () => { if (A) A.setPref(x.id); this.setState({ char: x.id }); },
-        style: 'flex: 1; min-width: 0; height: 40px; display: flex; align-items: center; gap: 5px; padding: 0 6px 0 3px; border-radius: 12px; cursor: pointer; overflow: hidden; white-space: nowrap; font: 800 11px Manrope, sans-serif; color: ' + (on ? '#0B0B14' : '#F4F4FA') + '; background: ' + (on ? '#22D3EE' : '#17172A') + '; border: 1px solid ' + (on ? '#22D3EE' : '#26264A') + ';',
+        style: 'flex: 1; min-width: 0; height: 40px; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 0 3px; border-radius: 12px; cursor: pointer; overflow: hidden; white-space: nowrap; font: 800 11px Manrope, sans-serif; color: ' + (on ? '#0B0B14' : '#F4F4FA') + '; background: ' + (on ? '#22D3EE' : '#17172A') + '; border: 1px solid ' + (on ? '#22D3EE' : '#26264A') + ';',
+        nameStyle: x.img ? 'display: none;' : '',
         imgStyle: x.img ? 'flex: none; width: 34px; height: 34px; border-radius: 10px; background: ' + (on ? '#0E8FA3' : '#26264A') + ';' : 'display: none;'
       };
     });
+    // ---- gameplay options ----
+    const pl = s.play || {};
+    const OPTS = [
+      { key: 'diff', title: 'DIFICULTAD DE LA IA', desc: 'Lo buenos que son los rivales y sus porteros.', choices: [['facil', 'Fácil'], ['normal', 'Normal'], ['dificil', 'Difícil']] },
+      { key: 'aim', title: 'AYUDA AL TIRO', desc: 'Cuánto te corrige la puntería hacia la portería.', choices: [['alta', 'Alta'], ['media', 'Media'], ['baja', 'Sin ayuda']] },
+      { key: 'dur', title: 'DURACIÓN (INFORMAL Y PRIVADA)', desc: 'Lo que dura cada partido. Competitivo tiene la suya.', choices: [[0, 'Normal'], [180, '3 min'], [300, '5 min']] },
+      { key: 'cam', title: 'CÁMARA DEL PARTIDO', desc: 'Más cerca para ver los detalles, más lejos para ver el campo.', choices: [['cerca', 'Cerca'], ['normal', 'Normal'], ['lejos', 'Lejos']] },
+      { key: 'replays', title: 'REPETICIONES DE GOL', desc: 'En penaltis y tiros libres, cada gol a cámara lenta.', choices: [[true, 'Sí'], [false, 'No']] },
+      { key: 'names', title: 'NOMBRES SOBRE LOS JUGADORES', desc: 'Si se ven los nombres encima de cada jugador.', choices: [[true, 'Sí'], [false, 'No']] }
+    ];
+    const opts = OPTS.map((o) => ({
+      title: o.title, desc: o.desc,
+      choices: o.choices.map(([v, label]) => {
+        const on = pl[o.key] === v;
+        return {
+          label, on: on ? 'true' : 'false',
+          pick: () => this.savePlay({ ...pl, [o.key]: v }),
+          style: 'flex: 1; height: 32px; border-radius: 10px; cursor: pointer; font: 800 12px Manrope, sans-serif; ' + (on ? 'background: #22D3EE; color: #0B0B14; border: 0;' : 'background: transparent; color: #CACAE0; border: 1px solid #2E2E52;')
+        };
+      })
+    }));
+    const tabSt = (on) => 'height: 32px; padding: 0 14px; border-radius: 10px; border: 0; cursor: pointer; font: 800 12px Manrope, sans-serif; letter-spacing: .5px; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
+    const play = s.tab === 'play';
     return {
+      showPlay: play, showCtrl: !play, playSel: play ? 'true' : 'false', ctrlSel: play ? 'false' : 'true',
+      playTab: tabSt(play), ctrlTab: tabSt(!play),
+      tabPlay: () => this.setState({ tab: 'play' }), tabCtrl: () => this.setState({ tab: 'ctrl' }),
+      opts, resetPlay: () => this.savePlay({ diff: 'normal', dur: 0, aim: 'media', cam: 'normal', replays: true, names: true }),
+      backHref: 'Deportes.dc.html',
       btns, chars,
       sizeVal: String(Math.round(c.size * 100)), sizeTxt: Math.round(c.size * 100) + '%',
       joyVal: String(Math.round(c.joy * 100)), joyTxt: Math.round(c.joy * 100) + '%',

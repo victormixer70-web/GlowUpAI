@@ -89,6 +89,13 @@
     return h.apply(null, [tag, p].concat(children(node, scope)));
   }
 
+  /* ---------- gameplay settings (Configuración > Jugabilidad), read by the match screens ---------- */
+  window.AMPlay = function () {
+    var d = { diff: 'normal', dur: 0, aim: 'media', cam: 'normal', replays: true, names: true };
+    try { var v = JSON.parse(localStorage.getItem('arenamix.play.v1') || 'null'); if (v) for (var k in d) if (v[k] != null) d[k] = v[k]; } catch (e) {}
+    return d;
+  };
+
   /* ---------- DC component base ---------- */
   function DCLogic(props, ctx) { PComponent.call(this, props, ctx); }
   DCLogic.prototype = Object.create(PComponent.prototype);
