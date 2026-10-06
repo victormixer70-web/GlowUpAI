@@ -849,7 +849,7 @@ class Component extends DCLogic {
     S.add(sun); S.add(sun.target);
     const fill = new T.DirectionalLight(0x9fc3ff, 0.35); fill.position.set(20, 18, D + 25); S.add(fill);
 
-    const zMin = -30, zMax = D + 14, W = 100, L = zMax - zMin, ppm = 20;
+    const zMin = Math.min(-30, D - 61.5), zMax = D + 14, W = 100, L = zMax - zMin, ppm = 20;
     const tex = this.canvasTex(W * ppm, L * ppm, (c, w, h) => {
       const X = (x) => (x + 50) * ppm, Z = (z) => (z - zMin) * ppm;
       c.fillStyle = '#095c04'; c.fillRect(0, 0, w, h);
@@ -873,14 +873,19 @@ class Component extends DCLogic {
     const apron = new T.Mesh(new T.PlaneGeometry(400, 400), this.mat(0x0a3a0c, { roughness: 1 }));
     apron.rotation.x = -Math.PI / 2; apron.position.y = -0.01; S.add(apron);
 
-    // stadium: stand behind the goal (ultras in the middle) and both touchline stands
+    // stadium: a full bowl. Stand behind the goal (ultras in the middle), both touchline stands, and the
+    // stand at the far end, behind the penalty taker (it fills the background when you play in goal)
     const teamCols = [['#FF8A3D', '#0B0B14'], ['#3EA6FF', '#F4F4FA']];
+    const far = D - 61;
     this.fans = this.buildStadium(S, [
       ['goal', 0, D + 9, 81, 0, () => true, (w) => Math.abs(w.x) < 15],
       ['west', -40.5, D - 26, 70, -Math.PI / 2, () => true],
       ['east', 40.5, D - 26, 70, Math.PI / 2, () => true],
+      ['back', 0, far, 81, Math.PI, () => true, (w) => Math.abs(w.x) < 12],
       ['corner', 'cw', -40.5, D + 9, Math.PI * 1.5],
-      ['corner', 'ce', 40.5, D + 9, 0]
+      ['corner', 'ce', 40.5, D + 9, 0],
+      ['corner', 'bw', -40.5, far, Math.PI],
+      ['corner', 'be', 40.5, far, Math.PI / 2]
     ], teamCols, (w) => (w.x < 0 ? 0 : 1));
 
     // ad boards
@@ -892,6 +897,7 @@ class Component extends DCLogic {
     adTex.wrapS = T.RepeatWrapping; adTex.repeat.set(2, 1);
     const adMat = new T.MeshStandardMaterial({ map: adTex, emissive: 0xffffff, emissiveMap: adTex, emissiveIntensity: 0.9 });
     const board = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); board.position.set(0, 0.45, D + 7); S.add(board);
+    const board2 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); board2.position.set(0, 0.45, far + 2); S.add(board2);
     [-1, 1].forEach((s) => { const sb = new T.Mesh(new T.BoxGeometry(0.15, 0.9, 50), adMat); sb.position.set(36 * s, 0.45, D - 18); S.add(sb); });
 
     // floodlights
