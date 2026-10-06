@@ -89,6 +89,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 
   <button type="button" aria-label="{{mainAria}}" onPointerDown="{{mainDown}}" onPointerUp="{{mainUp}}" onPointerCancel="{{mainUp}}" style="{{mainBtnStyle}}">{{mainLabel}}</button>
   <button type="button" aria-label="{{passAria}}" onPointerDown="{{passDown}}" onPointerUp="{{passUp}}" onPointerCancel="{{passUp}}" style="{{passBtnStyle}}">{{passLabel}}</button>
+ <button type="button" aria-label="Centro: balón bombeado al área para que un compañero remate de cabeza o de chilena" onPointerDown="{{crossDown}}" onPointerUp="{{crossUp}}" onPointerCancel="{{crossUp}}" style="{{crossBtnStyle}}">CENTRO</button>
   <button type="button" aria-label="{{skillAria}}" onPointerDown="{{skillDown}}" onPointerUp="{{skillUp}}" onPointerCancel="{{skillUp}}" style="{{skillBtnStyle}}">{{skillLabel}}</button>
   <button type="button" aria-label="Sprint: mantén pulsado para correr más rápido" onPointerDown="{{sprintDown}}" onPointerUp="{{sprintUp}}" onPointerCancel="{{sprintUp}}" style="{{sprintBtnStyle}}">SPRINT</button>
 
@@ -546,6 +547,7 @@ class Component extends DCLogic {
     }
     this.slideHits();
     if (this.props.tutorial) this.tutStep(dt);
+    this.crossStep(dt);
     this.ballStep(dt);
   }
   goalStep(dt) {
@@ -731,6 +733,12 @@ class Component extends DCLogic {
     const own = g.own >= 0 ? g.ps[g.own] : null;
     p.tdist = 99; p.parked = false;
     p.sprinting = false;
+    if (g.cross && g.cross.i === i && g.own < 0) {
+      // attack the cross: get to where it comes down, a step short so the ball arrives at head height
+      const [cx, cy] = this.seek(p, g.cross.x - sg * 0.4, g.cross.y, 0.25);
+      p.sprinting = true;
+      return [cx, cy, D.spd * 1.25, 16];
+    }
     if (this.props.tutorial) {
       if (own === p) { const [ax, ay] = this.seek(p, 4, 15); return [ax, ay, 2.4, 6]; }
       if (g.recv && g.recv.i === i) { const [ax, ay] = this.seek(p, b.x + b.vx * 0.3, b.y + b.vy * 0.3, 0.6); return [ax, ay, 6, 9]; }
@@ -1712,6 +1720,18 @@ class Component extends DCLogic {
       const m = this.pMeshes[i];
       m.position.copy(this.W(p.x, p.y, 0));
       if (p.act && p.act.type === 'dive') m.position.y += (0.18 + (p.act.h || 0)) * Math.sin(Math.PI * Math.min(1, p.act.t / 0.55));
+      m.rotation.order = 'YXZ'; m.rotation.x = 0;
+      if (p.act && p.act.type === 'header') {
+        // jump and nod the ball down
+        const k = Math.min(1, p.act.t / p.act.dur);
+        m.position.y += 0.5 * Math.sin(Math.PI * k);
+        m.rotation.x = 0.55 * Math.sin(Math.PI * Math.min(1, k * 1.6));
+      } else if (p.act && p.act.type === 'bicycle') {
+        // take off, turn over backwards with the legs going over the head, land on the back
+        const k = Math.min(1, p.act.t / p.act.dur);
+        m.position.y += 1.0 * Math.sin(Math.PI * Math.min(1, k * 1.15));
+        m.rotation.x = -Math.PI * 0.85 * Math.min(1, k * 1.7) * (k < 0.75 ? 1 : 1 - (k - 0.75) * 1.4);
+      }
       m.rotation.y = Math.atan2(Math.cos(p.face), Math.sin(p.face));
       this.animate(p, m, i);
       if (m.userData.anim) this.mocap(p, m, i, dt || 0);
@@ -2164,6 +2184,18 @@ class Component extends DCLogic {
       Lg.hip.rotation.set(0, 0, -0.2); Rg.hip.rotation.set(0, 0, 0.2);
       Lg.knee.rotation.x = 0.3; Rg.knee.rotation.x = 0.1;
       if (g.hold === i) { A0.sho.rotation.set(-1.2, 0, 0.3); A1.sho.rotation.set(-1.2, 0, -0.3); }
+    } else if (a.type === 'header') {
+      // arms out for balance, head driving forward
+      A0.sho.rotation.set(0.2, 0, -1.1); A1.sho.rotation.set(0.2, 0, 1.1);
+      A0.elb.rotation.x = -0.4; A1.elb.rotation.x = -0.4;
+      Lg.knee.rotation.x = 0.7; Rg.knee.rotation.x = 0.5; Lg.hip.rotation.x = -0.2; Rg.hip.rotation.x = 0.1;
+      u.head.rotation.set(0.45 * Math.sin(Math.PI * k), 0, 0);
+    } else if (a.type === 'bicycle') {
+      // scissor kick: the kicking leg swings up over the head, the other one drops; arms spread to break the fall
+      const e = Math.min(1, k * 2.2);
+      Rg.hip.rotation.set(-2.2 * e, 0, 0); Rg.knee.rotation.x = 0.2;
+      Lg.hip.rotation.set(-0.8 + 0.6 * e, 0, 0); Lg.knee.rotation.x = 0.9;
+      A0.sho.rotation.set(0, 0, -1.3); A1.sho.rotation.set(0, 0, 1.3);
     } else if (a.type === 'celebrate') {
       A0.sho.rotation.set(0, 0, -1.45); A1.sho.rotation.set(0, 0, 1.45);
       A0.elb.rotation.x = 0; A1.elb.rotation.x = 0;
@@ -2258,6 +2290,8 @@ class Component extends DCLogic {
       skillLabel: ctx === 'ball' ? 'REGATE' : 'PRESIÓN',
       skillAria: ctx === 'ball' ? 'Regate: deja atrás al rival que tienes delante' : 'Presión: mantén pulsado para ir a por el balón',
       skillBtnStyle: gkc ? 'display: none;' : tutI === 4 ? btn(26, 120, 60, '#53D88E', '#2F8A57', 15, glow(true)) : btn(26, 120, 60, ctx === 'ball' ? (h.skillCd > 0 ? '#5E5E80' : '#53D88E') : (g.press ? '#FFC53D' : '#F4B860'), ctx === 'ball' ? '#2F8A57' : '#A87420', 15, ctx !== 'ball' && !P.coach ? 'display: none;' : ''),
+      // CENTRO: team modes, with the ball, left of PASE
+      crossBtnStyle: n > 1 && ctx === 'ball' && !gkc && !P.tutorial ? btn(186, 16, 56, '#FFC53D', '#B7871A', 13) : 'display: none;',
       sprintBtnStyle: btn(98, 92, 56, sprintOn ? '#FFC53D' : '#22D3EE', '#0E8FA3', 14, glow(tutI === 2)),
       showGoal: g.phase === 'goal', scorerText: g.scorer,
       isTut: !!(P.tutorial && g.tut && g.tut.i < 7),
@@ -2319,6 +2353,8 @@ class Component extends DCLogic {
       mainDown: (e) => { this.hold(e, 'main'); this.mainPress(); },
       mainUp: (e) => this.releasePtr(e.pointerId),
       passDown: (e) => { this.hold(e, 'pass'); this.passPress(); },
+      crossDown: (e) => { this.hold(e, 'cross'); this.humanCross(); },
+      crossUp: (e) => this.releasePtr(e.pointerId),
       passUp: (e) => this.releasePtr(e.pointerId),
       skillDown: (e) => { this.hold(e, 'skill'); this.skillPress(); },
       skillUp: (e) => this.releasePtr(e.pointerId),
@@ -2351,6 +2387,66 @@ class Component extends DCLogic {
     if (c === 'ball' || c === 'team' || c === 'gkball') { if (!g.charging) { g.charging = true; g.charge = 0; } }
     else if (c === 'gk') this.keeperDive();
     else this.humanSlide();
+  }
+  // a lofted ball that lands at (tx, ty) at height zT after about T seconds, with the game's own physics
+  loftTo(b, tx, ty, zT, T) {
+    const d0 = Math.hypot(tx - b.x, ty - b.y) || 1, ux = (tx - b.x) / d0, uy = (ty - b.y) / d0;
+    let vh = d0 / T, vz = (zT - b.z + 4.905 * T * T) / T;
+    for (let it = 0; it < 4; it++) {
+      // fly it (gravity + air drag, as in ballStep) and correct the launch from where it ends up
+      let x = 0, z = b.z, wx = vh, wz = vz, t = 0;
+      const h = 1 / 120;
+      while (t < T) { wz -= 9.81 * h; const s3 = Math.hypot(wx, wz), dr = 1 - 0.012 * s3 * h; wx *= dr; wz *= dr; x += wx * h; z += wz * h; t += h; }
+      vh *= d0 / Math.max(0.5, x); vz += (zT - z) / T;
+    }
+    b.vx = ux * vh; b.vy = uy * vh; b.vz = vz; b.spin = 0;
+  }
+  // CENTRO: a cross into the box for the best-placed teammate, who attacks it with a header or a bicycle kick
+  humanCross() {
+    const g = this.g, p = g.ps[g.ctl], b = g.ball;
+    if (g.phase !== 'play' || this.size() < 2) return;
+    if (g.own !== g.ctl && (this.dist(p, b) > 1.5 || b.z > 1.2)) { this.flashMsg('Necesitas el balón para centrar', 0.8); return; }
+    const sg = p.team === 0 ? 1 : -1, gx = p.team === 0 ? 60 : 0, spotX = gx - sg * 8;
+    const mates = g.ps.filter((q) => q.team === p.team && q.role !== 'gk' && q !== p);
+    if (!mates.length) return;
+    const q = mates.sort((u, v) => Math.hypot(u.x - spotX, u.y - 15) - Math.hypot(v.x - spotX, v.y - 15))[0];
+    // into the space between the penalty spot and the six-yard box, on the far side from the crosser
+    const tx = gx - sg * (5.5 + Math.random() * 3), ty = this.clamp(15 + (p.y < 15 ? 1 : -1) * (0.8 + Math.random() * 2.2), 11.5, 18.5);
+    const kind = Math.random() < 0.6 ? 'header' : 'bicycle';
+    const zT = kind === 'header' ? 1.95 : 1.15;   // head height or waist height (bicycle kick)
+    const d = Math.hypot(tx - b.x, ty - b.y), T = this.clamp(0.7 + d / 24, 0.85, 1.6);
+    this.release(p);
+    b.z = Math.max(b.z, 0.05);
+    this.loftTo(b, tx, ty, zT, T);
+    p.act = { type: 'pass', t: 0, dur: 0.32 }; p.cd = 0.5;
+    const qi = g.ps.indexOf(q);
+    g.cross = { i: qi, x: tx, y: ty, t: T + 0.7, team: p.team, kind };
+    g.recv = { i: qi, t: T + 0.7 };
+    this.flashMsg('¡Centro!', 0.8);
+  }
+  // the teammate meets the cross: header (high ball) or bicycle kick (lower ball), at goal
+  crossStep(dt) {
+    const g = this.g, b = g.ball, c = g.cross;
+    if (!c) return;
+    c.t -= dt;
+    if (g.own >= 0 || g.hold >= 0 || c.t < 0 || g.phase !== 'play') { g.cross = null; return; }
+    const q = g.ps[c.i], dist = Math.hypot(b.x - q.x, b.y - q.y);
+    const header = c.kind !== 'bicycle';
+    if (q.act || dist > 1.5 || b.vz > 2 || (header ? b.z < 1.3 || b.z > 2.8 : b.z < 0.6 || b.z > 1.9)) return;
+    const sg = q.team === 0 ? 1 : -1, gx = q.team === 0 ? 60 : 0;
+    const kp = g.ps.find((o) => o.team !== q.team && o.role === 'gk');
+    // aim away from the keeper, a little less precise for the acrobatic one
+    const side = kp ? (kp.y < 15 ? 1 : -1) : (Math.random() < 0.5 ? -1 : 1);
+    const aimY = 15 + side * (1.8 + Math.random() * 0.9) + (Math.random() - 0.5) * (header ? 0.8 : 1.4);
+    const sp = header ? 16 + Math.random() * 3 : 21 + Math.random() * 4;
+    const dir = Math.atan2(aimY - b.y, gx - b.x);
+    b.vx = Math.cos(dir) * sp; b.vy = Math.sin(dir) * sp; b.vz = header ? -2.2 : 0.9; b.spin = 0;
+    g.last = c.i; g.cross = null; g.recv = null;
+    q.face = header ? dir : dir + Math.PI;   // a bicycle kick is struck with the back to goal
+    q.vx *= 0.3; q.vy *= 0.3;
+    q.act = { type: header ? 'header' : 'bicycle', t: 0, dur: header ? 0.6 : 0.95, lock: true };
+    q.cd = 0.4;
+    this.flashMsg(header ? '¡REMATE DE CABEZA!' : '¡CHILENA!', 1.3);
   }
   passPress() {
     const g = this.g;
