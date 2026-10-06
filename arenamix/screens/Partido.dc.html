@@ -2446,7 +2446,6 @@ class Component extends DCLogic {
     q.vx *= 0.3; q.vy *= 0.3;
     q.act = { type: header ? 'header' : 'bicycle', t: 0, dur: header ? 0.6 : 0.95, lock: true };
     q.cd = 0.4;
-    this.flashMsg(header ? '¡REMATE DE CABEZA!' : '¡CHILENA!', 1.3);
   }
   passPress() {
     const g = this.g;
