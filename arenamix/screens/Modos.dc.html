@@ -13,6 +13,9 @@
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
+.md-card{position:absolute;left:50%;top:10px;width:170px;height:244px;margin-left:-85px;padding:0;border:0;background:none;cursor:pointer;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.25,1.2,.4,1),opacity .35s,filter .35s;-webkit-tap-highlight-color:transparent}
+@keyframes mdGlow{0%,100%{box-shadow:0 0 0 2px var(--mc),0 0 22px var(--mc),0 18px 30px #000c}50%{box-shadow:0 0 0 2px var(--mc),0 0 38px var(--mc),0 18px 30px #000c}}
+@keyframes mdFloat{0%,100%{translate:0 0}50%{translate:0 -6px}}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -20,55 +23,46 @@ input::placeholder{color:#8686A6}
   <div class="bc-beams"></div>
   <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; height: 390px; z-index: 3"><dc-import name="Nav" active="jugar" hint-size="80px,390px"></dc-import></div>
   <!-- header: back, title, the three kinds of play -->
-  <div style="position: absolute; left: 96px; right: 12px; top: 10px; height: 40px; display: flex; align-items: center; gap: 10px; z-index: 1">
-    <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 44px; height: 36px; display: flex; align-items: center; justify-content: center; background: #17172A; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
-    <h1 class="bc-title" style="font-size: 26px">FÚTBOL</h1>
+  <div style="position: absolute; left: 96px; right: 12px; top: 10px; height: 40px; display: flex; align-items: center; gap: 10px; z-index: 4">
+    <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 44px; height: 36px; display: flex; align-items: center; justify-content: center; background: #17172A; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+    <h1 class="bc-title" style="font-size: 26px">¿A QUÉ JUGAMOS?</h1>
     <span style="flex: 1"></span>
-    <div role="tablist" aria-label="Tipo de partida" style="display: flex; gap: 4px">
-      <button type="button" role="tab" aria-selected="{{compSel}}" onClick="{{tabComp}}" class="bc-para" style="{{compTab}}">COMPETITIVO</button>
-      <button type="button" role="tab" aria-selected="{{casualSel}}" onClick="{{tabCasual}}" class="bc-para" style="{{casualTab}}">INFORMAL</button>
-      <button type="button" role="tab" aria-selected="{{trainSel}}" onClick="{{tabTrain}}" class="bc-para" style="{{trainTab}}">ENTRENAMIENTO</button>
+    <div role="tablist" aria-label="Tipo de partida" style="position: relative; display: flex; gap: 0; padding: 3px; border-radius: 14px; background: #0B0B14CC; border: 1px solid #2E2E58">
+      <span aria-hidden="true" style="{{thumbStyle}}"></span>
+      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
+        <button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" style="{{t.style}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{t.icon}}"/></svg>{{t.label}}</button>
+      </sc-for>
     </div>
   </div>
 
-  <!-- the selected mode, big -->
-  <div key="{{selKey}}" style="position: absolute; left: 96px; top: 58px; width: 392px; bottom: 12px; z-index: 1">
-    <div style="position: absolute; inset: 0; clip-path: polygon(0 0, 100% 0, 93% 100%, 0 100%); background: linear-gradient(150deg, #123A2C, #0C1F1A 55%, #0B0B14)"></div>
-    <div style="position: absolute; inset: 0; clip-path: polygon(0 0, 100% 0, 93% 100%, 0 100%); background: repeating-linear-gradient(90deg, #ffffff07 0 30px, transparent 30px 60px)"></div>
-    <span style="position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: linear-gradient(180deg, #22D3EE, #7C5CFF)"></span>
-    <span class="bc-para" style="position: absolute; left: 18px; top: 14px; padding: 3px 14px; background: {{catColor}}; color: #0B0B14; font: 800 11px Exo2, sans-serif; letter-spacing: 1.5px">{{catLabel}}</span>
-    <span style="position: absolute; left: 16px; top: 34px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: {{selSize}}px; line-height: 1; letter-spacing: -1px; text-shadow: 0 0 22px #22D3EE55, 0 4px 0 #07070F; white-space: nowrap">{{selTitle}}</span>
-    <span style="position: absolute; left: 20px; top: 120px; width: 170px; font-size: 12px; font-weight: 600; line-height: 1.4; color: #CACAE0">{{selDesc}}</span>
-    <!-- illustration: the line-up on a little pitch, or the goal -->
-    <svg width="176" height="112" viewBox="0 0 176 112" style="position: absolute; right: 34px; top: 66px; filter: drop-shadow(0 8px 14px #000A)">
-      <rect x="2" y="2" width="172" height="108" rx="6" fill="#1A6B3D" stroke="#ffffff66" stroke-width="2"/>
-      <rect x="2" y="2" width="172" height="108" rx="6" fill="url(#md-stripes)"/>
-      <defs><pattern id="md-stripes" width="24" height="108" patternUnits="userSpaceOnUse"><rect width="12" height="108" fill="#ffffff0c"/></pattern></defs>
-      <path d="M88 2V110" stroke="#ffffff66" stroke-width="1.5"/><circle cx="88" cy="56" r="16" fill="none" stroke="#ffffff66" stroke-width="1.5"/>
-      <rect x="2" y="34" width="22" height="44" fill="none" stroke="#ffffff66" stroke-width="1.5"/><rect x="152" y="34" width="22" height="44" fill="none" stroke="#ffffff66" stroke-width="1.5"/>
-      <sc-for list="{{dots}}" as="d" hint-placeholder-count="10"><circle cx="{{d.x}}" cy="{{d.y}}" r="{{d.r}}" fill="{{d.c}}" stroke="#0B0B14" stroke-width="1.5"/></sc-for>
-    </svg>
-    <sc-if value="{{showRank}}" hint-placeholder-val="{{ true }}">
-      <div style="position: absolute; left: 20px; right: 46px; top: 196px; display: flex; flex-direction: column; gap: 5px">
-        <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 800"><span style="color: {{rankColor}}">{{rankLabel}}</span><span style="color: #A3A3C2">{{mmrLabel}}</span></div>
-        <div class="bc-para" style="height: 8px; background: #26264A"><div class="am-bar-shine" style="{{rankBar}}"></div></div>
-        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700"><span style="color: #FFC53D">{{seasonLabel}}</span><a href="Rangos.dc.html">Ver rangos</a></div>
-      </div>
-    </sc-if>
-    <a href="{{playHref}}" onClick="{{saveSel}}" class="bc-btn am-shine" style="position: absolute; left: 18px; bottom: 16px; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 28px 0 22px; text-decoration: none; font-size: 26px"><svg width="18" height="18" viewBox="0 0 24 24" fill="#0B0B14"><path d="M6 3l15 9l-15 9z"/></svg>{{playLabel}}</a>
-  </div>
-
-  <!-- the list of modes -->
-  <div key="{{listKey}}" style="position: absolute; left: 498px; right: 12px; top: 58px; bottom: 12px; overflow-y: auto; scrollbar-width: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; align-content: start; z-index: 1">
-    <sc-for list="{{cards}}" as="m" hint-placeholder-count="6">
-      <button type="button" onClick="{{m.pick}}" class="{{m.cls}}" style="{{m.style}}">
-        <span style="display: flex; align-items: center; gap: 8px; width: 100%">
-          <span style="{{m.iconBox}}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{m.icon}}"/></svg></span>
-          <span style="flex: 1; min-width: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 19px; line-height: 1; letter-spacing: .5px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{m.title}}</span>
-        </span>
+  <!-- the modes as big cards in a carousel: swipe or tap the ones at the sides -->
+  <div key="{{listKey}}" onPointerDown="{{swDown}}" onPointerUp="{{swUp}}" onPointerCancel="{{swUp}}" style="position: absolute; left: 80px; right: 0; top: 52px; height: 270px; perspective: 900px; touch-action: pan-y; z-index: 1">
+    <span aria-hidden="true" style="{{spot}}"></span>
+    <sc-for list="{{cards}}" as="m" hint-placeholder-count="5">
+      <button type="button" onClick="{{m.pick}}" aria-label="{{m.aria}}" aria-pressed="{{m.on}}" class="md-card" style="{{m.style}}">
+        <span style="{{m.bg}}"></span>
+        <img src="{{m.img}}" alt="" draggable="false" style="{{m.imgStyle}}">
+        <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 110px; background: linear-gradient(180deg, transparent, #07070FEE 70%); pointer-events: none"></span>
         <span style="{{m.tagStyle}}">{{m.tag}}</span>
+        <span style="position: absolute; left: 12px; right: 10px; bottom: 30px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: {{m.size}}px; line-height: .92; letter-spacing: -.5px; text-align: left; color: #F4F4FA; text-shadow: 0 3px 0 #07070F, 0 0 18px {{m.glow}}">{{m.title}}</span>
+        <span style="position: absolute; left: 13px; bottom: 12px; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: {{m.sub}}">{{m.kicker}}</span>
       </button>
     </sc-for>
+  </div>
+
+  <!-- what you picked, in one line, and the big button -->
+  <div style="position: absolute; left: 96px; right: 14px; bottom: 12px; height: 54px; display: flex; align-items: center; gap: 14px; z-index: 4">
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 12px; font-weight: 600; color: #CACAE0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{selDesc}}</span>
+      <sc-if value="{{showRank}}" hint-placeholder-val="{{ true }}">
+        <a href="Rangos.dc.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #F4F4FA">
+          <span style="font-size: 11px; font-weight: 800; color: {{rankColor}}; white-space: nowrap">{{rankLabel}}</span>
+          <span class="bc-para" style="flex: 0 1 160px; height: 6px; background: #26264A"><span class="am-bar-shine" style="display: block; {{rankBar}}"></span></span>
+          <span style="font-size: 10px; font-weight: 700; color: #A3A3C2; white-space: nowrap">{{mmrLabel}} · {{seasonLabel}}</span>
+        </a>
+      </sc-if>
+    </div>
+    <a href="{{playHref}}" onClick="{{saveSel}}" class="bc-btn am-shine" style="flex: none; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 30px 0 24px; text-decoration: none; font-size: 26px; white-space: nowrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="#0B0B14"><path d="M6 3l15 9l-15 9z"/></svg>{{playLabel}}</a>
   </div>
 </div>
 </x-dc>
@@ -184,61 +178,75 @@ class Component extends DCLogic {
     const all = this.store('arenamix.mmr.v1') || {};
     return all[sport + ':' + id] || 0;
   }
+  posterKey(m) { return m.kind === 'team' ? 'team:' + m.n : m.duel === 'pen' ? 'pen' : m.duel === 'free' ? 'free' : m.kind === 'private' ? 'private' : m.id === 'tut' ? 'tut' : 'train'; }
   renderVals() {
     const s = this.state, C = this.catalog(s.sport);
     let list;
     if (s.cat === 'train') list = C.train;
-    else list = C.modes.concat(s.cat === 'casual' ? [{ id: 'private', title: 'PARTIDA PRIVADA', kind: 'private', desc: 'Invita a tus amigos con un código. Los huecos los rellena la IA y le puedes dar órdenes.' }] : []);
-    // the Unity version, exported from Unity to futbol3d/
-    if (s.cat === 'casual' && s.sport === 'futbol') list = list.concat([{ id: 'f3d', title: 'FÚTBOL UNITY', kind: 'ext', href: 'futbol3d/index.html', desc: 'La versión hecha en Unity (prueba).' }]);
-    let cur = list.find((m) => m.id === s.id && !m.soon) || list.find((m) => !m.soon);
+    else list = C.modes.concat(s.cat === 'casual' ? [{ id: 'private', title: 'PARTIDA PRIVADA', kind: 'private', desc: 'Juega online con tus amigos con un código de sala. Los huecos los rellena la IA.' }] : []);
+    list = list.filter((m) => !m.soon);
+    let ci = Math.max(0, list.findIndex((m) => m.id === s.id));
+    const cur = list[ci];
     const comp = s.cat === 'comp', S = this.season();
     const placingOf = (m) => this.placeOf(S, s.sport + ':' + m.id).g < 5;
-    const cards = list.map((m) => {
-      const on = m === cur, mmr = comp && !m.soon ? this.mmrOf(s.sport, m.id) : 0, R = this.rankOf(mmr);
-      const tag = m.soon ? 'PRÓXIMAMENTE' : comp ? (placingOf(m) ? 'Clasif. ' + this.placeOf(S, s.sport + ':' + m.id).g + '/5' : R.label) : s.cat === 'casual' ? (m.kind === 'private' ? 'Amigos' : 'Sin rango') : 'Libre';
+    const CAT = { comp: ['#FFC53D', '#3A2A0A'], casual: ['#22D3EE', '#0A2A33'], train: ['#53D88E', '#0A2A1A'] }[s.cat];
+    const P = window.AMPosters;
+    const cards = list.map((m, i) => {
+      const off = i - ci, a = Math.abs(off), on = off === 0;
+      const mmr = comp ? this.mmrOf(s.sport, m.id) : 0, R = this.rankOf(mmr);
+      const tag = comp ? (placingOf(m) ? 'CLASIF. ' + this.placeOf(S, s.sport + ':' + m.id).g + '/5' : R.label.toUpperCase()) : s.cat === 'casual' ? (m.kind === 'private' ? 'CON AMIGOS' : 'SIN RANGO') : 'LIBRE';
+      const img = P ? P.get(this.posterKey(m), () => this.forceUpdate()) : '';
+      // the carousel: the chosen card in the middle, the others fanned out and turned away
+      const tx = off === 0 ? 0 : Math.sign(off) * (a === 1 ? 182 : a === 2 ? 318 : 420);
+      const sc = a === 0 ? 1.06 : a === 1 ? 0.84 : 0.7;
+      const kicker = m.kind === 'team' ? 'PARTIDO · ' + m.n + ' CONTRA ' + m.n : m.kind === 'duel' ? 'DUELO · CARA A CARA' : m.kind === 'private' ? 'ONLINE · CÓDIGO DE SALA' : 'PRÁCTICA';
+      const title = m.kind === 'team' ? m.n + ' VS ' + m.n : m.title;
       return {
-        title: m.title, desc: m.desc, tag,
-        icon: Modos_ICON[this.iconOf(m)],
-        iconBox: 'flex: none; width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; ' + (on ? 'background: #22D3EE; color: #0B0B14; box-shadow: 0 0 10px #22D3EE88;' : 'background: #22D3EE1A; color: #22D3EE; border: 1px solid #22D3EE44;'),
-        cls: 'bc-tile' + (on ? ' on' : ''),
-        style: 'display: flex; flex-direction: column; align-items: flex-start; gap: 6px; height: 66px; padding: 9px 12px 8px 14px; box-sizing: border-box; font-family: Exo2, sans-serif; color: #F4F4FA; cursor: ' + (m.soon ? 'default' : 'pointer') + '; opacity: ' + (m.soon ? 0.45 : 1) + '; --bc-c: ' + (on ? '#22D3EE' : comp && !m.soon && !placingOf(m) ? R.text : '#3A3F7A') + ';',
-        tagStyle: 'font-size: 10px; font-weight: 800; letter-spacing: .5px; padding-left: 33px; white-space: nowrap; ' + (comp && !m.soon ? 'color: ' + (placingOf(m) ? '#A3A3C2' : R.text) + ';' : 'color: #A3A3C2;'),
-        pick: () => { if (!m.soon) this.setState({ id: m.id }); }
+        title, tag, kicker, img, on: on ? 'true' : 'false', aria: title + '. ' + m.desc,
+        size: title.length > 12 ? 30 : title.length > 7 ? 36 : 54,
+        glow: on ? CAT[0] + '88' : 'transparent', sub: on ? CAT[0] : '#A3A3C2',
+        style: 'transform: translateX(' + tx + 'px) translateZ(' + (-a * 60) + 'px) rotateY(' + (-Math.sign(off) * Math.min(2, a) * 16) + 'deg) scale(' + sc + '); z-index: ' + (10 - a) + '; opacity: ' + (a > 2 ? 0 : a === 2 ? 0.55 : 1) + '; pointer-events: ' + (a > 2 ? 'none' : 'auto') + '; filter: ' + (on ? 'none' : 'brightness(.62) saturate(.8)') + ';' + (on ? ' animation: mdFloat 3.2s ease-in-out infinite;' : ''),
+        bg: 'position: absolute; inset: 0; border-radius: 18px; overflow: hidden; background: radial-gradient(120% 80% at 50% 25%, ' + CAT[1] + ' 0%, #10102A 60%, #07070F 100%); --mc: ' + CAT[0] + '; ' + (on ? 'animation: mdGlow 2.4s ease-in-out infinite;' : 'box-shadow: 0 0 0 1px #2E2E58, 0 14px 24px #000a;'),
+        imgStyle: 'position: absolute; left: 0; top: 0; width: 170px; height: 215px; object-fit: cover; border-radius: 18px 18px 0 0; opacity: ' + (img ? 1 : 0) + '; transition: opacity .5s; pointer-events: none;',
+        tagStyle: 'position: absolute; left: 10px; top: 10px; padding: 3px 9px; transform: skewX(-10deg); background: ' + (on ? CAT[0] : '#17172ACC') + '; color: ' + (on ? '#0B0B14' : '#CACAE0') + '; font: 800 9.5px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap;',
+        pick: () => { if (on || performance.now() - (this.swiped || 0) < 350) return; this.setState({ id: m.id }); }
       };
     });
     const mmr = cur && comp ? this.mmrOf(s.sport, cur.id) : 0, R = this.rankOf(mmr);
     const curPlacing = cur && comp && placingOf(cur), curPc = cur ? this.placeOf(S, s.sport + ':' + cur.id) : null;
-    const tab = (on) => 'height: 34px; padding: 0 16px; border: 0; font: 800 12px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; ' + (on ? 'background: linear-gradient(135deg, #7EF0FF, #22D3EE); color: #0B0B14;' : 'background: #17172ACC; color: #CACAE0;');
     const ti = ['comp', 'casual', 'train'].indexOf(s.cat);
-    const href = !cur ? '#' : s.cat === 'train' || cur.kind === 'ext' ? cur.href : cur.kind === 'private' ? 'Privada.dc.html' : comp ? 'Competitivo.dc.html' : 'Rapida.dc.html';
-    const catName = { comp: 'COMPETITIVO', casual: 'INFORMAL', train: 'ENTRENAMIENTO' }[s.cat];
+    const TABS = [
+      { id: 'comp', label: 'COMPETITIVO', color: '#FFC53D', icon: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4' },
+      { id: 'casual', label: 'INFORMAL', color: '#22D3EE', icon: 'M12 21a9 9 0 1 0 0-18a9 9 0 0 0 0 18M8 14s1.5 2 4 2s4-2 4-2M9 9h.01M15 9h.01' },
+      { id: 'train', label: 'ENTRENAR', color: '#53D88E', icon: 'M12 3l7 18H5zM8 14h8M10 9h4' }
+    ];
+    const go = (d) => { const j = ci + d; if (j >= 0 && j < list.length) this.setState({ id: list[j].id }); };
+    const href = !cur ? '#' : s.cat === 'train' ? cur.href : cur.kind === 'private' ? 'Privada.dc.html' : comp ? 'Competitivo.dc.html' : 'Rapida.dc.html';
     return {
-      selSize: cur && cur.title.length > 9 ? 50 : cur && cur.title.length > 6 ? 62 : 80,
-      dots: this.dotsFor(cur),
-      sportName: C.name, sportSize: C.name.length > 7 ? 32 : 40,
-      bannerStyle: 'flex: none; height: 104px; padding: 10px 12px; box-sizing: border-box; border-radius: 16px; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(135deg, ' + C.c1 + ', ' + C.c2 + ');',
-      catLabel: catName + (comp ? ' · CON RANGO' : s.cat === 'casual' ? ' · SIN RANGO' : ''),
-      catColor: comp ? '#FFC53D' : s.cat === 'casual' ? '#22D3EE' : '#53D88E',
-      selTitle: cur ? cur.title : '', selDesc: cur ? cur.desc : '',
+      tabs: TABS.map((t, i) => ({
+        label: t.label, icon: t.icon, sel: i === ti ? 'true' : 'false',
+        style: 'position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; height: 32px; width: 132px; justify-content: center; border: 0; background: none; font: 800 11.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (i === ti ? '#0B0B14' : t.color) + ';',
+        pick: () => { if (i !== ti) this.setState({ cat: t.id, id: null }); }
+      })),
+      thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 132) + 'px; width: 132px; height: 32px; border-radius: 11px; background: ' + TABS[ti].color + '; box-shadow: 0 0 16px ' + TABS[ti].color + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s, box-shadow .3s;',
+      spot: 'position: absolute; left: 50%; top: 150px; width: 380px; height: 150px; margin-left: -190px; border-radius: 50%; background: radial-gradient(closest-side, ' + CAT[0] + '33, transparent); pointer-events: none;',
+      cards,
+      swDown: (e) => { this.sw = { x: e.clientX, t: performance.now() }; },
+      swUp: (e) => {
+        const w = this.sw; this.sw = null;
+        if (!w) return;
+        const dx = e.clientX - w.x;
+        if (Math.abs(dx) > 40 && performance.now() - w.t < 700) { this.swiped = performance.now(); go(dx < 0 ? 1 : -1); }
+      },
+      listKey: s.cat,
+      selDesc: cur ? cur.desc : '',
       showRank: comp && !!cur,
       rankLabel: curPlacing ? 'Sin clasificar' : R.label, rankColor: curPlacing ? '#A3A3C2' : R.text,
       mmrLabel: curPlacing ? 'Clasificatorias ' + curPc.g + '/5' : mmr + ' MMR',
-      seasonLabel: 'Temporada ' + S.num + ' · termina en ' + S.daysLeft + (S.daysLeft === 1 ? ' día' : ' días'),
-      rankBar: 'height: 8px; border-radius: 4px; box-shadow: 0 0 8px ' + R.text + '; background: ' + R.text + '; width: ' + (Math.max(0, Math.min(1, (mmr - R.lo) / (R.hi - R.lo))) * 100).toFixed(1) + '%;',
-      cards,
-      _unused: 'position: absolute; top: 4px; bottom: 4px; left: calc(4px + ' + ti + ' * (100% - 8px) / 3); width: calc((100% - 8px) / 3); border-radius: 12px; background: linear-gradient(135deg, #7EF0FF, #22D3EE); box-shadow: 0 0 14px #22D3EE88; transition: left .4s cubic-bezier(.3,1.5,.5,1);',
-      compSel: comp ? 'true' : 'false', casualSel: s.cat === 'casual' ? 'true' : 'false', trainSel: s.cat === 'train' ? 'true' : 'false',
-      listKey: s.cat, selKey: s.cat + ':' + (cur ? cur.id : ''),
-      selIcon: cur ? Modos_ICON[this.iconOf(cur)] : '',
-      selIconBox: 'flex: none; width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #0B0B14; background: linear-gradient(135deg, #7EF0FF, #22D3EE); box-shadow: 0 0 14px #22D3EE77;',
-      compTab: tab(comp), casualTab: tab(s.cat === 'casual'), trainTab: tab(s.cat === 'train'),
-      tabComp: () => this.setState({ cat: 'comp', id: null }),
-      tabCasual: () => this.setState({ cat: 'casual', id: null }),
-      tabTrain: () => this.setState({ cat: 'train', id: null }),
+      seasonLabel: 'T' + S.num + ' · ' + S.daysLeft + (S.daysLeft === 1 ? ' día' : ' días'),
+      rankBar: 'height: 6px; box-shadow: 0 0 8px ' + R.text + '; background: ' + R.text + '; width: ' + (Math.max(0, Math.min(1, (mmr - R.lo) / (R.hi - R.lo))) * 100).toFixed(1) + '%;',
       playHref: href,
       playLabel: s.cat === 'train' ? 'ENTRENAR' : cur && cur.kind === 'private' ? 'CREAR SALA' : comp ? 'BUSCAR PARTIDA' : 'JUGAR',
-      playStyle: 'display: flex; align-items: center; justify-content: center; flex: none; height: 52px; border-radius: 16px; background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #0B0B14; text-decoration: none; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; box-shadow: 0 5px 0 #0E8FA3;',
       saveSel: () => { if (cur) this.store('arenamix.sel', { sport: s.sport, cat: s.cat, id: cur.id }); }
     };
   }
