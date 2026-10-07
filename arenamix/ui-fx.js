@@ -109,11 +109,6 @@
     '.am-bar-shine::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,#ffffff70,transparent);transform:translateX(-100%);animation:amBarShine 2.6s ease-in-out infinite}',
     '@keyframes amBarShine{0%{transform:translateX(-100%)}60%,100%{transform:translateX(100%)}}',
     // main side bar: glowing active item
-    'nav[aria-label="Principal"]{background:linear-gradient(180deg,#14142C,#0E0E1C)!important;border-right:1px solid #2A2A52!important;z-index:2}',
-    'nav[aria-label="Principal"] a{transition:background .25s,color .25s,translate .25s}',
-    'nav[aria-label="Principal"] a[style*="background: #22D3EE"]{background:linear-gradient(160deg,#7EF0FF,#22D3EE 60%,#0EA5C0)!important;box-shadow:0 0 16px #22D3EE88,inset 0 1px 0 #ffffff88}',
-    'nav[aria-label="Principal"] a:not([style*="background: #22D3EE"]) svg{transition:translate .25s}',
-    'nav[aria-label="Principal"] a:not([style*="background: #22D3EE"]):hover{color:#F4F4FA!important;background:#ffffff0d!important}',
     '@media (prefers-reduced-motion: reduce){.am-bg::before,.am-shine::after,.am-float,.am-pulse,.am-pulse-gold,.am-bob,.am-spin,.am-coin,.am-bar-shine::after{animation:none!important}}',
     // ---- broadcast style (the look of the home screen), shared by every menu ----
     // stage: night-stadium backdrop with two swinging floodlight beams
