@@ -15,7 +15,8 @@ body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; display: flex; flex-direction: column; gap: 8px; padding: 10px 14px; box-sizing: border-box; user-select: none; -webkit-user-select: none">
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Manrope, sans-serif; display: flex; flex-direction: column; gap: 8px; padding: 10px 14px; box-sizing: border-box; user-select: none; -webkit-user-select: none">
+  <div class="am-bg under"></div>
   <div style="flex: none; display: flex; align-items: center; gap: 10px">
     <a href="{{backHref}}" aria-label="Volver" style="flex: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 20px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></a>
     <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: .5px">CONFIGURACIÓN</span>
@@ -27,7 +28,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{showPlay}}" hint-placeholder-val="{{ true }}">
     <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start">
       <sc-for list="{{opts}}" as="o" hint-placeholder-count="6">
-        <div style="padding: 9px 11px; border-radius: 14px; background: #17172A; border: 1px solid #26264A; display: flex; flex-direction: column; gap: 7px">
+        <div class="am-card" style="padding: 9px 11px; border-radius: 14px; background: #17172A; border: 1px solid #26264A; display: flex; flex-direction: column; gap: 7px">
           <div style="display: flex; flex-direction: column; gap: 2px">
             <span style="font-size: 12px; font-weight: 800; letter-spacing: 1px">{{o.title}}</span>
             <span style="font-size: 10.5px; line-height: 1.3; color: #A3A3C2">{{o.desc}}</span>
@@ -48,7 +49,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{showCtrl}}" hint-placeholder-val="{{ false }}">
     <div style="flex: 1; min-height: 0; display: flex; gap: 14px">
       <div style="flex: none; width: 236px; display: flex; flex-direction: column; gap: 8px">
-        <div style="display: flex; flex-direction: column; gap: 5px; padding: 10px; border-radius: 14px; background: #17172A; border: 1px solid #26264A">
+        <div class="am-card" style="display: flex; flex-direction: column; gap: 5px; padding: 10px; border-radius: 14px; background: #17172A; border: 1px solid #26264A">
           <label for="cf-size" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>TAMAÑO DE BOTONES</span><span style="color: #F4F4FA">{{sizeTxt}}</span></label>
           <input id="cf-size" type="range" min="60" max="140" step="5" value="{{sizeVal}}" onInput="{{onSize}}" style="width: 100%; accent-color: #22D3EE">
           <label for="cf-joy" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>TAMAÑO DEL JOYSTICK</span><span style="color: #F4F4FA">{{joyTxt}}</span></label>

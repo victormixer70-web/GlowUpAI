@@ -59,6 +59,7 @@
     // ---- shared look for the menus (used by the screens through these classes) ----
     // living background: soft colour orbs drifting over a faint pitch pattern
     '.am-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}',
+    '.am-bg.under{z-index:-1}',
     '.am-bg::before{content:"";position:absolute;inset:-20%;background:radial-gradient(30% 40% at 20% 30%,#22D3EE22,transparent 70%),radial-gradient(28% 36% at 80% 70%,#7C5CFF26,transparent 70%),radial-gradient(22% 30% at 70% 15%,#FFC53D14,transparent 70%);animation:amOrbs 14s ease-in-out infinite alternate}',
     '.am-bg::after{content:"";position:absolute;inset:0;background-image:linear-gradient(#ffffff06 1px,transparent 1px),linear-gradient(90deg,#ffffff06 1px,transparent 1px);background-size:32px 32px;mask-image:radial-gradient(80% 80% at 50% 50%,#000 30%,transparent 100%);-webkit-mask-image:radial-gradient(80% 80% at 50% 50%,#000 30%,transparent 100%)}',
     '@keyframes amOrbs{0%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(4%,-3%) rotate(8deg)}100%{transform:translate(-3%,4%) rotate(-6deg)}}',

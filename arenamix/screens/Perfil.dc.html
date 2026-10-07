@@ -15,11 +15,12 @@ body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; display: flex; gap: 14px; padding: 12px 14px; box-sizing: border-box">
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Manrope, sans-serif; display: flex; gap: 14px; padding: 12px 14px; box-sizing: border-box">
+  <div class="am-bg under"></div>
   <div style="flex: none; width: 250px; display: flex; flex-direction: column; gap: 10px">
     <div style="display: flex; align-items: center; gap: 10px">
       <a href="Deportes.dc.html" aria-label="Volver" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 28px; letter-spacing: 2px">PERFIL</span>
+      <span class="am-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 28px; letter-spacing: 2px">PERFIL</span>
     </div>
     <div style="flex: 1; min-height: 0; border-radius: 18px; background: linear-gradient(160deg, #1B2A4A, #14142A 60%); border: 1px solid #2E2E52; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px">
       <div style="width: 104px; height: 104px; border-radius: 52px; overflow: hidden; border: 3px solid #22D3EE; background: #21213A"><svg width="104" height="104" viewBox="64 12 72 72"><rect x="64" y="12" width="72" height="72" fill="#21213A"/><rect x="92" y="60" width="16" height="22" fill="#A66A43"/><path d="M62 82Q100 70 138 82V100H62Z" fill="#FF8A3D"/><path d="M86 78Q100 92 114 78" stroke="#0B0B14" stroke-width="5" fill="none"/><circle cx="100" cy="44" r="24" fill="#B9794F"/><ellipse cx="91" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><ellipse cx="109" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><path d="M93 56q7 5 14 0" stroke="#5A2E1E" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M76 42Q76 16 100 16Q124 16 124 42Q118 30 104 30Q96 26 88 30Q80 32 76 42Z" fill="#241811"/><rect x="75" y="29" width="50" height="9" rx="4" fill="#22D3EE"/></svg></div>
@@ -27,7 +28,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <span style="font-size: 12px; font-weight: 700; color: #A3A3C2">Nv. 12 · {{bestRank}}</span>
       <span style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 10px; background: #0B0B14; font-weight: 800; font-size: 14px; color: #FFC53D"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#B8860B" stroke-width="2"/></svg>{{coins}} carrascos</span>
     </div>
-    <a href="Logros.dc.html" style="position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; height: 52px; border-radius: 14px; background: #FFC53D; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; box-shadow: 0 5px 0 #B8860B">
+    <a href="Logros.dc.html" class="am-shine am-pulse-gold" style="position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; height: 52px; border-radius: 14px; background: #FFC53D; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; box-shadow: 0 5px 0 #B8860B">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="#0B0B14"><path d="M7 3h10v3h3v2a5 5 0 0 1-5 5h-.3A5 5 0 0 1 13 15v2h3v3H8v-3h3v-2a5 5 0 0 1-1.7-2H9a5 5 0 0 1-5-5V6h3zM6 8a3 3 0 0 0 1.5 2.6A7 7 0 0 1 7 8zm12 0h-1a7 7 0 0 1-.5 2.6A3 3 0 0 0 18 8z"/></svg>
       LOGROS
       <sc-if value="{{hasBadge}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: -6px; top: -8px; min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box; border-radius: 12px; background: #FF5C5C; color: #FFFFFF; font: 800 13px Manrope, sans-serif; display: flex; align-items: center; justify-content: center; font-style: normal; letter-spacing: 0">{{badge}}</span></sc-if>
@@ -38,12 +39,13 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </div>
   <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px">
-    <div role="tablist" style="display: flex; gap: 4px; padding: 4px; border-radius: 14px; background: #17172A">
-      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="5"><button type="button" role="tab" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button></sc-for>
+    <div role="tablist" style="position: relative; display: flex; padding: 4px; border-radius: 16px; background: #17172A; border: 1px solid #2E2E52">
+      <span style="{{thumb}}"></span>
+      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3"><button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button></sc-for>
     </div>
-    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+    <div key="{{sportKey}}" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
       <sc-for list="{{tiles}}" as="s" hint-placeholder-count="9">
-        <div style="display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 14px; background: #17172A; border: 1px solid #26264A">
+        <div style="{{s.box}}">
           <span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">{{s.label}}</span>
           <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 32px; line-height: 1; color: {{s.color}}">{{s.value}}</span>
         </div>
@@ -51,7 +53,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
     <div style="display: flex; flex-direction: column; gap: 4px">
       <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>VICTORIAS · EMPATES · DERROTAS</span><span>{{totalLabel}}</span></div>
-      <div style="display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: #26264A"><div style="{{barW}}"></div><div style="{{barD}}"></div><div style="{{barL}}"></div></div>
+      <div style="display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: #26264A; box-shadow: inset 0 1px 3px #0009"><div style="{{barW}}"></div><div style="{{barD}}"></div><div style="{{barL}}"></div></div>
     </div>
   </div>
 </div>
@@ -99,21 +101,23 @@ class Component extends DCLogic {
   renderVals() {
     const s = this.state, R = this.store('arenamix.record.v1', {}), r = R[s.sport] || { played: 0, won: 0, lost: 0, drawn: 0, gf: 0, ga: 0, clean: 0, best: 0 };
     const goals = s.sport === 'all' || s.sport === 'futbol', pct = (a) => (r.played ? Math.round(a / r.played * 100) : 0);
-    const tile = (label, value, color) => ({ label, value: String(value), color: color || '#F4F4FA' });
+    const tile = (label, value, color) => ({ label, value: String(value), color: color || '#F4F4FA', box: 'position: relative; display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 14px; background: linear-gradient(160deg, #1C1C3A, #141428); border: 1px solid #2A2A50; border-top: 3px solid ' + (color || '#5A5A8A') + '; box-shadow: 0 6px 14px #0006, 0 -4px 14px -8px ' + (color || '#5A5A8A') + ';' });
     const tiles = [
       tile('PARTIDOS', r.played), tile('VICTORIAS', r.won, '#53D88E'), tile('DERROTAS', r.lost, '#FF8A8E'),
       tile('EMPATES', r.drawn, '#CACAE0'), tile('% VICTORIAS', pct(r.won) + '%', '#22D3EE'), tile('MEJOR RACHA', r.best, '#FFC53D'),
       tile('GOLES MARCADOS', goals ? r.gf : '—'), tile('GOLES ENCAJADOS', goals ? r.ga : '—'), tile('PORTERÍAS A CERO', goals ? r.clean : '—')
     ];
-    const labels = { all: 'Todos', futbol: 'Fútbol', baloncesto: 'Baloncesto', tenis: 'Tenis', voley: 'Vóley' };
-    const tabs = Object.keys(labels).map((k) => ({ label: labels[k], pick: () => this.setState({ sport: k }), style: 'flex: 1; height: 34px; border: 0; border-radius: 10px; font: 800 12px Manrope, sans-serif; cursor: pointer; ' + (k === s.sport ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;') }));
+    const labels = { all: 'Todos', futbol: 'Fútbol', baloncesto: 'Basket' };
+    const keys = Object.keys(labels), ti = Math.max(0, keys.indexOf(s.sport));
+    const tabs = keys.map((k) => ({ label: labels[k], sel: k === s.sport ? 'true' : 'false', pick: () => this.setState({ sport: k }), style: 'position: relative; z-index: 1; flex: 1; height: 34px; border: 0; border-radius: 12px; font: 800 13px Manrope, sans-serif; cursor: pointer; background: transparent; transition: color .3s; color: ' + (k === s.sport ? '#0B0B14;' : '#CACAE0;') }));
     const cl = this.claimed(), ready = this.achievements().filter((a) => a.cur >= a.goal && !cl[a.id]).length;
     const mmr = this.store('arenamix.mmr.v1', {}), top = Object.keys(mmr).reduce((m, k) => Math.max(m, mmr[k] || 0), 0);
     const tiers = [['Bronce', 0], ['Plata', 300], ['Oro', 750], ['Platino', 1350], ['Diamante', 2100], ['Campeón', 3075], ['Super campeón', 4275], ['Élite', 5775]];
     let best = 'Sin rango'; if (Object.keys(mmr).length) tiers.forEach(([n, v]) => { if (top >= v) best = 'Mejor rango: ' + n; });
     const w = (a, c) => 'width: ' + pct(a) + '%; background: ' + c + ';';
     return {
-      tiles, tabs, coins: this.fmt(this.coins()), bestRank: best,
+      tiles, tabs, sportKey: s.sport,
+      thumb: 'position: absolute; top: 4px; bottom: 4px; left: calc(4px + ' + ti + ' * (100% - 8px) / 3); width: calc((100% - 8px) / 3); border-radius: 12px; background: linear-gradient(135deg, #7EF0FF, #22D3EE); box-shadow: 0 0 14px #22D3EE88; transition: left .4s cubic-bezier(.3,1.5,.5,1);', coins: this.fmt(this.coins()), bestRank: best,
       hasBadge: ready > 0, badge: String(ready),
       totalLabel: r.played + ' partidos',
       barW: w(r.won, '#53D88E'), barD: w(r.drawn, '#8C8CB0'), barL: w(r.lost, '#FF5C5C')
