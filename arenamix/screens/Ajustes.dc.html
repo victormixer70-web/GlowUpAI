@@ -139,7 +139,7 @@ class Component extends DCLogic {
       { key: 'music', title: 'MÚSICA DE LOS MENÚS', desc: 'La música que suena fuera del partido.', choices: [[0.9, 'Alta'], [0.6, 'Media'], [0.3, 'Baja'], [0, 'No']] },
       { key: 'sfx', title: 'EFECTOS DE SONIDO', desc: 'El balón, el árbitro, el público y los menús.', choices: [[1, 'Alta'], [0.8, 'Media'], [0.4, 'Baja'], [0, 'No']] },
       { key: 'cam', title: 'CÁMARA DEL PARTIDO', desc: 'Pro: detrás de tu jugador, mirando a la portería rival.', choices: [['cerca', 'Cerca'], ['normal', 'Normal'], ['lejos', 'Lejos'], ['pro', 'Pro']] },
-      { key: 'gfx', title: 'CALIDAD GRÁFICA', desc: 'Baja si tu móvil va lento o se calienta (menos nitidez, sin sombras).', choices: [['alta', 'Alta'], ['media', 'Media'], ['baja', 'Baja']] },
+      { key: 'gfx', title: 'CALIDAD GRÁFICA', desc: 'Auto: la baja sola si tu móvil va lento. Baja: menos nitidez, sin sombras.', choices: [['auto', 'Auto'], ['alta', 'Alta'], ['media', 'Media'], ['baja', 'Baja']] },
       { key: 'names', title: 'NOMBRES SOBRE LOS JUGADORES', desc: 'Con No, solo ves el TÚ encima de tu jugador.', choices: [[true, 'Sí'], [false, 'No']] },
       { key: 'passMark', title: 'INDICADOR DE PASE', desc: 'La flecha encima del compañero al que irá tu pase.', choices: [[true, 'Sí'], [false, 'No']] }
     ];
@@ -160,7 +160,7 @@ class Component extends DCLogic {
       showPlay: play, showCtrl: !play, playSel: play ? 'true' : 'false', ctrlSel: play ? 'false' : 'true',
       playTab: tabSt(play), ctrlTab: tabSt(!play),
       tabPlay: () => this.setState({ tab: 'play' }), tabCtrl: () => this.setState({ tab: 'ctrl' }),
-      opts, resetPlay: () => this.savePlay({ music: 0.6, sfx: 0.8, cam: 'normal', names: true, gfx: 'alta', passMark: true }),
+      opts, resetPlay: () => this.savePlay({ music: 0.6, sfx: 0.8, cam: 'normal', names: true, gfx: 'auto', passMark: true }),
       backHref: 'Deportes.dc.html',
       btns, chars,
       sizeVal: String(Math.round(c.size * 100)), sizeTxt: Math.round(c.size * 100) + '%',

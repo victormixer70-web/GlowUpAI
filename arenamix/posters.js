@@ -141,6 +141,20 @@
       add(ball(-0.3, 0.9));
       add(player({ char: you ? me : 'ty', kit: homeKit(), you: true, x: -0.6, z: 0.3, face: 0.5, t: 0.6 }));
       look = { pos: [0, 2.8, 9.4], at: [0, 0.9, -0.2] };
+    } else if (kind === 'pass') {
+      // the season kit, gold and black, next to the season trophy
+      add(patch(3.0));
+      add(player({ char: you ? me : 'ty', kit: { primary: '#FFC53D', secondary: '#0B0B14', pattern: 'stripes', shorts: '#0B0B14', socks: '#FFC53D', shoe: '#0B0B14' }, x: -0.55, z: 0.2, face: 0.35, t: 0.5 }));
+      var gold = new T.MeshStandardMaterial({ color: new T.Color('#FFC53D').convertSRGBToLinear(), metalness: 0.7, roughness: 0.25, emissive: new T.Color('#5A3A00'), emissiveIntensity: 0.4 });
+      var cup = new T.Group();
+      var prof = [[0, 0], [0.36, 0], [0.36, 0.1], [0.14, 0.18], [0.1, 0.5], [0.16, 0.56], [0.34, 0.75], [0.42, 1.05], [0.44, 1.25], [0.4, 1.27], [0, 1.0]].map(function (q) { return new T.Vector2(q[0], q[1]); });
+      cup.add(new T.Mesh(new T.LatheGeometry(prof, 40), gold));
+      [-1, 1].forEach(function (sd) { var h = new T.Mesh(new T.TorusGeometry(0.17, 0.035, 10, 24, Math.PI * 1.2), gold); h.position.set(sd * 0.46, 1.0, 0); h.rotation.z = sd > 0 ? -Math.PI * 0.6 : Math.PI * 1.6; cup.add(h); });
+      var base = new T.Mesh(new T.CylinderGeometry(0.42, 0.5, 0.5, 30), std('#141428', { r: 0.4 })); base.position.y = 0.25; S.add(base);
+      cup.position.set(0, 0.5, 0); cup.scale.setScalar(0.95);
+      var stand = new T.Group(); stand.add(base); stand.add(cup); stand.position.set(0.95, 0, -0.1); S.add(stand);
+      var glow = new T.PointLight(0xffc53d, 1.4, 6); glow.position.set(0.9, 2.2, 1.2); S.add(glow);
+      look = { pos: [0.2, 1.7, 6.4], at: [0.2, 1.0, 0] };
     } else {
       add(patch(3)); add(ball(0, 0));
     }

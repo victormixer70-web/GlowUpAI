@@ -72,7 +72,7 @@ input::placeholder{color:#8686A6}
         <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #FFB37A">PASE DE TEMPORADA</span>
         <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 28px; line-height: 1.05; max-width: 220px">Equipaciones exclusivas de temporada</span>
         <a href="#" class="bc-para" style="align-self: flex-start; display: flex; align-items: center; height: 44px; margin-top: 6px; padding: 0 22px; background: #FF8A3D; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px">[PRECIO]</a>
-        <svg width="120" height="120" viewBox="0 0 48 48" style="position: absolute; right: -6px; bottom: -10px"><path d="M14 8l-10 6l4 10l6-2v22h20V22l6 2l4-10l-10-6a8 8 0 0 1-20 0z" fill="#FFC53D"/><text x="24" y="36" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="12" fill="#2B1A0C">S1</text></svg>
+        <img src="{{passImg}}" alt="" style="position: absolute; right: -14px; bottom: -6px; width: 150px; height: 190px; object-fit: cover; object-position: 50% 20%; pointer-events: none; filter: drop-shadow(0 8px 12px #000a)">
       </section>
       <a href="Taquilla.dc.html" class="bc-tile" style="--bc-c: #FFC53D; display: flex; align-items: center; gap: 12px; padding: 12px 14px 12px 18px; text-decoration: none; color: #F4F4FA">
         <img src="{{prz.hat}}" alt="" style="width: 52px; height: 52px; object-fit: contain">
@@ -141,6 +141,7 @@ class Component extends DCLogic {
           }
         };
       }),
+      passImg: window.AMPosters ? window.AMPosters.get('pass', () => this.forceUpdate()) : '',
       prz: { coins100: P('coins:4'), chestReady: P('chest:common:open'), chestRare: P('chest:rare'), coins300: P('coins:14'), boots: P('boots:#E5484D'), hat: G ? G.thumb('cabeza', { id: 'h2', kind: 'top' }) : '' },
       isRewards: t === 'rewards',
       isShop: t === 'shop',

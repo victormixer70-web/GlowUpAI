@@ -203,6 +203,22 @@ class Component extends DCLogic {
     if (this.voice) { this.voice.close(); this.voice = null; }
   }
   /* ---------- online ---------- */
+  // automatic graphics: if the match runs slowly during the first seconds of play, step the quality down
+  autoGfx(now) {
+    if (!this.gfxAuto || !this.R || this.g.phase !== 'play' || this.gfxNow === 'baja') return;
+    const F = this.fpsS || (this.fpsS = { t0: now, n: 0 });
+    F.n++;
+    if (now - F.t0 < 4000) return;
+    const fps = F.n * 1000 / (now - F.t0);
+    this.fpsS = { t0: now, n: 0 };
+    if (fps >= 42) { if (!this.fpsOk) this.fpsOk = 1; return; }
+    const next = this.gfxNow === 'alta' ? 'media' : 'baja';
+    this.gfxNow = next;
+    this.R.setPixelRatio(Math.min(next === 'media' ? 1.5 : 1, window.devicePixelRatio || 1));
+    if (next === 'baja') this.R.shadowMap.enabled = false;
+    try { localStorage.setItem('arenamix.gfxauto.v1', next); } catch (e) {}
+    this.flashMsg('Gráficos ajustados para que vaya más fluido', 1.6);
+  }
   sfx(n, a) { const S = window.AMSfx; if (S && S[n] && !this.props.tutorialMute) try { S[n](a); } catch (e) {} }
   // the crowd follows the play: louder and brighter as the ball gets near a goal, roaring at a goal
   crowdLevel() {
@@ -514,6 +530,7 @@ class Component extends DCLogic {
     else for (let i = 0; i < 3; i++) this.step(dt / 3);
     if (N && N.host) this.hostSend(dt);
     this.recordFrame();
+    this.autoGfx(now);
     this.crowdT = (this.crowdT || 0) - dt;
     if (this.crowdT <= 0) { this.crowdT = 0.25; this.sfx('crowd', this.crowdLevel()); }
     this.draw3D(dt);
@@ -1574,7 +1591,11 @@ class Component extends DCLogic {
     let R;
     try { R = new T.WebGLRenderer({ canvas: this.cv, antialias: true }); } catch (e) { this.no3d = true; return; }
     // graphics quality (Configuración): sharpness and shadows, for slower phones
-    const gfx = (window.AMPlay ? window.AMPlay() : {}).gfx || 'alta';
+    let gfx = (window.AMPlay ? window.AMPlay() : {}).gfx || 'auto';
+    // automatic: start at the level this phone settled on last time
+    this.gfxAuto = gfx === 'auto';
+    if (this.gfxAuto) { try { gfx = localStorage.getItem('arenamix.gfxauto.v1') || 'alta'; } catch (e) { gfx = 'alta'; } }
+    this.gfxNow = gfx;
     R.setPixelRatio(Math.min(gfx === 'alta' ? 2 : gfx === 'media' ? 1.5 : 1, window.devicePixelRatio || 1));
     R.setSize(844, 390, false);
     R.shadowMap.enabled = gfx !== 'baja';
