@@ -9,13 +9,13 @@
 <body>
 <x-dc>
 <helmet>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Manrope, sans-serif">
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif">
   <div class="am-bg under"></div>
   <sc-if value="{{isRoom}}" hint-placeholder-val="{{ true }}">
     <a href="Modos.dc.html" aria-label="Volver a modos" style="position: absolute; left: 12px; top: 12px; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA">
@@ -24,14 +24,14 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <span class="am-title" style="position: absolute; left: 66px; top: 14px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px">PARTIDA PRIVADA · {{sportName}}</span>
     <span style="position: absolute; left: 66px; top: 44px; font-size: 12px; color: #A3A3C2">Código de sala <b style="color: #FFC53D; letter-spacing: 2px">{{code}}</b></span>
     <div style="position: absolute; right: 14px; top: 12px; display: flex; gap: 6px">
-      <button type="button" onClick="{{invite}}" style="height: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: #A78BFA; color: #0B0B14; font: 800 13px Manrope, sans-serif; cursor: pointer">Invitar amigos</button>
-      <button type="button" onClick="{{toggleJoin}}" style="height: 40px; padding: 0 14px; border: 1px solid #2E2E52; border-radius: 12px; background: #17172A; color: #F4F4FA; font: 800 13px Manrope, sans-serif; cursor: pointer">Unirse con código</button>
+      <button type="button" onClick="{{invite}}" style="height: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: #A78BFA; color: #0B0B14; font: 800 13px Exo2, sans-serif; cursor: pointer">Invitar amigos</button>
+      <button type="button" onClick="{{toggleJoin}}" style="height: 40px; padding: 0 14px; border: 1px solid #2E2E52; border-radius: 12px; background: #17172A; color: #F4F4FA; font: 800 13px Exo2, sans-serif; cursor: pointer">Unirse con código</button>
     </div>
     <sc-if value="{{showJoin}}" hint-placeholder-val="{{ false }}">
       <div class="am-card" style="position: absolute; right: 14px; top: 58px; z-index: 2; width: 300px; padding: 12px; border-radius: 14px; background: #17172A; border: 1px solid #2E2E52; display: flex; flex-direction: column; gap: 8px">
         <label for="pv-code" style="font-size: 12px; font-weight: 800">Código de la sala de tu amigo</label>
-        <input id="pv-code" value="{{joinCode}}" onInput="{{onJoinInput}}" maxlength="6" placeholder="Ej. K7Q2PX" style="height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid #2E2E52; background: #0B0B14; color: #F4F4FA; font: 800 16px Manrope, sans-serif; letter-spacing: 3px; text-transform: uppercase">
-        <button type="button" onClick="{{join}}" style="height: 38px; border: 0; border-radius: 10px; background: #22D3EE; color: #0B0B14; font: 800 13px Manrope, sans-serif; cursor: pointer">Unirse</button>
+        <input id="pv-code" value="{{joinCode}}" onInput="{{onJoinInput}}" maxlength="6" placeholder="Ej. K7Q2PX" style="height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid #2E2E52; background: #0B0B14; color: #F4F4FA; font: 800 16px Exo2, sans-serif; letter-spacing: 3px; text-transform: uppercase">
+        <button type="button" onClick="{{join}}" style="height: 38px; border: 0; border-radius: 10px; background: #22D3EE; color: #0B0B14; font: 800 13px Exo2, sans-serif; cursor: pointer">Unirse</button>
       </div>
     </sc-if>
     <div style="position: absolute; left: 14px; top: 72px; right: 14px; display: flex; gap: 6px; flex-wrap: wrap">
@@ -185,21 +185,21 @@ class Component extends DCLogic {
     const s = this.state, f = this.fmtObj(), n = this.size();
     const formats = this.C.modes.filter((m) => !m.soon).map((m) => ({
       title: m.title,
-      style: 'height: 36px; padding: 0 12px; border-radius: 10px; font: 800 12px Manrope, sans-serif; cursor: pointer; ' + (m.id === s.fmt ? 'background: #22D3EE; color: #0B0B14; border: 0;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E52;'),
+      style: 'height: 36px; padding: 0 12px; border-radius: 10px; font: 800 12px Exo2, sans-serif; cursor: pointer; ' + (m.id === s.fmt ? 'background: #22D3EE; color: #0B0B14; border: 0;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E52;'),
       pick: () => this.setState({ fmt: m.id })
     }));
     const slot = (team, i) => {
       const key = team + i, you = team === 'A' && i === 0, kind = you ? 'you' : this.slotKind(key);
       const name = you ? 'Invitado_4821 (tú)' : kind === 'friend' ? 'Amigo invitado' : 'IA ' + (team === 'A' ? 'compañera' : 'rival') + (n > 1 ? ' ' + (team === 'A' ? i : i + 1) : '');
       const tag = you ? 'ANFITRIÓN' : kind === 'friend' ? 'ESPERANDO…' : 'IA · toca para invitar';
-      const segS = (on) => 'height: 30px; padding: 0 12px; border: 0; border-radius: 8px; font: 800 12px Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
+      const segS = (on) => 'height: 30px; padding: 0 12px; border: 0; border-radius: 8px; font: 800 12px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
     return {
       canKeep: n === 4,
       fieldStyle: segS(!s.keeper), keeperStyle: segS(!!s.keeper),
       setField: () => this.setState({ keeper: false }), setKeeper: () => this.setState({ keeper: true }),
       asKeeper: n === 4 && !!s.keeper,
         name, tag,
-        style: 'display: flex; justify-content: space-between; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; font: 800 13px Manrope, sans-serif; color: #F4F4FA; text-align: left; cursor: ' + (you ? 'default' : 'pointer') + '; ' + (you ? 'background: #10303A; border: 1px solid #22D3EE;' : kind === 'friend' ? 'background: #1E1A3A; border: 1px dashed #A78BFA;' : 'background: #17172A; border: 1px solid #26264A;'),
+        style: 'display: flex; justify-content: space-between; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; font: 800 13px Exo2, sans-serif; color: #F4F4FA; text-align: left; cursor: ' + (you ? 'default' : 'pointer') + '; ' + (you ? 'background: #10303A; border: 1px solid #22D3EE;' : kind === 'friend' ? 'background: #1E1A3A; border: 1px dashed #A78BFA;' : 'background: #17172A; border: 1px solid #26264A;'),
         tagStyle: 'font-size: 10px; letter-spacing: .5px; color: ' + (you ? '#22D3EE' : kind === 'friend' ? '#A78BFA' : '#8686A6') + ';',
         tap: () => { if (you) return; const slots = { ...s.slots, [key]: kind === 'friend' ? 'ai' : 'friend' }; this.setState({ slots }); if (kind !== 'friend') this.say('Hueco reservado para un amigo. Pásale el código ' + this.code + '.'); }
       };

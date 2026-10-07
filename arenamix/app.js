@@ -183,9 +183,9 @@
     btn.id = 'install';
     btn.type = 'button';
     btn.textContent = 'Instalar app';
-    btn.setAttribute('style', 'position:fixed;left:12px;bottom:12px;z-index:20;height:44px;padding:0 18px;border:0;border-radius:22px;background:#22D3EE;color:#0B0B14;font:800 15px system-ui,sans-serif;box-shadow:0 4px 0 #0E8FA3,0 8px 24px #0008;cursor:pointer');
+    btn.setAttribute('style', 'position:fixed;left:12px;bottom:12px;z-index:20;height:44px;padding:0 18px;border:0;border-radius:22px;background:#22D3EE;color:#0B0B14;font:800 15px Exo2,system-ui,sans-serif;box-shadow:0 4px 0 #0E8FA3,0 8px 24px #0008;cursor:pointer');
     var tip = document.createElement('div');
-    tip.setAttribute('style', 'display:none;position:fixed;left:12px;bottom:66px;z-index:20;max-width:260px;padding:12px 14px;border-radius:14px;background:#17172A;border:1px solid #2E2E52;color:#F4F4FA;font:600 13px/1.45 system-ui,sans-serif');
+    tip.setAttribute('style', 'display:none;position:fixed;left:12px;bottom:66px;z-index:20;max-width:260px;padding:12px 14px;border-radius:14px;background:#17172A;border:1px solid #2E2E52;color:#F4F4FA;font:600 13px/1.45 Exo2,system-ui,sans-serif');
     tip.innerHTML = isIOS ? 'En iPhone: toca el botón <b>Compartir</b> (cuadrado con flecha) y elige <b>Añadir a pantalla de inicio</b>.' : 'Abre el menú del navegador <b>⋮</b> y elige <b>Instalar aplicación</b> o <b>Añadir a pantalla de inicio</b>.';
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -213,7 +213,7 @@
     var box = document.getElementById('loading');
     if (!box) return;
     box.setAttribute('style', 'position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;color:#F4F4FA;font:600 15px system-ui,sans-serif;background:#0B0B14');
-    box.innerHTML = '<div>' + msg + '</div><button type="button" style="height:44px;padding:0 22px;border:0;border-radius:22px;background:#22D3EE;color:#0B0B14;font:800 15px system-ui,sans-serif">Reintentar</button>';
+    box.innerHTML = '<div>' + msg + '</div><button type="button" style="height:44px;padding:0 22px;border:0;border-radius:22px;background:#22D3EE;color:#0B0B14;font:800 15px Exo2,system-ui,sans-serif">Reintentar</button>';
     box.querySelector('button').onclick = function () {
       var jobs = [];
       if (window.caches) jobs.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }));

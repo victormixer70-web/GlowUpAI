@@ -9,13 +9,13 @@
 <body>
 <x-dc>
 <helmet>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 100% at 50% 0%, #2A1F10 0%, #0B0B14 60%); color: #F4F4FA; font-family: Manrope, sans-serif; display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; box-sizing: border-box">
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 100% at 50% 0%, #2A1F10 0%, #0B0B14 60%); color: #F4F4FA; font-family: Exo2, sans-serif; display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; box-sizing: border-box">
   <div class="am-bg"></div>
   <div style="position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; flex: none">
     <a href="Perfil.dc.html" aria-label="Volver al perfil" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
@@ -38,7 +38,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         </div>
         <div style="flex: none; width: 104px; display: flex; flex-direction: column; align-items: center; gap: 4px">
           <span style="display: flex; align-items: center; gap: 4px; font-weight: 800; font-size: 13px; color: #FFC53D"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#B8860B" stroke-width="2"/></svg>+{{a.reward}}</span>
-          <sc-if value="{{a.canClaim}}" hint-placeholder-val="{{ false }}"><button type="button" class="am-pulse-gold am-shine" onClick="{{a.claim}}" style="height: 32px; padding: 0 14px; border: 0; border-radius: 16px; background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #D9A520); color: #2A1C02; font: 800 12px Manrope, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #2F8A57">RECLAMAR</button></sc-if>
+          <sc-if value="{{a.canClaim}}" hint-placeholder-val="{{ false }}"><button type="button" class="am-pulse-gold am-shine" onClick="{{a.claim}}" style="height: 32px; padding: 0 14px; border: 0; border-radius: 16px; background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #D9A520); color: #2A1C02; font: 800 12px Exo2, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #2F8A57">RECLAMAR</button></sc-if>
           <sc-if value="{{a.isClaimed}}" hint-placeholder-val="{{ false }}"><span style="display: flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 10px; background: #53D88E22; border: 1px solid #53D88E66; font-size: 11px; font-weight: 800; color: #53D88E"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg>Reclamado</span></sc-if>
           <sc-if value="{{a.isLocked}}" hint-placeholder-val="{{ true }}"><span style="font-size: 11px; font-weight: 700; color: #6E6E90">En curso</span></sc-if>
         </div>

@@ -9,13 +9,13 @@
 <body>
 <x-dc>
 <helmet>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<section tabIndex="0" aria-label="Partido. Muévete con WASD o flechas, Espacio chuta o hace entrada, E pasa o cambia de jugador, F regatea o presiona, Mayúsculas esprinta" onKeyDown="{{onKeyDown}}" onKeyUp="{{onKeyUp}}" style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0D0D1A; color: #F4F4FA; font-family: Manrope, sans-serif; outline: none; user-select: none; -webkit-user-select: none">
+<section tabIndex="0" aria-label="Partido. Muévete con WASD o flechas, Espacio chuta o hace entrada, E pasa o cambia de jugador, F regatea o presiona, Mayúsculas esprinta" onKeyDown="{{onKeyDown}}" onKeyUp="{{onKeyUp}}" style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0D0D1A; color: #F4F4FA; font-family: Exo2, sans-serif; outline: none; user-select: none; -webkit-user-select: none">
   <canvas ref="{{canvasRef}}" width="844" height="390" style="position: absolute; left: 0; top: 0; width: 844px; height: 390px; display: block"></canvas>
   <sc-if value="{{no3d}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #CACAE0">Tu navegador no permite gráficos 3D (WebGL) en esta vista.</div></sc-if>
 
@@ -71,7 +71,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <span style="font-size: 10px; font-weight: 800; letter-spacing: 1.5px; color: #FFC53D">{{tutKicker}}</span>
         <span style="font-size: 14px; font-weight: 700; line-height: 1.35">{{tutText}}</span>
       </span>
-      <button type="button" onClick="{{tutSkip}}" style="flex: none; height: 30px; padding: 0 10px; border: 1px solid #2E2E52; border-radius: 8px; background: transparent; color: #CACAE0; font: 700 12px Manrope, sans-serif; cursor: pointer">Saltar</button>
+      <button type="button" onClick="{{tutSkip}}" style="flex: none; height: 30px; padding: 0 10px; border: 1px solid #2E2E52; border-radius: 8px; background: transparent; color: #CACAE0; font: 700 12px Exo2, sans-serif; cursor: pointer">Saltar</button>
     </div>
   </sc-if>
   <sc-if value="{{flash}}" hint-placeholder-val="{{ false }}">
@@ -96,10 +96,10 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{hasMates}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; left: 0; right: 0; bottom: 8px; display: flex; justify-content: center; align-items: center; gap: 6px; pointer-events: none">
       <span style="font-size: 9px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">ÓRDENES</span>
-      <button type="button" aria-label="Orden a tus compañeros: ¡Pásala!" onPointerDown="{{ordPass}}" style="pointer-events: auto; height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Manrope, sans-serif; cursor: pointer; touch-action: none">¡Pásala!</button>
-      <button type="button" aria-label="Orden a tus compañeros: ¡Chuta!" onPointerDown="{{ordShoot}}" style="pointer-events: auto; height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Manrope, sans-serif; cursor: pointer; touch-action: none">¡Chuta!</button>
-      <button type="button" aria-label="Orden a tus compañeros: ¡Atrás!" onPointerDown="{{ordBack}}" style="pointer-events: auto; height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Manrope, sans-serif; cursor: pointer; touch-action: none">¡Atrás!</button>
-      <button type="button" aria-label="Orden a tus compañeros: ¡Presiona!" onPointerDown="{{ordPress}}" style="pointer-events: auto; height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Manrope, sans-serif; cursor: pointer; touch-action: none">¡Presiona!</button>
+      <button type="button" aria-label="Orden a tus compañeros: ¡Pásala!" onPointerDown="{{ordPass}}" style="pointer-events: auto; height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Exo2, sans-serif; cursor: pointer; touch-action: none">¡Pásala!</button>
+      <button type="button" aria-label="Orden a tus compañeros: ¡Chuta!" onPointerDown="{{ordShoot}}" style="pointer-events: auto; height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Exo2, sans-serif; cursor: pointer; touch-action: none">¡Chuta!</button>
+      <button type="button" aria-label="Orden a tus compañeros: ¡Atrás!" onPointerDown="{{ordBack}}" style="pointer-events: auto; height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Exo2, sans-serif; cursor: pointer; touch-action: none">¡Atrás!</button>
+      <button type="button" aria-label="Orden a tus compañeros: ¡Presiona!" onPointerDown="{{ordPress}}" style="pointer-events: auto; height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid #2E2E52; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Exo2, sans-serif; cursor: pointer; touch-action: none">¡Presiona!</button>
     </div>
   </sc-if>
 

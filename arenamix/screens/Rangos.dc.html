@@ -8,14 +8,14 @@
 <body>
 <x-dc>
 <helmet>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Manrope, sans-serif; overflow: hidden">
+<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <div class="am-bg under"></div>
   <div style="display: flex; align-items: center; gap: 10px; padding: 12px 18px 6px 18px">
     <a href="Modos.dc.html" aria-label="Volver" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
@@ -125,7 +125,7 @@ class Component extends DCLogic {
         ...r,
         wings: !!r.wings, crown: !!r.crown, glow: !!r.glow,
         isYou: r.id === 'bronce',
-        cardStyle: 'position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 2px 8px 2px; border-radius: 14px; cursor: pointer; font-family: Manrope, sans-serif; ' + (on ? 'background: #1E1A3A; border: 2px solid ' + r.c1 + ';' : 'background: #17172A; border: 2px solid #26264A;'),
+        cardStyle: 'position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 2px 8px 2px; border-radius: 14px; cursor: pointer; font-family: Exo2, sans-serif; ' + (on ? 'background: #1E1A3A; border: 2px solid ' + r.c1 + ';' : 'background: #17172A; border: 2px solid #26264A;'),
         labelStyle: 'font-size: 11px; font-weight: 800; color: ' + (on ? r.text : '#CACAE0') + ';',
         pick: () => this.setState({ sel: r.id })
       };

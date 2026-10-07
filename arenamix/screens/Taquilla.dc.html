@@ -8,14 +8,14 @@
 <body>
 <x-dc>
 <helmet>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Manrope, sans-serif; overflow: hidden">
+<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <div class="am-bg under"></div>
   <nav aria-label="Principal" style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; box-sizing: border-box; padding: 12px 8px; background: #111120; border-right: 1px solid #26264A; display: flex; flex-direction: column; align-items: center; gap: 8px">
     <span style="margin-bottom: 6px"><svg width="46" height="46" viewBox="0 0 512 512" role="img" aria-label="ARENA MIX" style="display: block; flex: none"><defs><linearGradient id="am-logo-taquilla" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B1A44"/><stop offset="1" stop-color="#0B0B14"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#am-logo-taquilla)" stroke="#2E2E52" stroke-width="10"/><path d="M60 400L470 150" stroke="#22D3EE" stroke-opacity=".12" stroke-width="70" stroke-linecap="round"/><text x="256" y="350" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="270" letter-spacing="-6"><tspan fill="#F4F4FA">A</tspan><tspan fill="#22D3EE" dx="90">M</tspan></text><path d="M262 120L222 238h38l-26 104l80-140h-42l30-82z" fill="#FFC53D" stroke="#0B0B14" stroke-width="10" stroke-linejoin="round"/></svg></span>
@@ -539,9 +539,9 @@ class Component extends DCLogic {
       { id: 'equipos', label: 'Equipos' }, { id: 'cabeza', label: 'Cabeza' },
       { id: 'cara', label: 'Cara' }, { id: 'calzado', label: 'Calzado' }
     ];
-    const tab = (on) => 'min-height: 40px; padding: 0 4px; border-radius: 12px; font: 800 13px Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14; border: 0; box-shadow: 0 3px 0 #0E8FA3;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E52;');
-    const chip = (on) => 'min-height: 40px; padding: 0 4px; border-radius: 20px; font: 700 12px Manrope, sans-serif; cursor: pointer; background: transparent; ' + (on ? 'color: #F4F4FA; border: 1.5px solid #F4F4FA;' : 'color: #A3A3C2; border: 1.5px solid #2E2E52;');
-    const lchip = (on) => 'flex: none; min-height: 36px; padding: 0 12px; border-radius: 18px; font: 700 12px Manrope, sans-serif; cursor: pointer; white-space: nowrap; ' + (on ? 'background: #1E1A3A; color: #22D3EE; border: 1.5px solid #22D3EE;' : 'background: #17172A; color: #CACAE0; border: 1.5px solid #26264A;');
+    const tab = (on) => 'min-height: 40px; padding: 0 4px; border-radius: 12px; font: 800 13px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14; border: 0; box-shadow: 0 3px 0 #0E8FA3;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E52;');
+    const chip = (on) => 'min-height: 40px; padding: 0 4px; border-radius: 20px; font: 700 12px Exo2, sans-serif; cursor: pointer; background: transparent; ' + (on ? 'color: #F4F4FA; border: 1.5px solid #F4F4FA;' : 'color: #A3A3C2; border: 1.5px solid #2E2E52;');
+    const lchip = (on) => 'flex: none; min-height: 36px; padding: 0 12px; border-radius: 18px; font: 700 12px Exo2, sans-serif; cursor: pointer; white-space: nowrap; ' + (on ? 'background: #1E1A3A; color: #22D3EE; border: 1.5px solid #22D3EE;' : 'background: #17172A; color: #CACAE0; border: 1.5px solid #26264A;');
 
     // only football for now: the other sports' kits come back with their own game
     const sports = SPORTS.filter((sp) => sp.id === 'futbol').map((sp) => ({ label: sp.label, style: tab(sp.id === sport), pick: () => this.setState({ sport: sp.id, preview: null }) }));
@@ -568,11 +568,11 @@ class Component extends DCLogic {
         name: it.name, label, color: it.color || '#2F4BA8', k,
         isKit: s.cat === 'equipos', isShoe: s.cat === 'calzado', isHead: s.cat === 'cabeza' || s.cat === 'cara',
         crest: it.crest || '',
-        crestStyle: s.cat === 'equipos' ? 'position: absolute; left: 24%; top: 28%; width: 13px; height: 13px; ' + ({ shield: 'border-radius: 2px 2px 7px 7px;', circle: 'border-radius: 50%;', diamond: 'clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);' })[it.crestShape] + ' background: ' + it.secondary + '; color: ' + it.primary + '; font: 800 6px Manrope, sans-serif; display: flex; align-items: center; justify-content: center; letter-spacing: -.3px;' : '',
+        crestStyle: s.cat === 'equipos' ? 'position: absolute; left: 24%; top: 28%; width: 13px; height: 13px; ' + ({ shield: 'border-radius: 2px 2px 7px 7px;', circle: 'border-radius: 50%;', diamond: 'clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);' })[it.crestShape] + ' background: ' + it.secondary + '; color: ' + it.primary + '; font: 800 6px Exo2, sans-serif; display: flex; align-items: center; justify-content: center; letter-spacing: -.3px;' : '',
         jerseyStyle: s.cat === 'equipos' ? 'position: relative; display: block; width: 46px; height: 44px; background: ' + this.jerseyBg(it.primary, it.secondary, it.pattern) + '; clip-path: polygon(32% 0, 68% 0, 100% 18%, 88% 42%, 78% 36%, 78% 100%, 22% 100%, 22% 36%, 12% 42%, 0 18%); filter: drop-shadow(0 2px 0 #00000055);' : '',
         isCoins: !own && it.st === 'coins',
         isReward: !own && it.st === 'reward',
-        style: 'display: flex; flex-direction: column; align-items: center; gap: 4px; height: 104px; padding: 8px 4px 6px 4px; box-sizing: border-box; border-radius: 14px; font-family: Manrope, sans-serif; cursor: pointer; min-width: 0; ' + (sel ? 'background: #1E1A3A; border: 2px solid #22D3EE;' : 'background: #17172A; border: 2px solid #26264A;'),
+        style: 'display: flex; flex-direction: column; align-items: center; gap: 4px; height: 104px; padding: 8px 4px 6px 4px; box-sizing: border-box; border-radius: 14px; font-family: Exo2, sans-serif; cursor: pointer; min-width: 0; ' + (sel ? 'background: #1E1A3A; border: 2px solid #22D3EE;' : 'background: #17172A; border: 2px solid #26264A;'),
         labelStyle: 'display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 800; color: ' + color + ';',
         pick: () => this.setState({ preview: { cat: s.cat, id: it.id } })
       };
@@ -607,7 +607,7 @@ class Component extends DCLogic {
         pick: () => { if (A) A.setPref(c.id); this.setState({ char: c.id }); },
         style: 'flex: 1; min-width: 0; height: 38px; display: flex; align-items: center; justify-content: center; gap: 3px; padding: 0 4px 0 2px; border-radius: 11px; cursor: pointer; overflow: hidden; white-space: nowrap; border: 1px solid ' + (on ? '#22D3EE' : '#2E2E52') + '; background: ' + (on ? '#22D3EE' : '#0B0B14CC') + '; color: ' + (on ? '#0B0B14' : '#F4F4FA') + ';',
         imgStyle: c.id === 'clasico' ? 'display: none;' : 'flex: none; width: 30px; height: 30px; border-radius: 9px; background: ' + (on ? '#0E8FA3' : '#26264A') + ';',
-        textStyle: c.id === 'clasico' ? 'font: 800 10px Manrope, sans-serif;' : 'display: none;'
+        textStyle: c.id === 'clasico' ? 'font: 800 10px Exo2, sans-serif;' : 'display: none;'
       };
     });
     return {

@@ -8,14 +8,14 @@
 <body>
 <x-dc>
 <helmet>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); color: #F4F4FA; font-family: Manrope, sans-serif; overflow: hidden">
+<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <div class="am-bg"></div>
   <nav aria-label="Principal" style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; box-sizing: border-box; padding: 12px 8px; background: #111120; border-right: 1px solid #26264A; display: flex; flex-direction: column; align-items: center; gap: 8px">
     <span style="margin-bottom: 6px"><svg width="46" height="46" viewBox="0 0 512 512" role="img" aria-label="ARENA MIX" style="display: block; flex: none"><defs><linearGradient id="am-logo-modos" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B1A44"/><stop offset="1" stop-color="#0B0B14"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#am-logo-modos)" stroke="#2E2E52" stroke-width="10"/><path d="M60 400L470 150" stroke="#22D3EE" stroke-opacity=".12" stroke-width="70" stroke-linecap="round"/><text x="256" y="350" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="270" letter-spacing="-6"><tspan fill="#F4F4FA">A</tspan><tspan fill="#22D3EE" dx="90">M</tspan></text><path d="M262 120L222 238h38l-26 104l80-140h-42l30-82z" fill="#FFC53D" stroke="#0B0B14" stroke-width="10" stroke-linejoin="round"/></svg></span>
@@ -189,14 +189,14 @@ class Component extends DCLogic {
         title: m.title, desc: m.desc, tag,
         icon: Modos_ICON[this.iconOf(m)],
         iconBox: 'flex: none; width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; ' + (on ? 'background: #22D3EE; color: #0B0B14; box-shadow: 0 0 10px #22D3EE88;' : 'background: #22D3EE1A; color: #22D3EE; border: 1px solid #22D3EE44;'),
-        style: 'display: flex; flex-direction: column; gap: 6px; min-height: 84px; padding: 10px; box-sizing: border-box; border-radius: 14px; font-family: Manrope, sans-serif; color: #F4F4FA; transition: transform .2s, box-shadow .2s; cursor: ' + (m.soon ? 'default' : 'pointer') + '; opacity: ' + (m.soon ? 0.45 : 1) + '; ' + (on ? 'background: linear-gradient(150deg, #0F3D4A, #10303A 60%, #13213A); border: 2px solid #22D3EE; box-shadow: 0 0 16px #22D3EE55, inset 0 1px 0 #ffffff1a;' : 'background: linear-gradient(160deg, #1C1C3A, #141428); border: 2px solid #2A2A50; box-shadow: 0 6px 14px #0006;'),
+        style: 'display: flex; flex-direction: column; gap: 6px; min-height: 84px; padding: 10px; box-sizing: border-box; border-radius: 14px; font-family: Exo2, sans-serif; color: #F4F4FA; transition: transform .2s, box-shadow .2s; cursor: ' + (m.soon ? 'default' : 'pointer') + '; opacity: ' + (m.soon ? 0.45 : 1) + '; ' + (on ? 'background: linear-gradient(150deg, #0F3D4A, #10303A 60%, #13213A); border: 2px solid #22D3EE; box-shadow: 0 0 16px #22D3EE55, inset 0 1px 0 #ffffff1a;' : 'background: linear-gradient(160deg, #1C1C3A, #141428); border: 2px solid #2A2A50; box-shadow: 0 6px 14px #0006;'),
         tagStyle: 'flex: none; font-size: 10px; font-weight: 800; padding: 3px 7px; border-radius: 6px; white-space: nowrap; ' + (comp && !m.soon ? 'background: #0B0B14; color: ' + (placingOf(m) ? '#A3A3C2' : R.text) + ';' : 'background: #21213A; color: #A3A3C2;'),
         pick: () => { if (!m.soon) this.setState({ id: m.id }); }
       };
     });
     const mmr = cur && comp ? this.mmrOf(s.sport, cur.id) : 0, R = this.rankOf(mmr);
     const curPlacing = cur && comp && placingOf(cur), curPc = cur ? this.placeOf(S, s.sport + ':' + cur.id) : null;
-    const tab = (on) => 'position: relative; z-index: 1; flex: 1; height: 36px; border: 0; border-radius: 12px; font: 800 12px Manrope, sans-serif; letter-spacing: .5px; cursor: pointer; background: transparent; transition: color .3s; color: ' + (on ? '#0B0B14;' : '#CACAE0;');
+    const tab = (on) => 'position: relative; z-index: 1; flex: 1; height: 36px; border: 0; border-radius: 12px; font: 800 12px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; background: transparent; transition: color .3s; color: ' + (on ? '#0B0B14;' : '#CACAE0;');
     const ti = ['comp', 'casual', 'train'].indexOf(s.cat);
     const href = !cur ? '#' : s.cat === 'train' || cur.kind === 'ext' ? cur.href : cur.kind === 'private' ? 'Privada.dc.html' : comp ? 'Competitivo.dc.html' : 'Rapida.dc.html';
     const catName = { comp: 'COMPETITIVO', casual: 'INFORMAL', train: 'ENTRENAMIENTO' }[s.cat];

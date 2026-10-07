@@ -9,13 +9,13 @@
 <body>
 <x-dc>
 <helmet>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Manrope, sans-serif; display: flex; gap: 14px; padding: 12px 14px; box-sizing: border-box">
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; display: flex; gap: 14px; padding: 12px 14px; box-sizing: border-box">
   <div class="am-bg under"></div>
   <div style="flex: none; width: 250px; display: flex; flex-direction: column; gap: 10px">
     <div style="display: flex; align-items: center; gap: 10px">
@@ -31,7 +31,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <a href="Logros.dc.html" class="am-shine am-pulse-gold" style="position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; height: 52px; border-radius: 14px; background: #FFC53D; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; box-shadow: 0 5px 0 #B8860B">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="#0B0B14"><path d="M7 3h10v3h3v2a5 5 0 0 1-5 5h-.3A5 5 0 0 1 13 15v2h3v3H8v-3h3v-2a5 5 0 0 1-1.7-2H9a5 5 0 0 1-5-5V6h3zM6 8a3 3 0 0 0 1.5 2.6A7 7 0 0 1 7 8zm12 0h-1a7 7 0 0 1-.5 2.6A3 3 0 0 0 18 8z"/></svg>
       LOGROS
-      <sc-if value="{{hasBadge}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: -6px; top: -8px; min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box; border-radius: 12px; background: #FF5C5C; color: #FFFFFF; font: 800 13px Manrope, sans-serif; display: flex; align-items: center; justify-content: center; font-style: normal; letter-spacing: 0">{{badge}}</span></sc-if>
+      <sc-if value="{{hasBadge}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: -6px; top: -8px; min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box; border-radius: 12px; background: #FF5C5C; color: #FFFFFF; font: 800 13px Exo2, sans-serif; display: flex; align-items: center; justify-content: center; font-style: normal; letter-spacing: 0">{{badge}}</span></sc-if>
     </a>
     <div style="display: flex; gap: 6px">
       <a href="Taquilla.dc.html" style="flex: 1; display: flex; align-items: center; justify-content: center; height: 36px; border-radius: 12px; border: 1px solid #2E2E52; color: #CACAE0; text-decoration: none; font-weight: 800; font-size: 12px">Taquilla</a>
@@ -109,7 +109,7 @@ class Component extends DCLogic {
     ];
     const labels = { all: 'Todos', futbol: 'Fútbol', baloncesto: 'Basket' };
     const keys = Object.keys(labels), ti = Math.max(0, keys.indexOf(s.sport));
-    const tabs = keys.map((k) => ({ label: labels[k], sel: k === s.sport ? 'true' : 'false', pick: () => this.setState({ sport: k }), style: 'position: relative; z-index: 1; flex: 1; height: 34px; border: 0; border-radius: 12px; font: 800 13px Manrope, sans-serif; cursor: pointer; background: transparent; transition: color .3s; color: ' + (k === s.sport ? '#0B0B14;' : '#CACAE0;') }));
+    const tabs = keys.map((k) => ({ label: labels[k], sel: k === s.sport ? 'true' : 'false', pick: () => this.setState({ sport: k }), style: 'position: relative; z-index: 1; flex: 1; height: 34px; border: 0; border-radius: 12px; font: 800 13px Exo2, sans-serif; cursor: pointer; background: transparent; transition: color .3s; color: ' + (k === s.sport ? '#0B0B14;' : '#CACAE0;') }));
     const cl = this.claimed(), ready = this.achievements().filter((a) => a.cur >= a.goal && !cl[a.id]).length;
     const mmr = this.store('arenamix.mmr.v1', {}), top = Object.keys(mmr).reduce((m, k) => Math.max(m, mmr[k] || 0), 0);
     const tiers = [['Bronce', 0], ['Plata', 300], ['Oro', 750], ['Platino', 1350], ['Diamante', 2100], ['Campeón', 3075], ['Super campeón', 4275], ['Élite', 5775]];

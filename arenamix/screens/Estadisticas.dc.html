@@ -8,7 +8,7 @@
 <body>
 <x-dc>
 <helmet>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
@@ -32,7 +32,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .st-ball{animation:stSpin 8s linear infinite}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 90% at 30% 10%, #1A1840 0%, #0B0B14 60%); color: #F4F4FA; font-family: Manrope, sans-serif; overflow: hidden">
+<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 90% at 30% 10%, #1A1840 0%, #0B0B14 60%); color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <nav aria-label="Principal" style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; box-sizing: border-box; padding: 12px 8px; background: #111120; border-right: 1px solid #26264A; display: flex; flex-direction: column; align-items: center; gap: 8px">
     <span style="margin-bottom: 6px"><svg width="46" height="46" viewBox="0 0 512 512" role="img" aria-label="ARENA MIX" style="display: block; flex: none"><defs><linearGradient id="am-logo-estadisticas" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B1A44"/><stop offset="1" stop-color="#0B0B14"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#am-logo-estadisticas)" stroke="#2E2E52" stroke-width="10"/><path d="M60 400L470 150" stroke="#22D3EE" stroke-opacity=".12" stroke-width="70" stroke-linecap="round"/><text x="256" y="350" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="270" letter-spacing="-6"><tspan fill="#F4F4FA">A</tspan><tspan fill="#22D3EE" dx="90">M</tspan></text><path d="M262 120L222 238h38l-26 104l80-140h-42l30-82z" fill="#FFC53D" stroke="#0B0B14" stroke-width="10" stroke-linejoin="round"/></svg></span>
     <a href="Deportes.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4l13 8l-13 8z"/></svg>Jugar</a>
@@ -79,8 +79,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 22px; line-height: 1">{{pmLabel}}</span><span style="font-size: 11px; color: #A3A3C2">PM</span>
     </span>
     <span style="flex: 1"></span>
-    <button type="button" aria-label="Cómo conseguir PM" aria-expanded="{{helpOpen}}" onClick="{{toggleHelp}}" style="width: 38px; height: 38px; border-radius: 19px; border: 1px solid #2E2E52; background: #17172A; color: #F4F4FA; font: 800 16px Manrope, sans-serif; cursor: pointer">?</button>
-    <button type="button" onClick="{{reset}}" aria-label="Restablecer puntos" style="display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px; border-radius: 19px; border: 1px solid #2E2E52; background: #17172A; color: #CACAE0; font: 800 12px Manrope, sans-serif; cursor: pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Reiniciar</button>
+    <button type="button" aria-label="Cómo conseguir PM" aria-expanded="{{helpOpen}}" onClick="{{toggleHelp}}" style="width: 38px; height: 38px; border-radius: 19px; border: 1px solid #2E2E52; background: #17172A; color: #F4F4FA; font: 800 16px Exo2, sans-serif; cursor: pointer">?</button>
+    <button type="button" onClick="{{reset}}" aria-label="Restablecer puntos" style="display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px; border-radius: 19px; border: 1px solid #2E2E52; background: #17172A; color: #CACAE0; font: 800 12px Exo2, sans-serif; cursor: pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Reiniciar</button>
   </div>
 
   <div key="{{cardKey}}" class="st-radar" style="position: absolute; left: 312px; top: 66px; width: 206px; height: 310px; display: flex; flex-direction: column; align-items: center">
@@ -238,7 +238,7 @@ class Component extends DCLogic {
         plus: max ? '★' : '+', cost: max ? 'MÁX' : c + ' PM',
         aria: max ? d.name + ' al máximo' : 'Mejorar ' + d.name + ' por ' + c + ' PM',
         flash: !!(this.state.flash && this.state.flash.id === d.id), bumpClass: this.state.flash && this.state.flash.id === d.id ? 'st-bump' : '',
-        btn: 'flex: none; width: 44px; height: 44px; border-radius: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: ' + (can ? 'pointer' : 'default') + '; font-family: Manrope, sans-serif; border: 0; ' + (can ? 'background: radial-gradient(circle at 35% 30%, #7EF0FF, #22D3EE 55%, #0E8FA3); color: #0B0B14; box-shadow: 0 3px 0 #0A6F80, 0 0 12px #22D3EE88;' : max ? 'background: linear-gradient(135deg, #FFE38A, #D9A520); color: #2A1C02;' : 'background: #26264A; color: #6E6E92;'),
+        btn: 'flex: none; width: 44px; height: 44px; border-radius: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: ' + (can ? 'pointer' : 'default') + '; font-family: Exo2, sans-serif; border: 0; ' + (can ? 'background: radial-gradient(circle at 35% 30%, #7EF0FF, #22D3EE 55%, #0E8FA3); color: #0B0B14; box-shadow: 0 3px 0 #0A6F80, 0 0 12px #22D3EE88;' : max ? 'background: linear-gradient(135deg, #FFE38A, #D9A520); color: #2A1C02;' : 'background: #26264A; color: #6E6E92;'),
         up: () => {
           if (!can) return;
           put({ ...cur, stats: { ...stats, [d.id]: v + 1 }, pm: pm - c }, null);
@@ -255,7 +255,7 @@ class Component extends DCLogic {
     const rr = (v) => R * (0.2 + 0.8 * (v - 10) / 140);
     const pts = def.stats.map((d, k) => [Math.cos(ang(k)) * rr(shown(d.id)), Math.sin(ang(k)) * rr(shown(d.id))]);
     const kit = (window.AMChars && window.AMChars.outfit('futbol')) || {};
-    const tab = (on) => 'position: relative; z-index: 1; flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border: 0; background: transparent; border-radius: 18px; font: 800 13px Manrope, sans-serif; cursor: pointer; transition: color .3s; color: ' + (on ? '#0B0B14' : '#CACAE0') + ';';
+    const tab = (on) => 'position: relative; z-index: 1; flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border: 0; background: transparent; border-radius: 18px; font: 800 13px Exo2, sans-serif; cursor: pointer; transition: color .3s; color: ' + (on ? '#0B0B14' : '#CACAE0') + ';';
     const keys = Object.keys(D), idx = keys.indexOf(sp);
     return {
       sports: keys.map((k) => ({ label: D[k].label, path: Est_ICON[D[k].icon], sel: k === sp ? 'true' : 'false', style: tab(k === sp), pick: () => { if (k !== sp) { this.dir = keys.indexOf(k) > idx ? 1 : -1; this.disp = {}; this.setState({ sport: k, flash: null }); } } })),

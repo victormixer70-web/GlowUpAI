@@ -9,13 +9,13 @@
 <body>
 <x-dc>
 <helmet>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0E0E1C; color: #F4F4FA; font-family: Manrope, sans-serif; user-select: none; -webkit-user-select: none">
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0E0E1C; color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none; -webkit-user-select: none">
   <canvas ref="{{canvasRef}}" width="844" height="390" style="position: absolute; left: 0; top: 0; width: 844px; height: 390px; display: block"></canvas>
   <svg width="844" height="390" viewBox="0 0 844 390" style="position: absolute; left: 0; top: 0; pointer-events: none">
     <polyline points="{{swipePts}}" fill="none" stroke="#C8F031" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
@@ -690,7 +690,7 @@ class Component extends DCLogic {
     const map = { ace: ['¡ACE!', '#C8F031'], winner: ['¡GANADOR!', '#C8F031'], fuera: ['FUERA', '#FF8A8E'], red: ['RED', '#FF8A8E'], devuelta: ['DEVUELTA', '#FFC53D'], fallo: ['FALLO', '#FF8A8E'] };
     const rm = R ? map[R.kind] : ['', '#fff'];
     const rs = Math.min(1, this.pt / 0.25);
-    const tab = (on) => 'height: 36px; padding: 0 14px; border: 0; border-radius: 10px; font: 800 13px Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #C8F031; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
+    const tab = (on) => 'height: 36px; padding: 0 14px; border: 0; border-radius: 10px; font: 800 13px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #C8F031; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
     const setMode = (m) => { this.mode = m; this.reset(); this.forceUpdate(); if (this.R) this.draw3D(0); };
     const serve = this.mode === 'serve';
     return {

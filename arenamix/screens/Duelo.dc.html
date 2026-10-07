@@ -9,13 +9,13 @@
 <body>
 <x-dc>
 <helmet>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0E0E1C; color: #F4F4FA; font-family: Manrope, sans-serif; user-select: none; -webkit-user-select: none">
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0E0E1C; color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none; -webkit-user-select: none">
   <canvas ref="{{canvasRef}}" width="844" height="390" style="position: absolute; left: 0; top: 0; width: 844px; height: 390px; display: block"></canvas>
 
   <svg width="844" height="390" viewBox="0 0 844 390" style="position: absolute; left: 0; top: 0; pointer-events: none">
@@ -68,7 +68,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{isFree}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; left: 12px; top: 62px; display: flex; align-items: center; gap: 6px">
       <span style="padding: 5px 10px; border-radius: 10px; background: #0B0B14CC; font-size: 12px; font-weight: 800; color: #FFC53D">{{fkLabel}}</span>
-      <sc-if value="{{isPractice}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{nextFK}}" style="height: 30px; padding: 0 12px; border: 1px solid #2E2E52; border-radius: 10px; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Manrope, sans-serif; cursor: pointer">Cambiar escenario ›</button></sc-if>
+      <sc-if value="{{isPractice}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{nextFK}}" style="height: 30px; padding: 0 12px; border: 1px solid #2E2E52; border-radius: 10px; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Exo2, sans-serif; cursor: pointer">Cambiar escenario ›</button></sc-if>
     </div>
   </sc-if>
   <sc-if value="{{isDuel}}" hint-placeholder-val="{{ true }}">
@@ -1341,7 +1341,7 @@ class Component extends DCLogic {
     const yg = this.sh.you.filter(Boolean).length, rg = this.sh.rival.filter(Boolean).length;
     const cd = 2.4 - this.pt, won = this.winner === 'you';
     const k = this.k, f2 = (n) => n.toFixed(1);
-    const tab = (on) => 'height: 36px; padding: 0 14px; border: 0; border-radius: 10px; font: 800 13px Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
+    const tab = (on) => 'height: 36px; padding: 0 14px; border: 0; border-radius: 10px; font: 800 13px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
     const fkAim = this.fkMode() && this.phase === 'aim' && !!this.cam;
     const showTraj = this.fkMode() && !!this.cam && (this.phase === 'aim' || this.phase === 'runup');
     let trajPts = '', retXf = 'translate(-99 -99)', apexXf = 'translate(-99 -99)', trajCol = '#FFFFFF';

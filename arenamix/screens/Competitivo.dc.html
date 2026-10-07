@@ -9,13 +9,13 @@
 <body>
 <x-dc>
 <helmet>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Manrope, sans-serif">
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif">
   <div class="am-bg under"></div>
   <sc-if value="{{showBg}}" hint-placeholder-val="{{ true }}">
     <svg width="844" height="390" viewBox="0 0 844 390" style="position: absolute; left: 0; top: 0">
@@ -76,7 +76,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       </svg>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 28px; letter-spacing: 1px">{{searchTitle}} · {{searchClock}}</span>
       <span style="font-size: 13px; color: #A3A3C2">{{searchSub}}</span>
-      <button type="button" onClick="{{cancel}}" style="height: 44px; padding: 0 22px; border-radius: 12px; border: 1.5px solid #4C4C78; background: transparent; color: #CACAE0; font: 700 14px Manrope, sans-serif; cursor: pointer">Cancelar</button>
+      <button type="button" onClick="{{cancel}}" style="height: 44px; padding: 0 22px; border-radius: 12px; border: 1.5px solid #4C4C78; background: transparent; color: #CACAE0; font: 700 14px Exo2, sans-serif; cursor: pointer">Cancelar</button>
     </div>
   </sc-if>
 
@@ -389,7 +389,7 @@ class Component extends DCLogic {
     const teamB = m ? m.rivals.map((x, i) => row(x, tagOf(m.rivalMmr[i]), false, true)) : [];
     const sp = this.sport, mg = pl.kind === 'mg';
     const won2 = won, xp = won2 ? 120 : lost ? 50 : 80, coins = won2 ? 40 : lost ? 10 : 20;
-    const segS = (on) => 'height: 30px; padding: 0 12px; border: 0; border-radius: 8px; font: 800 12px Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
+    const segS = (on) => 'height: 30px; padding: 0 12px; border: 0; border-radius: 8px; font: 800 12px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
     return {
       canKeep: n === 4,
       fieldStyle: segS(!s.keeper), keeperStyle: segS(!!s.keeper),
