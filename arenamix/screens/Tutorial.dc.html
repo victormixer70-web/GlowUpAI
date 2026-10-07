@@ -15,8 +15,9 @@ body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif">
+<div class="bc-stage" style="position: relative; width: 844px; height: 390px; overflow: hidden;  isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif">
   <div class="am-bg under"></div>
+  <div class="bc-beams" style="z-index: -1"></div>
   <sc-if value="{{isIntro}}" hint-placeholder-val="{{ true }}">
     <div style="{{introBg}}"></div>
     <div style="position: absolute; inset: 0; display: flex; align-items: center; gap: 36px; padding: 0 48px">
@@ -25,14 +26,14 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 52px; line-height: .95">TUTORIAL</span>
         <span style="font-size: 14px; line-height: 1.5; color: #CACAE0">{{introText}}</span>
         <div style="display: flex; gap: 10px; margin-top: 6px">
-          <button type="button" onClick="{{play}}" class="am-pulse am-shine" style="height: 54px; padding: 0 34px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">EMPEZAR</button>
+          <button type="button" onClick="{{play}}" class="bc-btn am-shine" style="height: 54px; padding: 0 34px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">EMPEZAR</button>
           <a href="Modos.dc.html" onClick="{{skip}}" style="display: flex; align-items: center; height: 54px; padding: 0 18px; border-radius: 14px; border: 1.5px solid #4C4C78; color: #CACAE0; text-decoration: none; font-weight: 700; font-size: 14px">Saltar</a>
         </div>
       </div>
       <div style="flex: 1; display: flex; flex-direction: column; gap: 8px">
         <span style="font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">VAS A APRENDER</span>
         <sc-for list="{{steps}}" as="st" hint-placeholder-count="5">
-          <div class="am-card" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: #17172A; border: 1px solid #26264A">
+          <div class="bc-tile" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: #17172A; border: 1px solid #26264A">
             <span style="flex: none; width: 28px; height: 28px; border-radius: 14px; background: #22D3EE; color: #0B0B14; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 16px">{{st.n}}</span>
             <span style="font-size: 13px; font-weight: 700">{{st.text}}</span>
           </div>
@@ -51,7 +52,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">TUTORIAL DE {{sportName}}</span>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 56px; line-height: 1; color: #22D3EE">{{doneTitle}}</span>
       <span style="font-size: 14px; color: #CACAE0; text-align: center; max-width: 420px">{{doneText}}</span>
-      <a href="Modos.dc.html" class="am-pulse am-shine" style="margin-top: 8px; display: flex; align-items: center; height: 52px; padding: 0 34px; border-radius: 14px; background: #22D3EE; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 22px; letter-spacing: 2px; box-shadow: 0 5px 0 #0E8FA3">IR A LOS MODOS</a>
+      <a href="Modos.dc.html" class="bc-btn am-shine" style="margin-top: 8px; display: flex; align-items: center; height: 52px; padding: 0 34px; border-radius: 14px; background: #22D3EE; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 22px; letter-spacing: 2px; box-shadow: 0 5px 0 #0E8FA3">IR A LOS MODOS</a>
     </div>
   </sc-if>
 </div>

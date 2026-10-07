@@ -15,12 +15,13 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
+<div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box;  isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <div class="am-bg under"></div>
+  <div class="bc-beams" style="z-index: -1"></div>
   <div style="display: flex; align-items: center; gap: 10px; padding: 12px 18px 6px 18px">
-    <a href="Modos.dc.html" aria-label="Volver" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+    <a href="Modos.dc.html" aria-label="Volver" class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 46px; height: 38px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
     <div style="display: flex; flex-direction: column">
-      <h1 class="am-title" style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1; letter-spacing: 1px">RANGOS</h1>
+      <h1 class="bc-title" style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1; letter-spacing: 1px">RANGOS</h1>
       <span style="font-size: 12px; color: #A3A3C2; font-weight: 600">Fútbol · Competitivo · Temporada 1</span>
     </div>
   </div>
@@ -37,7 +38,7 @@ input::placeholder{color:#8686A6}
     </svg>
     <div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
       <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">TU RANGO</span>
-      <span class="am-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1; color: #E3A56E">BRONCE 2</span>
+      <span class="bc-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1; color: #E3A56E">BRONCE 2</span>
       <span style="font-size: 13px; font-weight: 700">112 MMR <span style="color: #A3A3C2; font-weight: 600">· Bronce 3 a 200</span></span>
       <div style="height: 8px; border-radius: 4px; background: #3A2C1E"><div style="width: 12%; height: 8px; border-radius: 4px; background: #E3A56E"></div></div>
       <span style="font-size: 12px; color: #CACAE0">≈ 4 victorias para ascender</span>
@@ -68,7 +69,7 @@ input::placeholder{color:#8686A6}
       <p style="margin: 0; font-size: 12px; line-height: 1.45; color: #A3A3C2">Todos empiezan en Bronce 1 con 0 MMR. Cada deporte tiene su propio MMR y rango.</p>
     </div>
     <div style="display: flex; flex-direction: column; gap: 8px; overflow-y: auto">
-  <section class="am-card" style="padding: 12px; border-radius: 18px; background: #17172A; border: 1px solid #2E2E52; display: flex; flex-direction: column; gap: 10px">
+  <section class="bc-tile" style="padding: 12px; border-radius: 18px; background: #17172A; border: 1px solid #2E2E52; display: flex; flex-direction: column; gap: 10px">
     <div style="display: flex; align-items: baseline; justify-content: space-between">
       <span style="{{selTitleStyle}}">{{selName}}</span>
       <span style="font-size: 12px; font-weight: 700; color: #A3A3C2">≈ {{selWins}} victorias por fase</span>

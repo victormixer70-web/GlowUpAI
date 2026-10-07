@@ -15,8 +15,9 @@ body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif">
+<div class="bc-stage" style="position: relative; width: 844px; height: 390px; overflow: hidden;  isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif">
   <div class="am-bg under"></div>
+  <div class="bc-beams" style="z-index: -1"></div>
   <sc-if value="{{showBg}}" hint-placeholder-val="{{ true }}">
     <svg width="844" height="390" viewBox="0 0 844 390" style="position: absolute; left: 0; top: 0">
       <defs><radialGradient id="cp-g" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="{{glow}}" stop-opacity=".22"/><stop offset="1" stop-color="{{glow}}" stop-opacity="0"/></radialGradient></defs>
@@ -26,7 +27,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <a href="Modos.dc.html" aria-label="Volver a modos" style="position: absolute; left: 12px; top: 12px; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
     </a>
-    <span class="am-title" style="position: absolute; left: 66px; top: 22px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; color: {{headColor}}">{{headLabel}}</span>
+    <span class="bc-title" style="position: absolute; left: 66px; top: 22px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; color: {{headColor}}">{{headLabel}}</span>
   </sc-if>
 
   <sc-if value="{{isLobby}}" hint-placeholder-val="{{ true }}">
@@ -34,21 +35,21 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 260px">
         <sc-if value="{{ranked}}" hint-placeholder-val="{{ true }}">
           <svg width="140" height="148" viewBox="-6 -10 76 80"><circle cx="32" cy="32" r="34" fill="{{myC1}}" opacity=".15"/><sc-if value="{{myWings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{myC1}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{myC1}}"/></sc-if><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{myC1}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{myC2}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53Z" fill="#000000" opacity=".18"/><path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{myC1}}"/><rect x="20" y="62" width="7" height="5" rx="1.5" fill="{{pip1}}"/><rect x="29" y="62" width="7" height="5" rx="1.5" fill="{{pip2}}"/><rect x="38" y="62" width="7" height="5" rx="1.5" fill="{{pip3}}"/></svg>
-          <span class="am-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 34px; line-height: 1; color: {{myText}}">{{myRank}}</span>
+          <span class="bc-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 34px; line-height: 1; color: {{myText}}">{{myRank}}</span>
           <span style="font-size: 14px; font-weight: 700">{{mmrLabel}} MMR</span>
           <div style="width: 200px; height: 8px; border-radius: 4px; background: #26264A; margin-top: 4px"><div style="{{lobbyBar}}"></div></div>
           <span style="font-size: 12px; color: #A3A3C2">{{nextLabel}}</span>
         </sc-if>
         <sc-if value="{{placing}}" hint-placeholder-val="{{ false }}">
           <svg width="130" height="138" viewBox="-6 -10 76 80"><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="#3A3A5E"/><path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="#20203A"/><text x="32" y="40" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="26" fill="#8C8CB0">?</text></svg>
-          <span class="am-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1">SIN CLASIFICAR</span>
+          <span class="bc-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1">SIN CLASIFICAR</span>
           <span style="font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #53D88E">{{placeTitle}}</span>
           <div style="display: flex; gap: 6px; margin-top: 2px"><sc-for list="{{placeDots}}" as="dt" hint-placeholder-count="5"><span style="{{dt.style}}"></span></sc-for></div>
           <span style="font-size: 11px; color: #A3A3C2; text-align: center; margin-top: 2px">{{placeNote}}</span>
         </sc-if>
         <sc-if value="{{casual}}" hint-placeholder-val="{{ false }}">
           <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8l9-12h-7z"/></svg>
-          <span class="am-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1">SIN RANGO</span>
+          <span class="bc-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1">SIN RANGO</span>
           <span style="font-size: 12px; color: #A3A3C2; text-align: center">Juega tranquilo: no ganas ni pierdes MMR.</span>
         </sc-if>
       </div>
@@ -59,7 +60,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
           <sc-for list="{{chips}}" as="c" hint-placeholder-count="3"><span style="{{c.style}}">{{c.text}}</span></sc-for>
         </div>
         <sc-if value="{{canKeep}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">TU POSICIÓN</span><div style="display: flex; gap: 3px; padding: 3px; border-radius: 11px; background: #17172A"><button type="button" onClick="{{setField}}" style="{{fieldStyle}}">CAMPO</button><button type="button" onClick="{{setKeeper}}" style="{{keeperStyle}}">PORTERO</button></div></div></sc-if>
-        <button type="button" onClick="{{search}}" class="am-pulse am-shine" style="margin-top: 4px; height: 56px; border: 0; border-radius: 16px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 6px 0 #0E8FA3">BUSCAR PARTIDA</button>
+        <button type="button" onClick="{{search}}" class="bc-btn am-shine" style="margin-top: 4px; height: 56px; border: 0; border-radius: 16px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 6px 0 #0E8FA3">BUSCAR PARTIDA</button>
         <sc-if value="{{showNotice}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: #2A2410; border: 1px solid #FFC53D"><span style="flex: 1; font-size: 12px; font-weight: 700; color: #FFE38A">{{noticeText}}</span><button type="button" onClick="{{closeNotice}}" style="border: 0; background: transparent; color: #FFE38A; font-weight: 800; font-size: 13px; cursor: pointer">OK</button></div></sc-if>
         <span style="font-size: 11px; color: #8686A6">El online aún no está activo: de momento los demás jugadores los controla la IA.</span>
       </div>
@@ -120,14 +121,14 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <sc-for list="{{wCards}}" as="w" hint-placeholder-count="1">
           <div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
             <svg width="120" height="128" viewBox="-6 -10 76 80" style="{{w.pop}}"><circle cx="32" cy="32" r="34" fill="{{w.c1}}" opacity=".18"/><sc-if value="{{w.wings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{w.c1}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{w.c1}}"/></sc-if><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{w.c1}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{w.c2}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53Z" fill="#000000" opacity=".18"/><path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{w.c1}}"/></svg>
-            <span class="am-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 32px; line-height: 1; color: {{w.nameColor}}">{{w.name}}</span>
+            <span class="bc-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 32px; line-height: 1; color: {{w.nameColor}}">{{w.name}}</span>
             <span style="padding: 3px 10px; border-radius: 8px; background: #0B0B14; font-size: 13px; font-weight: 800; color: {{w.text}}">{{w.rank}}</span>
           </div>
         </sc-for>
       </div>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 40px; line-height: 1; margin-top: 4px">{{scoreLabel}}</span>
       <span style="font-size: 13px; color: #A3A3C2">{{scoreSub}}</span>
-      <button type="button" onClick="{{toResult}}" class="am-pulse am-shine" style="margin-top: 6px; height: 48px; padding: 0 36px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">CONTINUAR</button>
+      <button type="button" onClick="{{toResult}}" class="bc-btn am-shine" style="margin-top: 6px; height: 48px; padding: 0 36px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">CONTINUAR</button>
     </div>
   </sc-if>
   <sc-if value="{{isResult}}" hint-placeholder-val="{{ false }}">
@@ -142,7 +143,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <sc-if value="{{ranked}}" hint-placeholder-val="{{ true }}">
           <svg width="120" height="128" viewBox="-6 -10 76 80" style="{{emblemPop}}"><circle cx="32" cy="32" r="34" fill="{{myC1}}" opacity=".15"/><sc-if value="{{myWings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{myC1}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{myC1}}"/></sc-if><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{myC1}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{myC2}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53Z" fill="#000000" opacity=".18"/><path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{myC1}}"/><rect x="20" y="62" width="7" height="5" rx="1.5" fill="{{pip1}}"/><rect x="29" y="62" width="7" height="5" rx="1.5" fill="{{pip2}}"/><rect x="38" y="62" width="7" height="5" rx="1.5" fill="{{pip3}}"/></svg>
           <sc-if value="{{rankChanged}}" hint-placeholder-val="{{ false }}"><span style="{{changeStyle}}">{{changeLabel}}</span></sc-if>
-          <span class="am-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1; color: {{myText}}">{{myRank}}</span>
+          <span class="bc-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1; color: {{myText}}">{{myRank}}</span>
           <span style="font-size: 14px; font-weight: 700">{{mmrLabel}} MMR</span>
           <div style="width: 260px; height: 10px; border-radius: 5px; background: #26264A"><div style="{{resBar}}"></div></div>
           <span style="font-size: 12px; color: #A3A3C2">{{nextLabel}}</span>
@@ -159,7 +160,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
           <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; color: #FFC53D">+{{coins}} carrascos</span>
         </sc-if>
         <div style="display: flex; gap: 8px; margin-top: 6px">
-          <button type="button" onClick="{{again}}" class="am-pulse am-shine" style="height: 48px; padding: 0 24px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1.5px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">OTRA PARTIDA</button>
+          <button type="button" onClick="{{again}}" class="bc-btn am-shine" style="height: 48px; padding: 0 24px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1.5px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">OTRA PARTIDA</button>
           <a href="Modos.dc.html" style="display: flex; align-items: center; height: 48px; padding: 0 18px; border-radius: 14px; border: 1.5px solid #F4F4FA; color: #F4F4FA; text-decoration: none; font-weight: 800; font-size: 14px">Salir</a>
         </div>
       </div>

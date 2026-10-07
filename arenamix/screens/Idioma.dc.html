@@ -15,12 +15,13 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
+<div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box;  isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <div class="am-bg under"></div>
+  <div class="bc-beams" style="z-index: -1"></div>
   <div style="display: flex; align-items: center; gap: 10px; padding: 14px 20px 6px 20px">
-    <a href="Main.dc.html" aria-label="Volver" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+    <a href="Main.dc.html" aria-label="Volver" class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 46px; height: 38px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
     <div style="display: flex; flex-direction: column">
-      <h1 class="am-title" style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1; letter-spacing: 1px">IDIOMA</h1>
+      <h1 class="bc-title" style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1; letter-spacing: 1px">IDIOMA</h1>
       <span style="font-size: 12px; color: #A3A3C2">Menús, partidas y tienda. Puedes cambiarlo en Ajustes.</span>
     </div>
     <div style="flex: 1"></div>
@@ -28,7 +29,7 @@ input::placeholder{color:#8686A6}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3C2" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
       <input type="search" aria-label="Buscar idioma" placeholder="Buscar idioma" style="flex: 1; border: 0; outline: none; background: transparent; color: #F4F4FA; font: 500 15px Exo2, sans-serif">
     </label>
-        <a href="Main.dc.html" style="display: flex; align-items: center; justify-content: center; height: 44px; padding: 0 22px; border-radius: 14px; background: #22D3EE; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1px">CONFIRMAR · {{current}}</a>
+        <a href="Main.dc.html" class="bc-btn am-shine" style="flex: none; display: flex; align-items: center; justify-content: center; height: 42px; padding: 0 24px; text-decoration: none; font-size: 19px; white-space: nowrap">CONFIRMAR · {{current}}</a>
   </div>
   <div style="position: absolute; left: 20px; right: 20px; top: 76px; bottom: 14px; overflow-y: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start">
         <sc-for list="{{langs}}" as="l" hint-placeholder-count="10">

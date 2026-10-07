@@ -32,7 +32,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .st-ball{animation:stSpin 8s linear infinite}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 90% at 30% 10%, #1A1840 0%, #0B0B14 60%); color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
+<div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box;  color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <nav aria-label="Principal" style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; box-sizing: border-box; padding: 12px 8px; background: #111120; border-right: 1px solid #26264A; display: flex; flex-direction: column; align-items: center; gap: 8px">
     <span style="margin-bottom: 6px"><svg width="46" height="46" viewBox="0 0 512 512" role="img" aria-label="ARENA MIX" style="display: block; flex: none"><defs><linearGradient id="am-logo-estadisticas" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B1A44"/><stop offset="1" stop-color="#0B0B14"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#am-logo-estadisticas)" stroke="#2E2E52" stroke-width="10"/><path d="M60 400L470 150" stroke="#22D3EE" stroke-opacity=".12" stroke-width="70" stroke-linecap="round"/><text x="256" y="350" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="270" letter-spacing="-6"><tspan fill="#F4F4FA">A</tspan><tspan fill="#22D3EE" dx="90">M</tspan></text><path d="M262 120L222 238h38l-26 104l80-140h-42l30-82z" fill="#FFC53D" stroke="#0B0B14" stroke-width="10" stroke-linejoin="round"/></svg></span>
     <a href="Deportes.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4l13 8l-13 8z"/></svg>Jugar</a>
@@ -42,7 +42,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </nav>
   <!-- player card -->
   <div style="position: absolute; left: 96px; top: 10px; width: 208px; display: flex; flex-direction: column; align-items: center; gap: 6px">
-    <h1 style="align-self: flex-start; margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 1px; line-height: 1">MI JUGADOR</h1>
+    <h1 class="bc-title" style="align-self: flex-start; font-size: 24px">MI JUGADOR</h1>
     <div key="{{cardKey}}" class="st-float st-flip" style="position: relative; width: 196px; height: 300px; filter: drop-shadow(0 10px 18px {{cardGlow}})">
       <div style="position: absolute; inset: 0; clip-path: polygon(12% 0, 88% 0, 100% 7%, 100% 84%, 50% 100%, 0 84%, 0 7%); background: {{cardBg}}; overflow: hidden">
         <div style="position: absolute; inset: 6px; clip-path: polygon(12% 0, 88% 0, 100% 7%, 100% 84%, 50% 100%, 0 84%, 0 7%); border: 0; background: repeating-linear-gradient(135deg, rgba(255,255,255,.07) 0 6px, transparent 6px 14px)"></div>
