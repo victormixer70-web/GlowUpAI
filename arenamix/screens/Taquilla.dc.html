@@ -13,6 +13,14 @@
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
+@keyframes tqRing{to{rotate:360deg}}
+@keyframes tqBeam{0%,100%{rotate:-8deg}50%{rotate:8deg}}
+@keyframes tqTag{0%,100%{rotate:-4deg}50%{rotate:3deg}}
+@keyframes tqHint{0%,100%{translate:-6px 0}50%{translate:6px 0}}
+.tq-ring{position:absolute;left:50%;border-radius:50%;transform:translateX(-50%) perspective(400px) rotateX(72deg);pointer-events:none}
+.tq-ring i{position:absolute;inset:0;border-radius:50%;animation:tqRing 6s linear infinite}
+.tq-item{transition:translate .2s,box-shadow .2s}
+.tq-item:hover{translate:0 -3px}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -24,76 +32,74 @@ input::placeholder{color:#8686A6}
     <a href="Tienda.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 8h14l-1 13H6z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Tienda</a>
     <a href="Estadisticas.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Perfil</a>
   </nav>
-  <div style="position: absolute; left: 80px; top: 0; bottom: 0; width: 280px; padding: 12px 10px 12px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
-  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0">
-    <h1 class="am-title" style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 28px; letter-spacing: 1px">TAQUILLA</h1>
-    <a href="Tienda.dc.html" style="display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; border-radius: 20px; background: #17172A; border: 1px solid #2E2E52; color: #F4F4FA; text-decoration: none; font-weight: 800; font-size: 14px">
-      <svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">C</text></svg>
-      {{coinsLabel}}
-    </a>
-  </div>
-  <div style="position: relative; flex: 1; min-height: 0; border-radius: 22px; overflow: hidden; background: #12122A">
-    <svg width="100%" height="100%" viewBox="0 0 358 214" preserveAspectRatio="xMidYMid slice" style="position: absolute; left: 0; top: 0">
-      <defs>
-        <radialGradient id="tq-spot" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#DDE8FF" stop-opacity=".35"/><stop offset=".55" stop-color="#DDE8FF" stop-opacity="0"/></radialGradient>
-        <linearGradient id="tq-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1A1A3A"/><stop offset="1" stop-color="#12122A"/></linearGradient>
-        <linearGradient id="tq-pod" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E2E52"/><stop offset="1" stop-color="#17172A"/></linearGradient>
-      </defs>
-      <rect width="358" height="214" fill="url(#tq-wall)"/>
-      <rect x="14" y="16" width="56" height="150" rx="8" fill="#17172A" stroke="#2E2E52"/>
-      <rect x="288" y="16" width="56" height="150" rx="8" fill="#17172A" stroke="#2E2E52"/>
-      <path d="M22 30h40M22 40h40M296 30h40M296 40h40" stroke="#2E2E52" stroke-width="2"/>
-      <circle cx="60" cy="100" r="3" fill="#A3A3C2"/>
-      <circle cx="298" cy="100" r="3" fill="#A3A3C2"/>
-      <path d="M118 0L240 0L300 214H58Z" fill="url(#tq-spot)"/>
-      <ellipse cx="179" cy="194" rx="96" ry="18" fill="url(#tq-pod)"/>
-      <ellipse cx="179" cy="190" rx="96" ry="18" fill="#21213A" stroke="#22D3EE" stroke-opacity=".5" stroke-width="2"/>
-    </svg>
+  <!-- the locker room: lockers, spotlight, a turntable and you -->
+  <div style="position: absolute; left: 80px; top: 0; bottom: 0; width: 392px; overflow: hidden">
+    <div style="position: absolute; inset: 0 0 92px 0; background: repeating-linear-gradient(90deg, #1B2246 0 44px, #10142C 44px 47px); box-shadow: inset 0 -30px 40px #07070F"></div>
+    <div style="position: absolute; left: 0; right: 0; top: 18px; height: 2px; background: #2C3566"></div>
+    <div style="position: absolute; left: 0; right: 0; top: 0; height: 120px; background: repeating-linear-gradient(90deg, transparent 0 14px, #ffffff0d 14px 30px, transparent 30px 47px); mask-image: linear-gradient(180deg, transparent 20%, #000 30%, #000 40%, transparent 50%); -webkit-mask-image: linear-gradient(180deg, transparent 20%, #000 30%, #000 40%, transparent 50%)"></div>
+    <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 92px; background: linear-gradient(180deg, #2A2238, #120E1C); border-top: 2px solid #3A3460"></div>
+    <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 92px; background: repeating-linear-gradient(100deg, #ffffff06 0 2px, transparent 2px 38px)"></div>
+    <div style="position: absolute; left: 96px; top: -40px; width: 200px; height: 440px; transform-origin: 50% 0; background: linear-gradient(180deg, #E8F6FF55, #E8F6FF00 85%); clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%); filter: blur(6px); mix-blend-mode: screen; animation: tqBeam 7s ease-in-out infinite; pointer-events: none"></div>
+    <div class="tq-ring" style="bottom: 62px; margin-left: 20px; width: 230px; height: 230px; margin-bottom: -115px"><i style="border: 3px dashed #22D3EE88"></i><i style="inset: 22px; border: 2px solid #7C5CFF77; animation-direction: reverse; animation-duration: 9s"></i><i style="inset: 50px; background: radial-gradient(circle, #22D3EE55, transparent 70%); animation: none"></i></div>
     <sc-if value="{{show3d}}" hint-placeholder-val="{{ false }}">
-      <canvas ref="{{canvasRef}}" role="img" aria-label="{{viewerLabel}}" onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab"></canvas>
-      <span style="position: absolute; left: 50%; bottom: 52px; transform: translateX(-50%); display: flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 10px; background: #0B0B14B3; font-size: 10px; font-weight: 800; letter-spacing: .5px; color: #A3A3C2; pointer-events: none; white-space: nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/></svg>DESLIZA PARA GIRAR</span>
+      <canvas ref="{{canvasRef}}" role="img" aria-label="{{viewerLabel}}" onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" style="position: absolute; left: 40px; right: 0; top: 40px; bottom: 6px; width: calc(100% - 40px); height: calc(100% - 46px); display: block; touch-action: none; cursor: grab"></canvas>
+      <span style="position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 12px; background: #0B0B14CC; border: 1px solid #2E2E58; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #CACAE0; pointer-events: none; white-space: nowrap"><svg style="animation: tqHint 1.6s ease-in-out infinite" width="16" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M8 8l-4 4l4 4M16 8l4 4l-4 4"/></svg>DESLIZA PARA GIRAR</span>
     </sc-if>
-    <div role="radiogroup" aria-label="Personaje" style="position: absolute; left: 8px; right: 8px; bottom: 8px; display: flex; gap: 5px">
+    <sc-if value="{{show2d}}" hint-placeholder-val="{{ true }}">
+      <div style="position: absolute; left: 50%; bottom: 30px; transform: translateX(-38%)">
+        <dc-import name="Avatar" primary="{{kit.primary}}" secondary="{{kit.secondary}}" pattern="{{kit.pattern}}" shorts="{{kit.shorts}}" socks="{{kit.socks}}" shoe="{{shoe}}" number="{{number}}" crest="{{kit.crest}}" crest-shape="{{kit.crestShape}}" crest-mark="{{kit.crestMark}}" hat="{{hat}}" hat-color="{{hatColor}}" face="{{face}}" w="150" hint-size="150px,266px"></dc-import>
+      </div>
+    </sc-if>
+    <!-- title and the kit's swing tag -->
+    <div style="position: absolute; left: 14px; top: 12px; display: flex; align-items: center; gap: 10px">
+      <h1 style="margin: 0; padding: 2px 14px; transform: skewX(-12deg); background: #0B0B14CC; border-left: 4px solid #22D3EE; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 1px; line-height: 1.1">TAQUILLA</h1>
+    </div>
+    <div style="position: absolute; right: 14px; top: 10px; transform-origin: 50% 0; animation: tqTag 3s ease-in-out infinite; display: flex; flex-direction: column; align-items: center">
+      <span style="width: 2px; height: 12px; background: #A3A3C2"></span>
+      <div style="position: relative; width: 112px; padding: 14px 8px 8px; box-sizing: border-box; border-radius: 6px; background: linear-gradient(160deg, #FFFFFF, #DCE3EC); color: #0B0B14; text-align: center; box-shadow: 0 8px 16px #0009">
+        <span style="position: absolute; left: 50%; top: 4px; width: 8px; height: 8px; margin-left: -4px; border-radius: 4px; background: #10142C"></span>
+        <div style="font-size: 8px; font-weight: 800; letter-spacing: 1.5px; color: #4A5468">EQUIPACIÓN</div>
+        <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 15px; line-height: 1.05">{{kitTeam}}</div>
+        <div style="font-size: 9px; font-weight: 700; color: #4A5468">{{kitLeague}}</div>
+      </div>
+    </div>
+    <sc-if value="{{isPreviewing}}" hint-placeholder-val="{{ false }}">
+      <span class="am-pulse-gold" style="position: absolute; left: 50%; top: 58px; transform: translateX(-50%) skewX(-12deg); padding: 4px 12px; background: #FFC53D; color: #2A1C02; font-size: 11px; font-weight: 800; letter-spacing: 1.5px">PROBÁNDOTELO</span>
+    </sc-if>
+    <!-- who you play as -->
+    <div role="radiogroup" aria-label="Personaje" style="position: absolute; left: 10px; top: 64px; bottom: 8px; display: flex; flex-direction: column; justify-content: flex-start; gap: 4px">
       <sc-for list="{{charChips}}" as="ch" hint-placeholder-count="4">
         <button type="button" role="radio" aria-checked="{{ch.on}}" aria-label="{{ch.name}}" onClick="{{ch.pick}}" style="{{ch.style}}"><img src="{{ch.img}}" alt="" style="{{ch.imgStyle}}"><span style="{{ch.textStyle}}">{{ch.short}}</span></button>
       </sc-for>
     </div>
-    <sc-if value="{{show2d}}" hint-placeholder-val="{{ true }}">
-    <div style="position: absolute; left: 50%; bottom: 46px; transform: translateX(-50%)">
-      <dc-import name="Avatar" primary="{{kit.primary}}" secondary="{{kit.secondary}}" pattern="{{kit.pattern}}" shorts="{{kit.shorts}}" socks="{{kit.socks}}" shoe="{{shoe}}" number="{{number}}" crest="{{kit.crest}}" crest-shape="{{kit.crestShape}}" crest-mark="{{kit.crestMark}}" hat="{{hat}}" hat-color="{{hatColor}}" face="{{face}}" w="132" hint-size="132px,234px"></dc-import>
+  </div>
+
+  <!-- the rail: categories, leagues, the clothes on hangers, and the action -->
+  <div style="position: absolute; left: 462px; top: 0; right: 0; bottom: 0; clip-path: polygon(7% 0, 100% 0, 100% 100%, 0 100%); background: linear-gradient(160deg, #191936F2, #0E0E1EF2)"></div>
+  <div style="position: absolute; left: 462px; top: 0; width: 30px; bottom: 0; background: linear-gradient(180deg, #22D3EE, #7C5CFF); clip-path: polygon(88% 0, 100% 0, 12% 100%, 0 100%)"></div>
+  <div style="position: absolute; left: 498px; right: 14px; top: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <span style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #22D3EE">VESTUARIO · FÚTBOL</span>
+      <a href="Tienda.dc.html" style="display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; transform: skewX(-12deg); background: linear-gradient(135deg, #3A2A0A, #1E1A10); border: 1px solid #FFC53D; color: #FFE38A; text-decoration: none; font-weight: 800; font-size: 13px"><span style="display: flex; align-items: center; gap: 6px; transform: skewX(12deg)"><svg class="am-coin" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/></svg>{{coinsLabel}}</span></a>
     </div>
-    </sc-if>
-    <div style="position: absolute; left: 12px; top: 10px; display: flex; flex-direction: column; gap: 2px; max-width: 150px; padding: 6px 8px; border-radius: 8px; background: #0B0B14B3">
-      <span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">EQUIPACIÓN</span>
-      <span style="font-size: 12px; font-weight: 800; line-height: 1.2">{{kitName}}</span>
-    </div>
-    <sc-if value="{{isPreviewing}}" hint-placeholder-val="{{ false }}">
-      <span style="position: absolute; right: 12px; top: 12px; font-size: 10px; font-weight: 800; letter-spacing: 1px; padding: 4px 8px; border-radius: 6px; background: #3A2410; color: #FFB37A">VISTA PREVIA</span>
-    </sc-if>
-  </div>
-  </div>
-  <div style="position: absolute; left: 360px; top: 0; right: 0; bottom: 0; padding: 12px 16px 10px 8px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
-  <div role="tablist" aria-label="Deporte" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 0">
-    <sc-for list="{{sports}}" as="sp" hint-placeholder-count="4">
-      <button type="button" role="tab" onClick="{{sp.pick}}" style="{{sp.style}}">{{sp.label}}</button>
-    </sc-for>
-  </div>
-  <div role="tablist" aria-label="Categoría" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 0">
-    <sc-for list="{{cats}}" as="c" hint-placeholder-count="4">
-      <button type="button" role="tab" onClick="{{c.pick}}" style="{{c.style}}">{{c.label}}</button>
-    </sc-for>
-  </div>
-  <sc-if value="{{isTeams}}" hint-placeholder-val="{{ true }}">
-    <div style="display: flex; gap: 6px; padding: 0; overflow-x: auto">
-      <sc-for list="{{leagues}}" as="lg" hint-placeholder-count="5">
-        <button type="button" onClick="{{lg.pick}}" style="{{lg.style}}">{{lg.name}}</button>
+    <div role="tablist" aria-label="Categoría" style="position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 3px; border-radius: 14px; background: #0B0B14AA; border: 1px solid #2E2E58">
+      <span style="{{catThumb}}"></span>
+      <sc-for list="{{cats}}" as="c" hint-placeholder-count="4">
+        <button type="button" role="tab" aria-selected="{{c.sel}}" onClick="{{c.pick}}" style="{{c.style}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{c.icon}}"/></svg>{{c.label}}</button>
       </sc-for>
     </div>
-  </sc-if>
-    <div style="flex: 1; min-height: 0; overflow-y: auto">
-      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
-      <sc-for list="{{items}}" as="it" hint-placeholder-count="6">
-        <button type="button" onClick="{{it.pick}}" style="{{it.style}}">
+    <sc-if value="{{isTeams}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; gap: 5px; overflow-x: auto; flex: none; scrollbar-width: none">
+        <sc-for list="{{leagues}}" as="lg" hint-placeholder-count="5">
+          <button type="button" onClick="{{lg.pick}}" style="{{lg.style}}">{{lg.name}}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+    <div key="{{gridKey}}" style="flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; padding-top: 2px">
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 6px">
+      <sc-for list="{{items}}" as="it" hint-placeholder-count="8">
+        <button type="button" class="tq-item" onClick="{{it.pick}}" style="{{it.style}}">
+          <svg width="26" height="12" viewBox="0 0 26 12" style="position: absolute; top: -9px; left: 50%; margin-left: -13px"><path d="M13 10V5a2.5 2.5 0 1 1 2.5-2.5M2 11L13 6l11 5" fill="none" stroke="#A3A3C2" stroke-width="1.6" stroke-linecap="round"/></svg>
           <sc-if value="{{it.isKit}}" hint-placeholder-val="{{ true }}">
             <span style="{{it.jerseyStyle}}"><span style="{{it.crestStyle}}">{{it.crest}}</span></span>
           </sc-if>
@@ -122,37 +128,36 @@ input::placeholder{color:#8686A6}
               <sc-if value="{{it.k.stache}}" hint-placeholder-val="{{ false }}"><ellipse cx="91" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><ellipse cx="109" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><path d="M88 55Q94 49 100 53Q106 49 112 55Q107 59 100 56Q93 59 88 55Z" fill="#241811"/></sc-if>
             </svg>
           </sc-if>
-          <span style="font-size: 11px; font-weight: 700; line-height: 1.2; color: #F4F4FA; text-align: center; height: 27px; overflow: hidden">{{it.name}}</span>
+          <span style="font-size: 10px; font-weight: 700; line-height: 1.15; color: #F4F4FA; text-align: center; height: 23px; overflow: hidden">{{it.name}}</span>
           <span style="{{it.labelStyle}}">
-            <sc-if value="{{it.isCoins}}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/></svg></sc-if>
-            <sc-if value="{{it.isReward}}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></sc-if>
+            <sc-if value="{{it.isCoins}}" hint-placeholder-val="{{ false }}"><svg width="10" height="10" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/></svg></sc-if>
             {{it.label}}
           </span>
         </button>
       </sc-for>
       </div>
     </div>
-  <div style="flex: none;  display: flex; align-items: center; gap: 10px; min-height: 48px">
-    <div style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0">
-      <span style="font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{selName}}</span>
-      <span style="font-size: 12px; color: #A3A3C2">{{selHint}}</span>
+    <div style="flex: none; display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 6px 8px 6px 12px; border-radius: 14px; background: #0B0B14AA; border: 1px solid #2E2E58">
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0">
+        <span style="font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{selName}}</span>
+        <span style="font-size: 11px; color: #A3A3C2">{{selHint}}</span>
+      </div>
+      <sc-if value="{{showEquip}}" hint-placeholder-val="{{ true }}">
+        <button type="button" onClick="{{doEquip}}" class="am-pulse am-shine" style="height: 40px; padding: 0 18px; border: 0; transform: skewX(-12deg); background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1.5px; cursor: pointer">EQUIPAR</button>
+      </sc-if>
+      <sc-if value="{{showEquipped}}" hint-placeholder-val="{{ false }}">
+        <span style="display: flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border-radius: 18px; background: #22D3EE1F; border: 1px solid #22D3EE66; color: #22D3EE; font-weight: 800; font-size: 12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg>Puesto</span>
+      </sc-if>
+      <sc-if value="{{showBuy}}" hint-placeholder-val="{{ false }}">
+        <button type="button" onClick="{{doBuy}}" style="{{buyStyle}}">COMPRAR · {{selPrice}}</button>
+      </sc-if>
+      <sc-if value="{{showReward}}" hint-placeholder-val="{{ false }}">
+        <a href="{{rewardHref}}" style="display: flex; align-items: center; height: 38px; padding: 0 14px; transform: skewX(-12deg); border: 2px solid #9B6BFF; color: #C4B5FD; text-decoration: none; font-weight: 800; font-size: 12px"><span style="transform: skewX(12deg)">CÓMO CONSEGUIRLO</span></a>
+      </sc-if>
+      <sc-if value="{{showPremium}}" hint-placeholder-val="{{ false }}">
+        <a href="Tienda.dc.html" style="display: flex; align-items: center; height: 40px; padding: 0 16px; transform: skewX(-12deg); background: linear-gradient(135deg, #FFB37A, #FF8A3D); color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px"><span style="transform: skewX(12deg)">[PRECIO]</span></a>
+      </sc-if>
     </div>
-    <sc-if value="{{showEquip}}" hint-placeholder-val="{{ true }}">
-      <button type="button" onClick="{{doEquip}}" class="am-pulse am-shine" style="height: 46px; padding: 0 18px; border: 0; border-radius: 12px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px; cursor: pointer; box-shadow: 0 4px 0 #0E8FA3">EQUIPAR</button>
-    </sc-if>
-    <sc-if value="{{showEquipped}}" hint-placeholder-val="{{ false }}">
-      <span style="display: flex; align-items: center; height: 46px; padding: 0 16px; border-radius: 12px; border: 1px solid #2E2E52; color: #A3A3C2; font-weight: 700; font-size: 13px">Equipado</span>
-    </sc-if>
-    <sc-if value="{{showBuy}}" hint-placeholder-val="{{ false }}">
-      <button type="button" onClick="{{doBuy}}" style="{{buyStyle}}">COMPRAR · {{selPrice}}</button>
-    </sc-if>
-    <sc-if value="{{showReward}}" hint-placeholder-val="{{ false }}">
-      <a href="{{rewardHref}}" style="display: flex; align-items: center; height: 46px; padding: 0 14px; border-radius: 12px; border: 1.5px solid #22D3EE; color: #22D3EE; text-decoration: none; font-weight: 700; font-size: 13px">Cómo conseguirlo</a>
-    </sc-if>
-    <sc-if value="{{showPremium}}" hint-placeholder-val="{{ false }}">
-      <a href="Tienda.dc.html" style="display: flex; align-items: center; height: 46px; padding: 0 16px; border-radius: 12px; background: #FF8A3D; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px">[PRECIO]</a>
-    </sc-if>
-  </div>
   </div>
 </div>
 </x-dc>
@@ -540,12 +545,14 @@ class Component extends DCLogic {
       { id: 'cara', label: 'Cara' }, { id: 'calzado', label: 'Calzado' }
     ];
     const tab = (on) => 'min-height: 40px; padding: 0 4px; border-radius: 12px; font: 800 13px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14; border: 0; box-shadow: 0 3px 0 #0E8FA3;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E52;');
-    const chip = (on) => 'min-height: 40px; padding: 0 4px; border-radius: 20px; font: 700 12px Exo2, sans-serif; cursor: pointer; background: transparent; ' + (on ? 'color: #F4F4FA; border: 1.5px solid #F4F4FA;' : 'color: #A3A3C2; border: 1.5px solid #2E2E52;');
-    const lchip = (on) => 'flex: none; min-height: 36px; padding: 0 12px; border-radius: 18px; font: 700 12px Exo2, sans-serif; cursor: pointer; white-space: nowrap; ' + (on ? 'background: #1E1A3A; color: #22D3EE; border: 1.5px solid #22D3EE;' : 'background: #17172A; color: #CACAE0; border: 1.5px solid #26264A;');
+    const chip = (on) => 'position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 46px; border: 0; border-radius: 11px; background: transparent; font: 800 10px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (on ? '#0B0B14;' : '#A3A3C2;');
+    const lchip = (on) => 'flex: none; height: 28px; padding: 0 12px; transform: skewX(-12deg); font: 800 11px Exo2, sans-serif; cursor: pointer; white-space: nowrap; ' + (on ? 'background: #FFC53D; color: #1A1206; border: 0; box-shadow: 0 0 10px #FFC53D66;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E58;');
 
     // only football for now: the other sports' kits come back with their own game
     const sports = SPORTS.filter((sp) => sp.id === 'futbol').map((sp) => ({ label: sp.label, style: tab(sp.id === sport), pick: () => this.setState({ sport: sp.id, preview: null }) }));
-    const cats = CATS.map((c) => ({ label: c.label, style: chip(c.id === s.cat), pick: () => this.setState({ cat: c.id, preview: null }) }));
+    const ICON = { equipos: 'M8 3L3 6l2 5l3-1v11h8V10l3 1l2-5l-5-3a4 4 0 0 1-8 0z', cabeza: 'M4 16a8 8 0 0 1 16 0zM12 8V6M20 16h3', cara: 'M3 10h7v3a3 3 0 0 1-6 0zM14 10h7v3a3 3 0 0 1-6 0zM10 11h4', calzado: 'M4 8h7l2 4c4 0 8 1 9 5v2H4zM3 19h19' };
+    const cats = CATS.map((c) => ({ label: c.label.toUpperCase(), icon: ICON[c.id], sel: c.id === s.cat ? 'true' : 'false', style: chip(c.id === s.cat), pick: () => this.setState({ cat: c.id, preview: null }) }));
+    const ci = CATS.findIndex((c) => c.id === s.cat);
     const li = s.league[sport];
     const leagues = L[sport].map((lg, i) => ({ name: lg.name, style: lchip(i === li), pick: () => this.setState({ league: { ...s.league, [sport]: i }, preview: null }) }));
 
@@ -572,7 +579,7 @@ class Component extends DCLogic {
         jerseyStyle: s.cat === 'equipos' ? 'position: relative; display: block; width: 46px; height: 44px; background: ' + this.jerseyBg(it.primary, it.secondary, it.pattern) + '; clip-path: polygon(32% 0, 68% 0, 100% 18%, 88% 42%, 78% 36%, 78% 100%, 22% 100%, 22% 36%, 12% 42%, 0 18%); filter: drop-shadow(0 2px 0 #00000055);' : '',
         isCoins: !own && it.st === 'coins',
         isReward: !own && it.st === 'reward',
-        style: 'display: flex; flex-direction: column; align-items: center; gap: 4px; height: 104px; padding: 8px 4px 6px 4px; box-sizing: border-box; border-radius: 14px; font-family: Exo2, sans-serif; cursor: pointer; min-width: 0; ' + (sel ? 'background: #1E1A3A; border: 2px solid #22D3EE;' : 'background: #17172A; border: 2px solid #26264A;'),
+        style: (() => { const rc = equipped ? '#22D3EE' : own ? '#8A93C8' : it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D'; return 'position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 98px; margin-top: 8px; padding: 8px 3px 5px 3px; box-sizing: border-box; border-radius: 12px; font-family: Exo2, sans-serif; cursor: pointer; min-width: 0; background: linear-gradient(180deg, ' + rc + '30, #141428 70%); border: ' + (sel ? '2px solid ' + rc : '1px solid ' + rc + '55') + '; border-top: 3px solid ' + rc + '; box-shadow: ' + (sel ? '0 0 14px ' + rc + '88, 0 6px 12px #0008' : '0 6px 12px #0006') + ';'; })(),
         labelStyle: 'display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 800; color: ' + color + ';',
         pick: () => this.setState({ preview: { cat: s.cat, id: it.id } })
       };
@@ -605,9 +612,9 @@ class Component extends DCLogic {
         name: c.name, short: c.id === 'granny' ? 'Granny' : c.id === 'vegas' ? 'Vegas' : c.name, on: on ? 'true' : 'false',
         img: c.id === 'clasico' ? '' : 'assets/chars/' + c.id + '.png',
         pick: () => { if (A) A.setPref(c.id); this.setState({ char: c.id }); },
-        style: 'flex: 1; min-width: 0; height: 38px; display: flex; align-items: center; justify-content: center; gap: 3px; padding: 0 4px 0 2px; border-radius: 11px; cursor: pointer; overflow: hidden; white-space: nowrap; border: 1px solid ' + (on ? '#22D3EE' : '#2E2E52') + '; background: ' + (on ? '#22D3EE' : '#0B0B14CC') + '; color: ' + (on ? '#0B0B14' : '#F4F4FA') + ';',
-        imgStyle: c.id === 'clasico' ? 'display: none;' : 'flex: none; width: 30px; height: 30px; border-radius: 9px; background: ' + (on ? '#0E8FA3' : '#26264A') + ';',
-        textStyle: c.id === 'clasico' ? 'font: 800 10px Exo2, sans-serif;' : 'display: none;'
+        style: 'flex: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; padding: 0; border-radius: 20px; cursor: pointer; overflow: hidden; transition: transform .2s; ' + (on ? 'border: 2px solid #22D3EE; background: #0E8FA3; box-shadow: 0 0 12px #22D3EE; transform: scale(1.15);' : 'border: 1px solid #2E2E58; background: #17172ACC;'),
+        imgStyle: c.id === 'clasico' ? 'display: none;' : 'flex: none; width: 30px; height: 30px; border-radius: 15px;',
+        textStyle: c.id === 'clasico' ? 'font: 800 8px Exo2, sans-serif; color: #F4F4FA;' : 'display: none;'
       };
     });
     return {
@@ -625,6 +632,9 @@ class Component extends DCLogic {
       pUp: (e) => { if (this.drag && this.drag.id === e.pointerId) { if (performance.now() - this.drag.t > 80) this.spin = 0; this.drag = null; } },
       coinsLabel: this.fmt(s.coins),
       sports, cats, leagues, items,
+      catThumb: 'position: absolute; top: 3px; bottom: 3px; left: calc(3px + ' + ci + ' * (100% - 6px) / 4); width: calc((100% - 6px) / 4); border-radius: 11px; background: linear-gradient(135deg, #7EF0FF, #22D3EE); box-shadow: 0 0 12px #22D3EE88; transition: left .4s cubic-bezier(.3,1.5,.5,1);',
+      gridKey: s.cat + ':' + li,
+      kitTeam: kitItem.name, kitLeague: league.name,
       isTeams: s.cat === 'equipos',
       kit: kitItem,
       kitName: kitItem.name + ' · ' + league.name,
@@ -643,7 +653,7 @@ class Component extends DCLogic {
       showReward: !selOwned && selItem.st === 'reward',
       showPremium: !selOwned && selItem.st === 'premium',
       rewardHref: selItem.how === 'rank' ? 'Rangos.dc.html' : 'Tienda.dc.html',
-      buyStyle: 'height: 46px; padding: 0 14px; border: 0; border-radius: 12px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: .5px; cursor: pointer; ' + (canAfford ? 'background: #FFC53D; color: #0B0B14; box-shadow: 0 4px 0 #A8771A;' : 'background: #2E2E52; color: #A3A3C2;'),
+      buyStyle: 'height: 40px; padding: 0 14px; border: 0; transform: skewX(-12deg); font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 18px; letter-spacing: .5px; cursor: pointer; ' + (canAfford ? 'background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #D9A520); color: #2A1C02; box-shadow: 0 0 14px #FFC53D66;' : 'background: #26264A; color: #6E6E92; cursor: default;'),
       doEquip: () => equipNow(),
       doBuy: () => {
         if (!canAfford) return;
