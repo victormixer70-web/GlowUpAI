@@ -10,6 +10,10 @@
 <helmet>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
 <style>
+@keyframes tdWiggle{0%,62%,100%{rotate:0deg;scale:1}66%{rotate:-9deg;scale:1.08}72%{rotate:8deg;scale:1.1}78%{rotate:-6deg}84%{rotate:4deg}90%{rotate:0deg;scale:1}}
+@keyframes tdSnore{0%,100%{scale:1 1}50%{scale:1.04 .96}}
+.td-wiggle img{animation:tdWiggle 2.2s ease-in-out infinite;transform-origin:50% 90%}
+.td-snore img{animation:tdSnore 2.8s ease-in-out infinite;transform-origin:50% 100%}
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
@@ -55,7 +59,7 @@ input::placeholder{color:#8686A6}
           </div>
           <div style="position: absolute; left: calc(25% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px">
             <div class="am-float" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(160deg, #3A2A0A, #1E1A10); border: 1px solid #FFC53D; box-shadow: 0 0 18px #FFC53D55; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
-              <span class="am-bob" style="display: flex; height: 64px; align-items: center; margin-top: -4px"><img src="{{prz.chestReady}}" alt="" style="width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 6px 8px #000a)"></span>
+              <span class="td-wiggle" style="display: flex; height: 64px; align-items: center; margin-top: -4px"><img src="{{prz.chestReady}}" alt="" style="width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 6px 8px #000a)"></span>
               <span style="font-weight: 800; font-size: 13px; line-height: 1.15">Cofre común</span>
               <span style="font-size: 10px; color: #A3A3C2">¡Listo para abrir!</span>
               <button type="button" class="bc-btn-gold am-shine" style="height: 28px; padding: 0 16px; font-size: 15px; cursor: pointer">RECLAMAR</button>
@@ -64,7 +68,7 @@ input::placeholder{color:#8686A6}
           </div>
           <div style="position: absolute; left: calc(50% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px">
             <div class="" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(160deg, #1C1C3A, #141428); border: 1px solid #2A2A50; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
-              <span style="display: flex; height: 64px; align-items: center; margin-top: -4px"><img src="{{prz.chestRare}}" alt="" style="width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 6px 8px #000a)"></span>
+              <span class="td-snore" style="display: flex; height: 64px; align-items: center; margin-top: -4px"><img src="{{prz.chestRare}}" alt="" style="width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 6px 8px #000a)"></span>
               <span style="font-weight: 800; font-size: 13px; line-height: 1.15">Cofre raro</span>
               <span style="font-size: 10px; color: #A3A3C2">Accesorio de equipo</span>
               <span style="font-size: 11px; font-weight: 700; color: #8686A6">Faltan 3 victorias</span>

@@ -344,33 +344,86 @@
     var lean = coin(); lean.rotation.set(Math.PI / 2 - 0.35, 0, 0.15); lean.position.set(1.0, 0.95, 1.6); g.add(lean);
     return g;
   }
+  /* a cartoon chest with a personality: chunky and rounded on stubby gold feet, team-kit stripes, a football
+     for a padlock, and eyes: asleep while it's locked, wide awake (lid flung open, confetti) when it's yours */
+  // a box with soft, rounded edges (w × h × d, corner radius r)
+  function rbox(w, h, d, r, mat) {
+    var b = Math.min(r, d / 2 - 0.01, 0.12), geo = new T.ExtrudeGeometry(rounded(w - 2 * b, h - 2 * b, Math.max(0.01, r - b)), { depth: d - 2 * b, bevelEnabled: true, bevelThickness: b, bevelSize: b, bevelSegments: 3, curveSegments: 10 });
+    geo.translate(0, 0, -(d - 2 * b) / 2);
+    return mesh(geo, mat);
+  }
+  var CHESTS = {
+    common: { body: '#FF8A3D', dark: '#C2410C', trim: '#FFC53D', stripe: '#FFFFFF', gem: null },
+    rare: { body: '#2F7BFF', dark: '#1C4FB0', trim: '#7EF0FF', stripe: '#FFFFFF', gem: '#7EF0FF' },
+    epic: { body: '#8B5CF6', dark: '#5B21B6', trim: '#FFC53D', stripe: '#FF5C8A', gem: '#FF5C8A' },
+    legend: { body: '#1A1A2E', dark: '#0B0B14', trim: '#FFC53D', stripe: '#FFC53D', gem: '#22D3EE' }
+  };
   function chest(kind, open) {
-    var rare = kind === 'rare', epic = kind === 'epic', legend = kind === 'legend';
-    var wood = std(rare ? '#2A5FB0' : epic ? '#6D28D9' : legend ? '#1A1A2E' : '#C26020', { r: 0.6 }), woodD = std(rare ? '#1C3F78' : epic ? '#4C1D95' : legend ? '#0B0B14' : '#8A3E12', { r: 0.7 });
-    var gold = std('#FFC53D', { r: 0.3, m: 0.6, em: '#5A3A00', ei: 0.3 }), g = new T.Group();
-    g.add(mesh(new T.BoxGeometry(3, 1.6, 2), wood, 0, 0.8, 0));
-    for (var i = 0; i < 3; i++) g.add(mesh(new T.BoxGeometry(3.02, 0.06, 2.02), woodD, 0, 0.3 + i * 0.5, 0));
-    [-1.25, 1.25].forEach(function (x) { g.add(mesh(new T.BoxGeometry(0.22, 1.64, 2.06), gold, x, 0.8, 0)); });
-    // the lid: half a cylinder, hinged at the back
-    var lid = new T.Group(); lid.position.set(0, 1.6, -1);
-    var top = mesh(new T.CylinderGeometry(1, 1, 3, 32, 1, false, 0, Math.PI), wood, 0, 0, 1); top.rotation.z = Math.PI / 2; lid.add(top);
-    [-1.25, 1.25].forEach(function (x) { var b = mesh(new T.CylinderGeometry(1.03, 1.03, 0.22, 32, 1, false, 0, Math.PI), gold, x, 0, 1); b.rotation.z = Math.PI / 2; lid.add(b); });
-    lid.add(mesh(new T.BoxGeometry(0.5, 0.6, 0.2), gold, 0, -0.05, 2.02));
-    if (open) lid.rotation.x = -0.75;
-    g.add(lid);
-    g.add(mesh(new T.BoxGeometry(0.46, 0.5, 0.14), gold, 0, 1.35, 1.04));
-    if (rare || epic) [-0.8, 0.8].forEach(function (x) { g.add(mesh(new T.OctahedronGeometry(0.2), std(rare ? '#7EF0FF' : '#FF5C8A', { r: 0.1, em: rare ? '#0A6A80' : '#80102A', ei: 0.8 }), x, 1.0, 1.05)); });
-    if (open) {
-      // light pouring out of it, with sparks
-      var glow = mesh(new T.CylinderGeometry(1.1, 1.45, 1.6, 24, 1, true), new T.MeshBasicMaterial({ color: '#FFE38A', transparent: true, opacity: 0.2, side: T.DoubleSide, depthWrite: false, blending: T.AdditiveBlending }), 0, 2.4, 0);
-      glow.scale.z = 0.6; g.add(glow);
-      g.add(mesh(new T.BoxGeometry(2.8, 0.1, 1.8), new T.MeshBasicMaterial({ color: '#FFD75A' }), 0, 1.58, 0));
-      var heap = coinPile(9); heap.scale.setScalar(0.32); heap.position.set(-0.3, 1.6, 0); g.add(heap);
-      for (var s = 0; s < 7; s++) {
-        var sp = mesh(new T.OctahedronGeometry(0.1 + Math.random() * 0.08), new T.MeshBasicMaterial({ color: s % 2 ? '#FFFFFF' : '#FFE38A' }), (Math.random() - 0.5) * 2.6, 2.1 + Math.random() * 1.4, (Math.random() - 0.5) * 1.2);
-        g.add(sp);
-      }
+    var C = CHESTS[kind] || CHESTS.common, g = new T.Group();
+    var body = std(C.body, { r: 0.45 }), dark = std(C.dark, { r: 0.6 }), trim = std(C.trim, { r: 0.28, m: 0.5, em: C.trim, ei: 0.12 }), white = std(C.stripe, { r: 0.5 });
+    // the body: a soft, slightly bulging box
+    var bx = rbox(3, 1.7, 1.7, 0.4, body); bx.position.set(0, 0.95, 0); g.add(bx);
+    // kit stripes down the front and back
+    [-0.55, 0.55].forEach(function (x) { var st = rbox(0.32, 1.66, 1.78, 0.08, white); st.position.set(x, 0.95, 0); g.add(st); });
+    // a thick rim round the top and the bottom, with rivets
+    [0.2, 1.72].forEach(function (y) { var r = rbox(3.12, 0.22, 1.84, 0.1, trim); r.position.set(0, y, 0); g.add(r); });
+    for (var i = 0; i < 6; i++) g.add(mesh(new T.SphereGeometry(0.07, 10, 8), trim, -1.25 + i * 0.5, 1.72, 0.98));
+    // stubby gold feet
+    [[-1.15, -0.6], [1.15, -0.6], [-1.15, 0.6], [1.15, 0.6]].forEach(function (f) { var ft = mesh(new T.SphereGeometry(0.24, 14, 10), trim, f[0], 0.08, f[1]); ft.scale.y = 0.6; g.add(ft); });
+    // the lid: a puffy dome hinged at the back
+    var lid = new T.Group(); lid.position.set(0, 1.8, -0.85);
+    var dome = mesh(new T.SphereGeometry(1, 36, 18, 0, Math.PI * 2, 0, Math.PI / 2), body, 0, 0, 0.85); dome.scale.set(1.62, 0.78, 0.98); lid.add(dome);
+    var domeStripe = mesh(new T.SphereGeometry(1.005, 36, 18, 0, Math.PI * 2, 0, Math.PI / 2), white, 0, 0, 0.85); domeStripe.scale.set(0.5, 0.79, 0.99); lid.add(domeStripe);
+    var band = mesh(new T.TorusGeometry(1, 0.06, 8, 40, Math.PI), trim, 0, 0, 0.85); band.rotation.y = Math.PI / 2; band.scale.set(1, 0.8, 0.99); lid.add(band);
+    // the padlock is a football
+    var ball = mesh(new T.SphereGeometry(0.34, 28, 20), window.AMBall ? window.AMBall.material() : std('#FFFFFF'), 0, 0.05, 1.86); ball.rotation.set(0.4, 0.6, 0); lid.add(ball);
+    lid.add(mesh(new T.TorusGeometry(0.2, 0.06, 8, 20, Math.PI), trim, 0, 0.32, 1.86));
+    if (kind === 'legend') {
+      // a crown on top
+      var crown = hat('crown'); crown.scale.setScalar(0.42); crown.position.set(0, 0.72, 0.85); lid.add(crown);
     }
+    if (C.gem) [-1.2, 1.2].forEach(function (x) { lid.add(mesh(new T.OctahedronGeometry(0.17), std(C.gem, { r: 0.1, em: C.gem, ei: 0.5 }), x, 0.32, 1.45)); });
+    g.add(lid);
+    // the face, on the front of the body
+    var eyeW = std('#FFFFFF', { r: 0.3 }), ink = std('#0B0B14', { r: 0.4 });
+    [-0.95, 0.95].forEach(function (x) {
+      if (open) {
+        // wide awake and thrilled
+        var e = mesh(new T.SphereGeometry(0.26, 18, 14), eyeW, x, 1.18, 0.86); e.scale.set(1, 1.2, 0.45); g.add(e);
+        var pu = mesh(new T.SphereGeometry(0.13, 14, 10), ink, x * 0.97, 1.27, 0.98); pu.scale.z = 0.4; g.add(pu);
+        g.add(mesh(new T.SphereGeometry(0.045, 8, 6), eyeW, x * 0.97 + 0.05, 1.33, 1.03));
+        var brow = mesh(new T.TorusGeometry(0.2, 0.04, 6, 14, Math.PI * 0.7), ink, x, 1.5, 0.88); brow.rotation.z = Math.PI * 0.15; g.add(brow);
+      } else {
+        // fast asleep: closed eyelids
+        var lidc = mesh(new T.TorusGeometry(0.17, 0.045, 6, 16, Math.PI), ink, x, 1.2, 0.88); lidc.rotation.z = Math.PI; g.add(lidc);
+      }
+    });
+    if (open) {
+      // a big grin, the lid flung back and the treasure bursting out with confetti
+      var grin = mesh(new T.SphereGeometry(0.3, 18, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), ink, 0, 0.72, 0.84); grin.scale.set(1.3, 0.8, 0.4); g.add(grin);
+      g.add(mesh(new T.SphereGeometry(0.12, 12, 8), std('#FF5C8A', { r: 0.5 }), 0, 0.58, 0.9));
+      lid.rotation.x = -1.05;
+      g.add(mesh(new T.BoxGeometry(2.7, 0.08, 1.4), new T.MeshBasicMaterial({ color: '#FFE38A' }), 0, 1.78, 0));
+      var heap = coinPile(12); heap.scale.setScalar(0.3); heap.position.set(-0.2, 1.8, 0); g.add(heap);
+      var glow = mesh(new T.CylinderGeometry(1.0, 1.4, 1.9, 24, 1, true), new T.MeshBasicMaterial({ color: '#FFE38A', transparent: true, opacity: 0.2, side: T.DoubleSide, depthWrite: false, blending: T.AdditiveBlending }), 0, 2.75, 0);
+      glow.scale.z = 0.55; g.add(glow);
+      var cols = ['#22D3EE', '#FF5C8A', '#FFC53D', '#53D88E', '#A78BFA', '#FFFFFF'];
+      for (var k = 0; k < 18; k++) {
+        var a = (k / 18) * Math.PI * 2, rr = 0.6 + (k % 3) * 0.45;
+        var cf = mesh(new T.BoxGeometry(0.16, 0.05, 0.1), new T.MeshBasicMaterial({ color: cols[k % cols.length] }), Math.cos(a) * rr * 1.2, 2.4 + (k % 4) * 0.42, Math.sin(a) * rr * 0.4);
+        cf.rotation.set(k, k * 1.7, k * 0.5); g.add(cf);
+      }
+      for (var c2 = 0; c2 < 3; c2++) { var fc = coin(); fc.scale.setScalar(0.22); fc.position.set(-0.9 + c2 * 0.9, 3.1 + (c2 % 2) * 0.35, 0.2); fc.rotation.set(1.2, c2, 0.4); g.add(fc); }
+    } else {
+      // little Z's floating off it
+      ['Z', 'z'].forEach(function (zz, k) {
+        var cv = document.createElement('canvas'); cv.width = cv.height = 64;
+        var cx = cv.getContext('2d'); cx.font = '800 54px "Barlow Condensed", sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillStyle = '#FFFFFF'; cx.fillText(zz, 32, 34);
+        var sp = new T.Sprite(new T.SpriteMaterial({ map: new T.CanvasTexture(cv), transparent: true, depthWrite: false }));
+        sp.scale.setScalar(0.55 - k * 0.15); sp.position.set(1.5 + k * 0.45, 2.75 + k * 0.5, 0.4); g.add(sp);
+      });
+    }
+    g.rotation.z = open ? -0.06 : 0.04;
     return g;
   }
   function prizeModel(kind) {
