@@ -14,7 +14,9 @@
     // screen transitions: several styles, picked at random each time (all quick)
     '#fx-wipe{position:absolute;inset:0;z-index:40;pointer-events:none;overflow:hidden;display:none}',
     '#fx-wipe.go{display:block}',
-    '#fx-wipe i{position:absolute;display:block}',
+    '#fx-wipe i{position:absolute;display:block;will-change:transform,clip-path,opacity}',
+    // the wipe waits, covering everything, while the new screen is built underneath
+    '#fx-wipe.hold i{animation-play-state:paused!important}',
     // 1 diagonal bands
     '#fx-wipe.diag i{top:-20%;bottom:-20%;left:0;width:140%;transform:translateX(-120%) skewX(-18deg);animation:fxDiag .42s cubic-bezier(.7,0,.3,1) both}',
     '#fx-wipe.diag.back i{animation-name:fxDiagB}',
@@ -27,7 +29,7 @@
     '@keyframes fxIris{0%{clip-path:circle(0 at var(--fx-x,50%) var(--fx-y,50%))}50%{clip-path:circle(150% at var(--fx-x,50%) var(--fx-y,50%))}100%{clip-path:circle(150% at var(--fx-x,50%) var(--fx-y,50%));opacity:0}}',
     // 3 blinds: vertical strips flip in and out one after another
     '#fx-wipe.blinds i{top:0;bottom:0;transform:scaleY(0);transform-origin:top;animation:fxBlind .4s cubic-bezier(.6,0,.3,1) both}',
-    '@keyframes fxBlind{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}',
+    '@keyframes fxBlind{0%{transform:scaleY(0);transform-origin:top}40%{transform:scaleY(1);transform-origin:top}70%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}',
     // 4 shutter: two halves close in the middle with a flash line, then open
     '#fx-wipe.shutter i{left:0;right:0;height:51%;animation:fxShutT .4s cubic-bezier(.7,0,.3,1) both}',
     '#fx-wipe.shutter i:nth-child(1){top:0;transform:translateY(-100%)}',
@@ -41,25 +43,29 @@
     '#fx-wipe.burst i:nth-child(2){animation-delay:.04s}#fx-wipe.burst i:nth-child(3){animation-delay:.08s}',
     '@keyframes fxBurst{0%{transform:scale(0);opacity:1}55%{transform:scale(30);opacity:1}100%{transform:scale(30);opacity:0}}',
     // the new screen comes in a different way too
-    '.fx-screen{animation:fxScrR .38s cubic-bezier(.2,1.25,.35,1) both}',
+    '.fx-screen{animation:fxScrR .34s cubic-bezier(.16,.84,.3,1) both}',
     '.fx-screen.back{animation-name:fxScrL}',
     '.fx-screen.v1{animation-name:fxScrZoom}.fx-screen.v2{animation-name:fxScrUp}.fx-screen.v3{animation-name:fxScrTilt}',
-    '@keyframes fxScrR{from{opacity:0;translate:46px 0;scale:.96}to{opacity:1;translate:0 0;scale:1}}',
-    '@keyframes fxScrL{from{opacity:0;translate:-46px 0;scale:.96}to{opacity:1;translate:0 0;scale:1}}',
-    '@keyframes fxScrZoom{from{opacity:0;scale:1.12}to{opacity:1;scale:1}}',
-    '@keyframes fxScrUp{from{opacity:0;translate:0 40px}to{opacity:1;translate:0 0}}',
-    '@keyframes fxScrTilt{from{opacity:0;transform:perspective(900px) rotateX(18deg) translateY(30px)}to{opacity:1;transform:none}}',
-    '.fx-pop{animation:fxPop .38s cubic-bezier(.2,1.6,.4,1) both}',
+    '@keyframes fxScrR{from{opacity:.4;translate:26px 0}to{opacity:1;translate:0 0}}',
+    '@keyframes fxScrL{from{opacity:.4;translate:-26px 0}to{opacity:1;translate:0 0}}',
+    '@keyframes fxScrZoom{from{opacity:.4;scale:1.05}to{opacity:1;scale:1}}',
+    '@keyframes fxScrUp{from{opacity:.4;translate:0 22px}to{opacity:1;translate:0 0}}',
+    '@keyframes fxScrTilt{from{opacity:.4;transform:perspective(900px) rotateX(8deg) translateY(14px)}to{opacity:1;transform:none}}',
+    '.fx-pop{animation:fxPop .34s cubic-bezier(.18,1.3,.4,1) both}',
     '.fx-pop.p1{animation-name:fxPopL}.fx-pop.p2{animation-name:fxPopZ}',
-    '@keyframes fxPop{from{opacity:0;translate:0 16px;scale:.86}to{opacity:1;translate:0 0;scale:1}}',
-    '@keyframes fxPopL{from{opacity:0;translate:-22px 0}to{opacity:1;translate:0 0}}',
-    '@keyframes fxPopZ{from{opacity:0;scale:.5}to{opacity:1;scale:1}}',
-    '.fx-slide{animation:fxSlide .3s cubic-bezier(.2,1.25,.35,1) both}',
+    '@keyframes fxPop{from{opacity:0;translate:0 12px;scale:.92}to{opacity:1;translate:0 0;scale:1}}',
+    '@keyframes fxPopL{from{opacity:0;translate:-16px 0}to{opacity:1;translate:0 0}}',
+    '@keyframes fxPopZ{from{opacity:0;scale:.75}to{opacity:1;scale:1}}',
+    '.fx-pop,.fx-slide,.fx-screen{will-change:transform,opacity}',
+    '.fx-slide{animation:fxSlide .28s cubic-bezier(.16,.84,.3,1) both}',
     '@keyframes fxSlide{from{opacity:0;translate:var(--fx-dx,30px) 0}to{opacity:1;translate:0 0}}',
     // ---- shared look for the menus (used by the screens through these classes) ----
     // living background: soft colour orbs drifting over a faint pitch pattern
     '.am-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}',
     '.am-bg.under{z-index:-1}',
+    // while a game is running inside a menu screen (private room, ranked, tutorial) its animated backdrop is
+    // hidden: it sits under the 3D view anyway and redrawing it every frame costs the phone a lot
+    '.bc-stage:has(canvas)>.am-bg,.bc-stage:has(canvas)>.bc-beams{display:none!important}',
     '.am-bg::before{content:"";position:absolute;inset:-20%;background:radial-gradient(30% 40% at 20% 30%,#22D3EE22,transparent 70%),radial-gradient(28% 36% at 80% 70%,#7C5CFF26,transparent 70%),radial-gradient(22% 30% at 70% 15%,#FFC53D14,transparent 70%);animation:amOrbs 14s ease-in-out infinite alternate}',
     '.am-bg::after{content:"";position:absolute;inset:0;background-image:linear-gradient(#ffffff06 1px,transparent 1px),linear-gradient(90deg,#ffffff06 1px,transparent 1px);background-size:32px 32px;mask-image:radial-gradient(80% 80% at 50% 50%,#000 30%,transparent 100%);-webkit-mask-image:radial-gradient(80% 80% at 50% 50%,#000 30%,transparent 100%)}',
     '@keyframes amOrbs{0%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(4%,-3%) rotate(8deg)}100%{transform:translate(-3%,4%) rotate(-6deg)}}',
@@ -154,7 +160,34 @@
     wipe.innerHTML = html;
     wipe.style.setProperty('--fx-x', (lastTap.x / 844 * 100).toFixed(1) + '%'); wipe.style.setProperty('--fx-y', (lastTap.y / 390 * 100).toFixed(1) + '%');
     wipe.className = ''; void wipe.offsetWidth; wipe.className = 'go ' + st + (back ? ' back' : '');
-    clearTimeout(playWipe.t); playWipe.t = setTimeout(function () { wipe.className = ''; }, 700);
+    clearTimeout(playWipe.t); playWipe.t = setTimeout(function () { wipe.className = ''; }, 900);
+    return st;
+  };
+  // when each style has the whole screen covered (s), so the screens can be swapped unseen
+  var COVER = { diag: 0.2, iris: 0.21, blinds: 0.26, shutter: 0.19, burst: 0.23 };
+  var holding = false, pendingRoot = null, swapTok = 0;
+  window.AMFX = {
+    // the app calls this to change screen: the wipe covers, the new screen is built underneath, then it opens
+    swap: function (doSwap) {
+      var tok = ++swapTok;
+      mountFx();
+      var st = playWipe();
+      setTimeout(function () {
+        if (tok !== swapTok) { doSwap(); return; }
+        holding = true; wipe.classList.add('hold');
+        doSwap();
+        var t0 = performance.now(), frames = 0;
+        // open once the new screen has drawn a couple of frames (or after 1.2 s, whatever happens)
+        var wait = function () {
+          if (tok !== swapTok) return;
+          if (++frames < 3 && performance.now() - t0 < 1200) { requestAnimationFrame(wait); return; }
+          holding = false; wipe.classList.remove('hold');
+          if (pendingRoot) { var r = pendingRoot; pendingRoot = null; lastRoot = null; enter(r); }
+          clearTimeout(playWipe.t); playWipe.t = setTimeout(function () { wipe.className = ''; }, 520);
+        };
+        requestAnimationFrame(wait);
+      }, COVER[st] * 1000);
+    }
   };
   var layer = document.createElement('div'); layer.id = 'fx-layer';
   var mountFx = function () { if (!wipe.parentNode) stage.appendChild(wipe); if (!layer.parentNode) stage.appendChild(layer); };
@@ -167,11 +200,13 @@
     if (back) history.pop(); else history.push(location.hash);
     if (history.length > 30) history.shift();
     mountFx();
-    playWipe();
+    // the wipe itself is started by the app through AMFX.swap, in step with the screen change
   });
   var lastRoot = null;
   var enter = function (root) {
     if (!root || root === lastRoot || root.id === 'fx-wipe' || root.id === 'fx-layer') return;
+    // under a covering wipe: the screen makes its entrance when the wipe opens
+    if (holding) { pendingRoot = root; return; }
     lastRoot = root;
     mountFx();
     if (inGame()) return;
@@ -182,10 +217,10 @@
     // its buttons and cards pop in one after another
     var items = root.querySelectorAll('a[href], button, [role="tab"], [role="button"], [role="listitem"], [role="option"]');
     var n = 0;
-    for (var k = 0; k < items.length && n < 28; k++) {
+    for (var k = 0; k < items.length && n < 20; k++) {
       var el = items[k];
       if (!el.offsetParent) continue;
-      el.classList.remove('fx-pop', 'p1', 'p2'); el.style.animationDelay = (0.08 + n * 0.022).toFixed(3) + 's'; el.classList.add('fx-pop'); if (pv) el.classList.add('p' + pv);
+      el.classList.remove('fx-pop', 'p1', 'p2'); el.style.animationDelay = (0.05 + n * 0.018).toFixed(3) + 's'; el.classList.add('fx-pop'); if (pv) el.classList.add('p' + pv);
       n++;
     }
     setTimeout(function () { for (var q = 0; q < items.length; q++) { items[q].classList.remove('fx-pop', 'p1', 'p2'); items[q].style.animationDelay = ''; } }, 1200);

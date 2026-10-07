@@ -147,7 +147,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 </section>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"keeper":{"editor":"bool","default":false},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3,4],"default":3},"mates":{"editor":null},"label":{"editor":null},"tutorial":{"editor":"bool","default":false},"rivals":{"editor":null},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"keeper":{"editor":"bool","default":false},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3,4],"default":3},"mates":{"editor":null},"label":{"editor":null},"tutorial":{"editor":"bool","default":false},"rivals":{"editor":null},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"online":{"editor":null},"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -183,6 +183,149 @@ class Component extends DCLogic {
     if (this.raf) cancelAnimationFrame(this.raf);
     this.raf = null;
     if (this.R) { this.R.dispose(); this.R = null; }
+    if (this.netOff) { this.netOff(); this.netOff = null; }
+  }
+  /* ---------- online ---------- */
+  netHuman(i) {
+    const N = this.net;
+    return N && N.host ? N.humans.find((h) => h.i === i) || null : null;
+  }
+  // run fn as if the remote player h were the one holding the controls (their player, stick and buttons)
+  withHuman(h, fn) {
+    const g = this.g, sv = [g.ctl, this.inp, g.charging, g.charge, g.sprint, g.press, this.ctxH];
+    g.ctl = h.i; this.inp = h.inp; g.charging = h.charging; g.charge = h.charge; g.sprint = h.sprint; g.press = h.press; this.ctxH = h;
+    try { fn(); } finally {
+      h.i = g.ctl; h.charging = g.charging; h.charge = g.charge; h.press = g.press;
+      [g.ctl, this.inp, g.charging, g.charge, g.sprint, g.press, this.ctxH] = sv;
+    }
+  }
+  runEv(ev) {
+    const g = this.g;
+    if (g.phase !== 'play') return;
+    if (ev.x != null) this.inp = [ev.x, ev.y];
+    if (ev.k === 'kick') { g.charge = ev.c || 0; this.doKick(); }
+    else if (ev.k === 'pass') this.humanPass();
+    else if (ev.k === 'skill') this.humanSkill();
+    else if (ev.k === 'slide') this.humanSlide();
+    else if (ev.k === 'switch') this.switchPlayer();
+    else if (ev.k === 'cross') this.humanCross();
+    else if (ev.k === 'call') this.callForBall();
+    else if (ev.k === 'order') this.order(ev.o);
+  }
+  // a guest's button: sent to the host, which plays it (true = handled here)
+  netEv(k, o) {
+    const N = this.net;
+    if (!N || N.host) return false;
+    const [x, y] = this.worldInp();
+    N.room.send({ t: 'ev', k, o, c: this.g.charge, x, y });
+    return true;
+  }
+  worldInp() { const [x, y] = this.inp || [0, 0], m = this.net && this.net.mirror ? -1 : 1; return [+(x * m).toFixed(3), +(y * m).toFixed(3)]; }
+  netListen() {
+    const N = this.net;
+    if (this.netOff) this.netOff();
+    this.netOff = N.room.listen((kind, from, m) => {
+      const g = this.g;
+      if (kind === 'leave') {
+        if (N.host) {
+          // a player who drops out is played by the AI from then on
+          const h = N.humans.find((x) => x.id === from);
+          if (h) { N.humans = N.humans.filter((x) => x !== h); this.flashMsg(h.name + ' se ha desconectado', 2); }
+        } else { this.flashMsg('El anfitrión ha salido de la sala', 3); if (g.phase === 'play' || g.phase === 'goal') this.setupWinners(); }
+        return;
+      }
+      if (kind !== 'msg' || !m) return;
+      if (N.host) {
+        const h = N.humans.find((x) => x.id === from);
+        if (!h) return;
+        if (m.t === 'in') { h.inp = [m.x || 0, m.y || 0]; h.sprint = !!m.s; h.press = !!m.p; if (!m.c) h.charging = false; else if (!h.charging) { h.charging = true; h.charge = 0; } }
+        else if (m.t === 'ev') h.q.push(m);
+      } else if (m.t === 's') { N.snap = this.netUnpack(m); N.snapAt = performance.now(); }
+      else if (m.t === 'f') this.flashMsg(m.x, m.d);
+    });
+  }
+  // host → everyone, 20 times a second: where everything is
+  hostSend(dt) {
+    const N = this.net, g = this.g, b = g.ball;
+    N.snapT -= dt;
+    if (N.snapT > 0 || !N.room.count()) return;
+    N.snapT = 0.05;
+    const r2 = (v) => Math.round(v * 100) / 100, r3 = (v) => Math.round(v * 1000) / 1000;
+    const act = (a) => { if (!a) return 0; const o = {}; for (const k in a) if (typeof a[k] !== 'function') o[k] = typeof a[k] === 'number' ? r3(a[k]) : a[k]; return o; };
+    const chg = (i) => (i === g.ctl ? g.charging : (this.netHuman(i) || {}).charging) ? 1 : 0;
+    const ctl = {}; N.humans.forEach((h) => { ctl[h.id] = h.i; });
+    N.room.send({
+      t: 's',
+      ps: g.ps.map((p, i) => [r2(p.x), r2(p.y), r2(p.vx), r2(p.vy), r3(p.face), r2(p.run), r2(p.turn || 0), r2(p.touchAnim || 0), r2(p.stam), p.kickFoot || 0, chg(i), act(p.act), p.skillCd > 0 ? 1 : 0]),
+      b: [r2(b.x), r2(b.y), r2(b.z), r2(b.vx), r2(b.vy), r2(b.vz)],
+      own: g.own, hold: g.hold, sc: g.score, tm: r2(g.t), ph: g.phase, pt: r2(g.pt), con: g.concede, sci: g.sci ?? -1,
+      chat: g.chat.map((c) => [g.ps.indexOf(c.p), c.text, r2(c.t)]), ctl,
+      fx: g.fx ? [r2(g.fx.x), r2(g.fx.y), r2(g.fx.t)] : 0
+    });
+  }
+  // a guest turns the host's view into its own: mirrored if it plays on the other team
+  netUnpack(m) {
+    const N = this.net, n = this.size(), M = N.mirror;
+    const mi = (i) => (!M || i < 0 ? i : i < n ? i + n : i < 2 * n ? i - n : i === 2 * n ? 2 * n + 1 : 2 * n);
+    const X = (x) => (M ? 60 - x : x), Y = (y) => (M ? 30 - y : y), V = (v) => (M ? -v : v), F = (f) => (M ? this.ang(f + Math.PI) : f);
+    const ps = [];
+    m.ps.forEach((a, i) => {
+      let ac = a[11] || null;
+      if (ac && M) { ac = { ...ac }; if (ac.face != null) ac.face = F(ac.face); if (ac.s != null) ac.s = -ac.s; if (ac.stopY != null) ac.stopY = 30 - ac.stopY; }
+      ps[mi(i)] = { x: X(a[0]), y: Y(a[1]), vx: V(a[2]), vy: V(a[3]), face: F(a[4]), run: a[5], turn: a[6], touchAnim: a[7], stam: a[8], kickFoot: a[9], chg: a[10], act: ac, skillCd: a[12] };
+    });
+    const b = m.b;
+    return {
+      ps, b: { x: X(b[0]), y: Y(b[1]), z: b[2], vx: V(b[3]), vy: V(b[4]), vz: b[5] },
+      own: mi(m.own), hold: mi(m.hold), sc: M ? [m.sc[1], m.sc[0]] : m.sc, tm: m.tm, ph: m.ph, pt: m.pt, con: M ? 1 - m.con : m.con, sci: mi(m.sci),
+      chat: m.chat.map((c) => [mi(c[0]), c[1], c[2]]), ctl: mi(m.ctl[N.me] ?? -1), fx: m.fx ? { x: X(m.fx[0]), y: Y(m.fx[1]), t: m.fx[2] } : null
+    };
+  }
+  // a guest's frame: send the stick, then glide everything towards where the host says it is
+  clientStep(dt) {
+    const g = this.g, N = this.net, b = g.ball;
+    g.pt += dt;
+    if (g.flashT > 0) g.flashT -= dt;
+    g.chat.forEach((c) => { c.t -= dt; }); g.chat = g.chat.filter((c) => c.t > 0);
+    if (g.charging) g.charge = Math.min(1, g.charge + dt * 1.15);
+    let ix = g.jx + (g.keys.r ? 1 : 0) - (g.keys.l ? 1 : 0), iy = g.jy + (g.keys.d ? 1 : 0) - (g.keys.u ? 1 : 0);
+    const il = Math.hypot(ix, iy);
+    if (il > 1) { ix /= il; iy /= il; }
+    const sm = this.inpS || [0, 0], al = 1 - Math.exp(-dt / 0.025);
+    sm[0] += (ix - sm[0]) * al; sm[1] += (iy - sm[1]) * al;
+    this.inpS = sm;
+    this.inp = this.proCam() ? [-sm[1], sm[0]] : [sm[0], sm[1]];
+    N.inT -= dt;
+    if (N.inT <= 0) { N.inT = 1 / 30; const [x, y] = this.worldInp(); N.room.send({ t: 'in', x, y, s: g.sprint ? 1 : 0, p: g.press ? 1 : 0, c: g.charging ? 1 : 0 }); }
+    const S = N.snap;
+    if (!S) return;
+    if (S.ph === 'winners') { if (g.phase !== 'winners') { g.score = S.sc.slice(); this.setupWinners(); } return; }
+    if (S.ph !== g.phase) { if (S.ph === 'goal') { g.concede = S.con; const sc = g.ps[S.sci], tm = 1 - S.con; g.scorer = sc && sc.team === tm && sc.role !== 'gk' ? 'Gol de ' + (S.sci === g.ctl ? 'TI' : sc.name) : sc ? 'Gol en propia puerta' : ''; } g.phase = S.ph; }
+    const age = Math.min(0.25, (performance.now() - N.snapAt) / 1000), k = 1 - Math.exp(-dt * 14);
+    g.score = S.sc; g.t = Math.max(0, S.tm - (g.phase === 'play' ? age : 0)); g.pt = S.pt + age; g.own = S.own; g.hold = S.hold; g.concede = S.con;
+    if (S.ctl != null && S.ctl >= 0 && S.ctl !== g.ctl) { g.ctl = S.ctl; g.charging = false; }
+    g.ps.forEach((p, i) => {
+      const s = S.ps[i];
+      if (!s) return;
+      const tx = s.x + s.vx * age, ty = s.y + s.vy * age;
+      if (Math.hypot(tx - p.x, ty - p.y) > 3) { p.x = tx; p.y = ty; } else { p.x += (tx - p.x) * k; p.y += (ty - p.y) * k; }
+      p.vx = s.vx; p.vy = s.vy; p.turn = s.turn; p.stam = s.stam; p.kickFoot = s.kickFoot; p.touchAnim = s.touchAnim; p.skillCd = s.skillCd;
+      p.face = this.ang(p.face + this.ang(s.face - p.face) * k);
+      const sp = Math.hypot(p.vx, p.vy);
+      if (sp > 0.25) p.run += 2 * Math.PI * (0.9 + 0.09 * sp) * dt;
+      // actions keep their own clock between snapshots, so they play smoothly
+      const a = s.act, want = a ? a.t + age : 0;
+      if (!a) p.act = null;
+      else if (!p.act || p.act.type !== a.type || Math.abs(p.act.t - want) > 0.15) p.act = { ...a, t: Math.min(a.dur || 99, want) };
+      else p.act.t = Math.min(a.dur || 99, p.act.t + dt);
+      p.netChg = !!s.chg && i !== g.ctl;
+    });
+    // the ball: extrapolated with gravity, then eased onto it
+    const B = S.b, bz = Math.max(0, B.z + B.vz * age - (B.z > 0 ? 4.9 * age * age : 0)), bx = B.x + B.vx * age, by = B.y + B.vy * age;
+    if (Math.hypot(bx - b.x, by - b.y) > 4) { b.x = bx; b.y = by; b.z = bz; } else { const kb = 1 - Math.exp(-dt * 20); b.x += (bx - b.x) * kb; b.y += (by - b.y) * kb; b.z += (bz - b.z) * kb; }
+    b.vx = B.vx; b.vy = B.vy; b.vz = B.vz;
+    g.fx = S.fx;
+    g.chat = S.chat.filter((c) => g.ps[c[0]]).map((c) => ({ p: g.ps[c[0]], text: c[1], t: c[2] }));
   }
   size() {
     return Math.max(1, Math.min(4, Number(this.props.teamSize ?? 3)));
@@ -195,11 +338,24 @@ class Component extends DCLogic {
     const mates = Array.isArray(P.mates) ? P.mates : [P.mateName ?? 'Compañero', P.mate2Name ?? 'Compañero 2', 'Compañero 3'];
     const rivals = Array.isArray(P.rivals) ? P.rivals : [P.awayName ?? 'Rival', P.away2Name ?? 'Rival 2', P.away3Name ?? 'Rival 3', 'Rival 4'];
     const keeper = this.keeperMode();
-    const homeNames = keeper ? mates.concat(['Compañero 4', 'Compañero 5']) : [P.homeName ?? 'Tú'].concat(mates), awayNames = rivals;
+    let homeNames = keeper ? mates.concat(['Compañero 4', 'Compañero 5']) : [P.homeName ?? 'Tú'].concat(mates), awayNames = rivals;
+    // online: the room's players (the host's phone runs the match; a guest on the other team sees it
+    // mirrored, so on every phone your own team plays left to right in your kit)
+    const O = P.online;
+    this.net = O && O.room ? { room: O.room, host: !!O.isHost, me: O.me, mirror: !O.isHost && O.myTeam === 1, mySlot: O.mySlot || 0, humans: [], snapT: 0, inT: 0, snap: null } : null;
+    if (this.net) {
+      const N = this.net, real = (lt) => (N.mirror ? 1 - lt : lt);
+      const who = (lt, k) => (O.roster || []).find((r) => r.team === real(lt) && r.slot === k);
+      const nm = (lt, k) => { const r = who(lt, k); return r ? r.name : 'IA'; };
+      homeNames = Array.from({ length: n }, (_, k) => nm(0, k)); awayNames = Array.from({ length: n }, (_, k) => nm(1, k));
+      this.look = (lt, k) => { const r = who(lt, k); return r && r.id !== N.me ? r.look || null : null; };
+      this.netWho = who;
+    }
     const ps = [];
-    for (let k = 0; k < n; k++) ps.push({ team: 0, role: k || keeper ? 'mate' : 'human', slot: k, name: homeNames[k] });
+    for (let k = 0; k < n; k++) ps.push({ team: 0, role: (this.net ? k !== this.net.mySlot : k) || keeper ? 'mate' : 'human', slot: k, name: homeNames[k] });
     for (let k = 0; k < n; k++) ps.push({ team: 1, role: 'ai', slot: k, name: awayNames[k] });
     ps.push({ team: 0, role: 'gk', slot: -1, name: keeper ? (P.homeName ?? 'Tú') : 'Portero' }, { team: 1, role: 'gk', slot: -1, name: 'Portero' });
+    if (this.net) ps.forEach((p) => { if (p.role !== 'gk') p.look = this.look(p.team, p.slot); });
     ps.forEach((p) => Object.assign(p, { x: 30, y: 15, vx: 0, vy: 0, face: p.team ? Math.PI : 0, run: Math.random() * 6, cd: 0, inv: 0, skillCd: 0, stam: 1, think: 0, turn: 0, act: null, react: 0 }));
     this.g = {
       t: dur, dur, score: [0, 0], phase: 'ready', pt: 0, charging: false, charge: 0,
@@ -207,6 +363,14 @@ class Component extends DCLogic {
       own: -1, ctl: 0, last: -1, recv: null, sprint: false, press: false, scorer: '',
       ball: { x: 30, y: 15, z: 0, vx: 0, vy: 0, vz: 0, rot: 0, spin: 0 }, ps
     };
+    if (this.net && this.net.host) {
+      // everyone else in the room plays a player of their own on the host's phone
+      this.net.humans = (O.roster || []).filter((r) => r.id !== this.net.me).map((r) => {
+        const i = ps.findIndex((p) => p.team === r.team && p.slot === r.slot && p.role !== 'gk');
+        return { id: r.id, name: r.name, home: i, i, inp: [0, 0], sprint: false, press: false, charging: false, charge: 0, q: [] };
+      }).filter((h) => h.i >= 0);
+      this.netListen();
+    } else if (this.net) this.netListen();
     this.kickoff(0);
     if (this.props.tutorial) this.tutSetup(0);
   }
@@ -242,7 +406,8 @@ class Component extends DCLogic {
       Object.assign(p, { x, y });
     });
     g.own = -1; g.hold = -1; g.recv = null; g.charging = false; g.charge = 0;
-    g.ctl = this.keeperMode() ? g.ps.findIndex((p) => p.team === 0 && p.role === 'gk') : g.ps.findIndex((p) => p.team === 0 && p.slot === 0);
+    g.ctl = this.keeperMode() ? g.ps.findIndex((p) => p.team === 0 && p.role === 'gk') : g.ps.findIndex((p) => p.team === 0 && p.slot === (this.net ? this.net.mySlot : 0));
+    if (this.net) this.net.humans.forEach((h) => { h.i = h.home; h.charging = false; h.charge = 0; });
   }
   keeperMode() {
     // 4vs4: you can play in goal, with a camera from behind your own goal
@@ -294,11 +459,14 @@ class Component extends DCLogic {
   tick(now) {
     const dt = Math.min(0.033, Math.max(0, (now - this.last) / 1000));
     this.last = now;
-    for (let i = 0; i < 3; i++) this.step(dt / 3);
+    const N = this.net;
+    if (N && !N.host) this.clientStep(dt);
+    else for (let i = 0; i < 3; i++) this.step(dt / 3);
+    if (N && N.host) this.hostSend(dt);
     this.draw3D(dt);
     this.forceUpdate();
     const g = this.g;
-    this.raf = (g.phase === 'play' || g.phase === 'goal' || g.phase === 'winners') ? requestAnimationFrame(this.tick) : null;
+    this.raf = (g.phase === 'play' || g.phase === 'goal' || g.phase === 'winners' || (N && !N.host && g.phase !== 'end')) ? requestAnimationFrame(this.tick) : null;
   }
   ang(a) {
     while (a > Math.PI) a -= 2 * Math.PI;
@@ -307,7 +475,11 @@ class Component extends DCLogic {
   }
   clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
-  flashMsg(text, t) { this.g.flash = text; this.g.flashT = t || 1; }
+  flashMsg(text, t) {
+    // a message about a remote player's action goes to that player's phone
+    if (this.ctxH) { if (this.net) this.net.room.sendTo(this.ctxH.id, { t: 'f', x: text, d: t || 1 }); return; }
+    this.g.flash = text; this.g.flashT = t || 1;
+  }
   release(p) {
     const g = this.g, i = g.ps.indexOf(p);
     if (g.own === i) g.own = -1;
@@ -398,6 +570,7 @@ class Component extends DCLogic {
     g.score[team]++;
     g.phase = 'goal'; g.pt = 0; g.concede = 1 - team; g.own = -1;
     const sc = g.last >= 0 ? g.ps[g.last] : null;
+    g.sci = sc ? g.last : -1;
     g.scorer = sc && sc.team === team && sc.role !== 'gk' ? 'Gol de ' + (g.ps.indexOf(sc) === g.ctl || sc.role === 'human' ? 'TI' : sc.name) : sc ? 'Gol en propia puerta' : '';
     g.ps.forEach((p) => {
       if (p === sc && sc.team === team) p.act = { type: 'celebrate', t: 0, dur: 3, lock: true };
@@ -445,6 +618,7 @@ class Component extends DCLogic {
   }
   doKick() {
     const g = this.g, p = g.ps[g.ctl];
+    if (this.netEv('kick')) { g.charging = false; g.charge = 0; return; }
     if (g.phase !== 'play' || (p.act && p.act.type === 'windup')) { g.charging = false; g.charge = 0; return; }
     if (g.hold === g.ctl) {
       // a punt from the hands, aimed with the stick
@@ -456,11 +630,11 @@ class Component extends DCLogic {
     }
     const [ix, iy] = this.inp || [0, 0];
     let dir = Math.hypot(ix, iy) > 0.2 ? Math.atan2(iy, ix) : p.face;
-    const pre = this.tt('pre');
-    if (Math.cos(dir) > 0.2 && p.x > 26) {
-      const yInt = p.y + Math.tan(dir) * (60 - p.x);
+    const pre = this.tt('pre'), gx = p.team ? 0 : 60, sg = p.team ? -1 : 1;
+    if (Math.cos(dir) * sg > 0.2 && (p.x - 30) * sg > -4) {
+      const yInt = p.y + Math.tan(dir) * (gx - p.x);
       const ty = this.clamp(yInt, 12.7, 17.3);
-      dir += this.ang(Math.atan2(ty - p.y, 60 - p.x) - dir) * (0.45 + 0.45 * pre);
+      dir += this.ang(Math.atan2(ty - p.y, gx - p.x) - dir) * (0.45 + 0.45 * pre);
     }
     const power = Math.max(0.15, g.charge);
     dir += (Math.random() - 0.5) * 0.16 * (1 - pre) * (0.6 + power * 0.6);
@@ -477,7 +651,7 @@ class Component extends DCLogic {
   }
   humanPass() {
     const g = this.g, p = g.ps[g.ctl], b = g.ball;
-    if (g.phase !== 'play') return;
+    if (g.phase !== 'play' || this.netEv('pass')) return;
     if (g.hold === g.ctl) {
       const [ix, iy] = this.inp || [0, 0], aimed = Math.hypot(ix, iy) > 0.2;
       const q = this.pickPassTarget(p, aimed ? Math.atan2(iy, ix) : 0, !aimed);
@@ -494,10 +668,11 @@ class Component extends DCLogic {
   }
   switchPlayer() {
     const g = this.g, b = g.ball;
-    if (this.keeperMode()) return;
+    if (this.keeperMode() || this.netEv('switch')) return;
     let best = -1, bd = 1e9;
+    const tm = g.ps[g.ctl].team;
     g.ps.forEach((q, i) => {
-      if (q.team !== 0 || q.role === 'gk' || i === g.ctl) return;
+      if (q.team !== tm || q.role === 'gk' || i === g.ctl || this.netHuman(i)) return;
       const d = this.dist(q, b);
       if (d < bd) { bd = d; best = i; }
     });
@@ -505,6 +680,7 @@ class Component extends DCLogic {
   }
   humanSkill() {
     const g = this.g, p = g.ps[g.ctl];
+    if (this.netEv('skill')) return;
     if (g.own !== g.ctl) { this.flashMsg('Necesitas el balón para regatear', 0.8); return; }
     if (p.skillCd > 0) return;
     const [ix, iy] = this.inp || [0, 0];
@@ -515,6 +691,7 @@ class Component extends DCLogic {
   }
   humanSlide() {
     const g = this.g, p = g.ps[g.ctl], b = g.ball;
+    if (this.netEv('slide')) return;
     if (g.phase !== 'play' || p.cd > 0 || (p.act && p.act.lock)) return;
     const [ix, iy] = this.inp || [0, 0];
     const dir = Math.hypot(ix, iy) > 0.2 ? Math.atan2(iy, ix) : Math.atan2(b.y - p.y, b.x - p.x);
@@ -539,6 +716,10 @@ class Component extends DCLogic {
     if (g.t <= 0) { g.t = 0; g.charging = false; this.setupWinners(); return; }
     if (g.charging) g.charge = Math.min(1, g.charge + dt * 1.15);
     if (g.recv) { g.recv.t -= dt; if (g.recv.t <= 0) g.recv = null; }
+    if (this.net) this.net.humans.forEach((h) => {
+      if (h.charging) h.charge = Math.min(1, h.charge + dt * 1.15);
+      while (h.q.length) { const ev = h.q.shift(); this.withHuman(h, () => this.runEv(ev)); }
+    });
     let ix = g.jx + (g.keys.r ? 1 : 0) - (g.keys.l ? 1 : 0);
     let iy = g.jy + (g.keys.d ? 1 : 0) - (g.keys.u ? 1 : 0);
     const il = Math.hypot(ix, iy);
@@ -552,7 +733,7 @@ class Component extends DCLogic {
     // with the Pro camera too, the camera looks up the pitch
     this.inp = this.keeperMode() || this.proCam() ? [-sm[1], sm[0]] : [sm[0], sm[1]];
     const chasers = this.pickChasers();
-    g.ps.forEach((p, i) => this.movePlayer(p, i, dt, chasers));
+    g.ps.forEach((p, i) => { const h = this.netHuman(i); if (h) this.withHuman(h, () => this.movePlayer(p, i, dt, chasers)); else this.movePlayer(p, i, dt, chasers); });
     for (let i = 0; i < g.ps.length; i++) for (let j = i + 1; j < g.ps.length; j++) {
       const a = g.ps[i], c = g.ps[j];
       if ((a.act && a.act.type === 'slide') || (c.act && c.act.type === 'slide')) continue;
@@ -622,7 +803,7 @@ class Component extends DCLogic {
     const ownTeam = g.own >= 0 ? g.ps[g.own].team : (g.hold >= 0 ? g.ps[g.hold].team : -1);
     [0, 1].forEach((tm) => {
       if (tm === ownTeam) return;
-      const outs = g.ps.filter((q, i) => q.team === tm && q.role !== 'gk' && (i !== g.ctl || this.autoplay) && !(q.act && q.act.lock));
+      const outs = g.ps.filter((q, i) => q.team === tm && q.role !== 'gk' && (i !== g.ctl || this.autoplay) && !this.netHuman(i) && !(q.act && q.act.lock));
       if (!outs.length) return;
       const d = (q) => Math.hypot(b.x + b.vx * 0.3 - q.x, b.y + b.vy * 0.3 - q.y);
       outs.sort((u, v) => d(u) - d(v));
@@ -630,6 +811,7 @@ class Component extends DCLogic {
       const human = g.ps[g.ctl];
       outs.forEach((q) => { if (q.pressReq > 0) set.add(q); });
       if (!this.autoplay && tm === human.team && !(d(outs[0]) < d(human) - 1.5)) return;
+      if (this.net && this.net.humans.some((h) => g.ps[h.i].team === tm && !(d(outs[0]) < d(g.ps[h.i]) - 1.5))) return;
       set.add(outs[0]);
     });
     return set;
@@ -1232,7 +1414,7 @@ class Component extends DCLogic {
         return;
       }
     }
-    if (owner) { this.dribble(owner, dt); return; }
+    if (owner) { const h = this.netHuman(g.own); if (h) this.withHuman(h, () => this.dribble(owner, dt)); else this.dribble(owner, dt); return; }
     // ---- loose ball: first player to reach it controls it ----
     let best = -1, bd = 1e9;
     for (let i = 0; i < g.ps.length; i++) {
@@ -1803,8 +1985,9 @@ class Component extends DCLogic {
         socks: new THREE.Color(gk ? '#17172A' : home ? (P.homeColor ? hc : this.homeKit().socks) : ac),
         boot: home ? (P.homeColor ? 0xc8f031 : this.homeKit().shoe) : 0xf2f5fa, gloves: gk, number: gk ? '1' : nums[p.team][p.slot],
         trimCss: gk ? '#17172A' : home ? ht : at,
-        hair: [0x241811, 0xc9a227, 0x3a2418, 0x141b2d][Math.floor(Math.random() * 4)]
-      });
+        hair: [0x241811, 0xc9a227, 0x3a2418, 0x141b2d][Math.floor(Math.random() * 4)],
+        char: p.look ? p.look.char : undefined
+      }, p.look);
       this.S.add(m);
       return m;
     });
@@ -1962,7 +2145,10 @@ class Component extends DCLogic {
       c.fillStyle = hg; c.fillRect(0, h * 0.85, w, h * 0.15);
     });
   }
-  makePlayer(o) {
+  makePlayer(o, look) {
+    // another online player: their own character, with their hat and glasses on the team kit
+    if (look && o.kit) { o = { ...o, gear: true, kit: { ...o.kit, hat: look.hat, hatColor: look.hatColor, face: look.face } }; }
+    if (o.char === 'clasico') delete o.char;
     // Mixamo character when they are loaded and chosen in Configuración; procedural player otherwise
     const mx = window.AMChars && window.AMChars.make(o);
     if (mx) return mx;
@@ -2138,7 +2324,7 @@ class Component extends DCLogic {
     const lx = p.vx * c - p.vy * sn, lz = p.vx * sn + p.vy * c, sp = Math.hypot(p.vx, p.vy);
     const want = {};
     // one-shot clip for the current action: [game action] -> [clip, from, to] (seconds into the clip)
-    const charging = i === g.ctl && g.charging;
+    const charging = (i === g.ctl && g.charging) || !!p.netChg || !!(this.netHuman(i) || {}).charging;
     let act = null;
     // shot clip: backswing peaks at 0.27 s, the foot meets the ball at 0.42 s
     if (charging) act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.7 + 0.3 * g.charge : 0.12 + 0.15 * g.charge, key: 'charge' };
@@ -2258,7 +2444,7 @@ class Component extends DCLogic {
       }
     }
     // charging a shot: wind the kicking leg back
-    const charging = i === g.ctl && g.charging;
+    const charging = (i === g.ctl && g.charging) || !!p.netChg || !!(this.netHuman(i) || {}).charging;
     const a = p.act;
     if (charging || (a && a.type === 'windup')) {
       const c = charging ? g.charge : a.t / a.dur;
@@ -2363,7 +2549,7 @@ class Component extends DCLogic {
     const mode = P.mode ?? 'test', n = this.size();
     const won = g.score[0] > g.score[1], lost = g.score[0] < g.score[1];
     const chip = (c, t) => 'width: 22px; height: 22px; border-radius: 6px; background: ' + c + '; border: 3px solid ' + t + '; box-sizing: border-box;';
-    const online = !!P.ping;
+    const online = !!P.ping || !!this.net;
     const showNames = !this.play || this.play.names !== false;
     const tags = g.phase === 'winners' ? [] : g.ps.filter((q, k) => q.role !== 'gk' && (k === g.ctl || (showNames && (online || n > 1)))).map((q) => {
       const c = g.chat.find((m) => m.p === q), me = q === h, s = SP(q.x, q.y, 2.3);
@@ -2389,7 +2575,7 @@ class Component extends DCLogic {
     };
     const sprintOn = g.sprint && h.stam > 0.04;
     return {
-      tags, hasMates: n > 1, hasPing: online, pingLabel: (P.ping ?? '') + ' ms',
+      tags, hasMates: n > 1, hasPing: online, pingLabel: (this.net ? (this.net.host ? Math.max(0, ...Object.values(this.net.room.pings || {})) : this.net.room.ping) || '–' : P.ping ?? '') + ' ms',
       ordPass: (e) => { e.preventDefault(); if (g.phase === 'play') this.order('pass'); },
       ordShoot: (e) => { e.preventDefault(); if (g.phase === 'play') this.order('shoot'); },
       ordBack: (e) => { e.preventDefault(); if (g.phase === 'play') this.order('back'); },
@@ -2533,6 +2719,7 @@ class Component extends DCLogic {
   // CENTRO: a cross into the box for the best-placed teammate, who attacks it with a header or a bicycle kick
   humanCross() {
     const g = this.g, p = g.ps[g.ctl], b = g.ball;
+    if (this.netEv('cross')) return;
     if (g.phase !== 'play' || this.size() < 2) return;
     if (g.own !== g.ctl && (this.dist(p, b) > 1.5 || b.z > 1.2)) { this.flashMsg('Necesitas el balón para centrar', 0.8); return; }
     const sg = p.team === 0 ? 1 : -1, gx = p.team === 0 ? 60 : 0, spotX = gx - sg * 8;
@@ -2595,6 +2782,7 @@ class Component extends DCLogic {
   }
   order(kind) {
     const g = this.g, h = g.ps[g.ctl];
+    if (this.netEv('order', kind)) return;
     const mates = g.ps.filter((q, k) => q.team === h.team && q.role !== 'gk' && k !== g.ctl);
     if (!mates.length) return;
     if (kind === 'pass') { this.callForBall(); return; }
@@ -2609,6 +2797,7 @@ class Component extends DCLogic {
   }
   callForBall() {
     const g = this.g, h = g.ps[g.ctl];
+    if (this.netEv('call')) return;
     const owner = g.own >= 0 ? g.ps[g.own] : null;
     this.say(h, '¡Pásala!');
     if (owner && owner.team === h.team && owner !== h) { owner.passReq = 1.5; owner.think = Math.min(owner.think, 0.08); }

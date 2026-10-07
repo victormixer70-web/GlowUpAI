@@ -140,7 +140,11 @@
   App.prototype = Object.create(PComponent.prototype);
   App.prototype.componentDidMount = function () {
     var self = this;
-    window.addEventListener('hashchange', function () { self.setState({ screen: current() }); });
+    window.addEventListener('hashchange', function () {
+      var go = function () { self.setState({ screen: current() }); };
+      // with the interface motion loaded, the change happens under its covering wipe
+      if (window.AMFX && window.AMFX.swap && current() !== self.state.screen) window.AMFX.swap(go); else go();
+    });
   };
   App.prototype.render = function () {
     var Comp = registry[this.state.screen];

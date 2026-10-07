@@ -23,15 +23,19 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
     </a>
     <span class="bc-title" style="position: absolute; left: 66px; top: 14px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px">PARTIDA PRIVADA · {{sportName}}</span>
-    <span style="position: absolute; left: 66px; top: 44px; font-size: 12px; color: #A3A3C2">Código de sala <b style="color: #FFC53D; letter-spacing: 2px">{{code}}</b></span>
+    <span style="position: absolute; left: 66px; top: 46px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: #A3A3C2; white-space: nowrap">Código <b style="color: #FFC53D; letter-spacing: 3px; font-size: 15px">{{code}}</b><span style="{{netDot}}"></span>{{netLabel}}</span>
     <div style="position: absolute; right: 14px; top: 12px; display: flex; gap: 6px">
+      <input aria-label="Tu nombre en la sala" value="{{myName}}" onInput="{{onName}}" onBlur="{{saveName}}" maxlength="16" style="width: 120px; height: 38px; padding: 0 10px; box-sizing: border-box; border-radius: 12px; border: 1px solid #2E2E52; background: #0B0B14; color: #F4F4FA; font: 800 13px Exo2, sans-serif">
+      <sc-if value="{{isGuest}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{leaveRoom}}" style="height: 40px; padding: 0 14px; border: 1px solid #FF8A8E; border-radius: 12px; background: #2A1420; color: #FF8A8E; font: 800 13px Exo2, sans-serif; cursor: pointer">Salir de la sala</button></sc-if>
+      <sc-if value="{{notGuest}}" hint-placeholder-val="{{ true }}">
       <button type="button" onClick="{{invite}}" style="height: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: #A78BFA; color: #0B0B14; font: 800 13px Exo2, sans-serif; cursor: pointer">Invitar amigos</button>
       <button type="button" onClick="{{toggleJoin}}" style="height: 40px; padding: 0 14px; border: 1px solid #2E2E52; border-radius: 12px; background: #17172A; color: #F4F4FA; font: 800 13px Exo2, sans-serif; cursor: pointer">Unirse con código</button>
+      </sc-if>
     </div>
     <sc-if value="{{showJoin}}" hint-placeholder-val="{{ false }}">
       <div class="bc-tile" style="position: absolute; right: 14px; top: 58px; z-index: 2; width: 300px; padding: 12px; border-radius: 14px; background: #17172A; border: 1px solid #2E2E52; display: flex; flex-direction: column; gap: 8px">
         <label for="pv-code" style="font-size: 12px; font-weight: 800">Código de la sala de tu amigo</label>
-        <input id="pv-code" value="{{joinCode}}" onInput="{{onJoinInput}}" maxlength="6" placeholder="Ej. K7Q2PX" style="height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid #2E2E52; background: #0B0B14; color: #F4F4FA; font: 800 16px Exo2, sans-serif; letter-spacing: 3px; text-transform: uppercase">
+        <input id="pv-code" value="{{joinCode}}" onInput="{{onJoinInput}}" maxlength="5" placeholder="Ej. K7Q2P" style="height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid #2E2E52; background: #0B0B14; color: #F4F4FA; font: 800 16px Exo2, sans-serif; letter-spacing: 3px; text-transform: uppercase">
         <button type="button" onClick="{{join}}" style="height: 38px; border: 0; border-radius: 10px; background: #22D3EE; color: #0B0B14; font: 800 13px Exo2, sans-serif; cursor: pointer">Unirse</button>
       </div>
     </sc-if>
@@ -55,14 +59,17 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <div style="position: absolute; left: 14px; right: 14px; bottom: 12px; display: flex; align-items: center; gap: 14px">
       <span style="flex: 1; font-size: 11px; line-height: 1.45; color: #A3A3C2">{{note}}</span>
       <sc-if value="{{canKeep}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">TU POSICIÓN</span><div style="display: flex; gap: 3px; padding: 3px; border-radius: 11px; background: #17172A"><button type="button" onClick="{{setField}}" style="{{fieldStyle}}">CAMPO</button><button type="button" onClick="{{setKeeper}}" style="{{keeperStyle}}">PORTERO</button></div></div></sc-if>
-      <button type="button" onClick="{{startMatch}}" class="bc-btn am-shine" style="flex: none; height: 52px; padding: 0 34px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">EMPEZAR</button>
+      <button type="button" onClick="{{startMatch}}" class="bc-btn am-shine" style="flex: none; height: 52px; padding: 0 34px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">{{startLabel}}</button>
     </div>
     <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
       <div style="position: absolute; left: 0; right: 0; top: 160px; display: flex; justify-content: center; pointer-events: none"><span style="max-width: 460px; padding: 10px 16px; border-radius: 12px; background: #F4F4FA; color: #0B0B14; font-size: 13px; font-weight: 800; text-align: center">{{toastText}}</span></div>
     </sc-if>
   </sc-if>
 
-  <sc-if value="{{isTeamMatch}}" hint-placeholder-val="{{ false }}">
+  <sc-if value="{{isOnlineMatch}}" hint-placeholder-val="{{ false }}">
+    <dc-import name="Partido" online="{{online}}" label="PARTIDA ONLINE" mode="quick" duration="120" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Tu equipo" away-name="{{rivalTeamName}}" away-color="#3EA6FF" away-trim="#0B0B14" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
+  </sc-if>
+  <sc-if value="{{offlineTeam}}" hint-placeholder-val="{{ false }}">
     <dc-import name="Partido" keeper="{{asKeeper}}" label="PARTIDA PRIVADA" mode="quick" duration="120" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Invitado_4821" mates="{{mates}}" rivals="{{rivals}}" away-name="Equipo rival" away-color="#3EA6FF" away-trim="#0B0B14" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isDuelMatch}}" hint-placeholder-val="{{ false }}">
@@ -94,10 +101,81 @@ class Component extends DCLogic {
     this.C = this.catalog(this.sport);
     const fm = this.C.modes.filter((m) => !m.soon);
     const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    this.code = Array.from({ length: 6 }, () => abc[Math.floor(Math.random() * abc.length)]).join('');
+    this.code = window.AMOnline ? window.AMOnline.newCode() : Array.from({ length: 5 }, () => abc[Math.floor(Math.random() * abc.length)]).join('');
     const first = fm.find((m) => m.id === 'm2') || fm[0];
-    this.state = { fmt: first.id, slots: {}, phase: 'room', res: null, showJoin: false, joinCode: '', toast: '', target: 0 };
+    this.myName = window.AMOnline ? window.AMOnline.myName() : 'Jugador';
+    this.state = { fmt: first.id, slots: {}, phase: 'room', res: null, showJoin: false, joinCode: '', toast: '', target: 0, net: 'off', roster: [], name: this.myName };
   }
+  /* ---------- online room: this phone hosts a room under its code until it joins someone else's ---------- */
+  componentDidMount() { if (this.sport === 'futbol') this.openHost(); this.pingT = setInterval(() => { if (this.room && this.state.phase === 'room') this.forceUpdate(); }, 2000); }
+  look() {
+    const A = window.AMChars, o = A ? A.outfit('futbol') : null;
+    return { char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none' };
+  }
+  openHost() {
+    const O = window.AMOnline;
+    if (!O || !O.available()) { this.setState({ net: 'off' }); return; }
+    if (this.room) this.room.close();
+    this.setState({ net: 'connecting', roster: [] });
+    const room = this.room = O.host(this.code, this.myName, {
+      open: () => { if (this.room !== room) return; this.setState({ net: 'host', roster: [{ id: room.me, name: this.myName, team: 0, slot: 0, look: this.look(), host: true }] }); },
+      join: (id, name) => {
+        if (this.room !== room) return;
+        const seat = this.freeSeat([1, 0]);
+        if (!seat || this.state.phase === 'match') { room.sendTo(id, { t: 'full', why: seat ? 'La partida ya ha empezado.' : 'La sala está llena.' }); return; }
+        this.setRoster(this.state.roster.concat([{ id, name, team: seat[0], slot: seat[1], look: null }]));
+        this.say(name + ' ha entrado en la sala');
+      },
+      leave: (id) => {
+        if (this.room !== room) return;
+        const r = this.state.roster.find((x) => x.id === id);
+        this.setRoster(this.state.roster.filter((x) => x.id !== id));
+        if (r && this.state.phase !== 'match') this.say(r.name + ' ha salido de la sala');
+      },
+      msg: (id, m) => {
+        if (this.room !== room) return;
+        const R = this.state.roster;
+        if (m.t === 'hello') this.setRoster(R.map((x) => (x.id === id ? { ...x, name: String(m.name || x.name).slice(0, 16), look: m.look || null } : x)));
+        if (m.t === 'seat' && !R.some((x) => x.team === m.team && x.slot === m.slot) && m.slot < this.size()) this.setRoster(R.map((x) => (x.id === id ? { ...x, team: m.team, slot: m.slot } : x)));
+      },
+      error: (text, type) => {
+        if (this.room !== room) return;
+        if (type === 'unavailable-id') { this.code = O.newCode(); this.openHost(); return; }
+        this.room = null; room.close();
+        this.setState({ net: 'off' }); this.say(text);
+      }
+    });
+  }
+  joinRoom(code) {
+    const O = window.AMOnline;
+    if (!O || !O.available()) { this.say('Este navegador no permite jugar online.'); return; }
+    if (this.room) this.room.close();
+    this.setState({ net: 'connecting', roster: [] });
+    const room = this.room = O.join(code, this.myName, {
+      open: () => { if (this.room !== room) return; this.setState({ net: 'guest' }); room.send({ t: 'hello', name: this.myName, look: this.look() }); },
+      msg: (id, m) => {
+        if (this.room !== room) return;
+        if (m.t === 'lobby') this.setState({ roster: m.roster, fmt: m.fmt, hostCode: m.code });
+        if (m.t === 'start') this.setState({ roster: m.roster, fmt: m.fmt, phase: 'match', res: null });
+        if (m.t === 'full') { this.say(m.why); this.backHome(); }
+      },
+      leave: () => { if (this.room !== room) return; this.say('El anfitrión ha cerrado la sala'); if (this.state.phase !== 'match') this.backHome(); },
+      error: (text) => { if (this.room !== room) return; this.say(text); this.backHome(); }
+    });
+  }
+  backHome() { if (this.room) { this.room.close(); this.room = null; } this.setState({ phase: 'room', res: null }); setTimeout(() => this.openHost(), 300); }
+  freeSeat(order, R) {
+    R = R || this.state.roster;
+    const n = this.size();
+    for (const t of order) for (let k = 0; k < n; k++) if (!R.some((x) => x.team === t && x.slot === k)) return [t, k];
+    return null;
+  }
+  // the host owns the list of who sits where, and tells everyone
+  setRoster(R, fmt) {
+    this.setState({ roster: R }, () => this.lobbyOut(fmt));
+  }
+  lobbyOut(fmt) { if (this.room && this.room.isHost) this.room.send({ t: 'lobby', roster: this.state.roster, fmt: fmt || this.state.fmt, code: this.code }); }
+  guests() { return this.state.roster.filter((x) => !x.host).length; }
   catalog(sport) {
     const team = (n, soon) => ({ id: 'm' + n, title: n + 'VS' + n, kind: 'team', n, soon, desc: soon ? 'Partido por equipos. Lo estamos preparando.' : n === 1 ? 'Tú contra otro jugador, con porteros.' : n + ' contra ' + n + ', con porteros.' });
     const teams = (soon) => [1, 2, 3, 4].map((n) => team(n, soon));
@@ -159,7 +237,7 @@ class Component extends DCLogic {
     clearTimeout(this.toastT);
     this.toastT = setTimeout(() => this.setState({ toast: '' }), 3200);
   }
-  componentWillUnmount() { clearTimeout(this.toastT); }
+  componentWillUnmount() { clearTimeout(this.toastT); clearInterval(this.pingT); if (this.room) { this.room.close(); this.room = null; } }
   fmtObj() { return this.C.modes.find((m) => m.id === this.state.fmt); }
   size() { const f = this.fmtObj(); return f.kind === 'team' ? f.n : 1; }
   slotKind(key) { return this.state.slots[key] || 'ai'; }
@@ -184,15 +262,31 @@ class Component extends DCLogic {
   finish(r) { const f = this.fmtObj(); this.recordMatch(this.sport, f ? f.kind : 'team', r); this.setState({ phase: 'result', res: r }); }
   renderVals() {
     const s = this.state, f = this.fmtObj(), n = this.size();
+    const guest = s.net === 'guest', guests = this.guests(), online = s.net === 'host' || guest;
     const formats = this.C.modes.filter((m) => !m.soon).map((m) => ({
       title: m.title,
-      style: 'height: 36px; padding: 0 12px; border-radius: 10px; font: 800 12px Exo2, sans-serif; cursor: pointer; ' + (m.id === s.fmt ? 'background: #22D3EE; color: #0B0B14; border: 0;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E52;'),
-      pick: () => this.setState({ fmt: m.id })
+      style: 'height: 36px; padding: 0 12px; border-radius: 10px; font: 800 12px Exo2, sans-serif; cursor: ' + (guest ? 'default' : 'pointer') + '; ' + (m.id === s.fmt ? 'background: #22D3EE; color: #0B0B14; border: 0;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E52;') + (guest && m.id !== s.fmt ? ' opacity: .45;' : ''),
+      pick: () => {
+        if (guest) { this.say('El anfitrión elige el modo'); return; }
+        if (guests && m.kind !== 'team') { this.say('Con amigos en la sala, de momento solo partidos por equipos'); return; }
+        // anyone left without a seat in the smaller format moves to a free one
+        const n2 = m.kind === 'team' ? m.n : 1;
+        let R = this.state.roster.map((x) => ({ ...x }));
+        R.forEach((x) => { if (x.slot >= n2) x.slot = -1; });
+        R.forEach((x) => { if (x.slot < 0) { const sp = []; for (const t of x.host ? [0] : [x.team, 1 - x.team]) for (let k = 0; k < n2; k++) if (!R.some((y) => y.team === t && y.slot === k)) sp.push([t, k]); if (sp.length) { x.team = sp[0][0]; x.slot = sp[0][1]; } } });
+        R = R.filter((x) => x.slot >= 0);
+        this.setState({ fmt: m.id }, () => this.setRoster(R, m.id));
+      }
     }));
+    const meId = this.room && this.room.me;
     const slot = (team, i) => {
-      const key = team + i, you = team === 'A' && i === 0, kind = you ? 'you' : this.slotKind(key);
-      const name = you ? 'Invitado_4821 (tú)' : kind === 'friend' ? 'Amigo invitado' : 'IA ' + (team === 'A' ? 'compañera' : 'rival') + (n > 1 ? ' ' + (team === 'A' ? i : i + 1) : '');
-      const tag = you ? 'ANFITRIÓN' : kind === 'friend' ? 'ESPERANDO…' : 'IA · toca para invitar';
+      const key = team + i, tn = team === 'A' ? 0 : 1;
+      const occ = online ? s.roster.find((x) => x.team === tn && x.slot === i) : null;
+      const you = online ? !!occ && occ.id === meId : team === 'A' && i === 0;
+      const kind = you ? 'you' : occ ? 'player' : online ? 'ai' : this.slotKind(key);
+      const ping = occ && !you ? (s.net === 'host' ? this.room.pings[occ.id] : occ.host ? this.room.ping : 0) : 0;
+      const name = you ? s.name + ' (tú)' : occ ? occ.name : kind === 'friend' ? 'Amigo invitado' : 'IA ' + (team === 'A' ? 'compañera' : 'rival') + (n > 1 ? ' ' + (team === 'A' ? i : i + 1) : '');
+      const tag = occ && occ.host ? 'ANFITRIÓN' + (ping ? ' · ' + ping + ' ms' : '') : you ? 'TÚ' : occ ? 'CONECTADO' + (ping ? ' · ' + ping + ' ms' : '') : online ? (s.net === 'host' && tn === 0 ? 'IA · toca para ponerte' : 'IA · toca para ponerte') : kind === 'friend' ? 'ESPERANDO…' : 'IA · toca para invitar';
       const segS = (on) => 'height: 30px; padding: 0 12px; border: 0; border-radius: 8px; font: 800 12px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
     return {
       canKeep: n === 4,
@@ -201,26 +295,56 @@ class Component extends DCLogic {
       asKeeper: n === 4 && !!s.keeper,
         name, tag,
         style: 'display: flex; justify-content: space-between; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; font: 800 13px Exo2, sans-serif; color: #F4F4FA; text-align: left; cursor: ' + (you ? 'default' : 'pointer') + '; ' + (you ? 'background: #10303A; border: 1px solid #22D3EE;' : kind === 'friend' ? 'background: #1E1A3A; border: 1px dashed #A78BFA;' : 'background: #17172A; border: 1px solid #26264A;'),
-        tagStyle: 'font-size: 10px; letter-spacing: .5px; color: ' + (you ? '#22D3EE' : kind === 'friend' ? '#A78BFA' : '#8686A6') + ';',
-        tap: () => { if (you) return; const slots = { ...s.slots, [key]: kind === 'friend' ? 'ai' : 'friend' }; this.setState({ slots }); if (kind !== 'friend') this.say('Hueco reservado para un amigo. Pásale el código ' + this.code + '.'); }
+        tagStyle: 'font-size: 10px; letter-spacing: .5px; color: ' + (you ? '#22D3EE' : kind === 'player' ? '#53D88E' : kind === 'friend' ? '#A78BFA' : '#8686A6') + ';',
+        tap: () => {
+          if (you || occ) return;
+          if (online) {
+            // sit here: the host only on its own team (it runs the match from that side)
+            if (s.net === 'host') { if (tn !== 0) { this.say('El anfitrión juega en el equipo naranja'); return; } this.setRoster(s.roster.map((x) => (x.id === meId ? { ...x, slot: i } : x))); }
+            else this.room.send({ t: 'seat', team: tn, slot: i });
+            return;
+          }
+          const slots = { ...s.slots, [key]: kind === 'friend' ? 'ai' : 'friend' }; this.setState({ slots }); if (kind !== 'friend') this.say('Hueco reservado para un amigo. Pásale el código ' + this.code + '.');
+        }
       };
     };
     const teamA = Array.from({ length: n }, (_, i) => slot('A', i)), teamB = Array.from({ length: n }, (_, i) => slot('B', i));
     const res = s.res, won = res && res.home > res.away, lost = res && res.home < res.away;
     const live = s.phase === 'match';
     const mates = teamA.slice(1).map((p) => p.name.replace(' (tú)', '')).map((x) => (x === 'Amigo invitado' ? 'IA (amigo)' : x));
+    const me = s.roster.find((x) => x.id === meId);
+    const onlineMatch = live && online && f.kind === 'team' && me ? { room: this.room, isHost: s.net === 'host', me: meId, roster: s.roster, myTeam: me.team, mySlot: me.slot } : null;
+    const hostR = s.roster.find((x) => x.host);
     const rivals = teamB.map((p) => (p.name === 'Amigo invitado' ? 'IA (amigo)' : p.name));
     return {
-      sportName: this.C.name, code: this.code,
+      sportName: this.C.name, code: guest ? (s.hostCode || s.joinCode) : this.code,
+      netLabel: s.net === 'connecting' ? 'Conectando…' : s.net === 'host' ? (guests ? guests + (guests === 1 ? ' amigo conectado' : ' amigos conectados') : 'Sala abierta · esperando amigos') : guest ? 'En la sala de ' + (hostR ? hostR.name : 'tu amigo') : 'Sin conexión: los amigos los juega la IA',
+      netDot: 'width: 8px; height: 8px; border-radius: 4px; background: ' + (s.net === 'host' || guest ? '#53D88E' : s.net === 'connecting' ? '#FFC53D' : '#5E5E80') + '; box-shadow: 0 0 8px ' + (s.net === 'host' || guest ? '#53D88E' : 'transparent') + ';',
+      myName: s.name,
+      onName: (e) => { const v = e.currentTarget.value.replace(/[^\wÁÉÍÓÚÑáéíóúñ .-]/g, '').slice(0, 16); this.setState({ name: v }); },
+      saveName: () => {
+        const v = (s.name || '').trim() || this.myName; this.myName = v; if (window.AMOnline) window.AMOnline.setName(v);
+        this.setState({ name: v });
+        if (s.net === 'host') this.setRoster(s.roster.map((x) => (x.id === meId ? { ...x, name: v } : x)));
+        else if (guest) this.room.send({ t: 'hello', name: v, look: this.look() });
+      },
+      isGuest: guest, notGuest: !guest, leaveRoom: () => { this.say('Has salido de la sala'); this.backHome(); },
+      online: onlineMatch, offlineTeam: live && f.kind === 'team' && !onlineMatch, isOnlineMatch: !!onlineMatch,
+      rivalTeamName: onlineMatch ? (onlineMatch.myTeam === 0 ? 'Rival' : 'Rival') : 'Equipo rival',
       isRoom: s.phase === 'room', isResult: s.phase === 'result',
-      isTeamMatch: live && f.kind === 'team', isDuelMatch: live && f.kind === 'duel',
+      isDuelMatch: live && f.kind === 'duel',
       isBasket: live && f.kind === 'mg' && f.comp === 'Baloncesto', isTenis: live && f.kind === 'mg' && f.comp === 'Tenis', isVoley: live && f.kind === 'mg' && f.comp === 'Voley',
       formats, teamA, teamB,
-      note: f.kind === 'team' && n > 1 ? 'Los huecos libres los juega la IA. En el partido puedes darle órdenes: ¡Pásala!, ¡Chuta!, ¡Atrás! y ¡Presiona!. El online aún no está activo: los amigos invitados también los juega la IA de momento.' : 'El online aún no está activo: de momento tu rival lo juega la IA.',
+      note: online ? (guest ? 'Toca un hueco libre para cambiarte de sitio. El anfitrión elige el modo y empieza el partido.' : 'Pasa el código ' + this.code + ' a tus amigos: entran con «Unirse con código». Los huecos libres los juega la IA.') : f.kind === 'team' && n > 1 ? 'Los huecos libres los juega la IA. En el partido puedes darle órdenes: ¡Pásala!, ¡Chuta!, ¡Atrás! y ¡Presiona!.' : 'Sin conexión online: de momento tu rival lo juega la IA.',
       showJoin: s.showJoin, joinCode: s.joinCode,
       toggleJoin: () => this.setState({ showJoin: !s.showJoin }),
       onJoinInput: (e) => this.setState({ joinCode: e.currentTarget.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) }),
-      join: () => { this.setState({ showJoin: false }); this.say(s.joinCode.length === 6 ? 'Unirse a salas estará disponible cuando activemos el online.' : 'El código tiene 6 caracteres.'); },
+      join: () => {
+        const c = s.joinCode;
+        if (c.length < 5) { this.say('El código tiene 5 caracteres.'); return; }
+        if (c === this.code) { this.say('Ese es el código de tu propia sala.'); return; }
+        this.setState({ showJoin: false }); this.joinRoom(c);
+      },
       invite: () => {
         const text = 'Únete a mi partida de ARENA MIX con el código ' + this.code + ': ' + location.href.split('#')[0];
         if (navigator.share) navigator.share({ title: 'ARENA MIX', text }).catch(() => {});
@@ -229,6 +353,9 @@ class Component extends DCLogic {
       },
       toast: !!s.toast, toastText: s.toast,
       startMatch: () => {
+        if (guest) { this.say('Esperando a que el anfitrión empiece'); return; }
+        if (guests && f.kind !== 'team') { this.say('Con amigos en la sala, de momento solo partidos por equipos'); return; }
+        if (guests) this.room.send({ t: 'start', roster: s.roster, fmt: s.fmt });
         let target = 0;
         if (f.kind === 'mg') { const [lo, hi] = f.rival; target = Math.round(lo + (hi - lo) * (0.3 + Math.random() * 0.5)); }
         this.setState({ phase: 'match', res: null, target });
@@ -240,7 +367,8 @@ class Component extends DCLogic {
       resTitle: won ? '¡VICTORIA!' : lost ? 'DERROTA' : 'EMPATE',
       resTitleStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 48px; line-height: 1; letter-spacing: 2px; color: ' + (won ? '#22D3EE' : lost ? '#FF5C5C' : '#F4F4FA') + ';',
       scoreLabel: res ? res.home + ' – ' + res.away : '',
-      backRoom: () => this.setState({ phase: 'room', res: null })
+      backRoom: () => this.setState({ phase: 'room', res: null }, () => this.lobbyOut()),
+      startLabel: guest ? 'ESPERANDO…' : 'EMPEZAR'
     };
   }
 }
