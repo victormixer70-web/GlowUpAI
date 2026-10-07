@@ -1662,7 +1662,7 @@ class Component extends DCLogic {
     });
     const adMat = new T.MeshStandardMaterial({ map: adTex, emissive: 0xffffff, emissiveMap: adTex, emissiveIntensity: 0.9 });
     const b1 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); b1.position.set(0, 0.45, -17.5); S.add(b1);
-    if (this.keeperMode() || this.proCam()) { const b2 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); b2.position.set(0, 0.45, 19.2); S.add(b2); }
+    if (this.keeperMode() || this.proCam()) { const b2 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); b2.position.set(0, 0.45, 20.6); S.add(b2); }
     // the two team dugouts on that touchline, either side of halfway, as at a professional ground: a clear
     // curved canopy on steel ribs, a printed back panel, tall padded seats in the team colour, the technical
     // area marked on the grass and the coach standing in it (only for the cameras that see that side)
@@ -1678,7 +1678,7 @@ class Component extends DCLogic {
       const panelMat = new T.MeshStandardMaterial({ map: panelTex, emissive: 0xffffff, emissiveMap: panelTex, emissiveIntensity: 0.5, roughness: 0.6 });
       const lineMat = new T.MeshBasicMaterial({ color: 0xffffff });
       [-1, 1].forEach((sx, team) => {
-        const D = new T.Group(); D.position.set(sx * 8, 0, 16.2);
+        const D = new T.Group(); D.position.set(sx * 8, 0, 17.6);
         // canopy: clear curved roof and ends on five steel ribs, a rail along the front edge
         const shell = new T.Mesh(new T.CylinderGeometry(r, r, L, 24, 1, true, 0, Math.PI / 2), glass);
         shell.rotation.z = Math.PI / 2; shell.renderOrder = 3; D.add(shell);
@@ -1706,19 +1706,22 @@ class Component extends DCLogic {
         D.traverse((o) => { if (o.isMesh && o.material !== glass) { o.castShadow = true; o.receiveShadow = true; } });
         S.add(D);
         // technical area: a dashed white box in front of the dugout
-        const tx0 = sx * 8 - 5.5, tx1 = sx * 8 + 5.5, tz0 = 15.15, tz1 = 16.1;
+        const tx0 = sx * 8 - 5.5, tx1 = sx * 8 + 5.5, tz0 = 15.6, tz1 = 17.5;
+        // the area from the touchline to the dugout is laid in blue, like a coach's technical area
+        const pad = new T.Mesh(new T.PlaneGeometry(tx1 - tx0 + 0.6, 19.6 - 15.4), this.mat(0x1f4fa8, { roughness: 0.95 }));
+        pad.rotation.x = -Math.PI / 2; pad.position.set(sx * 8, 0.01, (15.4 + 19.6) / 2); pad.receiveShadow = true; S.add(pad);
         const dash = (x0, z0, x1, z1) => {
           const len = Math.hypot(x1 - x0, z1 - z0), nd = Math.max(1, Math.round(len / 0.6));
           for (let k = 0; k < nd; k += 1) {
             const u0 = k / nd, u1 = (k + 0.55) / nd, cx = x0 + (x1 - x0) * (u0 + u1) / 2, cz = z0 + (z1 - z0) * (u0 + u1) / 2;
-            const seg = new T.Mesh(new T.PlaneGeometry((u1 - u0) * len, 0.07), lineMat); seg.rotation.x = -Math.PI / 2; seg.rotation.z = -Math.atan2(z1 - z0, x1 - x0); seg.position.set(cx, 0.015, cz); S.add(seg);
+            const seg = new T.Mesh(new T.PlaneGeometry((u1 - u0) * len, 0.07), lineMat); seg.rotation.x = -Math.PI / 2; seg.rotation.z = -Math.atan2(z1 - z0, x1 - x0); seg.position.set(cx, 0.02, cz); S.add(seg);
           }
         };
         dash(tx0, tz0, tx1, tz0); dash(tx0, tz0, tx0, tz1); dash(tx1, tz0, tx1, tz1);
         // the coach, in a dark tracksuit, standing in the technical area following the play
         const coach = this.makePlayer({ noOutfit: true, noRing: true, kit: { primary: '#1d2230', secondary: teamCols[team][0], pattern: 'solid', shorts: '#1d2230', socks: '#1d2230', shoe: '#101318' }, shirt: new T.Color('#1d2230'), shorts: new T.Color('#1d2230'), socks: new T.Color('#1d2230'), boot: 0x101318, trimCss: teamCols[team][0], number: '' });
         S.add(coach);
-        this.staff.push({ m: coach, home: sx * 8, p: { x: 30 + sx * 8, y: 15.5 + 15, vx: 0, vy: 0, face: -Math.PI / 2, act: null, role: 'coach', run: 0, turn: 0 } });
+        this.staff.push({ m: coach, home: sx * 8, p: { x: 30 + sx * 8, y: 16.5 + 15, vx: 0, vy: 0, face: -Math.PI / 2, act: null, role: 'coach', run: 0, turn: 0 } });
       });
     }
     [-1, 1].forEach((s) => { const b = new T.Mesh(new T.BoxGeometry(0.15, 0.9, 34), adMat); b.position.set(34.5 * s, 0.45, 0); S.add(b); });
