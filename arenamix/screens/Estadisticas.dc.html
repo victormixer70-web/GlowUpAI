@@ -12,10 +12,21 @@
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
-input::placeholder{color:#8686A6}
+@keyframes stCardFloat{0%,100%{translate:0 0}50%{translate:0 -5px}}
+@keyframes stShine{0%{transform:translateX(-160%) skewX(-20deg)}55%,100%{transform:translateX(260%) skewX(-20deg)}}
+@keyframes stPmGlow{0%,100%{box-shadow:0 0 0 0 #22D3EE66,0 0 10px #22D3EE55}50%{box-shadow:0 0 0 6px #22D3EE00,0 0 18px #22D3EEAA}}
+@keyframes stFloatUp{0%{opacity:0;translate:0 6px;scale:.6}25%{opacity:1;scale:1.25}100%{opacity:0;translate:0 -30px;scale:1}}
+@keyframes stBump{0%{scale:1}35%{scale:1.35}100%{scale:1}}
+@keyframes stSpin{to{rotate:360deg}}
+.st-float{animation:stCardFloat 4s ease-in-out infinite}
+.st-shine{position:absolute;top:-10%;bottom:-10%;width:38%;left:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:stShine 3.8s ease-in-out infinite;pointer-events:none}
+.st-pm{animation:stPmGlow 1.8s ease-in-out infinite}
+.st-plus1{position:absolute;right:52px;top:2px;font:800 16px 'Barlow Condensed',sans-serif;color:#FFC53D;text-shadow:0 0 8px #FFC53D;animation:stFloatUp .75s ease-out forwards;pointer-events:none}
+.st-bump{animation:stBump .35s ease-out}
+.st-ball{animation:stSpin 8s linear infinite}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; overflow: hidden">
+<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 90% at 30% 10%, #1A1840 0%, #0B0B14 60%); color: #F4F4FA; font-family: Manrope, sans-serif; overflow: hidden">
   <nav aria-label="Principal" style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; box-sizing: border-box; padding: 12px 8px; background: #111120; border-right: 1px solid #26264A; display: flex; flex-direction: column; align-items: center; gap: 8px">
     <span style="margin-bottom: 6px"><svg width="46" height="46" viewBox="0 0 512 512" role="img" aria-label="ARENA MIX" style="display: block; flex: none"><defs><linearGradient id="am-logo-estadisticas" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B1A44"/><stop offset="1" stop-color="#0B0B14"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#am-logo-estadisticas)" stroke="#2E2E52" stroke-width="10"/><path d="M60 400L470 150" stroke="#22D3EE" stroke-opacity=".12" stroke-width="70" stroke-linecap="round"/><text x="256" y="350" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="270" letter-spacing="-6"><tspan fill="#F4F4FA">A</tspan><tspan fill="#22D3EE" dx="90">M</tspan></text><path d="M262 120L222 238h38l-26 104l80-140h-42l30-82z" fill="#FFC53D" stroke="#0B0B14" stroke-width="10" stroke-linejoin="round"/></svg></span>
     <a href="Deportes.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4l13 8l-13 8z"/></svg>Jugar</a>
@@ -23,114 +34,136 @@ input::placeholder{color:#8686A6}
     <a href="Tienda.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 8h14l-1 13H6z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Tienda</a>
     <a href="Estadisticas.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #0B0B14; background: #22D3EE"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Perfil</a>
   </nav>
-  <div style="position: absolute; left: 80px; top: 0; bottom: 0; width: 280px; padding: 12px 10px 12px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
-  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0">
-    <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 28px; letter-spacing: 1px">PERFIL</h1>
-    <span style="display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; border-radius: 20px; background: #1E1A3A; border: 1px solid #22D3EE; font-weight: 800; font-size: 13px">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7l7 7"/></svg>
-      {{pmLabel}} PM
-    </span>
-  </div>
-  <div role="tablist" aria-label="Deporte" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 0">
-    <sc-for list="{{sports}}" as="sp" hint-placeholder-count="4">
-      <button type="button" role="tab" onClick="{{sp.pick}}" style="{{sp.style}}">{{sp.label}}</button>
-    </sc-for>
-  </div>
-  <section style="flex: 1; min-height: 0; border-radius: 20px; background: #14142A; border: 1px solid #2E2E52; display: flex; align-items: flex-end; overflow: hidden; position: relative">
-    <div style="flex: none; width: 110px; display: flex; justify-content: center">
-      <dc-import name="Avatar" primary="#FF8A3D" secondary="#0B0B14" pattern="solid" shorts="#17172A" socks="#F4F4FA" shoe="#22D3EE" number="{{num}}" hat="band" hat-color="#22D3EE" face="none" w="84" hint-size="84px,149px"></dc-import>
-    </div>
-    <div style="flex: 1; align-self: stretch; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding-right: 14px">
-      <span style="font-weight: 800; font-size: 15px">Invitado_4821</span>
-      <span style="font-size: 12px; color: #A3A3C2; font-weight: 700">Nivel {{level}} en {{sportName}}</span>
-      <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 4px">
-        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 54px; line-height: .9">{{overall}}</span>
-        <span style="display: flex; flex-direction: column">
-          <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">MEDIA</span>
-          <span style="{{tierStyle}}">{{tier}}</span>
-        </span>
+  <!-- player card -->
+  <div style="position: absolute; left: 96px; top: 10px; width: 208px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+    <h1 style="align-self: flex-start; margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 1px; line-height: 1">MI JUGADOR</h1>
+    <div class="st-float" style="position: relative; width: 196px; height: 300px; filter: drop-shadow(0 10px 18px {{cardGlow}})">
+      <div style="position: absolute; inset: 0; clip-path: polygon(12% 0, 88% 0, 100% 7%, 100% 84%, 50% 100%, 0 84%, 0 7%); background: {{cardBg}}; overflow: hidden">
+        <div style="position: absolute; inset: 6px; clip-path: polygon(12% 0, 88% 0, 100% 7%, 100% 84%, 50% 100%, 0 84%, 0 7%); border: 0; background: repeating-linear-gradient(135deg, rgba(255,255,255,.07) 0 6px, transparent 6px 14px)"></div>
+        <div class="st-shine"></div>
+        <div style="position: absolute; left: 16px; top: 16px; display: flex; flex-direction: column; align-items: center; color: {{cardInk}}">
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 50px; line-height: .85">{{overall}}</span>
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px">{{pos}}</span>
+          <svg style="margin-top: 4px" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="{{cardInk}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{sportPath}}"/></svg>
+        </div>
+        <div style="position: absolute; right: 10px; top: 8px">
+          <dc-import name="Avatar" primary="{{kitP}}" secondary="{{kitS}}" pattern="{{kitPat}}" shorts="{{kitSh}}" socks="{{kitSo}}" shoe="{{kitShoe}}" number="{{num}}" hat="band" hat-color="#22D3EE" face="none" w="92" hint-size="92px,163px"></dc-import>
+        </div>
+        <div style="position: absolute; left: 14px; right: 14px; top: 172px; text-align: center; color: {{cardInk}}">
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1px; border-bottom: 1px solid {{cardLine}}; padding-bottom: 3px">INVITADO_4821</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; row-gap: 1px; margin-top: 5px; text-align: left">
+            <sc-for list="{{mini}}" as="m" hint-placeholder-count="6"><span style="font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; display: flex; gap: 6px"><b style="font-weight: 800; min-width: 26px; text-align: right">{{m.v}}</b>{{m.k}}</span></sc-for>
+          </div>
+        </div>
       </div>
-      <span style="font-size: 11px; color: #A3A3C2">Cada estadística va de 10 a 150</span>
     </div>
-  </section>
+    <span style="{{tierPill}}">{{tier}} · NV {{level}}</span>
   </div>
-  <div style="position: absolute; left: 360px; top: 0; right: 0; bottom: 0; padding: 12px 16px 10px 8px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
-  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0">
-    <h2 style="margin: 0; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">ESTADÍSTICAS DE {{sportUpper}}</h2>
-    <button type="button" onClick="{{reset}}" style="min-height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid #2E2E52; background: transparent; color: #CACAE0; font: 700 12px Manrope, sans-serif; cursor: pointer">Restablecer puntos</button>
+
+  <!-- right side: sport switch, points, radar and the stats -->
+  <div style="position: absolute; left: 318px; right: 12px; top: 10px; display: flex; align-items: center; gap: 10px">
+    <div role="tablist" aria-label="Deporte" style="position: relative; display: flex; width: 236px; height: 42px; border-radius: 21px; background: #17172A; border: 1px solid #2E2E52; padding: 3px; box-sizing: border-box">
+      <span style="{{thumb}}"></span>
+      <sc-for list="{{sports}}" as="sp" hint-placeholder-count="2">
+        <button type="button" role="tab" aria-selected="{{sp.sel}}" onClick="{{sp.pick}}" style="{{sp.style}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{sp.path}}"/></svg>{{sp.label}}</button>
+      </sc-for>
+    </div>
+    <span class="{{pmClass}}" style="display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border-radius: 20px; background: linear-gradient(135deg, #1E2C55, #1A1A3A); border: 1px solid #22D3EE; font-weight: 800; font-size: 14px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7l7 7"/></svg>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 22px; line-height: 1">{{pmLabel}}</span><span style="font-size: 11px; color: #A3A3C2">PM</span>
+    </span>
+    <span style="flex: 1"></span>
+    <button type="button" aria-label="Cómo conseguir PM" aria-expanded="{{helpOpen}}" onClick="{{toggleHelp}}" style="width: 38px; height: 38px; border-radius: 19px; border: 1px solid #2E2E52; background: #17172A; color: #F4F4FA; font: 800 16px Manrope, sans-serif; cursor: pointer">?</button>
+    <button type="button" onClick="{{reset}}" aria-label="Restablecer puntos" style="display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px; border-radius: 19px; border: 1px solid #2E2E52; background: #17172A; color: #CACAE0; font: 800 12px Manrope, sans-serif; cursor: pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Reiniciar</button>
   </div>
-    <div style="flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start">
+
+  <div style="position: absolute; left: 312px; top: 66px; width: 206px; height: 310px; display: flex; flex-direction: column; align-items: center">
+    <svg width="206" height="206" viewBox="-110 -110 220 220" role="img" aria-label="{{radarAria}}">
+      <defs><radialGradient id="st-rad" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#22D3EE" stop-opacity=".75"/><stop offset="1" stop-color="#7C5CFF" stop-opacity=".45"/></radialGradient></defs>
+      <polygon points="{{grid3}}" fill="#17172A" stroke="#2E2E52" stroke-width="1.5"/>
+      <polygon points="{{grid2}}" fill="none" stroke="#2E2E52" stroke-width="1"/>
+      <polygon points="{{grid1}}" fill="none" stroke="#2E2E52" stroke-width="1"/>
+      <sc-for list="{{axes}}" as="x" hint-placeholder-count="6"><line x1="0" y1="0" x2="{{x.x}}" y2="{{x.y}}" stroke="#2E2E52" stroke-width="1"/><text x="{{x.lx}}" y="{{x.ly}}" text-anchor="middle" dominant-baseline="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="15" fill="#CACAE0">{{x.k}}</text></sc-for>
+      <polygon points="{{radar}}" fill="url(#st-rad)" stroke="#22D3EE" stroke-width="2.5" stroke-linejoin="round"/>
+      <sc-for list="{{dots}}" as="d" hint-placeholder-count="6"><circle cx="{{d.x}}" cy="{{d.y}}" r="4" fill="#FFC53D" stroke="#0B0B14" stroke-width="1.5"/></sc-for>
+    </svg>
+    <span style="margin-top: 2px; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">MEDIA {{sportUpper}}</span>
+    <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 40px; line-height: 1; color: {{tierColor}}">{{overall}}<span style="font-size: 16px; color: #8686A6"> / 150</span></span>
+  </div>
+
+  <div style="position: absolute; left: 524px; right: 12px; top: 64px; bottom: 10px; display: flex; flex-direction: column; gap: 6px">
     <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
-      <div style="padding: 10px 12px; border-radius: 14px; background: #17172A; display: flex; align-items: center; gap: 10px">
-        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
-          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
-            <span style="font-weight: 800; font-size: 14px">{{r.name}}</span>
-            <span style="font-size: 13px; font-weight: 800">{{r.value}} <span style="color: #8686A6; font-weight: 700">/ 150</span></span>
+      <div style="position: relative; flex: 1; min-height: 0; display: flex; align-items: center; gap: 9px; padding: 0 8px 0 9px; border-radius: 14px; background: linear-gradient(90deg, #191934, #141428); border: 1px solid #26264A">
+        <span style="{{r.iconBox}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{r.path}}"/></svg></span>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 6px">
+            <span style="font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span>
+            <span class="{{r.bumpClass}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 19px; line-height: 1; color: {{r.color}}">{{r.value}}</span>
           </div>
-          <div style="position: relative; height: 8px; border-radius: 4px; background: #26264A">
-            <div style="{{r.bar}}"></div>
-            <span style="position: absolute; left: 33.33%; top: -2px; width: 2px; height: 12px; background: #0B0B14"></span>
-            <span style="position: absolute; left: 66.67%; top: -2px; width: 2px; height: 12px; background: #0B0B14"></span>
-          </div>
-          <span style="font-size: 11px; color: #A3A3C2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.effect}}</span>
+          <div style="display: flex; gap: 2px; height: 7px"><sc-for list="{{r.segs}}" as="g" hint-placeholder-count="15"><span style="{{g.style}}"></span></sc-for></div>
+          <span style="font-size: 10px; color: #A3A3C2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.effect}}</span>
         </div>
         <button type="button" onClick="{{r.up}}" aria-label="{{r.aria}}" style="{{r.btn}}">
-          <span style="font-size: 20px; line-height: 1; font-weight: 800">+</span>
-          <span style="font-size: 10px; font-weight: 800">{{r.cost}}</span>
+          <span style="font-size: 20px; line-height: .9; font-weight: 800">{{r.plus}}</span>
+          <span style="font-size: 9px; font-weight: 800">{{r.cost}}</span>
         </button>
+        <sc-if value="{{r.flash}}" hint-placeholder-val="{{ false }}"><span class="st-plus1">+1</span></sc-if>
       </div>
     </sc-for>
-    </div>
-    <div style="padding: 10px 12px; border-radius: 14px; background: #111120; border: 1px dashed #2E2E52; display: flex; flex-direction: column; gap: 4px">
-      <span style="font-size: 12px; font-weight: 800">Cómo conseguir puntos de mejora (PM)</span>
-      <span style="font-size: 11px; line-height: 1.45; color: #A3A3C2">Cada deporte tiene sus propios PM: se ganan subiendo de nivel en ese deporte (+3 por nivel), en sus entrenamientos y en cofres. Mejorar cuesta 1 PM hasta 50, 2 PM hasta 100, 3 PM hasta 130 y 5 PM hasta 150. Los PM no se venden con dinero real.</span>
-    </div>
   </div>
+
+  <sc-if value="{{showHelp}}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-label="Cómo conseguir puntos de mejora" style="position: absolute; right: 12px; top: 58px; width: 300px; padding: 12px 14px; border-radius: 14px; background: #111120F2; border: 1px solid #22D3EE; box-shadow: 0 10px 30px #000A; display: flex; flex-direction: column; gap: 6px; z-index: 5">
+      <span style="font-size: 13px; font-weight: 800">Puntos de mejora (PM)</span>
+      <span style="font-size: 11px; line-height: 1.5; color: #CACAE0">Cada deporte tiene sus propios PM: se ganan subiendo de nivel (+3 por nivel), en los entrenamientos y en los cofres. Mejorar cuesta 1 PM hasta 50, 2 PM hasta 100, 3 PM hasta 130 y 5 PM hasta 150. Los PM no se venden con dinero real.</span>
+    </div>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+// icons (24x24 stroke paths)
+const Est_ICON = {
+  ball: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M12 7l4 3l-1.5 4.5h-5L8 10zM12 3v4M16 10l4.5-1.5M14.5 14.5l2.5 4M9.5 14.5L7 18.5M8 10L3.5 8.5',
+  hoop: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M3 12h18M12 3v18M5.6 5.6c3 3 3 9.8 0 12.8M18.4 5.6c-3 3-3 9.8 0 12.8',
+  bolt: 'M13 2L4 14h7l-1 8l9-12h-7z',
+  fire: 'M12 22c4 0 7-3 7-7c0-4-3-6-4-10c-2 2-3 4-3 6c-1-1-2-2-2-4c-2 2-5 5-5 8c0 4 3 7 7 7z',
+  target: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M12 7a5 5 0 1 0 0 10a5 5 0 1 0 0-10M12 11a1 1 0 1 0 0 2a1 1 0 1 0 0-2',
+  heart: 'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z',
+  hand: 'M8 13V5a1.5 1.5 0 0 1 3 0v6M11 11V4a1.5 1.5 0 0 1 3 0v7M14 11V5a1.5 1.5 0 0 1 3 0v8c0 4-3 8-7 8c-3 0-5-2-6-5l-2-4a1.5 1.5 0 0 1 2.5-1.5L8 13',
+  up: 'M12 20V4M6 10l6-6l6 6',
+  shield: 'M12 3l7 3v5c0 5-3 8.5-7 10c-4-1.5-7-5-7-10V6z'
+};
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { sport: 'futbol', data: this.load() };
+    this.state = { sport: 'futbol', data: this.load(), help: false, flash: null };
+    this.disp = {};
+    this.step = this.step.bind(this);
   }
+  componentWillUnmount() { cancelAnimationFrame(this.raf); }
   defs() {
     const f1 = (n) => n.toFixed(1).replace('.', ',');
     const t = (v) => (v - 10) / 140;
     const pct = (a, b) => (v) => Math.round(a + (b - a) * t(v));
     return {
-      futbol: { label: 'Fútbol', num: '10', stats: [
-        { id: 'vel', name: 'Velocidad', effect: (v) => 'Carrera ' + f1(7.8 + 1.7 * t(v)) + ' m/s' },
-        { id: 'pot', name: 'Potencia de tiro', effect: (v) => 'Disparo máximo ' + Math.round((26 + 9 * t(v)) * 3.6) + ' km/h' },
-        { id: 'pre', name: 'Precisión', effect: (v) => 'Desvío del tiro ±' + f1(0.9 * (1 - t(v))) + ' m' },
-        { id: 'con', name: 'Control', effect: (v) => 'Balón pegado al pie ' + pct(50, 100)(v) + '%' },
-        { id: 'res', name: 'Resistencia', effect: (v) => 'Cansancio al final ' + (v >= 150 ? 'ninguno' : '−' + Math.round(12 * (1 - t(v))) + '% velocidad') },
-        { id: 'ref', name: 'Reflejos de portero', effect: (v) => 'Estirada ' + f1(4.2 + 1.8 * t(v)) + ' rad/s en duelos' }] },
-      basket: { label: 'Basket', num: '23', stats: [
-        { id: 'vel', name: 'Velocidad', effect: (v) => 'Contraataque ' + f1(5.8 + 2 * t(v)) + ' m/s' },
-        { id: 'sal', name: 'Salto', effect: (v) => 'Salto vertical ' + pct(55, 95)(v) + ' cm' },
-        { id: 'tri', name: 'Tiro exterior', effect: (v) => 'Triple abierto ' + pct(25, 55)(v) + '% de acierto' },
-        { id: 'bot', name: 'Bote', effect: (v) => 'Pérdidas al botar −' + pct(0, 70)(v) + '%' },
-        { id: 'def', name: 'Defensa', effect: (v) => 'Robos y tapones ' + pct(5, 30)(v) + '% de éxito' },
-        { id: 'res', name: 'Resistencia', effect: (v) => 'Cansancio en el último cuarto −' + Math.round(15 * (1 - t(v))) + '%' }] },
-      tenis: { label: 'Tenis', num: '7', stats: [
-        { id: 'saq', name: 'Potencia de saque', effect: (v) => 'Saque a ' + pct(150, 220)(v) + ' km/h' },
-        { id: 'pre', name: 'Precisión', effect: (v) => 'Desvío del golpe ±' + pct(60, 8)(v) + ' cm' },
-        { id: 'gol', name: 'Golpe de fondo', effect: (v) => 'Derecha a ' + pct(100, 160)(v) + ' km/h' },
-        { id: 'vel', name: 'Velocidad en pista', effect: (v) => f1(6.2 + 1.8 * t(v)) + ' m/s' },
-        { id: 'ref', name: 'Reflejos', effect: (v) => 'Alcance de la raqueta ' + pct(85, 120)(v) + ' cm' },
-        { id: 'res', name: 'Resistencia', effect: (v) => 'Sin bajón hasta el set ' + Math.round(1 + 2 * t(v)) }] },
-      voley: { label: 'Vóley', num: '4', stats: [
-        { id: 'sal', name: 'Salto', effect: (v) => 'Alcance de remate ' + f1(2.9 + 0.6 * t(v)) + ' m' },
-        { id: 'rem', name: 'Potencia de remate', effect: (v) => 'Remate ' + pct(60, 115)(v) + ' km/h' },
-        { id: 'saq', name: 'Saque', effect: (v) => 'Saque ' + pct(50, 105)(v) + ' km/h · desvío ±' + pct(80, 10)(v) + ' cm' },
-        { id: 'rec', name: 'Recepción', effect: (v) => 'Recepción perfecta ' + pct(20, 75)(v) + '%' },
-        { id: 'blo', name: 'Bloqueo', effect: (v) => 'Bloqueos ganados ' + pct(5, 40)(v) + '%' },
-        { id: 'ref', name: 'Reflejos', effect: (v) => 'Tiempo de reacción ' + pct(420, 220)(v) + ' ms' }] }
+      futbol: { label: 'Fútbol', num: '10', pos: 'DC', icon: 'ball', stats: [
+        { id: 'vel', k: 'VEL', icon: 'bolt', name: 'Velocidad', effect: (v) => 'Carrera ' + f1(7.8 + 1.7 * t(v)) + ' m/s' },
+        { id: 'pot', k: 'POT', icon: 'fire', name: 'Potencia de tiro', effect: (v) => 'Disparo máximo ' + Math.round((26 + 9 * t(v)) * 3.6) + ' km/h' },
+        { id: 'pre', k: 'PRE', icon: 'target', name: 'Precisión', effect: (v) => 'Desvío del tiro ±' + f1(0.9 * (1 - t(v))) + ' m' },
+        { id: 'con', k: 'CON', icon: 'ball', name: 'Control', effect: (v) => 'Balón pegado al pie ' + pct(50, 100)(v) + '%' },
+        { id: 'res', k: 'RES', icon: 'heart', name: 'Resistencia', effect: (v) => 'Cansancio al final ' + (v >= 150 ? 'ninguno' : '−' + Math.round(12 * (1 - t(v))) + '% velocidad') },
+        { id: 'ref', k: 'POR', icon: 'hand', name: 'Reflejos de portero', effect: (v) => 'Estirada ' + f1(4.2 + 1.8 * t(v)) + ' rad/s en duelos' }] },
+      basket: { label: 'Basket', num: '23', pos: 'AL', icon: 'hoop', stats: [
+        { id: 'vel', k: 'VEL', icon: 'bolt', name: 'Velocidad', effect: (v) => 'Contraataque ' + f1(5.8 + 2 * t(v)) + ' m/s' },
+        { id: 'sal', k: 'SAL', icon: 'up', name: 'Salto', effect: (v) => 'Salto vertical ' + pct(55, 95)(v) + ' cm' },
+        { id: 'tri', k: 'TIR', icon: 'target', name: 'Tiro exterior', effect: (v) => 'Triple abierto ' + pct(25, 55)(v) + '% de acierto' },
+        { id: 'bot', k: 'BOT', icon: 'hoop', name: 'Bote', effect: (v) => 'Pérdidas al botar −' + pct(0, 70)(v) + '%' },
+        { id: 'def', k: 'DEF', icon: 'shield', name: 'Defensa', effect: (v) => 'Robos y tapones ' + pct(5, 30)(v) + '% de éxito' },
+        { id: 'res', k: 'RES', icon: 'heart', name: 'Resistencia', effect: (v) => 'Cansancio en el último cuarto −' + Math.round(15 * (1 - t(v))) + '%' }] }
     };
   }
   fresh() {
-    const D = this.defs(), lv = { futbol: 12, basket: 5, tenis: 3, voley: 4 }, out = {};
+    const D = this.defs(), lv = { futbol: 12, basket: 5 }, out = {};
     Object.keys(D).forEach((k) => {
       const st = {}; D[k].stats.forEach((x) => { st[x.id] = 10; });
       out[k] = { stats: st, pm: lv[k] * 3, level: lv[k] };
@@ -141,6 +174,7 @@ class Component extends DCLogic {
     const base = this.fresh();
     try {
       const j = JSON.parse(localStorage.getItem('arenamix.stats.v2') || 'null');
+      this.extra = j || {};
       if (j && j.futbol) { Object.keys(base).forEach((k) => { if (j[k]) base[k] = { ...base[k], ...j[k], stats: { ...base[k].stats, ...j[k].stats } }; }); return base; }
       const old = JSON.parse(localStorage.getItem('arenamix.stats.v1') || 'null');
       if (old && old.stats) base.futbol = { ...base.futbol, stats: { ...base.futbol.stats, ...old.stats }, pm: old.pm };
@@ -149,50 +183,93 @@ class Component extends DCLogic {
   }
   save(data) {
     try {
-      localStorage.setItem('arenamix.stats.v2', JSON.stringify(data));
+      // keep whatever else is stored (other sports) untouched
+      localStorage.setItem('arenamix.stats.v2', JSON.stringify({ ...(this.extra || {}), ...data }));
       localStorage.setItem('arenamix.stats.v1', JSON.stringify(data.futbol));
     } catch (e) {}
   }
-  cost(v) {
-    return v < 50 ? 1 : v < 100 ? 2 : v < 130 ? 3 : 5;
+  cost(v) { return v < 50 ? 1 : v < 100 ? 2 : v < 130 ? 3 : 5; }
+  spent(v) { let n = 0; for (let x = 10; x < v; x++) n += this.cost(x); return n; }
+  // shown values ease towards the real ones: the radar, the bars and the rating grow instead of jumping
+  step() {
+    this.raf = null;
+    const D = this.defs()[this.state.sport], st = this.state.data[this.state.sport].stats;
+    let moving = false;
+    D.stats.forEach((d) => {
+      const cur = this.disp[d.id] ?? 10, to = st[d.id], nx = cur + (to - cur) * 0.2;
+      this.disp[d.id] = Math.abs(to - nx) < 0.3 ? to : nx;
+      if (this.disp[d.id] !== to) moving = true;
+    });
+    this.forceUpdate();
+    if (moving) this.raf = requestAnimationFrame(this.step);
   }
-  spent(v) {
-    let n = 0;
-    for (let x = 10; x < v; x++) n += this.cost(x);
-    return n;
+  kick() { if (!this.raf) this.raf = requestAnimationFrame(this.step); }
+  tierOf(v) {
+    return [[130, 'LEYENDA', '#7FE3FF', 'linear-gradient(160deg, #FFFFFF 0%, #A7F0FF 35%, #22D3EE 70%, #1B6FA8 100%)', '#06202B', '#22D3EE'],
+      [100, 'ESTRELLA', '#C79BFF', 'linear-gradient(160deg, #E4CCFF 0%, #9B6BFF 40%, #4B23B5 75%, #24105E 100%)', '#FFFFFF', '#9B6BFF'],
+      [70, 'ORO', '#FFD45C', 'linear-gradient(160deg, #FFF3B0 0%, #FFD45C 35%, #D9A520 70%, #8A6410 100%)', '#2A1C02', '#FFC53D'],
+      [40, 'PLATA', '#D6DEE9', 'linear-gradient(160deg, #FFFFFF 0%, #DCE3EC 35%, #9AA6B8 70%, #5C6678 100%)', '#141A24', '#C9D3E0'],
+      [0, 'BRONCE', '#E3A56E', 'linear-gradient(160deg, #FFD7B0 0%, #E6A672 35%, #A8663A 70%, #5A3018 100%)', '#2B1608', '#E3A56E']].find((x) => v >= x[0]);
   }
   renderVals() {
     const D = this.defs(), sp = this.state.sport, def = D[sp];
     const cur = this.state.data[sp], stats = cur.stats, pm = cur.pm;
-    const put = (next) => { const data = { ...this.state.data, [sp]: next }; this.save(data); this.setState({ data }); };
-    const rows = def.stats.map((d) => {
-      const v = stats[d.id], c = this.cost(v), max = v >= 150, can = !max && pm >= c;
+    if (def.stats.some((d) => (this.disp[d.id] ?? 10) !== stats[d.id])) this.kick();
+    const shown = (id) => this.disp[id] ?? 10;
+    const put = (next, flash) => { const data = { ...this.state.data, [sp]: next }; this.save(data); this.setState({ data, flash }); };
+    const rows = def.stats.map((d, i) => {
+      const v = stats[d.id], c = this.cost(v), max = v >= 150, can = !max && pm >= c, sv = shown(d.id);
+      const col = this.tierOf(v)[2];
+      const segs = [];
+      for (let k = 0; k < 15; k++) {
+        const fill = Math.max(0, Math.min(1, (sv - k * 10) / 10));
+        segs.push({ style: 'flex: 1; border-radius: 2px; background: ' + (fill > 0 ? 'linear-gradient(90deg, ' + col + ' ' + (fill * 100).toFixed(0) + '%, #26264A ' + (fill * 100).toFixed(0) + '%)' : '#26264A') + ';' + (fill > 0 ? ' box-shadow: 0 0 6px ' + col + '55;' : '') });
+      }
       return {
-        name: d.name, value: String(v), effect: d.effect(v),
-        cost: max ? 'MÁX' : c + ' PM',
+        name: d.name, value: String(Math.round(sv)), effect: d.effect(v), color: col, segs, path: Est_ICON[d.icon],
+        iconBox: 'flex: none; width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: ' + col + '; background: ' + col + '22; border: 1px solid ' + col + '55;',
+        plus: max ? '★' : '+', cost: max ? 'MÁX' : c + ' PM',
         aria: max ? d.name + ' al máximo' : 'Mejorar ' + d.name + ' por ' + c + ' PM',
-        bar: 'height: 8px; border-radius: 4px; background: #22D3EE; width: ' + (v / 150 * 100).toFixed(2) + '%;',
-        btn: 'flex: none; width: 52px; height: 52px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: ' + (can ? 'pointer' : 'default') + '; font-family: Manrope, sans-serif; ' + (can ? 'background: #22D3EE; color: #0B0B14; border: 0; box-shadow: 0 3px 0 #0E8FA3;' : 'background: #26264A; color: #8686A6; border: 0;'),
-        up: () => { if (can) put({ ...cur, stats: { ...stats, [d.id]: v + 1 }, pm: pm - c }); }
+        flash: !!(this.state.flash && this.state.flash.id === d.id), bumpClass: this.state.flash && this.state.flash.id === d.id ? 'st-bump' : '',
+        btn: 'flex: none; width: 44px; height: 44px; border-radius: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: ' + (can ? 'pointer' : 'default') + '; font-family: Manrope, sans-serif; border: 0; ' + (can ? 'background: radial-gradient(circle at 35% 30%, #7EF0FF, #22D3EE 55%, #0E8FA3); color: #0B0B14; box-shadow: 0 3px 0 #0A6F80, 0 0 12px #22D3EE88;' : max ? 'background: linear-gradient(135deg, #FFE38A, #D9A520); color: #2A1C02;' : 'background: #26264A; color: #6E6E92;'),
+        up: () => {
+          if (!can) return;
+          put({ ...cur, stats: { ...stats, [d.id]: v + 1 }, pm: pm - c }, null);
+          requestAnimationFrame(() => this.setState({ flash: { id: d.id, n: Date.now() } }));
+        }
       };
     });
-    const vals = def.stats.map((d) => stats[d.id]);
+    const vals = def.stats.map((d) => shown(d.id));
     const overall = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
-    const tiers = [[130, 'LEYENDA', '#FFE38A'], [100, 'ESTRELLA', '#C79BFF'], [70, 'PRO', '#8CC5FF'], [40, 'AMATEUR', '#7FE3D7'], [0, 'NOVATO', '#E3A56E']];
-    const tr = tiers.find((x) => overall >= x[0]);
-    const tab = (on) => 'min-height: 36px; padding: 0 4px; border-radius: 12px; font: 800 13px Manrope, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14; border: 0; box-shadow: 0 3px 0 #0E8FA3;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E52;');
+    const tr = this.tierOf(overall);
+    // radar: six axes, value 10 at the centre-ish, 150 at the edge
+    const n = def.stats.length, R = 78, ang = (k) => -Math.PI / 2 + k * 2 * Math.PI / n;
+    const ring = (f) => def.stats.map((_, k) => (Math.cos(ang(k)) * R * f).toFixed(1) + ',' + (Math.sin(ang(k)) * R * f).toFixed(1)).join(' ');
+    const rr = (v) => R * (0.2 + 0.8 * (v - 10) / 140);
+    const pts = def.stats.map((d, k) => [Math.cos(ang(k)) * rr(shown(d.id)), Math.sin(ang(k)) * rr(shown(d.id))]);
+    const kit = (window.AMChars && window.AMChars.outfit('futbol')) || {};
+    const tab = (on) => 'position: relative; z-index: 1; flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; border: 0; background: transparent; border-radius: 18px; font: 800 13px Manrope, sans-serif; cursor: pointer; transition: color .3s; color: ' + (on ? '#0B0B14' : '#CACAE0') + ';';
+    const keys = Object.keys(D), idx = keys.indexOf(sp);
     return {
-      sports: Object.keys(D).map((k) => ({ label: D[k].label, style: tab(k === sp), pick: () => this.setState({ sport: k }) })),
-      rows, overall: String(overall), pmLabel: String(pm),
-      level: String(cur.level), num: def.num,
-      sportName: { futbol: 'fútbol', basket: 'baloncesto', tenis: 'tenis', voley: 'vóley' }[sp],
-      sportUpper: { futbol: 'FÚTBOL', basket: 'BALONCESTO', tenis: 'TENIS', voley: 'VÓLEY' }[sp],
-      tier: tr[1],
-      tierStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1px; color: ' + tr[2] + ';',
+      sports: keys.map((k) => ({ label: D[k].label, path: Est_ICON[D[k].icon], sel: k === sp ? 'true' : 'false', style: tab(k === sp), pick: () => { if (k !== sp) { this.disp = {}; this.setState({ sport: k, flash: null }); } } })),
+      thumb: 'position: absolute; top: 3px; bottom: 3px; width: calc(50% - 3px); left: ' + (idx ? '50%' : '3px') + '; border-radius: 18px; background: linear-gradient(135deg, #7EF0FF, #22D3EE); box-shadow: 0 0 14px #22D3EE88; transition: left .45s cubic-bezier(.3,1.6,.5,1);',
+      rows, overall: String(overall), pmLabel: String(pm), pmClass: pm > 0 ? 'st-pm' : '',
+      level: String(cur.level), num: def.num, pos: def.pos, sportPath: Est_ICON[def.icon],
+      sportUpper: def.label.toUpperCase(),
+      tier: tr[1], tierColor: tr[2], cardBg: tr[3], cardInk: tr[4], cardGlow: tr[5] + '66', cardLine: tr[4] + '44',
+      tierPill: 'padding: 4px 14px; border-radius: 12px; background: ' + tr[5] + '22; border: 1px solid ' + tr[5] + '; color: ' + tr[2] + '; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 1.5px;',
+      mini: def.stats.map((d) => ({ k: d.k, v: String(Math.round(shown(d.id))) })),
+      kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#0B0B14', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#17172A', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE',
+      grid1: ring(1 / 3), grid2: ring(2 / 3), grid3: ring(1),
+      axes: def.stats.map((d, k) => ({ x: (Math.cos(ang(k)) * R).toFixed(1), y: (Math.sin(ang(k)) * R).toFixed(1), lx: (Math.cos(ang(k)) * (R + 16)).toFixed(1), ly: (Math.sin(ang(k)) * (R + 14)).toFixed(1), k: d.k })),
+      radar: pts.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '),
+      dots: pts.map((p) => ({ x: p[0].toFixed(1), y: p[1].toFixed(1) })),
+      radarAria: 'Estadísticas: ' + def.stats.map((d) => d.name + ' ' + stats[d.id]).join(', '),
+      showHelp: this.state.help, helpOpen: this.state.help ? 'true' : 'false', toggleHelp: () => this.setState({ help: !this.state.help }),
       reset: () => {
         const refund = def.stats.reduce((a, d) => a + this.spent(stats[d.id]), 0);
         const st = {}; def.stats.forEach((d) => { st[d.id] = 10; });
-        put({ ...cur, stats: st, pm: pm + refund });
+        put({ ...cur, stats: st, pm: pm + refund }, null);
       }
     };
   }
