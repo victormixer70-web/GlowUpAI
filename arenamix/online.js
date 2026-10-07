@@ -100,9 +100,124 @@
     return R;
   }
 
+  /* ---------- matchmaking with strangers, with no server of our own ----------
+     Each queue (mode + size) has a few well-known room codes. Searching: join the first of them with a free
+     seat; if none is open, host the first free code. If that code was taken a moment ago by someone else
+     searching, join them instead, so two people who search at the same moment end up together. on: update(M), start(M), error(text). */
+  var SLOTS = 4;
+  function matchmake(queue, n, name, look, on) {
+    on = on || {};
+    var M = { room: null, isHost: false, roster: [], started: false, cancelled: false, firstJoin: 0, hostK: 0 };
+    var call = function (k) { var f = on[k]; if (f) try { f(M); } catch (e) { console.error(e); } };
+    var codeOf = function (k) { return 'Q' + queue + 'K' + k; };
+    // knock on the rooms ks all at once; cb(room) for the first that gives you a seat, cb(null) if none does
+    function seek(ks, cb) {
+      if (M.cancelled || !ks.length) { cb(null); return; }
+      var won = null, left = ks.length, rooms = [];
+      var finish = function (r) { if (won !== null) return; won = r; rooms.forEach(function (x) { if (x !== r) try { x.close(); } catch (e) {} }); cb(r || null); };
+      var drop = function () { if (--left === 0 && won === null) finish(false); };
+      ks.forEach(function (k) {
+        var settled = false, r;
+        var no = function () { if (settled) return; settled = true; try { r.close(); } catch (e) {} drop(); };
+        r = room(false, codeOf(k), name, {
+          open: function () { r.send({ t: 'hello', name: name, look: look }); },
+          msg: function (id, m) {
+            if (m.t === 'lobby') { M.roster = m.roster; if (!settled) { settled = true; finish(r); } else if (M.room === r) call('update'); }
+            else if (m.t === 'full') no();
+            else if (m.t === 'start' && M.room === r) { M.started = true; M.roster = m.roster; call('start'); }
+          },
+          error: no,
+          leave: function () {
+            // the host gave up before the match: look again
+            if (M.room === r && !M.started && !M.cancelled) { M.room = null; M.roster = []; call('update'); search(); }
+          }
+        });
+        rooms.push(r);
+        setTimeout(no, 3500);
+      });
+    }
+    function balanceSeat() {
+      var cnt = [0, 0]; M.roster.forEach(function (x) { cnt[x.team]++; });
+      var order = cnt[1] <= cnt[0] ? [1, 0] : [0, 1];
+      for (var a = 0; a < 2; a++) for (var s = 0; s < n; s++) if (!M.roster.some(function (x) { return x.team === order[a] && x.slot === s; })) return [order[a], s];
+      return null;
+    }
+    function lobbyOut() { if (M.room && M.isHost) M.room.send({ t: 'lobby', roster: M.roster }); call('update'); }
+    function host(k) {
+      if (M.cancelled) return;
+      if (k > SLOTS) { call('error'); return; }
+      var r = room(true, codeOf(k), name, {
+        open: function () { M.room = r; M.isHost = true; M.hostK = k; M.roster = [{ id: r.me, name: name, team: 0, slot: 0, look: look, host: true }]; call('update'); },
+        join: function (id, nm) {
+          var seat = M.started ? null : balanceSeat();
+          if (!seat) { r.sendTo(id, { t: 'full' }); return; }
+          M.roster.push({ id: id, name: nm, team: seat[0], slot: seat[1], look: null });
+          if (!M.firstJoin) M.firstJoin = Date.now();
+          lobbyOut();
+          if (M.roster.length >= 2 * n) M.start();
+        },
+        msg: function (id, m) {
+          if (m.t === 'hello') { M.roster = M.roster.map(function (x) { return x.id === id ? Object.assign({}, x, { name: String(m.name || x.name).slice(0, 16), look: m.look || null }) : x; }); lobbyOut(); }
+        },
+        leave: function (id) { M.roster = M.roster.filter(function (x) { return x.id !== id; }); if (M.roster.length < 2) M.firstJoin = 0; lobbyOut(); },
+        error: function (text, type) {
+          if (M.room === r && type !== 'unavailable-id') return;
+          try { r.close(); } catch (e) {}
+          // taken a moment ago by someone else searching: sit in their room instead
+          seek([k], function (r2) { if (r2) { M.room = r2; M.isHost = false; call('update'); } else host(k + 1); });
+        }
+      });
+    }
+    function search() {
+      var all = []; for (var k = 1; k <= SLOTS; k++) all.push(k);
+      seek(all, function (r) {
+        if (M.cancelled) { if (r) r.close(); return; }
+        if (r) { M.room = r; M.isHost = false; call('update'); } else host(1);
+      });
+    }
+    M.start = function () { if (!M.isHost || M.started) return; M.started = true; M.room.send({ t: 'start', roster: M.roster }); call('start'); };
+    M.cancel = function () { M.cancelled = true; if (M.room) M.room.close(); M.room = null; };
+    search();
+    return M;
+  }
+
+  /* ---------- voice chat with your team-mates (WebRTC audio, phone to phone) ----------
+     Everyone hears the team-mates who have their microphone on; your own microphone is off until you
+     switch it on (the browser asks for permission the first time). */
+  function voice(room, ids) {
+    var V = { on: false, stream: null, calls: [], audios: [], peer: room.peer };
+    var play = function (rs) { var a = new Audio(); a.srcObject = rs; a.autoplay = true; a.play().catch(function () {}); V.audios.push(a); };
+    var onCall = function (c) {
+      if (ids.indexOf(c.peer) < 0) { try { c.close(); } catch (e) {} return; }
+      c.answer(); c.on('stream', play); V.calls.push(c);
+    };
+    V.peer.on('call', onCall);
+    V.setMic = function (on) {
+      if (on && !V.stream) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return Promise.resolve(false);
+        return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }).then(function (st) {
+          V.stream = st; V.on = true;
+          ids.forEach(function (id) { try { var c = V.peer.call(id, st); if (c) V.calls.push(c); } catch (e) {} });
+          return true;
+        }).catch(function () { return false; });
+      }
+      if (V.stream) V.stream.getAudioTracks().forEach(function (t) { t.enabled = on; });
+      V.on = on;
+      return Promise.resolve(true);
+    };
+    V.close = function () {
+      try { V.peer.off('call', onCall); } catch (e) {}
+      V.calls.forEach(function (c) { try { c.close(); } catch (e) {} });
+      if (V.stream) V.stream.getTracks().forEach(function (t) { t.stop(); });
+      V.audios.forEach(function (a) { a.srcObject = null; });
+    };
+    return V;
+  }
+
   window.AMOnline = {
     available: available, myName: myName, setName: setName, newCode: newCode,
     host: function (code, name, on) { return room(true, code, name, on); },
-    join: function (code, name, on) { return room(false, code, name, on); }
+    join: function (code, name, on) { return room(false, code, name, on); },
+    matchmake: matchmake, voice: voice
   };
 })();

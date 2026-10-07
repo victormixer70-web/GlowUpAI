@@ -105,6 +105,11 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 
   </sc-if>
+  <sc-if value="{{hasVoice}}" hint-placeholder-val="{{ false }}">
+    <button type="button" onClick="{{toggleMic}}" aria-pressed="{{micOn}}" aria-label="{{micAria}}" style="{{micStyle}}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/><sc-if value="{{micMuted}}" hint-placeholder-val="{{ true }}"><path d="M4 4l16 16"/></sc-if></svg>{{micLabel}}
+    </button>
+  </sc-if>
   <sc-if value="{{showReplay}}" hint-placeholder-val="{{ false }}">
     <div onPointerDown="{{skipReplay}}" style="position: absolute; inset: 0; z-index: 30; cursor: pointer">
       <span style="position: absolute; left: 0; right: 0; top: 0; height: 34px; background: #000"></span>
@@ -195,6 +200,7 @@ class Component extends DCLogic {
     if (this.R) { this.R.dispose(); this.R = null; }
     if (this.netOff) { this.netOff(); this.netOff = null; }
     this.sfx('crowd', 0);
+    if (this.voice) { this.voice.close(); this.voice = null; }
   }
   /* ---------- online ---------- */
   sfx(n, a) { const S = window.AMSfx; if (S && S[n] && !this.props.tutorialMute) try { S[n](a); } catch (e) {} }
@@ -337,7 +343,15 @@ class Component extends DCLogic {
       const s = S.ps[i];
       if (!s) return;
       const tx = s.x + s.vx * age, ty = s.y + s.vy * age;
-      if (Math.hypot(tx - p.x, ty - p.y) > 3) { p.x = tx; p.y = ty; } else { p.x += (tx - p.x) * k; p.y += (ty - p.y) * k; }
+      if (i === g.ctl && g.phase === 'play' && !(s.act && s.act.lock)) {
+        // prediction: move with your own stick now, and drift towards the host's position (ahead by half the ping)
+        const lead = Math.min(0.3, (N.room.ping || 0) / 2000), px = tx + s.vx * lead, py = ty + s.vy * lead;
+        const [ix, iy] = this.inp || [0, 0], vmax = 7.8 * (g.sprint ? 1.25 : 1);
+        p.pvx = (p.pvx || 0) + (ix * vmax - (p.pvx || 0)) * Math.min(1, dt * 9); p.pvy = (p.pvy || 0) + (iy * vmax - (p.pvy || 0)) * Math.min(1, dt * 9);
+        p.x += p.pvx * dt; p.y += p.pvy * dt;
+        const e = Math.hypot(px - p.x, py - p.y);
+        if (e > 3) { p.x = px; p.y = py; } else { const kc = Math.min(1, dt * (e > 1 ? 7 : 4)); p.x += (px - p.x) * kc; p.y += (py - p.y) * kc; }
+      } else if (Math.hypot(tx - p.x, ty - p.y) > 3) { p.x = tx; p.y = ty; } else { p.x += (tx - p.x) * k; p.y += (ty - p.y) * k; }
       p.vx = s.vx; p.vy = s.vy; p.turn = s.turn; p.stam = s.stam; p.kickFoot = s.kickFoot; p.touchAnim = s.touchAnim; p.skillCd = s.skillCd;
       p.face = this.ang(p.face + this.ang(s.face - p.face) * k);
       const sp = Math.hypot(p.vx, p.vy);
@@ -393,6 +407,10 @@ class Component extends DCLogic {
       own: -1, ctl: 0, last: -1, recv: null, sprint: false, press: false, scorer: '',
       ball: { x: 30, y: 15, z: 0, vx: 0, vy: 0, vz: 0, rot: 0, spin: 0 }, ps
     };
+    if (this.net && !this.voice && window.AMOnline && window.AMOnline.voice) {
+      const mates = (O.roster || []).filter((r) => r.team === (O.isHost ? 0 : O.myTeam) && r.id !== O.me).map((r) => r.id);
+      if (mates.length) { this.voice = window.AMOnline.voice(O.room, mates); this.voiceMates = mates.length; }
+    }
     if (this.net && this.net.host) {
       // everyone else in the room plays a player of their own on the host's phone
       this.net.humans = (O.roster || []).filter((r) => r.id !== this.net.me).map((r) => {
@@ -2713,6 +2731,11 @@ class Component extends DCLogic {
       sprintBtnStyle: btn(98, 92, 56, sprintOn ? '#FFC53D' : '#22D3EE', '#0E8FA3', 14, glow(tutI === 2)),
       showGoal: g.phase === 'goal' && !this.rp, scorerText: g.scorer,
       showReplay: !!this.rp,
+      hasVoice: !!this.voice && g.phase !== 'winners',
+      micOn: this.voice && this.voice.on ? 'true' : 'false', micMuted: !(this.voice && this.voice.on),
+      micLabel: this.voice && this.voice.on ? 'HABLANDO' : 'VOZ', micAria: this.voice && this.voice.on ? 'Silenciar tu micrófono' : 'Activar tu micrófono para hablar con tus compañeros',
+      micStyle: 'position: absolute; right: 14px; top: 50px; z-index: 5; display: flex; align-items: center; gap: 5px; height: 30px; padding: 0 12px; border-radius: 15px; font: 800 11px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; ' + (this.voice && this.voice.on ? 'background: #53D88E; color: #0B0B14; border: 0; box-shadow: 0 0 12px #53D88E;' : 'background: #0B0B14CC; color: #CACAE0; border: 1px solid #2E2E58;'),
+      toggleMic: (e) => { e.preventDefault(); const V = this.voice; if (!V) return; V.setMic(!V.on).then((ok) => { if (!ok) this.flashMsg('No se pudo usar el micrófono', 1.5); this.forceUpdate(); }); },
       skipReplay: (e) => { e.preventDefault(); if (this.rp) this.rp.t = this.rp.len; },
       isTut: !!(P.tutorial && g.tut && g.tut.i < 7),
       tutKicker: g.tut ? 'TUTORIAL · PASO ' + Math.min(7, g.tut.i + 1) + ' DE 7' : '',

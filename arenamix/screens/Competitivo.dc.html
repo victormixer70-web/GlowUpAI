@@ -62,7 +62,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <sc-if value="{{canKeep}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">TU POSICIÓN</span><div style="display: flex; gap: 3px; padding: 3px; border-radius: 11px; background: #17172A"><button type="button" onClick="{{setField}}" style="{{fieldStyle}}">CAMPO</button><button type="button" onClick="{{setKeeper}}" style="{{keeperStyle}}">PORTERO</button></div></div></sc-if>
         <button type="button" onClick="{{search}}" class="bc-btn am-shine" style="margin-top: 4px; height: 56px; border: 0; border-radius: 16px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 6px 0 #0E8FA3">BUSCAR PARTIDA</button>
         <sc-if value="{{showNotice}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: #2A2410; border: 1px solid #FFC53D"><span style="flex: 1; font-size: 12px; font-weight: 700; color: #FFE38A">{{noticeText}}</span><button type="button" onClick="{{closeNotice}}" style="border: 0; background: transparent; color: #FFE38A; font-weight: 800; font-size: 13px; cursor: pointer">OK</button></div></sc-if>
-        <span style="font-size: 11px; color: #8686A6">El online aún no está activo: de momento los demás jugadores los controla la IA.</span>
+        <span style="font-size: 11px; color: #8686A6">Partidos por equipos: buscamos jugadores reales online; si no hay nadie buscando, juegas con la IA.</span>
       </div>
     </div>
   </sc-if>
@@ -98,6 +98,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </sc-if>
 
+  <sc-if value="{{isOnlineMatch}}" hint-placeholder-val="{{ false }}">
+    <dc-import name="Partido" online="{{online}}" label="{{matchLabel}}" mode="{{matchMode}}" duration="{{duration}}" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Tu equipo" away-name="Rival" away-color="{{oppColor}}" away-trim="{{oppTrim}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
+  </sc-if>
   <sc-if value="{{isTeamMatch}}" hint-placeholder-val="{{ false }}">
     <dc-import name="Partido" ranks="{{ranks}}" keeper="{{asKeeper}}" label="{{matchLabel}}" mode="{{matchMode}}" duration="{{duration}}" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Invitado_4821" mates="{{mates}}" rivals="{{rivals}}" away-name="{{oppName}}" away-color="{{oppColor}}" away-trim="{{oppTrim}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
@@ -185,7 +188,27 @@ class Component extends DCLogic {
     this.tick = this.tick.bind(this);
     this.t = 0;
   }
-  componentWillUnmount() { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; }
+  componentWillUnmount() { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; this.endOnline(); }
+  endOnline() { if (this.mm) { this.mm.cancel(); this.mm = null; } }
+  // look for real players for a team match (same mode, same size), with the AI as the back-up
+  startOnline(n) {
+    const O = window.AMOnline;
+    if (!O || !O.available() || this.pl.kind !== 'team') return;
+    const A = window.AMChars, o = A ? A.outfit('futbol') : null;
+    const look = { char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none' };
+    this.endOnline();
+    this.mm = O.matchmake((this.props.casual ? 'r' : 'c') + this.pl.n, this.pl.n, O.myName(), look, {
+      update: () => this.forceUpdate(),
+      start: (M) => {
+        const me = M.roster.find((x) => x.id === M.room.me);
+        if (!me) return;
+        this.t = 0;
+        this.setState({ phase: 'found', match: this.makeMatch(), online: { room: M.room, isHost: M.isHost, me: M.room.me, roster: M.roster, myTeam: me.team, mySlot: me.slot } });
+        this.anim();
+      },
+      error: () => { this.endOnline(); }
+    });
+  }
   catalog(sport) {
     const team = (n, soon) => ({ id: 'm' + n, title: n + 'VS' + n, kind: 'team', n, soon, desc: soon ? 'Partido por equipos. Lo estamos preparando.' : n === 1 ? 'Tú contra otro jugador, con porteros.' : n + ' contra ' + n + ', con porteros.' });
     const teams = (soon) => [1, 2, 3, 4].map((n) => team(n, soon));
@@ -293,7 +316,13 @@ class Component extends DCLogic {
     this.last = now;
     this.t += dt;
     const s = this.state;
-    if (s.phase === 'search' && this.t > this.findAt) { this.t = 0; this.setState({ phase: 'found', match: this.makeMatch() }); }
+    const M = this.mm;
+    if (s.phase === 'search' && M && !M.cancelled) {
+      // a host with company starts when the room is full, or 10 s after the first player came in
+      if (M.isHost && M.roster.length > 1 && !M.started && Date.now() - M.firstJoin > 10000) M.start();
+      // nobody else searching: play the AI after a while
+      if (this.t > this.findAt + 20 && M.roster.length <= 1) { M.cancel(); this.mm = null; this.t = 0; this.setState({ phase: 'found', match: this.makeMatch(), online: null }); }
+    } else if (s.phase === 'search' && this.t > this.findAt) { this.t = 0; this.setState({ phase: 'found', match: this.makeMatch(), online: null }); }
     else if (s.phase === 'found' && this.t > 3.2) { this.setState({ phase: 'match' }); this.raf = null; return; }
     else if (s.phase === 'result' && this.t > 2.4) { this.forceUpdate(); this.raf = null; return; }
     else if (s.phase === 'winners' && this.t > 1.2) { this.forceUpdate(); this.raf = null; return; }
@@ -388,8 +417,16 @@ class Component extends DCLogic {
     else chips.push(chip('No afecta a tu rango'));
     const row = (name, tag, mine, right) => ({ name, tag, style: 'display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 14px; ' + (mine ? 'background: #10303A; border: 1px solid #22D3EE;' : 'background: #17172A; border: 1px solid #26264A;') + (right ? ' flex-direction: row-reverse;' : '') });
     const tagOf = (mm) => casual ? 'IA' : this.rankOf(mm).label + ' · IA';
-    const teamA = m ? [row('Invitado_4821', casual ? 'Tú' : placing ? 'Sin clasificar' : R.label, true)].concat(m.mates.map((x, i) => row(x, tagOf(m.mateMmr[i])))) : [];
-    const teamB = m ? m.rivals.map((x, i) => row(x, tagOf(m.rivalMmr[i]), false, true)) : [];
+    let teamA = m ? [row(window.AMOnline ? window.AMOnline.myName() : 'Tú', casual ? 'Tú' : placing ? 'Sin clasificar' : R.label, true)].concat(m.mates.map((x, i) => row(x, tagOf(m.mateMmr[i])))) : [];
+    let teamB = m ? m.rivals.map((x, i) => row(x, tagOf(m.rivalMmr[i]), false, true)) : [];
+    const OL = s.online;
+    if (OL) {
+      // the real players in their seats, the AI in the rest; your team is always on the left
+      const mine = OL.myTeam, seat = (t, k) => OL.roster.find((x) => x.team === t && x.slot === k);
+      const side = (t, right) => Array.from({ length: n }, (_, k) => { const r = seat(t, k); return r ? row(r.name, r.id === OL.me ? 'Tú' : 'ONLINE', r.id === OL.me, right) : row('IA', 'IA', false, right); });
+      teamA = side(mine, false); teamB = side(1 - mine, true);
+    }
+    const M = this.mm, humans = M ? M.roster.length : 1;
     const sp = this.sport, mg = pl.kind === 'mg';
     const won2 = won, xp = won2 ? 120 : lost ? 50 : 80, coins = won2 ? 40 : lost ? 10 : 20;
     const segS = (on) => 'height: 30px; padding: 0 12px; border: 0; border-radius: 8px; font: 800 12px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
@@ -429,7 +466,7 @@ class Component extends DCLogic {
       headLabel: (casual ? 'INFORMAL' : 'COMPETITIVO') + ' · ' + this.C.name + ' · ' + pl.title,
       headColor: casual ? '#22D3EE' : R.text,
       isLobby: s.phase === 'lobby', isSearch: s.phase === 'search', isFound: s.phase === 'found', isResult: s.phase === 'result',
-      isTeamMatch: s.phase === 'match' && pl.kind === 'team', isDuelMatch: s.phase === 'match' && pl.kind === 'duel',
+      isTeamMatch: s.phase === 'match' && pl.kind === 'team' && !OL, isOnlineMatch: s.phase === 'match' && pl.kind === 'team' && !!OL, online: OL, isDuelMatch: s.phase === 'match' && pl.kind === 'duel',
       isBasket: s.phase === 'match' && mg && pl.comp === 'Baloncesto', isTenis: s.phase === 'match' && mg && pl.comp === 'Tenis', isVoley: s.phase === 'match' && mg && pl.comp === 'Voley',
       plTitle: pl.title, plDesc: pl.desc, chips,
       myC1: R.c1, myC2: R.c2, myText: R.text, myWings: !!R.wings, myRank: R.label.toUpperCase(),
@@ -439,7 +476,7 @@ class Component extends DCLogic {
       nextLabel: '≈ ' + Math.max(1, Math.ceil((R.hi - shownMmr) / 25)) + ' victorias para ' + this.rankOf(R.hi).label,
       sweep: (this.t * 240).toFixed(1),
       searchTitle: n > 1 ? 'BUSCANDO JUGADORES' : 'BUSCANDO RIVAL',
-      searchSub: n > 1 ? found + ' / ' + total + ' jugadores' : 'Rango de búsqueda: ' + Math.max(0, s.mmr - 50 - Math.floor(this.t / 1.5) * 25) + '–' + (s.mmr + 50 + Math.floor(this.t / 1.5) * 25) + ' MMR',
+      searchSub: M && !M.cancelled ? (humans > 1 ? humans + ' jugadores online en la sala' + (M.isHost ? ' · empieza en ' + Math.max(0, Math.ceil(10 - (Date.now() - M.firstJoin) / 1000)) + ' s' : ' · esperando al anfitrión') : 'Buscando jugadores online… si no hay nadie, jugarás contra la IA') : n > 1 ? found + ' / ' + total + ' jugadores' : 'Rango de búsqueda: ' + Math.max(0, s.mmr - 50 - Math.floor(this.t / 1.5) * 25) + '–' + (s.mmr + 50 + Math.floor(this.t / 1.5) * 25) + ' MMR',
       searchClock: '0:' + String(Math.floor(this.t)).padStart(2, '0'),
       teamA, teamB,
       countLabel: this.t < 3 ? String(3 - Math.floor(this.t)) : '¡YA!',
@@ -458,11 +495,11 @@ class Component extends DCLogic {
       rankChanged: rankChanged || (s.justPlaced && s.phase === 'result'), changeLabel: s.justPlaced ? 'RANGO INICIAL' : up ? '¡ASCENSO!' : 'DESCENSO',
       changeStyle: 'padding: 4px 14px; border-radius: 8px; font-weight: 800; font-size: 14px; letter-spacing: 2px; ' + (up ? 'background: #22D3EE; color: #0B0B14;' : 'background: #2A1418; color: #FF8A8E;'),
       xp: String(xp), coins: String(coins),
-      search: () => { this.findAt = 2 + n * 0.6 + Math.random() * 1.5; this.setState({ phase: 'search' }); this.anim(); },
-      cancel: () => { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; this.setState({ phase: 'lobby' }); },
+      search: () => { this.findAt = 2 + n * 0.6 + Math.random() * 1.5; this.setState({ phase: 'search', online: null }); this.startOnline(n); this.anim(); },
+      cancel: () => { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; this.endOnline(); this.setState({ phase: 'lobby' }); },
       onEnd: (r) => this.finish(r),
       onScore: (score) => this.finish({ home: score, away: m ? m.target : 0 }),
-      again: () => this.setState({ phase: 'lobby', prevMmr: s.mmr, res: null, match: null, justPlaced: false })
+      again: () => { this.endOnline(); this.setState({ phase: 'lobby', prevMmr: s.mmr, res: null, match: null, justPlaced: false, online: null }); }
     };
   }
 }
