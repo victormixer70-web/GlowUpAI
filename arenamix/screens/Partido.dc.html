@@ -1560,12 +1560,29 @@ class Component extends DCLogic {
       const model = STAD.model();
       model.position.y = -0.03;
       S.add(model);
+      // the model is open on the side-on camera's side; for the cameras that look along the pitch (Pro and
+      // goalkeeper) the bowl is closed with a mirror image of its far half, each half clipped at the halfway
+      // plane z = 0 so they meet cleanly
+      const full = kv || this.proCam();
+      let seatList = STAD.seats();
+      if (full) {
+        this.R.localClippingEnabled = true;
+        const clipTo = (m, nz) => m.traverse((o) => {
+          if (!o.isMesh) return;
+          const mats = [].concat(o.material).map((mt) => { const c2 = mt.clone(); c2.clippingPlanes = [new T.Plane(new T.Vector3(0, 0, nz), 0)]; return c2; });
+          o.material = mats.length === 1 ? mats[0] : mats;
+        });
+        clipTo(model, -1);
+        const mirror = STAD.model(); mirror.position.y = -0.03; mirror.scale.z = -1; clipTo(mirror, 1); S.add(mirror);
+        const far = seatList.filter((q) => q[2] < 0);
+        seatList = far.concat(far.map(([x, y, z]) => [x, y, -z]));
+      }
       // fans in the model's seats, facing the pitch; ultras behind the goals
-      STAD.seats().forEach(([wx, wy, wz]) => {
+      seatList.forEach(([wx, wy, wz]) => {
         if (Math.random() < 0.07) return;
         const tx = Math.max(-26, Math.min(26, wx)), rotY = Math.atan2(tx - wx, -wz);
         const team = wx < 0 ? 0 : 1, ultra = Math.abs(wx) > 34, row = Math.round(wy / 0.5);
-        const key = (wz < -20 ? 'far' : Math.abs(wx) > 34 ? (wx < 0 ? 'west' : 'east') : 'side') + ':' + Math.floor((wx + 60) / 8) + ':' + (ultra ? 'u' : 'n');
+        const key = (wz < -20 ? 'far' : wz > 20 ? 'near' : Math.abs(wx) > 34 ? (wx < 0 ? 'west' : 'east') : 'side') + ':' + Math.floor((wx + 60) / 8) + ':' + (ultra ? 'u' : 'n');
         put(key, team, ultra, wx, wy - 0.02, wz, rotY, fanColor(team, ultra, row));
       });
     } else {
@@ -1645,7 +1662,35 @@ class Component extends DCLogic {
     });
     const adMat = new T.MeshStandardMaterial({ map: adTex, emissive: 0xffffff, emissiveMap: adTex, emissiveIntensity: 0.9 });
     const b1 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); b1.position.set(0, 0.45, -17.5); S.add(b1);
-    if (this.keeperMode()) { const b2 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); b2.position.set(0, 0.45, 17.5); S.add(b2); }
+    if (this.keeperMode() || this.proCam()) { const b2 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); b2.position.set(0, 0.45, 19.2); S.add(b2); }
+    // the two team dugouts on that touchline, either side of halfway, as at a professional ground: a curved
+    // clear canopy, a row of bucket seats in the team colour and a grey frame (only for the cameras that see them)
+    if (this.keeperMode() || this.proCam()) {
+      const L = 9, r = 1.9, steel = this.mat(0x5d6470, { roughness: 0.4, metalness: 0.6 });
+      const glass = new T.MeshStandardMaterial({ color: 0xaad2ff, transparent: true, opacity: 0.3, roughness: 0.1, metalness: 0.2, side: T.DoubleSide, depthWrite: false });
+      [-1, 1].forEach((sx, team) => {
+        const D = new T.Group(); D.position.set(sx * 8, 0, 16.2);
+        const shell = new T.Mesh(new T.CylinderGeometry(r, r, L, 20, 1, true, 0, Math.PI / 2), glass);
+        shell.rotation.z = Math.PI / 2; D.add(shell);
+        [-1, 1].forEach((e) => { const cap = new T.Mesh(new T.CircleGeometry(r, 14, 0, Math.PI / 2), glass); cap.rotation.y = -Math.PI / 2; cap.position.x = e * L / 2; D.add(cap); });
+        // frame: front edge of the roof, the ends and the floor
+        const rail = new T.Mesh(new T.CylinderGeometry(0.05, 0.05, L, 8), steel); rail.rotation.z = Math.PI / 2; rail.position.set(0, r, 0); D.add(rail);
+        [-1, 1].forEach((e) => {
+          const arc = new T.Mesh(new T.TorusGeometry(r, 0.05, 6, 16, Math.PI / 2), steel); arc.rotation.y = -Math.PI / 2; arc.position.x = e * L / 2; D.add(arc);
+        });
+        const floor = new T.Mesh(new T.BoxGeometry(L, 0.1, r), this.mat(0x2a2f3a, { roughness: 0.9 })); floor.position.set(0, 0.05, r / 2); D.add(floor);
+        // bucket seats in the team colour
+        const seatMat = this.mat(teamCols[team][0], { roughness: 0.5 });
+        for (let k = 0; k < 11; k++) {
+          const x = -L / 2 + 0.55 + k * (L - 1.1) / 10;
+          const pan = new T.Mesh(new T.BoxGeometry(0.5, 0.08, 0.45), seatMat); pan.position.set(x, 0.48, 0.95); D.add(pan);
+          const back = new T.Mesh(new T.BoxGeometry(0.5, 0.55, 0.07), seatMat); back.position.set(x, 0.78, 1.2); back.rotation.x = -0.12; D.add(back);
+          const leg = new T.Mesh(new T.BoxGeometry(0.06, 0.44, 0.06), steel); leg.position.set(x, 0.24, 1.0); D.add(leg);
+        }
+        D.traverse((o) => { if (o.isMesh && o.material !== glass) o.castShadow = true; });
+        S.add(D);
+      });
+    }
     [-1, 1].forEach((s) => { const b = new T.Mesh(new T.BoxGeometry(0.15, 0.9, 34), adMat); b.position.set(34.5 * s, 0.45, 0); S.add(b); });
     const glowTex = this.canvasTex(128, 128, (c) => { const g = c.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(220,232,255,0.5)'); g.addColorStop(1, 'rgba(220,232,255,0)'); c.fillStyle = g; c.fillRect(0, 0, 128, 128); });
     if (!STAD) [[-52, -40], [52, -40], [-54, 30], [54, 30]].forEach(([x, z]) => {
