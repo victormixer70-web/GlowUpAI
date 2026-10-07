@@ -1670,12 +1670,6 @@ class Component extends DCLogic {
     if (this.keeperMode() || this.proCam()) {
       const L = 9, r = 1.9, steel = this.mat(0x8a93a3, { roughness: 0.35, metalness: 0.7 });
       const glass = new T.MeshStandardMaterial({ color: 0xb8dcff, emissive: 0x1a3550, transparent: true, opacity: 0.34, roughness: 0.05, metalness: 0.3, side: T.DoubleSide, depthWrite: false });
-      const panelTex = this.canvasTex(512, 64, (c, w, h) => {
-        c.fillStyle = '#0B0B14'; c.fillRect(0, 0, w, h);
-        c.font = 'italic 800 40px Barlow Condensed, Arial'; c.textBaseline = 'middle'; c.fillStyle = '#22D3EE';
-        for (let x = 10; x < w; x += 250) c.fillText('ARENA MIX', x, h / 2 + 2);
-      });
-      const panelMat = new T.MeshStandardMaterial({ map: panelTex, emissive: 0xffffff, emissiveMap: panelTex, emissiveIntensity: 0.5, roughness: 0.6 });
       const lineMat = new T.MeshBasicMaterial({ color: 0xffffff });
       [-1, 1].forEach((sx, team) => {
         const D = new T.Group(); D.position.set(sx * 8, 0, 17.6);
@@ -1688,10 +1682,18 @@ class Component extends DCLogic {
         }
         const rail = new T.Mesh(new T.CylinderGeometry(0.06, 0.06, L, 8), steel); rail.rotation.z = Math.PI / 2; rail.position.set(0, r, 0); D.add(rail);
         // printed panel along the back and a raised floor
+        // each dugout is dressed in its team's kit: your Taquilla kit for yours, the rival's for theirs
+        const kitA = teamCols[team][0], kitB = teamCols[team][1];
+        const panelTex = this.canvasTex(512, 64, (c, w, h) => {
+          c.fillStyle = kitB; c.fillRect(0, 0, w, h); c.fillStyle = kitA; c.fillRect(0, h - 10, w, 10); c.fillRect(0, 0, w, 6);
+          c.font = 'italic 800 40px Barlow Condensed, Arial'; c.textBaseline = 'middle'; c.fillStyle = kitA;
+          for (let x = 10; x < w; x += 250) c.fillText('ARENA MIX', x, h / 2 + 2);
+        });
+        const panelMat = new T.MeshStandardMaterial({ map: panelTex, emissive: 0xffffff, emissiveMap: panelTex, emissiveIntensity: 0.5, roughness: 0.6 });
         const panel = new T.Mesh(new T.PlaneGeometry(L, 0.45), panelMat); panel.position.set(0, 0.5, 1.45); panel.rotation.y = Math.PI; D.add(panel);
         const floor = new T.Mesh(new T.BoxGeometry(L, 0.16, r), this.mat(0x30353f, { roughness: 0.9 })); floor.position.set(0, 0.08, r / 2); D.add(floor);
         // tall padded seats with headrests, in the team colour with a white trim
-        const seatMat = this.mat(teamCols[team][0], { roughness: 0.45 }), trimMat = this.mat(0xf4f4f6, { roughness: 0.5 });
+        const seatMat = this.mat(kitA, { roughness: 0.45 }), trimMat = this.mat(kitB, { roughness: 0.5 });
         const n = 10;
         for (let k = 0; k < n; k++) {
           const x = -L / 2 + 0.5 + k * (L - 1) / (n - 1);
