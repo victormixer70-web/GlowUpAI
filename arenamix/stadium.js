@@ -52,21 +52,34 @@
   window.AMStadium = api;
   load();
 
+  // the net material: thick white cords on a transparent texture, blended rather than cut out, so far
+  // away (where the cords shrink below a pixel) it still reads as a white mesh instead of vanishing
+  var netMat = null, CELL = 0.15;
+  function material() {
+    if (netMat) return netMat;
+    var cv = document.createElement('canvas'); cv.width = cv.height = 128;
+    var c = cv.getContext('2d'); c.strokeStyle = '#ffffff'; c.lineWidth = 14; c.lineCap = 'square';
+    c.beginPath(); c.moveTo(0, 0); c.lineTo(128, 128); c.moveTo(128, 0); c.lineTo(0, 128); c.stroke();
+    var tex = new T.CanvasTexture(cv); tex.wrapS = tex.wrapT = T.RepeatWrapping; tex.anisotropy = 8;
+    netMat = new T.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: 0xffffff, emissiveIntensity: 0.35, transparent: true, alphaTest: 0.02, depthWrite: false, side: T.DoubleSide, roughness: 0.9 });
+    return netMat;
+  }
+  // a flat piece of net between four corners [x, y, z], cords of a constant size
+  function quad(pts) {
+    var v = pts.map(function (q) { return new T.Vector3(q[0], q[1], q[2]); });
+    var wU = v[0].distanceTo(v[1]) / CELL, wV = v[0].distanceTo(v[3]) / CELL, pos = [], uv = [];
+    [[v[0], 0, 0], [v[1], wU, 0], [v[2], wU, wV], [v[0], 0, 0], [v[2], wU, wV], [v[3], 0, wV]].forEach(function (e) { pos.push(e[0].x, e[0].y, e[0].z); uv.push(e[1], e[2]); });
+    var g = new T.BufferGeometry();
+    g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); g.computeVertexNormals();
+    var m = new T.Mesh(g, material()); m.renderOrder = 2;
+    return m;
+  }
   /* A goal's back net that gives: a grid w wide and h high in its local x/y plane, pushed out along +z.
      Each frame, push() it where the ball is pressing into it (how far past its rest plane), then step():
      while the ball presses, the net wraps round it; when the ball drops away, it springs back and wobbles. */
-  var netTex = null;
   window.AMNet = function (w, h, mat) {
-    var cell = 0.16, nx = Math.ceil(w / 0.12), ny = Math.ceil(h / 0.12);
-    if (!mat) {
-      if (!netTex) {
-        var cv = document.createElement('canvas'); cv.width = cv.height = 128;
-        var c = cv.getContext('2d'); c.strokeStyle = '#ffffff'; c.lineWidth = 5;
-        c.beginPath(); c.moveTo(0, 0); c.lineTo(128, 128); c.moveTo(128, 0); c.lineTo(0, 128); c.stroke();
-        netTex = new T.CanvasTexture(cv); netTex.wrapS = netTex.wrapT = T.RepeatWrapping; netTex.anisotropy = 4;
-      }
-      mat = new T.MeshStandardMaterial({ map: netTex, alphaTest: 0.4, side: T.DoubleSide, roughness: 0.9 });
-    }
+    var cell = CELL, nx = Math.ceil(w / 0.12), ny = Math.ceil(h / 0.12);
+    mat = mat || material();
     var geo = new T.PlaneGeometry(w, h, nx, ny);
     geo.translate(0, h / 2, 0);
     var uv = geo.attributes.uv, pos = geo.attributes.position, base = Float32Array.from(pos.array);
@@ -77,7 +90,7 @@
       var u = (base[i * 3] + w / 2) / w, v = base[i * 3 + 1] / h;
       win[i] = Math.pow(Math.max(0, Math.sin(Math.PI * u)), 0.5) * Math.pow(Math.max(0, Math.sin(Math.PI * Math.min(1, v * 1.15))), 0.5);
     }
-    var mesh = new T.Mesh(geo, mat);
+    var mesh = new T.Mesh(geo, mat); mesh.renderOrder = 2;
     var d = 0, vd = 0, cx = 0, cy = h / 2, pushed = -1, lastT = 0;
     return {
       mesh: mesh,
@@ -100,4 +113,6 @@
       }
     };
   };
+  window.AMNet.material = material;
+  window.AMNet.quad = quad;
 })();

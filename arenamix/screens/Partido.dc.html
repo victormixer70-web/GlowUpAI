@@ -1642,22 +1642,7 @@ class Component extends DCLogic {
     const GOAL = STAD && STAD.goal(6.14, 2.51, 1.6, 1) ? STAD : null;
     this.nets = {};
     if (GOAL) {
-      const netTex = this.canvasTex(128, 128, (c, w, h) => {
-        c.clearRect(0, 0, w, h); c.strokeStyle = '#ffffff'; c.lineWidth = 5;
-        c.beginPath(); c.moveTo(0, 0); c.lineTo(w, h); c.moveTo(w, 0); c.lineTo(0, h); c.stroke();
-      });
-      netTex.wrapS = netTex.wrapT = T.RepeatWrapping;
-      const cell = 0.16;
-      const netM = new T.MeshStandardMaterial({ map: netTex, alphaTest: 0.4, transparent: false, side: T.DoubleSide, roughness: 0.9 });
-      const quad = (pts) => {
-        // pts: four corners [x, y, z]; UVs in metres so the mesh cells keep their size
-        const g2 = new T.BufferGeometry(), pos = [], uv = [];
-        const [a0, b0, c0, d0] = pts.map((q) => new T.Vector3(...q));
-        const wU = a0.distanceTo(b0) / cell, wV = a0.distanceTo(d0) / cell;
-        [[a0, 0, 0], [b0, wU, 0], [c0, wU, wV], [a0, 0, 0], [c0, wU, wV], [d0, 0, wV]].forEach(([v, u, w2]) => { pos.push(v.x, v.y, v.z); uv.push(u, w2); });
-        g2.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g2.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); g2.computeVertexNormals();
-        return new T.Mesh(g2, netM);
-      };
+      const quad = window.AMNet.quad, netM = window.AMNet.material();
       [-1, 1].forEach((s) => {
         const gx = 30 * s, bx = gx + 1.6 * s, hw = 3;
         const frame = GOAL.goal(6.14, 2.51, 1.6, s); frame.position.set(gx, 0, 0); S.add(frame);

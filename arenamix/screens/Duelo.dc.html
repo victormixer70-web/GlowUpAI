@@ -1003,6 +1003,11 @@ class Component extends DCLogic {
     this.net = window.AMNet ? window.AMNet(7.32, 2.1) : null;
     if (this.net) { this.net.mesh.position.set(GX, 0, D + 2); S.add(this.net.mesh); }
     else S.add(grid(backPts));
+    if (window.AMNet && window.AMNet.quad) {
+      const q = window.AMNet.quad, L = GX - 3.66, Rr = GX + 3.66;
+      [L, Rr].forEach((x) => S.add(q([[x, 0, D], [x, 0, D + 2], [x, 2.1, D + 2], [x, 2.44, D]])));
+      S.add(q([[L, 2.44, D], [Rr, 2.44, D], [Rr, 2.1, D + 2], [L, 2.1, D + 2]]));
+    } else {
     [-1, 1].forEach((s) => {
       const pts = [], x = GX + 3.66 * s;
       for (let z = 0; z <= 2.001; z += st) { const top = 2.44 - 0.17 * z; pts.push(x, 0, D + z, x, top, D + z); }
@@ -1013,6 +1018,7 @@ class Component extends DCLogic {
     for (let x = -3.66; x <= 3.661; x += st) roof.push(GX + x, 2.44, D, GX + x, 2.1, D + 2);
     for (let z = 0; z <= 2.001; z += st) roof.push(GX - 3.66, 2.44 - 0.17 * z, D + z, GX + 3.66, 2.44 - 0.17 * z, D + z);
     S.add(grid(roof));
+    }
 
     // ball
     const ballTex = this.canvasTex(512, 256, (c, w, h) => {
