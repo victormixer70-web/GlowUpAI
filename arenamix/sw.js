@@ -1,5 +1,5 @@
 /* Network-first so every update you publish reaches the phone; cache is the offline fallback. */
-const CACHE = 'arenamix-v68';
+const CACHE = 'arenamix-v69';
 const CORE = ['./', 'index.html', 'app.js', 'manifest.webmanifest', 'vendor/preact.min.js', 'vendor/three.min.js', 'vendor/GLTFLoader.js', 'vendor/SkeletonUtils.js', 'chars.js', 'grass.js', 'sky.js', 'ball.js', 'vendor/RGBELoader.js', 'stadium.js', 'music.js', 'ui-fx.js', 'assets/stadium/stadium.glb', 'assets/stadium/seats.json', 'assets/stadium/goal.glb', 'assets/sky/stadium_bg.jpg', 'assets/sky/stadium_env.hdr', 'assets/grass/color.jpg', 'assets/grass/normal.jpg', 'assets/grass/rough.jpg', 'assets/chars/ty.glb', 'assets/chars/vegas.glb', 'assets/chars/granny.glb', 'assets/chars/anims.json', 'icons/icon-192.png', 'icons/loading-bg.jpg', 'vendor/fonts/rajdhani-500.woff2', 'vendor/fonts/rajdhani-600.woff2', 'vendor/fonts/rajdhani-700.woff2'];
 
 self.addEventListener('install', (e) => {
