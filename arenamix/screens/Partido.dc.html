@@ -186,6 +186,8 @@ class Component extends DCLogic {
     if (this.netOff) { this.netOff(); this.netOff = null; }
   }
   /* ---------- online ---------- */
+  // your own numbers for the match (missions and the results screen), never a remote player's
+  stat(k) { if (!this.ctxH && this.mstats && !this.autoplay) this.mstats[k]++; }
   netHuman(i) {
     const N = this.net;
     return N && N.host ? N.humans.find((h) => h.i === i) || null : null;
@@ -218,6 +220,7 @@ class Component extends DCLogic {
     if (!N || N.host) return false;
     const [x, y] = this.worldInp();
     N.room.send({ t: 'ev', k, o, c: this.g.charge, x, y });
+    if (this.mstats) { const sk = { kick: 'shots', pass: 'passes', skill: 'skills' }[k]; if (sk) this.mstats[sk]++; }
     return true;
   }
   worldInp() { const [x, y] = this.inp || [0, 0], m = this.net && this.net.mirror ? -1 : 1; return [+(x * m).toFixed(3), +(y * m).toFixed(3)]; }
@@ -300,7 +303,7 @@ class Component extends DCLogic {
     const S = N.snap;
     if (!S) return;
     if (S.ph === 'winners') { if (g.phase !== 'winners') { g.score = S.sc.slice(); this.setupWinners(); } return; }
-    if (S.ph !== g.phase) { if (S.ph === 'goal') { g.concede = S.con; const sc = g.ps[S.sci], tm = 1 - S.con; g.scorer = sc && sc.team === tm && sc.role !== 'gk' ? 'Gol de ' + (S.sci === g.ctl ? 'TI' : sc.name) : sc ? 'Gol en propia puerta' : ''; } g.phase = S.ph; }
+    if (S.ph !== g.phase) { if (S.ph === 'goal') { g.concede = S.con; const sc = g.ps[S.sci], tm = 1 - S.con; g.scorer = sc && sc.team === tm && sc.role !== 'gk' ? 'Gol de ' + (S.sci === g.ctl ? 'TI' : sc.name) : sc ? 'Gol en propia puerta' : ''; if (S.sci === g.ctl && tm === 0) this.mstats.goals++; } g.phase = S.ph; }
     const age = Math.min(0.25, (performance.now() - N.snapAt) / 1000), k = 1 - Math.exp(-dt * 14);
     g.score = S.sc; g.t = Math.max(0, S.tm - (g.phase === 'play' ? age : 0)); g.pt = S.pt + age; g.own = S.own; g.hold = S.hold; g.concede = S.con;
     if (S.ctl != null && S.ctl >= 0 && S.ctl !== g.ctl) { g.ctl = S.ctl; g.charging = false; }
@@ -341,6 +344,7 @@ class Component extends DCLogic {
     let homeNames = keeper ? mates.concat(['Compañero 4', 'Compañero 5']) : [P.homeName ?? 'Tú'].concat(mates), awayNames = rivals;
     // online: the room's players (the host's phone runs the match; a guest on the other team sees it
     // mirrored, so on every phone your own team plays left to right in your kit)
+    this.mstats = { goals: 0, shots: 0, passes: 0, skills: 0, tackles: 0 };
     const O = P.online;
     this.net = O && O.room ? { room: O.room, host: !!O.isHost, me: O.me, mirror: !O.isHost && O.myTeam === 1, mySlot: O.mySlot || 0, humans: [], snapT: 0, inT: 0, snap: null } : null;
     if (this.net) {
@@ -568,6 +572,7 @@ class Component extends DCLogic {
     const g = this.g;
     if (g.tut && g.tut.i === 5 && team === 0) { g.tut.i = 6; g.tut.t = 0; this.flashMsg('¡GOLAZO! Último paso', 1.5); }
     g.score[team]++;
+    if (team === 0 && g.last === g.ctl) this.stat('goals');
     g.phase = 'goal'; g.pt = 0; g.concede = 1 - team; g.own = -1;
     const sc = g.last >= 0 ? g.ps[g.last] : null;
     g.sci = sc ? g.last : -1;
@@ -642,6 +647,7 @@ class Component extends DCLogic {
     const charge = g.charge, i = g.ctl;
     g.charging = false; g.charge = 0;
     if (this.dist(p, g.ball) > (g.own === i ? 1.7 : 1.5) || g.ball.z > 1.4) { this.flashMsg('Demasiado lejos del balón', 0.8); return; }
+    this.stat('shots');
     // a real strike: from the backswing the body turns to the target and the leg swings through; the ball
     // leaves at the moment the foot meets it, not when you let go of the button
     p.act = { type: 'windup', t: 0, dur: 0.11, from: 0.12 + 0.15 * charge, face: dir, then: () => {
@@ -664,7 +670,7 @@ class Component extends DCLogic {
     const [ix, iy] = this.inp || [0, 0];
     const aimed = Math.hypot(ix, iy) > 0.2, dir = aimed ? Math.atan2(iy, ix) : p.face;
     const q = this.pickPassTarget(p, dir, !aimed);
-    if (q) this.passBall(p, q); else this.pushAhead(p, dir, 12);
+    if (q) { this.passBall(p, q); this.stat('passes'); } else this.pushAhead(p, dir, 12);
   }
   switchPlayer() {
     const g = this.g, b = g.ball;
@@ -688,6 +694,7 @@ class Component extends DCLogic {
     if (Math.hypot(ix, iy) > 0.3) { const c = Math.cos(p.face) * iy - Math.sin(p.face) * ix; if (Math.abs(c) > 0.2) side = c > 0 ? 1 : -1; }
     p.lastSide = side;
     this.doSkill(p, side);
+    this.stat('skills');
   }
   humanSlide() {
     const g = this.g, p = g.ps[g.ctl], b = g.ball;
@@ -1285,7 +1292,7 @@ class Component extends DCLogic {
       const side = (Math.random() - 0.5) * 3;
       b.vx = Math.cos(p.face) * 5.5 - Math.sin(p.face) * side; b.vy = Math.sin(p.face) * 5.5 + Math.cos(p.face) * side; b.vz = 0.8;
       g.last = i;
-      if (i === g.ctl) this.flashMsg('¡Entrada limpia!', 0.9);
+      if (i === g.ctl) { this.flashMsg('¡Entrada limpia!', 0.9); this.stat('tackles'); }
     });
   }
   ballStep(dt) {
@@ -1409,7 +1416,7 @@ class Component extends DCLogic {
       b.x = p.x + nx * r; b.y = p.y + ny * r;
       if (owner && p.team !== owner.team && p.role !== 'gk') {
         g.own = -1; owner.cd = 0.25;
-        if (i === g.ctl) this.flashMsg('¡Balón cortado!', 0.8);
+        if (i === g.ctl) { this.flashMsg('¡Balón cortado!', 0.8); this.stat('tackles'); }
         else if (g.ps.indexOf(owner) === g.ctl) this.flashMsg('Te han cortado el balón', 0.8);
         return;
       }
@@ -1497,7 +1504,7 @@ class Component extends DCLogic {
         const ax = q.x - p.x, ay = q.y - p.y, an = Math.hypot(ax, ay) || 1;
         b.vx = ax / an * 2.5 + q.vx * 0.5; b.vy = ay / an * 2.5 + q.vy * 0.5;
         g.own = -1; p.cd = 0.35; g.last = qi;
-        if (qi === g.ctl) this.flashMsg('¡Balón recuperado!', 0.8);
+        if (qi === g.ctl) { this.flashMsg('¡Balón recuperado!', 0.8); this.stat('tackles'); }
         else if (oi === g.ctl) this.flashMsg('Te han robado el balón', 0.8);
         return;
       }
@@ -2639,7 +2646,7 @@ class Component extends DCLogic {
       finishLabel: P.onEnd ? 'CONTINUAR' : 'JUGAR OTRA VEZ',
       start: () => this.start(),
       finish: () => {
-        if (P.onEnd) P.onEnd({ home: g.score[0], away: g.score[1] });
+        if (P.onEnd) P.onEnd({ home: g.score[0], away: g.score[1], stats: this.mstats });
         else {
           if (this.confetti) { this.S.remove(this.confetti); this.confetti = null; }
           this.winCam = false;

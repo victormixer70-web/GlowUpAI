@@ -33,67 +33,35 @@ input::placeholder{color:#8686A6}
       <div style="flex: 1"></div>
     <span class="bc-para" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 18px; background: linear-gradient(135deg, #3A2A0A, #1E1A10); box-shadow: inset 0 0 0 1px #FFC53D; color: #FFE38A; font-weight: 800; font-size: 14px">
       <svg class="am-coin" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">C</text></svg>
-      2.450 carrascos
+      {{coins}} carrascos
     </span>
     </div>
     <div style="flex: 1; min-height: 0; overflow-y: auto">
       <sc-if value="{{isRewards}}" hint-placeholder-val="{{ true }}">
         <div style="display: flex; flex-direction: column; gap: 12px">
           <div class="bc-tile am-shine" style="display: flex; align-items: center; gap: 14px; padding: 10px 16px 10px 20px; --bc-c: #22D3EE">
-            <span style="position: relative; width: 58px; height: 58px; border-radius: 29px; background: conic-gradient(#22D3EE 72deg, #2E2E52 72deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px #22D3EE55"><span style="width: 48px; height: 48px; border-radius: 24px; background: #141428; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px">2<span style="font-size: 13px; color: #8686A6">/10</span></span></span>
+            <span style="position: relative; width: 58px; height: 58px; border-radius: 29px; background: conic-gradient(#22D3EE {{wDeg}}deg, #2E2E52 {{wDeg}}deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px #22D3EE55"><span style="width: 48px; height: 48px; border-radius: 24px; background: #141428; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px">{{wins}}<span style="font-size: 13px; color: #8686A6">/10</span></span></span>
             <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
               <span style="font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE">RECOMPENSAS ASEGURADAS</span>
               <span style="font-size: 13px; color: #CACAE0">Cada victoria de la semana te acerca a un premio garantizado. Sin azar.</span>
             </div>
-            <span style="padding: 6px 12px; border-radius: 12px; background: #0B0B14; border: 1px solid #2E2E52; font-size: 11px; font-weight: 800; color: #CACAE0">Se reinicia en 4 días</span>
+            <span style="padding: 6px 12px; border-radius: 12px; background: #0B0B14; border: 1px solid #2E2E52; font-size: 11px; font-weight: 800; color: #CACAE0">Se reinicia en {{wDays}}</span>
           </div>
           <div style="position: relative; height: 196px; margin: 0 62px">
-          <div style="position: absolute; left: calc(0% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px">
-            <div class="" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(160deg, #13303A, #121226); border: 1px solid #22D3EE66; opacity: .85; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
-              <span style="display: flex; height: 64px; align-items: center; margin-top: -4px"><img src="{{prz.coins100}}" alt="" style="width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 6px 8px #000a)"></span>
-              <span style="font-weight: 800; font-size: 13px; line-height: 1.15">100 carrascos</span>
-              <span style="font-size: 10px; color: #A3A3C2">Moneda del juego</span>
-              <span style="display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; color: #22D3EE"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg>Reclamado</span>
+          <sc-for list="{{ms}}" as="m" hint-placeholder-count="5">
+          <div style="{{m.pos}}">
+            <div class="{{m.cardCls}}" style="{{m.card}}">
+              <span class="{{m.icCls}}" style="display: flex; height: 64px; align-items: center; margin-top: -4px"><img src="{{m.img}}" alt="" style="width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 6px 8px #000a)"></span>
+              <span style="font-weight: 800; font-size: 13px; line-height: 1.15">{{m.name}}</span>
+              <span style="font-size: 10px; color: #A3A3C2">{{m.sub}}</span>
+              <sc-if value="{{m.canClaim}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{m.claim}}" class="bc-btn-gold am-shine" style="height: 28px; padding: 0 16px; font-size: 15px; cursor: pointer">RECLAMAR</button></sc-if>
+              <sc-if value="{{m.isClaimed}}" hint-placeholder-val="{{ false }}"><span style="display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; color: #22D3EE"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg>Reclamado</span></sc-if>
+              <sc-if value="{{m.isLocked}}" hint-placeholder-val="{{ true }}"><span style="font-size: 11px; font-weight: 700; color: #8686A6">{{m.left}}</span></sc-if>
             </div>
-            <span style="width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; background: #22D3EE; color: #0B0B14; box-shadow: 0 0 12px #22D3EE;">1</span>
+            <span style="{{m.dot}}">{{m.at}}</span>
           </div>
-          <div style="position: absolute; left: calc(25% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px">
-            <div class="am-float" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(160deg, #3A2A0A, #1E1A10); border: 1px solid #FFC53D; box-shadow: 0 0 18px #FFC53D55; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
-              <span class="td-wiggle" style="display: flex; height: 64px; align-items: center; margin-top: -4px"><img src="{{prz.chestReady}}" alt="" style="width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 6px 8px #000a)"></span>
-              <span style="font-weight: 800; font-size: 13px; line-height: 1.15">Cofre común</span>
-              <span style="font-size: 10px; color: #A3A3C2">¡Listo para abrir!</span>
-              <button type="button" class="bc-btn-gold am-shine" style="height: 28px; padding: 0 16px; font-size: 15px; cursor: pointer">RECLAMAR</button>
-            </div>
-            <span style="width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; background: #FFC53D; color: #2A1C02; box-shadow: 0 0 16px #FFC53D;">2</span>
-          </div>
-          <div style="position: absolute; left: calc(50% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px">
-            <div class="" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(160deg, #1C1C3A, #141428); border: 1px solid #2A2A50; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
-              <span class="td-snore" style="display: flex; height: 64px; align-items: center; margin-top: -4px"><img src="{{prz.chestRare}}" alt="" style="width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 6px 8px #000a)"></span>
-              <span style="font-weight: 800; font-size: 13px; line-height: 1.15">Cofre raro</span>
-              <span style="font-size: 10px; color: #A3A3C2">Accesorio de equipo</span>
-              <span style="font-size: 11px; font-weight: 700; color: #8686A6">Faltan 3 victorias</span>
-            </div>
-            <span style="width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; background: #21213A; color: #A3A3C2; border: 2px solid #3A3A66;">5</span>
-          </div>
-          <div style="position: absolute; left: calc(75% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px">
-            <div class="" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(160deg, #1C1C3A, #141428); border: 1px solid #2A2A50; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
-              <span style="display: flex; height: 64px; align-items: center; margin-top: -4px"><img src="{{prz.coins300}}" alt="" style="width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 6px 8px #000a)"></span>
-              <span style="font-weight: 800; font-size: 13px; line-height: 1.15">300 carrascos</span>
-              <span style="font-size: 10px; color: #A3A3C2">Moneda del juego</span>
-              <span style="font-size: 11px; font-weight: 700; color: #8686A6">Faltan 5 victorias</span>
-            </div>
-            <span style="width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; background: #21213A; color: #A3A3C2; border: 2px solid #3A3A66;">7</span>
-          </div>
-          <div style="position: absolute; left: calc(100% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px">
-            <div class="" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(160deg, #1C1C3A, #141428); border: 1px solid #2A2A50; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
-              <span style="display: flex; height: 64px; align-items: center; margin-top: -4px"><img src="{{prz.boots}}" alt="" style="width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 6px 8px #000a)"></span>
-              <span style="font-weight: 800; font-size: 13px; line-height: 1.15">Brote + Botas Carmesí</span>
-              <span style="font-size: 10px; color: #A3A3C2">Gran premio semanal</span>
-              <span style="font-size: 11px; font-weight: 700; color: #8686A6">Faltan 8 victorias</span>
-            </div>
-            <span style="width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; background: #21213A; color: #A3A3C2; border: 2px solid #3A3A66;">10</span>
-          </div>
-            <div style="position: absolute; left: 0; right: 0; top: 174px; height: 8px; border-radius: 4px; background: #26264A; z-index: -1; box-shadow: inset 0 1px 2px #0008"><div class="am-bar-shine" style="width: 25%; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #22D3EE, #7EF0FF); box-shadow: 0 0 10px #22D3EE"></div></div>
+          </sc-for>
+            <div style="position: absolute; left: 0; right: 0; top: 174px; height: 8px; border-radius: 4px; background: #26264A; z-index: -1; box-shadow: inset 0 1px 2px #0008"><div class="am-bar-shine" style="width: {{wBar}}%; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #22D3EE, #7EF0FF); box-shadow: 0 0 10px #22D3EE"></div></div>
           </div>
         </div>
       </sc-if>
@@ -142,9 +110,37 @@ class Component extends DCLogic {
     const t = this.state.tab;
     const tabStyle = (on) => 'height: 36px; padding: 0 20px; border: 0; font: 800 13px Exo2, sans-serif; letter-spacing: 1px; cursor: pointer; ' + (on ? 'background: linear-gradient(135deg, #7EF0FF, #22D3EE); color: #0B0B14;' : 'background: #17172ACC; color: #CACAE0;');
     const G = window.AMGear, P = (k) => (G ? G.prize(k) : '');
+    const PR = window.AMProgress, W = PR ? PR.weekly() : { wins: 0, milestones: [], daysLeft: 7 };
+    // the bar runs through the milestones, which sit at 0, 25, 50, 75 and 100 %
+    const AT = W.milestones.map((m) => m.at);
+    let wBar = 0;
+    for (let i = 0; i < AT.length; i++) { if (W.wins >= AT[i]) wBar = i * 25; else { const lo = i ? AT[i - 1] : 0; wBar = i ? (i - 1) * 25 + 25 * (W.wins - lo) / (AT[i] - lo) : 0; break; } }
     const PACK = ['coins:6', 'coins:16', 'bag', 'chest:legend:open'];
     const pk = (amount, bonus, k) => ({ amount, bonus, hot: k === 2, img: P(PACK[k]), style: 'position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 200px; padding: 16px 10px 12px 10px; box-sizing: border-box; clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px); color: #F4F4FA; font-family: Exo2, sans-serif; cursor: pointer; background: linear-gradient(160deg, ' + ['#1C1C3A', '#1D2A4A', '#2A1F4A', '#3A2A0A'][k] + ', #121226 75%); border: 1px solid ' + ['#2E2E58', '#22D3EE88', '#9B6BFF', '#FFC53D'][k] + '; box-shadow: 0 0 ' + (6 + k * 5) + 'px ' + ['#0000', '#22D3EE44', '#9B6BFF55', '#FFC53D66'][k] + ', 0 8px 18px #0007;' });
     return {
+      coins: String(PR ? PR.coins() : 2450).replace(/\B(?=(\d{3})+(?!\d))/g, '.'),
+      wins: String(W.wins), wDeg: String(Math.min(1, W.wins / 10) * 360), wDays: W.daysLeft === 1 ? '1 día' : W.daysLeft + ' días',
+      wBar: String(wBar.toFixed(1)),
+      ms: W.milestones.map((m, i) => {
+        const ready = m.reached && !m.claimed, rc = m.claimed ? '#22D3EE' : ready ? '#FFC53D' : '#2A2A50';
+        return {
+          name: m.name, sub: ready ? (m.prize === 'chest' ? '¡Listo para abrir!' : '¡Listo para recoger!') : m.sub, at: String(m.at),
+          img: P(m.icon + (ready && m.prize === 'chest' ? ':open' : '')),
+          canClaim: ready, isClaimed: m.claimed, isLocked: !m.reached,
+          left: (m.at - W.wins === 1 ? 'Falta 1 victoria' : 'Faltan ' + (m.at - W.wins) + ' victorias'),
+          icCls: ready ? 'td-wiggle' : (m.prize === 'chest' && !m.reached ? 'td-snore' : ''),
+          cardCls: ready ? 'am-float' : '',
+          pos: 'position: absolute; left: calc(' + (i * 25) + '% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px',
+          card: 'width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(160deg, ' + (m.claimed ? '#13303A, #121226' : ready ? '#3A2A0A, #1E1A10' : '#1C1C3A, #141428') + '); border: 1px solid ' + rc + (m.claimed ? '66' : '') + '; ' + (ready ? 'box-shadow: 0 0 18px #FFC53D55;' : '') + (m.claimed ? ' opacity: .85;' : '') + ' display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center',
+          dot: 'width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 18px; ' + (m.claimed ? 'background: #22D3EE; color: #0B0B14; box-shadow: 0 0 12px #22D3EE;' : ready ? 'background: #FFC53D; color: #2A1C02; box-shadow: 0 0 16px #FFC53D;' : 'background: #21213A; color: #A3A3C2; border: 2px solid #3A3A66;'),
+          claim: () => {
+            const r = PR.claim(m.id);
+            if (!r) return;
+            // a chest is opened in front of you; coins and the boots just pop out
+            if (window.AMResults) window.AMResults.reward(r, () => this.forceUpdate()); else this.forceUpdate();
+          }
+        };
+      }),
       prz: { coins100: P('coins:4'), chestReady: P('chest:common:open'), chestRare: P('chest:rare'), coins300: P('coins:14'), boots: P('boots:#E5484D'), hat: G ? G.thumb('cabeza', { id: 'h2', kind: 'top' }) : '' },
       isRewards: t === 'rewards',
       isShop: t === 'shop',

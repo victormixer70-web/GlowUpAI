@@ -319,9 +319,11 @@ class Component extends DCLogic {
       };
       add('all'); add(sport);
       localStorage.setItem('arenamix.record.v1', JSON.stringify(R));
-      const W = JSON.parse(localStorage.getItem('arenamix.wallet.v1') || 'null') || { coins: 2450 };
-      W.coins += w ? 40 : l ? 10 : 20;
-      localStorage.setItem('arenamix.wallet.v1', JSON.stringify(W));
+      // experience, coins, the weekly track and the daily missions, then the results screen plays it back
+      if (window.AMProgress) {
+        const sum = window.AMProgress.recordMatch({ home: r.home || 0, away: r.away || 0, kind, stats: r.stats });
+        if (window.AMResults && !r.tutorial) setTimeout(() => window.AMResults.show(sum), 60);
+      }
     } catch (e) {}
   }
   finish(r) {
