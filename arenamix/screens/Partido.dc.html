@@ -11,6 +11,7 @@
 <helmet>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;display=swap" rel="stylesheet">
 <style>
+@keyframes pdLive{0%,100%{opacity:1}50%{opacity:.25}}
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
@@ -103,6 +104,15 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </sc-if>
 
+  </sc-if>
+  <sc-if value="{{showReplay}}" hint-placeholder-val="{{ false }}">
+    <div onPointerDown="{{skipReplay}}" style="position: absolute; inset: 0; z-index: 30; cursor: pointer">
+      <span style="position: absolute; left: 0; right: 0; top: 0; height: 34px; background: #000"></span>
+      <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 34px; background: #000"></span>
+      <span style="position: absolute; left: 18px; top: 46px; display: flex; align-items: center; gap: 8px; padding: 4px 14px 4px 10px; transform: skewX(-12deg); background: #0B0B14E6; border-left: 4px solid #FF5C5C; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 2px"><span style="width: 9px; height: 9px; border-radius: 5px; background: #FF5C5C; box-shadow: 0 0 8px #FF5C5C; animation: pdLive 1s infinite"></span>REPETICIÓN</span>
+      <span style="position: absolute; right: 18px; bottom: 44px; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #CACAE0">TOCA PARA SALTAR</span>
+      <span style="position: absolute; left: 0; right: 0; top: 7px; text-align: center; font-size: 12px; font-weight: 800; letter-spacing: 3px; color: #FFC53D">{{scorerText}}</span>
+    </div>
   </sc-if>
   <sc-if value="{{showGoal}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; pointer-events: none">
@@ -485,6 +495,7 @@ class Component extends DCLogic {
     if (N && !N.host) this.clientStep(dt);
     else for (let i = 0; i < 3; i++) this.step(dt / 3);
     if (N && N.host) this.hostSend(dt);
+    this.recordFrame();
     this.crowdT = (this.crowdT || 0) - dt;
     if (this.crowdT <= 0) { this.crowdT = 0.25; this.sfx('crowd', this.crowdLevel()); }
     this.draw3D(dt);
@@ -789,7 +800,8 @@ class Component extends DCLogic {
       if (sp > 0.5) p.face += this.ang(Math.atan2(p.vy, p.vx) - p.face) * Math.min(1, dt * 8);
       if (sp > 0.25) p.run += 2 * Math.PI * (0.9 + 0.09 * sp) * dt;
     });
-    if (g.pt > 3) { if (this.props.tutorial) { this.tutSetup(6); g.phase = 'play'; g.pt = 0; return; } this.kickoff(g.concede); g.phase = 'play'; g.pt = 0; this.sfx('whistle', 1); }
+    if (g.pt > 1.4 && !this.rp && !this.rpDone && !this.props.tutorial) this.startReplay();
+    if (g.pt > 3 && !this.rp) { this.rpDone = false; if (this.props.tutorial) { this.tutSetup(6); g.phase = 'play'; g.pt = 0; return; } this.kickoff(g.concede); g.phase = 'play'; g.pt = 0; this.sfx('whistle', 1); }
   }
   // after a goal the ball flies on into the goal: the side nets and the roof stop it, and the back of the
   // net stretches, slows it down and drops it, so it stays in the goal (it never goes through)
@@ -2022,8 +2034,60 @@ class Component extends DCLogic {
     });
     this.meshFor = g.ps;
   }
+  /* ---------- goal replay: the last seconds before a goal, again, slowly, from a TV camera ---------- */
+  recordFrame() {
+    const g = this.g;
+    if (g.phase !== 'play') return;
+    const b = g.ball, buf = this.rbuf || (this.rbuf = []);
+    buf.push({
+      ps: g.ps.map((p) => [p.x, p.y, p.face, p.run, p.turn || 0, p.vx, p.vy, p.act ? { type: p.act.type, t: p.act.t, dur: p.act.dur, loft: p.act.loft, s: p.act.s, h: p.act.h, face: p.act.face, from: p.act.from, lock: p.act.lock } : null, p.touchAnim || 0]),
+      b: [b.x, b.y, b.z, b.vx, b.vy, b.vz], dt: this.lastDt || 0.016
+    });
+    if (buf.length > 260) buf.shift();
+  }
+  startReplay() {
+    const buf = this.rbuf || [];
+    // from about 2.8 s before the goal
+    let tsum = 0, i = buf.length - 1;
+    while (i > 0 && tsum < 2.8) { tsum += buf[i].dt; i--; }
+    const frames = buf.slice(i);
+    if (frames.length < 20) { this.rpDone = true; return; }
+    let acc = 0; frames.forEach((f) => { f.at = acc; acc += f.dt; });
+    this.rp = { frames, t: 0, len: acc, cam: null };
+    this.rbuf = [];
+  }
+  replayFrame(dt) {
+    const rp = this.rp, g = this.g;
+    rp.t += dt * 0.42;
+    if (rp.t >= rp.len) { this.rp = null; this.rpDone = true; return null; }
+    const F = rp.frames;
+    let k = 0; while (k < F.length - 2 && F[k + 1].at < rp.t) k++;
+    const A = F[k], B = F[k + 1] || A, u = B.at > A.at ? Math.min(1, (rp.t - A.at) / (B.at - A.at)) : 0;
+    const L = (a, b) => a + (b - a) * u;
+    // keep the live state aside and put the recorded one in its place for this draw
+    const keep = { ps: g.ps.map((p) => ({ x: p.x, y: p.y, face: p.face, run: p.run, turn: p.turn, vx: p.vx, vy: p.vy, act: p.act, touchAnim: p.touchAnim })), b: Object.assign({}, g.ball) };
+    g.ps.forEach((p, i) => {
+      const a = A.ps[i], c = B.ps[i];
+      if (!a || !c) return;
+      p.x = L(a[0], c[0]); p.y = L(a[1], c[1]); p.face = a[2] + this.ang(c[2] - a[2]) * u; p.run = L(a[3], c[3]); p.turn = a[4]; p.vx = a[5]; p.vy = a[6];
+      p.act = a[7] ? Object.assign({}, a[7], { t: c[7] && c[7].type === a[7].type ? L(a[7].t, c[7].t) : a[7].t }) : null; p.touchAnim = a[8];
+    });
+    const b = g.ball;
+    b.x = L(A.b[0], B.b[0]); b.y = L(A.b[1], B.b[1]); b.z = L(A.b[2], B.b[2]); b.vx = A.b[3]; b.vy = A.b[4]; b.vz = A.b[5];
+    return keep;
+  }
+  restoreFrame(keep) {
+    const g = this.g;
+    g.ps.forEach((p, i) => Object.assign(p, keep.ps[i]));
+    Object.assign(g.ball, keep.b);
+  }
   draw3D(dt) {
     if (!this.R || !this.S) return;
+    this.lastDt = dt || 0.016;
+    if (this.rp && !this.inReplayDraw) {
+      const keep = this.replayFrame(dt || 0.016);
+      if (keep) { this.inReplayDraw = true; try { this.draw3D(dt * 0.42); } finally { this.inReplayDraw = false; this.restoreFrame(keep); } return; }
+    }
     const T = THREE, g = this.g, b = g.ball;
     this.syncPlayers();
     g.ps.forEach((p, i) => {
@@ -2073,7 +2137,16 @@ class Component extends DCLogic {
       this.ball3.quaternion.premultiply(this.qTmp);
     }
     const c = g.ps[g.ctl];
-    if (g.phase === 'winners') {
+    if (this.inReplayDraw) {
+      const gx = (this.g.concede === 1 ? 60 : 0) - 30, sg = gx > 0 ? 1 : -1, bz = b.y - 15;
+      const want = new T.Vector3(gx - sg * 9.5, 2.1, Math.max(-11, Math.min(11, bz * 0.5)) + 9.5);
+      const look = new T.Vector3(b.x - 30, Math.min(1.6, b.z * 0.6 + 0.6), bz);
+      const rp = this.rp;
+      if (!rp.cam) { rp.cam = true; this.camPos.copy(want); this.camLook.copy(look); if (this.cam.fov !== 42) { this.cam.fov = 42; this.cam.updateProjectionMatrix(); } }
+      const f = 1 - Math.exp(-3 * (dt || 0.016) / 0.42);
+      this.camPos.lerp(want, f); this.camLook.lerp(look, f);
+      this.cam.position.copy(this.camPos); this.cam.lookAt(this.camLook);
+    } else if (g.phase === 'winners') {
       const n2 = g.win ? g.win.list.length : 1, dist = Math.max(6.5, n2 * 1.15 + 3), sway = Math.sin(g.pt * 0.4) * 1.2;
       const want = new T.Vector3(sway, 1.9, dist), look = new T.Vector3(0, 1.25, 0);
       if (!this.winCam) { this.winCam = true; this.camPos.copy(want); this.camLook.copy(look); if (this.cam.fov !== 40) { this.cam.fov = 40; this.cam.updateProjectionMatrix(); } }
@@ -2102,6 +2175,7 @@ class Component extends DCLogic {
       this.cam.position.copy(this.camPos);
       this.cam.lookAt(this.camLook);
     } else {
+    if (this.cam.fov !== 40) { this.cam.fov = 40; this.cam.updateProjectionMatrix(); }
     const fx = b.x * 0.75 + c.x * 0.25, fz = b.y * 0.75 + c.y * 0.25;
     // follow the play all the way to both touchlines, keeping it above the on-screen buttons
     const tx = Math.max(-21, Math.min(21, fx - 30)), tz = Math.max(-15, Math.min(15, fz - 15));
@@ -2637,7 +2711,9 @@ class Component extends DCLogic {
       // CENTRO: team modes, with the ball, left of PASE
       crossBtnStyle: n > 1 && ctx === 'ball' && !gkc && !P.tutorial ? btn(186, 16, 56, '#FFC53D', '#B7871A', 13) : 'display: none;',
       sprintBtnStyle: btn(98, 92, 56, sprintOn ? '#FFC53D' : '#22D3EE', '#0E8FA3', 14, glow(tutI === 2)),
-      showGoal: g.phase === 'goal', scorerText: g.scorer,
+      showGoal: g.phase === 'goal' && !this.rp, scorerText: g.scorer,
+      showReplay: !!this.rp,
+      skipReplay: (e) => { e.preventDefault(); if (this.rp) this.rp.t = this.rp.len; },
       isTut: !!(P.tutorial && g.tut && g.tut.i < 7),
       tutKicker: g.tut ? 'TUTORIAL · PASO ' + Math.min(7, g.tut.i + 1) + ' DE 7' : '',
       tutText: g.tut && g.tut.i < 7 ? this.tutSteps()[g.tut.i] : '',
@@ -2649,7 +2725,7 @@ class Component extends DCLogic {
       readyTitle: (P.coach ? 'MODO ENTRENADOR' : mode === 'comp' ? 'PARTIDO CLASIFICATORIO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA') + ' · ' + n + ' VS ' + n,
       showEnd: g.phase === 'end',
       showWin: g.phase === 'winners',
-      hud: g.phase !== 'winners',
+      hud: g.phase !== 'winners' && !this.rp,
       winKicker: g.phase === 'winners' ? (g.win.team < 0 ? 'FINAL DEL PARTIDO' : 'GANADORES') : '',
       winTitle: g.phase !== 'winners' ? '' : g.win.team < 0 ? 'EMPATE' : g.win.team === 0 ? (P.homeName ?? 'TU EQUIPO') : (P.awayName ?? 'RIVAL'),
       winTitleStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 48px; line-height: 1; letter-spacing: 1px; text-shadow: 0 4px 0 #0B0B14; color: ' + (g.phase === 'winners' && g.win.team === 1 ? '#FF8A8E' : '#22D3EE') + '; transform: scale(' + Math.min(1, 0.5 + g.pt * 1.5).toFixed(2) + ');',
