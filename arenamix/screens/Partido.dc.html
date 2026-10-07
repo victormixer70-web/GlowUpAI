@@ -248,6 +248,10 @@ class Component extends DCLogic {
     // 4vs4: you can play in goal, with a camera from behind your own goal
     return !!this.props.keeper && this.size() === 4 && !this.props.tutorial;
   }
+  // "Pro" camera (a personal setting): low behind your own player, always facing the goal you attack
+  proCam() {
+    return !this.keeperMode() && !!this.play && this.play.cam === 'pro' && !this.props.tutorial;
+  }
   keeperDive() {
     const g = this.g, p = g.ps[g.ctl], b = g.ball;
     if (p.act || g.hold >= 0) return;
@@ -545,7 +549,8 @@ class Component extends DCLogic {
     if (Math.hypot(ix, iy) < 0.01 && Math.hypot(sm[0], sm[1]) < 0.05) { sm[0] = 0; sm[1] = 0; }
     this.inpS = sm;
     // behind-the-goal camera: up on the stick is up the pitch
-    this.inp = this.keeperMode() ? [-sm[1], sm[0]] : [sm[0], sm[1]];
+    // with the Pro camera too, the camera looks up the pitch
+    this.inp = this.keeperMode() || this.proCam() ? [-sm[1], sm[0]] : [sm[0], sm[1]];
     const chasers = this.pickChasers();
     g.ps.forEach((p, i) => this.movePlayer(p, i, dt, chasers));
     for (let i = 0; i < g.ps.length; i++) for (let j = i + 1; j < g.ps.length; j++) {
@@ -1779,6 +1784,17 @@ class Component extends DCLogic {
       const look = new T.Vector3(this.clamp(b.x - 30, -24, 6) * 0.8 - 4, 0, (b.y - 15) * 0.75);
       const f = 1 - Math.exp(-4.5 * (dt || 1));
       if (this.cam.fov !== 58) { this.cam.fov = 58; this.cam.updateProjectionMatrix(); this.camPos.copy(want); this.camLook.copy(look); }
+      this.camPos.lerp(want, f); this.camLook.lerp(look, f);
+      this.cam.position.copy(this.camPos);
+      this.cam.lookAt(this.camLook);
+    } else if (this.proCam()) {
+      // Pro camera: just behind and above your player, looking past him towards the goal you attack,
+      // turning a little towards the ball so you never lose it
+      const cx = c.x - 30, cz = c.y - 15, bz = b.y - 15;
+      const want = new T.Vector3(Math.max(-34, cx - 7.2), 3.4, cz * 0.92 + (bz - cz) * 0.12);
+      const look = new T.Vector3(cx + 6, 0.9, cz + (bz - cz) * 0.35);
+      const f = 1 - Math.exp(-5.5 * (dt || 1));
+      if (this.cam.fov !== 60) { this.cam.fov = 60; this.cam.updateProjectionMatrix(); this.camPos.copy(want); this.camLook.copy(look); }
       this.camPos.lerp(want, f); this.camLook.lerp(look, f);
       this.cam.position.copy(this.camPos);
       this.cam.lookAt(this.camLook);

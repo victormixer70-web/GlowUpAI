@@ -134,7 +134,7 @@ class Component extends DCLogic {
     // personal settings only: they change what you see, never the rules everybody plays by online
     const OPTS = [
       { key: 'music', title: 'MÚSICA DE LOS MENÚS', desc: 'La música que suena fuera del partido.', choices: [[0.9, 'Alta'], [0.6, 'Media'], [0.3, 'Baja'], [0, 'No']] },
-      { key: 'cam', title: 'CÁMARA DEL PARTIDO', desc: 'Más cerca para ver los detalles, más lejos para ver más campo.', choices: [['cerca', 'Cerca'], ['normal', 'Normal'], ['lejos', 'Lejos']] },
+      { key: 'cam', title: 'CÁMARA DEL PARTIDO', desc: 'Pro: detrás de tu jugador, mirando a la portería rival.', choices: [['cerca', 'Cerca'], ['normal', 'Normal'], ['lejos', 'Lejos'], ['pro', 'Pro']] },
       { key: 'gfx', title: 'CALIDAD GRÁFICA', desc: 'Baja si tu móvil va lento o se calienta (menos nitidez, sin sombras).', choices: [['alta', 'Alta'], ['media', 'Media'], ['baja', 'Baja']] },
       { key: 'names', title: 'NOMBRES SOBRE LOS JUGADORES', desc: 'Con No, solo ves el TÚ encima de tu jugador.', choices: [[true, 'Sí'], [false, 'No']] },
       { key: 'passMark', title: 'INDICADOR DE PASE', desc: 'La flecha encima del compañero al que irá tu pase.', choices: [[true, 'Sí'], [false, 'No']] }
