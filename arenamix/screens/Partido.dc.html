@@ -1395,23 +1395,27 @@ class Component extends DCLogic {
     sun.shadow.normalBias = 0.04;
     S.add(sun);
     const fill = new T.DirectionalLight(0x9fc3ff, 0.35); fill.position.set(20, 20, -30); S.add(fill);
-    const M = 7, ppm = 24, PW = 60 + 2 * M, PH = 30 + 2 * M;
+    // the pitch markings of a real pitch, in its proportions: halfway line and centre circle, penalty areas
+    // with their spot and arc, goal areas, corner arcs; mowing stripes across the pitch
+    const M = 7, ppm = 32, PW = 60 + 2 * M, PH = 30 + 2 * M;
     const tex = this.canvasTex(PW * ppm, PH * ppm, (c, w, h) => {
       const X = (x) => (x + M) * ppm, Y = (y) => (y + M) * ppm;
-      c.fillStyle = '#095c04'; c.fillRect(0, 0, w, h);
-      for (let x = -M, i = 0; x < 60 + M; x += 5, i++) if (i % 2) { c.fillStyle = '#0b6c05'; c.fillRect(X(x), 0, 5 * ppm, h); }
-      for (let i = 0; i < 9000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.035)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
-      c.strokeStyle = '#f4f8f4'; c.lineWidth = 0.14 * ppm;
+      c.fillStyle = '#0a5c06'; c.fillRect(0, 0, w, h);
+      for (let x = -M, i = 0; x < 60 + M; x += 3.75, i++) if (i % 2) { c.fillStyle = '#12780b'; c.fillRect(X(x), 0, 3.75 * ppm, h); }
+      for (let i = 0; i < 12000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.035)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
+      c.strokeStyle = '#ffffff'; c.lineWidth = 0.17 * ppm;
       c.strokeRect(X(0), Y(0), 60 * ppm, 30 * ppm);
       c.beginPath(); c.moveTo(X(30), Y(0)); c.lineTo(X(30), Y(30)); c.stroke();
-      c.beginPath(); c.arc(X(30), Y(15), 5.5 * ppm, 0, Math.PI * 2); c.stroke();
+      c.beginPath(); c.arc(X(30), Y(15), 5.2 * ppm, 0, Math.PI * 2); c.stroke();
       c.strokeRect(X(0), Y(6), 9 * ppm, 18 * ppm); c.strokeRect(X(51), Y(6), 9 * ppm, 18 * ppm);
-      c.strokeRect(X(0), Y(10), 3.5 * ppm, 10 * ppm); c.strokeRect(X(56.5), Y(10), 3.5 * ppm, 10 * ppm);
-      c.beginPath(); c.arc(X(7), Y(15), 4 * ppm, -0.72, 0.72); c.stroke();
-      c.beginPath(); c.arc(X(53), Y(15), 4 * ppm, Math.PI - 0.72, Math.PI + 0.72); c.stroke();
+      c.strokeRect(X(0), Y(11), 3 * ppm, 8 * ppm); c.strokeRect(X(57), Y(11), 3 * ppm, 8 * ppm);
+      // the "D": the part of the circle round the penalty spot that lies outside the area
+      const da = Math.acos(2 / 5.2);
+      c.beginPath(); c.arc(X(7), Y(15), 5.2 * ppm, -da, da); c.stroke();
+      c.beginPath(); c.arc(X(53), Y(15), 5.2 * ppm, Math.PI - da, Math.PI + da); c.stroke();
       [[0, 0, 0], [60, 0, Math.PI / 2], [60, 30, Math.PI], [0, 30, -Math.PI / 2]].forEach(([x, y, a]) => { c.beginPath(); c.arc(X(x), Y(y), 0.8 * ppm, a, a + Math.PI / 2); c.stroke(); });
-      c.fillStyle = '#f4f8f4';
-      [[30, 15], [7, 15], [53, 15]].forEach(([x, y]) => { c.beginPath(); c.arc(X(x), Y(y), 0.2 * ppm, 0, Math.PI * 2); c.fill(); });
+      c.fillStyle = '#ffffff';
+      [[30, 15, 0.25], [7, 15, 0.2], [53, 15, 0.2]].forEach(([x, y, r]) => { c.beginPath(); c.arc(X(x), Y(y), r * ppm, 0, Math.PI * 2); c.fill(); });
     });
     // real lawn texture tiled under the painted stripes and lines
     const pitch = new T.Mesh(new T.PlaneGeometry(PW, PH), window.AMGrass ? window.AMGrass.material(tex, PW, PH) : new T.MeshStandardMaterial({ map: tex, roughness: 0.95 }));

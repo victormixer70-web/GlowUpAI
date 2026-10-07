@@ -42,7 +42,9 @@
           'vec4 pC = mapTexelToLinear(texture2D(pitchMap, vPitchUv));',
           'float lr = dot(gC.rgb, vec3(0.2126, 0.7152, 0.0722)) / ' + MEAN_LUM + ';',
           'vec3 det = mix(vec3(lr), clamp(gC.rgb / ' + MEAN + ', 0.0, 3.0), 0.08);',
-          'diffuseColor.rgb *= pC.rgb * mix(vec3(1.0), det, 0.85);'
+          // painted lines stay crisp white: the lawn detail only shows through faintly on them
+          'float paint = smoothstep(0.35, 0.7, dot(pC.rgb, vec3(0.333)));',
+          'diffuseColor.rgb *= pC.rgb * mix(vec3(1.0), det, 0.85 * (1.0 - 0.8 * paint));'
         ].join('\n'));
     };
     return m;
