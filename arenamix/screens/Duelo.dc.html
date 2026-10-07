@@ -252,9 +252,10 @@ class Component extends DCLogic {
     if (b.y > top) { b.y = top; if (b.vy > 0) b.vy = -b.vy * 0.1; }
     const pen = b.z - back;
     if (pen > 0) {
-      b.vz += (-420 * pen - 24 * b.vz) * dt;
+      b.vz += (-300 * pen - 17 * b.vz) * dt;
+      if (b.vz < 0) b.vz *= Math.exp(-9 * dt);   // a net soaks up the rebound
       b.vx *= Math.exp(-4 * dt);
-      if (pen > 0.8) { b.z = back + 0.8; b.vz = Math.min(b.vz, 0); }
+      if (pen > 1) { b.z = back + 1; b.vz = Math.min(b.vz, 0); }
     }
     if (b.z < D + 0.4 && b.vz < 0) { b.z = D + 0.4; b.vz = 0; }
     if (b.y <= 0.11 && b.vy === 0) { const f = Math.exp(-1.8 * dt); b.vx *= f; b.vz *= f; }

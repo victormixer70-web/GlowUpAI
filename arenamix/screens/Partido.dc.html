@@ -572,7 +572,7 @@ class Component extends DCLogic {
   // after a goal the ball flies on into the goal: the side nets and the roof stop it, and the back of the
   // net stretches, slows it down and drops it, so it stays in the goal (it never goes through)
   netBall(dt) {
-    const b = this.g.ball, s = b.x < 30 ? -1 : 1, R = 0.27, back = 1.6 - R;
+    const b = this.g.ball, s = b.x < 30 ? -1 : 1, R = 0.23, back = 1.6 - R;
     if (b.z > 0 || b.vz > 0) {
       b.vz -= 9.81 * dt;
       const drag = 1 - 0.012 * Math.hypot(b.vx, b.vy, b.vz) * dt;
@@ -593,12 +593,13 @@ class Component extends DCLogic {
       const top = 2.44 - 0.275 * Math.min(dep, 1.6) - R;
       if (b.z > top) { b.z = top; if (b.vz > 0) b.vz = -b.vz * 0.1; b.vx *= 0.9; }
     }
-    // the back of the net: a stiff, well-damped spring that can stretch up to 0.8 m
+    // the back of the net: a damped spring that can stretch up to 1 m
     const pen = dep - back;
     if (pen > 0) {
-      vout += (-420 * pen - 24 * vout) * dt;
+      vout += (-300 * pen - 17 * vout) * dt;
+      if (vout < 0) vout *= Math.exp(-9 * dt);   // a net soaks up the rebound
       const f = Math.exp(-4 * dt); b.vy *= f;
-      if (pen > 0.8) { dep = back + 0.8; vout = Math.min(vout, 0); }
+      if (pen > 1) { dep = back + 1; vout = Math.min(vout, 0); }
     }
     // it can come back off the net a little, but not roll back out over the line
     if (dep < 0.4 && vout < 0) { dep = 0.4; vout = 0; }
@@ -1671,7 +1672,7 @@ class Component extends DCLogic {
       [[64, 128], [192, 128], [320, 128], [448, 128]].forEach(([x, y]) => pent(x, y, 30));
       [[0, 40], [128, 40], [256, 40], [384, 40], [512, 40], [64, 225], [192, 225], [320, 225], [448, 225]].forEach(([x, y]) => pent(x, y, 24));
     });
-    this.ball3 = new T.Mesh(new T.SphereGeometry(0.27, 40, 28), window.AMBall ? window.AMBall.material() : new T.MeshStandardMaterial({ map: ballTex, roughness: 0.45 }));
+    this.ball3 = new T.Mesh(new T.SphereGeometry(0.23, 40, 28), window.AMBall ? window.AMBall.material() : new T.MeshStandardMaterial({ map: ballTex, roughness: 0.45 }));
     this.ball3.castShadow = true;
     S.add(this.ball3);
     this.meshFor = null;
@@ -1741,11 +1742,11 @@ class Component extends DCLogic {
       this.animate(p, m, i);
       if (m.userData.anim) this.mocap(p, m, i, dt || 0);
     });
-    this.ball3.position.copy(this.W(b.x, b.y, b.z + 0.27));
+    this.ball3.position.copy(this.W(b.x, b.y, b.z + 0.23));
     // the net wraps round the ball pressing into it, then springs back
     if (this.nets) {
       const ns = b.x < 30 ? -1 : 1, dep = ns < 0 ? -b.x : b.x - 60, net = this.nets[ns];
-      if (net && dep > 0 && b.y > 12 && b.y < 18) net.push(-ns * (b.y - 15), b.z + 0.27, dep - 1.33);
+      if (net && dep > 0 && b.y > 12 && b.y < 18) net.push(-ns * (b.y - 15), b.z + 0.23, dep - 1.37);
       for (const k in this.nets) this.nets[k].step(dt || 0);
     }
     this.ball3.visible = g.phase !== 'winners';
@@ -1753,7 +1754,7 @@ class Component extends DCLogic {
     if (bsp > 0.01 && dt) {
       if (!this.qTmp) { this.qTmp = new T.Quaternion(); this.aTmp = new T.Vector3(); }
       this.aTmp.set(b.vy / bsp, 0, -b.vx / bsp);
-      this.qTmp.setFromAxisAngle(this.aTmp, bsp * dt / 0.27);
+      this.qTmp.setFromAxisAngle(this.aTmp, bsp * dt / 0.23);
       this.ball3.quaternion.premultiply(this.qTmp);
     }
     const c = g.ps[g.ctl];

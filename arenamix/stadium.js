@@ -91,7 +91,7 @@
       win[i] = Math.pow(Math.max(0, Math.sin(Math.PI * u)), 0.5) * Math.pow(Math.max(0, Math.sin(Math.PI * Math.min(1, v * 1.15))), 0.5);
     }
     var mesh = new T.Mesh(geo, mat); mesh.renderOrder = 2;
-    var d = 0, vd = 0, cx = 0, cy = h / 2, pushed = -1, lastT = 0;
+    var d = 0, vd = 0, cx = 0, cy = h / 2, pushed = -1, lastT = 0, tt = 0, rip = 0;
     return {
       mesh: mesh,
       push: function (x, y, depth) { if (depth > 0 && depth > pushed) { pushed = depth; cx = x; cy = y; } },
@@ -99,15 +99,20 @@
         dt = Math.min(0.05, Math.max(0, dt));
         if (pushed > 0) { vd = dt > 0 ? (pushed + 0.06 - d) / Math.max(dt, 0.008) : 0; d = pushed + 0.06; }
         else if (Math.abs(d) > 0.001 || Math.abs(vd) > 0.01) {
-          var om = 16, z = 0.16; vd += (-om * om * d - 2 * z * om * vd) * dt; d += vd * dt;
-        } else { d = 0; vd = 0; }
+          // let go: it swings back past its rest and ripples for a second or two
+          var om = 12, z = 0.09; vd += (-om * om * d - 2 * z * om * vd) * dt; d += vd * dt;
+        } else if (rip < 0.002) { d = 0; vd = 0; }
         pushed = -1;
-        if (d === 0 && lastT === 0) return;
+        if (d === 0 && lastT === 0 && rip < 0.002) return;
         lastT = d;
-        var s2 = 2 * 0.6 * 0.6;
+        // ripples running out from where the ball hit, while the net is moving fast
+        tt += dt; rip += (Math.min(0.12, Math.abs(vd) * 0.012) - rip) * Math.min(1, dt * 6);
+        var s2 = 2 * 0.85 * 0.85;
         for (var i = 0; i < pos.count; i++) {
           var dx = base[i * 3] - cx, dy = base[i * 3 + 1] - cy;
-          pos.array[i * 3 + 2] = d * win[i] * Math.exp(-(dx * dx + dy * dy) / s2);
+          // a dent round the ball, plus the whole net billowing with it
+          var r2 = dx * dx + dy * dy, r = Math.sqrt(r2);
+          pos.array[i * 3 + 2] = win[i] * (d * (0.7 * Math.exp(-r2 / s2) + 0.3) + rip * Math.sin(r * 5 - tt * 16) * Math.exp(-r * 0.7));
         }
         pos.needsUpdate = true;
       }
