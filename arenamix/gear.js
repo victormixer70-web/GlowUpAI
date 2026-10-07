@@ -308,5 +308,100 @@
     return cache[key];
   }
 
-  window.AMGear = { hat: hat, face: face, boot: boot, thumb: thumb };
+  /* ---------- prizes for the shop and the weekly rewards: coin piles, treasure chests, the boots ---------- */
+  var coinMats = null;
+  function coinMaterials() {
+    if (coinMats) return coinMats;
+    var c = document.createElement('canvas'); c.width = c.height = 128;
+    var x = c.getContext('2d'), gr = x.createRadialGradient(54, 50, 6, 64, 64, 64);
+    gr.addColorStop(0, '#FFF1B0'); gr.addColorStop(0.55, '#FFC53D'); gr.addColorStop(1, '#C98A12');
+    x.fillStyle = gr; x.fillRect(0, 0, 128, 128);
+    x.strokeStyle = '#A8700E'; x.lineWidth = 7; x.beginPath(); x.arc(64, 64, 50, 0, Math.PI * 2); x.stroke();
+    // an embossed star (it reads the same whichever way the cap's UVs turn)
+    var star5 = function (cx, cy, r1, r2) { x.beginPath(); for (var k = 0; k < 10; k++) { var a = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? r2 : r1; x.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); } x.closePath(); x.fill(); };
+    x.fillStyle = '#9A6510'; star5(66, 68, 30, 13); x.fillStyle = '#FFE38A'; star5(63, 65, 30, 13);
+    var face = new T.CanvasTexture(c); face.encoding = T.sRGBEncoding;
+    var e = document.createElement('canvas'); e.width = 64; e.height = 8;
+    var y = e.getContext('2d'); for (var i = 0; i < 64; i++) { y.fillStyle = i % 2 ? '#D8981C' : '#FFCF4D'; y.fillRect(i, 0, 1, 8); }
+    var edge = new T.CanvasTexture(e); edge.encoding = T.sRGBEncoding; edge.wrapS = T.RepeatWrapping; edge.repeat.x = 6;
+    var mk = function (map) { return new T.MeshStandardMaterial({ map: map, metalness: 0.35, roughness: 0.32, emissive: new T.Color('#5A3A00'), emissiveIntensity: 0.35 }); };
+    coinMats = [mk(edge), mk(face), mk(face)];
+    return coinMats;
+  }
+  function coin() { var m = new T.Mesh(new T.CylinderGeometry(1, 1, 0.2, 40), coinMaterials()); m.castShadow = true; return m; }
+  // n coins: a few stacks, more coins = taller stacks and some lying around them
+  function coinPile(n) {
+    var g = new T.Group(), stacks = n < 8 ? 1 : n < 20 ? 3 : 5, per = Math.ceil(n / stacks), k = 0;
+    var spots = [[0, 0], [1.9, 0.6], [-1.8, 0.7], [0.4, 1.9], [-0.6, -1.7]];
+    for (var s = 0; s < stacks && k < n; s++) {
+      var h = s === 0 ? per + 2 : per - s;
+      for (var i = 0; i < h && k < n; i++, k++) {
+        var c = coin(); c.position.set(spots[s][0] + (Math.random() - 0.5) * 0.12, 0.1 + i * 0.21, spots[s][1] + (Math.random() - 0.5) * 0.12);
+        c.rotation.y = Math.random() * 6; g.add(c);
+      }
+    }
+    // one coin standing up, leaning on the pile, face to the viewer
+    var lean = coin(); lean.rotation.set(Math.PI / 2 - 0.35, 0, 0.15); lean.position.set(1.0, 0.95, 1.6); g.add(lean);
+    return g;
+  }
+  function chest(kind, open) {
+    var rare = kind === 'rare', epic = kind === 'epic', legend = kind === 'legend';
+    var wood = std(rare ? '#2A5FB0' : epic ? '#6D28D9' : legend ? '#1A1A2E' : '#C26020', { r: 0.6 }), woodD = std(rare ? '#1C3F78' : epic ? '#4C1D95' : legend ? '#0B0B14' : '#8A3E12', { r: 0.7 });
+    var gold = std('#FFC53D', { r: 0.3, m: 0.6, em: '#5A3A00', ei: 0.3 }), g = new T.Group();
+    g.add(mesh(new T.BoxGeometry(3, 1.6, 2), wood, 0, 0.8, 0));
+    for (var i = 0; i < 3; i++) g.add(mesh(new T.BoxGeometry(3.02, 0.06, 2.02), woodD, 0, 0.3 + i * 0.5, 0));
+    [-1.25, 1.25].forEach(function (x) { g.add(mesh(new T.BoxGeometry(0.22, 1.64, 2.06), gold, x, 0.8, 0)); });
+    // the lid: half a cylinder, hinged at the back
+    var lid = new T.Group(); lid.position.set(0, 1.6, -1);
+    var top = mesh(new T.CylinderGeometry(1, 1, 3, 32, 1, false, 0, Math.PI), wood, 0, 0, 1); top.rotation.z = Math.PI / 2; lid.add(top);
+    [-1.25, 1.25].forEach(function (x) { var b = mesh(new T.CylinderGeometry(1.03, 1.03, 0.22, 32, 1, false, 0, Math.PI), gold, x, 0, 1); b.rotation.z = Math.PI / 2; lid.add(b); });
+    lid.add(mesh(new T.BoxGeometry(0.5, 0.6, 0.2), gold, 0, -0.05, 2.02));
+    if (open) lid.rotation.x = -0.75;
+    g.add(lid);
+    g.add(mesh(new T.BoxGeometry(0.46, 0.5, 0.14), gold, 0, 1.35, 1.04));
+    if (rare || epic) [-0.8, 0.8].forEach(function (x) { g.add(mesh(new T.OctahedronGeometry(0.2), std(rare ? '#7EF0FF' : '#FF5C8A', { r: 0.1, em: rare ? '#0A6A80' : '#80102A', ei: 0.8 }), x, 1.0, 1.05)); });
+    if (open) {
+      // light pouring out of it, with sparks
+      var glow = mesh(new T.CylinderGeometry(1.1, 1.45, 1.6, 24, 1, true), new T.MeshBasicMaterial({ color: '#FFE38A', transparent: true, opacity: 0.2, side: T.DoubleSide, depthWrite: false, blending: T.AdditiveBlending }), 0, 2.4, 0);
+      glow.scale.z = 0.6; g.add(glow);
+      g.add(mesh(new T.BoxGeometry(2.8, 0.1, 1.8), new T.MeshBasicMaterial({ color: '#FFD75A' }), 0, 1.58, 0));
+      var heap = coinPile(9); heap.scale.setScalar(0.32); heap.position.set(-0.3, 1.6, 0); g.add(heap);
+      for (var s = 0; s < 7; s++) {
+        var sp = mesh(new T.OctahedronGeometry(0.1 + Math.random() * 0.08), new T.MeshBasicMaterial({ color: s % 2 ? '#FFFFFF' : '#FFE38A' }), (Math.random() - 0.5) * 2.6, 2.1 + Math.random() * 1.4, (Math.random() - 0.5) * 1.2);
+        g.add(sp);
+      }
+    }
+    return g;
+  }
+  function prizeModel(kind) {
+    var p = kind.split(':'), g = new T.Group();
+    if (p[0] === 'coins') { g.add(coinPile(+p[1] || 6)); g.rotation.y = -0.4; }
+    else if (p[0] === 'chest') { var c = chest(p[1], p[2] === 'open'); c.rotation.y = 0.2; g.add(c); }
+    else if (p[0] === 'bag') {
+      // a sack of coins, tied, with coins spilling at its foot
+      var cloth = std('#7A4A22', { r: 0.9 });
+      var sack = mesh(new T.SphereGeometry(1.3, 28, 20), cloth, 0, 1.1, 0); sack.scale.set(1.18, 0.9, 1.05); g.add(sack);
+      g.add(mesh(new T.CylinderGeometry(0.32, 0.6, 0.45, 20), cloth, 0, 2.2, 0));
+      var ruff = mesh(new T.ConeGeometry(0.62, 0.5, 9, 1, true), std('#8A5A2C', { r: 0.9, side: T.DoubleSide }), 0, 2.62, 0); ruff.rotation.x = Math.PI; g.add(ruff);
+      var tie = mesh(new T.TorusGeometry(0.42, 0.08, 8, 24), std('#FFC53D', { r: 0.3, m: 0.6 }), 0, 2.38, 0); tie.rotation.x = Math.PI / 2; g.add(tie);
+      var mark = coin(); mark.rotation.set(Math.PI / 2, 0, 0); mark.scale.setScalar(0.55); mark.position.set(0, 1.15, 1.36); g.add(mark);
+      var pile = coinPile(7); pile.scale.setScalar(0.45); pile.position.set(1.4, 0, 0.8); g.add(pile);
+      g.rotation.y = -0.3;
+    } else if (p[0] === 'boots') {
+      var b = boot(p[1] || '#E5484D'); b.rotation.y = 0.45; g.add(b);
+      var sp = hat('sprout'); sp.scale.setScalar(0.9); sp.position.set(-0.5, -0.1, 0); g.add(sp);
+    }
+    return g;
+  }
+  var pcache = {};
+  function prize(kind) {
+    if (pcache[kind]) return pcache[kind];
+    if (!stage()) return '';
+    var g = prizeModel(kind);
+    g.userData.low = kind.indexOf('boots') === 0;
+    pcache[kind] = snap(g, kind.indexOf('chest') === 0 ? 0.8 : 0.84);
+    return pcache[kind];
+  }
+
+  window.AMGear = { hat: hat, face: face, boot: boot, thumb: thumb, prize: prize };
 })();
