@@ -589,8 +589,8 @@ class Component extends DCLogic {
       // side netting
       if (b.y < 12 + R) { b.y = 12 + R; b.vy = Math.abs(b.vy) * 0.15; b.vx *= 0.7; }
       if (b.y > 18 - R) { b.y = 18 - R; b.vy = -Math.abs(b.vy) * 0.15; b.vx *= 0.7; }
-      // roof, sloping down from the crossbar to the back
-      const top = 2.44 - 0.275 * Math.min(dep, 1.6) - R;
+      // roof, flat at the crossbar and sagging a little in the middle
+      const top = 2.5 - 0.16 * Math.sin(Math.PI * Math.min(1, dep / 1.6)) - R;
       if (b.z > top) { b.z = top; if (b.vz > 0) b.vz = -b.vz * 0.1; b.vx *= 0.9; }
     }
     // the back of the net: a damped spring that can stretch up to 1 m
@@ -1639,20 +1639,14 @@ class Component extends DCLogic {
     });
     const white = this.mat(0xf4f6fa, { roughness: 0.35, metalness: 0.2 });
     const netMat = new T.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
-    // the downloaded goal: its frame, with a light textured net (same shape as the net the ball hits)
-    const GOAL = STAD && STAD.goal(6.14, 2.51, 1.6, 1) ? STAD : null;
+    // the goals: a real 11-a-side goal (white frame, box net, padded poles behind), scaled to this pitch;
+    // the back of the net gives when the ball hits it
     this.nets = {};
-    if (GOAL) {
-      const quad = window.AMNet.quad, netM = window.AMNet.material();
+    if (window.AMNet && window.AMNet.goal) {
       [-1, 1].forEach((s) => {
-        const gx = 30 * s, bx = gx + 1.6 * s, hw = 3;
-        const frame = GOAL.goal(6.14, 2.51, 1.6, s); frame.position.set(gx, 0, 0); S.add(frame);
-        // the back of the net gives when the ball hits it
-        const net = window.AMNet ? window.AMNet(6, 2.0, netM) : null;
-        if (net) { net.mesh.position.set(bx, 0, 0); net.mesh.rotation.y = s * Math.PI / 2; S.add(net.mesh); this.nets[s] = net; }
-        else S.add(quad([[bx, 0, -hw], [bx, 0, hw], [bx, 2.0, hw], [bx, 2.0, -hw]]));
-        S.add(quad([[gx, 2.44, -hw], [gx, 2.44, hw], [bx, 2.0, hw], [bx, 2.0, -hw]]));
-        [-hw, hw].forEach((z) => S.add(quad([[gx, 0, z], [bx, 0, z], [bx, 2.0, z], [gx, 2.44, z]])));
+        const G = window.AMNet.goal(6, 2.44, 1.6);
+        G.group.position.set(30 * s, 0, 0); G.group.rotation.y = s * Math.PI / 2; S.add(G.group);
+        this.nets[s] = G.net;
       });
     } else
     [-1, 1].forEach((s) => {

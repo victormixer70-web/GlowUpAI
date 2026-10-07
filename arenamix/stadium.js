@@ -54,12 +54,12 @@
 
   // the net material: thick white cords on a transparent texture, blended rather than cut out, so far
   // away (where the cords shrink below a pixel) it still reads as a white mesh instead of vanishing
-  var netMat = null, CELL = 0.15;
+  var netMat = null, CELL = 0.13;
   function material() {
     if (netMat) return netMat;
     var cv = document.createElement('canvas'); cv.width = cv.height = 128;
-    var c = cv.getContext('2d'); c.strokeStyle = '#ffffff'; c.lineWidth = 14; c.lineCap = 'square';
-    c.beginPath(); c.moveTo(0, 0); c.lineTo(128, 128); c.moveTo(128, 0); c.lineTo(0, 128); c.stroke();
+    // square mesh, as on a real goal: a cord along two edges of each tile makes the grid when it repeats
+    var c = cv.getContext('2d'); c.fillStyle = '#ffffff'; c.fillRect(0, 0, 128, 12); c.fillRect(0, 0, 12, 128);
     var tex = new T.CanvasTexture(cv); tex.wrapS = tex.wrapT = T.RepeatWrapping; tex.anisotropy = 8;
     netMat = new T.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: 0xffffff, emissiveIntensity: 0.35, transparent: true, alphaTest: 0.02, depthWrite: false, side: T.DoubleSide, roughness: 0.9 });
     return netMat;
@@ -73,6 +73,56 @@
     g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); g.computeVertexNormals();
     var m = new T.Mesh(g, material()); m.renderOrder = 2;
     return m;
+  }
+  // a piece of net between four corners [x, y, z] (a b c d round the edge, u along a→b, v along a→d),
+  // sagging by up to sag metres along the direction n in the middle
+  function sheet(pts, n, sag) {
+    var v = pts.map(function (q) { return new T.Vector3(q[0], q[1], q[2]); });
+    var W = v[0].distanceTo(v[1]), H = v[0].distanceTo(v[3]), nu = Math.max(2, Math.ceil(W / 0.3)), nv = Math.max(2, Math.ceil(H / 0.3));
+    var pos = [], uv = [], idx = [], N = new T.Vector3(n[0], n[1], n[2]), p = new T.Vector3(), q = new T.Vector3();
+    for (var j = 0; j <= nv; j++) for (var i = 0; i <= nu; i++) {
+      var u = i / nu, w = j / nv;
+      p.copy(v[0]).lerp(v[1], u); q.copy(v[3]).lerp(v[2], u); p.lerp(q, w);
+      p.addScaledVector(N, sag * Math.sin(Math.PI * u) * Math.sin(Math.PI * w));
+      pos.push(p.x, p.y, p.z); uv.push(u * W / CELL, w * H / CELL);
+    }
+    for (j = 0; j < nv; j++) for (i = 0; i < nu; i++) { var a = j * (nu + 1) + i; idx.push(a, a + 1, a + nu + 2, a, a + nu + 2, a + nu + 1); }
+    var g = new T.BufferGeometry();
+    g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); g.setIndex(idx); g.computeVertexNormals();
+    var m = new T.Mesh(g, material()); m.renderOrder = 2;
+    return m;
+  }
+  /* A full goal like a real 11-a-side one: a round white frame, a box net (flat roof at crossbar height,
+     sagging a little, straight back), and two padded blue poles behind it with the ropes that hold the net
+     up. Local frame: goal line on z = 0, net towards +z, posts at x = ±w/2, ground at y = 0. Returns
+     { group, net } where net is the back net that gives (AMNet), centred at z = d. */
+  function boxGoal(w, h, d) {
+    var G = new T.Group(), r = 0.06, hw = w / 2;
+    var white = new T.MeshStandardMaterial({ color: 0xf6f7fa, roughness: 0.35, metalness: 0.15 });
+    [-1, 1].forEach(function (s) {
+      var post = new T.Mesh(new T.CylinderGeometry(r, r, h + r, 20), white); post.position.set(s * (hw + r), (h + r) / 2, 0); post.castShadow = true; G.add(post);
+    });
+    var bar = new T.Mesh(new T.CylinderGeometry(r, r, w + 4 * r, 20), white); bar.rotation.z = Math.PI / 2; bar.position.set(0, h + r, 0); bar.castShadow = true; G.add(bar);
+    // the net: roof, sides and the back that gives
+    var top = h + r;
+    G.add(sheet([[-hw, top, 0], [hw, top, 0], [hw, top, d], [-hw, top, d]], [0, -1, 0], 0.16));
+    [-1, 1].forEach(function (s) {
+      var x = s * hw;
+      G.add(sheet([[x, 0, 0], [x, 0, d], [x, top, d], [x, top, 0]], [-s, 0, 0], 0.06));
+    });
+    var net = window.AMNet(w, top);
+    net.mesh.position.set(0, 0, d); G.add(net.mesh);
+    // the padded poles behind, and the ropes from the top back corners of the net
+    var blue = new T.MeshStandardMaterial({ color: 0x1d5fd6, roughness: 0.6 }), grey = new T.MeshStandardMaterial({ color: 0x9aa3ad, roughness: 0.5, metalness: 0.4 });
+    var rope = new T.LineBasicMaterial({ color: 0xdfe4ea });
+    [-1, 1].forEach(function (s) {
+      var px = s * (hw + 0.55), pz = d + 0.55, ph = top + 0.25;
+      var pad = new T.Mesh(new T.CylinderGeometry(0.09, 0.09, ph - 0.1, 14), blue); pad.position.set(px, (ph - 0.1) / 2, pz); pad.castShadow = true; G.add(pad);
+      var tip = new T.Mesh(new T.CylinderGeometry(0.04, 0.04, 0.3, 10), grey); tip.position.set(px, ph + 0.05, pz); G.add(tip);
+      var lg = new T.BufferGeometry().setFromPoints([new T.Vector3(s * hw, top, d), new T.Vector3(px, ph + 0.15, pz)]);
+      G.add(new T.Line(lg, rope));
+    });
+    return { group: G, net: net };
   }
   /* A goal's back net that gives: a grid w wide and h high in its local x/y plane, pushed out along +z.
      Each frame, push() it where the ball is pressing into it (how far past its rest plane), then step():
@@ -120,4 +170,5 @@
   };
   window.AMNet.material = material;
   window.AMNet.quad = quad;
+  window.AMNet.goal = boxGoal;
 })();

@@ -248,7 +248,7 @@ class Component extends DCLogic {
     const D = this.D, GX = this.GX ?? 0, R = 0.11, back = D + 2 - R;
     b.curve = 0; b.res = null;
     if (Math.abs(b.x - GX) > 3.66 - R) { b.x = GX + Math.sign(b.x - GX) * (3.66 - R); b.vx = -b.vx * 0.15; b.vz *= 0.7; }
-    const top = 2.44 - 0.17 * Math.min(b.z - D, 2) - R;
+    const top = 2.5 - 0.16 * Math.sin(Math.PI * Math.min(1, (b.z - D) / 2)) - R;
     if (b.y > top) { b.y = top; if (b.vy > 0) b.vy = -b.vy * 0.1; }
     const pen = b.z - back;
     if (pen > 0) {
@@ -984,42 +984,10 @@ class Component extends DCLogic {
       sp.scale.set(30, 30, 1); sp.position.set(x, 36, z); S.add(sp);
     });
 
-    // goal
-    const white = this.mat(0xf4f6fa, { roughness: 0.35, metalness: 0.2 });
-    const post = (x) => { const p = new T.Mesh(new T.CylinderGeometry(0.06, 0.06, 2.44, 16), white); p.position.set(x, 1.22, D); p.castShadow = true; S.add(p); };
-    post(GX - 3.66); post(GX + 3.66);
-    const bar = new T.Mesh(new T.CylinderGeometry(0.06, 0.06, 7.44, 16), white); bar.rotation.z = Math.PI / 2; bar.position.set(GX, 2.44, D); bar.castShadow = true; S.add(bar);
-    const support = this.mat(0xb9c2d1, { roughness: 0.5 });
-    [-1, 1].forEach((s) => {
-      const sp = new T.Mesh(new T.CylinderGeometry(0.025, 0.025, 2.03, 8), support);
-      sp.position.set(GX + 3.66 * s, 2.27, D + 1); sp.rotation.x = Math.atan2(2, 0.34) - Math.PI / 2; S.add(sp);
-      const bk = new T.Mesh(new T.CylinderGeometry(0.025, 0.025, 2.1, 8), support); bk.position.set(GX + 3.66 * s, 1.05, D + 2); S.add(bk);
-    });
-    const netMat = new T.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
-    const grid = (pts) => { const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pts, 3)); return new T.LineSegments(g, netMat); };
-    const st = 0.16, backPts = [];
-    for (let x = -3.66; x <= 3.661; x += st) backPts.push(GX + x, 0, D + 2, GX + x, 2.1, D + 2);
-    for (let y = 0; y <= 2.101; y += st) backPts.push(GX - 3.66, y, D + 2, GX + 3.66, y, D + 2);
-    // the back of the net gives when the ball hits it
-    this.net = window.AMNet ? window.AMNet(7.32, 2.1) : null;
-    if (this.net) { this.net.mesh.position.set(GX, 0, D + 2); S.add(this.net.mesh); }
-    else S.add(grid(backPts));
-    if (window.AMNet && window.AMNet.quad) {
-      const q = window.AMNet.quad, L = GX - 3.66, Rr = GX + 3.66;
-      [L, Rr].forEach((x) => S.add(q([[x, 0, D], [x, 0, D + 2], [x, 2.1, D + 2], [x, 2.44, D]])));
-      S.add(q([[L, 2.44, D], [Rr, 2.44, D], [Rr, 2.1, D + 2], [L, 2.1, D + 2]]));
-    } else {
-    [-1, 1].forEach((s) => {
-      const pts = [], x = GX + 3.66 * s;
-      for (let z = 0; z <= 2.001; z += st) { const top = 2.44 - 0.17 * z; pts.push(x, 0, D + z, x, top, D + z); }
-      for (let y = 0; y <= 2.44; y += st) { const zEnd = y <= 2.1 ? 2 : (2.44 - y) / 0.17; pts.push(x, y, D, x, y, D + zEnd); }
-      S.add(grid(pts));
-    });
-    const roof = [];
-    for (let x = -3.66; x <= 3.661; x += st) roof.push(GX + x, 2.44, D, GX + x, 2.1, D + 2);
-    for (let z = 0; z <= 2.001; z += st) roof.push(GX - 3.66, 2.44 - 0.17 * z, D + z, GX + 3.66, 2.44 - 0.17 * z, D + z);
-    S.add(grid(roof));
-    }
+    // goal: a real 11-a-side goal (white frame, box net, padded poles behind); the back of the net gives
+    const GOALm = window.AMNet.goal(7.32, 2.44, 2);
+    GOALm.group.position.set(GX, 0, D); S.add(GOALm.group);
+    this.net = GOALm.net;
 
     // ball
     const ballTex = this.canvasTex(512, 256, (c, w, h) => {
