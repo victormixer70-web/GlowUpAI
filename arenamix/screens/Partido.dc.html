@@ -322,7 +322,7 @@ class Component extends DCLogic {
     this.release(p);
     g.recv = null;
     g.fx = { x: b.x, y: b.y, t: 0 };
-    p.act = { type: 'kick', t: 0, dur: 0.38, loft };
+    p.act = { type: 'kick', t: 0, dur: 0.45, loft };
     return true;
   }
   passBall(p, q) {
@@ -441,7 +441,7 @@ class Component extends DCLogic {
   }
   doKick() {
     const g = this.g, p = g.ps[g.ctl];
-    if (g.phase !== 'play') { g.charging = false; g.charge = 0; return; }
+    if (g.phase !== 'play' || (p.act && p.act.type === 'windup')) { g.charging = false; g.charge = 0; return; }
     if (g.hold === g.ctl) {
       // a punt from the hands, aimed with the stick
       const [ix, iy] = this.inp || [0, 0], dir = Math.hypot(ix, iy) > 0.2 ? Math.atan2(iy, ix) : 0;
@@ -461,8 +461,15 @@ class Component extends DCLogic {
     const power = Math.max(0.15, g.charge);
     dir += (Math.random() - 0.5) * 0.16 * (1 - pre) * (0.6 + power * 0.6);
     const spin = Math.hypot(ix, iy) > 0.2 ? this.clamp(this.ang(Math.atan2(iy, ix) - dir) * 0.8, -0.35, 0.35) : 0;
-    if (!this.kick(p, power, dir, power > 0.75, 0.93 + 0.25 * this.tt('pot'), spin)) this.flashMsg('Demasiado lejos del balón', 0.8);
+    const charge = g.charge, i = g.ctl;
     g.charging = false; g.charge = 0;
+    if (this.dist(p, g.ball) > (g.own === i ? 1.7 : 1.5) || g.ball.z > 1.4) { this.flashMsg('Demasiado lejos del balón', 0.8); return; }
+    // a real strike: from the backswing the body turns to the target and the leg swings through; the ball
+    // leaves at the moment the foot meets it, not when you let go of the button
+    p.act = { type: 'windup', t: 0, dur: 0.11, from: 0.12 + 0.15 * charge, face: dir, then: () => {
+      if (g.phase !== 'play') return;
+      if (!this.kick(p, power, dir, power > 0.75, 0.93 + 0.25 * this.tt('pot'), spin)) this.flashMsg('Demasiado lejos del balón', 0.8);
+    } };
   }
   humanPass() {
     const g = this.g, p = g.ps[g.ctl], b = g.ball;
@@ -690,6 +697,7 @@ class Component extends DCLogic {
       else if (p.watch || (sp < 2.5 && !(i === g.ctl && !this.autoplay))) { want = Math.atan2(b.y - p.y, b.x - p.x); rate = 7; }
       else if (sp > 0.6) want = Math.atan2(p.vy, p.vx);
       else { want = Math.atan2(b.y - p.y, b.x - p.x); rate = 4; }
+      if (p.act && p.act.type === 'windup' && p.act.face != null) { want = p.act.face; rate = 22; }
       if (p.role === 'gk') {
         const base = p.team === 0 ? 0 : Math.PI;
         want = base + this.clamp(this.ang(want - base), -1, 1);
@@ -739,6 +747,7 @@ class Component extends DCLogic {
     else p.stam = Math.min(1, p.stam + dt * (0.09 + 0.05 * this.tt('res')));
     p.sprinting = spr;
     if (g.own === i) maxV *= 0.95;
+    if (p.act && p.act.type === 'windup') maxV *= 0.5;   // plant the standing foot to strike
     return [dx, dy, maxV, g.own === i ? 11 : 14];
   }
   seekS(p, tx, ty, slow, dt) {
@@ -965,7 +974,7 @@ class Component extends DCLogic {
     S = S || this.shotQuality(p);
     const ty = S.ty + (Math.random() - 0.5) * 0.5;
     const dg = S.dg;
-    p.act = { type: 'windup', t: 0, dur: 0.2, then: () => {
+    p.act = { type: 'windup', t: 0, dur: 0.2, face: Math.atan2(ty - p.y, gx - p.x), then: () => {
       if (g.own !== i || g.phase !== 'play') return;
       const dir = Math.atan2(ty - p.y, gx - p.x) + (Math.random() - 0.5) * D.err * (dg > 14 ? 1 : 0.7);
       const loft = dg > 22 && Math.random() < 0.25;
@@ -2024,11 +2033,12 @@ class Component extends DCLogic {
     // one-shot clip for the current action: [game action] -> [clip, from, to] (seconds into the clip)
     const charging = i === g.ctl && g.charging;
     let act = null;
-    if (charging) act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.7 + 0.3 * g.charge : 0.2 + 0.22 * g.charge, key: 'charge' };
+    // shot clip: backswing peaks at 0.27 s, the foot meets the ball at 0.42 s
+    if (charging) act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.7 + 0.3 * g.charge : 0.12 + 0.15 * g.charge, key: 'charge' };
     else if (a) {
       const k = Math.min(1, a.t / a.dur);
-      if (a.type === 'windup') act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.75 + 0.3 * k : 0.22 + 0.22 * k, key: a };
-      else if (a.type === 'kick') act = gk ? { id: 'gkKick', t: 2.05 + 0.6 * k, key: a } : { id: 'shot', t: 0.47 + 0.5 * k, key: a };
+      if (a.type === 'windup') { const f0 = a.from ?? 0.12; act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.75 + 0.3 * k : f0 + (0.42 - f0) * k, key: 'strike' }; }
+      else if (a.type === 'kick') act = gk ? { id: 'gkKick', t: 2.05 + 0.6 * k, key: a } : { id: 'shot', t: 0.42 + 0.55 * k, key: 'strike' };
       else if (a.type === 'pass') act = { id: 'pass', t: 0.28 + 0.22 * k, key: a };
       else if (a.type === 'throw') act = { id: 'gkThrow', t: 1.3 + 0.6 * k, key: a };
       else if (a.type === 'slide') act = { id: 'slide', t: 0.2 + 0.75 * k, key: a };
