@@ -12,94 +12,73 @@
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
-input::placeholder{color:#8686A6}
+input::placeholder{color:#7A7A9C}
+@keyframes lgBeamL{0%,100%{rotate:-16deg}50%{rotate:4deg}}
+@keyframes lgBeamR{0%,100%{rotate:16deg}50%{rotate:-4deg}}
+@keyframes lgBounce{0%,100%{translate:0 0;animation-timing-function:cubic-bezier(.3,0,.7,.4)}50%{translate:0 -46px;animation-timing-function:cubic-bezier(.3,.6,.7,1)}}
+@keyframes lgShadow{0%,100%{scale:1;opacity:.55}50%{scale:.55;opacity:.25}}
+@keyframes lgSpinBall{to{rotate:360deg}}
+@keyframes lgTwinkle{0%,100%{opacity:.15}50%{opacity:1}}
+@keyframes lgPlayer{0%,100%{translate:0 0}50%{translate:0 -5px}}
+@keyframes lgTitle{0%,100%{filter:drop-shadow(0 0 14px #22D3EE55)}50%{filter:drop-shadow(0 0 26px #22D3EEAA)}}
+.lg-beam{position:absolute;top:-40px;width:200px;height:460px;transform-origin:50% 0;background:linear-gradient(180deg,#E8F6FF66,#E8F6FF00 80%);clip-path:polygon(45% 0,55% 0,100% 100%,0 100%);filter:blur(5px);pointer-events:none;mix-blend-mode:screen}
+.lg-flash{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 6px #fff;animation:lgTwinkle 1.6s ease-in-out infinite}
+.lg-field:focus-within{border-color:#22D3EE!important;box-shadow:0 0 0 3px #22D3EE33}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: #0B0B14; color: #F4F4FA; font-family: Manrope, sans-serif; overflow: hidden">
-  <div style="position: absolute; left: 0; top: 0; width: 440px; height: 390px; overflow: hidden">
-    <svg width="440" height="390" viewBox="0 0 390 318" preserveAspectRatio="xMidYMid slice" style="position: absolute; left: 0; top: 0">
-      <defs>
-        <linearGradient id="m-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#15123A"/><stop offset="1" stop-color="#0B0B14"/></linearGradient>
-        <radialGradient id="m-glow"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".7"/><stop offset=".3" stop-color="#DDE8FF" stop-opacity=".25"/><stop offset="1" stop-color="#DDE8FF" stop-opacity="0"/></radialGradient>
-        <linearGradient id="m-beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E8F0FF" stop-opacity=".22"/><stop offset="1" stop-color="#E8F0FF" stop-opacity="0"/></linearGradient>
-        <linearGradient id="m-pitch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1A6B3D"/><stop offset="1" stop-color="#239152"/></linearGradient>
-        <linearGradient id="m-fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B0B14" stop-opacity="0"/><stop offset="1" stop-color="#0B0B14"/></linearGradient>
-        <pattern id="m-crowd" width="8" height="7" patternUnits="userSpaceOnUse"><circle cx="4" cy="3.5" r="2.3" fill="#2A2A55"/></pattern>
-        <pattern id="m-crowd2" width="22" height="13" patternUnits="userSpaceOnUse"><circle cx="6" cy="4" r="2.3" fill="#22D3EE" opacity=".55"/><circle cx="17" cy="10" r="2.3" fill="#FF8A3D" opacity=".55"/></pattern>
-      </defs>
-      <rect width="390" height="318" fill="url(#m-sky)"/>
-      <circle cx="120" cy="40" r="1.2" fill="#FFFFFF" opacity=".6"/>
-      <circle cx="250" cy="24" r="1" fill="#FFFFFF" opacity=".5"/>
-      <circle cx="300" cy="70" r="1.2" fill="#FFFFFF" opacity=".4"/>
-      <circle cx="170" cy="80" r="1" fill="#FFFFFF" opacity=".4"/>
-      <path d="M0 150Q195 104 390 150V214H0Z" fill="#14142C"/>
-      <path d="M0 150Q195 104 390 150V214H0Z" fill="url(#m-crowd)"/>
-      <path d="M0 150Q195 104 390 150V214H0Z" fill="url(#m-crowd2)"/>
-      <path d="M0 196H390V214H0Z" fill="#101024"/>
-      <path d="M0 200H390" stroke="#22D3EE" stroke-width="3" opacity=".7"/>
-      <path d="M-40 318L56 206H334L430 318Z" fill="url(#m-pitch)"/>
-      <path d="M102 206H148L117 318H38Z" fill="#FFFFFF" opacity=".05"/>
-      <path d="M194 206H240L273 318H195Z" fill="#FFFFFF" opacity=".05"/>
-      <path d="M286 206H334L430 318H352Z" fill="#FFFFFF" opacity=".05"/>
-      <path d="M30 262H360" stroke="#FFFFFF" stroke-width="2" opacity=".45"/>
-      <ellipse cx="195" cy="262" rx="74" ry="20" fill="none" stroke="#FFFFFF" stroke-width="2" opacity=".45"/>
-      <path d="M38 36L-60 318H140L56 36Z" fill="url(#m-beam)"/>
-      <path d="M334 36L250 318H450L352 36Z" fill="url(#m-beam)"/>
-      <rect x="44" y="36" width="5" height="164" fill="#21213A"/>
-      <rect x="341" y="36" width="5" height="164" fill="#21213A"/>
-      <rect x="26" y="20" width="40" height="18" rx="3" fill="#21213A"/>
-      <rect x="324" y="20" width="40" height="18" rx="3" fill="#21213A"/>
-      <path d="M30 24h8v10h-8zM41 24h8v10h-8zM52 24h10v10H52z" fill="#F4F8FF"/>
-      <path d="M328 24h10v10h-10zM341 24h8v10h-8zM352 24h8v10h-8z" fill="#F4F8FF"/>
-      <circle cx="46" cy="29" r="60" fill="url(#m-glow)"/>
-      <circle cx="344" cy="29" r="60" fill="url(#m-glow)"/>
-      <ellipse cx="195" cy="296" rx="90" ry="14" fill="#22D3EE" opacity=".12"/>
-      <rect y="268" width="390" height="50" fill="url(#m-fade)"/>
-    </svg>
-    <div style="position: absolute; left: 145px; top: 30px">
-      <dc-import name="Avatar" primary="#FF8A3D" secondary="#0B0B14" pattern="solid" shorts="#17172A" socks="#F4F4FA" shoe="#22D3EE" number="10" hat="band" hat-color="#22D3EE" face="none" w="150" hint-size="150px,266px"></dc-import>
-    </div>
-    <div style="position: absolute; left: 0; right: 0; bottom: 18px; text-align: center">
-      <h1 style="margin: 0; display: inline-flex; align-items: center; gap: 12px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 54px; line-height: .95; letter-spacing: 1px; color: #F4F4FA; text-shadow: 0 4px 0 #0B0B14"><svg width="58" height="58" viewBox="0 0 512 512" role="img" aria-label="ARENA MIX" style="display: block; flex: none"><defs><linearGradient id="am-logo-main" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B1A44"/><stop offset="1" stop-color="#0B0B14"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#am-logo-main)" stroke="#2E2E52" stroke-width="10"/><path d="M60 400L470 150" stroke="#22D3EE" stroke-opacity=".12" stroke-width="70" stroke-linecap="round"/><text x="256" y="350" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="270" letter-spacing="-6"><tspan fill="#F4F4FA">A</tspan><tspan fill="#22D3EE" dx="90">M</tspan></text><path d="M262 120L222 238h38l-26 104l80-140h-42l30-82z" fill="#FFC53D" stroke="#0B0B14" stroke-width="10" stroke-linejoin="round"/></svg><span>ARENA <span style="color: #22D3EE">MIX</span></span></h1>
+<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(100% 120% at 30% 0%, #1E2558 0%, #0D0F26 45%, #06060D 100%); color: #F4F4FA; font-family: Manrope, sans-serif; overflow: hidden">
+  <div class="am-bg"></div>
+  <div style="position: absolute; left: -40px; right: -40px; top: 150px; height: 90px; border-radius: 50% 50% 0 0 / 40% 40% 0 0; background: repeating-radial-gradient(circle at 50% 160%, #1B1B3E 0 6px, #14142E 6px 12px); opacity: .9"></div>
+  <span class="lg-flash" style="left: 90px; top: 175px"></span><span class="lg-flash" style="left: 210px; top: 168px; animation-delay: .5s"></span><span class="lg-flash" style="left: 300px; top: 182px; animation-delay: 1.1s"></span><span class="lg-flash" style="left: 160px; top: 196px; animation-delay: .8s"></span><span class="lg-flash" style="left: 380px; top: 172px; animation-delay: .3s"></span><span class="lg-flash" style="left: 60px; top: 200px; animation-delay: 1.3s"></span><span class="lg-flash" style="left: 420px; top: 195px; animation-delay: .9s"></span>
+  <div style="position: absolute; left: -60px; right: 300px; bottom: -10px; height: 150px; background: linear-gradient(180deg, #1A6B3D, #0F4A28); clip-path: polygon(14% 0, 86% 0, 100% 100%, 0 100%)"></div>
+  <div style="position: absolute; left: -60px; right: 300px; bottom: -10px; height: 150px; background: repeating-linear-gradient(90deg, #ffffff0a 0 40px, transparent 40px 80px); clip-path: polygon(14% 0, 86% 0, 100% 100%, 0 100%)"></div>
+  <div style="position: absolute; left: 70px; width: 310px; bottom: 40px; height: 50px; border: 2px solid #ffffff55; border-radius: 50%"></div>
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 120px; background: linear-gradient(180deg, transparent, #06060D 95%)"></div>
+  <div class="lg-beam" style="left: 20px; animation: lgBeamL 9s ease-in-out infinite"></div>
+  <div class="lg-beam" style="left: 290px; animation: lgBeamR 11s ease-in-out infinite"></div>
+  <div style="position: absolute; left: 26px; top: 18px; display: flex; align-items: center; gap: 12px; animation: lgTitle 3.5s ease-in-out infinite">
+    <svg width="62" height="62" viewBox="0 0 512 512" role="img" aria-label="ARENA MIX" style="display: block; flex: none"><defs><linearGradient id="am-logo-main" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B1A44"/><stop offset="1" stop-color="#0B0B14"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#am-logo-main)" stroke="#2E2E52" stroke-width="10"/><path d="M60 400L470 150" stroke="#22D3EE" stroke-opacity=".12" stroke-width="70" stroke-linecap="round"/><text x="256" y="350" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="270" letter-spacing="-6"><tspan fill="#F4F4FA">A</tspan><tspan fill="#22D3EE" dx="90">M</tspan></text><path d="M262 120L222 238h38l-26 104l80-140h-42l30-82z" fill="#FFC53D" stroke="#0B0B14" stroke-width="10" stroke-linejoin="round"/></svg>
+    <div style="display: flex; flex-direction: column">
+      <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 54px; line-height: .9; letter-spacing: 1px"><span style="color: #F4F4FA">ARENA</span> <span style="background: linear-gradient(90deg, #7EF0FF, #22D3EE); -webkit-background-clip: text; background-clip: text; color: transparent">MIX</span></h1>
+      <span style="margin-top: 4px; padding: 2px 10px; align-self: flex-start; transform: skewX(-12deg); background: #FFC53D; color: #1A1206; font: 800 11px Manrope, sans-serif; letter-spacing: 2px">FÚTBOL ARCADE · 1 VS 1 A 4 VS 4</span>
     </div>
   </div>
-  <div style="position: absolute; left: 440px; top: 0; right: 0; bottom: 0; padding: 12px 28px 10px 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; background: #0B0B14">
+  <div style="position: absolute; left: 116px; top: 100px; filter: drop-shadow(0 14px 18px #000C); animation: lgPlayer 3.2s ease-in-out infinite">
+    <dc-import name="Avatar" primary="{{kitP}}" secondary="{{kitS}}" pattern="{{kitPat}}" shorts="{{kitSh}}" socks="{{kitSo}}" shoe="{{kitShoe}}" number="10" hat="band" hat-color="#22D3EE" face="none" w="150" hint-size="150px,266px"></dc-import>
+  </div>
+  <span style="position: absolute; left: 286px; top: 352px; width: 38px; height: 10px; border-radius: 50%; background: #000; filter: blur(2px); animation: lgShadow .9s infinite"></span>
+  <div style="position: absolute; left: 286px; top: 318px; width: 38px; height: 38px; animation: lgBounce .9s infinite">
+    <svg width="38" height="38" viewBox="0 0 24 24" style="animation: lgSpinBall 1.8s linear infinite"><circle cx="12" cy="12" r="11" fill="#F7F8FA" stroke="#0B0B14" stroke-width="1"/><path d="M12 7l4 3l-1.5 4.5h-5L8 10z" fill="#17172A"/><path d="M12 1v6M16 10l6-2M14.5 14.5l3.5 5M9.5 14.5L6 19.5M8 10L2 8" stroke="#17172A" stroke-width="1.2"/></svg>
+  </div>
+  <div style="position: absolute; left: 452px; top: 12px; right: 12px; bottom: 12px; clip-path: polygon(9% 0, 100% 0, 100% 100%, 0 100%); background: linear-gradient(160deg, #1A1A3ACC, #0D0D1ECC); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px)"></div>
+  <div style="position: absolute; left: 452px; top: 12px; width: 36px; bottom: 12px; background: linear-gradient(180deg, #22D3EE, #7C5CFF); clip-path: polygon(88% 0, 100% 0, 12% 100%, 0 100%); opacity: .9"></div>
+  <div style="position: absolute; left: 498px; right: 30px; top: 22px; bottom: 18px; display: flex; flex-direction: column; gap: 9px">
     <div style="display: flex; align-items: center; justify-content: space-between">
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 24px">Inicia sesión</span>
-            <a href="Idioma.dc.html" aria-label="Cambiar idioma" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 22px; background: #0B0B14CC; border: 1px solid #2E2E52; color: #F4F4FA; text-decoration: none; font-size: 14px; font-weight: 600">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z"/></svg>
-        <span>Español</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A3A3C2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6-6"/></svg>
-      </a>
+      <span style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #22D3EE">BIENVENIDO</span>
+      <a href="Idioma.dc.html" aria-label="Cambiar idioma" style="display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 15px; background: #0B0B14AA; border: 1px solid #2E2E58; color: #F4F4FA; text-decoration: none; font-weight: 700; font-size: 12px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>Español</a>
     </div>
-  <form style="display: flex; flex-direction: column; gap: 8px">
-    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: #CACAE0">Correo electrónico
-      <input type="email" placeholder="tu@correo.com" style="height: 42px; box-sizing: border-box; padding: 0 14px; border-radius: 12px; border: 1px solid #2E2E52; background: #17172A; color: #F4F4FA; font: 500 15px Manrope, sans-serif">
-    </label>
-    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: #CACAE0">Contraseña
-      <input type="password" placeholder="••••••••" style="height: 42px; box-sizing: border-box; padding: 0 14px; border-radius: 12px; border: 1px solid #2E2E52; background: #17172A; color: #F4F4FA; font: 500 15px Manrope, sans-serif">
-    </label>
-    <a href="Deportes.dc.html" class="am-pulse am-shine" style="display: flex; align-items: center; justify-content: center; height: 48px; margin-top: 2px; border-radius: 14px; background: #22D3EE; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 1px; box-shadow: 0 6px 0 #0E8FA3, 0 10px 28px #22D3EE40">INICIAR SESIÓN</a>
-    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 2px">
-      <button type="button" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 40px; border-radius: 12px; border: 1px solid #2E2E52; background: #17172A; color: #F4F4FA; font: 600 14px Manrope, sans-serif"><span style="width: 18px; height: 18px; border-radius: 9px; background: #F4F4FA; color: #0B0B14; font: 800 12px Manrope, sans-serif; display: flex; align-items: center; justify-content: center">G</span>Google</button>
-      <button type="button" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 40px; border-radius: 12px; border: 1px solid #2E2E52; background: #17172A; color: #F4F4FA; font: 600 14px Manrope, sans-serif"><svg width="16" height="18" viewBox="0 0 16 18" fill="#F4F4FA"><path d="M13 9.5c0-2 1.6-3 1.7-3c-1-1.4-2.4-1.6-2.9-1.6c-1.2-.1-2.4.7-3 .7s-1.6-.7-2.6-.7C4.800 5 3.400 5.800 2.700 7.100c-1.500 2.600-.4 6.400 1 8.500c.7 1 1.500 2.100 2.600 2.100c1-.1 1.400-.7 2.600-.7s1.600.7 2.600.7c1.100 0 1.800-1 2.500-2c.8-1.100 1.100-2.200 1.100-2.300c0 0-2.100-.8-2.100-3.200zM11 3.300c.6-.7 1-1.700.9-2.700c-.8 0-1.900.6-2.500 1.300c-.5.600-1 1.600-.9 2.600c1 .1 1.900-.5 2.500-1.200z"/></svg>Apple</button>
-    </div>
-  </form>
-        <a href="Deportes.dc.html" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 42px; box-sizing: border-box; border-radius: 14px; border: 1.5px solid #F4F4FA; color: #F4F4FA; text-decoration: none; font-weight: 700; font-size: 15px">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4l13 8l-13 8z"/></svg>
-      Jugar como invitado
-    </a>
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px">
-      <p style="margin: 0; font-size: 12px; color: #A3A3C2; text-align: center">Como invitado, el progreso solo se guarda en este dispositivo.</p>
-      <p style="margin: 2px 0 0 0; font-size: 13px; color: #CACAE0">¿No tienes cuenta? <a href="#" style="font-weight: 700">Crear cuenta</a></p>
-    </div>
+    <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 32px; line-height: 1; white-space: nowrap">¡SALTA AL CAMPO!</span>
+    <a href="Deportes.dc.html" class="am-pulse am-shine" style="flex: none; display: flex; align-items: center; justify-content: center; gap: 10px; height: 52px; transform: skewX(-10deg); background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #0B0B14; text-decoration: none"><span style="display: flex; align-items: center; gap: 10px; transform: skewX(10deg); font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 21px; letter-spacing: .5px; white-space: nowrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="#0B0B14"><path d="M6 3l15 9l-15 9z"/></svg>JUGAR COMO INVITADO</span></a>
+    <span style="font-size: 11px; color: #A3A3C2; text-align: center; margin-top: -3px">Sin registro: tu progreso se guarda en este móvil</span>
+    <div style="display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #8686A6"><span style="flex: 1; height: 1px; background: #2E2E58"></span>O INICIA SESIÓN<span style="flex: 1; height: 1px; background: #2E2E58"></span></div>
+    <form style="flex: none; display: flex; flex-direction: column; gap: 8px">
+      <label class="lg-field" style="display: flex; align-items: center; gap: 10px; padding-left: 12px; border-radius: 12px; border: 1px solid #2E2E58; background: #0B0B14AA; transition: border-color .2s, box-shadow .2s"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8686A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6l9-6"/></svg><input type="email" aria-label="Correo electrónico" placeholder="Correo electrónico" style="height: 40px; box-sizing: border-box; flex: 1; min-width: 0; padding: 0 12px 0 0; border: 0; background: transparent; color: #F4F4FA; font: 600 14px Manrope, sans-serif; outline: none"></label>
+      <label class="lg-field" style="display: flex; align-items: center; gap: 10px; padding-left: 12px; border-radius: 12px; border: 1px solid #2E2E58; background: #0B0B14AA; transition: border-color .2s, box-shadow .2s"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8686A6" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><input type="password" aria-label="Contraseña" placeholder="Contraseña" style="height: 40px; box-sizing: border-box; flex: 1; min-width: 0; padding: 0 12px 0 0; border: 0; background: transparent; color: #F4F4FA; font: 600 14px Manrope, sans-serif; outline: none"></label>
+      <div style="display: flex; gap: 8px">
+        <a href="Deportes.dc.html" style="flex: 1; display: flex; align-items: center; justify-content: center; height: 42px; transform: skewX(-10deg); border: 2px solid #22D3EE; color: #22D3EE; text-decoration: none; background: #22D3EE14"><span style="transform: skewX(10deg); font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1.5px">ENTRAR</span></a>
+        <button type="button" aria-label="Entrar con Google" style="flex: none; width: 46px; height: 42px; border-radius: 12px; border: 1px solid #2E2E58; background: #0B0B14AA; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z" fill="#4285F4"/><path d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z" fill="#34A853"/><path d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2z" fill="#FBBC05"/><path d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.4L6.4 10C7.2 7.7 9.4 5.9 12 5.9z" fill="#EA4335"/></svg></button>
+        <button type="button" aria-label="Entrar con Apple" style="flex: none; width: 46px; height: 42px; border-radius: 12px; border: 1px solid #2E2E58; background: #0B0B14AA; color: #F4F4FA; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="16" height="18" viewBox="0 0 16 18" fill="#F4F4FA"><path d="M13 9.5c0-2 1.6-3 1.7-3c-1-1.4-2.4-1.6-2.9-1.6c-1.2-.1-2.4.7-3 .7s-1.6-.7-2.6-.7C4.800 5 3.400 5.800 2.700 7.100c-1.500 2.600-.4 6.400 1 8.500c.7 1 1.500 2.100 2.600 2.100c1-.1 1.400-.7 2.600-.7s1.600.7 2.600.7c1.100 0 1.800-1 2.500-2c.8-1.100 1.100-2.200 1.100-2.300c0 0-2.100-.8-2.100-3.200zM11 3.300c.6-.7 1-1.700.9-2.700c-.8 0-1.900.6-2.500 1.300c-.5.600-1 1.600-.9 2.600c1 .1 1.900-.5 2.500-1.200z"/></svg></button>
+      </div>
+    </form>
+    <p style="margin: auto 0 0 0; font-size: 12px; color: #A3A3C2; text-align: center">¿No tienes cuenta? <a href="#" style="font-weight: 800">Crear cuenta</a></p>
   </div>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
   renderVals() {
-    return {};
+    const kit = (window.AMChars && window.AMChars.outfit('futbol')) || {};
+    return { kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#0B0B14', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#17172A', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE' };
   }
 }
 </script>
