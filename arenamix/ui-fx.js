@@ -93,6 +93,34 @@
     'nav[aria-label="Principal"] a:not([style*="background: #22D3EE"]) svg{transition:translate .25s}',
     'nav[aria-label="Principal"] a:not([style*="background: #22D3EE"]):hover{color:#F4F4FA!important;background:#ffffff0d!important}',
     '@media (prefers-reduced-motion: reduce){.am-bg::before,.am-shine::after,.am-float,.am-pulse,.am-pulse-gold,.am-bob,.am-spin,.am-coin,.am-bar-shine::after{animation:none!important}}',
+    // ---- broadcast style (the look of the home screen), shared by every menu ----
+    // stage: night-stadium backdrop with two swinging floodlight beams
+    '.bc-stage{background:radial-gradient(90% 120% at 40% 0%,#1D2350 0%,#0D0F24 45%,#07070F 100%)!important}',
+    '.bc-beams{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}',
+    '.bc-beams::before,.bc-beams::after{content:"";position:absolute;top:-60px;width:220px;height:520px;transform-origin:50% 0;background:linear-gradient(180deg,#E8F6FF40,#E8F6FF00 80%);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);filter:blur(6px);mix-blend-mode:screen}',
+    '.bc-beams::before{left:22%;animation:bcBeamL 9s ease-in-out infinite}',
+    '.bc-beams::after{left:62%;animation:bcBeamR 11s ease-in-out infinite}',
+    '@keyframes bcBeamL{0%,100%{rotate:-14deg}50%{rotate:6deg}}',
+    '@keyframes bcBeamR{0%,100%{rotate:14deg}50%{rotate:-6deg}}',
+    // title: italic condensed on a slanted dark label with the cyan strip
+    '.bc-title{display:inline-block;margin:0;padding:2px 16px 2px 14px;transform:skewX(-12deg);background:#0B0B14CC;border-left:4px solid #22D3EE;font-family:"Barlow Condensed",sans-serif!important;font-weight:800!important;font-style:italic!important;letter-spacing:1px;line-height:1.1;color:#F4F4FA!important;-webkit-text-fill-color:#F4F4FA;background-clip:border-box!important;filter:none!important}',
+    // slanted shapes made with clip-path, so the text inside stays straight
+    '.bc-para{clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}',
+    '.bc-cut{clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}',
+    '.bc-btn{clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);background:linear-gradient(135deg,#7EF0FF,#22D3EE 55%,#0EA5C0)!important;color:#0B0B14!important;border:0!important;border-radius:0!important;box-shadow:none!important;font-family:"Barlow Condensed",sans-serif!important;font-style:italic!important;font-weight:800!important;letter-spacing:1.5px}',
+    '.bc-btn-gold{clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);background:linear-gradient(135deg,#FFE38A,#FFC53D 55%,#D9A520)!important;color:#2A1C02!important;border:0!important;border-radius:0!important;box-shadow:none!important;font-family:"Barlow Condensed",sans-serif!important;font-style:italic!important;font-weight:800!important;letter-spacing:1px}',
+    // tile: a dark slanted card with a coloured strip on its leading edge
+    '.bc-tile{position:relative;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);background:linear-gradient(110deg,#1F2350,#13142C 70%)!important;border:0!important;border-radius:0!important;box-shadow:none!important}',
+    '.bc-tile::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--bc-c,#22D3EE)}',
+    '.bc-tile.on{background:linear-gradient(110deg,#0F4A5A,#13213A 70%)!important}',
+    '.bc-tile.on::after{content:"";position:absolute;inset:0;border:2px solid var(--bc-c,#22D3EE);clip-path:inherit;pointer-events:none}',
+    // glass panel with a diagonal edge and the gradient strip
+    '.bc-glass{background:linear-gradient(160deg,#191936F2,#0E0E1EF2)!important;clip-path:polygon(28px 0,100% 0,100% 100%,0 100%)}',
+    // live ticker band
+    '.bc-ticker{overflow:hidden;white-space:nowrap}',
+    '.bc-ticker>span{display:inline-block;padding-left:100%;animation:bcTick 22s linear infinite}',
+    '@keyframes bcTick{from{transform:translateX(0)}to{transform:translateX(-100%)}}',
+    '@media (prefers-reduced-motion: reduce){.bc-beams::before,.bc-beams::after,.bc-ticker>span{animation:none!important}}',
     // buttons: squash on press, spring back on release
     '.fx-btn{transition:scale .32s cubic-bezier(.3,2,.5,1),filter .2s}',
     '.fx-btn.fx-down{scale:.9;transition:scale .08s ease-out;filter:brightness(1.15)}',

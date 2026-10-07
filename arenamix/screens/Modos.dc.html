@@ -15,8 +15,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #17163A 0%, #0B0B14 65%); color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
+<div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <div class="am-bg"></div>
+  <div class="bc-beams"></div>
   <nav aria-label="Principal" style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; box-sizing: border-box; padding: 12px 8px; background: #111120; border-right: 1px solid #26264A; display: flex; flex-direction: column; align-items: center; gap: 8px">
     <span style="margin-bottom: 6px"><svg width="46" height="46" viewBox="0 0 512 512" role="img" aria-label="ARENA MIX" style="display: block; flex: none"><defs><linearGradient id="am-logo-modos" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B1A44"/><stop offset="1" stop-color="#0B0B14"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#am-logo-modos)" stroke="#2E2E52" stroke-width="10"/><path d="M60 400L470 150" stroke="#22D3EE" stroke-opacity=".12" stroke-width="70" stroke-linecap="round"/><text x="256" y="350" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="270" letter-spacing="-6"><tspan fill="#F4F4FA">A</tspan><tspan fill="#22D3EE" dx="90">M</tspan></text><path d="M262 120L222 238h38l-26 104l80-140h-42l30-82z" fill="#FFC53D" stroke="#0B0B14" stroke-width="10" stroke-linejoin="round"/></svg></span>
     <a href="Deportes.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #0B0B14; background: #22D3EE"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4l13 8l-13 8z"/></svg>Jugar</a>
@@ -24,54 +25,56 @@ input::placeholder{color:#8686A6}
     <a href="Tienda.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 8h14l-1 13H6z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Tienda</a>
     <a href="Estadisticas.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Perfil</a>
   </nav>
-  <div style="position: absolute; left: 80px; top: 0; bottom: 0; width: 300px; padding: 12px 10px 12px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px">
-    <div class="am-shine" style="{{bannerStyle}}">
-      <svg class="am-spin" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-opacity=".18" stroke-width="1.4" style="position: absolute; right: -24px; bottom: -34px"><path d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M12 7l4 3l-1.5 4.5h-5L8 10zM12 3v4M16 10l4.5-1.5M14.5 14.5l2.5 4M9.5 14.5L7 18.5M8 10L3.5 8.5"/></svg>
-      <div style="display: flex; align-items: center; justify-content: space-between">
-        <a href="Deportes.dc.html" aria-label="Volver a deportes" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 20px; background: #0B0B14CC; color: #F4F4FA">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
-        </a>
-        <span style="padding: 4px 10px; border-radius: 12px; background: #0B0B14CC; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #CACAE0">MODOS DE JUEGO</span>
-      </div>
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: {{sportSize}}px; line-height: 1; letter-spacing: 1px; text-shadow: 0 3px 0 #0B0B14">{{sportName}}</span>
+  <!-- header: back, title, the three kinds of play -->
+  <div style="position: absolute; left: 96px; right: 12px; top: 10px; height: 40px; display: flex; align-items: center; gap: 10px; z-index: 1">
+    <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 44px; height: 36px; display: flex; align-items: center; justify-content: center; background: #17172A; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+    <h1 class="bc-title" style="font-size: 26px">FÚTBOL</h1>
+    <span style="flex: 1"></span>
+    <div role="tablist" aria-label="Tipo de partida" style="display: flex; gap: 4px">
+      <button type="button" role="tab" aria-selected="{{compSel}}" onClick="{{tabComp}}" class="bc-para" style="{{compTab}}">COMPETITIVO</button>
+      <button type="button" role="tab" aria-selected="{{casualSel}}" onClick="{{tabCasual}}" class="bc-para" style="{{casualTab}}">INFORMAL</button>
+      <button type="button" role="tab" aria-selected="{{trainSel}}" onClick="{{tabTrain}}" class="bc-para" style="{{trainTab}}">ENTRENAMIENTO</button>
     </div>
-    <div key="{{selKey}}" class="am-card" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 7px; padding: 12px; border-radius: 16px">
-      <div style="display: flex; align-items: center; gap: 10px">
-        <span style="{{selIconBox}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{selIcon}}"/></svg></span>
-        <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
-      <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: {{catColor}}">{{catLabel}}</span>
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; line-height: 1">{{selTitle}}</span>
-        </div>
-      </div>
-      <span style="font-size: 12px; line-height: 1.4; color: #BABAD6">{{selDesc}}</span>
-      <sc-if value="{{showRank}}" hint-placeholder-val="{{ true }}">
-        <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 2px">
-          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800"><span style="color: {{rankColor}}">{{rankLabel}}</span><span style="color: #A3A3C2">{{mmrLabel}}</span></div>
-          <div style="height: 8px; border-radius: 4px; background: #26264A; box-shadow: inset 0 1px 2px #0008"><div class="am-bar-shine" style="{{rankBar}}"></div></div>
-          <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700"><span style="color: #FFC53D">{{seasonLabel}}</span><a href="Rangos.dc.html">Ver rangos</a></div>
-        </div>
-      </sc-if>
-    </div>
-    <a href="{{playHref}}" onClick="{{saveSel}}" class="am-pulse am-shine" style="{{playStyle}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="#0B0B14" style="margin-right: 8px"><path d="M6 3l15 9l-15 9z"/></svg>{{playLabel}}</a>
   </div>
-  <div style="position: absolute; left: 380px; top: 0; right: 0; bottom: 0; padding: 12px 14px 12px 6px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
-    <div role="tablist" style="position: relative; display: flex; gap: 0; padding: 4px; border-radius: 16px; background: #17172A; border: 1px solid #2E2E52; flex: none">
-      <span style="{{tabThumb}}"></span>
-      <button type="button" role="tab" aria-selected="{{compSel}}" onClick="{{tabComp}}" style="{{compTab}}">COMPETITIVO</button>
-      <button type="button" role="tab" aria-selected="{{casualSel}}" onClick="{{tabCasual}}" style="{{casualTab}}">INFORMAL</button>
-      <button type="button" role="tab" aria-selected="{{trainSel}}" onClick="{{tabTrain}}" style="{{trainTab}}">ENTRENAMIENTO</button>
-    </div>
-    <div key="{{listKey}}" style="flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; padding: 2px">
-      <sc-for list="{{cards}}" as="m" hint-placeholder-count="6">
-        <button type="button" onClick="{{m.pick}}" style="{{m.style}}">
-          <span style="display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%">
-            <span style="display: flex; align-items: center; gap: 8px; min-width: 0"><span style="{{m.iconBox}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{m.icon}}"/></svg></span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; line-height: 1.05; letter-spacing: .5px; text-align: left">{{m.title}}</span></span>
-            <span style="{{m.tagStyle}}">{{m.tag}}</span>
-          </span>
-          <span style="font-size: 11px; line-height: 1.35; color: #A3A3C2; text-align: left">{{m.desc}}</span>
-        </button>
-      </sc-for>
-    </div>
+
+  <!-- the selected mode, big -->
+  <div key="{{selKey}}" style="position: absolute; left: 96px; top: 58px; width: 392px; bottom: 12px; z-index: 1">
+    <div style="position: absolute; inset: 0; clip-path: polygon(0 0, 100% 0, 93% 100%, 0 100%); background: linear-gradient(150deg, #123A2C, #0C1F1A 55%, #0B0B14)"></div>
+    <div style="position: absolute; inset: 0; clip-path: polygon(0 0, 100% 0, 93% 100%, 0 100%); background: repeating-linear-gradient(90deg, #ffffff07 0 30px, transparent 30px 60px)"></div>
+    <span style="position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: linear-gradient(180deg, #22D3EE, #7C5CFF)"></span>
+    <span class="bc-para" style="position: absolute; left: 18px; top: 14px; padding: 3px 14px; background: {{catColor}}; color: #0B0B14; font: 800 11px Exo2, sans-serif; letter-spacing: 1.5px">{{catLabel}}</span>
+    <span style="position: absolute; left: 16px; top: 34px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: {{selSize}}px; line-height: 1; letter-spacing: -1px; text-shadow: 0 0 22px #22D3EE55, 0 4px 0 #07070F; white-space: nowrap">{{selTitle}}</span>
+    <span style="position: absolute; left: 20px; top: 120px; width: 170px; font-size: 12px; font-weight: 600; line-height: 1.4; color: #CACAE0">{{selDesc}}</span>
+    <!-- illustration: the line-up on a little pitch, or the goal -->
+    <svg width="176" height="112" viewBox="0 0 176 112" style="position: absolute; right: 34px; top: 66px; filter: drop-shadow(0 8px 14px #000A)">
+      <rect x="2" y="2" width="172" height="108" rx="6" fill="#1A6B3D" stroke="#ffffff66" stroke-width="2"/>
+      <rect x="2" y="2" width="172" height="108" rx="6" fill="url(#md-stripes)"/>
+      <defs><pattern id="md-stripes" width="24" height="108" patternUnits="userSpaceOnUse"><rect width="12" height="108" fill="#ffffff0c"/></pattern></defs>
+      <path d="M88 2V110" stroke="#ffffff66" stroke-width="1.5"/><circle cx="88" cy="56" r="16" fill="none" stroke="#ffffff66" stroke-width="1.5"/>
+      <rect x="2" y="34" width="22" height="44" fill="none" stroke="#ffffff66" stroke-width="1.5"/><rect x="152" y="34" width="22" height="44" fill="none" stroke="#ffffff66" stroke-width="1.5"/>
+      <sc-for list="{{dots}}" as="d" hint-placeholder-count="10"><circle cx="{{d.x}}" cy="{{d.y}}" r="{{d.r}}" fill="{{d.c}}" stroke="#0B0B14" stroke-width="1.5"/></sc-for>
+    </svg>
+    <sc-if value="{{showRank}}" hint-placeholder-val="{{ true }}">
+      <div style="position: absolute; left: 20px; right: 46px; top: 196px; display: flex; flex-direction: column; gap: 5px">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 800"><span style="color: {{rankColor}}">{{rankLabel}}</span><span style="color: #A3A3C2">{{mmrLabel}}</span></div>
+        <div class="bc-para" style="height: 8px; background: #26264A"><div class="am-bar-shine" style="{{rankBar}}"></div></div>
+        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700"><span style="color: #FFC53D">{{seasonLabel}}</span><a href="Rangos.dc.html">Ver rangos</a></div>
+      </div>
+    </sc-if>
+    <a href="{{playHref}}" onClick="{{saveSel}}" class="bc-btn am-shine" style="position: absolute; left: 18px; bottom: 16px; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 28px 0 22px; text-decoration: none; font-size: 26px"><svg width="18" height="18" viewBox="0 0 24 24" fill="#0B0B14"><path d="M6 3l15 9l-15 9z"/></svg>{{playLabel}}</a>
+  </div>
+
+  <!-- the list of modes -->
+  <div key="{{listKey}}" style="position: absolute; left: 498px; right: 12px; top: 58px; bottom: 12px; overflow-y: auto; scrollbar-width: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; align-content: start; z-index: 1">
+    <sc-for list="{{cards}}" as="m" hint-placeholder-count="6">
+      <button type="button" onClick="{{m.pick}}" class="{{m.cls}}" style="{{m.style}}">
+        <span style="display: flex; align-items: center; gap: 8px; width: 100%">
+          <span style="{{m.iconBox}}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{m.icon}}"/></svg></span>
+          <span style="flex: 1; min-width: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 19px; line-height: 1; letter-spacing: .5px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{m.title}}</span>
+        </span>
+        <span style="{{m.tagStyle}}">{{m.tag}}</span>
+      </button>
+    </sc-for>
   </div>
 </div>
 </x-dc>
@@ -115,6 +118,21 @@ class Component extends DCLogic {
         train: [{ id: 'train', title: 'PISTA LIBRE', href: 'Voley.dc.html', desc: 'Saques y remates a tu ritmo.' }, { id: 'tut', title: 'TUTORIAL', href: 'Tutorial.dc.html', desc: 'Repasa los controles paso a paso.' }] }
     };
     return S[sport] || S.futbol;
+  }
+  // the line-up on the little pitch for team modes; a goal and the ball for penalties; a wall for free kicks
+  dotsFor(m) {
+    if (!m) return [];
+    const d = (x, y, c, r) => ({ x: String(x), y: String(y), c, r: String(r || 6) });
+    if (m.kind === 'team') {
+      const n = m.n, out = [d(12, 56, '#FFC53D'), d(164, 56, '#2FBF71')];
+      const ys = (k) => k === 1 ? [56] : k === 2 ? [36, 76] : k === 3 ? [28, 56, 84] : [24, 46, 66, 88];
+      const xs = (k) => k <= 2 ? [56] : [44, 70];
+      ys(n).forEach((y, i) => { const x = n <= 2 ? 58 : (i % 2 ? 72 : 46); out.push(d(x, y, '#22D3EE')); out.push(d(176 - x, y, '#FF8A3D')); });
+      return out;
+    }
+    if (m.duel === 'pen') return [d(164, 56, '#2FBF71', 7), d(134, 56, '#F4F4FA', 4), d(110, 56, '#22D3EE', 7)];
+    if (m.duel === 'free') return [d(164, 56, '#2FBF71', 7), d(130, 44, '#FF8A3D', 5), d(130, 54, '#FF8A3D', 5), d(130, 64, '#FF8A3D', 5), d(96, 70, '#F4F4FA', 4), d(84, 78, '#22D3EE', 7)];
+    return [d(88, 56, '#22D3EE', 7), d(110, 56, '#F4F4FA', 4)];
   }
   iconOf(m) { return m.kind === 'team' ? 'team' : m.duel === 'pen' ? 'pen' : m.duel === 'free' ? 'free' : m.kind === 'private' ? 'private' : m.kind === 'ext' ? 'ext' : m.id === 'tut' ? 'tut' : 'train'; }
   tiers() {
@@ -189,22 +207,25 @@ class Component extends DCLogic {
         title: m.title, desc: m.desc, tag,
         icon: Modos_ICON[this.iconOf(m)],
         iconBox: 'flex: none; width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; ' + (on ? 'background: #22D3EE; color: #0B0B14; box-shadow: 0 0 10px #22D3EE88;' : 'background: #22D3EE1A; color: #22D3EE; border: 1px solid #22D3EE44;'),
-        style: 'display: flex; flex-direction: column; gap: 6px; min-height: 84px; padding: 10px; box-sizing: border-box; border-radius: 14px; font-family: Exo2, sans-serif; color: #F4F4FA; transition: transform .2s, box-shadow .2s; cursor: ' + (m.soon ? 'default' : 'pointer') + '; opacity: ' + (m.soon ? 0.45 : 1) + '; ' + (on ? 'background: linear-gradient(150deg, #0F3D4A, #10303A 60%, #13213A); border: 2px solid #22D3EE; box-shadow: 0 0 16px #22D3EE55, inset 0 1px 0 #ffffff1a;' : 'background: linear-gradient(160deg, #1C1C3A, #141428); border: 2px solid #2A2A50; box-shadow: 0 6px 14px #0006;'),
-        tagStyle: 'flex: none; font-size: 10px; font-weight: 800; padding: 3px 7px; border-radius: 6px; white-space: nowrap; ' + (comp && !m.soon ? 'background: #0B0B14; color: ' + (placingOf(m) ? '#A3A3C2' : R.text) + ';' : 'background: #21213A; color: #A3A3C2;'),
+        cls: 'bc-tile' + (on ? ' on' : ''),
+        style: 'display: flex; flex-direction: column; align-items: flex-start; gap: 6px; height: 66px; padding: 9px 12px 8px 14px; box-sizing: border-box; font-family: Exo2, sans-serif; color: #F4F4FA; cursor: ' + (m.soon ? 'default' : 'pointer') + '; opacity: ' + (m.soon ? 0.45 : 1) + '; --bc-c: ' + (on ? '#22D3EE' : comp && !m.soon && !placingOf(m) ? R.text : '#3A3F7A') + ';',
+        tagStyle: 'font-size: 10px; font-weight: 800; letter-spacing: .5px; padding-left: 33px; white-space: nowrap; ' + (comp && !m.soon ? 'color: ' + (placingOf(m) ? '#A3A3C2' : R.text) + ';' : 'color: #A3A3C2;'),
         pick: () => { if (!m.soon) this.setState({ id: m.id }); }
       };
     });
     const mmr = cur && comp ? this.mmrOf(s.sport, cur.id) : 0, R = this.rankOf(mmr);
     const curPlacing = cur && comp && placingOf(cur), curPc = cur ? this.placeOf(S, s.sport + ':' + cur.id) : null;
-    const tab = (on) => 'position: relative; z-index: 1; flex: 1; height: 36px; border: 0; border-radius: 12px; font: 800 12px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; background: transparent; transition: color .3s; color: ' + (on ? '#0B0B14;' : '#CACAE0;');
+    const tab = (on) => 'height: 34px; padding: 0 16px; border: 0; font: 800 12px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; ' + (on ? 'background: linear-gradient(135deg, #7EF0FF, #22D3EE); color: #0B0B14;' : 'background: #17172ACC; color: #CACAE0;');
     const ti = ['comp', 'casual', 'train'].indexOf(s.cat);
     const href = !cur ? '#' : s.cat === 'train' || cur.kind === 'ext' ? cur.href : cur.kind === 'private' ? 'Privada.dc.html' : comp ? 'Competitivo.dc.html' : 'Rapida.dc.html';
     const catName = { comp: 'COMPETITIVO', casual: 'INFORMAL', train: 'ENTRENAMIENTO' }[s.cat];
     return {
+      selSize: cur && cur.title.length > 9 ? 50 : cur && cur.title.length > 6 ? 62 : 80,
+      dots: this.dotsFor(cur),
       sportName: C.name, sportSize: C.name.length > 7 ? 32 : 40,
       bannerStyle: 'flex: none; height: 104px; padding: 10px 12px; box-sizing: border-box; border-radius: 16px; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(135deg, ' + C.c1 + ', ' + C.c2 + ');',
       catLabel: catName + (comp ? ' · CON RANGO' : s.cat === 'casual' ? ' · SIN RANGO' : ''),
-      catColor: comp ? '#E3A56E' : s.cat === 'casual' ? '#22D3EE' : '#53D88E',
+      catColor: comp ? '#FFC53D' : s.cat === 'casual' ? '#22D3EE' : '#53D88E',
       selTitle: cur ? cur.title : '', selDesc: cur ? cur.desc : '',
       showRank: comp && !!cur,
       rankLabel: curPlacing ? 'Sin clasificar' : R.label, rankColor: curPlacing ? '#A3A3C2' : R.text,
@@ -212,7 +233,7 @@ class Component extends DCLogic {
       seasonLabel: 'Temporada ' + S.num + ' · termina en ' + S.daysLeft + (S.daysLeft === 1 ? ' día' : ' días'),
       rankBar: 'height: 8px; border-radius: 4px; box-shadow: 0 0 8px ' + R.text + '; background: ' + R.text + '; width: ' + (Math.max(0, Math.min(1, (mmr - R.lo) / (R.hi - R.lo))) * 100).toFixed(1) + '%;',
       cards,
-      tabThumb: 'position: absolute; top: 4px; bottom: 4px; left: calc(4px + ' + ti + ' * (100% - 8px) / 3); width: calc((100% - 8px) / 3); border-radius: 12px; background: linear-gradient(135deg, #7EF0FF, #22D3EE); box-shadow: 0 0 14px #22D3EE88; transition: left .4s cubic-bezier(.3,1.5,.5,1);',
+      _unused: 'position: absolute; top: 4px; bottom: 4px; left: calc(4px + ' + ti + ' * (100% - 8px) / 3); width: calc((100% - 8px) / 3); border-radius: 12px; background: linear-gradient(135deg, #7EF0FF, #22D3EE); box-shadow: 0 0 14px #22D3EE88; transition: left .4s cubic-bezier(.3,1.5,.5,1);',
       compSel: comp ? 'true' : 'false', casualSel: s.cat === 'casual' ? 'true' : 'false', trainSel: s.cat === 'train' ? 'true' : 'false',
       listKey: s.cat, selKey: s.cat + ':' + (cur ? cur.id : ''),
       selIcon: cur ? Modos_ICON[this.iconOf(cur)] : '',

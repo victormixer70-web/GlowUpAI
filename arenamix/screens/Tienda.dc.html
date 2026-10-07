@@ -15,8 +15,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #22163F 0%, #0B0B14 65%); color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
+<div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <div class="am-bg"></div>
+  <div class="bc-beams"></div>
   <nav aria-label="Principal" style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; box-sizing: border-box; padding: 12px 8px; background: #111120; border-right: 1px solid #26264A; display: flex; flex-direction: column; align-items: center; gap: 8px">
     <span style="margin-bottom: 6px"><svg width="46" height="46" viewBox="0 0 512 512" role="img" aria-label="ARENA MIX" style="display: block; flex: none"><defs><linearGradient id="am-logo-tienda" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B1A44"/><stop offset="1" stop-color="#0B0B14"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#am-logo-tienda)" stroke="#2E2E52" stroke-width="10"/><path d="M60 400L470 150" stroke="#22D3EE" stroke-opacity=".12" stroke-width="70" stroke-linecap="round"/><text x="256" y="350" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="270" letter-spacing="-6"><tspan fill="#F4F4FA">A</tspan><tspan fill="#22D3EE" dx="90">M</tspan></text><path d="M262 120L222 238h38l-26 104l80-140h-42l30-82z" fill="#FFC53D" stroke="#0B0B14" stroke-width="10" stroke-linejoin="round"/></svg></span>
     <a href="Deportes.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 64px; height: 64px; border-radius: 16px; text-decoration: none; font-size: 10px; font-weight: 800; color: #A3A3C2; background: transparent"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4l13 8l-13 8z"/></svg>Jugar</a>
@@ -26,14 +27,13 @@ input::placeholder{color:#8686A6}
   </nav>
   <div style="position: absolute; left: 80px; top: 0; right: 0; bottom: 0; padding: 12px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px">
     <div style="display: flex; align-items: center; gap: 14px">
-      <h1 class="am-title" style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 32px; letter-spacing: 1px">TIENDA</h1>
-  <div role="tablist" aria-label="Sección" style="position: relative; width: 280px; padding: 4px; border-radius: 16px; background: #17172A; border: 1px solid #2E2E52; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr))">
-    <span style="{{thumb}}"></span>
-    <button type="button" role="tab" aria-selected="{{rSel}}" onClick="{{showRewards}}" style="{{rewardsTab}}">Recompensas</button>
-    <button type="button" role="tab" aria-selected="{{sSel}}" onClick="{{showShop}}" style="{{shopTab}}">Comprar</button>
+      <h1 class="bc-title" style="font-size: 30px">TIENDA</h1>
+  <div role="tablist" aria-label="Sección" style="display: flex; gap: 4px">
+    <button type="button" role="tab" aria-selected="{{rSel}}" onClick="{{showRewards}}" class="bc-para" style="{{rewardsTab}}">RECOMPENSAS</button>
+    <button type="button" role="tab" aria-selected="{{sSel}}" onClick="{{showShop}}" class="bc-para" style="{{shopTab}}">COMPRAR</button>
   </div>
       <div style="flex: 1"></div>
-    <span style="display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: 20px; background: linear-gradient(135deg, #2A2140, #1A1730); border: 1px solid #FFC53D88; box-shadow: 0 0 12px #FFC53D33; color: #FFE38A; font-weight: 800; font-size: 14px">
+    <span class="bc-para" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 18px; background: linear-gradient(135deg, #3A2A0A, #1E1A10); box-shadow: inset 0 0 0 1px #FFC53D; color: #FFE38A; font-weight: 800; font-size: 14px">
       <svg class="am-coin" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">C</text></svg>
       2.450 carrascos
     </span>
@@ -41,7 +41,7 @@ input::placeholder{color:#8686A6}
     <div style="flex: 1; min-height: 0; overflow-y: auto">
       <sc-if value="{{isRewards}}" hint-placeholder-val="{{ true }}">
         <div style="display: flex; flex-direction: column; gap: 12px">
-          <div class="am-card am-shine" style="display: flex; align-items: center; gap: 14px; padding: 10px 16px; border-radius: 16px">
+          <div class="bc-tile am-shine" style="display: flex; align-items: center; gap: 14px; padding: 10px 16px 10px 20px; --bc-c: #22D3EE">
             <span style="position: relative; width: 58px; height: 58px; border-radius: 29px; background: conic-gradient(#22D3EE 72deg, #2E2E52 72deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px #22D3EE55"><span style="width: 48px; height: 48px; border-radius: 24px; background: #141428; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px">2<span style="font-size: 13px; color: #8686A6">/10</span></span></span>
             <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
               <span style="font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE">RECOMPENSAS ASEGURADAS</span>
@@ -51,7 +51,7 @@ input::placeholder{color:#8686A6}
           </div>
           <div style="position: relative; height: 196px; margin: 0 62px">
           <div style="position: absolute; left: calc(0% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px">
-            <div class="" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; border-radius: 16px; background: linear-gradient(160deg, #13303A, #121226); border: 1px solid #22D3EE66; opacity: .85; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
+            <div class="" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(160deg, #13303A, #121226); border: 1px solid #22D3EE66; opacity: .85; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
               <span style="display: flex; height: 44px; align-items: center"><svg width="34" height="34" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">C</text></svg></span>
               <span style="font-weight: 800; font-size: 13px; line-height: 1.15">100 carrascos</span>
               <span style="font-size: 10px; color: #A3A3C2">Moneda del juego</span>
@@ -60,16 +60,16 @@ input::placeholder{color:#8686A6}
             <span style="width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; background: #22D3EE; color: #0B0B14; box-shadow: 0 0 12px #22D3EE;">1</span>
           </div>
           <div style="position: absolute; left: calc(25% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px">
-            <div class="am-float" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; border-radius: 16px; background: linear-gradient(160deg, #3A2A0A, #1E1A10); border: 1px solid #FFC53D; box-shadow: 0 0 18px #FFC53D55; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
+            <div class="am-float" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(160deg, #3A2A0A, #1E1A10); border: 1px solid #FFC53D; box-shadow: 0 0 18px #FFC53D55; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
               <span class="am-bob" style="display: flex; height: 44px; align-items: center"><svg width="46" height="42" viewBox="0 0 54 50"><ellipse cx="27" cy="46" rx="20" ry="3.5" fill="#000" opacity=".35"/><path d="M5 22h44v20a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" fill="#C26020"/><path d="M5 22a22 14 0 0 1 44 0z" fill="#FF8A3D"/><rect x="23" y="20" width="8" height="12" rx="2" fill="#FFC53D" stroke="#7A4E0E" stroke-width="1.5"/></svg></span>
               <span style="font-weight: 800; font-size: 13px; line-height: 1.15">Cofre común</span>
               <span style="font-size: 10px; color: #A3A3C2">¡Listo para abrir!</span>
-              <button type="button" class="am-pulse-gold am-shine" style="height: 28px; padding: 0 12px; border: 0; border-radius: 14px; background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #D9A520); color: #2A1C02; font: 800 12px Exo2, sans-serif; cursor: pointer">RECLAMAR</button>
+              <button type="button" class="bc-btn-gold am-shine" style="height: 28px; padding: 0 16px; font-size: 15px; cursor: pointer">RECLAMAR</button>
             </div>
             <span style="width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; background: #FFC53D; color: #2A1C02; box-shadow: 0 0 16px #FFC53D;">2</span>
           </div>
           <div style="position: absolute; left: calc(50% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px">
-            <div class="" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; border-radius: 16px; background: linear-gradient(160deg, #1C1C3A, #141428); border: 1px solid #2A2A50; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
+            <div class="" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(160deg, #1C1C3A, #141428); border: 1px solid #2A2A50; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
               <span style="display: flex; height: 44px; align-items: center"><svg width="46" height="42" viewBox="0 0 54 50"><ellipse cx="27" cy="46" rx="20" ry="3.5" fill="#000" opacity=".35"/><path d="M5 22h44v20a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" fill="#2A5FB0"/><path d="M5 22a22 14 0 0 1 44 0z" fill="#6FB6FF"/><rect x="23" y="20" width="8" height="12" rx="2" fill="#FFC53D" stroke="#7A4E0E" stroke-width="1.5"/></svg></span>
               <span style="font-weight: 800; font-size: 13px; line-height: 1.15">Cofre raro</span>
               <span style="font-size: 10px; color: #A3A3C2">Accesorio de equipo</span>
@@ -78,7 +78,7 @@ input::placeholder{color:#8686A6}
             <span style="width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; background: #21213A; color: #A3A3C2; border: 2px solid #3A3A66;">5</span>
           </div>
           <div style="position: absolute; left: calc(75% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px">
-            <div class="" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; border-radius: 16px; background: linear-gradient(160deg, #1C1C3A, #141428); border: 1px solid #2A2A50; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
+            <div class="" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(160deg, #1C1C3A, #141428); border: 1px solid #2A2A50; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
               <span style="display: flex; height: 44px; align-items: center"><svg width="34" height="34" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">C</text></svg></span>
               <span style="font-weight: 800; font-size: 13px; line-height: 1.15">300 carrascos</span>
               <span style="font-size: 10px; color: #A3A3C2">Moneda del juego</span>
@@ -87,7 +87,7 @@ input::placeholder{color:#8686A6}
             <span style="width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; background: #21213A; color: #A3A3C2; border: 2px solid #3A3A66;">7</span>
           </div>
           <div style="position: absolute; left: calc(100% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px">
-            <div class="" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; border-radius: 16px; background: linear-gradient(160deg, #1C1C3A, #141428); border: 1px solid #2A2A50; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
+            <div class="" style="width: 120px; height: 150px; box-sizing: border-box; padding: 10px 8px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(160deg, #1C1C3A, #141428); border: 1px solid #2A2A50; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center">
               <span style="display: flex; height: 44px; align-items: center"><svg width="44" height="40" viewBox="0 0 44 40"><path d="M6 14h14l4 6c6 0 14 2 16 8v4H6z" fill="#E5484D"/><rect x="4" y="31" width="38" height="5" rx="2.5" fill="#F4F4FA"/></svg></span>
               <span style="font-weight: 800; font-size: 13px; line-height: 1.15">Brote + Botas Carmesí</span>
               <span style="font-size: 10px; color: #A3A3C2">Gran premio semanal</span>
@@ -102,13 +102,13 @@ input::placeholder{color:#8686A6}
       <sc-if value="{{isShop}}" hint-placeholder-val="{{ false }}">
         <div style="display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 14px; align-items: start">
           <div style="display: flex; flex-direction: column; gap: 10px">
-      <section class="am-shine" style="position: relative; padding: 18px; border-radius: 18px; background: linear-gradient(140deg, #5A2A0C, #2B1A0C 70%); border: 1px solid #FF8A3D; box-shadow: 0 0 18px #FF8A3D44; overflow: hidden; display: flex; flex-direction: column; gap: 8px">
+      <section class="am-shine bc-cut" style="position: relative; padding: 18px; background: linear-gradient(140deg, #5A2A0C, #2B1A0C 70%); border: 1px solid #FF8A3D; box-shadow: 0 0 18px #FF8A3D44; overflow: hidden; display: flex; flex-direction: column; gap: 8px">
         <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #FFB37A">PASE DE TEMPORADA</span>
         <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 28px; line-height: 1.05; max-width: 220px">Equipaciones exclusivas de temporada</span>
-        <a href="#" style="align-self: flex-start; display: flex; align-items: center; height: 44px; margin-top: 6px; padding: 0 18px; border-radius: 12px; background: #FF8A3D; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px">[PRECIO]</a>
+        <a href="#" class="bc-para" style="align-self: flex-start; display: flex; align-items: center; height: 44px; margin-top: 6px; padding: 0 22px; background: #FF8A3D; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px">[PRECIO]</a>
         <svg width="120" height="120" viewBox="0 0 48 48" style="position: absolute; right: -6px; bottom: -10px"><path d="M14 8l-10 6l4 10l6-2v22h20V22l6 2l4-10l-10-6a8 8 0 0 1-20 0z" fill="#FFC53D"/><text x="24" y="36" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="12" fill="#2B1A0C">S1</text></svg>
       </section>
-      <a href="Taquilla.dc.html" class="am-card" style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; text-decoration: none; color: #F4F4FA">
+      <a href="Taquilla.dc.html" class="bc-tile" style="--bc-c: #FFC53D; display: flex; align-items: center; gap: 12px; padding: 12px 14px 12px 18px; text-decoration: none; color: #F4F4FA">
         <svg width="44" height="44" viewBox="66 -18 68 66"><circle cx="100" cy="44" r="24" fill="#B9794F"/><path d="M76 42Q76 16 100 16Q124 16 124 42Q118 30 104 30Q96 26 88 30Q80 32 76 42Z" fill="#241811"/><rect x="78" y="-16" width="44" height="42" rx="3" fill="#1A1A22"/><rect x="78" y="12" width="44" height="8" fill="#E5484D"/><rect x="66" y="22" width="68" height="9" rx="4.5" fill="#1A1A22"/></svg>
         <span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 700; font-size: 14px">Sombrero de copa</span><span style="font-size: 12px; color: #A3A3C2">Ver en la Taquilla</span></span>
         <span style="font-weight: 800; color: #FFC53D">900 C</span>
@@ -123,7 +123,7 @@ input::placeholder{color:#8686A6}
             <svg class="am-float" width="{{p.size}}" height="{{p.size}}" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">C</text></svg>
             <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1">{{p.amount}}</span>
             <span style="font-size: 12px; font-weight: 700; color: #22D3EE">{{p.bonus}}</span>
-            <span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 38px; margin-top: auto; border-radius: 19px; background: linear-gradient(135deg, #FFFFFF, #D6DEE9); color: #0B0B14; font-weight: 800; font-size: 14px; box-shadow: 0 3px 0 #8A93A3">[PRECIO]</span>
+            <span class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 36px; margin-top: auto; background: linear-gradient(135deg, #FFFFFF, #D6DEE9); color: #0B0B14; font-weight: 800; font-size: 14px">[PRECIO]</span>
           </button>
         </sc-for>
       </div>
@@ -142,8 +142,8 @@ class Component extends DCLogic {
   }
   renderVals() {
     const t = this.state.tab;
-    const tabStyle = (on) => 'position: relative; z-index: 1; min-height: 40px; border: 0; border-radius: 12px; font: 800 14px Exo2, sans-serif; cursor: pointer; background: transparent; transition: color .3s; color: ' + (on ? '#0B0B14;' : '#CACAE0;');
-    const pk = (amount, bonus, k) => ({ amount, bonus, hot: k === 2, size: String(40 + k * 6), style: 'position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 200px; padding: 16px 10px 12px 10px; box-sizing: border-box; border-radius: 18px; color: #F4F4FA; font-family: Exo2, sans-serif; cursor: pointer; background: linear-gradient(160deg, ' + ['#1C1C3A', '#1D2A4A', '#2A1F4A', '#3A2A0A'][k] + ', #121226 75%); border: 1px solid ' + ['#2E2E58', '#22D3EE88', '#9B6BFF', '#FFC53D'][k] + '; box-shadow: 0 0 ' + (6 + k * 5) + 'px ' + ['#0000', '#22D3EE44', '#9B6BFF55', '#FFC53D66'][k] + ', 0 8px 18px #0007;' });
+    const tabStyle = (on) => 'height: 36px; padding: 0 20px; border: 0; font: 800 13px Exo2, sans-serif; letter-spacing: 1px; cursor: pointer; ' + (on ? 'background: linear-gradient(135deg, #7EF0FF, #22D3EE); color: #0B0B14;' : 'background: #17172ACC; color: #CACAE0;');
+    const pk = (amount, bonus, k) => ({ amount, bonus, hot: k === 2, size: String(40 + k * 6), style: 'position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 200px; padding: 16px 10px 12px 10px; box-sizing: border-box; clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px); color: #F4F4FA; font-family: Exo2, sans-serif; cursor: pointer; background: linear-gradient(160deg, ' + ['#1C1C3A', '#1D2A4A', '#2A1F4A', '#3A2A0A'][k] + ', #121226 75%); border: 1px solid ' + ['#2E2E58', '#22D3EE88', '#9B6BFF', '#FFC53D'][k] + '; box-shadow: 0 0 ' + (6 + k * 5) + 'px ' + ['#0000', '#22D3EE44', '#9B6BFF55', '#FFC53D66'][k] + ', 0 8px 18px #0007;' });
     return {
       isRewards: t === 'rewards',
       isShop: t === 'shop',
