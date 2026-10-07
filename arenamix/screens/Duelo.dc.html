@@ -301,6 +301,7 @@ class Component extends DCLogic {
     Object.assign(this.b, { vx: v.vx + (Math.random() * 2 - 1) * err, vy: v.vy + (Math.random() * 2 - 1) * err * 0.6, vz: v.vz, curve: v.curve, res: v.res || null, resR: 0, age: 0 });
     this.lastSpeed = v.vz;
     this.phase = 'flight'; this.pt = 0; this.trail = [];
+    if (window.AMSfx) try { window.AMSfx.kick(0.8); } catch (e) {}
     if (this.pendingDive) { this.k.decided = true; this.pendingDive = null; }
   }
   rivalShot() {
@@ -362,6 +363,12 @@ class Component extends DCLogic {
     this.pts += kind === 'diana' ? 3 : kind === 'gol' ? 1 : 0;
     if (goal || kind === 'parada' || kind === 'palo') this.shake = 0.35;
     this.phase = 'result'; this.pt = 0;
+    // the sound of it: the net and the stadium for a goal (yours or theirs), the post, the "ooh" of a save or a miss
+    const S = window.AMSfx;
+    if (S) try {
+      const mine = this.turn === 'you' || this.turn === 0;
+      if (goal) { S.net(); S.roar(mine); } else if (kind === 'palo') S.post(); else S.ooh();
+    } catch (e) {}
   }
   checkWinner() {
     const a = this.sh.you.filter(Boolean).length, b = this.sh.rival.filter(Boolean).length;

@@ -184,8 +184,20 @@ class Component extends DCLogic {
     this.raf = null;
     if (this.R) { this.R.dispose(); this.R = null; }
     if (this.netOff) { this.netOff(); this.netOff = null; }
+    this.sfx('crowd', 0);
   }
   /* ---------- online ---------- */
+  sfx(n, a) { const S = window.AMSfx; if (S && S[n] && !this.props.tutorialMute) try { S[n](a); } catch (e) {} }
+  // the crowd follows the play: louder and brighter as the ball gets near a goal, roaring at a goal
+  crowdLevel() {
+    const g = this.g, b = g.ball;
+    if (g.phase === 'goal') return 1;
+    if (g.phase === 'winners') return 0.55;
+    if (g.phase !== 'play') return 0.12;
+    const d = Math.min(Math.hypot(b.x - 0, b.y - 15), Math.hypot(b.x - 60, b.y - 15));
+    const k = Math.max(0, 1 - d / 26);
+    return 0.12 + 0.8 * k * k;
+  }
   // your own numbers for the match (missions and the results screen), never a remote player's
   stat(k) { if (!this.ctxH && this.mstats && !this.autoplay) this.mstats[k]++; }
   netHuman(i) {
@@ -303,6 +315,10 @@ class Component extends DCLogic {
     const S = N.snap;
     if (!S) return;
     if (S.ph === 'winners') { if (g.phase !== 'winners') { g.score = S.sc.slice(); this.setupWinners(); } return; }
+    if (S.ph === 'goal' && g.phase !== 'goal') { this.sfx('net'); this.sfx('roar', S.con === 1); }
+    if (S.ph === 'play' && g.phase === 'goal') this.sfx('whistle', 1);
+    const bsp = Math.hypot(S.b.vx, S.b.vy), bsp0 = this.lastBsp || 0;
+    if (S !== this.lastSnap) { if (bsp - bsp0 > 5) this.sfx(bsp > 16 ? 'kick' : 'pass', Math.min(1, bsp / 28)); this.lastBsp = bsp; this.lastSnap = S; }
     if (S.ph !== g.phase) { if (S.ph === 'goal') { g.concede = S.con; const sc = g.ps[S.sci], tm = 1 - S.con; g.scorer = sc && sc.team === tm && sc.role !== 'gk' ? 'Gol de ' + (S.sci === g.ctl ? 'TI' : sc.name) : sc ? 'Gol en propia puerta' : ''; if (S.sci === g.ctl && tm === 0) this.mstats.goals++; } g.phase = S.ph; }
     const age = Math.min(0.25, (performance.now() - N.snapAt) / 1000), k = 1 - Math.exp(-dt * 14);
     g.score = S.sc; g.t = Math.max(0, S.tm - (g.phase === 'play' ? age : 0)); g.pt = S.pt + age; g.own = S.own; g.hold = S.hold; g.concede = S.con;
@@ -432,6 +448,7 @@ class Component extends DCLogic {
   }
   start() {
     if (this.g.phase === 'end') this.newGame();
+    this.sfx('whistle', 1);
     this.g.phase = 'play';
     this.g.pt = 0;
     this.loop();
@@ -444,6 +461,7 @@ class Component extends DCLogic {
   setupWinners() {
     // end of match: the winning team lines up on the pitch to celebrate (both teams if it is a draw)
     const g = this.g;
+    if (g.phase !== 'winners') this.sfx('whistle', 3);
     g.phase = 'winners'; g.pt = 0;
     const w = g.score[0] > g.score[1] ? 0 : g.score[1] > g.score[0] ? 1 : -1;
     const team = (t) => g.ps.filter((q) => q.team === t).sort((a, b) => (a.role === 'gk') - (b.role === 'gk') || a.slot - b.slot);
@@ -467,6 +485,8 @@ class Component extends DCLogic {
     if (N && !N.host) this.clientStep(dt);
     else for (let i = 0; i < 3; i++) this.step(dt / 3);
     if (N && N.host) this.hostSend(dt);
+    this.crowdT = (this.crowdT || 0) - dt;
+    if (this.crowdT <= 0) { this.crowdT = 0.25; this.sfx('crowd', this.crowdLevel()); }
     this.draw3D(dt);
     this.forceUpdate();
     const g = this.g;
@@ -503,6 +523,7 @@ class Component extends DCLogic {
     g.recv = null;
     g.fx = { x: b.x, y: b.y, t: 0 };
     p.act = { type: 'kick', t: 0, dur: 0.45, loft };
+    this.sfx('kick', power);
     return true;
   }
   passBall(p, q) {
@@ -572,6 +593,7 @@ class Component extends DCLogic {
     const g = this.g;
     if (g.tut && g.tut.i === 5 && team === 0) { g.tut.i = 6; g.tut.t = 0; this.flashMsg('¡GOLAZO! Último paso', 1.5); }
     g.score[team]++;
+    this.sfx('net'); this.sfx('roar', team === 0);
     if (team === 0 && g.last === g.ctl) this.stat('goals');
     g.phase = 'goal'; g.pt = 0; g.concede = 1 - team; g.own = -1;
     const sc = g.last >= 0 ? g.ps[g.last] : null;
@@ -767,7 +789,7 @@ class Component extends DCLogic {
       if (sp > 0.5) p.face += this.ang(Math.atan2(p.vy, p.vx) - p.face) * Math.min(1, dt * 8);
       if (sp > 0.25) p.run += 2 * Math.PI * (0.9 + 0.09 * sp) * dt;
     });
-    if (g.pt > 3) { if (this.props.tutorial) { this.tutSetup(6); g.phase = 'play'; g.pt = 0; return; } this.kickoff(g.concede); g.phase = 'play'; g.pt = 0; }
+    if (g.pt > 3) { if (this.props.tutorial) { this.tutSetup(6); g.phase = 'play'; g.pt = 0; return; } this.kickoff(g.concede); g.phase = 'play'; g.pt = 0; this.sfx('whistle', 1); }
   }
   // after a goal the ball flies on into the goal: the side nets and the roof stop it, and the back of the
   // net stretches, slows it down and drops it, so it stays in the goal (it never goes through)
@@ -1320,7 +1342,7 @@ class Component extends DCLogic {
       b.vx *= drag; b.vy *= drag; b.vz *= drag;
       if (b.z <= 0) {
         b.z = 0;
-        if (b.vz < -1.2) { b.vz = -b.vz * 0.55; b.vx *= 0.82; b.vy *= 0.82; } else b.vz = 0;
+        if (b.vz < -1.2) { if (b.vz < -3) this.sfx('bounce', -b.vz); b.vz = -b.vz * 0.55; b.vx *= 0.82; b.vy *= 0.82; } else b.vz = 0;
       }
     } else {
       const s2 = Math.hypot(b.vx, b.vy);
@@ -1354,7 +1376,7 @@ class Component extends DCLogic {
       const dx = b.x - px, dy = b.y - py, d = Math.hypot(dx, dy);
       if (d < 0.32 && d > 0 && b.z < 2.44) {
         const nx = dx / d, ny = dy / d, vn = b.vx * nx + b.vy * ny;
-        if (vn < 0) { b.vx -= 1.75 * vn * nx; b.vy -= 1.75 * vn * ny; if (Math.abs(vn) > 6) this.flashMsg('¡AL PALO!', 1.2); }
+        if (vn < 0) { b.vx -= 1.75 * vn * nx; b.vy -= 1.75 * vn * ny; if (Math.abs(vn) > 3) this.sfx('post'); if (Math.abs(vn) > 6) this.flashMsg('¡AL PALO!', 1.2); }
         b.x = px + nx * 0.32; b.y = py + ny * 0.32;
       }
     });
