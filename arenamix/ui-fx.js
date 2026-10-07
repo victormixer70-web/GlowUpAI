@@ -1,5 +1,6 @@
-/* ARENA MIX interface motion: a diagonal wipe in the brand colours between screens, the new screen
-   swinging in with its buttons and cards popping in one after another, buttons that squash when pressed
+/* ARENA MIX interface motion: screen changes with no waiting (the new screen arrives from the first frame
+   while a frozen copy of the old one leaves: push, card flip, zoom into your tap, iris, light slash or
+   falling strips; a TV-replay stinger into and out of the games), cards popping in, buttons that squash when pressed
    and spring back with a burst of light, and tab content sliding in from the side of the chosen tab.
    It works on every screen from the outside (no screen code changes) and stays out of the matches. */
 (function () {
@@ -11,53 +12,68 @@
 
   var css = document.createElement('style');
   css.textContent = [
-    // screen transitions: several styles, picked at random each time (all quick)
-    '#fx-wipe{position:absolute;inset:0;z-index:40;pointer-events:none;overflow:hidden;display:none}',
-    '#fx-wipe.go{display:block}',
-    '#fx-wipe i{position:absolute;display:block;will-change:transform,clip-path,opacity}',
-    // the wipe waits, covering everything, while the new screen is built underneath
-    '#fx-wipe.hold i{animation-play-state:paused!important}',
-    // 1 diagonal bands
-    '#fx-wipe.diag i{top:-20%;bottom:-20%;left:0;width:140%;transform:translateX(-120%) skewX(-18deg);animation:fxDiag .42s cubic-bezier(.7,0,.3,1) both}',
-    '#fx-wipe.diag.back i{animation-name:fxDiagB}',
-    '#fx-wipe.diag i:nth-child(2){animation-delay:.03s}#fx-wipe.diag i:nth-child(3){animation-delay:.06s}',
-    '@keyframes fxDiag{0%{transform:translateX(-120%) skewX(-18deg)}45%,55%{transform:translateX(-15%) skewX(-18deg)}100%{transform:translateX(110%) skewX(-18deg)}}',
-    '@keyframes fxDiagB{0%{transform:translateX(110%) skewX(-18deg)}45%,55%{transform:translateX(-15%) skewX(-18deg)}100%{transform:translateX(-120%) skewX(-18deg)}}',
-    // 2 iris: a circle grows from where you tapped, then opens from the centre
-    '#fx-wipe.iris i{inset:0;clip-path:circle(0 at var(--fx-x,50%) var(--fx-y,50%));animation:fxIris .44s cubic-bezier(.6,0,.3,1) both}',
-    '#fx-wipe.iris i:nth-child(2){animation-delay:.04s}#fx-wipe.iris i:nth-child(3){animation-delay:.08s}',
-    '@keyframes fxIris{0%{clip-path:circle(0 at var(--fx-x,50%) var(--fx-y,50%))}50%{clip-path:circle(150% at var(--fx-x,50%) var(--fx-y,50%))}100%{clip-path:circle(150% at var(--fx-x,50%) var(--fx-y,50%));opacity:0}}',
-    // 3 blinds: vertical strips flip in and out one after another
-    '#fx-wipe.blinds i{top:0;bottom:0;transform:scaleY(0);transform-origin:top;animation:fxBlind .4s cubic-bezier(.6,0,.3,1) both}',
-    '@keyframes fxBlind{0%{transform:scaleY(0);transform-origin:top}40%{transform:scaleY(1);transform-origin:top}70%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}',
-    // 4 shutter: two halves close in the middle with a flash line, then open
-    '#fx-wipe.shutter i{left:0;right:0;height:51%;animation:fxShutT .4s cubic-bezier(.7,0,.3,1) both}',
-    '#fx-wipe.shutter i:nth-child(1){top:0;transform:translateY(-100%)}',
-    '#fx-wipe.shutter i:nth-child(2){bottom:0;transform:translateY(100%);animation-name:fxShutB}',
-    '#fx-wipe.shutter i:nth-child(3){top:50%;height:3px;margin-top:-1px;transform:scaleX(0);animation-name:fxShutL}',
-    '@keyframes fxShutT{0%{transform:translateY(-100%)}45%,55%{transform:translateY(0)}100%{transform:translateY(-100%)}}',
-    '@keyframes fxShutB{0%{transform:translateY(100%)}45%,55%{transform:translateY(0)}100%{transform:translateY(100%)}}',
-    '@keyframes fxShutL{0%,35%{transform:scaleX(0);opacity:1}50%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}',
-    // 5 zoom: a bright burst from the centre
-    '#fx-wipe.burst i{left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;animation:fxBurst .42s cubic-bezier(.5,0,.3,1) both}',
-    '#fx-wipe.burst i:nth-child(2){animation-delay:.04s}#fx-wipe.burst i:nth-child(3){animation-delay:.08s}',
-    '@keyframes fxBurst{0%{transform:scale(0);opacity:1}55%{transform:scale(30);opacity:1}100%{transform:scale(30);opacity:0}}',
-    // the new screen comes in a different way too
-    '.fx-screen{animation:fxScrR .34s cubic-bezier(.16,.84,.3,1) both}',
-    '.fx-screen.back{animation-name:fxScrL}',
-    '.fx-screen.v1{animation-name:fxScrZoom}.fx-screen.v2{animation-name:fxScrUp}.fx-screen.v3{animation-name:fxScrTilt}',
-    '@keyframes fxScrR{from{opacity:.4;translate:26px 0}to{opacity:1;translate:0 0}}',
-    '@keyframes fxScrL{from{opacity:.4;translate:-26px 0}to{opacity:1;translate:0 0}}',
-    '@keyframes fxScrZoom{from{opacity:.4;scale:1.05}to{opacity:1;scale:1}}',
-    '@keyframes fxScrUp{from{opacity:.4;translate:0 22px}to{opacity:1;translate:0 0}}',
-    '@keyframes fxScrTilt{from{opacity:.4;transform:perspective(900px) rotateX(8deg) translateY(14px)}to{opacity:1;transform:none}}',
-    '.fx-pop{animation:fxPop .34s cubic-bezier(.18,1.3,.4,1) both}',
-    '.fx-pop.p1{animation-name:fxPopL}.fx-pop.p2{animation-name:fxPopZ}',
-    '@keyframes fxPop{from{opacity:0;translate:0 12px;scale:.92}to{opacity:1;translate:0 0;scale:1}}',
-    '@keyframes fxPopL{from{opacity:0;translate:-16px 0}to{opacity:1;translate:0 0}}',
-    '@keyframes fxPopZ{from{opacity:0;scale:.75}to{opacity:1;scale:1}}',
-    '.fx-pop,.fx-slide,.fx-screen{will-change:transform,opacity}',
-    '.fx-slide{animation:fxSlide .28s cubic-bezier(.16,.84,.3,1) both}',
+    // ---- screen transitions: the new screen is there from the first frame, never behind a curtain ----
+    // the old screen is a frozen copy (#fx-old) that leaves while the new one arrives; one style each time
+    '#fx-old{position:absolute!important;left:0;top:0;width:844px;height:390px;margin:0!important;pointer-events:none!important;z-index:30;will-change:transform,opacity,clip-path}',
+    '#fx-old.under{z-index:1}',
+    '.fx-in{will-change:transform,opacity,clip-path;z-index:2}',
+    // 1 EMPUJE: the new screen pushes the old one off, a light edge between them
+    '.fx-in.push{animation:fxPushIn .3s cubic-bezier(.22,.9,.26,1) both;box-shadow:-14px 0 30px #000a}',
+    '.fx-in.push.back{animation-name:fxPushInB;box-shadow:14px 0 30px #000a}',
+    '#fx-old.push{animation:fxPushOut .3s cubic-bezier(.22,.9,.26,1) both}',
+    '#fx-old.push.back{animation-name:fxPushOutB}',
+    '@keyframes fxPushIn{from{transform:translateX(100%)}to{transform:none}}',
+    '@keyframes fxPushInB{from{transform:translateX(-100%)}to{transform:none}}',
+    '@keyframes fxPushOut{to{transform:translateX(-32%) scale(.94);opacity:.25}}',
+    '@keyframes fxPushOutB{to{transform:translateX(32%) scale(.94);opacity:.25}}',
+    // 2 CARTA: the screen turns over like a player card
+    '#fx-old.flip{animation:fxFlipOut .16s cubic-bezier(.55,0,.9,.4) both}',
+    '.fx-in.flip{animation:fxFlipIn .22s .14s cubic-bezier(.1,.6,.3,1.15) both}',
+    '.fx-in.flip.back,#fx-old.flip.back{animation-direction:normal}',
+    '@keyframes fxFlipOut{to{transform:perspective(1100px) rotateY(88deg) scale(.92);filter:brightness(.5)}}',
+    '@keyframes fxFlipIn{from{transform:perspective(1100px) rotateY(-88deg) scale(.92)}to{transform:none}}',
+    // 3 ZOOM: you dive into the button you pressed, the new screen settles in
+    '#fx-old.zoom{animation:fxZoomOut .28s cubic-bezier(.5,0,.75,0) both}',
+    '.fx-in.zoom{animation:fxZoomIn .3s cubic-bezier(.16,.84,.3,1) both}',
+    '@keyframes fxZoomOut{to{transform:scale(1.9);opacity:0}}',
+    '@keyframes fxZoomIn{from{transform:scale(.86);opacity:0}to{transform:none;opacity:1}}',
+    // 4 IRIS: the new screen opens in a circle from your finger, with a ring of light on its edge
+    '.fx-in.iris{animation:fxIris .34s cubic-bezier(.5,0,.2,1) both}',
+    '@keyframes fxIris{from{clip-path:circle(0 at var(--fx-x) var(--fx-y))}to{clip-path:circle(960px at var(--fx-x) var(--fx-y))}}',
+    '.fx-iring{position:absolute;z-index:31;left:var(--fx-x);top:var(--fx-y);width:2px;height:2px;border-radius:50%;pointer-events:none;box-shadow:0 0 0 3px #22D3EE,0 0 24px 6px #22D3EEaa;animation:fxIring .34s cubic-bezier(.5,0,.2,1) both}',
+    '@keyframes fxIring{from{transform:translate(-50%,-50%) scale(0)}to{transform:translate(-50%,-50%) scale(960);opacity:.2}}',
+    // 5 TAJO: a diagonal slash of light cuts the screen open
+    '.fx-in.slash{animation:fxSlash .32s cubic-bezier(.6,0,.2,1) both}',
+    '@keyframes fxSlash{from{clip-path:polygon(58% 0,58% 0,42% 100%,42% 100%)}to{clip-path:polygon(-40% 0,140% 0,120% 100%,-60% 100%)}}',
+    '.fx-blade{position:absolute;z-index:31;left:50%;top:-30%;width:6px;height:160%;margin-left:-3px;pointer-events:none;transform:rotate(17deg) scaleY(0);background:linear-gradient(#FFF0,#FFF 30%,#FFC53D 70%,#FFF0);box-shadow:0 0 22px 6px #FFC53D99;animation:fxBlade .32s cubic-bezier(.6,0,.2,1) both}',
+    '.fx-blade.b2{background:linear-gradient(#FFF0,#7EF0FF 30%,#22D3EE 70%,#FFF0);box-shadow:0 0 22px 6px #22D3EE99;animation-name:fxBlade2}',
+    '@keyframes fxBlade{0%{transform:rotate(17deg) scaleY(0)}35%{transform:rotate(17deg) scaleY(1);opacity:1}100%{transform:translateX(-520px) rotate(17deg) scaleY(1);opacity:0}}',
+    '@keyframes fxBlade2{0%{transform:rotate(17deg) scaleY(0)}35%{transform:rotate(17deg) scaleY(1);opacity:1}100%{transform:translateX(520px) rotate(17deg) scaleY(1);opacity:0}}',
+    // 6 TIRAS: the old screen breaks into strips that drop away in a wave
+    '#fx-old.strip{animation:fxStrip .3s cubic-bezier(.55,0,.8,.3) both}',
+    '#fx-old.strip.up{animation-name:fxStripUp}',
+    '@keyframes fxStrip{to{transform:translateY(105%) rotate(2deg)}}',
+    '@keyframes fxStripUp{to{transform:translateY(-105%) rotate(-2deg)}}',
+    '.fx-in.strip{animation:fxStripIn .34s cubic-bezier(.16,.84,.3,1) both}',
+    '@keyframes fxStripIn{from{transform:scale(.94);filter:brightness(.4)}to{transform:none;filter:none}}',
+    // 7 REPETICIÓN (into and out of the games, which take a moment to build): a TV replay stinger
+    '#fx-sting{position:absolute;inset:0;z-index:40;pointer-events:none;overflow:hidden}',
+    '#fx-sting i{position:absolute;top:-25%;bottom:-25%;left:0;width:150%;transform:translateX(105%) skewX(-20deg)}',
+    '#fx-sting i:nth-child(1){background:#FFC53D;animation:fxStIn .16s cubic-bezier(.6,0,.4,1) both}',
+    '#fx-sting i:nth-child(2){background:#22D3EE;animation:fxStIn .16s .03s cubic-bezier(.6,0,.4,1) both}',
+    '#fx-sting i:nth-child(3){background:#0B0B14;animation:fxStIn .16s .06s cubic-bezier(.6,0,.4,1) both}',
+    '#fx-sting b{position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;animation:fxStLogo .3s .1s cubic-bezier(.2,1.6,.4,1) both}',
+    '#fx-sting.out i{animation:fxStOut .22s cubic-bezier(.6,0,.4,1) both!important}',
+    '#fx-sting.out i:nth-child(2){animation-delay:.03s!important}#fx-sting.out i:nth-child(1){animation-delay:.06s!important}',
+    '#fx-sting.out b{animation:fxStLogoOut .16s ease-in both}',
+    '@keyframes fxStIn{from{transform:translateX(105%) skewX(-20deg)}to{transform:translateX(-18%) skewX(-20deg)}}',
+    '@keyframes fxStOut{from{transform:translateX(-18%) skewX(-20deg)}to{transform:translateX(-130%) skewX(-20deg)}}',
+    '@keyframes fxStLogo{from{transform:scale(0) rotate(-200deg)}to{transform:none}}',
+    '@keyframes fxStLogoOut{to{transform:scale(2.2);opacity:0}}',
+    // cards and buttons of the new screen settle in quickly after it
+    '.fx-pop{animation:fxPop .24s cubic-bezier(.2,1.3,.4,1) both;will-change:transform,opacity}',
+    '@keyframes fxPop{from{opacity:0;translate:0 10px;scale:.94}to{opacity:1;translate:0 0;scale:1}}',
+    '.fx-slide{animation:fxSlide .24s cubic-bezier(.16,.84,.3,1) both;will-change:transform,opacity}',
     '@keyframes fxSlide{from{opacity:0;translate:var(--fx-dx,30px) 0}to{opacity:1;translate:0 0}}',
     // ---- shared look for the menus (used by the screens through these classes) ----
     // living background: soft colour orbs drifting over a faint pitch pattern
@@ -140,96 +156,119 @@
   document.head.appendChild(css);
   if (reduce) return;
 
-  var wipe = document.createElement('div'); wipe.id = 'fx-wipe';
-  // each style: its pieces and their colours (cyan, yellow, dark)
-  var STYLES = {
-    diag: ['#22D3EE', '#FFC53D', '#0B0B14'],
-    iris: ['#22D3EE', '#FFC53D', '#0B0B14'],
-    blinds: null,
-    shutter: ['#0B0B14', '#0B0B14', '#22D3EE'],
-    burst: ['#FFC53D', '#22D3EE', '#0B0B14']
-  };
-  var lastStyle = '', lastTap = { x: 422, y: 195 };
-  var playWipe = function () {
-    var names = Object.keys(STYLES).filter(function (n) { return n !== lastStyle; });
-    var st = names[Math.floor(Math.random() * names.length)]; lastStyle = st;
-    var html = '';
-    if (st === 'blinds') {
-      for (var k = 0; k < 7; k++) html += '<i style="left:' + (k * 100 / 7).toFixed(3) + '%;width:' + (100 / 7 + 0.3).toFixed(3) + '%;background:' + (k % 2 ? '#FFC53D' : '#22D3EE') + ';animation-delay:' + (k * 0.022).toFixed(3) + 's"></i>';
-    } else STYLES[st].forEach(function (c) { html += '<i style="background:' + c + '"></i>'; });
-    wipe.innerHTML = html;
-    wipe.style.setProperty('--fx-x', (lastTap.x / 844 * 100).toFixed(1) + '%'); wipe.style.setProperty('--fx-y', (lastTap.y / 390 * 100).toFixed(1) + '%');
-    wipe.className = ''; void wipe.offsetWidth; wipe.className = 'go ' + st + (back ? ' back' : '');
-    clearTimeout(playWipe.t); playWipe.t = setTimeout(function () { wipe.className = ''; }, 900);
-    return st;
-  };
-  // when each style has the whole screen covered (s), so the screens can be swapped unseen
-  var COVER = { diag: 0.2, iris: 0.21, blinds: 0.26, shutter: 0.19, burst: 0.23 };
-  var holding = false, pendingRoot = null, swapTok = 0;
-  window.AMFX = {
-    // the app calls this to change screen: the wipe covers, the new screen is built underneath, then it opens
-    swap: function (doSwap) {
-      var tok = ++swapTok;
-      mountFx();
-      var st = playWipe();
-      setTimeout(function () {
-        if (tok !== swapTok) { doSwap(); return; }
-        holding = true; wipe.classList.add('hold');
-        doSwap();
-        var t0 = performance.now(), frames = 0;
-        // open once the new screen has drawn a couple of frames (or after 1.2 s, whatever happens)
-        var wait = function () {
-          if (tok !== swapTok) return;
-          if (++frames < 3 && performance.now() - t0 < 1200) { requestAnimationFrame(wait); return; }
-          holding = false; wipe.classList.remove('hold');
-          if (pendingRoot) { var r = pendingRoot; pendingRoot = null; lastRoot = null; enter(r); }
-          clearTimeout(playWipe.t); playWipe.t = setTimeout(function () { wipe.className = ''; }, 520);
-        };
-        requestAnimationFrame(wait);
-      }, COVER[st] * 1000);
-    }
-  };
   var layer = document.createElement('div'); layer.id = 'fx-layer';
-  var mountFx = function () { if (!wipe.parentNode) stage.appendChild(wipe); if (!layer.parentNode) stage.appendChild(layer); };
+  var mountFx = function () { if (!layer.parentNode) stage.appendChild(layer); };
+  var lastTap = { x: 422, y: 195 };
+  var rootOf = function () { for (var c = stage.firstElementChild; c; c = c.nextElementSibling) if (!c.id && !c.hasAttribute('data-fx')) return c; return null; };
 
-  // ---- screen changes: wipe across, then the new screen and its controls come in ----
-  var history = [location.hash], back = false;
+  // ---- screen changes: a frozen copy of the old screen leaves while the new one arrives, at once ----
+  var history = [location.hash], back = false, prevHash = location.hash, curHash = location.hash;
   window.addEventListener('hashchange', function () {
+    prevHash = curHash; curHash = location.hash;
     var i = history.lastIndexOf(location.hash);
     back = i >= 0 && i === history.length - 2;
     if (back) history.pop(); else history.push(location.hash);
     if (history.length > 30) history.shift();
-    mountFx();
-    // the wipe itself is started by the app through AMFX.swap, in step with the screen change
   });
+  var MODES = ['push', 'flip', 'zoom', 'iris', 'slash', 'strip'];
+  var lastMode = '', pending = null, tok = 0, sting = null;
+  var cleanup = [];
+  var clearAll = function () { cleanup.splice(0).forEach(function (f) { try { f(); } catch (e) {} }); };
+  // a still copy of the screen, canvases included (as far as the browser lets them be read)
+  var freeze = function (old) {
+    var c = old.cloneNode(true);
+    c.id = 'fx-old'; c.removeAttribute('class'); c.className = old.className.replace(/\bfx-\S+/g, '');
+    c.setAttribute('aria-hidden', 'true'); c.inert = true;
+    var a = old.querySelectorAll('canvas'), b = c.querySelectorAll('canvas');
+    for (var k = 0; k < a.length; k++) { try { b[k].getContext('2d').drawImage(a[k], 0, 0); } catch (e) {} }
+    return c;
+  };
+  var addFx = function (cls, styleVars) {
+    var d = document.createElement('div'); d.className = cls; d.setAttribute('data-fx', '1');
+    if (styleVars) d.setAttribute('style', styleVars);
+    stage.appendChild(d); return d;
+  };
+  var tapVars = function () { return '--fx-x:' + lastTap.x.toFixed(0) + 'px;--fx-y:' + lastTap.y.toFixed(0) + 'px;'; };
+  var stinger = function (tk, doSwap) {
+    // games build a 3D scene first: the stinger covers that moment, then opens on the game
+    if (sting) sting.remove();
+    sting = addFx('', '');
+    sting.id = 'fx-sting';
+    sting.innerHTML = '<i></i><i></i><i></i><b><svg viewBox="0 0 512 512" width="120" height="120"><rect width="512" height="512" rx="112" fill="#0B0B14" stroke="#22D3EE" stroke-width="14"/><text x="256" y="350" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="270" letter-spacing="-6"><tspan fill="#F4F4FA">A</tspan><tspan fill="#22D3EE" dx="90">M</tspan></text><path d="M262 120L222 238h38l-26 104l80-140h-42l30-82z" fill="#FFC53D" stroke="#0B0B14" stroke-width="10" stroke-linejoin="round"/></svg></b>';
+    var s = sting;
+    setTimeout(function () {
+      doSwap();
+      var t0 = performance.now(), n = 0;
+      var wait = function () {
+        if (++n < 3 && performance.now() - t0 < 1500) { requestAnimationFrame(wait); return; }
+        s.classList.add('out');
+        setTimeout(function () { s.remove(); if (sting === s) sting = null; }, 320);
+      };
+      requestAnimationFrame(wait);
+    }, 200);
+  };
+  window.AMFX = {
+    swap: function (doSwap) {
+      var tk = ++tok;
+      clearAll();
+      mountFx();
+      var old = rootOf();
+      // into or out of a game (or a screen with a live 3D view): the stinger, which covers the build-up
+      if (!old || inGame() || GAME.test(prevHash) || old.querySelector('canvas')) { stinger(tk, doSwap); return; }
+      var modes = MODES.filter(function (m) { return m !== lastMode; });
+      var mode = modes[Math.floor(Math.random() * modes.length)]; lastMode = mode;
+      var dur = mode === 'flip' ? 380 : 360;
+      if (mode === 'strip') {
+        // six strips of the old screen, falling away one after another, up and down in turn
+        for (var k = 0; k < 6; k++) {
+          var c = freeze(old);
+          c.classList.add('strip'); if (k % 2) c.classList.add('up');
+          c.style.clipPath = 'inset(0 ' + (100 - (k + 1) * 100 / 6).toFixed(3) + '% 0 ' + (k * 100 / 6).toFixed(3) + '%)';
+          c.style.animationDelay = (k * 0.022).toFixed(3) + 's';
+          stage.appendChild(c);
+          (function (c) { cleanup.push(function () { c.remove(); }); })(c);
+        }
+      } else {
+        var o = freeze(old);
+        o.classList.add(mode); if (back) o.classList.add('back');
+        if (mode === 'iris' || mode === 'slash' || mode === 'push') o.classList.add('under');
+        if (mode === 'zoom') o.style.transformOrigin = lastTap.x.toFixed(0) + 'px ' + lastTap.y.toFixed(0) + 'px';
+        stage.appendChild(o);
+        cleanup.push(function () { o.remove(); });
+      }
+      if (mode === 'iris') { var ir = addFx('fx-iring', tapVars()); cleanup.push(function () { ir.remove(); }); }
+      if (mode === 'slash') { var b1 = addFx('fx-blade'), b2 = addFx('fx-blade b2'); cleanup.push(function () { b1.remove(); b2.remove(); }); }
+      pending = { mode: mode, back: back };
+      doSwap();
+      setTimeout(function () { if (tk === tok) clearAll(); }, dur + 60);
+    }
+  };
   var lastRoot = null;
   var enter = function (root) {
-    if (!root || root === lastRoot || root.id === 'fx-wipe' || root.id === 'fx-layer') return;
-    // under a covering wipe: the screen makes its entrance when the wipe opens
-    if (holding) { pendingRoot = root; return; }
+    if (!root || root === lastRoot) return;
     lastRoot = root;
     mountFx();
-    if (inGame()) return;
-    root.classList.remove('fx-screen', 'back', 'v1', 'v2', 'v3'); void root.offsetWidth;
-    root.classList.add('fx-screen');
-    if (back) root.classList.add('back'); else { var v = Math.floor(Math.random() * 4); if (v) root.classList.add('v' + v); }
-    var pv = Math.floor(Math.random() * 3);
-    // its buttons and cards pop in one after another
-    var items = root.querySelectorAll('a[href], button, [role="tab"], [role="button"], [role="listitem"], [role="option"]');
+    var p = pending; pending = null;
+    if (!p || inGame()) return;
+    root.classList.remove('fx-in', 'push', 'flip', 'zoom', 'iris', 'slash', 'strip', 'back');
+    root.style.setProperty('--fx-x', lastTap.x.toFixed(0) + 'px'); root.style.setProperty('--fx-y', lastTap.y.toFixed(0) + 'px');
+    root.classList.add('fx-in', p.mode); if (p.back) root.classList.add('back');
+    if (p.mode === 'zoom') root.style.transformOrigin = lastTap.x.toFixed(0) + 'px ' + lastTap.y.toFixed(0) + 'px';
+    var end = function () { root.classList.remove('fx-in', 'push', 'flip', 'zoom', 'iris', 'slash', 'strip', 'back'); root.style.transformOrigin = ''; };
+    setTimeout(end, 520);
+    // its cards and buttons settle in right behind it
+    var lag = p.mode === 'flip' ? 0.24 : 0.12;
+    var items = root.querySelectorAll('a[href], button, [role="tab"], [role="listitem"], [role="option"]');
     var n = 0;
-    for (var k = 0; k < items.length && n < 20; k++) {
+    for (var k = 0; k < items.length && n < 14; k++) {
       var el = items[k];
       if (!el.offsetParent) continue;
-      el.classList.remove('fx-pop', 'p1', 'p2'); el.style.animationDelay = (0.05 + n * 0.018).toFixed(3) + 's'; el.classList.add('fx-pop'); if (pv) el.classList.add('p' + pv);
+      el.style.animationDelay = (lag + n * 0.014).toFixed(3) + 's'; el.classList.add('fx-pop');
       n++;
     }
-    setTimeout(function () { for (var q = 0; q < items.length; q++) { items[q].classList.remove('fx-pop', 'p1', 'p2'); items[q].style.animationDelay = ''; } }, 1200);
+    setTimeout(function () { for (var q = 0; q < items.length; q++) { items[q].classList.remove('fx-pop'); items[q].style.animationDelay = ''; } }, 900);
   };
-  new MutationObserver(function () {
-    var r = null;
-    for (var c = stage.firstElementChild; c; c = c.nextElementSibling) if (c.id !== 'fx-wipe' && c.id !== 'fx-layer') { r = c; break; }
-    if (r) enter(r);
-  }).observe(stage, { childList: true });
+  new MutationObserver(function () { var r = rootOf(); if (r) enter(r); }).observe(stage, { childList: true });
 
   // ---- presses: squash and spring back, a burst of light; new content after a press slides or pops in ----
   var pressable = 'button, a[href], [role="tab"], [role="button"], [role="option"], [role="menuitem"]';
@@ -285,5 +324,5 @@
   }).observe(stage, { childList: true, subtree: true });
 
   // first screen
-  var first = stage.firstElementChild; if (first) enter(first);
+  var first = rootOf(); if (first) enter(first);
 })();
