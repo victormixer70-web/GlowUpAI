@@ -57,7 +57,7 @@
           root.updateMatrixWorld(true);
           var box = new T.Box3().setFromObject(root);
           prepKit(root, box);
-          tpl[c.id] = { root: root, box: box };
+          tpl[c.id] = { root: root, box: box, head: measureHead(root) };
           if (onStep) onStep();
           res(true);
         }, null, function () { if (onStep) onStep(); res(false); });
@@ -125,6 +125,66 @@
       m.userData.kitable = true;
       m.userData.keepSkin = /elvis/i.test(m.name) ? 1 : 0;
     });
+  }
+  /* head size and where the eyes are, from the vertices the head bone moves (T-pose, model units):
+     skull (face and scalp), all (with the hair), eyes (eyeballs / lashes, if the model has them) */
+  function measureHead(root) {
+    var skull = new T.Box3(), all = new T.Box3(), eyes = new T.Box3(), v = new T.Vector3(), pts = [];
+    root.traverse(function (m) {
+      if (!m.isSkinnedMesh) return;
+      var names = m.skeleton.bones.map(function (b) { return b.name; }), geo = m.geometry, pos = geo.attributes.position, si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight;
+      if (!si || !sw) return;
+      var isHair = /hair/i.test(m.name), isEye = /eye|lash/i.test(m.name), skip = /brow|mouth|hood|shirt|scarf|teeth|tongue/i.test(m.name);
+      for (var i = 0; i < pos.count; i++) {
+        var best = 0, bw = -1;
+        for (var k = 0; k < 4; k++) { var w = sw.array[i * 4 + k]; if (w > bw) { bw = w; best = si.array[i * 4 + k]; } }
+        if (!/Head|Eye/.test(names[best] || '')) continue;
+        if (skip) continue;
+        // where the vertex really is with the model's own pose (its bones need not sit at the bind pose)
+        if (m.boneTransform) m.boneTransform(i, v); else v.fromBufferAttribute(pos, i);
+        v.applyMatrix4(m.matrixWorld);
+        all.expandByPoint(v);
+        if (isEye) eyes.expandByPoint(v);
+        else if (!isHair) { skull.expandByPoint(v); pts.push(v.x, v.y, v.z); }
+      }
+    });
+    // the front of the face at eye height (the bridge of the nose), where glasses rest
+    var h = skull.max.y - skull.min.y, cx = (skull.min.x + skull.max.x) / 2, hw = (skull.max.x - skull.min.x) / 2;
+    var ey = eyes.isEmpty() ? skull.min.y + h * 0.5 : (eyes.min.y + eyes.max.y) / 2, front = -Infinity;
+    for (var j = 0; j < pts.length; j += 3) {
+      if (pts[j + 1] > ey - h * 0.03 && pts[j + 1] < ey + h * 0.06 && Math.abs(pts[j] - cx) < hw * 0.3) front = Math.max(front, pts[j + 2]);
+    }
+    return { skull: skull, all: all, eyes: eyes.isEmpty() ? null : eyes, front: isFinite(front) ? front : null };
+  }
+  // Taquilla gear (AMGear) on the head bone: a hat on top of the hair, glasses / moustache on the eyes
+  var HEADFIX = { ty: { eyeY: 0.55, stY: 0.1, stS: 0.6 }, granny: { stY: 0.3, stS: 0.8 }, vegas: { hatS: 1.3, hatY: -0.12, hatZ: 0.12 } };
+  function dress(id, kit, g, s, off, attach) {
+    var G = window.AMGear, hd = tpl[id] && tpl[id].head;
+    if (!G || !hd || hd.skull.isEmpty() || (!kit.hat && !kit.face)) return;
+    var toG = function (p) { return p.clone().multiplyScalar(s).add(off); };
+    var sk0 = toG(hd.skull.min), sk1 = toG(hd.skull.max), a0 = toG(hd.all.min), a1 = toG(hd.all.max);
+    var R = Math.max((sk1.x - sk0.x) / 2, (a1.x - a0.x) / 2 * 0.9), fx = HEADFIX[id] || {};
+    var zs = Math.max(0.95, Math.min(1.3, (a1.z - a0.z) / 2 / R));
+    var h = kit.hat && kit.hat !== 'none' && G.hat(kit.hat, kit.hatColor);
+    if (h) {
+      if (kit.hat === 'band' || kit.hat === 'phones') fx = {};
+      var hs = R * (fx.hatS || 1);
+      h.scale.set(hs, hs, hs * zs);
+      h.position.set((sk0.x + sk1.x) / 2, a1.y - R * 0.88 + R * (fx.hatY || 0), (a0.z + a1.z) / 2 + R * (fx.hatZ || 0));
+      attach(h);
+    }
+    fx = HEADFIX[id] || {};
+    var f = kit.face && kit.face !== 'none' && G.face(kit.face);
+    if (f) {
+      var ey, ez, ex = (sk0.x + sk1.x) / 2;
+      if (hd.eyes) { var e0 = toG(hd.eyes.min), e1 = toG(hd.eyes.max); ey = (e0.y + e1.y) / 2; ez = e1.z; }
+      else { ey = sk0.y + (sk1.y - sk0.y) * (fx.eyeY || 0.5); ez = sk1.z; }
+      if (hd.front != null) ez = Math.max(ez, hd.front * s + off.z - R * 0.12);
+      var fs = (sk1.x - sk0.x) / 2 * 0.9, st = kit.face === 'stache';
+      f.scale.setScalar(fs * (st && fx.stS || 1));
+      f.position.set(ex, ey + (st && fx.stY || 0) * fs, ez + R * 0.04);
+      attach(f);
+    }
   }
   var PAT = { solid: 0, stripes: 1, pin: 2, hoops: 3, halves: 4, centre: 5, sash: 6, diag: 7, band: 8 };
   function col(c, fb) {
@@ -206,6 +266,9 @@
     var kit = o.kit || (o.you && !o.noOutfit ? outfit(o.sport) : null);
     if (!kit && o.shirt != null) kit = { primary: o.shirt, secondary: o.trimCss, pattern: 'solid', shorts: o.shorts, socks: o.socks, shoe: o.boot };
     if (kit) model.traverse(function (m) { if (m.isSkinnedMesh && m.userData.kitable) m.material = kitMaterial(m.material, kit, new T.Vector4().fromArray(m.userData.kitLum), m.userData.keepSkin); });
+    var gear = [];
+    // the accessories only go on your own character, not on teammates who share the kit
+    if (kit && (o.you || o.gear) && !o.noGear) dress(id, kit, g, s, holder.position, function (obj) { gear.push(obj); });
     // team colour ring under the feet, so sides can be told apart whatever the outfit
     if (o.shirt != null && !o.noRing) {
       var ring = new T.Mesh(new T.RingGeometry(0.42, 0.55, 40), new T.MeshBasicMaterial({ color: new T.Color(o.shirt), transparent: true, opacity: 0.85, depthWrite: false }));
@@ -268,6 +331,14 @@
       };
     }
     socket(body, hips, I, true);
+    // gear placed in g's space at the rest pose rides on the head bone
+    var headBone = by['mixamorigHead'] || by[BONES.neck];
+    if (headBone) gear.forEach(function (obj) {
+      var r = info.get(headBone), a = new T.Group(), q = r.wq.clone().invert();
+      a.quaternion.copy(q); a.scale.setScalar(1 / r.ws);
+      a.position.copy(r.wp).negate().applyQuaternion(q).multiplyScalar(1 / r.ws);
+      a.add(obj); headBone.add(a);
+    });
     socket(head, by[BONES.neck], I, false);
     socket(arms[0].elb, by[BONES.rFore], rz(Math.PI / 2), false); socket(arms[1].elb, by[BONES.lFore], rz(Math.PI / 2 * -1), false);
     socket(arms[0].sho, by[BONES.rArm], rz(Math.PI / 2), false); socket(arms[1].sho, by[BONES.lArm], rz(-Math.PI / 2), false);
