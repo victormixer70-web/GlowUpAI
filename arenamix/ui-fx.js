@@ -58,7 +58,7 @@
     '@keyframes fxStripIn{from{transform:scale(.94);filter:brightness(.4)}to{transform:none;filter:none}}',
     // 7 REPETICIÓN (into and out of the games, which take a moment to build): a TV replay stinger
     '#fx-sting{position:absolute;inset:0;z-index:40;pointer-events:none;overflow:hidden}',
-    '#fx-sting i{position:absolute;top:-25%;bottom:-25%;left:0;width:150%;transform:translateX(105%) skewX(-20deg)}',
+    '#fx-sting i{position:absolute;top:-25%;bottom:-25%;left:0;width:150%;transform:translateX(105%) skewX(0deg)}',
     '#fx-sting i:nth-child(1){background:#FFC53D;animation:fxStIn .1s cubic-bezier(.6,0,.4,1) both}',
     '#fx-sting i:nth-child(2){background:#22D3EE;animation:fxStIn .1s .02s cubic-bezier(.6,0,.4,1) both}',
     '#fx-sting i:nth-child(3){background:#0B0B14;animation:fxStIn .1s .04s cubic-bezier(.6,0,.4,1) both}',
@@ -66,8 +66,8 @@
     '#fx-sting.out i{animation:fxStOut .22s cubic-bezier(.6,0,.4,1) both!important}',
     '#fx-sting.out i:nth-child(2){animation-delay:.03s!important}#fx-sting.out i:nth-child(1){animation-delay:.06s!important}',
     '#fx-sting.out b{animation:fxStLogoOut .16s ease-in both}',
-    '@keyframes fxStIn{from{transform:translateX(105%) skewX(-20deg)}to{transform:translateX(-18%) skewX(-20deg)}}',
-    '@keyframes fxStOut{from{transform:translateX(-18%) skewX(-20deg)}to{transform:translateX(-130%) skewX(-20deg)}}',
+    '@keyframes fxStIn{from{transform:translateX(105%) skewX(0deg)}to{transform:translateX(-18%) skewX(0deg)}}',
+    '@keyframes fxStOut{from{transform:translateX(-18%) skewX(0deg)}to{transform:translateX(-130%) skewX(0deg)}}',
     '@keyframes fxStLogo{from{transform:scale(0) rotate(-200deg)}to{transform:none}}',
     '@keyframes fxStLogoOut{to{transform:scale(2.2);opacity:0}}',
     // cards and buttons of the new screen settle in quickly after it
@@ -90,8 +90,8 @@
     '.am-card.hot{border-color:#22D3EE!important;box-shadow:0 0 0 1px #22D3EE55,0 0 18px #22D3EE44,0 8px 22px #0007}',
     // light sweeping across, every few seconds
     '.am-shine{position:relative;overflow:hidden}',
-    '.am-shine::after{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:35%;background:linear-gradient(90deg,transparent,#ffffff40,transparent);transform:translateX(-200%) skewX(-20deg);animation:amShine 4.5s ease-in-out infinite;pointer-events:none}',
-    '@keyframes amShine{0%{transform:translateX(-200%) skewX(-20deg)}50%,100%{transform:translateX(420%) skewX(-20deg)}}',
+    '.am-shine::after{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:35%;background:linear-gradient(90deg,transparent,#ffffff40,transparent);transform:translateX(-200%) skewX(0deg);animation:amShine 4.5s ease-in-out infinite;pointer-events:none}',
+    '@keyframes amShine{0%{transform:translateX(-200%) skewX(0deg)}50%,100%{transform:translateX(420%) skewX(0deg)}}',
     '.am-float{animation:amFloat 3.6s ease-in-out infinite}',
     '@keyframes amFloat{0%,100%{translate:0 0}50%{translate:0 -5px}}',
     '.am-pulse{animation:amPulse 1.8s ease-in-out infinite}',
@@ -120,19 +120,28 @@
     '@keyframes bcBeamL{0%,100%{rotate:-14deg}50%{rotate:6deg}}',
     '@keyframes bcBeamR{0%,100%{rotate:14deg}50%{rotate:-6deg}}',
     // title: italic condensed on a slanted dark label with the cyan strip
-    '.bc-title{display:inline-block;margin:0;padding:2px 16px 2px 14px;transform:skewX(-12deg);background:#0B0B14CC;border-left:4px solid #22D3EE;font-family:"Barlow Condensed",sans-serif!important;font-weight:800!important;font-style:italic!important;letter-spacing:1px;line-height:1.1;color:#F4F4FA!important;-webkit-text-fill-color:#F4F4FA;background-clip:border-box!important;filter:none!important}',
+    '.bc-title{display:inline-block;margin:0;padding:3px 16px 1px;border-radius:12px;background:linear-gradient(180deg,#1C1D3E,#0B0B14)!important;box-shadow:inset 0 2px 0 #ffffff1c,inset 0 -3px 0 #00000080,0 0 0 2px #0B0B14,0 0 0 3.5px #22D3EE88,0 6px 14px #0008;font-family:"Barlow Condensed",sans-serif!important;font-weight:800!important;font-style:italic!important;letter-spacing:1px;line-height:1.1;color:#F4F4FA!important;-webkit-text-fill-color:#F4F4FA;text-shadow:0 3px 0 #05050A;background-clip:border-box!important;filter:none!important}',
     // slanted shapes made with clip-path, so the text inside stays straight
-    '.bc-para{clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}',
-    '.bc-cut{clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}',
-    '.bc-btn{clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);background:linear-gradient(135deg,#7EF0FF,#22D3EE 55%,#0EA5C0)!important;color:#0B0B14!important;border:0!important;border-radius:0!important;box-shadow:none!important;font-family:"Barlow Condensed",sans-serif!important;font-style:italic!important;font-weight:800!important;letter-spacing:1.5px}',
-    '.bc-btn-gold{clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);background:linear-gradient(135deg,#FFE38A,#FFC53D 55%,#D9A520)!important;color:#2A1C02!important;border:0!important;border-radius:0!important;box-shadow:none!important;font-family:"Barlow Condensed",sans-serif!important;font-style:italic!important;font-weight:800!important;letter-spacing:1px}',
+    // chunky game-UI pieces: rounded, dark outline, a gloss on top and depth underneath
+    '.bc-para{clip-path:none;border-radius:12px;outline:2px solid #05050Acc;outline-offset:-1px}',
+    '.bc-cut{clip-path:inset(0 round 18px);border-radius:18px}',
+    // a gloss on the top half of every chip and the pieces that used to be slanted
+    '.bc-para{position:relative}',
+    '.bc-para::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,#ffffff24,#ffffff08 45%,transparent 50%,#00000026);pointer-events:none}',
+    '[style*="skewX(0deg)"]{border-radius:12px}',
+    '.hm-pass{border-radius:20px!important;box-shadow:inset 0 2px 0 #FFFFFF66,inset 0 -4px 0 #7A2A05,0 0 0 2px #2A0E02,0 4px 0 #2A0E02,0 0 18px #FF8A3D55!important}',
+    '.hm-pass::after{border-radius:inherit}',
+    '.rs-board{border-radius:16px;overflow:hidden;box-shadow:0 0 0 2px #05050A,0 5px 0 #05050A,0 12px 24px #000a!important}',
+    '.rs-chip{border-radius:12px}.rs-go{border-radius:18px!important}.rs-out{border-radius:14px!important}',
+    '.bc-btn{clip-path:none;border-radius:16px!important;position:relative;background:linear-gradient(135deg,#7EF0FF,#22D3EE 55%,#0EA5C0)!important;color:#0B0B14!important;border:0!important;box-shadow:inset 0 3px 0 #FFFFFF99,inset 0 -5px 0 #0A7F93,0 0 0 2px #05343C,0 5px 0 #05343C,0 10px 22px #22D3EE44!important;font-family:"Barlow Condensed",sans-serif!important;font-style:italic!important;font-weight:800!important;letter-spacing:1.5px}',
+    '.bc-btn-gold{clip-path:none;border-radius:16px!important;position:relative;background:linear-gradient(135deg,#FFE38A,#FFC53D 55%,#D9A520)!important;color:#2A1C02!important;border:0!important;box-shadow:inset 0 3px 0 #FFFFFFB0,inset 0 -5px 0 #B7871A,0 0 0 2px #4A3205,0 5px 0 #4A3205,0 10px 22px #FFC53D44!important;font-family:"Barlow Condensed",sans-serif!important;font-style:italic!important;font-weight:800!important;letter-spacing:1px}',
     // tile: a dark slanted card with a coloured strip on its leading edge
-    '.bc-tile{position:relative;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);background:linear-gradient(110deg,#1F2350,#13142C 70%)!important;border:0!important;border-radius:0!important;box-shadow:none!important}',
+    '.bc-tile{position:relative;clip-path:inset(0 round 16px);border-radius:16px;background:linear-gradient(110deg,#1F2350,#13142C 70%)!important;border:0!important;box-shadow:inset 0 2px 0 #ffffff14,inset 0 -3px 0 #00000066,inset 0 0 0 1.5px #ffffff10!important}',
     '.bc-tile::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--bc-c,#22D3EE)}',
     '.bc-tile.on{background:linear-gradient(110deg,#0F4A5A,#13213A 70%)!important}',
     '.bc-tile.on::after{content:"";position:absolute;inset:0;border:2px solid var(--bc-c,#22D3EE);clip-path:inherit;pointer-events:none}',
     // glass panel with a diagonal edge and the gradient strip
-    '.bc-glass{background:linear-gradient(160deg,#191936F2,#0E0E1EF2)!important;clip-path:polygon(28px 0,100% 0,100% 100%,0 100%)}',
+    '.bc-glass{background:linear-gradient(160deg,#191936F2,#0E0E1EF2)!important;clip-path:inset(0 round 20px);border-radius:20px}',
     // live ticker band
     '.bc-ticker{overflow:hidden;white-space:nowrap}',
     '.bc-ticker>span{display:inline-block;padding-left:100%;animation:bcTick 22s linear infinite}',

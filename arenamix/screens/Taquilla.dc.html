@@ -46,7 +46,7 @@ input::placeholder{color:#8686A6}
     </sc-if>
     <!-- title and the kit's swing tag -->
     <div style="position: absolute; left: 14px; top: 12px; display: flex; align-items: center; gap: 10px">
-      <h1 style="margin: 0; padding: 2px 14px; transform: skewX(-12deg); background: #0B0B14CC; border-left: 4px solid #22D3EE; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 1px; line-height: 1.1">TAQUILLA</h1>
+      <h1 style="margin: 0; padding: 2px 14px; transform: skewX(0deg); background: #0B0B14CC; border-left: 4px solid #22D3EE; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 1px; line-height: 1.1">TAQUILLA</h1>
     </div>
     <div style="position: absolute; right: 14px; top: 10px; transform-origin: 50% 0; animation: tqTag 3s ease-in-out infinite; display: flex; flex-direction: column; align-items: center">
       <span style="width: 2px; height: 12px; background: #A3A3C2"></span>
@@ -58,7 +58,7 @@ input::placeholder{color:#8686A6}
       </div>
     </div>
     <sc-if value="{{isPreviewing}}" hint-placeholder-val="{{ false }}">
-      <span class="am-pulse-gold" style="position: absolute; left: 50%; top: 58px; transform: translateX(-50%) skewX(-12deg); padding: 4px 12px; background: #FFC53D; color: #2A1C02; font-size: 11px; font-weight: 800; letter-spacing: 1.5px">PROBÁNDOTELO</span>
+      <span class="am-pulse-gold" style="position: absolute; left: 50%; top: 58px; transform: translateX(-50%) skewX(0deg); padding: 4px 12px; background: #FFC53D; color: #2A1C02; font-size: 11px; font-weight: 800; letter-spacing: 1.5px">PROBÁNDOTELO</span>
     </sc-if>
     <!-- who you play as -->
     <div role="radiogroup" aria-label="Personaje" style="position: absolute; left: 10px; top: 64px; bottom: 8px; display: flex; flex-direction: column; justify-content: flex-start; gap: 4px">
@@ -69,12 +69,12 @@ input::placeholder{color:#8686A6}
   </div>
 
   <!-- the rail: categories, leagues, the clothes on hangers, and the action -->
-  <div style="position: absolute; left: 462px; top: 0; right: 0; bottom: 0; clip-path: polygon(7% 0, 100% 0, 100% 100%, 0 100%); background: linear-gradient(160deg, #191936F2, #0E0E1EF2)"></div>
-  <div style="position: absolute; left: 462px; top: 0; width: 30px; bottom: 0; background: linear-gradient(180deg, #22D3EE, #7C5CFF); clip-path: polygon(88% 0, 100% 0, 12% 100%, 0 100%)"></div>
+  <div style="position: absolute; left: 462px; top: 0; right: 0; bottom: 0; border-radius: 24px 0 0 24px; background: linear-gradient(160deg, #191936F2, #0E0E1EF2)"></div>
+  <div style="position: absolute; left: 462px; top: 24px; width: 4px; bottom: 24px; border-radius: 2px; background: linear-gradient(180deg, #22D3EE, #7C5CFF); box-shadow: 0 0 12px #22D3EE"></div>
   <div style="position: absolute; left: 498px; right: 14px; top: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 8px">
     <div style="display: flex; align-items: center; justify-content: space-between">
       <span style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #22D3EE">VESTUARIO · FÚTBOL</span>
-      <a href="Tienda.dc.html" style="display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; transform: skewX(-12deg); background: linear-gradient(135deg, #3A2A0A, #1E1A10); border: 1px solid #FFC53D; color: #FFE38A; text-decoration: none; font-weight: 800; font-size: 13px"><span style="display: flex; align-items: center; gap: 6px; transform: skewX(12deg)"><svg class="am-coin" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/></svg>{{coinsLabel}}</span></a>
+      <a href="Tienda.dc.html" style="display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; transform: skewX(0deg); background: linear-gradient(135deg, #3A2A0A, #1E1A10); border: 1px solid #FFC53D; color: #FFE38A; text-decoration: none; font-weight: 800; font-size: 13px"><span style="display: flex; align-items: center; gap: 6px; transform: skewX(0deg)"><svg class="am-coin" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/></svg>{{coinsLabel}}</span></a>
     </div>
     <div role="tablist" aria-label="Categoría" style="position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 3px; border-radius: 14px; background: #0B0B14AA; border: 1px solid #2E2E58">
       <span style="{{catThumb}}"></span>
@@ -115,7 +115,7 @@ input::placeholder{color:#8686A6}
         <span style="font-size: 11px; color: #A3A3C2">{{selHint}}</span>
       </div>
       <sc-if value="{{showEquip}}" hint-placeholder-val="{{ true }}">
-        <button type="button" onClick="{{doEquip}}" class="am-pulse am-shine" style="height: 40px; padding: 0 18px; border: 0; transform: skewX(-12deg); background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1.5px; cursor: pointer">EQUIPAR</button>
+        <button type="button" onClick="{{doEquip}}" class="am-pulse am-shine" style="height: 40px; padding: 0 18px; border: 0; transform: skewX(0deg); background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1.5px; cursor: pointer">EQUIPAR</button>
       </sc-if>
       <sc-if value="{{showEquipped}}" hint-placeholder-val="{{ false }}">
         <span style="display: flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border-radius: 18px; background: #22D3EE1F; border: 1px solid #22D3EE66; color: #22D3EE; font-weight: 800; font-size: 12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg>Puesto</span>
@@ -124,10 +124,10 @@ input::placeholder{color:#8686A6}
         <button type="button" onClick="{{doBuy}}" style="{{buyStyle}}">COMPRAR · {{selPrice}}</button>
       </sc-if>
       <sc-if value="{{showReward}}" hint-placeholder-val="{{ false }}">
-        <a href="{{rewardHref}}" style="display: flex; align-items: center; height: 38px; padding: 0 14px; transform: skewX(-12deg); border: 2px solid #9B6BFF; color: #C4B5FD; text-decoration: none; font-weight: 800; font-size: 12px"><span style="transform: skewX(12deg)">CÓMO CONSEGUIRLO</span></a>
+        <a href="{{rewardHref}}" style="display: flex; align-items: center; height: 38px; padding: 0 14px; transform: skewX(0deg); border: 2px solid #9B6BFF; color: #C4B5FD; text-decoration: none; font-weight: 800; font-size: 12px"><span style="transform: skewX(0deg)">CÓMO CONSEGUIRLO</span></a>
       </sc-if>
       <sc-if value="{{showPremium}}" hint-placeholder-val="{{ false }}">
-        <a href="Tienda.dc.html" style="display: flex; align-items: center; height: 40px; padding: 0 16px; transform: skewX(-12deg); background: linear-gradient(135deg, #FFB37A, #FF8A3D); color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px"><span style="transform: skewX(12deg)">[PRECIO]</span></a>
+        <a href="Tienda.dc.html" style="display: flex; align-items: center; height: 40px; padding: 0 16px; transform: skewX(0deg); background: linear-gradient(135deg, #FFB37A, #FF8A3D); color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px"><span style="transform: skewX(0deg)">[PRECIO]</span></a>
       </sc-if>
     </div>
   </div>
@@ -535,7 +535,7 @@ class Component extends DCLogic {
     ];
     const tab = (on) => 'min-height: 40px; padding: 0 4px; border-radius: 12px; font: 800 13px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14; border: 0; box-shadow: 0 3px 0 #0E8FA3;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E52;');
     const chip = (on) => 'position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 46px; border: 0; border-radius: 11px; background: transparent; font: 800 10px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (on ? '#0B0B14;' : '#A3A3C2;');
-    const lchip = (on) => 'flex: none; height: 28px; padding: 0 12px; transform: skewX(-12deg); font: 800 11px Exo2, sans-serif; cursor: pointer; white-space: nowrap; ' + (on ? 'background: #FFC53D; color: #1A1206; border: 0; box-shadow: 0 0 10px #FFC53D66;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E58;');
+    const lchip = (on) => 'flex: none; height: 28px; padding: 0 12px; transform: skewX(0deg); font: 800 11px Exo2, sans-serif; cursor: pointer; white-space: nowrap; ' + (on ? 'background: #FFC53D; color: #1A1206; border: 0; box-shadow: 0 0 10px #FFC53D66;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E58;');
 
     // only football for now: the other sports' kits come back with their own game
     const sports = SPORTS.filter((sp) => sp.id === 'futbol').map((sp) => ({ label: sp.label, style: tab(sp.id === sport), pick: () => this.setState({ sport: sp.id, preview: null }) }));
@@ -643,7 +643,7 @@ class Component extends DCLogic {
       showReward: !selOwned && selItem.st === 'reward',
       showPremium: !selOwned && selItem.st === 'premium',
       rewardHref: selItem.how === 'rank' ? 'Rangos.dc.html' : selItem.how === 'pass' ? 'Pase.dc.html' : 'Tienda.dc.html',
-      buyStyle: 'height: 40px; padding: 0 14px; border: 0; transform: skewX(-12deg); font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 18px; letter-spacing: .5px; cursor: pointer; ' + (canAfford ? 'background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #D9A520); color: #2A1C02; box-shadow: 0 0 14px #FFC53D66;' : 'background: #26264A; color: #6E6E92; cursor: default;'),
+      buyStyle: 'height: 40px; padding: 0 14px; border: 0; transform: skewX(0deg); font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 18px; letter-spacing: .5px; cursor: pointer; ' + (canAfford ? 'background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #D9A520); color: #2A1C02; box-shadow: 0 0 14px #FFC53D66;' : 'background: #26264A; color: #6E6E92; cursor: default;'),
       doEquip: () => equipNow(),
       doBuy: () => {
         if (!canAfford) return;

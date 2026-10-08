@@ -12,7 +12,7 @@
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 @keyframes stCardFloat{0%,100%{translate:0 0}50%{translate:0 -5px}}
-@keyframes stShine{0%{transform:translateX(-160%) skewX(-20deg)}55%,100%{transform:translateX(260%) skewX(-20deg)}}
+@keyframes stShine{0%{transform:translateX(-160%) skewX(0deg)}55%,100%{transform:translateX(260%) skewX(0deg)}}
 @keyframes stPmGlow{0%,100%{box-shadow:0 0 0 0 #22D3EE66,0 0 10px #22D3EE55}50%{box-shadow:0 0 0 6px #22D3EE00,0 0 18px #22D3EEAA}}
 @keyframes stFloatUp{0%{opacity:0;translate:0 6px;scale:.6}25%{opacity:1;scale:1.25}100%{opacity:0;translate:0 -30px;scale:1}}
 @keyframes stBump{0%{scale:1}35%{scale:1.35}100%{scale:1}}
@@ -90,10 +90,10 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 
   <!-- top bar: sport, points, help and reset -->
   <div style="position: absolute; left: 318px; right: 12px; top: 10px; display: flex; align-items: center; gap: 10px">
-    <div role="tablist" aria-label="Deporte" style="position: relative; display: flex; width: 236px; height: 40px; background: #17172ACC; box-shadow: inset 0 0 0 1px #2E2E52; padding: 3px; box-sizing: border-box; transform: skewX(-12deg)">
+    <div role="tablist" aria-label="Deporte" style="position: relative; display: flex; width: 236px; height: 40px; background: #17172ACC; box-shadow: inset 0 0 0 1px #2E2E52; padding: 3px; box-sizing: border-box; transform: skewX(0deg)">
       <span style="{{thumb}}"></span>
       <sc-for list="{{sports}}" as="sp" hint-placeholder-count="2">
-        <button type="button" role="tab" aria-selected="{{sp.sel}}" onClick="{{sp.pick}}" style="{{sp.style}}"><span style="display: flex; align-items: center; gap: 6px; transform: skewX(12deg)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{sp.path}}"/></svg>{{sp.label}}</span></button>
+        <button type="button" role="tab" aria-selected="{{sp.sel}}" onClick="{{sp.pick}}" style="{{sp.style}}"><span style="display: flex; align-items: center; gap: 6px; transform: skewX(0deg)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{sp.path}}"/></svg>{{sp.label}}</span></button>
       </sc-for>
     </div>
     <span class="{{pmClass}} bc-para" style="display: flex; align-items: center; gap: 7px; height: 38px; padding: 0 16px; background: linear-gradient(135deg, #0F3A4A, #12122A); box-shadow: inset 0 0 0 1px #22D3EE; font-weight: 800; font-size: 14px">
@@ -132,7 +132,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
     <div style="width: 180px; margin-top: 8px; display: flex; flex-direction: column; gap: 3px">
       <div style="display: flex; justify-content: space-between; font-size: 9.5px; font-weight: 800; letter-spacing: 1px; color: #8686A6"><span>{{tier}}</span><span>{{nextTier}}</span></div>
-      <div style="height: 6px; background: #1E1E3A; transform: skewX(-14deg); overflow: hidden"><div class="am-bar-shine" style="{{tierBar}}"></div></div>
+      <div style="height: 6px; background: #1E1E3A; transform: skewX(0deg); overflow: hidden"><div class="am-bar-shine" style="{{tierBar}}"></div></div>
     </div>
   </div>
 
@@ -146,11 +146,11 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
             <span style="font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span>
             <span class="{{r.bumpClass}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 21px; line-height: 1; color: {{r.color}}; text-shadow: 0 0 10px {{r.color}}66">{{r.value}}</span>
           </div>
-          <div style="display: flex; gap: 2px; height: 7px; transform: skewX(-20deg)"><sc-for list="{{r.segs}}" as="g" hint-placeholder-count="15"><span style="{{g.style}}"></span></sc-for></div>
+          <div style="display: flex; gap: 2px; height: 7px; transform: skewX(0deg)"><sc-for list="{{r.segs}}" as="g" hint-placeholder-count="15"><span style="{{g.style}}"></span></sc-for></div>
           <span style="font-size: 10px; color: #A3A3C2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.effect}}</span>
         </div>
         <button type="button" onClick="{{r.up}}" aria-label="{{r.aria}}" style="{{r.btn}}">
-          <span style="display: flex; flex-direction: column; align-items: center; transform: skewX(12deg)"><span style="font-size: 20px; line-height: .9; font-weight: 800">{{r.plus}}</span><span style="font-size: 9px; font-weight: 800">{{r.cost}}</span></span>
+          <span style="display: flex; flex-direction: column; align-items: center; transform: skewX(0deg)"><span style="font-size: 20px; line-height: .9; font-weight: 800">{{r.plus}}</span><span style="font-size: 9px; font-weight: 800">{{r.cost}}</span></span>
         </button>
         <sc-if value="{{r.flash}}" hint-placeholder-val="{{ false }}"><span class="st-plus1">+1</span></sc-if>
       </div>
@@ -271,13 +271,13 @@ class Component extends DCLogic {
         segs.push({ style: 'flex: 1; border-radius: 2px; background: ' + (fill > 0 ? 'linear-gradient(90deg, ' + col + ' ' + (fill * 100).toFixed(0) + '%, #26264A ' + (fill * 100).toFixed(0) + '%)' : '#26264A') + ';' + (fill > 0 ? ' box-shadow: 0 0 6px ' + col + '55;' : '') });
       }
       return {
-        rowStyle: 'position: relative; flex: 1; min-height: 0; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 12px; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); background: linear-gradient(90deg, ' + col + '1f, #15152CEE 38%, #111124EE); box-shadow: inset 3px 0 0 ' + col + '; animation-delay: ' + (0.08 + i * 0.06).toFixed(2) + 's; --dx: ' + (this.dir || 1) * 50 + 'px;',
+        rowStyle: 'position: relative; flex: 1; min-height: 0; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 12px; clip-path: inset(0 round 12px); background: linear-gradient(90deg, ' + col + '1f, #15152CEE 38%, #111124EE); box-shadow: inset 3px 0 0 ' + col + '; animation-delay: ' + (0.08 + i * 0.06).toFixed(2) + 's; --dx: ' + (this.dir || 1) * 50 + 'px;',
         name: d.name, value: String(Math.round(sv)), effect: d.effect(v), color: col, segs, path: Est_ICON[d.icon],
         iconBox: 'flex: none; width: 28px; height: 28px; margin: 0 2px; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; color: ' + col + '; background: ' + col + '22; box-shadow: inset 0 0 0 1.5px ' + col + '88, 0 0 10px ' + col + '33;',
         plus: max ? '★' : '+', cost: max ? 'MÁX' : c + ' PM',
         aria: max ? d.name + ' al máximo' : 'Mejorar ' + d.name + ' por ' + c + ' PM',
         flash: !!(this.state.flash && this.state.flash.id === d.id), bumpClass: this.state.flash && this.state.flash.id === d.id ? 'st-bump' : '',
-        btn: 'flex: none; width: 46px; height: 40px; transform: skewX(-12deg); display: flex; align-items: center; justify-content: center; cursor: ' + (can ? 'pointer' : 'default') + '; font-family: Exo2, sans-serif; border: 0; ' + (can ? 'background: radial-gradient(circle at 35% 30%, #7EF0FF, #22D3EE 55%, #0E8FA3); color: #0B0B14; box-shadow: 0 3px 0 #0A6F80, 0 0 12px #22D3EE88; background: linear-gradient(135deg, #9AF5FF, #22D3EE 60%, #0FA7C0);' : max ? 'background: linear-gradient(135deg, #FFE38A, #D9A520); color: #2A1C02;' : 'background: #26264A; color: #6E6E92;'),
+        btn: 'flex: none; width: 46px; height: 40px; transform: skewX(0deg); display: flex; align-items: center; justify-content: center; cursor: ' + (can ? 'pointer' : 'default') + '; font-family: Exo2, sans-serif; border: 0; ' + (can ? 'background: radial-gradient(circle at 35% 30%, #7EF0FF, #22D3EE 55%, #0E8FA3); color: #0B0B14; box-shadow: 0 3px 0 #0A6F80, 0 0 12px #22D3EE88; background: linear-gradient(135deg, #9AF5FF, #22D3EE 60%, #0FA7C0);' : max ? 'background: linear-gradient(135deg, #FFE38A, #D9A520); color: #2A1C02;' : 'background: #26264A; color: #6E6E92;'),
         up: () => {
           if (!can) return;
           put({ ...cur, stats: { ...stats, [d.id]: v + 1 }, pm: pm - c }, null);
@@ -328,7 +328,7 @@ class Component extends DCLogic {
       level: String(cur.level), num: def.num, pos: def.pos, sportPath: Est_ICON[def.icon],
       sportUpper: def.label.toUpperCase(),
       tier: tr[1], tierColor: tr[2], cardBg: tr[3], cardInk: tr[4], cardGlow: tr[5] + '66', cardLine: tr[4] + '44',
-      tierPill: 'position: absolute; left: 200px; top: 356px; transform: translateX(-50%) skewX(-12deg); display: flex; align-items: center; gap: 6px; white-space: nowrap; padding: 4px 16px; background: linear-gradient(90deg, ' + tr[5] + '33, #0B0B14E6); box-shadow: inset 0 0 0 1px ' + tr[5] + ', 0 0 14px ' + tr[5] + '55; color: ' + tr[2] + '; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 1.5px;',
+      tierPill: 'position: absolute; left: 200px; top: 356px; transform: translateX(-50%) skewX(0deg); display: flex; align-items: center; gap: 6px; white-space: nowrap; padding: 4px 16px; background: linear-gradient(90deg, ' + tr[5] + '33, #0B0B14E6); box-shadow: inset 0 0 0 1px ' + tr[5] + ', 0 0 14px ' + tr[5] + '55; color: ' + tr[2] + '; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 1.5px;',
       mini: def.stats.map((d) => ({ k: d.k, v: String(Math.round(shown(d.id))) })),
       kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#0B0B14', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#17172A', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE',
       grid1: ring(1 / 3), grid2: ring(2 / 3), grid3: ring(1),
