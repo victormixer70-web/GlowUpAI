@@ -440,6 +440,41 @@
       var mark = coin(); mark.rotation.set(Math.PI / 2, 0, 0); mark.scale.setScalar(0.55); mark.position.set(0, 1.15, 1.36); g.add(mark);
       var pile = coinPile(7); pile.scale.setScalar(0.45); pile.position.set(1.4, 0, 0.8); g.add(pile);
       g.rotation.y = -0.3;
+    } else if (p[0] === 'trophy') {
+      // a gold cup with two handles on a dark plinth with a gold band and a star
+      var gold = std('#FFC53D', { r: 0.25, m: 0.85 });
+      var prof = [[0, 0], [0.62, 0], [0.62, 0.14], [0.26, 0.3], [0.18, 0.86], [0.28, 0.96], [0.6, 1.3], [0.74, 1.8], [0.78, 2.15], [0.7, 2.2], [0, 1.75]].map(function (q) { return new T.Vector2(q[0], q[1]); });
+      var cup = new T.Mesh(new T.LatheGeometry(prof, 48), gold); cup.position.y = 0.9; g.add(cup);
+      [-1, 1].forEach(function (sd) { var h = new T.Mesh(new T.TorusGeometry(0.34, 0.07, 12, 28, Math.PI * 1.25), gold); h.position.set(sd * 0.8, 2.6, 0); h.rotation.z = sd > 0 ? -Math.PI * 0.62 : Math.PI * 1.62; g.add(h); });
+      var plinth = rbox(1.5, 0.9, 1.5, 0.12, std('#1B1B33', { r: 0.4 })); plinth.position.y = 0.45; g.add(plinth);
+      var band = mesh(new T.BoxGeometry(1.53, 0.14, 1.53), gold, 0, 0.62, 0); g.add(band);
+      var st = new T.Shape(); for (var i = 0; i < 10; i++) { var a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 0.13 : 0.3; if (i) st.lineTo(Math.cos(a) * r, -Math.sin(a) * r); else st.moveTo(Math.cos(a) * r, -Math.sin(a) * r); }
+      var star = new T.Mesh(new T.ExtrudeGeometry(st, { depth: 0.06, bevelEnabled: false }), std('#FFFFFF', { r: 0.3 })); star.position.set(0, 1.85, 0.62); star.rotation.x = -0.12; g.add(star);
+      g.rotation.y = -0.35;
+    } else if (p[0] === 'shield') {
+      // the rank crest: a bevelled metal shield, a darker inset and a raised star
+      var col = p[1] || '#C07A3E';
+      var sh = function (s) { var q = new T.Shape(); q.moveTo(0, 1.1 * s); q.lineTo(0.95 * s, 0.78 * s); q.lineTo(0.95 * s, 0.05 * s); q.quadraticCurveTo(0.9 * s, -0.75 * s, 0, -1.15 * s); q.quadraticCurveTo(-0.9 * s, -0.75 * s, -0.95 * s, 0.05 * s); q.lineTo(-0.95 * s, 0.78 * s); q.lineTo(0, 1.1 * s); return q; };
+      var outer = new T.Mesh(new T.ExtrudeGeometry(sh(1), { depth: 0.25, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.07, bevelSegments: 3 }), std(col, { r: 0.3, m: 0.75 }));
+      g.add(outer);
+      var inner = new T.Mesh(new T.ExtrudeGeometry(sh(0.74), { depth: 0.1, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.03, bevelSegments: 2 }), std(new T.Color(col).multiplyScalar(0.45).getStyle(), { r: 0.5, m: 0.4 }));
+      inner.position.z = 0.28; g.add(inner);
+      var st2 = new T.Shape(); for (var j = 0; j < 10; j++) { var a2 = -Math.PI / 2 + j * Math.PI / 5, r2 = j % 2 ? 0.2 : 0.46; if (j) st2.lineTo(Math.cos(a2) * r2, -Math.sin(a2) * r2); else st2.moveTo(Math.cos(a2) * r2, -Math.sin(a2) * r2); }
+      var star2 = new T.Mesh(new T.ExtrudeGeometry(st2, { depth: 0.1, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.03, bevelSegments: 2 }), std(new T.Color(col).lerp(new T.Color('#FFFFFF'), 0.45).getStyle(), { r: 0.25, m: 0.7 }));
+      star2.position.set(0, 0, 0.42); g.add(star2);
+      g.rotation.set(-0.08, 0.35, 0);
+    } else if (p[0] === 'target') {
+      // a target board, tilted back, with a dart in the bullseye
+      var board = new T.Group(), cols = ['#F4F4FA', '#E5484D', '#F4F4FA', '#E5484D', '#FFC53D'];
+      cols.forEach(function (c, k) { var r = 1.2 - k * 0.24; board.add(mesh(new T.CylinderGeometry(r, r, 0.2 + k * 0.03, 48), std(c, { r: 0.5 }), 0, k * 0.015, 0)); });
+      board.add(mesh(new T.TorusGeometry(1.2, 0.09, 12, 56), std('#1E5A3A', { r: 0.5 }), 0, 0, 0)); board.children[board.children.length - 1].rotation.x = Math.PI / 2;
+      board.rotation.x = Math.PI / 2 - 0.25; board.position.y = 1.3; g.add(board);
+      var dart = new T.Group();
+      dart.add(mesh(new T.CylinderGeometry(0.05, 0.05, 1.3, 12), std('#22D3EE', { r: 0.3, m: 0.4 }), 0, 0.65, 0));
+      dart.add(mesh(new T.ConeGeometry(0.09, 0.3, 12), std('#D6DEE9', { r: 0.2, m: 0.9 }), 0, -0.1, 0)); dart.children[1].rotation.x = Math.PI;
+      [0, 1, 2].forEach(function (k) { var f = mesh(new T.BoxGeometry(0.02, 0.36, 0.26), std('#53D88E', { r: 0.5 }), 0, 1.2, 0); f.rotation.y = k * Math.PI / 3; dart.add(f); });
+      dart.scale.setScalar(1.45); dart.position.set(0.05, 1.4, 0.2); dart.rotation.set(-0.75, 0, -0.75); g.add(dart);
+      g.rotation.y = 0.25;
     } else if (p[0] === 'boots') {
       var b = boot(p[1] || '#E5484D'); b.rotation.y = 0.45; g.add(b);
       var sp = hat('sprout'); sp.scale.setScalar(0.9); sp.position.set(-0.5, -0.1, 0); g.add(sp);
