@@ -13,6 +13,26 @@ body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
 .md-card{position:absolute;left:50%;top:10px;width:170px;height:244px;margin-left:-85px;padding:0;border:0;background:none;cursor:pointer;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.25,1.2,.4,1),opacity .35s,filter .35s;-webkit-tap-highlight-color:transparent}
+.md-bg{position:absolute;left:80px;right:0;top:0;bottom:0;z-index:0;pointer-events:none;overflow:hidden;contain:layout paint}
+.md-stands{position:absolute;left:-40px;right:-40px;top:58px;height:170px;border-radius:50% 50% 0 0/30% 30% 0 0;background:radial-gradient(circle,color-mix(in srgb,var(--c) 50%,transparent) 1.1px,transparent 1.7px) 4px 3px/13px 11px,radial-gradient(circle,#FFFFFF22 1.1px,transparent 1.7px) 0 0/9px 8px,repeating-linear-gradient(180deg,transparent 0 20px,#00000055 20px 23px),linear-gradient(180deg,#1E1E36,#0E0E1C 75%);-webkit-mask-image:linear-gradient(180deg,#000 45%,transparent);mask-image:linear-gradient(180deg,#000 45%,transparent);opacity:.6}
+.md-roof{position:absolute;left:-40px;right:-40px;top:44px;height:30px;border-radius:50% 50% 0 0/100% 100% 0 0;background:#07070F;box-shadow:0 3px 0 color-mix(in srgb,var(--c) 45%,transparent),0 8px 26px color-mix(in srgb,var(--c) 22%,transparent)}
+.md-tower{position:absolute;top:58px;width:46px;height:20px;border-radius:3px;background:radial-gradient(circle,#FFFFFF 2px,#FFF6C8aa 3px,transparent 4px) 0 0/11.5px 10px,#1A1A2A;box-shadow:0 0 26px 6px #FFF6C844}
+.md-word{position:absolute;left:0;top:118px;white-space:nowrap;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-style:italic;font-size:120px;line-height:1;color:transparent;-webkit-text-stroke:1.5px color-mix(in srgb,var(--c) 26%,transparent);will-change:transform;animation:mdWord 26s linear infinite}
+@keyframes mdWord{to{transform:translateX(-50%)}}
+.md-pitchw{position:absolute;left:0;right:0;bottom:0;height:250px;overflow:hidden;-webkit-mask-image:linear-gradient(0deg,#000 15%,transparent 62%);mask-image:linear-gradient(0deg,#000 15%,transparent 62%)}
+.md-pitch{position:absolute;left:-60%;right:-60%;bottom:-20px;height:420px;transform:perspective(520px) rotateX(58deg);transform-origin:50% 100%;background:radial-gradient(circle at 50% 38%,transparent 70px,color-mix(in srgb,var(--c) 70%,#fff) 71px 74px,transparent 75px),radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--c) 30%,transparent),transparent 70px),linear-gradient(90deg,transparent calc(50% - 2px),#FFFFFF55 calc(50% - 2px) calc(50% + 2px),transparent calc(50% + 2px)),repeating-linear-gradient(90deg,#1D5634 0 80px,#174A2C 80px 160px);opacity:.85}
+.md-vig{position:absolute;inset:0;background:radial-gradient(100% 90% at 50% 55%,transparent 45%,#000000a8 100%)}
+.md-rays{position:absolute;left:50%;top:180px;width:900px;height:900px;margin:-450px 0 0 -450px;background:repeating-conic-gradient(color-mix(in srgb,var(--c) 14%,transparent) 0 7deg,transparent 7deg 18deg);-webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent);will-change:transform;animation:mdSpin 60s linear infinite}
+@keyframes mdSpin{to{transform:rotate(360deg)}}
+.md-spark i{position:absolute;bottom:40px;width:4px;height:4px;border-radius:50%;background:#FFE08A;box-shadow:0 0 6px #FFC53D;opacity:0;will-change:transform,opacity;animation:mdSpark 4s linear infinite}
+@keyframes mdSpark{0%{transform:translateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(-300px);opacity:0}}
+.md-neon{position:absolute;left:-200px;width:1200px;height:3px;background:linear-gradient(90deg,transparent,var(--c) 45%,#fff 50%,var(--c) 55%,transparent);opacity:.5;will-change:transform;animation:mdNeon 3.4s linear infinite}
+@keyframes mdNeon{from{transform:rotate(-12deg) translateX(-600px)}to{transform:rotate(-12deg) translateX(600px)}}
+.md-dots{position:absolute;right:-30px;top:40px;width:300px;height:300px;background:radial-gradient(circle,color-mix(in srgb,var(--c) 40%,transparent) 2px,transparent 2.6px) 0 0/14px 14px;-webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent);opacity:.5}
+.md-dots.l{right:auto;left:-60px;top:170px;width:240px;height:240px}
+.md-chalk path{stroke-dasharray:6 7;animation:mdChalk 1.4s linear infinite}
+@keyframes mdChalk{to{stroke-dashoffset:-26}}
+.md-cone{position:absolute;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:16px solid #FF8A3D;filter:drop-shadow(0 3px 2px #000a)}
 @keyframes mdGlow{0%,100%{box-shadow:0 0 0 2px var(--mc),0 0 22px var(--mc),0 18px 30px #000c}50%{box-shadow:0 0 0 2px var(--mc),0 0 38px var(--mc),0 18px 30px #000c}}
 @keyframes mdFloat{0%,100%{translate:0 0}50%{translate:0 -6px}}
 </style>
@@ -20,6 +40,23 @@ input::placeholder{color:#8686A6}
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <div class="am-bg"></div>
   <div class="bc-beams"></div>
+  <div class="md-bg" style="{{bgVars}}">
+    <sc-if value="{{bgComp}}" hint-placeholder-val="{{ true }}"><div class="md-rays"></div></sc-if>
+    <div class="md-roof"></div><div class="md-stands"></div>
+    <div class="md-tower" style="left: 18px"></div><div class="md-tower" style="right: 18px"></div>
+    <div class="md-word">{{bgWord}}</div>
+    <div class="md-pitchw"><div class="md-pitch"></div></div>
+    <sc-if value="{{bgComp}}" hint-placeholder-val="{{ true }}"><div class="md-spark"><sc-for list="{{bgSparks}}" as="k" hint-placeholder-count="0"><i style="{{k}}"></i></sc-for></div></sc-if>
+    <sc-if value="{{bgCasual}}" hint-placeholder-val="{{ false }}"><div class="md-dots"></div><div class="md-dots l"></div><div class="md-neon" style="top: 110px"></div><div class="md-neon" style="top: 250px; animation-delay: -1.7s; animation-duration: 4.2s"></div></sc-if>
+    <sc-if value="{{bgTrain}}" hint-placeholder-val="{{ false }}">
+      <svg class="md-chalk" width="764" height="390" viewBox="0 0 764 390" style="position: absolute; inset: 0" fill="none" stroke="#FFFFFF" stroke-opacity=".28" stroke-width="2.5" stroke-linecap="round">
+        <g stroke-dasharray="none"><path d="M40 300l14 14M54 300l-14 14M690 110l14 14M704 110l-14 14M120 120l14 14M134 120l-14 14" style="animation: none; stroke-dasharray: none"/><circle cx="640" cy="290" r="9"/><circle cx="150" cy="210" r="9"/><circle cx="690" cy="200" r="9"/></g>
+        <path d="M60 296C110 250 120 190 140 215"/><path d="M640 280C600 220 690 170 690 190"/><path d="M134 128C200 80 260 90 300 110"/>
+      </svg>
+      <span class="md-cone" style="left: 30px; bottom: 70px"></span><span class="md-cone" style="left: 70px; bottom: 96px"></span><span class="md-cone" style="right: 40px; bottom: 80px"></span><span class="md-cone" style="right: 86px; bottom: 104px"></span>
+    </sc-if>
+    <div class="md-vig"></div>
+  </div>
   <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; height: 390px; z-index: 3"><dc-import name="Nav" active="jugar" hint-size="80px,390px"></dc-import></div>
   <!-- header: back, title, the three kinds of play -->
   <div style="position: absolute; left: 96px; right: 12px; top: 10px; height: 40px; display: flex; align-items: center; gap: 10px; z-index: 4">
@@ -230,6 +267,10 @@ class Component extends DCLogic {
       thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 132) + 'px; width: 132px; height: 32px; border-radius: 11px; background: ' + TABS[ti].color + '; box-shadow: 0 0 16px ' + TABS[ti].color + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s, box-shadow .3s;',
       spot: 'position: absolute; left: 50%; top: 150px; width: 380px; height: 150px; margin-left: -190px; border-radius: 50%; background: radial-gradient(closest-side, ' + CAT[0] + '33, transparent); pointer-events: none;',
       cards,
+      bgVars: '--c: ' + CAT[0] + ';',
+      bgComp: comp, bgCasual: s.cat === 'casual', bgTrain: s.cat === 'train',
+      bgWord: (() => { const w = { comp: 'COMPETITIVO', casual: 'INFORMAL', train: 'ENTRENAMIENTO' }[s.cat] + ' · '; return w.repeat(4) + w.repeat(4); })(),
+      bgSparks: comp ? Array.from({ length: 16 }, (_, k) => { const r = (n) => { const x = Math.sin((k + n) * 91.3) * 43758.5; return x - Math.floor(x); }; return 'left: ' + (40 + r(1) * 680).toFixed(0) + 'px; animation-duration: ' + (3 + r(2) * 3).toFixed(2) + 's; animation-delay: -' + (r(3) * 6).toFixed(2) + 's'; }) : [],
       swDown: (e) => { this.sw = { x: e.clientX, t: performance.now() }; },
       swUp: (e) => {
         const w = this.sw; this.sw = null;
