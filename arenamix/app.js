@@ -5,7 +5,7 @@
 
   var SCREENS = ['Main', 'Idioma', 'Deportes', 'Modos', 'Rangos', 'Taquilla', 'Tienda', 'Estadisticas',
     'Rapida', 'Competitivo', 'Privada', 'Entrenamiento', 'Tutorial', 'Perfil', 'Logros', 'Ajustes',
-    'Baloncesto', 'Tenis', 'Voley', 'Partido', 'Duelo', 'Avatar', 'RangosTabla', 'Nav', 'Pase'];
+    'Baloncesto', 'Tenis', 'Voley', 'Partido', 'Duelo', 'Avatar', 'RangosTabla', 'Nav', 'Pase', 'EntrenoLibre'];
   var registry = {};
   var helmetDone = {};
 

@@ -153,7 +153,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 
   <sc-if value="{{showReady}}" hint-placeholder-val="{{ true }}">
-    <div style="position: absolute; inset: 0; background: #0B0B14B3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
+    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
+      <div class="am-arena" aria-hidden="true"><i class="aa-pitch"></i><i class="aa-beam" style="left: 18%"></i><i class="aa-beam r" style="left: 82%"></i><i class="aa-flash" style="left: 12%; top: 22%"></i><i class="aa-flash" style="left: 31%; top: 30%; animation-delay: -1.1s"></i><i class="aa-flash" style="left: 58%; top: 18%; animation-delay: -2.3s"></i><i class="aa-flash" style="left: 77%; top: 27%; animation-delay: -0.6s"></i><i class="aa-flash" style="left: 90%; top: 20%; animation-delay: -1.8s"></i></div>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 40px; letter-spacing: 1px">{{readyTitle}}</span>
       <span style="font-size: 13px; color: #CACAE0; text-align: center; max-width: 520px; line-height: 1.5">Con balón: CHUT (mantén para potencia), PASE al compañero que señala la flecha, REGATE para dejar atrás al rival y SPRINT. Sin balón: ENTRADA y PRESIÓN; si lo tiene un compañero, PÍDELA.</span>
       <button type="button" onClick="{{start}}" style="height: 54px; padding: 0 40px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 6px 0 #0E8FA3">SAQUE INICIAL</button>
@@ -179,7 +180,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </sc-if>
   <sc-if value="{{showEnd}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; inset: 0; background: #0B0B14CC; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px">
+    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px">
+      <div class="am-arena" aria-hidden="true"><i class="aa-pitch"></i><i class="aa-beam" style="left: 18%"></i><i class="aa-beam r" style="left: 82%"></i><i class="aa-flash" style="left: 12%; top: 22%"></i><i class="aa-flash" style="left: 31%; top: 30%; animation-delay: -1.1s"></i><i class="aa-flash" style="left: 58%; top: 18%; animation-delay: -2.3s"></i><i class="aa-flash" style="left: 77%; top: 27%; animation-delay: -0.6s"></i><i class="aa-flash" style="left: 90%; top: 20%; animation-delay: -1.8s"></i></div>
       <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">FINAL DEL PARTIDO</span>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 64px; line-height: 1">{{s0}} – {{s1}}</span>
       <span style="{{endStyle}}">{{endText}}</span>
@@ -188,7 +190,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 </section>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"keeper":{"editor":"bool","default":false},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3,4],"default":3},"mates":{"editor":null},"label":{"editor":null},"tutorial":{"editor":"bool","default":false},"rivals":{"editor":null},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"online":{"editor":null},"aiLevel":{"editor":null},"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"keeper":{"editor":"bool","default":false},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3,4],"default":3},"mates":{"editor":null},"label":{"editor":null},"tutorial":{"editor":"bool","default":false},"rivals":{"editor":null},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"online":{"editor":null},"aiLevel":{"editor":null},"practice":{"editor":"bool","default":false},"$preview":{"width":844,"height":390}}'>
 // ball radius in the match (metres): a little bigger than a real one so it reads on a phone
 const Partido_BR = 0.17;
 class Component extends DCLogic {
@@ -434,7 +436,7 @@ class Component extends DCLogic {
   newGame() {
     // gameplay settings (Configuración > Jugabilidad)
     this.play = window.AMPlay ? window.AMPlay() : { cam: 'normal', names: true, gfx: 'alta', passMark: true };
-    const P = this.props, n = this.size(), dur = Number(P.duration ?? 90);
+    const P = this.props, n = this.size(), dur = P.practice ? 9999 : Number(P.duration ?? 90);
     this.st = this.loadStats();
     const mates = Array.isArray(P.mates) ? P.mates : [P.mateName ?? 'Compañero', P.mate2Name ?? 'Compañero 2', 'Compañero 3'];
     const rivals = Array.isArray(P.rivals) ? P.rivals : [P.awayName ?? 'Rival', P.away2Name ?? 'Rival 2', P.away3Name ?? 'Rival 3', 'Rival 4'];
@@ -455,7 +457,7 @@ class Component extends DCLogic {
     }
     const ps = [];
     for (let k = 0; k < n; k++) ps.push({ team: 0, role: (this.net ? k !== this.net.mySlot : k) || keeper ? 'mate' : 'human', slot: k, name: homeNames[k] });
-    for (let k = 0; k < n; k++) ps.push({ team: 1, role: 'ai', slot: k, name: awayNames[k] });
+    if (!P.practice) for (let k = 0; k < n; k++) ps.push({ team: 1, role: 'ai', slot: k, name: awayNames[k] });
     ps.push({ team: 0, role: 'gk', slot: -1, name: keeper ? (P.homeName ?? 'Tú') : 'Portero' }, { team: 1, role: 'gk', slot: -1, name: 'Portero' });
     if (this.net) ps.forEach((p) => { if (p.role !== 'gk') p.look = this.look(p.team, p.slot); });
     ps.forEach((p) => Object.assign(p, { x: 30, y: 15, vx: 0, vy: 0, face: p.team ? Math.PI : 0, run: Math.random() * 6, cd: 0, inv: 0, skillCd: 0, stam: 1, think: 0, turn: 0, act: null, react: 0 }));
@@ -509,8 +511,29 @@ class Component extends DCLogic {
     }
     return this.aiL;
   }
+  // free training: you on the ball somewhere in front of the goal, the keeper set on his line
+  practiceReset() {
+    const g = this.g, b = g.ball, me = g.ps[g.ctl], k = g.ps.find((q) => q.team === 1 && q.role === 'gk');
+    const x = 36 + Math.random() * 15, y = 5 + Math.random() * 20;
+    Object.assign(me, { x, y, vx: 0, vy: 0, face: Math.atan2(15 - y, 60 - x), act: null, cd: 0, stam: 1 });
+    Object.assign(b, { x: x + Math.cos(me.face) * 0.6, y: y + Math.sin(me.face) * 0.6, z: 0, vx: 0, vy: 0, vz: 0, spin: 0, dip: 0, kn: 0, fire: 0 });
+    if (k) Object.assign(k, { x: 58.8, y: 15, vx: 0, vy: 0, act: null, cd: 0.3, react: 0 });
+    g.ps.forEach((q) => { if (q.team === 0 && q.role === 'gk') Object.assign(q, { x: 1.2, y: 15, vx: 0, vy: 0, act: null }); });
+    g.own = g.ctl; g.hold = -1; g.recv = null; g.cross = null; g.charging = false; g.charge = 0; g.last = g.ctl;
+    g.resetT = 0; g.idleT = 0;
+  }
+  // free training: after a save, a miss or a ball left lying, a new ball at your feet
+  practiceStep(dt) {
+    const g = this.g, b = g.ball;
+    if (g.resetT > 0) { g.resetT -= dt; if (g.resetT <= 0) this.practiceReset(); return; }
+    const loose = g.own < 0 && g.hold < 0 && Math.hypot(b.vx, b.vy) < 3 && b.z < 0.3;
+    g.idleT = loose ? (g.idleT || 0) + dt : 0;
+    if (g.idleT > 1.4) { g.resetT = 0.01; }
+    if (b.x < 30 && g.own < 0) g.resetT = 0.4;
+  }
   kickoff(team) {
     const g = this.g, n = this.size();
+    if (this.props.practice) { this.practiceReset(); return; }
     Object.assign(g.ball, { x: 30, y: 15, z: 0, vx: 0, vy: 0, vz: 0, spin: 0 });
     const slots = n === 1 ? [[0, 15]] : n === 2 ? [[0, 15], [19, 22]] : n === 3 ? [[0, 15], [19, 7], [19, 23]] : [[0, 15], [19, 6], [19, 24], [11, 15]];
     g.ps.forEach((p) => {
@@ -1038,7 +1061,8 @@ class Component extends DCLogic {
     if (g.phase === 'goal') { this.goalStep(dt); return; }
     if (g.phase === 'intro') { this.introStep(); return; }
     if (g.phase !== 'play') return;
-    if (!this.props.tutorial) g.t -= dt;
+    if (!this.props.tutorial && !this.props.practice) g.t -= dt;
+    if (this.props.practice) this.practiceStep(dt);
     if (g.t <= 0) { g.t = 0; g.charging = false; this.setupWinners(); return; }
     if (g.charging) g.charge = Math.min(1, g.charge + dt * 1.15);
     if (g.recv) { g.recv.t -= dt; if (g.recv.t <= 0) g.recv = null; }
@@ -1100,7 +1124,8 @@ class Component extends DCLogic {
       if (sp > 0.5) p.face += this.ang(Math.atan2(p.vy, p.vx) - p.face) * Math.min(1, dt * 8);
       if (sp > 0.25) p.run += 2 * Math.PI * (0.9 + 0.09 * sp) * dt;
     });
-    if (g.pt > 1.4 && !this.rp && !this.rpDone && !this.props.tutorial) this.startReplay();
+    if (g.pt > 1.4 && !this.rp && !this.rpDone && !this.props.tutorial && !this.props.practice) this.startReplay();
+    if (this.props.practice && g.pt > 1.8) { g.phase = 'play'; g.pt = 0; this.practiceReset(); return; }
     if (g.pt > 3 && !this.rp) { this.rpDone = false; if (this.props.tutorial) { this.tutSetup(6); g.phase = 'play'; g.pt = 0; return; } this.kickoff(g.concede); g.phase = 'play'; g.pt = 0; this.sfx('whistle', 1); }
   }
   // after a goal the ball flies on into the goal: the side nets and the roof stop it, and the back of the
@@ -1741,12 +1766,14 @@ class Component extends DCLogic {
         b.dip = 0; b.kn = 0;
         if (sp < D.catchV && Math.random() < 0.85) {
           g.hold = i; g.holdT = 0.9; g.last = i;
+          if (this.props.practice && p.team === 1) { g.score[1]++; g.resetT = 1.1; g.holdT = 9; }
           if (sp > 15) this.callout('¡QUÉ PARADA!', '', p.team === 0 ? '#22D3EE' : '#FF5C5C'); else this.flashMsg(sp > 12 ? '¡PARADÓN!' : 'Atrapa el portero', 1.2);
         } else {
           const out = p.team === 0 ? 1 : -1, side = b.y >= p.y ? 1 : -1;
           b.vx = out * Math.max(4, Math.abs(b.vx) * 0.35); b.vy = side * (5 + Math.random() * 4); b.vz = 2.5;
           p.cd = 0.5; g.last = i;
           this.flashMsg('¡Despeje!', 1);
+          if (this.props.practice && p.team === 1) { g.score[1]++; g.resetT = 1.5; }
         }
         return;
       }
@@ -1810,6 +1837,7 @@ class Component extends DCLogic {
   // the keeper of team takes the ball in hand on the edge of the six-yard box and plays it out;
   // the attackers step back out of the area first
   goalKick(team) {
+    if (this.props.practice) { if (this.g.resetT > 0) return; this.flashMsg('Fuera', 0.8); this.g.resetT = 0.8; Object.assign(this.g.ball, { vx: 0, vy: 0, vz: 0, x: team ? 61 : -1 }); return; }
     const g = this.g, b = g.ball, i = g.ps.findIndex((p) => p.team === team && p.role === 'gk');
     if (i < 0) return;
     const k = g.ps[i];
@@ -1967,7 +1995,7 @@ class Component extends DCLogic {
       const P0 = this.props, rm = P0.online && P0.online.room, key = rm ? String(rm.code || rm.id || '') : '';
       let r = Math.random();
       if (key) { let h = 7; for (let k = 0; k < key.length; k++) h = (h * 31 + key.charCodeAt(k)) | 0; r = ((h >>> 0) % 1000) / 1000; }
-      const one = this.size() === 1;
+      const one = this.size() === 1 && !P0.practice;
       this.wx = window.__amWx ? window.__amWx : P0.tutorial ? 'dia' : one ? (r < 0.6 ? 'noche' : r < 0.85 ? 'lluvia' : 'nieve') : (r < 0.45 ? 'dia' : r < 0.7 ? 'noche' : r < 0.88 ? 'lluvia' : 'nieve');
     }
     const night = this.wx === 'noche', grey = this.wx === 'lluvia' || this.wx === 'nieve';
@@ -2503,7 +2531,7 @@ class Component extends DCLogic {
       sp.scale.set(26, 26, 1); sp.position.set(x, 30, z); S.add(sp);
     });
     // 1 VS 1: a street cage round the pitch (no wall on the camera's side)
-    if (n === 1 && !this.props.tutorial) {
+    if (n === 1 && !this.props.tutorial && !this.props.practice) {
       const mesh = this.canvasTex(128, 128, (c, w, h) => {
         c.clearRect(0, 0, w, h); c.strokeStyle = 'rgba(205,215,230,0.95)'; c.lineWidth = 5;
         c.beginPath(); c.moveTo(0, 0); c.lineTo(w, h); c.moveTo(w, 0); c.lineTo(0, h); c.stroke();
@@ -3437,7 +3465,7 @@ class Component extends DCLogic {
       homeName: P.homeName ?? 'Tú', awayName: P.awayName ?? 'Rival',
       homeChip: chip(hc, ht), awayChip: chip(ac, at),
       s0: String(g.score[0]), s1: String(g.score[1]),
-      clock: this.fmtClock(g.t),
+      clock: P.practice ? '∞' : this.fmtClock(g.t),
       clockStyle: 'display: flex; align-items: center; margin-left: 6px; padding: 0 10px; background: ' + (this.golden() ? '#3A2A08' : '#0B0B14E6') + '; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 20px; color: ' + (g.t <= 10 && g.phase === 'play' ? '#FF5C5C' : this.golden() ? '#FFC53D' : '#F4F4FA') + ';',
       scoreStyle: 'display: flex; align-items: center; gap: 8px; padding: 0 14px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 26px; line-height: 1; ' + (this.golden() ? 'background: linear-gradient(135deg, #FFE08A, #FFC53D 55%, #C98A12); color: #0B0B14;' : 'background: #F4F4FA; color: #0B0B14;'),
       wxOverlay: 'position: absolute; inset: 0; pointer-events: none; ' + ({

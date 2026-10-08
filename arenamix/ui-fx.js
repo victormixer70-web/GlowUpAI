@@ -156,6 +156,17 @@
     '.fx-spark{position:absolute;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#FFC53D;box-shadow:0 0 8px #FFC53D;animation:fxSpark .45s ease-out forwards}',
     '@keyframes fxRing{from{opacity:.95;scale:.4}to{opacity:0;scale:4.2}}',
     '@keyframes fxSpark{from{opacity:1;translate:0 0}to{opacity:0;translate:var(--sx) var(--sy)}}',
+    // ---- a night-stadium backdrop for any full-screen panel (in-match screens too) ----
+    '.am-arena{position:absolute;inset:0;overflow:hidden;background:radial-gradient(70% 60% at 50% 42%,#1D2A6B 0%,#0E1233 55%,#05060F 100%)}',
+    '.am-arena::before{content:"";position:absolute;left:50%;top:44%;width:1100px;height:1100px;margin:-550px 0 0 -550px;background:repeating-conic-gradient(#22D3EE14 0 7deg,transparent 7deg 18deg);-webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent);animation:amSpin 70s linear infinite;pointer-events:none}',
+    '.am-arena::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle,#FFFFFF55 1px,transparent 1.6px) 0 0/11px 9px,radial-gradient(circle,#22D3EE55 1px,transparent 1.6px) 5px 4px/14px 12px;-webkit-mask-image:linear-gradient(180deg,transparent 4%,#000 14%,#000 36%,transparent 48%);mask-image:linear-gradient(180deg,transparent 4%,#000 14%,#000 36%,transparent 48%);opacity:.55}',
+    '.am-arena>.aa-pitch{position:absolute;left:-60%;right:-60%;bottom:-20px;height:420px;transform:perspective(520px) rotateX(58deg);transform-origin:50% 100%;background:radial-gradient(circle at 50% 35%,transparent 64px,#FFFFFF33 65px 68px,transparent 69px),linear-gradient(90deg,transparent calc(50% - 2px),#FFFFFF33 calc(50% - 2px) calc(50% + 2px),transparent calc(50% + 2px)),repeating-linear-gradient(90deg,#1B5232 0 80px,#164529 80px 160px);-webkit-mask-image:linear-gradient(0deg,#000 30%,transparent 62%);mask-image:linear-gradient(0deg,#000 30%,transparent 62%);opacity:.8}',
+    '.am-arena>.aa-beam{position:absolute;top:-30px;width:300px;height:520px;margin-left:-150px;background:linear-gradient(180deg,#E8F6FF30,transparent 75%);clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);transform-origin:50% 0;will-change:transform;animation:aaBeam 6s ease-in-out infinite alternate}',
+    '.am-arena>.aa-beam.r{animation-delay:-3s;animation-direction:alternate-reverse}',
+    '@keyframes aaBeam{from{transform:rotate(-24deg)}to{transform:rotate(24deg)}}',
+    '.am-arena>.aa-flash{position:absolute;width:10px;height:10px;margin:-5px;border-radius:50%;background:radial-gradient(closest-side,#fff,#ffffff55 40%,transparent);opacity:0;animation:aaFlash 3.2s infinite}',
+    '@keyframes aaFlash{0%,90%,100%{opacity:0}93%{opacity:1}}',
+    '.am-arena~*{position:relative}',
     // ---- a living app: things that move on their own and answer your finger ----
     // the backdrop drifts with the phone's tilt (or the finger): depth
     '.am-bg,.bc-beams,.rg-bg,.md-bg{transform:translate3d(calc(var(--px,0) * -12px),calc(var(--py,0) * -9px),0) scale(1.05);transition:transform .25s ease-out}',
