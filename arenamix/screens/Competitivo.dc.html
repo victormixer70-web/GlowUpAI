@@ -23,6 +23,33 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .mm-slot{background-image:linear-gradient(100deg,transparent 30%,#ffffff12 50%,transparent 70%)!important;background-size:60% 100%!important;background-repeat:no-repeat!important;animation:mmShine 1.6s linear infinite}
 .mm-reel{filter:blur(1.2px);opacity:.55}
 .mm-vs{animation:mmVs 1.2s ease-in-out infinite}
+.ko-a{animation:koInL .45s cubic-bezier(.2,1,.3,1) both}.ko-b{animation:koInR .45s cubic-bezier(.2,1,.3,1) both}
+@keyframes koInL{from{transform:translateX(-60%)}to{transform:none}}@keyframes koInR{from{transform:translateX(60%)}to{transform:none}}
+.ko-stripes{position:absolute;inset:0;background:repeating-linear-gradient(115deg,#ffffff08 0 14px,transparent 14px 40px);animation:koSlide 3s linear infinite}
+@keyframes koSlide{to{background-position:200px 0}}
+.ko-bolt{animation:koBolt 3.2s both}@keyframes koBolt{0%,12%{opacity:0}14%{opacity:1}17%{opacity:.2}20%,70%{opacity:1}73%{opacity:.3}76%{opacity:1}100%{opacity:1}}
+.ko-spot{position:absolute;top:-60px;width:180px;height:560px;background:linear-gradient(180deg,#ffffff30,transparent 80%);filter:blur(6px);transform-origin:50% 0;pointer-events:none;mix-blend-mode:screen}
+.ko-spot-l{left:120px;animation:koSpotL 3.2s ease-in-out both}.ko-spot-r{right:120px;animation:koSpotR 3.2s ease-in-out both}
+@keyframes koSpotL{from{rotate:-35deg;opacity:0}20%{opacity:1}to{rotate:25deg;opacity:.6}}@keyframes koSpotR{from{rotate:35deg;opacity:0}20%{opacity:1}to{rotate:-25deg;opacity:.6}}
+.ko-head{animation:koFade .3s .25s both}@keyframes koFade{from{opacity:0;translate:0 -8px}}
+.ko-card{animation-duration:.5s;animation-fill-mode:both;animation-timing-function:cubic-bezier(.2,1.5,.4,1)}
+.ko-in-l{animation-name:koCardL}.ko-in-r{animation-name:koCardR}
+@keyframes koCardL{from{transform:translateX(-340px) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes koCardR{from{transform:translateX(340px) rotate(8deg);opacity:0}to{transform:none;opacity:1}}
+.ko-med{animation:koStamp .5s .45s cubic-bezier(.2,1.6,.4,1) both,koFlip .6s 2.05s cubic-bezier(.5,0,.3,1.3) both}
+@keyframes koStamp{from{transform:scale(3.2) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes koFlip{from{transform:rotateY(0)}to{transform:rotateY(180deg) scale(1.12)}}
+.ko-face{position:absolute;inset:0;border-radius:60px;display:flex;align-items:center;justify-content:center}
+.ko-back{transform:rotateY(180deg);opacity:0;animation:koShowB .6s 2.05s step-end both}.ko-face:not(.ko-back){animation:koHideF .6s 2.05s step-end both}
+@keyframes koShowB{0%{opacity:0}45%,100%{opacity:1}}@keyframes koHideF{0%{opacity:1}45%,100%{opacity:0}}
+.ko-back svg{animation:koToot .18s 2.5s 4 alternate both}@keyframes koToot{to{transform:scale(1.15) rotate(-8deg)}}
+.ko-wave{opacity:0;animation:koWave .7s .62s ease-out both}.ko-wave2{animation:koWave .9s 2.45s ease-out both}
+@keyframes koWave{from{transform:scale(.9);opacity:.9}to{transform:scale(2.6);opacity:0}}
+.ko-t1{animation:koT1 1.6s .7s both}@keyframes koT1{0%{opacity:0;letter-spacing:14px}25%,80%{opacity:1;letter-spacing:4px}100%{opacity:0}}
+.ko-t2{animation:koT2 .5s 2.35s cubic-bezier(.2,1.8,.4,1) both}@keyframes koT2{from{opacity:0;transform:scale(.3) rotate(-8deg)}to{opacity:1;transform:rotate(-3deg)}}
+.ko-sub{animation:koFade .4s .5s both}
+.ko-root{animation:koOut .45s 2.8s ease-in both}@keyframes koOut{to{transform:scale(1.35);filter:blur(4px)}}
+.ko-flash{opacity:0;animation:koFlash .5s 2.85s both}@keyframes koFlash{0%{opacity:0}60%{opacity:1}100%{opacity:1}}
 .mm-dot{display:inline-block;width:8px;height:8px;border-radius:4px;background:#53D88E;box-shadow:0 0 8px #53D88E;animation:mmBlink 1s infinite}
 </style>
 </helmet>
@@ -109,19 +136,36 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 
   <sc-if value="{{isFound}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; inset: 64px 30px 20px 30px; display: flex; align-items: center; justify-content: space-between">
-      <div style="display: flex; flex-direction: column; gap: 6px; width: 270px">
-        <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE">TU EQUIPO</span>
-        <sc-for list="{{teamA}}" as="p" hint-placeholder-count="2"><span style="{{p.style}}"><span>{{p.name}}</span><span style="color: #A3A3C2; font-size: 11px">{{p.tag}}</span></span></sc-for>
+    <div class="ko-root" style="position: absolute; inset: 0; z-index: 5; overflow: hidden; background: #07070F">
+      <!-- the two halves crash together along a diagonal -->
+      <div class="ko-a" style="position: absolute; inset: 0; clip-path: polygon(0 0, 57% 0, 43% 100%, 0 100%); background: radial-gradient(70% 90% at 15% 50%, #0F5566 0%, #0A2230 55%, #07101A 100%)"><div class="ko-stripes"></div></div>
+      <div class="ko-b" style="position: absolute; inset: 0; clip-path: polygon(57% 0, 100% 0, 100% 100%, 43% 100%); background: radial-gradient(70% 90% at 85% 50%, #66202A 0%, #2E1018 55%, #14070C 100%)"><div class="ko-stripes"></div></div>
+      <svg class="ko-bolt" width="844" height="390" viewBox="0 0 844 390" style="position: absolute; inset: 0; pointer-events: none"><path d="M481 -5 L452 120 L470 128 L430 262 L448 270 L362 395" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round" style="filter: drop-shadow(0 0 6px #7EF0FF) drop-shadow(0 0 14px #A78BFA)"/></svg>
+      <!-- spotlights crossing -->
+      <div class="ko-spot ko-spot-l"></div><div class="ko-spot ko-spot-r"></div>
+      <!-- teams -->
+      <div style="position: absolute; left: 34px; top: 0; bottom: 0; width: 260px; display: flex; flex-direction: column; justify-content: center; gap: 8px">
+        <span class="ko-head" style="font-size: 12px; font-weight: 800; letter-spacing: 3px; color: #7EF0FF">TU EQUIPO</span>
+        <sc-for list="{{koA}}" as="p" hint-placeholder-count="2"><div class="ko-card ko-in-l" style="{{p.style}}"><span style="{{p.av}}">{{p.ini}}</span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><b style="font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</b><span style="font-size: 11px; font-weight: 700; color: {{p.tagColor}}">{{p.tag}}</span></span></div></sc-for>
       </div>
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
-        <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">¡PARTIDA ENCONTRADA!</span>
-        <span style="{{countStyle}}">{{countLabel}}</span>
+      <div style="position: absolute; right: 34px; top: 0; bottom: 0; width: 260px; display: flex; flex-direction: column; justify-content: center; gap: 8px">
+        <span class="ko-head" style="font-size: 12px; font-weight: 800; letter-spacing: 3px; color: #FF9EA2; text-align: right">RIVALES</span>
+        <sc-for list="{{koB}}" as="p" hint-placeholder-count="2"><div class="ko-card ko-in-r" style="{{p.style}}"><span style="{{p.av}}">{{p.ini}}</span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><b style="font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</b><span style="font-size: 11px; font-weight: 700; color: {{p.tagColor}}">{{p.tag}}</span></span></div></sc-for>
       </div>
-      <div style="display: flex; flex-direction: column; gap: 6px; width: 270px">
-        <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #FF8A8E; text-align: right">RIVALES</span>
-        <sc-for list="{{teamB}}" as="p" hint-placeholder-count="2"><span style="{{p.style}}"><span>{{p.name}}</span><span style="color: #A3A3C2; font-size: 11px">{{p.tag}}</span></span></sc-for>
+      <!-- the medallion: VS, then it flips into the referee's whistle -->
+      <div class="ko-wave" style="position: absolute; left: 362px; top: 135px; width: 120px; height: 120px; border-radius: 60px; border: 3px solid #FFFFFF"></div>
+      <div class="ko-wave ko-wave2" style="position: absolute; left: 362px; top: 135px; width: 120px; height: 120px; border-radius: 60px; border: 3px solid #FFC53D"></div>
+      <div class="ko-med" style="position: absolute; left: 362px; top: 135px; width: 120px; height: 120px; transform-style: preserve-3d">
+        <div class="ko-face" style="background: radial-gradient(circle at 35% 30%, #2A2A50, #0B0B14 75%); box-shadow: 0 0 0 4px #FFFFFF, 0 0 30px #7EF0FF, 0 0 50px #FF5C8A66"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 58px; line-height: 1; background: linear-gradient(90deg, #7EF0FF 0 50%, #FF8A8E 50% 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 #000)">VS</span></div>
+        <div class="ko-face ko-back" style="background: radial-gradient(circle at 35% 30%, #FFE38A, #FFC53D 55%, #B7791F); box-shadow: 0 0 0 4px #FFFFFF, 0 0 36px #FFC53D">
+          <svg width="74" height="74" viewBox="0 0 64 64"><path d="M8 30a14 14 0 1 0 28 0h18a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H22A14 14 0 0 0 8 30z" fill="#1B1B2E"/><circle cx="22" cy="30" r="6" fill="#FFC53D"/><rect x="40" y="14" width="8" height="8" rx="2" fill="#1B1B2E"/><path d="M50 8l4-5M56 14l5-3M44 6l1-5" stroke="#1B1B2E" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
       </div>
+      <!-- the words under it -->
+      <span class="ko-t1" style="position: absolute; left: 0; right: 0; top: 274px; text-align: center; font-size: 13px; font-weight: 800; letter-spacing: 4px; color: #F4F4FA">¡PARTIDA ENCONTRADA!</span>
+      <span class="ko-t2" style="position: absolute; left: 0; right: 0; top: 262px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 48px; line-height: 1; letter-spacing: 2px; color: #FFE38A; text-shadow: 0 4px 0 #05050A, 0 0 24px #FFC53D">¡A JUGAR!</span>
+      <span class="ko-sub" style="position: absolute; left: 0; right: 0; top: 30px; text-align: center; font-size: 11px; font-weight: 800; letter-spacing: 3px; color: #A3A3C2">{{koMode}}</span>
+      <div class="ko-flash" style="position: absolute; inset: 0; background: #FFFFFF; pointer-events: none"></div>
     </div>
   </sc-if>
 
@@ -352,6 +396,12 @@ class Component extends DCLogic {
       if (this.t > this.findAt + 20 && M.roster.length <= 1) { M.cancel(); this.mm = null; this.t = 0; this.setState({ phase: 'found', match: this.pre || this.makeMatch(), online: null }); }
     } else if (s.phase === 'search' && this.t > this.findAt) { this.t = 0; this.setState({ phase: 'found', match: this.pre || this.makeMatch(), online: null }); }
     if (s.phase === 'search') this.drawGlobe(this.t);
+    if (s.phase === 'found') {
+      // the walkout's sounds: the medallion stamping down, then the referee
+      const fx = window.AMSfx, k = this.koFx || (this.koFx = {});
+      if (this.t > 0.5 && !k.stamp) { k.stamp = 1; if (fx && fx.thud) fx.thud(3); }
+      if (this.t > 2.4 && !k.whistle) { k.whistle = 1; if (fx && fx.whistle) fx.whistle(1); if (fx && fx.roar) fx.roar(true); }
+    }
     if (s.phase === 'found' && this.t > 3.2) { this.setState({ phase: 'match' }); this.raf = null; return; }
     else if (s.phase === 'result' && this.t > 2.4) { this.forceUpdate(); this.raf = null; return; }
     else if (s.phase === 'winners' && this.t > 1.2) { this.forceUpdate(); this.raf = null; return; }
@@ -529,7 +579,7 @@ class Component extends DCLogic {
     if (placing) { chips.push(chip('Clasificatoria ' + Math.min(5, pc.g + 1) + ' de 5', 'g')); chips.push(chip('Rango inicial máximo: Oro 3')); }
     else if (!casual) { chips.push(chip('Rivales de MMR parecido')); chips.push(chip('Victoria ≈ +25 MMR', 'g')); chips.push(chip(R.name === 'Bronce' ? 'Derrota −12 MMR' : 'Derrota ≈ −25 MMR', 'r')); }
     else chips.push(chip('No afecta a tu rango'));
-    const row = (name, tag, mine, right) => ({ name, tag, style: 'display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 14px; ' + (mine ? 'background: #10303A; border: 1px solid #22D3EE;' : 'background: #17172A; border: 1px solid #26264A;') + (right ? ' flex-direction: row-reverse;' : '') });
+    const row = (name, tag, mine, right) => ({ name, tag, mine, style: 'display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 14px; ' + (mine ? 'background: #10303A; border: 1px solid #22D3EE;' : 'background: #17172A; border: 1px solid #26264A;') + (right ? ' flex-direction: row-reverse;' : '') });
     const tagOf = (mm) => casual ? 'IA' : this.rankOf(mm).label + ' · IA';
     let teamA = m ? [row(window.AMOnline ? window.AMOnline.myName() : 'Tú', casual ? 'Tú' : placing ? 'Sin clasificar' : R.label, true)].concat(m.mates.map((x, i) => row(x, tagOf(m.mateMmr[i])))) : [];
     let teamB = m ? m.rivals.map((x, i) => row(x, tagOf(m.rivalMmr[i]), false, true)) : [];
@@ -622,8 +672,19 @@ class Component extends DCLogic {
       searchSub: M && !M.cancelled ? (humans > 1 ? humans + ' jugadores online en la sala' + (M.isHost ? ' · empieza en ' + Math.max(0, Math.ceil(10 - (Date.now() - M.firstJoin) / 1000)) + ' s' : ' · esperando al anfitrión') : 'Buscando jugadores online… si no hay nadie, jugarás contra la IA') : n > 1 ? found + ' / ' + total + ' jugadores' : 'Rango de búsqueda: ' + Math.max(0, s.mmr - 50 - Math.floor(this.t / 1.5) * 25) + '–' + (s.mmr + 50 + Math.floor(this.t / 1.5) * 25) + ' MMR',
       searchClock: '0:' + String(Math.floor(this.t)).padStart(2, '0'),
       teamA, teamB,
-      countLabel: this.t < 3 ? String(3 - Math.floor(this.t)) : '¡YA!',
-      countStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 100px; line-height: 1; color: #22D3EE; text-shadow: 0 6px 0 #0B0B14; transform: scale(' + (1.4 - (this.t % 1) * 0.4).toFixed(2) + ');',
+      koMode: (casual ? 'INFORMAL' : 'COMPETITIVO') + ' · ' + (pl.kind === 'team' ? pl.n + ' CONTRA ' + pl.n : pl.title || ''),
+      ...(() => {
+        const face = (window.AMChars && window.AMChars.pref() !== 'clasico') ? 'assets/chars/' + window.AMChars.pref() + '.png' : '';
+        const mk = (list, team) => list.map((p, i) => {
+          const col = team ? '#FF8A8E' : '#22D3EE', mine = !!p.mine;
+          return {
+            name: p.name, tag: p.tag, ini: p.name.replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase() || '?', tagColor: mine ? '#53D88E' : col,
+            style: 'position: relative; display: flex; align-items: center; gap: 10px; height: 54px; padding: 0 14px; box-sizing: border-box; animation-delay: ' + (0.15 + i * 0.12).toFixed(2) + 's; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); ' + (team ? 'flex-direction: row-reverse; text-align: right; ' : '') + 'background: linear-gradient(' + (team ? '270' : '90') + 'deg, ' + col + (mine ? '55' : '33') + ', #0B0B14CC); box-shadow: inset ' + (team ? '-4' : '4') + 'px 0 0 ' + col + (mine ? ', 0 0 18px ' + col + '66' : '') + ';',
+            av: 'flex: none; width: 38px; height: 38px; border-radius: 19px; display: flex; align-items: center; justify-content: center; font: 800 14px \'Barlow Condensed\', sans-serif; box-shadow: 0 0 0 2px #0B0B14, 0 0 0 4px ' + col + '; ' + (mine && face ? 'background: #22D3EE url(' + face + ') center/cover; color: transparent;' : 'background: ' + col + '; color: #0B0B14;')
+          };
+        });
+        return { koA: mk(teamA, 0), koB: mk(teamB, 1) };
+      })(),
       matchLabel: casual ? 'INFORMAL' : 'COMPETITIVO', matchMode: casual ? 'quick' : 'comp', duration: casual ? 90 : 120, teamSize: n,
       mates: m ? m.mates : [], rivals: m ? m.rivals : [], oppName: m ? m.rivals[0] : '',
       oppColor: m ? m.color : '#A78BFA', oppTrim: m ? m.trim : '#F4F4FA',
@@ -638,7 +699,7 @@ class Component extends DCLogic {
       rankChanged: rankChanged || (s.justPlaced && s.phase === 'result'), changeLabel: s.justPlaced ? 'RANGO INICIAL' : up ? '¡ASCENSO!' : 'DESCENSO',
       changeStyle: 'padding: 4px 14px; border-radius: 8px; font-weight: 800; font-size: 14px; letter-spacing: 2px; ' + (up ? 'background: #22D3EE; color: #0B0B14;' : 'background: #2A1418; color: #FF8A8E;'),
       xp: String(xp), coins: String(coins),
-      search: () => { this.findAt = 2 + n * 0.6 + Math.random() * 1.5; this.pre = this.makeMatch(); this.arcs = []; this.seen = 1; this.setState({ phase: 'search', online: null }); this.startOnline(n); this.anim(); },
+      search: () => { this.findAt = 2 + n * 0.6 + Math.random() * 1.5; this.pre = this.makeMatch(); this.koFx = {}; this.arcs = []; this.seen = 1; this.setState({ phase: 'search', online: null }); this.startOnline(n); this.anim(); },
       cancel: () => { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; this.endOnline(); this.setState({ phase: 'lobby' }); },
       onEnd: (r) => this.finish(r),
       onScore: (score) => this.finish({ home: score, away: m ? m.target : 0 }),
