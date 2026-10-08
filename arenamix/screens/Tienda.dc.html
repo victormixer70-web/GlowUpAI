@@ -70,8 +70,9 @@ input::placeholder{color:#8686A6}
           <div style="display: flex; flex-direction: column; gap: 10px">
       <section class="am-shine bc-cut" style="position: relative; padding: 18px; background: linear-gradient(140deg, #5A2A0C, #2B1A0C 70%); border: 1px solid #FF8A3D; box-shadow: 0 0 18px #FF8A3D44; overflow: hidden; display: flex; flex-direction: column; gap: 8px">
         <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #FFB37A">PASE DE TEMPORADA</span>
-        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 28px; line-height: 1.05; max-width: 220px">Equipaciones exclusivas de temporada</span>
-        <a href="#" class="bc-para" style="align-self: flex-start; display: flex; align-items: center; height: 44px; margin-top: 6px; padding: 0 22px; background: #FF8A3D; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px">[PRECIO]</a>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 28px; line-height: 1.05; max-width: 150px">30 niveles de premios</span>
+        <span style="font-size: 11px; font-weight: 700; color: #FFB37A; max-width: 140px">Nivel {{passLv}} · {{passNote}}</span>
+        <a href="Pase.dc.html" class="bc-para" style="position: relative; z-index: 1; align-self: flex-start; display: flex; align-items: center; height: 40px; margin-top: 2px; padding: 0 20px; background: #FF8A3D; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px">VER PASE</a>
         <img src="{{passImg}}" alt="" style="position: absolute; right: -14px; bottom: -6px; width: 150px; height: 190px; object-fit: cover; object-position: 50% 20%; pointer-events: none; filter: drop-shadow(0 8px 12px #000a)">
       </section>
       <a href="Taquilla.dc.html" class="bc-tile" style="--bc-c: #FFC53D; display: flex; align-items: center; gap: 12px; padding: 12px 14px 12px 18px; text-decoration: none; color: #F4F4FA">
@@ -141,6 +142,8 @@ class Component extends DCLogic {
           }
         };
       }),
+      passLv: String(PR ? PR.pass().level : 0),
+      passNote: (() => { const S = PR && PR.pass(); return !S ? '' : S.ready ? (S.ready === 1 ? '1 premio listo' : S.ready + ' premios listos') : S.premium ? 'Premium activo' : 'Gratis y premium'; })(),
       passImg: window.AMPosters ? window.AMPosters.get('pass', () => this.forceUpdate()) : '',
       prz: { coins100: P('coins:4'), chestReady: P('chest:common:open'), chestRare: P('chest:rare'), coins300: P('coins:14'), boots: P('boots:#E5484D'), hat: G ? G.thumb('cabeza', { id: 'h2', kind: 'top' }) : '' },
       isRewards: t === 'rewards',

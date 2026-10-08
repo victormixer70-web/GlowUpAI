@@ -155,10 +155,9 @@ class Component extends DCLogic {
     // what you equipped and bought stays saved between visits
     try {
       const k = JSON.parse(localStorage.getItem('arenamix.locker.v1') || 'null');
-      if (k && k.equip) {
-        Object.keys(this.state.equip).forEach((sp) => { if (k.equip[sp]) this.state.equip[sp] = { ...this.state.equip[sp], ...k.equip[sp] }; });
-        if (Array.isArray(k.bought)) this.state.bought = k.bought;
-      }
+      if (k && k.equip) Object.keys(this.state.equip).forEach((sp) => { if (k.equip[sp]) this.state.equip[sp] = { ...this.state.equip[sp], ...k.equip[sp] }; });
+      // prizes from chests and the pass can arrive before you ever open the Taquilla
+      if (k && Array.isArray(k.bought)) this.state.bought = k.bought;
     } catch (e) {}
     this.saveLocker(this.state.equip, this.state.bought);
     this.state.char = window.AMChars ? window.AMChars.pref() : 'clasico';
@@ -299,7 +298,11 @@ class Component extends DCLogic {
           ['Auxerre Blanco', W, '#0058A8', 'solid', W, W], ['Rennes Rojinegro', '#E13327', K, 'solid', K, K],
           ['Nantes Amarillo', '#FCDD09', '#00843D', 'solid', '#00843D', '#FCDD09'], ['Angers Blanquinegro', K, W, 'stripes', K, K],
           ['Le Havre Celeste', '#87CEEB', '#0F2A55', 'halves', '#0F2A55', '#0F2A55'], ['Lorient Naranja', '#F58113', K, 'solid', K, '#F58113'],
-          ['París Marino', '#1B2A48', W, 'solid', '#1B2A48', '#1B2A48'], ['Metz Granate', '#7A1C2C', W, 'solid', W, '#7A1C2C']] }
+          ['París Marino', '#1B2A48', W, 'solid', '#1B2A48', '#1B2A48'], ['Metz Granate', '#7A1C2C', W, 'solid', W, '#7A1C2C']] },
+        // the season pass's kits (progress.js gives them out: futbol-5-n)
+        { name: 'Pase de temporada', country: 'Temporada', pass: [30, 6, 14, 15], teams: [
+          ['Temporada Oro', '#141414', '#FFC53D', 'stripes', '#141414', '#FFC53D'], ['Temporada Neón', '#0B0B14', '#22D3EE', 'diag', '#0B0B14', '#22D3EE'],
+          ['Temporada Lava', '#FF5A1F', '#2A0A0A', 'halves', '#2A0A0A', '#FF5A1F'], ['Temporada Hielo', '#E8F7FF', '#3EA6FF', 'pin', '#3EA6FF', '#E8F7FF']] }
       ],
       basket: [
         { name: 'Liga Norteamérica', country: 'EE. UU. y Canadá', teams: [
@@ -418,9 +421,11 @@ class Component extends DCLogic {
         { id: 'h3', name: 'Gorro de chef', kind: 'chef', st: 'coins', price: 700 },
         { id: 'h4', name: 'Casco vikingo', kind: 'viking', st: 'reward', req: 'Oro 1', how: 'rank' },
         { id: 'h5', name: 'Gorro hélice', kind: 'prop', st: 'coins', price: 600 },
-        { id: 'h6', name: 'Corona', kind: 'crown', st: 'premium' },
+        { id: 'h6', name: 'Corona', kind: 'crown', st: 'reward', req: 'Premium nv. 25', how: 'pass' },
         { id: 'h7', name: 'Brote', kind: 'sprout', st: 'reward', req: '10 victorias', how: 'wins' },
-        { id: 'h8', name: 'Auriculares', kind: 'phones', st: 'coins', price: 800 }
+        { id: 'h8', name: 'Auriculares', kind: 'phones', st: 'coins', price: 800 },
+        { id: 'h10', name: 'Gorra Temporada', kind: 'cap', color: '#FF8A3D', st: 'reward', req: 'Premium nv. 1', how: 'pass' },
+        { id: 'h11', name: 'Cinta Dorada', kind: 'band', color: '#FFC53D', st: 'reward', req: 'Pase nv. 5', how: 'pass' }
       ],
       cara: [
         { id: 'f0', name: 'Ninguno', kind: 'none', st: 'owned' },
@@ -429,7 +434,7 @@ class Component extends DCLogic {
         { id: 'f3', name: 'Gafas estrella', kind: 'star', st: 'coins', price: 650 },
         { id: 'f4', name: 'Gafas 3D', kind: 'd3', st: 'reward', req: 'Plata 1', how: 'rank' },
         { id: 'f5', name: 'Máscara de esquí', kind: 'ski', st: 'coins', price: 750 },
-        { id: 'f6', name: 'Bigote', kind: 'stache', st: 'premium' }
+        { id: 'f6', name: 'Bigote', kind: 'stache', st: 'reward', req: 'Premium nv. 4', how: 'pass' }
       ],
       calzado: [
         { id: 's1', name: 'Volt', color: '#C8F031', st: 'owned' },
@@ -437,7 +442,9 @@ class Component extends DCLogic {
         { id: 's3', name: 'Naranja', color: '#FF8A3D', st: 'coins', price: 900 },
         { id: 's4', name: 'Carmesí', color: '#E5484D', st: 'reward', req: '10 victorias', how: 'wins' },
         { id: 's5', name: 'Celeste', color: '#3EA6FF', st: 'coins', price: 700 },
-        { id: 's6', name: 'Oro', color: '#FFC53D', st: 'premium' }
+        { id: 's6', name: 'Oro', color: '#FFC53D', st: 'reward', req: 'Premium nv. 18', how: 'pass' },
+        { id: 's7', name: 'Galaxia', color: '#9B6BFF', st: 'reward', req: 'Premium nv. 9', how: 'pass' },
+        { id: 's8', name: 'Lava', color: '#FF5A1F', st: 'reward', req: 'Pase nv. 10', how: 'pass' }
       ]
     };
   }
@@ -466,6 +473,11 @@ class Component extends DCLogic {
       { st: 'owned' }, { st: 'coins', price: 1500 }, { st: 'coins', price: 1500 },
       { st: 'reward', req: 'Plata 1', how: 'rank' }, { st: 'coins', price: 1200 }, { st: 'premium' }
     ];
+    const lg = L[sport][li];
+    if (lg.pass) {
+      const lv = lg.pass[ti], free = ti === 3;
+      return { id: sport + '-' + li + '-' + ti, crest: 'T' + (ti + 1), crestShape: 'shield', crestMark: 'star', name: t[0], primary: t[1], secondary: t[2], pattern: t[3], shorts: t[4], socks: t[5], st: 'reward', req: (free ? 'Pase nv. ' : 'Premium nv. ') + lv, how: 'pass' };
+    }
     const crest = this.initials(t[0]);
     const v = this.crestVariants(L)[sport + '-' + li + '-' + ti];
     const crestShape = ['shield', 'circle', 'diamond'][v % 3];
@@ -568,7 +580,7 @@ class Component extends DCLogic {
     let selHint = 'En tu taquilla';
     if (selEquipped) selHint = 'Lo llevas puesto';
     else if (!selOwned && selItem.st === 'coins') selHint = canAfford ? 'Disponible por carrascos' : 'Te faltan carrascos';
-    else if (!selOwned && selItem.st === 'reward') selHint = selItem.how === 'rank' ? 'Recompensa: alcanza ' + selItem.req : 'Recompensa: gana ' + selItem.req;
+    else if (!selOwned && selItem.st === 'reward') selHint = selItem.how === 'rank' ? 'Recompensa: alcanza ' + selItem.req : selItem.how === 'pass' ? 'Pase de temporada: ' + selItem.req.replace('Pase ', '').replace('Premium', 'premium,') : 'Recompensa: gana ' + selItem.req;
     else if (!selOwned && selItem.st === 'premium') selHint = 'Objeto premium';
 
     const equipNow = (extra) => {
@@ -628,7 +640,7 @@ class Component extends DCLogic {
       showBuy: !selOwned && selItem.st === 'coins',
       showReward: !selOwned && selItem.st === 'reward',
       showPremium: !selOwned && selItem.st === 'premium',
-      rewardHref: selItem.how === 'rank' ? 'Rangos.dc.html' : 'Tienda.dc.html',
+      rewardHref: selItem.how === 'rank' ? 'Rangos.dc.html' : selItem.how === 'pass' ? 'Pase.dc.html' : 'Tienda.dc.html',
       buyStyle: 'height: 40px; padding: 0 14px; border: 0; transform: skewX(-12deg); font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 18px; letter-spacing: .5px; cursor: pointer; ' + (canAfford ? 'background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #D9A520); color: #2A1C02; box-shadow: 0 0 14px #FFC53D66;' : 'background: #26264A; color: #6E6E92; cursor: default;'),
       doEquip: () => equipNow(),
       doBuy: () => {

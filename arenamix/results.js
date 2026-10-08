@@ -34,6 +34,10 @@
     '#am-res .cn b{display:block;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:34px;line-height:1;color:#FFE38A;text-shadow:0 0 14px #FFC53D88}',
     '#am-res .cn span{font-size:12px;font-weight:800;color:#FFC53D}',
     '#am-res .wk{display:flex;align-items:center;gap:10px;margin-top:8px}',
+    '#am-res .pn:has(.ps) .pile{top:14px;width:90px;height:80px;margin-left:-45px}#am-res .pn:has(.ps) .cn{bottom:34px}',
+    '#am-res .ps{position:absolute;left:12px;right:12px;bottom:10px;display:flex;align-items:center;gap:8px;font:800 11px Exo2,sans-serif;letter-spacing:1px;color:#FFB37A}',
+    '#am-res .ps i{flex:1;height:6px;background:#26264A;overflow:hidden}#am-res .ps i u{display:block;height:100%;background:linear-gradient(90deg,#FF8A3D,#FFC53D);transition:width 1s ease-out}',
+    '#am-res .ps.up b{color:#FFC53D;animation:amResPop .5s ease-out}',
     '#am-res .wk img{width:76px;height:76px;object-fit:contain;filter:drop-shadow(0 6px 8px #000a)}',
     '#am-res .dots{display:flex;gap:3px;margin-top:10px}#am-res .dots i{flex:1;height:7px;background:#26264A;transition:background .3s,box-shadow .3s}',
     '#am-res .dots i.on{background:#22D3EE;box-shadow:0 0 6px #22D3EE}#am-res .dots i.m{outline:1px solid #FFC53D88}#am-res .dots i.new{background:#FFC53D;box-shadow:0 0 10px #FFC53D}',
@@ -74,7 +78,8 @@
           '<div class="xpls" style="display:flex;flex-direction:column;gap:4px;margin-top:10px;margin-right:52px">' +
           S.xpLines.map(function (l) { return '<div class="xpl"><span>' + esc(l.label) + '</span><b>+' + l.xp + '</b></div>'; }).join('') + '</div>' +
           '<div class="bl"><span class="lvl">NIVEL ' + S.before.level + '</span><span class="xpn">+0 XP</span></div><div class="bar"><i></i></div><div class="lvup"></div></div>' +
-        '<div class="pn" style="--pc:#FFC53D;animation-delay:.4s;flex:.8"><div class="h">CARRASCOS</div><img class="pile" src="' + P(S.coinsGain + S.levelBonus > 60 ? 'coins:14' : 'coins:6') + '" alt=""><div class="cn"><b class="cv">' + fmt(S.coinsBefore) + '</b><span>+' + (S.coinsGain + S.levelBonus) + (S.levelBonus ? ' (incluye subida de nivel)' : '') + '</span></div></div>' +
+        '<div class="pn" style="--pc:#FFC53D;animation-delay:.4s;flex:.8"><div class="h">CARRASCOS</div><img class="pile" src="' + P(S.coinsGain + S.levelBonus > 60 ? 'coins:14' : 'coins:6') + '" alt=""><div class="cn"><b class="cv">' + fmt(S.coinsBefore) + '</b><span>+' + (S.coinsGain + S.levelBonus) + (S.levelBonus ? ' (incluye subida de nivel)' : '') + '</span></div>' +
+          (S.pass ? '<div class="ps' + (S.pass.after > S.pass.before ? ' up' : '') + '"><b>PASE NV. ' + S.pass.after + '</b><i><u style="width:' + (S.pass.after >= 30 ? 100 : S.pass.into / S.pass.need * 100).toFixed(0) + '%"></u></i>' + (S.pass.ready ? '<span style="color:#FFC53D">' + S.pass.ready + ' 🎁</span>' : '') + '</div>' : '') + '</div>' +
         '<div class="pn" style="--pc:#A78BFA;animation-delay:.55s"><div class="h">ESTA SEMANA · ' + S.weekAfter + '/10 VICTORIAS</div>' +
           '<div class="dots">' + dots + '</div>' +
           '<div class="wk"><img src="' + (nextM ? P(nextM.icon + (nextM.reached ? ':open' : '')) : P('chest:legend:open')) + '" alt=""><span style="font-size:12px;font-weight:800;line-height:1.35;color:#CACAE0">' + esc(weekText) + '</span></div></div>' +
@@ -176,7 +181,7 @@
     var loot = (r.items || []).map(function (it) { return '<div class="it"><img src="' + it.pic + '" alt=""><span>¡NUEVO!</span><b>' + esc(it.name) + '</b></div>'; });
     if (r.coins) loot.push('<div class="it" style="animation-delay:.12s"><img src="' + P(r.coins >= 300 ? 'coins:14' : 'coins:6') + '" alt=""><span>CARRASCOS</span><b>+' + r.coins + '</b></div>');
     el.innerHTML = '<div class="rays"></div><div class="k">' + esc((m.name || 'PREMIO').toUpperCase()) + '</div>' +
-      '<img class="ch" src="' + (isChest ? P('chest:' + m.chest) : P(m.icon)) + '" alt="">' +
+      '<img class="ch" src="' + (isChest ? P('chest:' + m.chest) : (m.pic || P(m.icon))) + '" alt="">' +
       '<div class="fl"></div><div class="tap">' + (isChest ? '¡TOCA PARA ABRIR!' : '¡TOCA PARA RECOGER!') + '</div>' +
       '<div class="loot">' + loot.join('') + '</div><button type="button" class="ok">' + (r.items && r.items.length ? 'GENIAL' : 'RECOGER') + '</button>';
     stage.appendChild(el);
