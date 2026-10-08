@@ -19,11 +19,35 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 @keyframes rgPin{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 .rg-node{position:absolute;width:64px;height:78px;margin:-39px 0 0 -32px;padding:0;border:0;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
 .rg-node:hover{transform:translateY(-4px) scale(1.06)}
+.rg-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:linear-gradient(180deg,#070718 0%,#120F33 55%,#1D1240 100%);contain:layout paint}
+.rg-stars{position:absolute;inset:0 0 35% 0;background:radial-gradient(circle,#ffffffcc 1px,transparent 1.6px) 0 0/53px 41px,radial-gradient(circle,#ffffff88 .8px,transparent 1.4px) 21px 17px/37px 29px;-webkit-mask-image:linear-gradient(180deg,#000,transparent);mask-image:linear-gradient(180deg,#000,transparent)}
+.rg-stars.b{background:radial-gradient(circle,#ffffff 1.2px,transparent 2px) 11px 7px/89px 67px;animation:rgTw 2.6s ease-in-out infinite}
+@keyframes rgTw{0%,100%{opacity:.2}50%{opacity:1}}
+.rg-aur{position:absolute;left:-20%;top:-30%;width:140%;height:90%;background:radial-gradient(40% 35% at 30% 50%,color-mix(in srgb,var(--rc) 45%,transparent),transparent 70%),radial-gradient(35% 30% at 70% 40%,color-mix(in srgb,var(--rc) 30%,#22D3EE33),transparent 70%);opacity:.7;will-change:transform;animation:rgAur 14s ease-in-out infinite alternate;transition:background .6s}
+@keyframes rgAur{from{transform:translateX(-6%) skewY(-3deg)}to{transform:translateX(6%) skewY(3deg)}}
+.rg-mt{position:absolute;left:-10%;width:120%;bottom:0;will-change:transform}
+.rg-mt.f{height:62%;animation:rgDrift 40s ease-in-out infinite alternate}
+.rg-mt.m{height:46%;animation:rgDrift 28s ease-in-out infinite alternate-reverse}
+.rg-mt.n{height:30%;animation:rgDrift 20s ease-in-out infinite alternate}
+@keyframes rgDrift{from{transform:translateX(-3%)}to{transform:translateX(3%)}}
+.rg-cloud{position:absolute;width:220px;height:46px;border-radius:50%;background:radial-gradient(closest-side,#ffffff1c,transparent);will-change:transform;animation:rgCloud 38s linear infinite}
+@keyframes rgCloud{from{transform:translateX(-260px)}to{transform:translateX(1100px)}}
+.rg-spark i{position:absolute;bottom:-6px;width:4px;height:4px;border-radius:50%;background:var(--rc);box-shadow:0 0 8px var(--rc);opacity:0;will-change:transform,opacity;animation:rgUp 6s linear infinite}
+@keyframes rgUp{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-330px);opacity:0}}
 .rg-step{display:flex;align-items:center;gap:6px;padding:0 8px;min-width:0;border-radius:12px;box-shadow:inset 0 2px 0 #ffffff14,inset 0 -3px 0 #0007}
 </style>
 </helmet>
-<div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
-  <div class="am-bg under"></div>
+<div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden; {{stageVars}}">
+  <!-- night sky over the mountains you climb: aurora in the chosen rank's colour, stars, clouds, sparks -->
+  <div class="rg-bg">
+    <div class="rg-aur"></div>
+    <div class="rg-stars"></div><div class="rg-stars b"></div>
+    <div class="rg-cloud" style="top: 40px; animation-delay: -6s"></div><div class="rg-cloud" style="top: 120px; animation-delay: -24s; animation-duration: 52s; width: 300px"></div>
+    <svg class="rg-mt f" viewBox="0 0 1000 240" preserveAspectRatio="none"><path d="M0 240L0 150L70 110L120 135L190 60L250 115L320 80L380 120L450 30L520 100L590 70L650 120L720 40L790 95L860 65L930 110L1000 80L1000 240Z" fill="color-mix(in srgb, var(--rc) 22%, #1A1440)"/><path d="M190 60L205 75L180 82ZM450 30L468 50L440 58ZM720 40L736 58L708 64Z" fill="#ffffff44"/></svg>
+    <svg class="rg-mt m" viewBox="0 0 1000 180" preserveAspectRatio="none"><path d="M0 180L0 120L90 70L160 110L250 50L330 100L410 60L500 115L590 55L680 105L760 70L850 120L930 75L1000 100L1000 180Z" fill="#15112E"/></svg>
+    <svg class="rg-mt n" viewBox="0 0 1000 120" preserveAspectRatio="none"><path d="M0 120L0 70L120 40L220 75L340 30L460 70L580 35L700 80L820 45L920 75L1000 55L1000 120Z" fill="#0C0A1E"/></svg>
+    <div class="rg-spark"><sc-for list="{{sparks}}" as="k" hint-placeholder-count="0"><i style="{{k}}"></i></sc-for></div>
+  </div>
   <!-- header -->
   <div style="position: absolute; left: 18px; top: 12px; display: flex; align-items: center; gap: 10px; z-index: 3">
     <a href="Modos.dc.html" aria-label="Volver" class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 46px; height: 38px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
@@ -147,7 +171,10 @@ class Component extends DCLogic {
         style: 'flex: 1; height: ' + (34 + k * 9) + 'px; color: ' + (yours ? '#0B0B14' : r.text) + '; background: ' + (yours ? r.c1 : 'linear-gradient(180deg, ' + r.c2 + 'cc, #0B0B14)') + ';' + (yours ? ' box-shadow: inset 0 2px 0 #ffffff66, inset 0 -3px 0 #0005, 0 0 14px ' + r.c1 + '88;' : '')
       };
     });
+    const rnd = (k) => { const x = Math.sin(k * 77.3) * 43758.5; return x - Math.floor(x); };
     return {
+      stageVars: '--rc: ' + r.c1 + ';',
+      sparks: Array.from({ length: 16 }, (_, k) => 'left: ' + (rnd(k + 1) * 844).toFixed(0) + 'px; animation-duration: ' + (4.5 + rnd(k + 30) * 4).toFixed(2) + 's; animation-delay: -' + (rnd(k + 60) * 8).toFixed(2) + 's'),
       season: 'Temporada 1',
       heroStyle: 'position: absolute; left: 18px; top: 60px; width: 282px; bottom: 12px; box-sizing: border-box; padding: 14px 12px 12px; border-radius: 22px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between; background: radial-gradient(90% 60% at 50% 25%, ' + r.c2 + '88, #11112A 70%); box-shadow: inset 0 2px 0 #ffffff18, inset 0 -4px 0 #0008, inset 0 0 0 2px ' + r.c1 + '55, 0 10px 24px #0008;',
       heroKey: 'h' + sel, heroC: r.c1, heroC2: r.c2, heroText: r.text, heroName: r.name.toUpperCase(),
