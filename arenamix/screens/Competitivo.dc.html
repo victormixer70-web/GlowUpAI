@@ -61,6 +61,29 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .em-k{animation:emSlide .4s .15s cubic-bezier(.2,1.4,.4,1) both}@keyframes emSlide{from{opacity:0;translate:-40px 0}}
 .em-t{animation:emPopT .6s .05s cubic-bezier(.2,1.8,.4,1) both;transform-origin:0 50%}@keyframes emPopT{from{transform:scale(.3) rotate(-8deg);opacity:0}to{transform:rotate(-3deg);opacity:1}}
 .em-s{animation:emSlide .4s .3s both}.em-b{animation:emSlide .45s .42s cubic-bezier(.2,1.4,.4,1) both}
+.rs-root{position:absolute;inset:0;z-index:5;overflow:hidden;background:radial-gradient(90% 100% at 25% 45%,var(--rc2) 0%,#0E0E1E 60%,#07070F 100%)}
+.rs-rays{position:absolute;left:150px;top:200px;width:1300px;height:1300px;margin:-650px 0 0 -650px;background:repeating-conic-gradient(from 0deg,var(--rc3) 0deg 8deg,transparent 8deg 20deg);animation:emRays 50s linear infinite;mask-image:radial-gradient(closest-side,#000,transparent);-webkit-mask-image:radial-gradient(closest-side,#000,transparent);pointer-events:none}
+.rs-spot{position:absolute;left:30px;top:-40px;width:240px;height:440px;background:linear-gradient(180deg,#FFFFFF30,#FFFFFF05 85%);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);filter:blur(4px);pointer-events:none}
+.rs-me{position:absolute;animation:rsMeIn .6s cubic-bezier(.2,1.4,.4,1) both}@keyframes rsMeIn{from{opacity:0;transform:translateY(40px) scale(.9)}}
+.rs-cup{animation:rsCup .7s .5s cubic-bezier(.2,1.8,.4,1) both}@keyframes rsCup{from{opacity:0;transform:scale(.2) rotate(-30deg)}}
+.rs-k{font:800 12px Exo2,sans-serif;letter-spacing:3px;color:var(--rc);animation:emSlide .4s .1s both}
+.rs-t{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-style:italic;font-size:72px;line-height:.9;color:var(--rc);text-shadow:0 6px 0 #05050A,0 0 34px var(--rc);transform-origin:0 60%;animation:emPopT .65s .05s cubic-bezier(.2,1.8,.4,1) both}
+.rs-board{display:flex;align-items:stretch;height:46px;transform:skewX(-10deg);box-shadow:0 10px 24px #000a;animation:emSlide .45s .3s cubic-bezier(.2,1.4,.4,1) both}
+.rs-team{display:flex;align-items:center;width:150px;padding:0 14px;font:800 13px Exo2,sans-serif;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs-score{display:flex;align-items:center;gap:10px;padding:0 16px;background:#0B0B14;color:#FFFFFF;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:34px}
+.rs-score i{font-style:normal;color:#4C4C78}.rs-score b{display:inline-block}
+.rs-d1{animation:rsDigit .5s .55s cubic-bezier(.2,1.8,.4,1) both}.rs-d2{animation:rsDigit .5s .7s cubic-bezier(.2,1.8,.4,1) both}@keyframes rsDigit{from{transform:rotateX(90deg) scale(1.6);opacity:0}}
+.rs-panel{display:flex;flex-direction:column;gap:6px;width:430px;padding:10px 14px;box-sizing:border-box;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);background:#0B0B14B3;box-shadow:inset 3px 0 0 var(--rc);animation:emSlide .45s .45s cubic-bezier(.2,1.4,.4,1) both}
+.rs-chip{display:flex;align-items:center;gap:5px;padding:4px 12px;transform:skewX(-10deg);background:color-mix(in srgb,var(--cc) 22%,transparent);box-shadow:inset 0 0 0 1px var(--cc);color:var(--cc);font:800 13px Exo2,sans-serif}
+.rs-chip b{font-family:'Barlow Condensed',sans-serif;font-size:20px;line-height:1}.rs-chip img{width:24px;height:24px;object-fit:contain}
+.rs-btns{display:flex;align-items:center;gap:10px;margin-top:auto;animation:emSlide .45s .6s cubic-bezier(.2,1.4,.4,1) both}
+.rs-go{height:52px;padding:0 26px;border:0;transform:skewX(-12deg);background:linear-gradient(135deg,#9AF5FF,#22D3EE 55%,#0FA7C0);color:#0B0B14;box-shadow:0 5px 0 #0A6F80,0 0 24px #22D3EE66;cursor:pointer}
+.rs-go span,.rs-out span{display:inline-block;transform:skewX(12deg);font-family:'Barlow Condensed',sans-serif;font-weight:800;font-style:italic;font-size:24px;letter-spacing:1px}
+.rs-out{display:flex;align-items:center;height:44px;padding:0 20px;transform:skewX(-12deg);box-shadow:inset 0 0 0 2px #F4F4FA88;color:#F4F4FA;text-decoration:none}
+.rs-out span{font-size:18px}
+.rs-confetti i,.rs-rain i{position:absolute;top:-20px;pointer-events:none}
+.rs-confetti i{width:8px;height:12px;animation:rsFall linear infinite}@keyframes rsFall{to{transform:translateY(440px) rotate(720deg)}}
+.rs-rain i{width:2px;height:18px;background:linear-gradient(180deg,transparent,#9FB3D8AA);animation:rsRain linear infinite}@keyframes rsRain{to{transform:translate(-30px,440px)}}
 .mm-dot{display:inline-block;width:8px;height:8px;border-radius:4px;background:#53D88E;box-shadow:0 0 8px #53D88E;animation:mmBlink 1s infinite}
 </style>
 </helmet>
@@ -234,8 +257,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 
   <sc-if value="{{isWinners}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 38%, #3A2A08 0%, #12121F 55%, #0B0B14 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
-      <span style="font-size: 13px; font-weight: 800; letter-spacing: 4px; color: #FFC53D">{{wKicker}}</span>
+    <div class="rs-root" style="--rc: #FFC53D; --rc2: #3A2A08; --rc3: #FFC53D1f; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+      <div class="rs-rays" style="left: 422px; top: 160px"></div>
+      <span class="rs-k" style="position: relative; font-size: 14px; letter-spacing: 5px; color: #FFC53D">{{wKicker}}</span>
       <div style="display: flex; align-items: flex-end; gap: 40px">
         <sc-for list="{{wCards}}" as="w" hint-placeholder-count="1">
           <div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
@@ -247,40 +271,57 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       </div>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 40px; line-height: 1; margin-top: 4px">{{scoreLabel}}</span>
       <span style="font-size: 13px; color: #A3A3C2">{{scoreSub}}</span>
-      <button type="button" onClick="{{toResult}}" class="bc-btn am-shine" style="margin-top: 6px; height: 48px; padding: 0 36px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">CONTINUAR</button>
+      <button type="button" onClick="{{toResult}}" class="rs-go" style="position: relative; margin-top: 8px"><span>CONTINUAR</span></button>
     </div>
   </sc-if>
   <sc-if value="{{isResult}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; inset: 64px 40px 24px 40px; display: flex; align-items: center; gap: 40px">
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 280px">
-        <span style="{{resTitleStyle}}">{{resTitle}}</span>
-        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 54px; line-height: 1">{{scoreLabel}}</span>
-        <span style="font-size: 13px; color: #A3A3C2">{{scoreSub}}</span>
-        <sc-if value="{{deltaShown}}" hint-placeholder-val="{{ true }}"><span style="{{deltaStyle}}">{{deltaLabel}} MMR</span></sc-if>
-      </div>
-      <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px">
-        <sc-if value="{{ranked}}" hint-placeholder-val="{{ true }}">
-          <svg width="120" height="128" viewBox="-6 -10 76 80" style="{{emblemPop}}"><circle cx="32" cy="32" r="34" fill="{{myC1}}" opacity=".15"/><sc-if value="{{myWings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{myC1}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{myC1}}"/></sc-if><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{myC1}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{myC2}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53Z" fill="#000000" opacity=".18"/><path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{myC1}}"/><rect x="20" y="62" width="7" height="5" rx="1.5" fill="{{pip1}}"/><rect x="29" y="62" width="7" height="5" rx="1.5" fill="{{pip2}}"/><rect x="38" y="62" width="7" height="5" rx="1.5" fill="{{pip3}}"/></svg>
-          <sc-if value="{{rankChanged}}" hint-placeholder-val="{{ false }}"><span style="{{changeStyle}}">{{changeLabel}}</span></sc-if>
-          <span class="bc-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1; color: {{myText}}">{{myRank}}</span>
-          <span style="font-size: 14px; font-weight: 700">{{mmrLabel}} MMR</span>
-          <div style="width: 260px; height: 10px; border-radius: 5px; background: #26264A"><div style="{{resBar}}"></div></div>
-          <span style="font-size: 12px; color: #A3A3C2">{{nextLabel}}</span>
-        </sc-if>
-        <sc-if value="{{placing}}" hint-placeholder-val="{{ false }}">
-          <svg width="110" height="118" viewBox="-6 -10 76 80"><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="#3A3A5E"/><path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="#20203A"/><text x="32" y="40" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="26" fill="#8C8CB0">?</text></svg>
-          <span style="font-size: 14px; font-weight: 800; letter-spacing: 1px; color: #53D88E">{{placeTitle}}</span>
-          <div style="display: flex; gap: 6px"><sc-for list="{{placeDots}}" as="dt" hint-placeholder-count="5"><span style="{{dt.style}}"></span></sc-for></div>
-          <span style="font-size: 12px; color: #A3A3C2">Tu rango aparecerá al terminar las 5.</span>
-        </sc-if>
-        <sc-if value="{{casual}}" hint-placeholder-val="{{ false }}">
-          <span style="font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">RECOMPENSAS</span>
-          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; color: #22D3EE">+{{xp}} XP</span>
-          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; color: #FFC53D">+{{coins}} VCD</span>
-        </sc-if>
-        <div style="display: flex; gap: 8px; margin-top: 6px">
-          <button type="button" onClick="{{again}}" class="bc-btn am-shine" style="height: 48px; padding: 0 24px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1.5px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">OTRA PARTIDA</button>
-          <a href="Modos.dc.html" style="display: flex; align-items: center; height: 48px; padding: 0 18px; border-radius: 14px; border: 1.5px solid #F4F4FA; color: #F4F4FA; text-decoration: none; font-weight: 800; font-size: 14px">Salir</a>
+    <div class="rs-root" style="{{rsVars}}">
+      <div class="rs-rays"></div>
+      <sc-if value="{{rsWin}}" hint-placeholder-val="{{ false }}"><div class="rs-confetti"><sc-for list="{{rsBits}}" as="c" hint-placeholder-count="0"><i style="{{c}}"></i></sc-for></div></sc-if>
+      <sc-if value="{{rsLoss}}" hint-placeholder-val="{{ false }}"><div class="rs-rain"><sc-for list="{{rsDrops}}" as="c" hint-placeholder-count="0"><i style="{{c}}"></i></sc-for></div></sc-if>
+      <!-- you, under a spotlight, with the cup if you won -->
+      <div class="rs-spot"></div>
+      <div style="position: absolute; left: 34px; bottom: 26px; width: 220px; height: 26px; border-radius: 50%; background: radial-gradient(closest-side, var(--rc) , transparent); opacity: .45"></div>
+      <img class="rs-me" src="{{rsMe}}" alt="" style="{{rsMeStyle}}">
+      <sc-if value="{{rsWin}}" hint-placeholder-val="{{ false }}"><img class="rs-cup" src="{{rsCup}}" alt="" style="position: absolute; left: 190px; top: 150px; width: 96px; height: 96px; object-fit: contain; filter: drop-shadow(0 6px 10px #000c)"></sc-if>
+      <!-- the verdict -->
+      <div style="position: absolute; left: 300px; right: 22px; top: 18px; bottom: 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px">
+        <span class="rs-k">{{rsKicker}}</span>
+        <span class="rs-t">{{resTitle}}</span>
+        <!-- broadcast scoreboard -->
+        <div class="rs-board">
+          <span class="rs-team" style="background: linear-gradient(90deg, #22D3EE, #0E8FA3); color: #0B0B14">{{rsHome}}</span>
+          <span class="rs-score"><b class="rs-d1">{{rsH}}</b><i>–</i><b class="rs-d2">{{rsA}}</b></span>
+          <span class="rs-team" style="background: linear-gradient(270deg, {{rsAwayC}}, #2A2A4A); color: #FFFFFF; justify-content: flex-end">{{rsAway}}</span>
+        </div>
+        <div class="rs-panel">
+          <sc-if value="{{ranked}}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; align-items: center; gap: 14px; width: 100%">
+              <svg width="78" height="84" viewBox="-6 -10 76 80" style="{{emblemPop}}"><circle cx="32" cy="32" r="34" fill="{{myC1}}" opacity=".18"/><sc-if value="{{myWings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{myC1}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{myC1}}"/></sc-if><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{myC1}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{myC2}}"/><path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{myText}}"/></svg>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+                <div style="display: flex; align-items: baseline; gap: 10px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1; color: {{myText}}">{{myRank}}</span><sc-if value="{{deltaShown}}" hint-placeholder-val="{{ true }}"><span style="{{deltaStyle}}">{{deltaLabel}} MMR</span></sc-if></div>
+                <sc-if value="{{rankChanged}}" hint-placeholder-val="{{ false }}"><span style="{{changeStyle}}">{{changeLabel}}</span></sc-if>
+                <div style="height: 9px; background: #ffffff18; transform: skewX(-16deg); overflow: hidden"><div style="{{resBar}}"></div></div>
+                <span style="font-size: 11px; color: #CACAE0">{{mmrLabel}} MMR · {{nextLabel}}</span>
+                <sc-if value="{{rsShield}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; font-weight: 800; color: #C4B5FD">🛡 Tu escudo de rango te ha salvado los MMR</span></sc-if>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{placing}}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; align-items: center; gap: 14px">
+              <span style="font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #53D88E">{{placeTitle}}</span>
+              <div style="display: flex; gap: 6px"><sc-for list="{{placeDots}}" as="dt" hint-placeholder-count="5"><span style="{{dt.style}}"></span></sc-for></div>
+            </div>
+            <span style="font-size: 11px; color: #CACAE0">Tu rango aparecerá al terminar las 5.</span>
+          </sc-if>
+          <div style="display: flex; gap: 8px; margin-top: 2px">
+            <span class="rs-chip" style="--cc: #22D3EE"><b>+{{xp}}</b> XP</span>
+            <span class="rs-chip" style="--cc: #FFC53D"><img src="{{rsCoin}}" alt=""><b>+{{coins}}</b> VCD</span>
+          </div>
+        </div>
+        <div class="rs-btns">
+          <button type="button" onClick="{{again}}" class="rs-go"><span>OTRA PARTIDA</span></button>
+          <a href="Modos.dc.html" class="rs-out"><span>SALIR</span></a>
         </div>
       </div>
     </div>
@@ -591,6 +632,7 @@ class Component extends DCLogic {
     }
     if (!casual) {
       const opp = s.match.rivalMmr.reduce((a, b) => a + b, 0) / s.match.rivalMmr.length;
+      this.shieldUsed = false;
       const adj = Math.round((opp - s.mmr) / 10);
       let delta = 0;
       if (w) delta = Math.max(12, Math.min(32, (s.mmr >= 3075 ? 20 : 25) + adj));
@@ -741,11 +783,30 @@ class Component extends DCLogic {
       oppColor: m ? m.color : '#A78BFA', oppTrim: m ? m.trim : '#F4F4FA',
       duelKind: pl.duel || 'pen', mgMode: pl.mode || '',
       resTitle: won ? '¡VICTORIA!' : lost ? 'DERROTA' : 'EMPATE',
-      resTitleStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 52px; line-height: 1; letter-spacing: 2px; color: ' + (won ? '#22D3EE' : lost ? '#FF5C5C' : '#F4F4FA') + ';',
+      ...(() => {
+        const col = won ? ['#22D3EE', '#0F3A4A', '#22D3EE22'] : lost ? ['#FF5C5C', '#3A1420', '#FF5C5C1c'] : ['#C4B5FD', '#25204A', '#A78BFA1c'];
+        const PO = window.AMPosters, G = window.AMGear, me = PO && PO.cardKey ? PO.get(PO.cardKey(), () => this.forceUpdate()) : '';
+        const rnd = (k) => { const x = Math.sin(k * 99.7) * 43758.5; return x - Math.floor(x); };
+        const CC = ['#22D3EE', '#FFC53D', '#FF5C8A', '#53D88E', '#A78BFA', '#FFFFFF'];
+        return {
+          rsVars: '--rc: ' + col[0] + '; --rc2: ' + col[1] + '; --rc3: ' + col[2] + ';',
+          rsWin: won, rsLoss: lost, rsMe: me,
+          rsMeStyle: 'left: 40px; bottom: 30px; width: 210px; height: 280px; object-fit: cover; object-position: 50% 0; filter: drop-shadow(0 10px 14px #000c)' + (lost ? ' grayscale(.5) brightness(.8)' : '') + '; opacity: ' + (me ? 1 : 0),
+          rsCup: G ? G.prize('trophy') : '', rsCoin: G ? G.prize('coins:6') : '',
+          rsKicker: (casual ? 'INFORMAL' : placing ? 'CLASIFICATORIA' : 'COMPETITIVO') + ' · ' + (pl.kind === 'team' ? pl.n + ' VS ' + pl.n : pl.title || '') + ' · FINAL',
+          rsHome: (window.AMOnline ? window.AMOnline.myName() : 'Tú').toUpperCase(), rsAway: (m && m.rivals ? (m.rivals.length > 1 ? 'RIVALES' : m.rivals[0]) : 'RIVAL').toUpperCase(),
+          rsAwayC: m ? m.color : '#FF5C8A',
+          rsH: res ? String(res.home) : '0', rsA: res ? String(res.away) : '0',
+          rsShield: !!this.shieldUsed,
+          rsBits: won ? Array.from({ length: 34 }, (_, k) => 'left: ' + (rnd(k) * 844).toFixed(0) + 'px; background: ' + CC[k % 6] + '; animation-duration: ' + (2.4 + rnd(k + 50) * 2.2).toFixed(2) + 's; animation-delay: -' + (rnd(k + 9) * 4).toFixed(2) + 's') : [],
+          rsDrops: lost ? Array.from({ length: 40 }, (_, k) => 'left: ' + (rnd(k) * 900).toFixed(0) + 'px; animation-duration: ' + (0.7 + rnd(k + 3) * 0.5).toFixed(2) + 's; animation-delay: -' + (rnd(k + 7) * 1.2).toFixed(2) + 's') : []
+        };
+      })(),
+      resTitleStyleOld: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 52px; line-height: 1; letter-spacing: 2px; color: ' + (won ? '#22D3EE' : lost ? '#FF5C5C' : '#F4F4FA') + ';',
       scoreLabel: res ? res.home + ' – ' + res.away : '',
       scoreSub: !res ? '' : mg ? 'Tú ' + res.home + ' ' + pl.unit + ' · ' + (m ? m.rivals[0] : 'Rival') + ' ' + res.away : 'contra ' + (m ? m.rivals.join(', ') : ''),
       deltaLabel: (s.delta > 0 ? '+' : s.delta < 0 ? '−' : '±') + Math.abs(Math.round(s.delta * ease(this.t / 1.2))),
-      deltaStyle: 'margin-top: 6px; padding: 6px 14px; border-radius: 10px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 28px; ' + (s.delta > 0 ? 'background: #13261A; color: #53D88E;' : s.delta < 0 ? 'background: #2A1418; color: #FF8A8E;' : 'background: #17172A; color: #CACAE0;'),
+      deltaStyle: 'padding: 2px 10px; transform: skewX(-10deg); font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 18px; ' + (s.delta > 0 ? 'background: #13261A; color: #53D88E;' : s.delta < 0 ? 'background: #2A1418; color: #FF8A8E;' : 'background: #17172A; color: #CACAE0;'),
       emblemPop: 'transform: scale(' + (rankChanged || pop < 1 ? (0.6 + pop * 0.4 + (rankChanged ? Math.max(0, 0.25 - (this.t - 1.9) * 0.5) : 0)) : 1).toFixed(3) + ');',
       rankChanged: rankChanged || (s.justPlaced && s.phase === 'result'), changeLabel: s.justPlaced ? 'RANGO INICIAL' : up ? '¡ASCENSO!' : 'DESCENSO',
       changeStyle: 'padding: 4px 14px; border-radius: 8px; font-weight: 800; font-size: 14px; letter-spacing: 2px; ' + (up ? 'background: #22D3EE; color: #0B0B14;' : 'background: #2A1418; color: #FF8A8E;'),
