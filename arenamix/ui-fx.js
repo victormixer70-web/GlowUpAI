@@ -59,9 +59,9 @@
     // 7 REPETICIÓN (into and out of the games, which take a moment to build): a TV replay stinger
     '#fx-sting{position:absolute;inset:0;z-index:40;pointer-events:none;overflow:hidden}',
     '#fx-sting i{position:absolute;top:-25%;bottom:-25%;left:0;width:150%;transform:translateX(105%) skewX(-20deg)}',
-    '#fx-sting i:nth-child(1){background:#FFC53D;animation:fxStIn .16s cubic-bezier(.6,0,.4,1) both}',
-    '#fx-sting i:nth-child(2){background:#22D3EE;animation:fxStIn .16s .03s cubic-bezier(.6,0,.4,1) both}',
-    '#fx-sting i:nth-child(3){background:#0B0B14;animation:fxStIn .16s .06s cubic-bezier(.6,0,.4,1) both}',
+    '#fx-sting i:nth-child(1){background:#FFC53D;animation:fxStIn .1s cubic-bezier(.6,0,.4,1) both}',
+    '#fx-sting i:nth-child(2){background:#22D3EE;animation:fxStIn .1s .02s cubic-bezier(.6,0,.4,1) both}',
+    '#fx-sting i:nth-child(3){background:#0B0B14;animation:fxStIn .1s .04s cubic-bezier(.6,0,.4,1) both}',
     '#fx-sting b{position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;animation:fxStLogo .3s .1s cubic-bezier(.2,1.6,.4,1) both}',
     '#fx-sting.out i{animation:fxStOut .22s cubic-bezier(.6,0,.4,1) both!important}',
     '#fx-sting.out i:nth-child(2){animation-delay:.03s!important}#fx-sting.out i:nth-child(1){animation-delay:.06s!important}',
@@ -165,7 +165,7 @@
     if (back) history.pop(); else history.push(location.hash);
     if (history.length > 30) history.shift();
   });
-  var MODES = ['push', 'flip', 'zoom', 'iris', 'slash', 'strip'];
+  var MODES = ['push', 'flip', 'zoom', 'iris', 'slash'];
   var lastMode = '', pending = null, tok = 0, sting = null;
   var cleanup = [];
   var clearAll = function () { cleanup.splice(0).forEach(function (f) { try { f(); } catch (e) {} }); };
@@ -195,12 +195,12 @@
       doSwap();
       var t0 = performance.now(), n = 0;
       var wait = function () {
-        if (++n < 3 && performance.now() - t0 < 1500) { requestAnimationFrame(wait); return; }
+        if (++n < 2 && performance.now() - t0 < 1500) { requestAnimationFrame(wait); return; }
         s.classList.add('out');
         setTimeout(function () { s.remove(); if (sting === s) sting = null; }, 320);
       };
       requestAnimationFrame(wait);
-    }, 200);
+    }, 140);
   };
   window.AMFX = {
     swap: function (doSwap) {

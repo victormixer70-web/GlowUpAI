@@ -205,19 +205,23 @@ class Component extends DCLogic {
   /* ---------- online ---------- */
   // automatic graphics: if the match runs slowly during the first seconds of play, step the quality down
   autoGfx(now) {
-    if (!this.gfxAuto || !this.R || this.g.phase !== 'play' || this.gfxNow === 'baja') return;
-    const F = this.fpsS || (this.fpsS = { t0: now, n: 0 });
+    if (!this.gfxAuto || !this.R || this.g.phase !== 'play') return;
+    const F = this.fpsS || (this.fpsS = { t0: now, n: 0, good: 0 });
     F.n++;
-    if (now - F.t0 < 4000) return;
+    if (now - F.t0 < 1500) return;
     const fps = F.n * 1000 / (now - F.t0);
-    this.fpsS = { t0: now, n: 0 };
-    if (fps >= 42) { if (!this.fpsOk) this.fpsOk = 1; return; }
-    const next = this.gfxNow === 'alta' ? 'media' : 'baja';
-    this.gfxNow = next;
-    this.R.setPixelRatio(Math.min(next === 'media' ? 1.5 : 1, window.devicePixelRatio || 1));
-    if (next === 'baja') this.R.shadowMap.enabled = false;
-    try { localStorage.setItem('arenamix.gfxauto.v1', next); } catch (e) {}
-    this.flashMsg('Gráficos ajustados para que vaya más fluido', 1.6);
+    F.t0 = now; F.n = 0;
+    let pr = this.pr, changed = false;
+    if (fps < 50) {
+      F.good = 0;
+      // first less sharp, then (at normal sharpness) without shadows, then less sharp again
+      if (pr > 1) { pr = Math.max(1, pr - 0.25); changed = true; }
+      else if (this.R.shadowMap.enabled) { this.R.shadowMap.enabled = false; this.gfxNow = 'baja'; changed = true; this.S && this.S.traverse((o) => { if (o.material) [].concat(o.material).forEach((m) => { m.needsUpdate = true; }); }); }
+      else if (pr > 0.75) { pr = Math.max(0.75, pr - 0.125); changed = true; }
+    } else if (fps > 57 && ++F.good >= 3 && pr < this.prCap) { pr = Math.min(this.prCap, pr + 0.25); F.good = 0; changed = true; }
+    if (!changed) return;
+    if (pr !== this.pr) { this.pr = pr; this.R.setPixelRatio(pr); this.R.setSize(844, 390, false); }
+    try { localStorage.setItem('arenamix.gfxdyn.v1', JSON.stringify({ pr: this.pr, shadows: this.R.shadowMap.enabled })); } catch (e) {}
   }
   sfx(n, a) { const S = window.AMSfx; if (S && S[n] && !this.props.tutorialMute) try { S[n](a); } catch (e) {} }
   // the crowd follows the play: louder and brighter as the ball gets near a goal, roaring at a goal
@@ -1589,17 +1593,24 @@ class Component extends DCLogic {
     if (this.R) return;
     const T = THREE;
     let R;
-    try { R = new T.WebGLRenderer({ canvas: this.cv, antialias: true }); } catch (e) { this.no3d = true; return; }
     // graphics quality (Configuración): sharpness and shadows, for slower phones
     let gfx = (window.AMPlay ? window.AMPlay() : {}).gfx || 'auto';
-    // automatic: start at the level this phone settled on last time
+    // automatic: the sharpness moves by itself to keep the match smooth, starting where this phone settled last time
     this.gfxAuto = gfx === 'auto';
-    if (this.gfxAuto) { try { gfx = localStorage.getItem('arenamix.gfxauto.v1') || 'alta'; } catch (e) { gfx = 'alta'; } }
-    this.gfxNow = gfx;
-    R.setPixelRatio(Math.min(gfx === 'alta' ? 2 : gfx === 'media' ? 1.5 : 1, window.devicePixelRatio || 1));
+    const dpr = window.devicePixelRatio || 1;
+    let pr = Math.min(gfx === 'alta' ? 2 : gfx === 'media' ? 1.5 : 1, dpr), shadows = gfx !== 'baja';
+    if (this.gfxAuto) {
+      let A = null;
+      try { A = JSON.parse(localStorage.getItem('arenamix.gfxdyn.v1') || 'null'); } catch (e) {}
+      pr = Math.min(dpr, A && A.pr ? A.pr : 1.25); shadows = A ? !!A.shadows : true;
+      gfx = shadows ? 'media' : 'baja';
+    }
+    this.gfxNow = gfx; this.pr = pr; this.prCap = Math.min(2, dpr);
+    try { R = new T.WebGLRenderer({ canvas: this.cv, antialias: pr < 1.5, powerPreference: 'high-performance' }); } catch (e) { this.no3d = true; return; }
+    R.setPixelRatio(pr);
     R.setSize(844, 390, false);
-    R.shadowMap.enabled = gfx !== 'baja';
-    R.shadowMap.type = T.PCFSoftShadowMap;
+    R.shadowMap.enabled = shadows;
+    R.shadowMap.type = T.PCFShadowMap;
     R.outputEncoding = T.sRGBEncoding;
     R.toneMapping = T.ACESFilmicToneMapping;
     R.toneMappingExposure = 1.1;
@@ -1665,7 +1676,7 @@ class Component extends DCLogic {
     const sun = new T.DirectionalLight(0xfff4e0, 1.2);
     sun.position.set(-18, 34, 22);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.mapSize.set(this.gfxNow === 'alta' ? 2048 : 1024, this.gfxNow === 'alta' ? 2048 : 1024);
     Object.assign(sun.shadow.camera, { left: -40, right: 40, top: 30, bottom: -30, near: 5, far: 110 });
     sun.shadow.bias = -0.0005;
     sun.shadow.normalBias = 0.04;

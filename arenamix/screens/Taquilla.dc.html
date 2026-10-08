@@ -37,7 +37,7 @@ input::placeholder{color:#8686A6}
     <div style="position: absolute; left: 96px; top: -40px; width: 200px; height: 440px; transform-origin: 50% 0; background: linear-gradient(180deg, #E8F6FF55, #E8F6FF00 85%); clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%); filter: blur(6px); mix-blend-mode: screen; animation: tqBeam 7s ease-in-out infinite; pointer-events: none"></div>
     <div class="tq-ring" style="bottom: 62px; margin-left: 20px; width: 230px; height: 230px; margin-bottom: -115px"><i style="border: 3px dashed #22D3EE88"></i><i style="inset: 22px; border: 2px solid #7C5CFF77; animation-direction: reverse; animation-duration: 9s"></i><i style="inset: 50px; background: radial-gradient(circle, #22D3EE55, transparent 70%); animation: none"></i></div>
     <sc-if value="{{show3d}}" hint-placeholder-val="{{ false }}">
-      <canvas ref="{{canvasRef}}" role="img" aria-label="{{viewerLabel}}" onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" style="position: absolute; left: 40px; right: 0; top: 40px; bottom: 6px; width: calc(100% - 40px); height: calc(100% - 46px); display: block; touch-action: none; cursor: grab"></canvas>
+      <div ref="{{canvasRef}}" role="img" aria-label="{{viewerLabel}}" onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" style="position: absolute; left: 40px; right: 0; top: 40px; bottom: 6px; width: calc(100% - 40px); height: calc(100% - 46px); display: block; touch-action: none; cursor: grab"></div>
       <span style="position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 12px; background: #0B0B14CC; border: 1px solid #2E2E58; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #CACAE0; pointer-events: none; white-space: nowrap"><svg style="animation: tqHint 1.6s ease-in-out infinite" width="16" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M8 8l-4 4l4 4M16 8l4 4l-4 4"/></svg>DESLIZA PARA GIRAR</span>
     </sc-if>
     <sc-if value="{{show2d}}" hint-placeholder-val="{{ true }}">
@@ -166,24 +166,38 @@ class Component extends DCLogic {
   }
   componentWillUnmount() { this.stop3D(); }
   /* ---------- 3D locker room: your character in the kit you are looking at, turned with a finger ---------- */
+  /* The 3D viewer (renderer, lights, sky light and the last character dressed) is made once and kept between
+     visits: its canvas moves into the holder each time you come back, so the Taquilla opens at once. */
+  // the shared viewer (also built ahead of time by the app while you are on the menus)
+  viewer() {
+    const T = window.THREE;
+    let V = window.__amTaqV;
+    if (!V) {
+      const cv = document.createElement('canvas');
+      cv.style.cssText = 'position: absolute; inset: 0; width: 100%; height: 100%; display: block';
+      const R = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+      R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+      R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.15;
+      R.setClearColor(0x000000, 0);
+      const S = new T.Scene();
+      S.add(new T.HemisphereLight(0xdfe8ff, 0x2a2440, 0.9));
+      const key = new T.DirectionalLight(0xffffff, 1.1); key.position.set(2, 4, 4); S.add(key);
+      const rim = new T.DirectionalLight(0x22d3ee, 0.6); rim.position.set(-3, 2.5, -3); S.add(rim);
+      V = window.__amTaqV = { cv, R, S, cam: new T.PerspectiveCamera(28, 1, 0.1, 50), model: null, modelKey: '', sz: '' };
+      if (window.AMSky) window.AMSky.env(R).then((e) => { if (e) S.environment = e; });
+    }
+    return V;
+  }
   init3D() {
-    const T = window.THREE, A = window.AMChars;
-    if (!T || !A || !this.cv) return;
+    const A = window.AMChars;
+    if (!window.THREE || !A || !this.cv) return;
     this.stop3D();
-    const R = new T.WebGLRenderer({ canvas: this.cv, antialias: true, alpha: true });
-    R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
-    R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.15;
-    R.setClearColor(0x000000, 0);
-    this.R = R;
-    const S = new T.Scene();
-    S.add(new T.HemisphereLight(0xdfe8ff, 0x2a2440, 0.9));
-    const key = new T.DirectionalLight(0xffffff, 1.1); key.position.set(2, 4, 4); S.add(key);
-    const rim = new T.DirectionalLight(0x22d3ee, 0.6); rim.position.set(-3, 2.5, -3); S.add(rim);
-    this.S = S;
-    this.cam = new T.PerspectiveCamera(28, 1, 0.1, 50);
-    if (window.AMSky) window.AMSky.env(R).then((e) => { if (e && this.R === R) { S.environment = e; } });
-    this.modelKey = ''; this.model = null; this.t0 = performance.now();
-    A.load().then(() => { if (this.R === R) this.modelKey = ''; });
+    const V = this.viewer();
+    this.V = V; this.R = V.R; this.S = V.S; this.cam = V.cam;
+    this.cv.appendChild(V.cv);
+    this.t0 = performance.now();
+    A.load().then(() => { if (this.V === V) this.forceUpdate(); });
+    const R = V.R;
     const loop = () => {
       if (this.R !== R) return;
       this.raf = requestAnimationFrame(loop);
@@ -194,23 +208,24 @@ class Component extends DCLogic {
   stop3D() {
     if (this.raf) cancelAnimationFrame(this.raf);
     this.raf = null;
-    if (this.R) { this.R.dispose(); this.R = null; }
-    this.model = null; this.modelKey = '';
+    if (this.V && this.V.cv.parentNode) this.V.cv.parentNode.removeChild(this.V.cv);
+    this.R = null; this.V = null;
   }
   frame3D() {
-    const T = window.THREE, A = window.AMChars, R = this.R, cv = this.cv;
-    if (!R || !cv || !this.want) return;
+    const T = window.THREE, A = window.AMChars, R = this.R, cv = this.cv, V = this.V;
+    if (!R || !cv || !V || !this.want) return;
     const w = cv.clientWidth, h = cv.clientHeight;
     if (!w || !h) return;
-    if (this.sz !== w + 'x' + h) { this.sz = w + 'x' + h; R.setSize(w, h, false); this.cam.aspect = w / h; this.cam.updateProjectionMatrix(); }
-    // rebuild the character when the character or the outfit being looked at changes
+    if (V.sz !== w + 'x' + h) { V.sz = w + 'x' + h; R.setSize(w, h, false); this.cam.aspect = w / h; this.cam.updateProjectionMatrix(); }
+    // rebuild the character when the character or the outfit being looked at changes (kept between visits)
     const key = this.want.char + '|' + JSON.stringify(this.want.kit);
-    if (key !== this.modelKey && A.ready()) {
-      if (this.model) this.S.remove(this.model);
-      this.model = A.make({ char: this.want.char, kit: this.want.kit, noRing: true, gear: true });
-      if (this.model) this.S.add(this.model);
-      this.modelKey = key;
+    if (key !== V.modelKey && A.ready()) {
+      if (V.model) V.S.remove(V.model);
+      V.model = A.make({ char: this.want.char, kit: this.want.kit, noRing: true, gear: true });
+      if (V.model) V.S.add(V.model);
+      V.modelKey = key;
     }
+    this.model = V.model;
     const now = performance.now(), dt = Math.min(0.05, (now - (this.tPrev || now)) / 1000);
     this.tPrev = now;
     if (!this.drag) { this.rotY += this.spin * dt; this.spin *= Math.pow(0.04, dt); if (Math.abs(this.spin) < 0.05) this.spin = 0; }

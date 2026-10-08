@@ -13,80 +13,107 @@
   var WHOLE = /^\s*\{\{\s*([^{}]+?)\s*\}\}\s*$/;
   var ANY = /\{\{\s*([^{}]+?)\s*\}\}/g;
 
-  function lookup(path, scope) {
+  /* Templates are compiled once into small functions (a template is walked only the first time it renders);
+     after that a re-render only evaluates bindings and builds vnodes. */
+  function getter(path) {
     path = path.trim();
-    if (path === 'true') return true;
-    if (path === 'false') return false;
-    if (path === 'null') return null;
-    if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
-    if (/^'.*'$|^".*"$/.test(path)) return path.slice(1, -1);
-    var parts = path.split('.');
-    var cur;
-    for (var i = scope.length - 1; i >= 0; i--) {
-      if (scope[i] && Object.prototype.hasOwnProperty.call(scope[i], parts[0])) { cur = scope[i][parts[0]]; break; }
-    }
-    for (var j = 1; j < parts.length && cur != null; j++) cur = cur[parts[j]];
-    return cur;
+    if (path === 'true') return function () { return true; };
+    if (path === 'false') return function () { return false; };
+    if (path === 'null') return function () { return null; };
+    if (/^-?\d+(\.\d+)?$/.test(path)) { var num = Number(path); return function () { return num; }; }
+    if (/^'.*'$|^".*"$/.test(path)) { var lit = path.slice(1, -1); return function () { return lit; }; }
+    var parts = path.split('.'), head = parts[0], rest = parts.slice(1), nr = rest.length;
+    return function (scope) {
+      var cur;
+      for (var i = scope.length - 1; i >= 0; i--) {
+        var sc = scope[i];
+        if (sc && Object.prototype.hasOwnProperty.call(sc, head)) { cur = sc[head]; break; }
+      }
+      for (var j = 0; j < nr && cur != null; j++) cur = cur[rest[j]];
+      return cur;
+    };
   }
-  function interp(str, scope) {
-    return str.replace(ANY, function (_, p) { var v = lookup(p, scope); return v == null ? '' : String(v); });
-  }
-  function value(str, scope) {
+  // a string with bindings: whole-binding keeps the value's type, mixed text becomes a string
+  function compileValue(str) {
     var m = WHOLE.exec(str);
-    if (m) return lookup(m[1], scope);
-    return str.indexOf('{{') >= 0 ? interp(str, scope) : str;
+    if (m) return getter(m[1]);
+    if (str.indexOf('{{') < 0) return function () { return str; };
+    var bits = [], last = 0, mm;
+    ANY.lastIndex = 0;
+    while ((mm = ANY.exec(str))) { if (mm.index > last) bits.push(str.slice(last, mm.index)); bits.push(getter(mm[1])); last = ANY.lastIndex; }
+    if (last < str.length) bits.push(str.slice(last));
+    var nb = bits.length;
+    return function (scope) {
+      var out = '';
+      for (var i = 0; i < nb; i++) { var b = bits[i]; if (typeof b === 'string') out += b; else { var v = b(scope); if (v != null) out += v; } }
+      return out;
+    };
   }
+  function value(str, scope) { return compileValue(str)(scope); }
   function camel(s) { return s.replace(/-([a-z0-9])/g, function (_, c) { return c.toUpperCase(); }); }
 
-  function children(node, scope) {
-    var out = [];
-    for (var c = node.firstChild; c; c = c.nextSibling) {
-      var r = build(c, scope);
-      if (r == null) continue;
-      if (Array.isArray(r)) Array.prototype.push.apply(out, r); else out.push(r);
-    }
-    return out;
+  // compile(node) -> function(scope, out): pushes the node's vnodes (or strings) onto out
+  function compileKids(node) {
+    var fns = [];
+    for (var c = node.firstChild; c; c = c.nextSibling) { var f = compile(c); if (f) fns.push(f); }
+    var n = fns.length;
+    return function (scope, out) { for (var i = 0; i < n; i++) fns[i](scope, out); };
   }
-  function build(node, scope) {
+  function compile(node) {
     if (node.nodeType === 3) {
       var t = node.nodeValue;
-      if (!/\S/.test(t)) return ' ';
-      return t.indexOf('{{') >= 0 ? interp(t, scope) : t;
+      if (!/\S/.test(t)) return function (scope, out) { out.push(' '); };
+      if (t.indexOf('{{') < 0) return function (scope, out) { out.push(t); };
+      var tv = compileValue(t);
+      return function (scope, out) { var v = tv(scope); out.push(v == null ? '' : String(v)); };
     }
     if (node.nodeType !== 1) return null;
     var tag = node.localName;
     if (tag === 'helmet' || tag === 'script') return null;
-    if (tag === 'sc-if') return value(node.getAttribute('value') || '', scope) ? children(node, scope) : null;
+    if (tag === 'sc-if') {
+      var cond = compileValue(node.getAttribute('value') || ''), kidsIf = compileKids(node);
+      return function (scope, out) { if (cond(scope)) kidsIf(scope, out); };
+    }
     if (tag === 'sc-for') {
-      var list = value(node.getAttribute('list') || '', scope) || [];
-      var as = node.getAttribute('as') || 'item';
-      var res = [];
-      for (var i = 0; i < list.length; i++) {
-        var sc = {}; sc[as] = list[i]; sc.$index = i;
-        Array.prototype.push.apply(res, children(node, scope.concat([sc])));
-      }
-      return res;
+      var listOf = compileValue(node.getAttribute('list') || ''), as = node.getAttribute('as') || 'item', kidsFor = compileKids(node);
+      return function (scope, out) {
+        var list = listOf(scope) || [];
+        for (var i = 0; i < list.length; i++) { var sc = {}; sc[as] = list[i]; sc.$index = i; kidsFor(scope.concat([sc]), out); }
+      };
     }
-    if (tag === 'dc-import') {
-      var name = node.getAttribute('name');
-      var Comp = registry[name];
-      if (!Comp) return null;
-      var props = {};
-      for (var a = 0; a < node.attributes.length; a++) {
-        var at = node.attributes[a];
-        if (at.name === 'name' || at.name.indexOf('hint-') === 0) continue;
-        props[camel(at.name)] = value(at.value, scope);
-      }
-      return h(Comp, props);
-    }
-    var p = {};
+    var attrs = [];
     for (var k = 0; k < node.attributes.length; k++) {
-      var att = node.attributes[k], n = att.name, v = value(att.value, scope);
-      if (n.indexOf('hint-') === 0) continue;
-      if (n === 'for') n = 'htmlFor';
-      p[n] = v;
+      var at = node.attributes[k], an = at.name;
+      if (an.indexOf('hint-') === 0) continue;
+      if (tag === 'dc-import') { if (an === 'name') continue; an = camel(an); }
+      else if (an === 'for') an = 'htmlFor';
+      attrs.push([an, compileValue(at.value)]);
     }
-    return h.apply(null, [tag, p].concat(children(node, scope)));
+    var na = attrs.length;
+    if (tag === 'dc-import') {
+      var cname = node.getAttribute('name');
+      return function (scope, out) {
+        var Comp = registry[cname];
+        if (!Comp) return;
+        var props = {};
+        for (var i = 0; i < na; i++) props[attrs[i][0]] = attrs[i][1](scope);
+        out.push(h(Comp, props));
+      };
+    }
+    var kidsEl = compileKids(node);
+    return function (scope, out) {
+      var p = {};
+      for (var i = 0; i < na; i++) p[attrs[i][0]] = attrs[i][1](scope);
+      var kids = [];
+      kidsEl(scope, kids);
+      out.push(h.apply(null, [tag, p].concat(kids)));
+    };
+  }
+  function children(node, scope) {
+    var f = node.__amc || (node.__amc = compileKids(node));
+    var out = [];
+    f(scope, out);
+    return out;
   }
 
   /* ---------- gameplay settings (Configuración > Jugabilidad), read by the match screens ---------- */
@@ -260,10 +287,40 @@
     var t = setTimeout(function () { done++; res(); }, 9000);
     window.AMStadium.load().then(function () { clearTimeout(t); done++; res(); }, function () { clearTimeout(t); done++; res(); });
   })) : Promise.resolve();
+  /* While you are on the menus, the 3D pictures of the Modos cards, the Tienda and the season pass are drawn
+     one at a time in idle moments, so those screens open at once the first time too (never during a match). */
+  function prewarm() {
+    var idle = window.requestIdleCallback || function (f) { return setTimeout(function () { f({ timeRemaining: function () { return 8; } }); }, 120); };
+    var G = function () { return window.AMGear; };
+    var jobs = [];
+    // the Taquilla's 3D viewer with your character, its shaders compiled
+    jobs.push(function () {
+      var Tq = registry.Taquilla, A = window.AMChars;
+      if (!Tq || !Tq.prototype.viewer || window.__amTaqV || !A) return;
+      var V = Tq.prototype.viewer.call({}), m = A.make({ you: true, noRing: true, gear: true });
+      if (m) { V.S.add(m); V.R.compile(V.S, V.cam); V.S.remove(m); }
+    });
+    ['team:1', 'team:2', 'team:3', 'team:4', 'pen', 'free', 'private', 'train', 'tut', 'pass'].forEach(function (k) { jobs.push(function () { if (window.AMPosters) window.AMPosters.get(k); }); });
+    ['coins:4', 'coins:5', 'coins:6', 'coins:8', 'coins:12', 'coins:14', 'coins:16', 'bag', 'boots:#E5484D', 'chest:common', 'chest:common:open', 'chest:rare', 'chest:rare:open', 'chest:epic', 'chest:epic:open', 'chest:legend', 'chest:legend:open'].forEach(function (k) {
+      jobs.push(function () { if (G()) G().prize(k); });
+    });
+    ['h10', 'h11', 'f6', 's6', 's7', 's8', 'h5', 'h6'].forEach(function (id) { jobs.push(function () { if (window.AMProgress) window.AMProgress.itemPic(id); }); });
+    var busy = function () { return /^#\/(Partido|Duelo|Entrenamiento|Tutorial|Competitivo|Rapida|Privada|Baloncesto|Tenis|Voley)\b/.test(location.hash); };
+    var next = function (dl) {
+      if (!jobs.length) return;
+      if (busy() || !(window.AMChars && window.AMChars.ready())) { setTimeout(function () { idle(next, { timeout: 4000 }); }, 1500); return; }
+      if (dl && dl.timeRemaining && dl.timeRemaining() < 6) { idle(next, { timeout: 4000 }); return; }
+      try { jobs.shift()(); } catch (e) {}
+      setTimeout(function () { idle(next, { timeout: 4000 }); }, 60);
+    };
+    setTimeout(function () { idle(next, { timeout: 4000 }); }, 2500);
+  }
+
   Promise.all(SCREENS.map(function (n) { return load(n).then(function () { done++; }); }).concat([chars, stad])).then(function () {
     clearTimeout(hang);
     render(h(App), document.getElementById('stage'));
     ready = true;
+    prewarm();
   }).catch(function (err) {
     finished = true;
     clearTimeout(hang);
