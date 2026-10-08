@@ -34,7 +34,27 @@
       return n;
     } catch (e) { return 'Jugador'; }
   }
-  function setName(n) { try { localStorage.setItem('arenamix.name.v1', String(n).slice(0, 16)); } catch (e) {} }
+  function setName(n) { try { localStorage.setItem('arenamix.name.v1', String(n).slice(0, 16)); localStorage.setItem('arenamix.namechosen.v1', '1'); } catch (e) {} }
+  // has the player picked a name yet (the first time in, the login screen asks for one)
+  function hasName() { try { return localStorage.getItem('arenamix.namechosen.v1') === '1' && !!localStorage.getItem('arenamix.name.v1'); } catch (e) { return true; } }
+  // what is wrong with a name, or '' when it is fine
+  var BAD = ['puta', 'puto', 'mierda', 'gilipollas', 'cabron', 'cabrón', 'polla', 'coño', 'joder', 'maricon', 'maricón', 'zorra', 'subnormal', 'retrasado', 'nazi', 'hitler', 'fuck', 'shit', 'bitch', 'nigger', 'nigga', 'idiota', 'imbecil', 'imbécil', 'pene', 'culo', 'follar', 'sexo', 'porno', 'admin', 'moderador'];
+  function checkName(n) {
+    n = String(n || '').trim();
+    if (n.length < 3) return 'Mínimo 3 caracteres';
+    if (n.length > 16) return 'Máximo 16 caracteres';
+    if (!/^[A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ_.\-]+$/.test(n)) return 'Solo letras, números, _ . y - (sin espacios)';
+    if (!/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(n)) return 'Pon al menos una letra';
+    var low = n.toLowerCase().replace(/[_.\-0-9]/g, '');
+    if (BAD.some(function (w) { return low.indexOf(w) >= 0; })) return 'Ese nombre no está permitido';
+    return '';
+  }
+  // a fun name to start from
+  function suggestName() {
+    var A = ['Rayo', 'Toro', 'Crack', 'Gol', 'Tiki', 'Volea', 'Muro', 'Chilena', 'Tigre', 'Cohete', 'Panenka', 'Zurdo', 'Taco', 'Lobo', 'Halcon'];
+    var B = ['Veloz', 'Dorado', 'Loco', 'Real', 'Fino', 'Bravo', 'Nocturno', 'Letal', 'Feroz', 'Mágico', 'Total', 'Supremo'];
+    return A[Math.floor(Math.random() * A.length)] + B[Math.floor(Math.random() * B.length)] + (Math.random() < 0.5 ? '' : Math.floor(Math.random() * 99));
+  }
   function newCode() {
     var abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', s = '';
     for (var i = 0; i < 5; i++) s += abc[Math.floor(Math.random() * abc.length)];
@@ -215,7 +235,7 @@
   }
 
   window.AMOnline = {
-    available: available, myName: myName, setName: setName, newCode: newCode,
+    available: available, myName: myName, setName: setName, hasName: hasName, checkName: checkName, suggestName: suggestName, newCode: newCode,
     host: function (code, name, on) { return room(true, code, name, on); },
     join: function (code, name, on) { return room(false, code, name, on); },
     matchmake: matchmake, voice: voice

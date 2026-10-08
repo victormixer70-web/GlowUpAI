@@ -161,7 +161,11 @@
   /* ---------- app shell ---------- */
   function current() {
     var m = /^#\/([A-Za-z0-9]+)/.exec(location.hash);
-    return m && registry[m[1]] ? m[1] : 'Main';
+    var name = m && registry[m[1]] ? m[1] : 'Main';
+    // nobody gets past the entrance without a player name
+    var O = window.AMOnline;
+    if (name !== 'Main' && name !== 'Idioma' && O && O.hasName && !O.hasName()) { try { history.replaceState(null, '', '#/Main'); } catch (e) {} return 'Main'; }
+    return name;
   }
   function App() { PComponent.call(this); this.state = { screen: current() }; }
   App.prototype = Object.create(PComponent.prototype);

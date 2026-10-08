@@ -15,6 +15,11 @@ input::placeholder{color:#6E6E92}
 @keyframes lgSwing{0%,100%{rotate:-1.6deg}50%{rotate:1.6deg}}
 @keyframes lgHolo{to{background-position:200% 0}}
 @keyframes lgPulse{0%,100%{box-shadow:0 0 0 0 #FFC53D77,0 8px 22px #000a}50%{box-shadow:0 0 0 8px #FFC53D00,0 8px 22px #000a}}
+@keyframes lgFade{from{opacity:0}}
+.lg-nm{animation:lgNmIn .45s cubic-bezier(.2,1.4,.4,1) both}@keyframes lgNmIn{from{opacity:0;transform:translateY(30px) scale(.9) rotate(-2deg)}}
+.lg-shirt{animation:lgShirt 3.2s ease-in-out infinite;transform-origin:50% 0}@keyframes lgShirt{0%,100%{rotate:-2deg}50%{rotate:2deg}}
+.lg-dice:active svg{rotate:200deg;transition:rotate .3s}
+.lg-nm .lg-field{height:44px}
 @keyframes lgIn{from{opacity:0;translate:0 -40px;rotate:-8deg}to{opacity:1;translate:0 0;rotate:0}}
 @keyframes lgTicketIn{from{opacity:0;translate:-60px 0}to{opacity:1;translate:0 0}}
 @keyframes lgTitleIn{from{opacity:0;letter-spacing:30px}to{opacity:1;letter-spacing:-2px}}
@@ -112,6 +117,37 @@ input::placeholder{color:#6E6E92}
       </div>
     </div>
   </div>
+  <!-- the first time in: pick your player name (it goes on the back of your shirt) -->
+  <sc-if value="{{nameOpen}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; z-index: 8; background: #05050ADD; display: flex; align-items: center; justify-content: center; animation: lgFade .25s both">
+      <form onSubmit="{{nameSubmit}}" class="lg-nm" style="position: relative; width: 560px; height: 300px; box-sizing: border-box; display: flex; gap: 22px; padding: 0 26px 0 22px; align-items: center; border-radius: 18px; background: linear-gradient(165deg, #1B1D44 0%, #10112A 55%, #0B0B18 100%); border: 1px solid #3A3A6E; box-shadow: 0 24px 50px #000d, 0 0 40px #22D3EE22; overflow: hidden">
+        <div style="position: absolute; left: 0; right: 0; top: 0; height: 6px; background: linear-gradient(100deg, #22D3EE, #7C5CFF, #FF5C8A, #FFC53D, #22D3EE) 0 0 / 200% 100%; animation: lgHolo 6s linear infinite"></div>
+        <!-- your shirt from behind, with the name printed as you type -->
+        <div style="position: relative; flex: none; width: 190px; height: 210px">
+          <div style="position: absolute; left: 50%; bottom: -6px; width: 160px; height: 30px; margin-left: -80px; border-radius: 50%; background: radial-gradient(closest-side, #22D3EE55, transparent)"></div>
+          <svg class="lg-shirt" width="190" height="200" viewBox="0 0 100 106">
+            <defs><linearGradient id="lg-sh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".25"/><stop offset=".6" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient></defs>
+            <path d="M34 6 Q50 12 66 6 L90 16 L99 42 L84 48 L80 40 L80 102 L20 102 L20 40 L16 48 L1 42 L10 16 Z" fill="{{shirtP}}" stroke="#0B0B14" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M34 6 Q50 12 66 6 L90 16 L99 42 L84 48 L80 40 L80 102 L20 102 L20 40 L16 48 L1 42 L10 16 Z" fill="url(#lg-sh)"/>
+            <path d="M34 6 Q50 12 66 6" fill="none" stroke="{{shirtS}}" stroke-width="3"/>
+            <text x="50" y="34" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="{{shirtFs}}" letter-spacing=".5" fill="{{shirtS}}">{{shirtName}}</text>
+            <text x="50" y="84" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="46" fill="{{shirtS}}" stroke="#0B0B14" stroke-opacity=".25" stroke-width=".8">10</text>
+          </svg>
+        </div>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+          <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #22D3EE">ANTES DE SALIR AL CAMPO</span>
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 32px; line-height: .95">¿CÓMO TE<br>LLAMAS, CRACK?</span>
+          <span style="font-size: 11.5px; color: #A3A3C2; line-height: 1.4">Es tu nombre de jugador: lo verán tus rivales y tus amigos en los partidos online.</span>
+          <div style="display: flex; gap: 8px">
+            <label class="lg-field" style="{{nameField}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8686A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><input type="text" maxLength="16" autocomplete="nickname" autocapitalize="off" spellcheck="false" aria-label="Nombre de jugador" placeholder="Tu nombre" value="{{nameDraft}}" onInput="{{nameInput}}" style="font-size: 16px; font-weight: 800"></label>
+            <button type="button" onClick="{{nameDice}}" aria-label="Sugerir un nombre" class="lg-dice" style="flex: none; width: 44px; height: 44px; border-radius: 11px; border: 1px solid #2E2E58; background: #07070FCC; color: #FFC53D; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg></button>
+          </div>
+          <span role="status" style="{{nameMsgStyle}}">{{nameMsg}}</span>
+          <button type="submit" disabled="{{nameBad}}" style="{{nameBtn}}"><span style="display: inline-block; transform: skewX(10deg); font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 21px; letter-spacing: 1px">¡A JUGAR!</span></button>
+        </div>
+      </form>
+    </div>
+  </sc-if>
   <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
     <span role="status" style="position: absolute; left: 514px; width: 304px; top: 196px; z-index: 5; padding: 8px 12px; box-sizing: border-box; border-radius: 10px; background: #F4F4FA; color: #0B0B14; font-size: 12px; font-weight: 800; text-align: center">{{toast}}</span>
   </sc-if>
@@ -121,7 +157,7 @@ input::placeholder{color:#6E6E92}
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { torn: false, toast: '', kicks: 0 };
+    this.state = { torn: false, toast: '', kicks: 0, nameOpen: false, nameDraft: '' };
     this.fans = 47000 + Math.floor(Math.random() * 9000);
     this.serial = String(1000 + Math.floor(Math.random() * 9000));
     this.canvasRef = (el) => { if (el && el !== this.cv) { this.cv = el; this.init3D(); } else if (!el && this.cv) { this.stop3D(); this.cv = null; } };
@@ -279,7 +315,10 @@ class Component extends DCLogic {
   renderVals() {
     const s = this.state, A = window.AMChars, kit = (A && A.outfit('futbol')) || {};
     const pref = A ? A.pref() : 'clasico', show3d = !!(A && window.THREE && pref !== 'clasico');
-    const name = window.AMOnline ? window.AMOnline.myName() : 'Invitado';
+    const O = window.AMOnline;
+    const name = s.nameOpen && s.nameDraft ? s.nameDraft : O && O.hasName && !O.hasName() ? 'NUEVO JUGADOR' : O ? O.myName() : 'Invitado';
+    const nmErr = O ? O.checkName(s.nameDraft) : '';
+    { const ib = document.getElementById('install'); if (ib) ib.style.visibility = s.nameOpen ? 'hidden' : ''; }
     return {
       crowdRef: this.crowdRef, canvasRef: this.canvasRef, show3d, show2d: !show3d,
       kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#0B0B14', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#17172A', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE',
@@ -294,7 +333,30 @@ class Component extends DCLogic {
       },
       ticketCls: 'lg-ticket' + (s.torn ? ' torn' : ''),
       // tear off the stub and walk in
-      guest: () => { if (s.torn) return; this.setState({ torn: true }); setTimeout(() => { location.hash = '#/Deportes'; }, 260); },
+      guest: () => {
+        if (s.torn) return;
+        // no name yet: choose one first
+        if (O && O.hasName && !O.hasName()) { this.setState({ nameOpen: true, nameDraft: '' }); return; }
+        this.setState({ torn: true }); setTimeout(() => { location.hash = '#/Deportes'; }, 260);
+      },
+      nameOpen: s.nameOpen, nameDraft: s.nameDraft,
+      nameInput: (e) => this.setState({ nameDraft: e.target.value.replace(/\s/g, '').slice(0, 16) }),
+      nameDice: () => this.setState({ nameDraft: O ? O.suggestName() : 'Crack10' }),
+      nameBad: !!nmErr,
+      nameMsg: !s.nameDraft ? '3 a 16 caracteres: letras, números, _ . -' : nmErr || '¡Buen nombre!',
+      nameMsgStyle: 'font-size: 11px; font-weight: 800; min-height: 14px; color: ' + (!s.nameDraft ? '#8686A6' : nmErr ? '#FF8A8E' : '#53D88E'),
+      nameField: 'flex: 1; min-width: 0; ' + (s.nameDraft && nmErr ? 'border-color: #FF5C5C; box-shadow: 0 0 0 3px #FF5C5C22' : s.nameDraft ? 'border-color: #53D88E; box-shadow: 0 0 0 3px #53D88E22' : ''),
+      nameBtn: 'height: 44px; border: 0; padding: 0; transform: skewX(-10deg); cursor: ' + (nmErr ? 'default' : 'pointer') + '; ' + (nmErr ? 'background: #26264A; color: #6E6E92;' : 'background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #F59E0B); color: #1A1204; box-shadow: 0 4px 0 #B7791F, 0 0 18px #FFC53D66;'),
+      shirtName: (s.nameDraft || 'TU NOMBRE').toUpperCase(), shirtFs: String(Math.max(7, Math.min(13, 130 / Math.max(6, (s.nameDraft || 'TU NOMBRE').length)))),
+      shirtP: kit.primary || '#FF8A3D', shirtS: kit.secondary || '#0B0B14',
+      nameSubmit: (e) => {
+        e.preventDefault();
+        if (nmErr || !O) return;
+        O.setName(s.nameDraft.trim());
+        if (window.AMSfx && window.AMSfx.levelUp) window.AMSfx.levelUp();
+        this.setState({ nameOpen: false, torn: true });
+        setTimeout(() => { location.hash = '#/Deportes'; }, 420);
+      },
       submit: (e) => { e.preventDefault(); this.say('Las cuentas llegan pronto. De momento entra como invitado: tu progreso se guarda aquí.'); },
       soon: (e) => { e.preventDefault(); this.say('Las cuentas llegan pronto. De momento entra como invitado.'); },
       hasToast: !!s.toast, toast: s.toast
