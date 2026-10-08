@@ -666,7 +666,7 @@ class Component extends DCLogic {
     b.vx = Math.cos(dir) * sp + p.vx * 0.2;
     b.vy = Math.sin(dir) * sp + p.vy * 0.2;
     b.vz = loft ? 3 + 5.5 * power : 0.4 + 1.2 * power;
-    b.spin = spin || 0;
+    b.spin = spin || 0; b.dip = 0; b.kn = 0;
     this.release(p);
     g.recv = null;
     g.fx = { x: b.x, y: b.y, t: 0 };
@@ -675,6 +675,34 @@ class Component extends DCLogic {
     p.act = { type: 'kick', t: 0, dur: 0.62, loft };
     this.sfx('kick', power);
     return true;
+  }
+  // a real shot's flight: how high it crosses the goal line comes from the power (low and skidding,
+  // waist height, or rising into the top corner, and over the bar if overhit), it curls in towards the far
+  // post (more with the stick to the side), and a full-power strike dips late and wobbles in the air
+  shotPlan(p, power, dir, mult, spinIn, pre) {
+    const g = this.g, b = g.ball, sg = p.team === 0 ? 1 : -1, gx = p.team === 0 ? 60 : 0;
+    const sp = (9 + 19 * power) * (mult || 1), atGoal = Math.cos(dir) * sg > 0.3;
+    const side = (p.y < 15 ? 1 : -1) * sg;
+    let spin = spinIn || 0;
+    if (Math.abs(spin) < 0.05) spin = side * (0.1 + 0.16 * (1 - power)) * (atGoal ? 1 : 0.5);
+    const dip = power > 0.82 ? 0.3 * (power - 0.82) / 0.18 : 0, kn = power > 0.9 ? 6 : 0;
+    let vz, aim = dir;
+    if (atGoal) {
+      const d = Math.abs((gx - p.x) / Math.cos(dir)), t = (d / sp) * (1 + 0.006 * sp * (d / sp));
+      // target height on the goal line (ball's bottom): a little random, more so with low precision
+      const zg = Math.max(0.05, 0.12 + 1.85 * Math.pow(power, 1.6) + (Math.random() - 0.5) * (0.25 + 0.6 * (1 - (pre ?? 0.5))) * power);
+      vz = (zg - b.z + 0.5 * 9.81 * (1 + dip) * t * t) / Math.max(0.15, t);
+      // but never a lob: the top of the flight is capped by the power, so a soft shot stays low and skids
+      const hMax = 0.25 + 2.3 * Math.pow(power, 1.5);
+      vz = this.clamp(Math.min(vz, Math.sqrt(2 * 9.81 * (1 + dip) * hMax)), 0.2, 9);
+      // the natural curl bends it in towards the far post, so it starts where aimed
+      aim = dir - (Math.abs(spinIn || 0) >= 0.05 ? spin * Math.min(t, 1.2) * 0.25 : 0);
+    } else vz = 1 + 3.2 * power;
+    return { dir: aim, vz, spin, dip, kn };
+  }
+  applyShot(plan) {
+    const b = this.g.ball;
+    b.vz = plan.vz; b.spin = plan.spin; b.dip = plan.dip; b.kn = plan.kn; b.knT = Math.random() * 6;
   }
   passBall(p, q) {
     const g = this.g, b = g.ball, i = g.ps.indexOf(p);
@@ -688,7 +716,7 @@ class Component extends DCLogic {
     let h, vz;
     if (d > 19) { vz = 4.2 + 0.12 * d; h = d / (2 * vz / 9.81 * 0.95); }
     else { h = Math.min(20, Math.sqrt(81 + 3.4 * d)); vz = 0.15; }
-    b.vx = Math.cos(dir) * h; b.vy = Math.sin(dir) * h; b.vz = vz; b.spin = 0;
+    b.vx = Math.cos(dir) * h; b.vy = Math.sin(dir) * h; b.vz = vz; b.spin = 0; b.dip = 0; b.kn = 0;
     this.release(p);
     g.recv = { i: g.ps.indexOf(q), t: d / h + 1 };
     p.act = { type: p.role === 'gk' ? 'throw' : 'pass', t: 0, dur: p.role === 'gk' ? 0.5 : 0.32 };
@@ -697,7 +725,7 @@ class Component extends DCLogic {
   pushAhead(p, dir, speed) {
     const g = this.g, b = g.ball, i = g.ps.indexOf(p);
     if (this.dist(p, b) > (g.own === i ? 1.7 : 1.5) || b.z > 1.4 || (g.own !== i && p.cd > 0)) return false;
-    b.vx = Math.cos(dir) * speed; b.vy = Math.sin(dir) * speed; b.vz = 0.1; b.spin = 0;
+    b.vx = Math.cos(dir) * speed; b.vy = Math.sin(dir) * speed; b.vz = 0.1; b.spin = 0; b.dip = 0; b.kn = 0;
     this.release(p);
     p.cd = 0.15;
     p.act = { type: 'pass', t: 0, dur: 0.3 };
@@ -739,7 +767,7 @@ class Component extends DCLogic {
     if (beaten && (trick === 'cano' || trick === 'sombrero')) {
       this.release(p); p.cd = 0.05;
       b.vx = Math.cos(f) * (trick === 'cano' ? 7.5 : 6.2) + p.vx * 0.2; b.vy = Math.sin(f) * (trick === 'cano' ? 7.5 : 6.2) + p.vy * 0.2;
-      b.vz = trick === 'sombrero' ? 4.4 : 0.1; b.spin = 0;
+      b.vz = trick === 'sombrero' ? 4.4 : 0.1; b.spin = 0; b.dip = 0; b.kn = 0;
       g.recv = { i, t: 1.4 };
     }
     if (human) {
@@ -855,14 +883,19 @@ class Component extends DCLogic {
     const [ix, iy] = this.inp || [0, 0];
     let dir = Math.hypot(ix, iy) > 0.2 ? Math.atan2(iy, ix) : p.face;
     const pre = this.tt('pre'), gx = p.team ? 0 : 60, sg = p.team ? -1 : 1;
+    let assisted = false;
     if (Math.cos(dir) * sg > 0.2 && (p.x - 30) * sg > -4) {
       const yInt = p.y + Math.tan(dir) * (gx - p.x);
-      const ty = this.clamp(yInt, 12.7, 17.3);
-      dir += this.ang(Math.atan2(ty - p.y, gx - p.x) - dir) * (0.45 + 0.45 * pre);
+      // inside the posts: your aim, nudged a little; heading wide: brought back to that side of the goal
+      const wide = yInt < 13 || yInt > 17, ty = wide ? this.clamp(yInt, 13.4, 16.6) : yInt;
+      assisted = wide;
+      dir += this.ang(Math.atan2(ty - p.y, gx - p.x) - dir) * (wide ? 0.92 + 0.08 * pre : 0.35);
     }
     const power = Math.max(0.15, g.charge);
-    dir += (Math.random() - 0.5) * 0.16 * (1 - pre) * (0.6 + power * 0.6);
-    const spin = Math.hypot(ix, iy) > 0.2 ? this.clamp(this.ang(Math.atan2(iy, ix) - dir) * 0.8, -0.35, 0.35) : 0;
+    dir += (Math.random() - 0.5) * 0.09 * (1 - pre) * (0.6 + power * 0.6);
+    // the stick a little to one side of the shot bends it that way; pushed well wide it only aimed the shot
+    const off = Math.hypot(ix, iy) > 0.2 ? this.ang(Math.atan2(iy, ix) - dir) : 0;
+    const spin = !assisted && Math.abs(off) < 0.55 ? this.clamp(off * 0.8, -0.3, 0.3) : 0;
     const charge = g.charge, i = g.ctl;
     g.charging = false; g.charge = 0;
     const fire = (g.superM || 0) >= 1 && !this.ctxH && !this.props.tutorial;
@@ -874,12 +907,13 @@ class Component extends DCLogic {
       if (g.phase !== 'play') return;
       if (fire) {
         if (!this.kick(p, Math.max(power, 0.8), dir, false, (0.93 + 0.25 * this.tt('pot')) * 1.32, spin * 0.5)) { this.flashMsg('Demasiado lejos del balón', 0.8); return; }
-        g.superM = 0; g.ball.fire = 2.2; g.ball.vz = Math.min(g.ball.vz, 1.6);
+        g.superM = 0; g.ball.fire = 2.2; g.ball.vz = Math.min(g.ball.vz, 1.6); g.ball.dip = 0.15; g.ball.kn = 0;
         this.callout('¡TIRO DE FUEGO!', '', '#FF7A2E'); this.vib([30, 30, 60]); this.sfx('kick', 1);
         return;
       }
-      if (!this.kick(p, power, dir, power > 0.75, 0.93 + 0.25 * this.tt('pot'), spin)) this.flashMsg('Demasiado lejos del balón', 0.8);
-      else this.vib(Math.round(12 + 26 * power));
+      const mult = 0.93 + 0.25 * this.tt('pot'), plan = this.shotPlan(p, power, dir, mult, spin, pre);
+      if (!this.kick(p, power, plan.dir, false, mult, plan.spin)) this.flashMsg('Demasiado lejos del balón', 0.8);
+      else { this.applyShot(plan); this.vib(Math.round(12 + 26 * power)); }
     } };
   }
   humanPass(kind) {
@@ -927,7 +961,7 @@ class Component extends DCLogic {
     const sg = p.team === 0 ? 1 : -1;
     const tx = this.clamp(q.x + sg * 5.5 + q.vx * 0.3, 2, 58), ty = this.clamp(q.y + q.vy * 0.4 + (15 - q.y) * 0.15, 2, 28);
     const d = Math.hypot(tx - b.x, ty - b.y), dir = Math.atan2(ty - b.y, tx - b.x), h = this.clamp(9 + d * 0.5, 12, 21);
-    b.vx = Math.cos(dir) * h; b.vy = Math.sin(dir) * h; b.vz = 0.12; b.spin = 0;
+    b.vx = Math.cos(dir) * h; b.vy = Math.sin(dir) * h; b.vz = 0.12; b.spin = 0; b.dip = 0; b.kn = 0;
     this.release(p);
     g.recv = { i: g.ps.indexOf(q), t: d / h + 1.4 };
     q.runTo = { x: tx, y: ty, t: d / h + 0.8 };
@@ -1478,8 +1512,8 @@ class Component extends DCLogic {
     p.act = { type: 'windup', t: 0, dur: 0.24, from: 0.04, face: Math.atan2(ty - p.y, gx - p.x), then: () => {
       if (g.own !== i || g.phase !== 'play') return;
       const dir = Math.atan2(ty - p.y, gx - p.x) + (Math.random() - 0.5) * D.err * (dg > 14 ? 1 : 0.7);
-      const loft = dg > 22 && Math.random() < 0.25;
-      this.kick(p, this.clamp(0.55 + dg / 45 + Math.random() * 0.2, 0.55, 1), dir, loft, D.pot, dg > 14 ? (ty > 15 ? 1 : -1) * (p.team === 0 ? 1 : -1) * Math.random() * 0.15 : 0);
+      const power = this.clamp(0.45 + dg / 45 + Math.random() * 0.25, 0.4, 1), plan = this.shotPlan(p, power, dir, D.pot, 0, 1 - D.err);
+      if (this.kick(p, power, plan.dir, false, D.pot, plan.spin)) this.applyShot(plan);
     } };
   }
   gkMove(p, i, dt) {
@@ -1622,12 +1656,14 @@ class Component extends DCLogic {
     if (b.fire > 0) { b.fire -= dt; if (g.own >= 0 || Math.hypot(b.vx, b.vy) < 9) b.fire = 0; }
     // ---- free ball physics: gravity, air drag, bounce, rolling resistance, curl ----
     if (b.z > 0 || b.vz > 0) {
-      b.vz -= 9.81 * dt;
+      b.vz -= 9.81 * (1 + (b.dip || 0)) * dt;
+      if (b.kn > 0) { b.knT += dt; const w = Math.sin(b.knT * 6) * b.kn * dt; b.vx += -b.vy * 0.02 * w; b.vy += w * (b.vx >= 0 ? 1 : -1); }
       b.z += b.vz * dt;
       const s3 = Math.hypot(b.vx, b.vy, b.vz), drag = 1 - 0.012 * s3 * dt;
       b.vx *= drag; b.vy *= drag; b.vz *= drag;
       if (b.z <= 0) {
         b.z = 0;
+        b.dip = 0; b.kn = 0;
         if (b.vz < -1.2) { if (b.vz < -3) this.sfx('bounce', -b.vz); b.vz = -b.vz * 0.55; b.vx *= 0.82; b.vy *= 0.82; } else b.vz = 0;
       }
     } else {
@@ -1686,6 +1722,7 @@ class Component extends DCLogic {
         const saveP = this.clamp(D.save - 0.42 * Math.pow(edge, 1.3) - Math.max(0, sp - 16) * 0.025 - (b.z > 1.6 ? 0.12 : 0), 0.08, 0.9);
         if (Math.random() > saveP * ((b.fire || 0) > 0 ? 0.3 : 1)) { p.cd = 0.35; continue; }
         if ((b.fire || 0) > 0) { b.fire = 0; if (p.team === 1) this.callout('¡PARA EL FUEGO!', 'Qué reflejos', '#FF7A2E'); }
+        b.dip = 0; b.kn = 0;
         if (sp < D.catchV && Math.random() < 0.85) {
           g.hold = i; g.holdT = 0.9; g.last = i;
           if (sp > 15) this.callout('¡QUÉ PARADA!', '', p.team === 0 ? '#22D3EE' : '#FF5C5C'); else this.flashMsg(sp > 12 ? '¡PARADÓN!' : 'Atrapa el portero', 1.2);
@@ -1745,7 +1782,7 @@ class Component extends DCLogic {
     }
     if (best >= 0) {
       const p = g.ps[best];
-      g.own = best; g.last = best; b.spin = 0;
+      g.own = best; g.last = best; b.spin = 0; b.dip = 0; b.kn = 0;
       // first touch: cushion the ball to the feet instead of sticking it there
       const rs = Math.hypot(b.vx - p.vx, b.vy - p.vy), keep = this.clamp(0.15 + rs * 0.012, 0.15, 0.35);
       b.vx = p.vx + (b.vx - p.vx) * keep; b.vy = p.vy + (b.vy - p.vy) * keep; b.vz = Math.min(b.vz, 0);
@@ -1804,7 +1841,7 @@ class Component extends DCLogic {
     const tx = p.x + Math.cos(a) * R + p.vx * dt, ty = p.y + Math.sin(a) * R + p.vy * dt;
     let cx = (tx - b.x) * 14, cy = (ty - b.y) * 14; const cl = Math.hypot(cx, cy), cap = 7 + 0.5 * sp;
     if (cl > cap) { cx *= cap / cl; cy *= cap / cl; }
-    b.vx = p.vx + cx; b.vy = p.vy + cy; b.vz = 0; b.spin = 0;
+    b.vx = p.vx + cx; b.vy = p.vy + cy; b.vz = 0; b.spin = 0; b.dip = 0; b.kn = 0;
     // poke-away chances for a defender close to the ball (the body bounce handles direct contact)
     for (let qi = 0; qi < g.ps.length; qi++) {
       const q = g.ps[qi];
@@ -3538,7 +3575,7 @@ class Component extends DCLogic {
       while (t < T) { wz -= 9.81 * h; const s3 = Math.hypot(wx, wz), dr = 1 - 0.012 * s3 * h; wx *= dr; wz *= dr; x += wx * h; z += wz * h; t += h; }
       vh *= d0 / Math.max(0.5, x); vz += (zT - z) / T;
     }
-    b.vx = ux * vh; b.vy = uy * vh; b.vz = vz; b.spin = 0;
+    b.vx = ux * vh; b.vy = uy * vh; b.vz = vz; b.spin = 0; b.dip = 0; b.kn = 0;
   }
   // CENTRO: a cross into the box for the best-placed teammate, who attacks it with a header or a bicycle kick
   humanCross() {
@@ -3601,7 +3638,7 @@ class Component extends DCLogic {
     if (c.toYou) { const iy = (this.inp || [0, 0])[1]; if (Math.abs(iy) > 0.3) aimY = 15 + Math.sign(iy) * (2 + Math.random() * 0.8); g.volleyReq = 0; this.stat('shots'); if (!header) { g.chilenaT = 2.5; this.flashMsg('¡CHILENA!', 0.9); } else this.flashMsg('¡Cabezazo!', 0.8); }
     const sp = header ? 16 + Math.random() * 3 : 21 + Math.random() * 4;
     const dir = Math.atan2(aimY - b.y, gx - b.x);
-    b.vx = Math.cos(dir) * sp; b.vy = Math.sin(dir) * sp; b.vz = header ? -2.2 : 0.9; b.spin = 0;
+    b.vx = Math.cos(dir) * sp; b.vy = Math.sin(dir) * sp; b.vz = header ? -2.2 : 0.9; b.spin = 0; b.dip = 0; b.kn = 0;
     g.last = c.i; g.cross = null; g.recv = null;
     q.face = header ? dir : dir + Math.PI;   // a bicycle kick is struck with the back to goal
     q.vx *= 0.3; q.vy *= 0.3;
