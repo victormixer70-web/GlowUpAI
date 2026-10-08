@@ -35,7 +35,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <!-- top bar: you, your coins, settings -->
   <div style="position: absolute; left: 96px; right: 12px; top: 10px; height: 44px; display: flex; align-items: center; gap: 10px; z-index: 1">
     <a href="Perfil.dc.html" aria-label="Tu perfil: estadísticas y logros" style="position: relative; flex: none; width: 44px; height: 44px; border-radius: 22px; background: conic-gradient(#22D3EE {{lvDeg}}deg, #2E2E52 {{lvDeg}}deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px #22D3EE55">
-      <span style="width: 38px; height: 38px; border-radius: 19px; overflow: hidden; background: #21213A"><svg width="38" height="38" viewBox="64 12 72 72"><rect x="64" y="12" width="72" height="72" fill="#21213A"/><rect x="92" y="60" width="16" height="22" fill="#A66A43"/><path d="M62 82Q100 70 138 82V100H62Z" fill="#FF8A3D"/><circle cx="100" cy="44" r="24" fill="#B9794F"/><ellipse cx="91" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><ellipse cx="109" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><path d="M93 56q7 5 14 0" stroke="#5A2E1E" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M76 42Q76 16 100 16Q124 16 124 42Q118 30 104 30Q96 26 88 30Q80 32 76 42Z" fill="#241811"/><rect x="75" y="29" width="50" height="9" rx="4" fill="#22D3EE"/></svg></span>
+      <span style="width: 38px; height: 38px; border-radius: 19px; overflow: hidden; background: #21213A"><sc-if value="{{hasFace}}" hint-placeholder-val="{{ false }}"><img src="{{face}}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block"></sc-if><sc-if value="{{noFace}}" hint-placeholder-val="{{ true }}"><svg width="38" height="38" viewBox="64 12 72 72"><rect x="64" y="12" width="72" height="72" fill="#21213A"/><rect x="92" y="60" width="16" height="22" fill="#A66A43"/><path d="M62 82Q100 70 138 82V100H62Z" fill="#FF8A3D"/><circle cx="100" cy="44" r="24" fill="#B9794F"/><ellipse cx="91" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><ellipse cx="109" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><path d="M93 56q7 5 14 0" stroke="#5A2E1E" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M76 42Q76 16 100 16Q124 16 124 42Q118 30 104 30Q96 26 88 30Q80 32 76 42Z" fill="#241811"/><rect x="75" y="29" width="50" height="9" rx="4" fill="#22D3EE"/></svg></sc-if></span>
       <span style="position: absolute; right: -6px; bottom: -4px; padding: 1px 5px; border-radius: 8px; background: #22D3EE; color: #0B0B14; font: 800 10px Exo2, sans-serif">{{lv}}</span>
     </a>
     <div style="display: flex; flex-direction: column; line-height: 1.1">
@@ -62,9 +62,16 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <span style="display: flex; align-items: center; gap: 10px; transform: skewX(12deg); font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 2px">JUGAR<svg class="hm-arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B0B14" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6l-6 6"/></svg></span>
     </span>
   </a>
-  <div style="position: absolute; left: 408px; top: 72px; z-index: 2; pointer-events: none; filter: drop-shadow(0 12px 16px #000C); animation: hmPlayer 3.4s ease-in-out infinite">
-    <dc-import name="Avatar" primary="{{kitP}}" secondary="{{kitS}}" pattern="{{kitPat}}" shorts="{{kitSh}}" socks="{{kitSo}}" shoe="{{kitShoe}}" number="10" hat="band" hat-color="#22D3EE" face="none" w="138" hint-size="138px,245px"></dc-import>
-  </div>
+  <!-- your own player, in 3D, stepping out of the panel (the 2D figure only if 3D isn't available) -->
+  <div style="position: absolute; left: 378px; top: 324px; width: 170px; height: 30px; margin-top: -22px; z-index: 1; pointer-events: none; border-radius: 50%; background: radial-gradient(closest-side, #22D3EE55, transparent)"></div>
+  <sc-if value="{{hero3d}}" hint-placeholder-val="{{ true }}">
+    <div ref="{{heroRef}}" style="position: absolute; left: 362px; top: 52px; width: 200px; height: 290px; z-index: 2; pointer-events: none; filter: drop-shadow(0 12px 16px #000C)"></div>
+  </sc-if>
+  <sc-if value="{{hero2d}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 408px; top: 72px; z-index: 2; pointer-events: none; filter: drop-shadow(0 12px 16px #000C); animation: hmPlayer 3.4s ease-in-out infinite">
+      <dc-import name="Avatar" primary="{{kitP}}" secondary="{{kitS}}" pattern="{{kitPat}}" shorts="{{kitSh}}" socks="{{kitSo}}" shoe="{{kitShoe}}" number="10" hat="band" hat-color="#22D3EE" face="none" w="138" hint-size="138px,245px"></dc-import>
+    </div>
+  </sc-if>
 
   <!-- side tiles -->
   <div style="position: absolute; left: 538px; right: 12px; top: 62px; height: 264px; display: flex; flex-direction: column; gap: 8px; z-index: 1">
@@ -130,6 +137,14 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.heroRef = (el) => {
+      if (el && el !== this.heroEl) { if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = el; if (window.AMHero) window.AMHero.attach(el); }
+      else if (!el && this.heroEl) { if (window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; }
+    };
+  }
+  componentWillUnmount() { if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; }
   store(key, def) { try { const v = JSON.parse(localStorage.getItem(key) || 'null'); return v == null ? def : v; } catch (e) { return def; } }
   renderVals() {
     const go = (sp) => () => { try { localStorage.setItem('arenamix.sport', JSON.stringify(sp)); } catch (e) {} };
@@ -148,6 +163,7 @@ class Component extends DCLogic {
     const M = PR ? PR.missions() : { list: [], hoursLeft: 0 };
     const mDone = M.list.filter((m) => m.done).length, mReady = M.list.filter((m) => m.done && !m.claimed).length;
     const nextMiss = M.list.find((m) => !m.done);
+    const hero3d = !!(window.AMHero && window.THREE && window.AMChars && window.AMChars.pref() !== 'clasico');
     return {
       name: window.AMOnline ? window.AMOnline.myName() : 'Invitado',
       lv: String(L.level), lvPct: String(Math.round(L.pct * 100)), lvDeg: String(Math.round(L.pct * 360)),
@@ -180,6 +196,9 @@ class Component extends DCLogic {
       })),
       go_futbol: go('futbol'), href_futbol: href('futbol'),
       ready: String(ready), hasReady: ready > 0, achLabel: ready ? '¡Tienes premios por reclamar!' : 'Consigue retos y gana carrascos',
+      heroRef: this.heroRef,
+      hero3d: hero3d, hero2d: !hero3d,
+      face: hero3d ? 'assets/chars/' + window.AMChars.pref() + '.png' : '', hasFace: hero3d, noFace: !hero3d,
       kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#0B0B14', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#17172A', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE'
     };
   }

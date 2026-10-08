@@ -209,7 +209,7 @@
       mountFx();
       var old = rootOf();
       // into or out of a game (or a screen with a live 3D view): the stinger, which covers the build-up
-      if (!old || inGame() || GAME.test(prevHash) || old.querySelector('canvas')) { stinger(tk, doSwap); return; }
+      if (!old || inGame() || GAME.test(prevHash) || old.querySelector('canvas:not([data-am-shared])')) { stinger(tk, doSwap); return; }
       var modes = MODES.filter(function (m) { return m !== lastMode; });
       var mode = modes[Math.floor(Math.random() * modes.length)]; lastMode = mode;
       var dur = mode === 'flip' ? 380 : 360;

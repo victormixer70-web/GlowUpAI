@@ -299,10 +299,7 @@
     var jobs = [];
     // the Taquilla's 3D viewer with your character, its shaders compiled
     jobs.push(function () {
-      var Tq = registry.Taquilla, A = window.AMChars;
-      if (!Tq || !Tq.prototype.viewer || window.__amTaqV || !A) return;
-      var V = Tq.prototype.viewer.call({}), m = A.make({ you: true, noRing: true, gear: true });
-      if (m) { V.S.add(m); V.R.compile(V.S, V.cam); V.S.remove(m); }
+      if (window.AMHero) window.AMHero.warm();
     });
     ['team:1', 'team:2', 'team:3', 'team:4', 'pen', 'free', 'private', 'train', 'tut', 'pass'].forEach(function (k) { jobs.push(function () { if (window.AMPosters) window.AMPosters.get(k); }); });
     ['coins:4', 'coins:5', 'coins:6', 'coins:8', 'coins:12', 'coins:14', 'coins:16', 'bag', 'boots:#E5484D', 'chest:common', 'chest:common:open', 'chest:rare', 'chest:rare:open', 'chest:epic', 'chest:epic:open', 'chest:legend', 'chest:legend:open'].forEach(function (k) {
