@@ -50,6 +50,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .ko-sub{animation:koFade .4s .5s both}
 .ko-root{animation:koOut .45s 2.8s ease-in both}@keyframes koOut{to{transform:scale(1.35);filter:blur(4px)}}
 .ko-flash{opacity:0;animation:koFlash .5s 2.85s both}@keyframes koFlash{0%{opacity:0}60%{opacity:1}100%{opacity:1}}
+.em-pop{animation:emPop .45s cubic-bezier(.2,1.5,.4,1) both}@keyframes emPop{from{opacity:0;transform:scale(.85) translateY(20px)}}
+.em-ping{animation:emPing 1.6s ease-out infinite;transform-origin:0 0}@keyframes emPing{from{transform:scale(1);opacity:1}to{transform:scale(4);opacity:0}}
 .mm-dot{display:inline-block;width:8px;height:8px;border-radius:4px;background:#53D88E;box-shadow:0 0 8px #53D88E;animation:mmBlink 1s infinite}
 </style>
 </helmet>
@@ -131,6 +133,28 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <span style="display: flex; align-items: baseline; gap: 10px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; letter-spacing: 1px"><span>{{searchTitle}}</span><span style="min-width: 52px; color: #22D3EE">{{searchClock}}</span></span>
         <span style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #A3A3C2"><i class="mm-dot"></i>{{searchSub}}</span>
         <button type="button" onClick="{{cancel}}" class="bc-para" style="margin-top: 2px; height: 32px; padding: 0 22px; border: 0; background: #17172ACC; box-shadow: inset 0 0 0 1px #4C4C78; color: #CACAE0; font: 800 13px Exo2, sans-serif; letter-spacing: 1px; cursor: pointer">CANCELAR</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isEmpty}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 56px 0 0 0; display: flex; align-items: center; justify-content: center">
+      <div class="bc-cut em-pop" style="position: relative; width: 560px; padding: 22px 26px 20px 150px; box-sizing: border-box; background: linear-gradient(160deg, #2A1220, #14101E 60%, #0B0B14); box-shadow: inset 0 0 0 1px #FF5C8A88, 0 20px 40px #000c; display: flex; flex-direction: column; gap: 10px">
+        <!-- an empty pitch, with the globe of players dimmed -->
+        <svg width="120" height="120" viewBox="-60 -60 120 120" style="position: absolute; left: 18px; top: 50%; margin-top: -60px">
+          <circle r="50" fill="#1A1A33" stroke="#FF5C8A" stroke-opacity=".5" stroke-width="2"/>
+          <g fill="#FF5C8A" opacity=".35"><circle cx="-18" cy="-20" r="3"/><circle cx="10" cy="-28" r="3"/><circle cx="24" cy="-6" r="3"/><circle cx="-28" cy="8" r="3"/><circle cx="2" cy="18" r="3"/><circle cx="20" cy="26" r="3"/><circle cx="-10" cy="32" r="3"/></g>
+          <circle r="8" fill="#53D88E"/><circle r="8" fill="none" stroke="#53D88E" stroke-width="2" class="em-ping"/>
+          <g transform="translate(30 -30)"><circle r="15" fill="#FF3B5C" stroke="#0B0B14" stroke-width="3"/><path d="M-6 -6l12 12M6 -6l-12 12" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/></g>
+        </svg>
+        <span style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #FF8AA8">BÚSQUEDA DETENIDA</span>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1">{{emptyTitle}}</span>
+        <span style="font-size: 12.5px; line-height: 1.45; color: #CACAE0">{{emptySub}}</span>
+        <div style="display: flex; gap: 8px; margin-top: 6px">
+          <button type="button" onClick="{{emptyRetry}}" class="bc-btn" style="height: 42px; padding: 0 16px; border: 0; white-space: nowrap; cursor: pointer; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px">REINTENTAR</button>
+          <button type="button" onClick="{{emptyAI}}" class="bc-para" style="height: 42px; padding: 0 16px; border: 0; background: #17172A; box-shadow: inset 0 0 0 1px #4C4C78; color: #F4F4FA; white-space: nowrap; cursor: pointer; font: 800 12px Exo2, sans-serif">JUGAR CONTRA LA IA</button>
+          <button type="button" onClick="{{emptyBack}}" class="bc-para" style="height: 42px; padding: 0 14px; border: 0; background: transparent; color: #A3A3C2; cursor: pointer; font: 800 13px Exo2, sans-serif">VOLVER</button>
+        </div>
       </div>
     </div>
   </sc-if>
@@ -392,9 +416,13 @@ class Component extends DCLogic {
     if (s.phase === 'search' && M && !M.cancelled) {
       // a host with company starts when the room is full, or 10 s after the first player came in
       if (M.isHost && M.roster.length > 1 && !M.started && Date.now() - M.firstJoin > 10000) M.start();
-      // nobody else searching: play the AI after a while
-      if (this.t > this.findAt + 20 && M.roster.length <= 1) { M.cancel(); this.mm = null; this.t = 0; this.setState({ phase: 'found', match: this.pre || this.makeMatch(), online: null }); }
+      // nobody else searching after a while: say so (and let the player choose what to do)
+      if (this.t > this.findAt + 20 && M.roster.length <= 1) { M.cancel(); this.mm = null; this.t = 0; this.setState({ phase: 'empty', emptyWhy: 'nobody' }); }
+    } else if (s.phase === 'search' && this.pl.kind === 'team') {
+      // online modes with no connection to the matchmaking service: nobody can be found
+      if (this.t > 8) { this.endOnline(); this.t = 0; this.setState({ phase: 'empty', emptyWhy: 'offline' }); }
     } else if (s.phase === 'search' && this.t > this.findAt) { this.t = 0; this.setState({ phase: 'found', match: this.pre || this.makeMatch(), online: null }); }
+    if (s.phase === 'empty') { this.forceUpdate(); this.raf = null; return; }
     if (s.phase === 'search') this.drawGlobe(this.t);
     if (s.phase === 'found') {
       // the walkout's sounds: the medallion stamping down, then the referee
@@ -648,7 +676,7 @@ class Component extends DCLogic {
         if (s.phase !== 'search') return { slotsA: [], slotsB: [] };
         const pre = this.pre || { mates: [], rivals: [], mateMmr: [], rivalMmr: [] };
         const live = M && !M.cancelled, others = live ? M.roster.filter((x) => x.id !== M.room.me) : [];
-        const have = live ? Math.min(total, 1 + others.length) : found;
+        const have = live ? Math.min(total, 1 + others.length) : pl.kind === 'team' ? 1 : found;
         this.foundNow = have;
         const POOL = ['Kai_Striker', 'LunaGol_09', 'ToroVeloz', 'Mika10', 'Zeta_FC', 'Nico_Volea', 'Sara_Crack', 'Dani_Muro', 'Bruno7', 'Iker_Rayo', 'Vega_22', 'Leo_Tiki', 'Noa_Golazo', 'Rafa_Pared', 'Alba_Top'];
         const FLAGS = ['ES', 'MX', 'AR', 'BR', 'FR', 'IT', 'DE', 'PT', 'CO', 'US', 'JP', 'GB'];
@@ -671,7 +699,7 @@ class Component extends DCLogic {
         };
         return { slotsA: Array.from({ length: n }, (_, k) => card(0, k)), slotsB: Array.from({ length: n }, (_, k) => card(1, k)) };
       })(),
-      searchSub: M && !M.cancelled ? (humans > 1 ? humans + ' jugadores online en la sala' + (M.isHost ? ' · empieza en ' + Math.max(0, Math.ceil(10 - (Date.now() - M.firstJoin) / 1000)) + ' s' : ' · esperando al anfitrión') : 'Buscando jugadores online… si no hay nadie, jugarás contra la IA') : n > 1 ? found + ' / ' + total + ' jugadores' : 'Rango de búsqueda: ' + Math.max(0, s.mmr - 50 - Math.floor(this.t / 1.5) * 25) + '–' + (s.mmr + 50 + Math.floor(this.t / 1.5) * 25) + ' MMR',
+      searchSub: !(M && !M.cancelled) && pl.kind === 'team' ? 'Conectando con el servidor de partidas…' : M && !M.cancelled ? (humans > 1 ? humans + ' jugadores online en la sala' + (M.isHost ? ' · empieza en ' + Math.max(0, Math.ceil(10 - (Date.now() - M.firstJoin) / 1000)) + ' s' : ' · esperando al anfitrión') : 'Buscando jugadores online…') : n > 1 ? found + ' / ' + total + ' jugadores' : 'Rango de búsqueda: ' + Math.max(0, s.mmr - 50 - Math.floor(this.t / 1.5) * 25) + '–' + (s.mmr + 50 + Math.floor(this.t / 1.5) * 25) + ' MMR',
       searchClock: '0:' + String(Math.floor(this.t)).padStart(2, '0'),
       teamA, teamB,
       koMode: (casual ? 'INFORMAL' : 'COMPETITIVO') + ' · ' + (pl.kind === 'team' ? pl.n + ' CONTRA ' + pl.n : pl.title || ''),
@@ -701,6 +729,12 @@ class Component extends DCLogic {
       rankChanged: rankChanged || (s.justPlaced && s.phase === 'result'), changeLabel: s.justPlaced ? 'RANGO INICIAL' : up ? '¡ASCENSO!' : 'DESCENSO',
       changeStyle: 'padding: 4px 14px; border-radius: 8px; font-weight: 800; font-size: 14px; letter-spacing: 2px; ' + (up ? 'background: #22D3EE; color: #0B0B14;' : 'background: #2A1418; color: #FF8A8E;'),
       xp: String(xp), coins: String(coins),
+      isEmpty: s.phase === 'empty',
+      emptyTitle: 'NO HAY SUFICIENTES JUGADORES EN LÍNEA',
+      emptySub: s.emptyWhy === 'offline' ? 'No hemos podido conectar con el servidor de partidas. Comprueba tu conexión a internet e inténtalo de nuevo.' : 'Ahora mismo no hay nadie más buscando ' + (pl.kind === 'team' ? pl.n + ' contra ' + pl.n : 'esta partida') + (casual ? ' informal' : ' competitivo') + '. Prueba otra vez en un rato o invita a tus amigos con una sala privada.',
+      emptyRetry: () => { this.findAt = 2 + n * 0.6 + Math.random() * 1.5; this.pre = this.makeMatch(); this.koFx = {}; this.arcs = []; this.seen = 1; this.setState({ phase: 'search', online: null }); this.startOnline(n); this.anim(); },
+      emptyAI: () => { this.t = 0; this.setState({ phase: 'found', match: this.pre || this.makeMatch(), online: null }); this.anim(); },
+      emptyBack: () => { this.setState({ phase: 'lobby' }); },
       search: () => { this.findAt = 2 + n * 0.6 + Math.random() * 1.5; this.pre = this.makeMatch(); this.koFx = {}; this.arcs = []; this.seen = 1; this.setState({ phase: 'search', online: null }); this.startOnline(n); this.anim(); },
       cancel: () => { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; this.endOnline(); this.setState({ phase: 'lobby' }); },
       onEnd: (r) => this.finish(r),
