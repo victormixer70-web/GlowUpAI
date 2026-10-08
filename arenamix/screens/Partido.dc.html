@@ -558,7 +558,6 @@ class Component extends DCLogic {
     this.dive(p, this.clamp(iy, 10.5, 19.5), t, D, Math.max(0, b.z + b.vz * t - 4.9 * t * t));
   }
   start() {
-    window.__amDbg = this;
     if (this.g.phase === 'end') this.newGame();
     // team matches open with the fans: the camera shows each end, flares lit, then kick-off
     if (this.size() >= 2 && !this.props.tutorial && !this.net && !this.introDone) {
