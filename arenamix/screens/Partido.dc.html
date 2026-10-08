@@ -648,6 +648,7 @@ class Component extends DCLogic {
     const sc = g.last >= 0 ? g.ps[g.last] : null;
     g.sci = sc ? g.last : -1;
     g.scorer = sc && sc.team === team && sc.role !== 'gk' ? 'Gol de ' + (g.ps.indexOf(sc) === g.ctl || sc.role === 'human' ? 'TI' : sc.name) : sc ? 'Gol en propia puerta' : '';
+    if (g.chilenaT > 0 && sc && sc.team === team) { g.scorer = '¡GOLAZO DE CHILENA! · ' + g.scorer; g.chilenaT = 0; }
     g.ps.forEach((p) => {
       if (p === sc && sc.team === team) p.act = { type: 'celebrate', t: 0, dur: 3, lock: true };
       else if (p.team === team) p.act = { type: 'cheer', t: 0, dur: 3, lock: true };
@@ -695,6 +696,7 @@ class Component extends DCLogic {
   doKick() {
     const g = this.g, p = g.ps[g.ctl];
     if (this.netEv('kick')) { g.charging = false; g.charge = 0; return; }
+    if (g.cross && g.cross.toYou && g.cross.i === g.ctl && g.own < 0) { g.volleyReq = 0.45; g.charging = false; g.charge = 0; return; }
     if (g.phase !== 'play' || (p.act && p.act.type === 'windup')) { g.charging = false; g.charge = 0; return; }
     if (g.hold === g.ctl) {
       // a punt from the hands, aimed with the stick
@@ -821,6 +823,7 @@ class Component extends DCLogic {
     this.slideHits();
     if (this.props.tutorial) this.tutStep(dt);
     this.crossStep(dt);
+    if (g.chilenaT > 0) g.chilenaT -= dt;
     this.ballStep(dt);
   }
   goalStep(dt) {
@@ -1209,6 +1212,11 @@ class Component extends DCLogic {
     const foes = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk');
     const pressure = foes.reduce((m, q) => Math.min(m, this.dist(p, q)), 99);
     const caller = g.ps[g.ctl];
+    // you are in the box and your teammate is out wide: a cross for you to finish with a header or a bicycle kick
+    if (caller && caller.team === p.team && caller !== p && this.size() > 1 && !this.props.tutorial && this.inBox(caller) && this.wideFor(p)) {
+      const asked = p.passReq > 0, freeMark = foes.reduce((m, o) => Math.min(m, this.dist(o, caller)), 99);
+      if (asked || (freeMark > 1.2 && Math.random() < 0.55)) { p.passReq = 0; this.crossFrom(p, caller, Math.random() < 0.7 ? 'bicycle' : 'header'); this.say(p, '¡Centro!'); return; }
+    }
     if (p.passReq > 0 && caller.team === p.team && caller !== p) { p.passReq = 0; this.passBall(p, caller); this.say(p, '¡Toma!'); return; }
     const S = this.shotQuality(p);
     if (p.shootReq > 0 && S.dg < 30) { p.shootReq = 0; this.say(p, '¡Allá va!'); this.aiShoot(p, S); return; }
@@ -2748,7 +2756,7 @@ class Component extends DCLogic {
       joyBaseStyle: 'position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none; transform: translate(' + this.joy.bx.toFixed(1) + 'px, ' + this.joy.by.toFixed(1) + 'px); opacity: ' + (this.joy.on ? 1 : 0.45) + ';',
       joyRingStyle: 'position: absolute; left: -' + this.JR + 'px; top: -' + this.JR + 'px; width: ' + (this.JR * 2) + 'px; height: ' + (this.JR * 2) + 'px; border-radius: 50%; box-sizing: border-box; background: #0B0B1466; border: 2px solid ' + (this.joy.on ? '#22D3EE99' : '#2E2E52') + ';',
       knobStyle: 'position: absolute; left: -' + Math.round(28 * this.cfg.joy) + 'px; top: -' + Math.round(28 * this.cfg.joy) + 'px; width: ' + Math.round(56 * this.cfg.joy) + 'px; height: ' + Math.round(56 * this.cfg.joy) + 'px; border-radius: 50%; background: #22D3EE; box-shadow: 0 3px 0 #0E8FA3, 0 4px 14px #0008; transform: translate(' + this.joy.kx.toFixed(1) + 'px, ' + this.joy.ky.toFixed(1) + 'px);',
-      mainLabel: ctx === 'gk' ? 'ESTIRADA' : ctx === 'gkball' ? 'PATADA' : atk ? 'CHUT' : 'ENTRADA',
+      mainLabel: g.cross && g.cross.toYou && g.cross.i === g.ctl ? (g.cross.kind === 'header' ? '¡CABEZA!' : '¡CHILENA!') : ctx === 'gk' ? 'ESTIRADA' : ctx === 'gkball' ? 'PATADA' : atk ? 'CHUT' : 'ENTRADA',
       mainAria: atk ? 'Chutar: mantén pulsado para más potencia' : 'Entrada: tírate al suelo para robar el balón',
       mainBtnStyle: glow(tutI === 5 || tutI === 6).length ? btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : '#F4F4FA') : '#FF7A7A', atk ? '#A3A3C2' : '#B33A3A', atk ? 24 : 17, glow(true)) : btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : '#F4F4FA') : '#FF7A7A', atk ? '#A3A3C2' : '#B33A3A', atk ? 24 : 17, 'transform: scale(' + (g.charging ? 0.94 + g.charge * 0.1 : 1).toFixed(3) + ');'),
       passLabel: ctx === 'gk' ? 'SALIR' : ctx === 'gkball' ? 'SAQUE' : ctx === 'ball' ? 'PASE' : ctx === 'team' ? 'PÍDELA' : P.coach ? 'CAMBIO' : 'PRESIÓN',
@@ -2857,6 +2865,8 @@ class Component extends DCLogic {
   mainPress() {
     const g = this.g;
     if (g.phase !== 'play') return;
+    // a cross on its way to you: CHUT is the volley, not a tackle
+    if (g.cross && g.cross.toYou && g.cross.i === g.ctl) { this.doKick(); return; }
     const c = this.ctx();
     if (c === 'ball' || c === 'team' || c === 'gkball') { if (!g.charging) { g.charging = true; g.charge = 0; } }
     else if (c === 'gk') this.keeperDive();
@@ -2885,19 +2895,33 @@ class Component extends DCLogic {
     const mates = g.ps.filter((q) => q.team === p.team && q.role !== 'gk' && q !== p);
     if (!mates.length) return;
     const q = mates.sort((u, v) => Math.hypot(u.x - spotX, u.y - 15) - Math.hypot(v.x - spotX, v.y - 15))[0];
-    // into the space between the penalty spot and the six-yard box, on the far side from the crosser
-    const tx = gx - sg * (5.5 + Math.random() * 3), ty = this.clamp(15 + (p.y < 15 ? 1 : -1) * (0.8 + Math.random() * 2.2), 11.5, 18.5);
-    const kind = Math.random() < 0.6 ? 'header' : 'bicycle';
+    this.crossFrom(p, q, Math.random() < 0.6 ? 'header' : 'bicycle');
+    this.flashMsg('¡Centro!', 0.8);
+  }
+  // in the rival box (for the side `p` attacks)
+  inBox(p) { const gx = p.team === 0 ? 60 : 0; return Math.abs(gx - p.x) < 15 && p.y > 6 && p.y < 24; }
+  // out wide in the attacking third: a crossing position
+  wideFor(p) { const gx = p.team === 0 ? 60 : 0; return Math.abs(gx - p.x) < 24 && Math.abs(p.y - 15) > 5.5; }
+  // a lofted ball from p into the box for q: at head height (header) or waist height (bicycle kick)
+  crossFrom(p, q, kind) {
+    const g = this.g, b = g.ball, sg = p.team === 0 ? 1 : -1, gx = p.team === 0 ? 60 : 0, qi = g.ps.indexOf(q);
+    let tx, ty;
+    if (qi === g.ctl) {
+      // to you: just ahead of where you are, so it is all about the timing
+      tx = this.clamp(q.x + sg * 0.6 + (q.vx || 0) * 0.5, sg > 0 ? 44 : 4, sg > 0 ? 56 : 16); ty = this.clamp(q.y + (q.vy || 0) * 0.5, 9, 21);
+    } else {
+      // into the space between the penalty spot and the six-yard box, on the far side from the crosser
+      tx = gx - sg * (5.5 + Math.random() * 3); ty = this.clamp(15 + (p.y < 15 ? 1 : -1) * (0.8 + Math.random() * 2.2), 11.5, 18.5);
+    }
     const zT = kind === 'header' ? 1.95 : 1.15;   // head height or waist height (bicycle kick)
     const d = Math.hypot(tx - b.x, ty - b.y), T = this.clamp(0.7 + d / 24, 0.85, 1.6);
     this.release(p);
     b.z = Math.max(b.z, 0.05);
     this.loftTo(b, tx, ty, zT, T);
     p.act = { type: 'pass', t: 0, dur: 0.32 }; p.cd = 0.5;
-    const qi = g.ps.indexOf(q);
-    g.cross = { i: qi, x: tx, y: ty, t: T + 0.7, team: p.team, kind };
+    g.cross = { i: qi, x: tx, y: ty, t: T + 0.7, team: p.team, kind, toYou: qi === g.ctl };
     g.recv = { i: qi, t: T + 0.7 };
-    this.flashMsg('¡Centro!', 0.8);
+    if (qi === g.ctl) { g.volleyReq = 0; this.flashMsg(kind === 'header' ? '¡Centro alto! Pulsa CHUT para rematar de cabeza' : '¡Centro! Pulsa CHUT para la CHILENA', 1.4); }
   }
   // the teammate meets the cross: header (high ball) or bicycle kick (lower ball), at goal
   crossStep(dt) {
@@ -2906,13 +2930,20 @@ class Component extends DCLogic {
     c.t -= dt;
     if (g.own >= 0 || g.hold >= 0 || c.t < 0 || g.phase !== 'play') { g.cross = null; return; }
     const q = g.ps[c.i], dist = Math.hypot(b.x - q.x, b.y - q.y);
-    const header = c.kind !== 'bicycle';
-    if (q.act || dist > 1.5 || b.vz > 2 || (header ? b.z < 1.3 || b.z > 2.8 : b.z < 0.6 || b.z > 1.9)) return;
+    let header = c.kind !== 'bicycle';
+    if (c.toYou) {
+      // yours: it only happens if you press CHUT around the moment the ball arrives
+      if (g.volleyReq > 0) g.volleyReq -= dt;
+      if (!(g.volleyReq > 0) || dist > 1.9 || b.z < 0.45 || b.z > 2.9 || b.vz > 2.5) return;
+      header = c.kind === 'header' ? b.z > 1.45 : b.z > 2.45;
+      if (q.act && q.act.lock) return;
+    } else if (q.act || dist > 1.5 || b.vz > 2 || (header ? b.z < 1.3 || b.z > 2.8 : b.z < 0.6 || b.z > 1.9)) return;
     const sg = q.team === 0 ? 1 : -1, gx = q.team === 0 ? 60 : 0;
     const kp = g.ps.find((o) => o.team !== q.team && o.role === 'gk');
     // aim away from the keeper, a little less precise for the acrobatic one
     const side = kp ? (kp.y < 15 ? 1 : -1) : (Math.random() < 0.5 ? -1 : 1);
-    const aimY = 15 + side * (1.8 + Math.random() * 0.9) + (Math.random() - 0.5) * (header ? 0.8 : 1.4);
+    let aimY = 15 + side * (1.8 + Math.random() * 0.9) + (Math.random() - 0.5) * (header ? 0.8 : 1.4);
+    if (c.toYou) { const iy = (this.inp || [0, 0])[1]; if (Math.abs(iy) > 0.3) aimY = 15 + Math.sign(iy) * (2 + Math.random() * 0.8); g.volleyReq = 0; this.stat('shots'); if (!header) { g.chilenaT = 2.5; this.flashMsg('¡CHILENA!', 0.9); } else this.flashMsg('¡Cabezazo!', 0.8); }
     const sp = header ? 16 + Math.random() * 3 : 21 + Math.random() * 4;
     const dir = Math.atan2(aimY - b.y, gx - b.x);
     b.vx = Math.cos(dir) * sp; b.vy = Math.sin(dir) * sp; b.vz = header ? -2.2 : 0.9; b.spin = 0;
