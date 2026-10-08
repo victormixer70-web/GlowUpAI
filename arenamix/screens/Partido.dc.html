@@ -381,7 +381,7 @@ class Component extends DCLogic {
     const sm = this.inpS || [0, 0], al = 1 - Math.exp(-dt / 0.025);
     sm[0] += (ix - sm[0]) * al; sm[1] += (iy - sm[1]) * al;
     this.inpS = sm;
-    this.inp = this.proCam() ? [-sm[1], sm[0]] : [sm[0], sm[1]];
+    this.inp = this.proCam() ? this.proMap(sm) : [sm[0], sm[1]];
     N.inT -= dt;
     if (N.inT <= 0) { N.inT = 1 / 30; const [x, y] = this.worldInp(); N.room.send({ t: 'in', x, y, s: g.sprint ? 1 : 0, p: g.press ? 1 : 0, c: g.charging ? 1 : 0 }); }
     const S = N.snap;
@@ -527,7 +527,22 @@ class Component extends DCLogic {
     // 4vs4: you can play in goal, with a camera from behind your own goal
     return !!this.props.keeper && this.size() === 4 && !this.props.tutorial;
   }
-  // "Pro" camera (a personal setting): low behind your own player, always facing the goal you attack
+  // Pro camera: the stick works relative to where the camera looks (up = into the screen)
+  proMap(sm) {
+    const y = this.proYaw || 0, c = Math.cos(y), s = Math.sin(y), f = -sm[1], r = sm[0];
+    return [f * c - r * s, f * s + r * c];
+  }
+  // defending (the rival has it, or a loose ball has got behind you): the Pro camera turns to show your goal
+  proDefending() {
+    const g = this.g, c = g.ps[g.ctl], b = g.ball, sg = c.team === 0 ? 1 : -1;
+    const owner = g.own >= 0 ? g.ps[g.own] : g.hold >= 0 ? g.ps[g.hold] : null;
+    if (owner) this.proDef = owner.team !== c.team && !(owner.role === 'gk' && g.hold >= 0);
+    else if ((b.x - c.x) * sg < -3) this.proDef = true;
+    else if ((b.x - c.x) * sg > 2) this.proDef = false;
+    return !!this.proDef;
+  }
+  // "Pro" camera (a personal setting): low behind your own player, facing the goal you attack, and turning
+  // round to face your own goal when you defend
   proCam() {
     return !this.keeperMode() && !!this.play && this.play.cam === 'pro' && !this.props.tutorial;
   }
@@ -1040,7 +1055,7 @@ class Component extends DCLogic {
     this.inpS = sm;
     // behind-the-goal camera: up on the stick is up the pitch
     // with the Pro camera too, the camera looks up the pitch
-    this.inp = this.keeperMode() || this.proCam() ? [-sm[1], sm[0]] : [sm[0], sm[1]];
+    this.inp = this.keeperMode() ? [-sm[1], sm[0]] : this.proCam() ? this.proMap(sm) : [sm[0], sm[1]];
     const chasers = this.pickChasers();
     g.ps.forEach((p, i) => { const h = this.netHuman(i); if (h) this.withHuman(h, () => this.movePlayer(p, i, dt, chasers)); else this.movePlayer(p, i, dt, chasers); });
     for (let i = 0; i < g.ps.length; i++) for (let j = i + 1; j < g.ps.length; j++) {
@@ -2841,9 +2856,19 @@ class Component extends DCLogic {
     } else if (this.proCam()) {
       // Pro camera: just behind and above your player, looking past him towards the goal you attack,
       // turning a little towards the ball so you never lose it
-      const cx = c.x - 30, cz = c.y - 15, bz = b.y - 15;
-      const want = new T.Vector3(Math.max(-34, cx - 7.2), 3.4, cz * 0.92 + (bz - cz) * 0.12);
-      const look = new T.Vector3(cx + 6, 0.9, cz + (bz - cz) * 0.35);
+      const sg = c.team === 0 ? 1 : -1;
+      let target;
+      if (g.phase === 'play' && this.proDefending()) {
+        // towards a point between the ball and your goal, so both stay on screen
+        const lx = b.x * 0.55 + (sg > 0 ? 0 : 60) * 0.45, ly = b.y * 0.55 + 15 * 0.45;
+        target = Math.hypot(lx - c.x, ly - c.y) > 1.5 ? Math.atan2(ly - c.y, lx - c.x) : (this.proYaw || 0);
+      } else target = (sg > 0 ? 0 : Math.PI) + this.clamp(Math.atan2(b.y - c.y, Math.abs(b.x - c.x) + 6) * 0.35, -0.5, 0.5) * sg;
+      if (this.proYaw == null) this.proYaw = target;
+      this.proYaw = this.ang(this.proYaw + this.ang(target - this.proYaw) * Math.min(1, (dt || 0) * 2.4));
+      const dx = Math.cos(this.proYaw), dy = Math.sin(this.proYaw);
+      const px = this.clamp(c.x - dx * 7.2, -4, 64), py = this.clamp(c.y - dy * 7.2, -4, 34);
+      const want = new T.Vector3(px - 30, 3.4, py - 15);
+      const look = new T.Vector3(c.x + dx * 6 - 30 + (b.x - c.x) * 0.12, 0.9, c.y + dy * 6 - 15 + (b.y - c.y) * 0.25);
       const f = 1 - Math.exp(-5.5 * (dt || 1));
       if (this.cam.fov !== 60) { this.cam.fov = 60; this.cam.updateProjectionMatrix(); this.camPos.copy(want); this.camLook.copy(look); }
       this.camPos.lerp(want, f); this.camLook.lerp(look, f);
