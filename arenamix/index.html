@@ -7,8 +7,6 @@
 <meta name="theme-color" content="#0B0B14">
 <meta name="description" content="Juego de fútbol: partidos de 1 contra 1 a 4 contra 4, penaltis y tiros libres.">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,800&amp;display=swap" rel="stylesheet">
 <link rel="icon" href="icons/icon-192.png?v=3" type="image/png">
 <link rel="apple-touch-icon" href="icons/icon-192.png?v=3">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,22 +14,18 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ARENA MIX">
 <style>
-  /* the game's fonts, bundled so they look the same offline: Exo 2 for text, Barlow Condensed for titles */
-  @font-face { font-family: 'Barlow Condensed'; font-style: italic; font-weight: 700; font-display: swap; src: url(vendor/fonts/barlowc-700i-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-  @font-face { font-family: 'Barlow Condensed'; font-style: italic; font-weight: 700; font-display: swap; src: url(vendor/fonts/barlowc-700i-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-  @font-face { font-family: 'Barlow Condensed'; font-style: italic; font-weight: 800; font-display: swap; src: url(vendor/fonts/barlowc-800i-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-  @font-face { font-family: 'Barlow Condensed'; font-style: italic; font-weight: 800; font-display: swap; src: url(vendor/fonts/barlowc-800i-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-  @font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 600; font-display: swap; src: url(vendor/fonts/barlowc-600-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-  @font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 600; font-display: swap; src: url(vendor/fonts/barlowc-600-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-  @font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 700; font-display: swap; src: url(vendor/fonts/barlowc-700-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-  @font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 700; font-display: swap; src: url(vendor/fonts/barlowc-700-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-  @font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 800; font-display: swap; src: url(vendor/fonts/barlowc-800-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-  @font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 800; font-display: swap; src: url(vendor/fonts/barlowc-800-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-  @font-face { font-family: 'Exo2'; font-style: normal; font-weight: 400 900; font-display: swap; src: url(vendor/fonts/exo2-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-  @font-face { font-family: 'Exo2'; font-style: normal; font-weight: 400 900; font-display: swap; src: url(vendor/fonts/exo2-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+  /* the game's fonts, bundled so they look the same offline: Luckiest Guy for titles, buttons and numbers, Lilita One for
+     everything else. The screens ask for 'Barlow Condensed' (titles) and 'Exo2' (text); both names point at the new
+     faces, sized to fit the room the old ones had. */
+  @font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 100 900; font-display: swap; size-adjust: 84%; src: url(vendor/fonts/luckiestguy-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Exo2'; font-style: normal; font-weight: 100 900; font-display: swap; size-adjust: 96%; src: url(vendor/fonts/lilitaone-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Luckiest Guy'; font-display: swap; src: url(vendor/fonts/luckiestguy-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Lilita One'; font-display: swap; src: url(vendor/fonts/lilitaone-latin.woff2) format('woff2'); }
   @font-face { font-family: 'Rajdhani'; font-weight: 500; src: url(vendor/fonts/rajdhani-500.woff2) format('woff2'); font-display: swap; }
   @font-face { font-family: 'Rajdhani'; font-weight: 600; src: url(vendor/fonts/rajdhani-600.woff2) format('woff2'); font-display: swap; }
   @font-face { font-family: 'Rajdhani'; font-weight: 700; src: url(vendor/fonts/rajdhani-700.woff2) format('woff2'); font-display: swap; }
+  /* Luckiest Guy draws lowercase as small capitals: whatever uses the title face is shown in capitals */
+  [style*="Barlow Condensed"], [font-family*="Barlow"], .bc-title, .bc-btn, .bc-btn-gold, .hm-pass-lv b, .st-plus1, #am-res .t, #am-res .sc, #am-res .lv, #am-res .lvup, #am-res .go, #am-res .cn b, #am-rw .it b, #am-rw .ok, #am-rw .tap { text-transform: uppercase; }
   html, body { margin: 0; height: 100%; background: #000000; overflow: hidden; overscroll-behavior: none; touch-action: none; -webkit-tap-highlight-color: transparent; }
   #stage { position: fixed; left: 50%; top: 50%; width: 844px; height: 390px; transform-origin: center center; overflow: hidden; background: #0B0B14; }
   #loading { position: fixed; inset: 0; z-index: 5; background: #05060a; overflow: hidden; transition: opacity .45s ease; font-family: 'Rajdhani', system-ui, sans-serif; }
