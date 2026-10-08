@@ -155,7 +155,28 @@
     '.fx-ring{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:3px solid #22D3EE;box-shadow:0 0 14px #22D3EE;animation:fxRing .5s ease-out forwards}',
     '.fx-spark{position:absolute;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#FFC53D;box-shadow:0 0 8px #FFC53D;animation:fxSpark .45s ease-out forwards}',
     '@keyframes fxRing{from{opacity:.95;scale:.4}to{opacity:0;scale:4.2}}',
-    '@keyframes fxSpark{from{opacity:1;translate:0 0}to{opacity:0;translate:var(--sx) var(--sy)}}'
+    '@keyframes fxSpark{from{opacity:1;translate:0 0}to{opacity:0;translate:var(--sx) var(--sy)}}',
+    // ---- a living app: things that move on their own and answer your finger ----
+    // the backdrop drifts with the phone's tilt (or the finger): depth
+    '.am-bg,.bc-beams,.rg-bg,.md-bg{transform:translate3d(calc(var(--px,0) * -12px),calc(var(--py,0) * -9px),0) scale(1.05);transition:transform .25s ease-out}',
+    // main buttons beat now and then, asking to be pressed
+    '.bc-btn,.bc-btn-gold,.rs-go{animation:amBeat 3.8s ease-in-out infinite}',
+    '.bc-btn.fx-down,.bc-btn-gold.fx-down,.rs-go.fx-down{animation:none!important}',
+    '@keyframes amBeat{0%,78%,100%{scale:1}84%{scale:1.07}88%{scale:.98}92%{scale:1.04}}',
+    // motes of light rising through every menu
+    '.am-motes{position:absolute;inset:0;pointer-events:none;overflow:hidden}',
+    '.am-motes i{position:absolute;bottom:-8px;width:var(--s,4px);height:var(--s,4px);border-radius:50%;background:var(--c,#9BEFFF);box-shadow:0 0 8px var(--c,#9BEFFF);opacity:0;will-change:transform,opacity;animation:amMote var(--d,9s) linear infinite}',
+    '@keyframes amMote{0%{transform:translate(0,0);opacity:0}12%{opacity:.85}50%{transform:translate(var(--dx,14px),-200px)}100%{transform:translate(0,-420px);opacity:0}}',
+    // cards lean towards your finger while you hold them
+    '.fx-tilt{transition:transform .12s ease-out!important;transform-style:preserve-3d}',
+    '.fx-tilt-off{transition:transform .45s cubic-bezier(.3,1.8,.5,1)!important}',
+    // a ball that hops away when you tap an empty spot
+    '.fx-ball{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;pointer-events:none;animation:fxBallX 1.3s cubic-bezier(.25,.6,.5,1) forwards}',
+    '.fx-ball b{position:relative;display:block;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#E6E9F0 45%,#9AA3B5);box-shadow:inset -3px -3px 0 #0002,0 0 0 1.5px #0B0B14;animation:fxBallY 1.3s linear forwards,fxBallR 1.3s linear forwards}',
+    '.fx-ball b::after{content:"";position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4.5px;background:#17172A;clip-path:polygon(50% 0,100% 38%,82% 100%,18% 100%,0 38%)}',
+    '@keyframes fxBallX{0%{translate:0 0;opacity:1}75%{opacity:1}100%{translate:var(--bx) 0;opacity:0}}',
+    '@keyframes fxBallY{0%{translate:0 0}18%{translate:0 -70px;animation-timing-function:ease-in}36%{translate:0 0;animation-timing-function:ease-out}52%{translate:0 -34px;animation-timing-function:ease-in}66%{translate:0 0}76%{translate:0 -12px}86%,100%{translate:0 0}}',
+    '@keyframes fxBallR{to{rotate:var(--br)}}'
   ].join('\n');
   document.head.appendChild(css);
   if (reduce) return;
@@ -290,13 +311,15 @@
       sp.style.setProperty('--sx', (Math.cos(a) * d).toFixed(1) + 'px'); sp.style.setProperty('--sy', (Math.sin(a) * d).toFixed(1) + 'px');
       layer.appendChild(sp);
     }
-    setTimeout(function () { while (layer.firstChild) layer.removeChild(layer.firstChild); }, 600);
+    var mine = Array.prototype.slice.call(layer.querySelectorAll('.fx-ring,.fx-spark'));
+    setTimeout(function () { mine.forEach(function (n) { n.remove(); }); }, 600);
   };
   document.addEventListener('pointerdown', function (e) {
     if (inGame()) return;
     var el = e.target.closest && e.target.closest(pressable);
     if (!el || !stage.contains(el)) return;
     el.classList.add('fx-btn', 'fx-down'); down = el;
+    try { if (navigator.vibrate) navigator.vibrate(8); } catch (err) {}
     lastTap = stageXY(e);
     burst(lastTap);
     // a tab: the new content comes in from the side of the tab you picked
@@ -327,6 +350,117 @@
     });
   }).observe(stage, { childList: true, subtree: true });
 
+  // ---- tilt the phone (or move a finger): the backdrop drifts behind the screen ----
+  var tgt = { x: 0, y: 0 }, cur = { x: 0, y: 0 }, gyro = false, tiltRaf = 0;
+  var tiltLoop = function () {
+    tiltRaf = 0;
+    if (inGame()) return;
+    cur.x += (tgt.x - cur.x) * 0.12; cur.y += (tgt.y - cur.y) * 0.12;
+    stage.style.setProperty('--px', cur.x.toFixed(3)); stage.style.setProperty('--py', cur.y.toFixed(3));
+    if (Math.abs(tgt.x - cur.x) > 0.002 || Math.abs(tgt.y - cur.y) > 0.002) tiltRaf = requestAnimationFrame(tiltLoop);
+  };
+  var aim = function (x, y) { tgt.x = Math.max(-1, Math.min(1, x)); tgt.y = Math.max(-1, Math.min(1, y)); if (!tiltRaf) tiltRaf = requestAnimationFrame(tiltLoop); };
+  window.addEventListener('deviceorientation', function (e) {
+    if (e.gamma == null || inGame()) return;
+    gyro = true;
+    // landscape: the phone's beta (front/back) moves things sideways, gamma up and down
+    var land = Math.abs(window.orientation || 0) === 90 || (screen.orientation && /landscape/.test(screen.orientation.type));
+    var a = land ? e.beta : e.gamma, b = land ? e.gamma : e.beta - 40;
+    aim((a || 0) / 25, (b || 0) / 25);
+  });
+  document.addEventListener('pointermove', function (e) {
+    if (gyro || inGame()) return;
+    var p = stageXY(e); aim((p.x - 422) / 422, (p.y - 195) / 195);
+  }, { passive: true });
+
+  // ---- hold a card and it leans towards your finger ----
+  var tiltEl = null, tiltTf = '', tiltLoopId = 0;
+  // the screens redraw their own markup now and then: keep the lean applied while the finger is down
+  var tiltPt = null;
+  var tiltHold = function () {
+    tiltLoopId = 0; if (!tiltEl) return;
+    // the card was rebuilt under the finger: carry on with the new one
+    if (!tiltEl.isConnected && tiltPt) { var nu = tiltable(document.elementFromPoint(tiltPt.x, tiltPt.y)); if (nu) tiltEl = nu; else { tiltEl = null; return; } } if (!tiltEl.classList.contains('fx-tilt')) tiltEl.classList.add('fx-tilt'); if (tiltTf && tiltEl.style.transform !== tiltTf) tiltEl.style.transform = tiltTf; tiltLoopId = requestAnimationFrame(tiltHold); };
+  var tiltable = function (el) {
+    if (!el || !stage.contains(el)) return null;
+    var c = el.closest('button, a[href], [role="button"], .bc-tile, .am-card');
+    // or a card laid out in a grid of cards
+    // or any card-sized rounded panel with a background
+    if (!c) for (var q = el, up = 0; q && q !== stage && up < 6; q = q.parentElement, up++) {
+      var cs = getComputedStyle(q), rq = q.getBoundingClientRect(), sc = stage.getBoundingClientRect().width / 844;
+      if ((parseFloat(cs.borderTopLeftRadius) >= 8 || /round/.test(cs.clipPath)) && (cs.backgroundImage !== 'none' || cs.backgroundColor !== 'rgba(0, 0, 0, 0)') && rq.width / sc >= 90 && rq.width / sc <= 420 && rq.height / sc >= 60 && rq.height / sc <= 330) { c = q; break; }
+    }
+    if (!c || c.closest('[role="tablist"]')) return null;
+    var r = c.getBoundingClientRect(), s = stage.getBoundingClientRect().width / 844;
+    if (r.width / s < 90 || r.height / s < 60) return null;
+    if (c.style.transform || getComputedStyle(c).transform !== 'none') return null;
+    return c;
+  };
+  var untilt = function () {
+    if (!tiltEl) return;
+    var el = tiltEl; tiltEl = null; tiltTf = ''; cancelAnimationFrame(tiltLoopId); tiltLoopId = 0;
+    el.classList.remove('fx-tilt'); el.classList.add('fx-tilt-off'); el.style.transform = '';
+    setTimeout(function () { el.classList.remove('fx-tilt-off'); }, 460);
+  };
+  document.addEventListener('pointerdown', function (e) {
+    if (inGame()) return;
+    var c = tiltable(e.target);
+    if (!c) return;
+    tiltEl = c; c.classList.add('fx-tilt'); tiltTf = ''; tiltPt = { x: e.clientX, y: e.clientY }; if (!tiltLoopId) tiltLoopId = requestAnimationFrame(tiltHold);
+  }, true);
+  var tiltMove = function (x, y) {
+    if (!tiltEl) return;
+    tiltPt = { x: x, y: y };
+    var r = tiltEl.getBoundingClientRect(), u = (x - r.left) / r.width - 0.5, v = (y - r.top) / r.height - 0.5;
+    tiltTf = 'perspective(600px) rotateY(' + (u * 14).toFixed(1) + 'deg) rotateX(' + (-v * 12).toFixed(1) + 'deg) scale(1.03)';
+    tiltEl.style.transform = tiltTf;
+  };
+  // a finger keeps sending touch moves even after the browser takes the gesture over (the pointer is
+  // cancelled then), so the lean follows touches and ends when the finger lifts
+  document.addEventListener('pointermove', function (e) { tiltMove(e.clientX, e.clientY); }, { passive: true });
+  document.addEventListener('touchmove', function (e) { var t = e.touches[0]; if (t) tiltMove(t.clientX, t.clientY); }, { passive: true });
+  document.addEventListener('pointerup', untilt, true);
+  document.addEventListener('touchend', function (e) { if (!e.touches.length) untilt(); }, true);
+  document.addEventListener('touchcancel', untilt, true);
+
+  // ---- tap an empty spot: a ball hops away ----
+  document.addEventListener('pointerdown', function (e) {
+    if (inGame() || !stage.contains(e.target)) return;
+    if (e.target.closest(pressable + ', input, select, textarea, canvas, [onclick]')) return;
+    if (layer.querySelectorAll('.fx-ball').length > 3) return;
+    mountFx();
+    var p = stageXY(e), dir = p.x > 422 ? -1 : 1, d = (90 + Math.random() * 90) * dir;
+    var ball = document.createElement('div'); ball.className = 'fx-ball';
+    ball.style.left = p.x + 'px'; ball.style.top = p.y + 'px';
+    ball.style.setProperty('--bx', d.toFixed(0) + 'px'); ball.style.setProperty('--br', (d * 4).toFixed(0) + 'deg');
+    ball.appendChild(document.createElement('b'));
+    layer.appendChild(ball);
+    setTimeout(function () { ball.remove(); }, 1350);
+  });
+
+  // ---- motes of light in every menu backdrop ----
+  var MC = ['#9BEFFF', '#FFE38A', '#C79BFF', '#9BEFFF', '#FF9AC8'];
+  var motes = function (root) {
+    if (!root || inGame()) return;
+    var bgs = root.querySelectorAll('.am-bg');
+    for (var k = 0; k < bgs.length; k++) {
+      if (bgs[k].querySelector('.am-motes')) continue;
+      var box = document.createElement('div'); box.className = 'am-motes';
+      for (var j = 0; j < 14; j++) {
+        var i = document.createElement('i');
+        i.style.left = (Math.random() * 100).toFixed(1) + '%';
+        i.style.setProperty('--s', (2 + Math.random() * 4).toFixed(1) + 'px');
+        i.style.setProperty('--c', MC[j % MC.length]);
+        i.style.setProperty('--d', (7 + Math.random() * 7).toFixed(1) + 's');
+        i.style.setProperty('--dx', ((Math.random() - 0.5) * 60).toFixed(0) + 'px');
+        i.style.animationDelay = '-' + (Math.random() * 12).toFixed(1) + 's';
+        box.appendChild(i);
+      }
+      bgs[k].appendChild(box);
+    }
+  };
+  new MutationObserver(function () { var r = rootOf(); if (r) motes(r); }).observe(stage, { childList: true });
+
   // first screen
-  var first = rootOf(); if (first) enter(first);
+  var first = rootOf(); if (first) { enter(first); motes(first); }
 })();
