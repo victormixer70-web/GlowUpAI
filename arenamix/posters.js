@@ -155,6 +155,11 @@
       var stand = new T.Group(); stand.add(base); stand.add(cup); stand.position.set(0.95, 0, -0.1); S.add(stand);
       var glow = new T.PointLight(0xffc53d, 1.4, 6); glow.position.set(0.9, 2.2, 1.2); S.add(glow);
       look = { pos: [0.2, 1.7, 6.4], at: [0.2, 1.0, 0] };
+    } else if (kind === 'card') {
+      // the profile card's portrait: you in your kit, from the knees up, lit like a trading card
+      add(player({ char: you ? me : 'ty', kit: homeKit(), you: true, x: 0, z: 0, face: 0.28, t: 0.35 }));
+      var spot = new T.PointLight(0xffffff, 0.9, 8); spot.position.set(1.5, 2.6, 2.4); S.add(spot);
+      look = { pos: [0.12, 1.4, 3.1], at: [0, 1.18, 0] };
     } else {
       add(patch(3)); add(ball(0, 0));
     }
@@ -188,5 +193,7 @@
     pump();
     return '';
   }
-  window.AMPosters = { get: get };
+  // the card portrait changes with your character and kit: its key carries them
+  function cardKey() { var A = window.AMChars; return 'card:' + (A ? A.pref() : '') + ':' + JSON.stringify(homeKit()); }
+  window.AMPosters = { get: get, cardKey: cardKey };
 })();
