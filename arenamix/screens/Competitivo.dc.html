@@ -13,6 +13,17 @@
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
+@keyframes mmBeam{to{rotate:360deg}}
+@keyframes mmLand{0%{transform:perspective(500px) rotateX(90deg) scale(.9);filter:brightness(3)}60%{transform:perspective(500px) rotateX(-12deg) scale(1.04);filter:brightness(1.4)}100%{transform:none;filter:none}}
+@keyframes mmShine{from{background-position:-160% 0}to{background-position:260% 0}}
+@keyframes mmBlink{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes mmVs{0%,100%{scale:1}50%{scale:1.12}}
+.mm-beam{animation:mmBeam 9s linear infinite}
+.mm-land{animation:mmLand .55s cubic-bezier(.2,1.4,.4,1) both}
+.mm-slot{background-image:linear-gradient(100deg,transparent 30%,#ffffff12 50%,transparent 70%)!important;background-size:60% 100%!important;background-repeat:no-repeat!important;animation:mmShine 1.6s linear infinite}
+.mm-reel{filter:blur(1.2px);opacity:.55}
+.mm-vs{animation:mmVs 1.2s ease-in-out infinite}
+.mm-dot{display:inline-block;width:8px;height:8px;border-radius:4px;background:#53D88E;box-shadow:0 0 8px #53D88E;animation:mmBlink 1s infinite}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; overflow: hidden;  isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif">
@@ -68,16 +79,32 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 
   <sc-if value="{{isSearch}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; inset: 60px 0 0 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px">
-      <svg width="170" height="170" viewBox="-100 -100 200 200">
-        <circle r="92" fill="#111120" stroke="#26264A" stroke-width="2"/><circle r="62" fill="none" stroke="#26264A" stroke-width="2"/><circle r="32" fill="none" stroke="#26264A" stroke-width="2"/>
-        <path d="M-92 0H92M0 -92V92" stroke="#26264A" stroke-width="1.5"/>
-        <g transform="rotate({{sweep}})"><path d="M0 0L92 0A92 92 0 0 0 65 -65Z" fill="#22D3EE" opacity=".22"/><path d="M0 0L92 0" stroke="#22D3EE" stroke-width="3"/></g>
-        <circle r="7" fill="#22D3EE"/>
-      </svg>
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 28px; letter-spacing: 1px">{{searchTitle}} · {{searchClock}}</span>
-      <span style="font-size: 13px; color: #A3A3C2">{{searchSub}}</span>
-      <button type="button" onClick="{{cancel}}" style="height: 44px; padding: 0 22px; border-radius: 12px; border: 1.5px solid #4C4C78; background: transparent; color: #CACAE0; font: 700 14px Exo2, sans-serif; cursor: pointer">Cancelar</button>
+    <div style="position: absolute; inset: 0; overflow: hidden">
+      <!-- stadium light sweeping behind the globe -->
+      <div class="mm-beam" style="position: absolute; left: 50%; top: -120px; width: 900px; height: 900px; margin-left: -450px; background: conic-gradient(from 0deg, transparent 0deg, #22D3EE14 18deg, transparent 40deg, transparent 180deg, #A78BFA12 200deg, transparent 222deg); border-radius: 50%; pointer-events: none"></div>
+      <canvas ref="{{globeRef}}" width="520" height="520" style="position: absolute; left: 307px; top: 62px; width: 230px; height: 230px"></canvas>
+      <!-- the two teams' cards -->
+      <div style="position: absolute; left: 34px; top: 74px; width: 232px; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #22D3EE">TU EQUIPO</span>
+        <sc-for list="{{slotsA}}" as="c" hint-placeholder-count="2">
+          <sc-if value="{{c.on}}" hint-placeholder-val="{{ true }}"><div class="mm-land" style="{{c.style}}"><span style="{{c.av}}">{{c.ini}}</span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><b style="font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{c.name}}</b><span style="font-size: 10.5px; font-weight: 700; color: {{c.tagColor}}">{{c.tag}}</span></span></div></sc-if>
+          <sc-if value="{{c.off}}" hint-placeholder-val="{{ false }}"><div class="mm-slot" style="{{c.style}}"><span style="{{c.av}}">?</span><span style="flex: 1; height: 34px; overflow: hidden; position: relative"><span class="mm-reel" style="{{c.reel}}">{{c.spin}}</span></span></div></sc-if>
+        </sc-for>
+      </div>
+      <div style="position: absolute; right: 34px; top: 74px; width: 232px; display: flex; flex-direction: column; gap: 8px; align-items: stretch">
+        <span style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #FF8A8E; text-align: right">RIVALES</span>
+        <sc-for list="{{slotsB}}" as="c" hint-placeholder-count="2">
+          <sc-if value="{{c.on}}" hint-placeholder-val="{{ true }}"><div class="mm-land" style="{{c.style}}"><span style="{{c.av}}">{{c.ini}}</span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><b style="font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{c.name}}</b><span style="font-size: 10.5px; font-weight: 700; color: {{c.tagColor}}">{{c.tag}}</span></span></div></sc-if>
+          <sc-if value="{{c.off}}" hint-placeholder-val="{{ false }}"><div class="mm-slot" style="{{c.style}}"><span style="{{c.av}}">?</span><span style="flex: 1; height: 34px; overflow: hidden; position: relative"><span class="mm-reel" style="{{c.reel}}">{{c.spin}}</span></span></div></sc-if>
+        </sc-for>
+      </div>
+      <span class="mm-vs" style="position: absolute; left: 50%; top: 52px; margin-left: -40px; width: 80px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; color: #F4F4FA; text-shadow: 0 0 18px #22D3EE, 0 3px 0 #05050A">VS</span>
+      <!-- status -->
+      <div style="position: absolute; left: 0; right: 0; bottom: 14px; display: flex; flex-direction: column; align-items: center; gap: 4px">
+        <span style="display: flex; align-items: baseline; gap: 10px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; letter-spacing: 1px"><span>{{searchTitle}}</span><span style="min-width: 52px; color: #22D3EE">{{searchClock}}</span></span>
+        <span style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #A3A3C2"><i class="mm-dot"></i>{{searchSub}}</span>
+        <button type="button" onClick="{{cancel}}" class="bc-para" style="margin-top: 2px; height: 32px; padding: 0 22px; border: 0; background: #17172ACC; box-shadow: inset 0 0 0 1px #4C4C78; color: #CACAE0; font: 800 13px Exo2, sans-serif; letter-spacing: 1px; cursor: pointer">CANCELAR</button>
+      </div>
     </div>
   </sc-if>
 
@@ -186,6 +213,7 @@ class Component extends DCLogic {
     const mmr = placing ? 0 : this.mmrOf(this.sport, this.pl.id);
     this.state = { phase: 'lobby', mmr, prevMmr: mmr, match: null, res: null, delta: 0, placing, place: pc, justPlaced: false, notice: !!S.notice && !props.casual };
     this.tick = this.tick.bind(this);
+    this.globeRef = (el) => { this.gcv = el || null; };
     this.t = 0;
   }
   componentWillUnmount() { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; this.endOnline(); }
@@ -321,13 +349,99 @@ class Component extends DCLogic {
       // a host with company starts when the room is full, or 10 s after the first player came in
       if (M.isHost && M.roster.length > 1 && !M.started && Date.now() - M.firstJoin > 10000) M.start();
       // nobody else searching: play the AI after a while
-      if (this.t > this.findAt + 20 && M.roster.length <= 1) { M.cancel(); this.mm = null; this.t = 0; this.setState({ phase: 'found', match: this.makeMatch(), online: null }); }
-    } else if (s.phase === 'search' && this.t > this.findAt) { this.t = 0; this.setState({ phase: 'found', match: this.makeMatch(), online: null }); }
-    else if (s.phase === 'found' && this.t > 3.2) { this.setState({ phase: 'match' }); this.raf = null; return; }
+      if (this.t > this.findAt + 20 && M.roster.length <= 1) { M.cancel(); this.mm = null; this.t = 0; this.setState({ phase: 'found', match: this.pre || this.makeMatch(), online: null }); }
+    } else if (s.phase === 'search' && this.t > this.findAt) { this.t = 0; this.setState({ phase: 'found', match: this.pre || this.makeMatch(), online: null }); }
+    if (s.phase === 'search') this.drawGlobe(this.t);
+    if (s.phase === 'found' && this.t > 3.2) { this.setState({ phase: 'match' }); this.raf = null; return; }
     else if (s.phase === 'result' && this.t > 2.4) { this.forceUpdate(); this.raf = null; return; }
     else if (s.phase === 'winners' && this.t > 1.2) { this.forceUpdate(); this.raf = null; return; }
     this.forceUpdate();
     this.raf = requestAnimationFrame(this.tick);
+  }
+  /* the search: a globe of dots turning under a stadium light; players around the world shoot towards you
+     (you are in Spain), and each one found lands as a gold arc */
+  drawGlobe(t) {
+    const cv = this.gcv;
+    if (!cv) return;
+    const g = cv.getContext('2d'), W = cv.width, R = W * 0.36, cx = W / 2, cy = W / 2;
+    if (!this.dots) {
+      const LAND = [[-100, 45, 32, 20], [-75, 60, 22, 12], [-60, -15, 16, 26], [-45, 72, 14, 8], [12, 50, 20, 11], [20, 5, 20, 30], [90, 50, 50, 20], [78, 20, 9, 11], [108, 12, 13, 11], [135, -25, 17, 11], [45, 25, 12, 9], [140, 37, 5, 8]];
+      const isLand = (lo, la) => LAND.some(([x, y, rx, ry]) => { const dx = ((lo - x + 540) % 360 - 180) / rx, dy = (la - y) / ry; return dx * dx + dy * dy < 1; });
+      this.dots = []; this.land = [];
+      const N = 3000;
+      for (let i = 0; i < N; i++) {
+        const la = Math.asin(1 - 2 * (i + 0.5) / N) * 180 / Math.PI, lo = ((i * 137.508) % 360) - 180, l = isLand(lo, la);
+        this.dots.push([lo, la, l]); if (l) this.land.push([lo, la]);
+      }
+    }
+    const tilt = 0.38, lon0 = -4 + Math.sin(t * 0.22) * 75, D = Math.PI / 180;
+    const vec = (lo, la) => [Math.cos(la * D) * Math.sin((lo - lon0) * D), Math.sin(la * D), Math.cos(la * D) * Math.cos((lo - lon0) * D)];
+    const proj = (v, h) => { const y = v[1] * Math.cos(tilt) - v[2] * Math.sin(tilt), z = v[1] * Math.sin(tilt) + v[2] * Math.cos(tilt); return [cx + R * h * v[0], cy - R * h * y, z]; };
+    g.clearRect(0, 0, W, W);
+    // atmosphere
+    let gr = g.createRadialGradient(cx, cy, R * 0.9, cx, cy, R * 1.35);
+    gr.addColorStop(0, '#22D3EE40'); gr.addColorStop(1, '#22D3EE00');
+    g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, R * 1.35, 0, 7); g.fill();
+    gr = g.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
+    gr.addColorStop(0, '#1C2C55'); gr.addColorStop(1, '#0A0D22');
+    g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, R, 0, 7); g.fill();
+    // the dots
+    for (const [lo, la, l] of this.dots) {
+      const p = proj(vec(lo, la), 1);
+      if (p[2] < 0) continue;
+      g.fillStyle = l ? 'rgba(126,240,255,' + (0.35 + 0.65 * p[2]).toFixed(2) + ')' : 'rgba(90,110,190,' + (0.3 * p[2]).toFixed(2) + ')';
+      const r = (l ? 3 : 1.5) * (0.5 + 0.5 * p[2]);
+      g.fillRect(p[0] - r / 2, p[1] - r / 2, r, r);
+    }
+    // a ring orbiting the globe
+    g.save(); g.translate(cx, cy); g.rotate(-0.35);
+    g.strokeStyle = '#A78BFA55'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 0, R * 1.22, R * 0.34, 0, 0, 7); g.stroke();
+    const sa = t * 1.3; g.fillStyle = '#E9DDFF'; g.beginPath(); g.arc(Math.cos(sa) * R * 1.22, Math.sin(sa) * R * 0.34, 5, 0, 7); g.fill();
+    g.restore();
+    // you
+    const me = vec(-4, 40), pm = proj(me, 1);
+    // arcs: a new searcher every so often; found players in gold
+    const arcs = this.arcs || (this.arcs = []);
+    if (!this.nextArc || t < this.lastT) this.nextArc = t;
+    this.lastT = t;
+    if (t >= this.nextArc && this.land.length) {
+      const [lo, la] = this.land[Math.floor(Math.random() * this.land.length)];
+      arcs.push({ a: vec(lo, la), lo, la, t0: t, gold: false });
+      this.nextArc = t + 0.35 + Math.random() * 0.5;
+    }
+    const found = this.foundNow || 1;
+    while ((this.seen || 1) < found) { this.seen = (this.seen || 1) + 1; const [lo, la] = this.land[Math.floor(Math.random() * this.land.length)]; arcs.push({ lo, la, t0: t, gold: true }); if (window.AMSfx && window.AMSfx.coin) window.AMSfx.coin(); }
+    for (let i = arcs.length - 1; i >= 0; i--) {
+      const A = arcs[i], age = t - A.t0, life = A.gold ? 2.2 : 1.6;
+      if (age > life || age < 0) { arcs.splice(i, 1); continue; }
+      const a = vec(A.lo, A.la), b = vec(-4, 40);
+      const dot = Math.max(-1, Math.min(1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2])), om = Math.acos(dot) || 0.001, so = Math.sin(om);
+      const head = Math.min(1, age / 0.9), tail = Math.max(0, head - 0.45);
+      const pts = [];
+      for (let k = 0; k <= 24; k++) {
+        const u = tail + (head - tail) * k / 24, s1 = Math.sin((1 - u) * om) / so, s2 = Math.sin(u * om) / so;
+        const v = [a[0] * s1 + b[0] * s2, a[1] * s1 + b[1] * s2, a[2] * s1 + b[2] * s2];
+        pts.push(proj(v, 1 + 0.32 * Math.sin(Math.PI * u) * Math.min(1, om)));
+      }
+      const fade = age > life - 0.4 ? (life - age) / 0.4 : 1, col = A.gold ? '255,197,61' : '34,211,238';
+      g.lineCap = 'round';
+      for (let k = 1; k < pts.length; k++) {
+        if (pts[k][2] < -0.25) continue;
+        g.strokeStyle = 'rgba(' + col + ',' + (fade * k / pts.length).toFixed(2) + ')'; g.lineWidth = (A.gold ? 4 : 2.4) * (0.4 + k / pts.length);
+        g.beginPath(); g.moveTo(pts[k - 1][0], pts[k - 1][1]); g.lineTo(pts[k][0], pts[k][1]); g.stroke();
+      }
+      const hp = pts[pts.length - 1];
+      if (head < 1 && hp[2] > -0.25) { g.fillStyle = 'rgba(' + col + ',' + fade + ')'; g.beginPath(); g.arc(hp[0], hp[1], A.gold ? 6 : 4, 0, 7); g.fill(); }
+      // where it came from
+      const ps = proj(a, 1);
+      if (ps[2] > 0) { g.strokeStyle = 'rgba(' + col + ',' + (fade * (1 - age / life)).toFixed(2) + ')'; g.lineWidth = 2; g.beginPath(); g.arc(ps[0], ps[1], 4 + age * 10, 0, 7); g.stroke(); }
+    }
+    // your ping
+    if (pm[2] > 0) {
+      for (let k = 0; k < 3; k++) { const ph = (t * 0.9 + k / 3) % 1; g.strokeStyle = 'rgba(83,216,142,' + (1 - ph).toFixed(2) + ')'; g.lineWidth = 2.5; g.beginPath(); g.arc(pm[0], pm[1], 6 + ph * 34, 0, 7); g.stroke(); }
+      g.fillStyle = '#53D88E'; g.shadowColor = '#53D88E'; g.shadowBlur = 16; g.beginPath(); g.arc(pm[0], pm[1], 7, 0, 7); g.fill(); g.shadowBlur = 0;
+      g.fillStyle = '#0B0B14'; g.beginPath(); g.arc(pm[0], pm[1], 3, 0, 7); g.fill();
+    }
   }
   seedMmr() {
     const s = this.state;
@@ -476,6 +590,35 @@ class Component extends DCLogic {
       nextLabel: '≈ ' + Math.max(1, Math.ceil((R.hi - shownMmr) / 25)) + ' victorias para ' + this.rankOf(R.hi).label,
       sweep: (this.t * 240).toFixed(1),
       searchTitle: n > 1 ? 'BUSCANDO JUGADORES' : 'BUSCANDO RIVAL',
+      globeRef: this.globeRef,
+      ...(() => {
+        // the cards: slot k of 2n alternates your team and the rivals; you are already in
+        if (s.phase !== 'search') return { slotsA: [], slotsB: [] };
+        const pre = this.pre || { mates: [], rivals: [], mateMmr: [], rivalMmr: [] };
+        const live = M && !M.cancelled, others = live ? M.roster.filter((x) => x.id !== M.room.me) : [];
+        const have = live ? Math.min(total, 1 + others.length) : found;
+        this.foundNow = have;
+        const POOL = ['Kai_Striker', 'LunaGol_09', 'ToroVeloz', 'Mika10', 'Zeta_FC', 'Nico_Volea', 'Sara_Crack', 'Dani_Muro', 'Bruno7', 'Iker_Rayo', 'Vega_22', 'Leo_Tiki', 'Noa_Golazo', 'Rafa_Pared', 'Alba_Top'];
+        const FLAGS = ['ES', 'MX', 'AR', 'BR', 'FR', 'IT', 'DE', 'PT', 'CO', 'US', 'JP', 'GB'];
+        const myName = window.AMOnline ? window.AMOnline.myName() : 'Tú';
+        const face = (window.AMChars && window.AMChars.pref() !== 'clasico') ? 'assets/chars/' + window.AMChars.pref() + '.png' : '';
+        const card = (team, k) => {
+          const idx = k === 0 && team === 0 ? 0 : team === 0 ? 2 * k : 2 * k + 1, on = idx < have, mine = team === 0 && k === 0, col = team === 0 ? '#22D3EE' : '#FF8A8E';
+          let name = '', tag = '';
+          if (mine) { name = myName; tag = casual ? 'Tú' : placing ? 'Tú · Sin clasificar' : 'Tú · ' + R.label; }
+          else if (live) { const o = others[idx - 1]; name = o ? o.name : 'Jugador'; tag = 'ONLINE · ' + FLAGS[(name.length * 7) % FLAGS.length]; }
+          else { const i2 = team === 0 ? k - 1 : k, nm = team === 0 ? pre.mates[i2] : pre.rivals[i2], mm = team === 0 ? pre.mateMmr[i2] : pre.rivalMmr[i2]; name = nm || 'Jugador'; tag = (casual ? 'Listo' : this.rankOf(mm || 0).label) + ' · ' + FLAGS[(name.length * 5 + k) % FLAGS.length]; }
+          const spinI = Math.floor(this.t * 14 + k * 3 + team * 7);
+          return {
+            on, off: !on, name, tag, ini: name.replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase() || '?', tagColor: mine ? '#53D88E' : col,
+            spin: POOL[spinI % POOL.length],
+            reel: 'position: absolute; left: 0; top: ' + (8 + (1 - (this.t * 14) % 1) * 16).toFixed(1) + 'px; font-weight: 800; font-size: 14px; color: #8686A6; white-space: nowrap',
+            style: 'position: relative; display: flex; align-items: center; gap: 10px; height: 50px; padding: 0 12px; box-sizing: border-box; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); ' + (team ? 'flex-direction: row-reverse; text-align: right; ' : '') + (on ? 'background: linear-gradient(' + (team ? '270' : '90') + 'deg, ' + col + '30, #14142ACC); box-shadow: inset ' + (team ? '-3' : '3') + 'px 0 0 ' + col + ';' : 'background-color: #10101ECC; box-shadow: inset 0 0 0 1px #2E2E52;'),
+            av: 'flex: none; width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font: 800 13px \'Barlow Condensed\', sans-serif; ' + (on ? (mine && face ? 'background: #22D3EE url(' + face + ') center/cover; color: transparent;' : 'background: ' + col + '; color: #0B0B14;') : 'background: #1E1E3A; color: #4C4C78; border: 1px dashed #4C4C78; box-sizing: border-box;')
+          };
+        };
+        return { slotsA: Array.from({ length: n }, (_, k) => card(0, k)), slotsB: Array.from({ length: n }, (_, k) => card(1, k)) };
+      })(),
       searchSub: M && !M.cancelled ? (humans > 1 ? humans + ' jugadores online en la sala' + (M.isHost ? ' · empieza en ' + Math.max(0, Math.ceil(10 - (Date.now() - M.firstJoin) / 1000)) + ' s' : ' · esperando al anfitrión') : 'Buscando jugadores online… si no hay nadie, jugarás contra la IA') : n > 1 ? found + ' / ' + total + ' jugadores' : 'Rango de búsqueda: ' + Math.max(0, s.mmr - 50 - Math.floor(this.t / 1.5) * 25) + '–' + (s.mmr + 50 + Math.floor(this.t / 1.5) * 25) + ' MMR',
       searchClock: '0:' + String(Math.floor(this.t)).padStart(2, '0'),
       teamA, teamB,
@@ -495,7 +638,7 @@ class Component extends DCLogic {
       rankChanged: rankChanged || (s.justPlaced && s.phase === 'result'), changeLabel: s.justPlaced ? 'RANGO INICIAL' : up ? '¡ASCENSO!' : 'DESCENSO',
       changeStyle: 'padding: 4px 14px; border-radius: 8px; font-weight: 800; font-size: 14px; letter-spacing: 2px; ' + (up ? 'background: #22D3EE; color: #0B0B14;' : 'background: #2A1418; color: #FF8A8E;'),
       xp: String(xp), coins: String(coins),
-      search: () => { this.findAt = 2 + n * 0.6 + Math.random() * 1.5; this.setState({ phase: 'search', online: null }); this.startOnline(n); this.anim(); },
+      search: () => { this.findAt = 2 + n * 0.6 + Math.random() * 1.5; this.pre = this.makeMatch(); this.arcs = []; this.seen = 1; this.setState({ phase: 'search', online: null }); this.startOnline(n); this.anim(); },
       cancel: () => { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; this.endOnline(); this.setState({ phase: 'lobby' }); },
       onEnd: (r) => this.finish(r),
       onScore: (score) => this.finish({ home: score, away: m ? m.target : 0 }),
