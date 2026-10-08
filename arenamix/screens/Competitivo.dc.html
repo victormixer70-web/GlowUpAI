@@ -258,13 +258,13 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 
   <sc-if value="{{isOnlineMatch}}" hint-placeholder-val="{{ false }}">
-    <dc-import name="Partido" online="{{online}}" label="{{matchLabel}}" mode="{{matchMode}}" duration="{{duration}}" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Tu equipo" away-name="Rival" away-color="{{oppColor}}" away-trim="{{oppTrim}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
+    <dc-import name="Partido" ai-level="{{aiLevel}}" online="{{online}}" label="{{matchLabel}}" mode="{{matchMode}}" duration="{{duration}}" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Tu equipo" away-name="Rival" away-color="{{oppColor}}" away-trim="{{oppTrim}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isTeamMatch}}" hint-placeholder-val="{{ false }}">
-    <dc-import name="Partido" ranks="{{ranks}}" keeper="{{asKeeper}}" label="{{matchLabel}}" mode="{{matchMode}}" duration="{{duration}}" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Invitado_4821" mates="{{mates}}" rivals="{{rivals}}" away-name="{{oppName}}" away-color="{{oppColor}}" away-trim="{{oppTrim}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
+    <dc-import name="Partido" ai-level="{{aiLevel}}" ranks="{{ranks}}" keeper="{{asKeeper}}" label="{{matchLabel}}" mode="{{matchMode}}" duration="{{duration}}" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Invitado_4821" mates="{{mates}}" rivals="{{rivals}}" away-name="{{oppName}}" away-color="{{oppColor}}" away-trim="{{oppTrim}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isDuelMatch}}" hint-placeholder-val="{{ false }}">
-    <dc-import name="Duelo" kind="{{duelKind}}" rival-name="{{oppName}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
+    <dc-import name="Duelo" ai-level="{{aiLevel}}" kind="{{duelKind}}" rival-name="{{oppName}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isBasket}}" hint-placeholder-val="{{ false }}">
     <dc-import name="Baloncesto" mode="{{mgMode}}" locked="{{ true }}" on-end="{{onScore}}" hint-size="844px,390px"></dc-import>
@@ -818,6 +818,7 @@ class Component extends DCLogic {
         });
         return { koA: mk(teamA, 0), koB: mk(teamB, 1) };
       })(),
+      aiLevel: window.AMProgress && window.AMProgress.aiLevel ? window.AMProgress.aiLevel(casual ? null : s.mmr) : 0.5,
       matchLabel: casual ? 'INFORMAL' : 'COMPETITIVO', matchMode: casual ? 'quick' : 'comp', duration: casual ? 90 : 120, teamSize: n,
       mates: m ? m.mates : [], rivals: m ? m.rivals : [], oppName: m ? m.rivals[0] : '',
       oppColor: m ? m.color : '#A78BFA', oppTrim: m ? m.trim : '#F4F4FA',

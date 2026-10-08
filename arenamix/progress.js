@@ -15,6 +15,30 @@
   function addGems(n) { var g = get('arenamix.gems.v1', null) || { n: 60 }; g.n = Math.max(0, g.n + n); put('arenamix.gems.v1', g); return g.n; }
   function spendGems(n) { if (gems() < n) return false; addGems(-n); return true; }
 
+
+  /* ---------- AI difficulty (Informal and Entrenar; Competitivo follows your MMR) ---------- */
+  var AI = { facil: 0.15, normal: 0.5, dificil: 0.85 };
+  function aiPref() { var v = get('arenamix.ai.v1', 'normal'); return AI[v] != null ? v : 'normal'; }
+  function setAiPref(v) { if (AI[v] != null) put('arenamix.ai.v1', v); }
+  function aiLevel(mmr) { return mmr == null ? AI[aiPref()] : Math.max(0.3, Math.min(1, 0.4 + mmr / 3000)); }
+
+  /* ---------- goal celebrations, bought with BOB: your player does the one you equip after scoring ---------- */
+  var CELEBS = [
+    { id: 'clasica', name: 'Brazos al cielo', desc: 'La de siempre: corre al córner con los brazos arriba', price: 0, color: '#22D3EE' },
+    { id: 'rodillas', name: 'Rodillazo', desc: 'Se tira de rodillas por el césped con los brazos abiertos', price: 30, color: '#FFC53D' },
+    { id: 'siu', name: '¡Siuuu!', desc: 'Carrera, salto con giro y aterrizaje con los brazos abajo', price: 45, color: '#FF5C8A' },
+    { id: 'avion', name: 'El avión', desc: 'Vuela en zigzag con los brazos como alas', price: 30, color: '#53D88E' },
+    { id: 'baile', name: 'El baile', desc: 'Un bailecito de lado a lado para la grada', price: 40, color: '#A78BFA' },
+    { id: 'silencio', name: 'Silencio', desc: 'Dedo en los labios mirando a la afición rival', price: 35, color: '#FF8A3D' }
+  ];
+  function celebState() { var c = get('arenamix.celebs.v1', null) || {}; c.own = c.own || ['clasica']; c.on = c.on || 'clasica'; return c; }
+  function buyCeleb(id) {
+    var c = celebState(), x = CELEBS.find(function (k) { return k.id === id; });
+    if (!x || c.own.indexOf(id) >= 0 || !spendGems(x.price)) return false;
+    c.own.push(id); c.on = id; put('arenamix.celebs.v1', c); return true;
+  }
+  function equipCeleb(id) { var c = celebState(); if (c.own.indexOf(id) < 0) return false; c.on = id; put('arenamix.celebs.v1', c); return true; }
+
   /* ---------- boosts, bought with BOB: each lasts some matches (the shield, one defeat) ---------- */
   var BOOSTS = [
     { id: 'xp2', name: 'Doble XP', desc: 'Experiencia x2 en tus próximos 3 partidos', uses: 3, price: 25, color: '#22D3EE', icon: 'xp' },
@@ -305,6 +329,8 @@
   window.AMProgress = {
     coins: coins, addCoins: addCoins, gems: gems, addGems: addGems, spendGems: spendGems,
     boostList: BOOSTS, boostLeft: boostLeft, buyBoost: buyBoost, useBoost: useBoost,
+    aiPref: aiPref, setAiPref: setAiPref, aiLevel: aiLevel,
+    celebList: CELEBS, celebs: celebState, buyCeleb: buyCeleb, equipCeleb: equipCeleb,
     // everything waiting to be collected, by section (for the badges on the menu)
     pending: function () {
       var W = weekly(), P = pass(), M = missions();
