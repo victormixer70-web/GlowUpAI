@@ -571,7 +571,7 @@ class Component extends DCLogic {
     this.release(p);
     g.recv = null;
     g.fx = { x: b.x, y: b.y, t: 0 };
-    p.act = { type: 'kick', t: 0, dur: 0.45, loft };
+    p.act = { type: 'kick', t: 0, dur: 0.62, loft };
     this.sfx('kick', power);
     return true;
   }
@@ -723,7 +723,7 @@ class Component extends DCLogic {
     this.stat('shots');
     // a real strike: from the backswing the body turns to the target and the leg swings through; the ball
     // leaves at the moment the foot meets it, not when you let go of the button
-    p.act = { type: 'windup', t: 0, dur: 0.11, from: 0.12 + 0.15 * charge, face: dir, then: () => {
+    p.act = { type: 'windup', t: 0, dur: 0.17 + 0.09 * charge, from: 0.04, face: dir, then: () => {
       if (g.phase !== 'play') return;
       if (!this.kick(p, power, dir, power > 0.75, 0.93 + 0.25 * this.tt('pot'), spin)) this.flashMsg('Demasiado lejos del balón', 0.8);
     } };
@@ -847,7 +847,7 @@ class Component extends DCLogic {
   // after a goal the ball flies on into the goal: the side nets and the roof stop it, and the back of the
   // net stretches, slows it down and drops it, so it stays in the goal (it never goes through)
   netBall(dt) {
-    const b = this.g.ball, s = b.x < 30 ? -1 : 1, R = 0.23, back = 1.6 - R;
+    const b = this.g.ball, s = b.x < 30 ? -1 : 1, R = 0.23;
     if (b.z > 0 || b.vz > 0) {
       b.vz -= 9.81 * dt;
       const drag = 1 - 0.012 * Math.hypot(b.vx, b.vy, b.vz) * dt;
@@ -860,21 +860,31 @@ class Component extends DCLogic {
     }
     if (b.z === 0 && b.vz === 0) { const f = Math.exp(-1.8 * dt); b.vx *= f; b.vy *= f; }
     let dep = s < 0 ? -b.x : b.x - 60, vout = s * b.vx;
-    if (dep > 0) {
-      // side netting
-      if (b.y < 12 + R) { b.y = 12 + R; b.vy = Math.abs(b.vy) * 0.15; b.vx *= 0.7; }
-      if (b.y > 18 - R) { b.y = 18 - R; b.vy = -Math.abs(b.vy) * 0.15; b.vx *= 0.7; }
-      // roof, flat at the crossbar and sagging a little in the middle
-      const top = 2.5 - 0.16 * Math.sin(Math.PI * Math.min(1, dep / 1.6)) - R;
-      if (b.z > top) { b.z = top; if (b.vz > 0) b.vz = -b.vz * 0.1; b.vx *= 0.9; }
-    }
-    // the back of the net: a damped spring that can stretch up to 1 m
-    const pen = dep - back;
-    if (pen > 0) {
-      vout += (-300 * pen - 17 * vout) * dt;
-      if (vout < 0) vout *= Math.exp(-9 * dt);   // a net soaks up the rebound
-      const f = Math.exp(-4 * dt); b.vy *= f;
-      if (pen > 1) { dep = back + 1; vout = Math.min(vout, 0); }
+    const net = this.nets && this.nets[s];
+    if (dep > 0 && net && net.contact) {
+      // side nets: the ball stops against them (they give a few centimetres)
+      if (b.y < 12 + R) { b.y = 12 + R; b.vy = Math.abs(b.vy) * 0.12; vout *= 0.75; b.vz *= 0.8; }
+      if (b.y > 18 - R) { b.y = 18 - R; b.vy = -Math.abs(b.vy) * 0.12; vout *= 0.75; b.vz *= 0.8; }
+      // the roof and the back: exactly the net that is drawn. It gives like a spring as far as that spot
+      // allows (least by the frame and the ground pegs) and then holds; it soaks up the speed and drops the ball
+      const x = -s * (b.y - 15), c = net.contact(x, dep, b.z + R, R);
+      if (c.pen > 0) {
+        const [nd, nz] = c.n;
+        let vn = vout * nd + b.vz * nz;
+        vn += (-260 * c.pen - 16 * vn) * dt;
+        if (vn < 0) vn *= Math.exp(-10 * dt);
+        let pen = c.pen;
+        if (pen > c.give) { const back = pen - c.give; dep -= nd * back; b.z -= nz * back; pen = c.give; if (vn > 0) vn = 0; }
+        // tangential: the cords grab the ball
+        const vt = vout * nz - b.vz * nd, f = Math.exp(-5 * dt);
+        vout = vn * nd + vt * nz * f; b.vz = vn * nz - vt * nd * f;
+        b.vy *= Math.exp(-3 * dt);
+        if (b.z < 0) b.z = 0;
+      }
+    } else if (dep > 0) {
+      if (b.y < 12 + R) { b.y = 12 + R; b.vy = Math.abs(b.vy) * 0.15; }
+      if (b.y > 18 - R) { b.y = 18 - R; b.vy = -Math.abs(b.vy) * 0.15; }
+      if (dep > 1.4) { dep = 1.4; vout = Math.min(0, vout) * 0.2; }
     }
     // it can come back off the net a little, but not roll back out over the line
     if (dep < 0.4 && vout < 0) { dep = 0.4; vout = 0; }
@@ -1016,7 +1026,8 @@ class Component extends DCLogic {
     else p.stam = Math.min(1, p.stam + dt * (0.09 + 0.05 * this.tt('res')));
     p.sprinting = spr;
     if (g.own === i) maxV *= 0.95;
-    if (p.act && p.act.type === 'windup') maxV *= 0.5;   // plant the standing foot to strike
+    if (p.act && p.act.type === 'windup') maxV *= 0.32;   // plant the standing foot to strike
+    else if (p.act && p.act.type === 'kick' && p.act.t < 0.35) maxV *= 0.5;   // and follow through before running on
     return [dx, dy, maxV, g.own === i ? 11 : 14];
   }
   seekS(p, tx, ty, slow, dt) {
@@ -1181,7 +1192,8 @@ class Component extends DCLogic {
     const open = bs > 5.5 && pressure > 3.2;
     p.sprinting = open;
     let maxV = D.spd * (open ? 1.02 : pressure < 2 ? 0.8 : 0.9);
-    if (p.act && p.act.type === 'windup') maxV *= 0.45;
+    if (p.act && p.act.type === 'windup') maxV *= 0.32;
+    else if (p.act && p.act.type === 'kick' && p.act.t < 0.35) maxV *= 0.5;
     return [dx, dy, maxV, 8];
   }
   shotQuality(p) {
@@ -1248,7 +1260,7 @@ class Component extends DCLogic {
     S = S || this.shotQuality(p);
     const ty = S.ty + (Math.random() - 0.5) * 0.5;
     const dg = S.dg;
-    p.act = { type: 'windup', t: 0, dur: 0.2, face: Math.atan2(ty - p.y, gx - p.x), then: () => {
+    p.act = { type: 'windup', t: 0, dur: 0.24, from: 0.04, face: Math.atan2(ty - p.y, gx - p.x), then: () => {
       if (g.own !== i || g.phase !== 'play') return;
       const dir = Math.atan2(ty - p.y, gx - p.x) + (Math.random() - 0.5) * D.err * (dg > 14 ? 1 : 0.7);
       const loft = dg > 22 && Math.random() < 0.25;
@@ -1549,6 +1561,12 @@ class Component extends DCLogic {
     p.touchT = Math.max(0, (p.touchT || 0) - dt);
     if (d > 2.6) { g.own = -1; return; }
     if (b.z > 0.5) return;
+    // setting up a shot: the ball sits just in front of the striking foot (a touch to the side of the standing one)
+    if (p.act && p.act.type === 'windup') {
+      const f = p.act.face ?? p.face, tx = p.x + Math.cos(f) * 0.5 - Math.sin(f) * 0.08, ty = p.y + Math.sin(f) * 0.5 + Math.cos(f) * 0.08, k = Math.min(1, dt * 16);
+      b.x += (tx - b.x) * k; b.y += (ty - b.y) * k; b.vx = p.vx; b.vy = p.vy; b.z = Math.max(0, b.z * (1 - k));
+      return;
+    }
     // close control: the ball is kept on a short leash in front of the runner, worked in polar terms round
     // his feet, so in a turn it is dragged round him (never through him) and at a sprint it is pushed a
     // little ahead with each touch and caught up again, but never runs off on its own
@@ -2022,7 +2040,7 @@ class Component extends DCLogic {
     this.nets = {};
     if (window.AMNet && window.AMNet.goal) {
       [-1, 1].forEach((s) => {
-        const G = window.AMNet.goal(6, 2.44, 1.6);
+        const G = window.AMNet.goal(6, 2.44, 1.9);
         G.group.position.set(30 * s, 0, 0); G.group.rotation.y = s * Math.PI / 2; S.add(G.group);
         this.nets[s] = G.net;
       });
@@ -2182,7 +2200,7 @@ class Component extends DCLogic {
     // the net wraps round the ball pressing into it, then springs back
     if (this.nets) {
       const ns = b.x < 30 ? -1 : 1, dep = ns < 0 ? -b.x : b.x - 60, net = this.nets[ns];
-      if (net && dep > 0 && b.y > 12 && b.y < 18) net.push(-ns * (b.y - 15), b.z + 0.23, dep - 1.37);
+      if (net && dep > 0 && b.y > 11.6 && b.y < 18.4) (net.press ? net.press(-ns * (b.y - 15), dep, b.z + 0.23, 0.23) : net.push(-ns * (b.y - 15), b.z + 0.23, dep - 1.37));
       for (const k in this.nets) this.nets[k].step(dt || 0);
     }
     this.ball3.visible = g.phase !== 'winners';
@@ -2487,11 +2505,11 @@ class Component extends DCLogic {
     const charging = (i === g.ctl && g.charging) || !!p.netChg || !!(this.netHuman(i) || {}).charging;
     let act = null;
     // shot clip: backswing peaks at 0.27 s, the foot meets the ball at 0.42 s
-    if (charging) act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.7 + 0.3 * g.charge : 0.12 + 0.15 * g.charge, key: 'charge' };
+    if (charging && (gk || sp < 2.2)) act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.7 + 0.3 * g.charge : 0.04 + 0.1 * g.charge, key: 'charge' };
     else if (a) {
       const k = Math.min(1, a.t / a.dur);
       if (a.type === 'windup') { const f0 = a.from ?? 0.12; act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.75 + 0.3 * k : f0 + (0.42 - f0) * k, key: 'strike' }; }
-      else if (a.type === 'kick') act = gk ? { id: 'gkKick', t: 2.05 + 0.6 * k, key: a } : { id: 'shot', t: 0.42 + 0.55 * k, key: 'strike' };
+      else if (a.type === 'kick') act = gk ? { id: 'gkKick', t: 2.05 + 0.6 * k, key: a } : { id: 'shot', t: 0.42 + 0.8 * k, key: 'strike' };
       else if (a.type === 'pass') act = { id: 'pass', t: 0.28 + 0.22 * k, key: a };
       else if (a.type === 'throw') act = { id: 'gkThrow', t: 1.3 + 0.6 * k, key: a };
       else if (a.type === 'slide') act = { id: 'slide', t: 0.2 + 0.75 * k, key: a };
@@ -2508,7 +2526,7 @@ class Component extends DCLogic {
       st.act.live = false; st.act.t += dt;
     }
     if (st.act) {
-      st.act.w += ((st.act.live ? 1 : 0) - st.act.w) * Math.min(1, dt * (st.act.live ? 14 : 6));
+      st.act.w += ((st.act.live ? 1 : 0) - st.act.w) * Math.min(1, dt * (st.act.live ? (st.act.key === 'strike' ? 40 : 14) : (st.act.id === 'shot' ? 4 : 6)));
       if (!st.act.live && st.act.w < 0.02) st.act = null;
     }
     const aw = st.act ? st.act.w : 0;
