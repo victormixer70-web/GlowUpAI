@@ -231,7 +231,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <sc-if value="{{casual}}" hint-placeholder-val="{{ false }}">
           <span style="font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">RECOMPENSAS</span>
           <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; color: #22D3EE">+{{xp}} XP</span>
-          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; color: #FFC53D">+{{coins}} carrascos</span>
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; color: #FFC53D">+{{coins}} VCD</span>
         </sc-if>
         <div style="display: flex; gap: 8px; margin-top: 6px">
           <button type="button" onClick="{{again}}" class="bc-btn am-shine" style="height: 48px; padding: 0 24px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1.5px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">OTRA PARTIDA</button>
@@ -546,6 +546,8 @@ class Component extends DCLogic {
       let delta = 0;
       if (w) delta = Math.max(12, Math.min(32, (s.mmr >= 3075 ? 20 : 25) + adj));
       else if (l) delta = this.rankOf(s.mmr).name === 'Bronce' ? -12 : -Math.max(15, Math.min(35, 25 - adj));
+      // a rank shield (Tienda > potenciadores) absorbs one defeat
+      if (l && delta < 0 && window.AMProgress && window.AMProgress.useBoost && window.AMProgress.useBoost('shield')) { delta = 0; this.shieldUsed = true; }
       mmr = Math.max(0, s.mmr + delta);
       const all = this.store('arenamix.mmr.v1') || {};
       all[this.sport + ':' + this.pl.id] = mmr;

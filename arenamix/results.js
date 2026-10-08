@@ -78,7 +78,8 @@
           '<div class="xpls" style="display:flex;flex-direction:column;gap:4px;margin-top:10px;margin-right:52px">' +
           S.xpLines.map(function (l) { return '<div class="xpl"><span>' + esc(l.label) + '</span><b>+' + l.xp + '</b></div>'; }).join('') + '</div>' +
           '<div class="bl"><span class="lvl">NIVEL ' + S.before.level + '</span><span class="xpn">+0 XP</span></div><div class="bar"><i></i></div><div class="lvup"></div></div>' +
-        '<div class="pn" style="--pc:#FFC53D;animation-delay:.4s;flex:.8"><div class="h">CARRASCOS</div><img class="pile" src="' + P(S.coinsGain + S.levelBonus > 60 ? 'coins:14' : 'coins:6') + '" alt=""><div class="cn"><b class="cv">' + fmt(S.coinsBefore) + '</b><span>+' + (S.coinsGain + S.levelBonus) + (S.levelBonus ? ' (incluye subida de nivel)' : '') + '</span></div>' +
+        '<div class="pn" style="--pc:#FFC53D;animation-delay:.4s;flex:.8"><div class="h">VCD</div><img class="pile" src="' + P(S.coinsGain + S.levelBonus > 60 ? 'coins:14' : 'coins:6') + '" alt=""><div class="cn"><b class="cv">' + fmt(S.coinsBefore) + '</b><span>+' + (S.coinsGain + S.levelBonus) + (S.levelBonus ? ' (incluye subida de nivel)' : '') + (S.gemsGain ? ' · +' + S.gemsGain + ' BOB' : '') + '</span></div>' +
+          (S.boostsUsed && S.boostsUsed.length ? '<div style="position:absolute;left:12px;right:12px;top:30px;display:flex;flex-wrap:wrap;gap:4px">' + S.boostsUsed.map(function (b) { return '<span style="padding:2px 7px;background:#FF5CC833;box-shadow:inset 0 0 0 1px #FF5CC8;color:#FFB3E6;font:800 9.5px Exo2,sans-serif;letter-spacing:.5px;transform:skewX(-10deg)">⚡ ' + esc(b).toUpperCase() + '</span>'; }).join('') + '</div>' : '') +
           (S.pass ? '<div class="ps' + (S.pass.after > S.pass.before ? ' up' : '') + '"><b>PASE NV. ' + S.pass.after + '</b><i><u style="width:' + (S.pass.after >= 30 ? 100 : S.pass.into / S.pass.need * 100).toFixed(0) + '%"></u></i>' + (S.pass.ready ? '<span style="color:#FFC53D">' + S.pass.ready + ' 🎁</span>' : '') + '</div>' : '') + '</div>' +
         '<div class="pn" style="--pc:#A78BFA;animation-delay:.55s"><div class="h">ESTA SEMANA · ' + S.weekAfter + '/10 VICTORIAS</div>' +
           '<div class="dots">' + dots + '</div>' +
@@ -117,7 +118,7 @@
           lvShown = L.level;
           q('.lv').textContent = L.level; q('.lv').classList.remove('up'); void q('.lv').offsetWidth; q('.lv').classList.add('up');
           q('.lvl').textContent = 'NIVEL ' + L.level;
-          var up = q('.lvup'); up.textContent = '¡NIVEL ' + L.level + '!  +100 carrascos'; up.classList.remove('on'); void up.offsetWidth; up.classList.add('on');
+          var up = q('.lvup'); up.textContent = '¡NIVEL ' + L.level + '!  +100 VCD'; up.classList.remove('on'); void up.offsetWidth; up.classList.add('on');
           burst(170, 200, 30, ['#FFC53D', '#22D3EE', '#FFFFFF']);
           if (sfx && sfx.levelUp) sfx.levelUp();
         }
@@ -179,7 +180,8 @@
     var isChest = m.prize === 'chest';
     var el = document.createElement('div'); el.id = 'am-rw';
     var loot = (r.items || []).map(function (it) { return '<div class="it"><img src="' + it.pic + '" alt=""><span>¡NUEVO!</span><b>' + esc(it.name) + '</b></div>'; });
-    if (r.coins) loot.push('<div class="it" style="animation-delay:.12s"><img src="' + P(r.coins >= 300 ? 'coins:14' : 'coins:6') + '" alt=""><span>CARRASCOS</span><b>+' + r.coins + '</b></div>');
+    if (r.gems) loot.push('<div class="it" style="animation-delay:.18s"><img src="' + P('gems:' + (r.gems >= 30 ? 3 : r.gems >= 15 ? 2 : 1)) + '" alt=""><span>BOB</span><b>+' + r.gems + '</b></div>');
+    if (r.coins) loot.push('<div class="it" style="animation-delay:.12s"><img src="' + P(r.coins >= 300 ? 'coins:14' : 'coins:6') + '" alt=""><span>VCD</span><b>+' + r.coins + '</b></div>');
     el.innerHTML = '<div class="rays"></div><div class="k">' + esc((m.name || 'PREMIO').toUpperCase()) + '</div>' +
       '<img class="ch" src="' + (isChest ? P('chest:' + m.chest) : (m.pic || P(m.icon))) + '" alt="">' +
       '<div class="fl"></div><div class="tap">' + (isChest ? '¡TOCA PARA ABRIR!' : '¡TOCA PARA RECOGER!') + '</div>' +

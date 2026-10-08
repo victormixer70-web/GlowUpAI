@@ -582,7 +582,7 @@ class Component extends DCLogic {
     const canAfford = selItem.st === 'coins' && s.coins >= selItem.price;
     let selHint = 'En tu taquilla';
     if (selEquipped) selHint = 'Lo llevas puesto';
-    else if (!selOwned && selItem.st === 'coins') selHint = canAfford ? 'Disponible por carrascos' : 'Te faltan carrascos';
+    else if (!selOwned && selItem.st === 'coins') selHint = canAfford ? 'Disponible por VCD' : 'Te faltan VCD';
     else if (!selOwned && selItem.st === 'reward') selHint = selItem.how === 'rank' ? 'Recompensa: alcanza ' + selItem.req : selItem.how === 'pass' ? 'Pase de temporada: ' + selItem.req.replace('Pase ', '').replace('Premium', 'premium,') : 'Recompensa: gana ' + selItem.req;
     else if (!selOwned && selItem.st === 'premium') selHint = 'Objeto premium';
 
@@ -637,7 +637,7 @@ class Component extends DCLogic {
       isPreviewing: !!s.preview && s.preview.id !== eq[s.preview.cat],
       selName: selItem.name,
       selHint,
-      selPrice: selItem.st === 'coins' ? this.fmt(selItem.price) + ' C' : '',
+      selPrice: selItem.st === 'coins' ? this.fmt(selItem.price) + ' VCD' : '',
       showEquipped: selEquipped,
       showEquip: selOwned && !selEquipped,
       showBuy: !selOwned && selItem.st === 'coins',

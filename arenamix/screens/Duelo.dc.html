@@ -1410,7 +1410,7 @@ class Component extends DCLogic {
       doneTitle: this.practice ? yg + ' GOLES · ' + this.pts + ' PUNTOS' : won ? '¡GANAS EL DUELO!' : 'PIERDES EL DUELO',
       doneStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 44px; line-height: 1; letter-spacing: 2px; color: ' + (this.practice || won ? '#22D3EE' : '#FF5C5C') + ';',
       doneScore: this.practice ? 'Récord: ' + this.best : yg + ' – ' + rg,
-      doneReward: this.practice ? (yg >= 3 ? '+1 PM de fútbol por 3 goles o más' : 'Marca 3 goles para ganar 1 PM') : won ? '+30 carrascos · +90 XP' : '+10 carrascos · +40 XP',
+      doneReward: this.practice ? (yg >= 3 ? '+1 PM de fútbol por 3 goles o más' : 'Marca 3 goles para ganar 1 PM') : won ? '+30 VCD · +90 XP' : '+10 VCD · +40 XP',
       rematchLabel: this.props.onEnd && !this.practice ? 'CONTINUAR' : this.practice ? 'OTRA RONDA' : 'REVANCHA',
       rematch: () => { if (this.props.onEnd && !this.practice) this.props.onEnd({ home: yg, away: rg }); else this.setup(false); },
       isFree: this.kind === 'free',

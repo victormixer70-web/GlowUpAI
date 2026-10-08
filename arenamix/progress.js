@@ -9,6 +9,32 @@
   function coins() { return (get('arenamix.wallet.v1', null) || { coins: 2450 }).coins; }
   function addCoins(n) { var w = get('arenamix.wallet.v1', null) || { coins: 2450 }; w.coins = Math.max(0, w.coins + n); put('arenamix.wallet.v1', w); return w.coins; }
 
+  /* ---------- BOB: the gems (premium currency). Earned on level ups, daily missions and the season pass;
+     spent on boosts in the Tienda ---------- */
+  function gems() { return (get('arenamix.gems.v1', null) || { n: 60 }).n; }
+  function addGems(n) { var g = get('arenamix.gems.v1', null) || { n: 60 }; g.n = Math.max(0, g.n + n); put('arenamix.gems.v1', g); return g.n; }
+  function spendGems(n) { if (gems() < n) return false; addGems(-n); return true; }
+
+  /* ---------- boosts, bought with BOB: each lasts some matches (the shield, one defeat) ---------- */
+  var BOOSTS = [
+    { id: 'xp2', name: 'Doble XP', desc: 'Experiencia x2 en tus próximos 3 partidos', uses: 3, price: 25, color: '#22D3EE', icon: 'xp' },
+    { id: 'vcd2', name: 'Doble VCD', desc: 'VCD x2 al terminar tus próximos 3 partidos', uses: 3, price: 25, color: '#FFC53D', icon: 'vcd' },
+    { id: 'pass2', name: 'Pase turbo', desc: 'El pase de temporada sube el doble durante 3 partidos', uses: 3, price: 35, color: '#FF8A3D', icon: 'pass' },
+    { id: 'shield', name: 'Escudo de rango', desc: 'Tu próxima derrota competitiva no te quita MMR', uses: 1, price: 40, color: '#A78BFA', icon: 'shield' },
+    { id: 'chest', name: 'Cofre exprés', desc: 'Abre ahora un cofre raro: un accesorio seguro', uses: 0, price: 50, color: '#53D88E', icon: 'chest' }
+  ];
+  function boosts() { return get('arenamix.boosts.v1', null) || {}; }
+  function boostLeft(id) { return boosts()[id] || 0; }
+  function buyBoost(id) {
+    var b = BOOSTS.find(function (x) { return x.id === id; });
+    if (!b || !spendGems(b.price)) return null;
+    if (id === 'chest') { var r = rollChest('rare'); r.milestone = { name: 'Cofre exprés', prize: 'chest', chest: 'rare' }; return r; }
+    var B = boosts(); B[id] = (B[id] || 0) + b.uses; put('arenamix.boosts.v1', B);
+    return { ok: true, left: B[id] };
+  }
+  // spend one use of a boost if there is one
+  function useBoost(id) { var B = boosts(); if (!B[id]) return false; B[id]--; put('arenamix.boosts.v1', B); return true; }
+
   /* ---------- experience: level n needs 150 + 50·n XP to reach n + 1 ---------- */
   function need(n) { return 150 + 50 * n; }
   function levelOf(xp) {
@@ -21,10 +47,10 @@
 
   /* ---------- the weekly track: wins this week (Monday to Sunday) unlock guaranteed prizes ---------- */
   var MILESTONES = [
-    { id: 'w1', at: 1, prize: 'coins', amount: 100, name: '100 carrascos', sub: 'Moneda del juego', icon: 'coins:4' },
-    { id: 'w2', at: 2, prize: 'chest', chest: 'common', name: 'Cofre común', sub: 'Carrascos o un accesorio', icon: 'chest:common' },
+    { id: 'w1', at: 1, prize: 'coins', amount: 100, name: '100 VCD', sub: 'Moneda del juego', icon: 'coins:4' },
+    { id: 'w2', at: 2, prize: 'chest', chest: 'common', name: 'Cofre común', sub: 'VCD o un accesorio', icon: 'chest:common' },
     { id: 'w5', at: 5, prize: 'chest', chest: 'rare', name: 'Cofre raro', sub: 'Accesorio de equipo', icon: 'chest:rare' },
-    { id: 'w7', at: 7, prize: 'coins', amount: 300, name: '300 carrascos', sub: 'Moneda del juego', icon: 'coins:14' },
+    { id: 'w7', at: 7, prize: 'coins', amount: 300, name: '300 VCD', sub: 'Moneda del juego', icon: 'coins:14' },
     { id: 'w10', at: 10, prize: 'items', items: ['s4', 'h7'], name: 'Brote + Botas Carmesí', sub: 'Gran premio semanal', icon: 'boots:#E5484D' }
   ];
   function weekId(t) { var d = new Date(t || Date.now()); var day = (d.getDay() + 6) % 7; d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - day); return d.getTime(); }
@@ -145,21 +171,22 @@
     var x = M.list.find(function (m) { return m.id === id; }), p = POOL.find(function (m) { return m.id === id; });
     if (!x || !p || x.claimed || x.have < p.n) return null;
     x.claimed = true; put('arenamix.missions.v1', M);
-    addCoins(p.coins); var before = levelOf(xp()); var after = levelOf(addXp(p.xp)); addPassXp(p.xp);
-    return { coins: p.coins, xp: p.xp, levelUp: after.level > before.level ? after.level : 0 };
+    addCoins(p.coins); addGems(3); var before = levelOf(xp()); var after = levelOf(addXp(p.xp)); addPassXp(p.xp);
+    if (after.level > before.level) addGems(5 * (after.level - before.level));
+    return { coins: p.coins, gems: 3, xp: p.xp, levelUp: after.level > before.level ? after.level : 0 };
   }
 
   /* ---------- the season pass: 30 levels, a free row for everyone and a premium row for pass holders ----------
      Seasons last six weeks from Monday 5 October 2026. Pass XP is earned with the same experience as your level
      (matches and missions); every level needs 300. Premium is bought once per season (payment still to wire up). */
   var SEASON0 = new Date(2026, 9, 5).getTime(), SEASON_DAYS = 42, PASS_XP = 300;
-  var C = function (n) { return { t: 'coins', n: n }; }, X = function (k) { return { t: 'chest', k: k }; }, I = function (id) { return { t: 'item', id: id }; };
-  var FREE = [C(100), X('common'), C(150), X('common'), I('h11'), C(200), X('common'), C(200), X('rare'), I('s8'),
-    C(200), X('common'), C(250), X('rare'), I('futbol-5-3'), C(250), X('common'), C(300), X('rare'), I('h5'),
-    C(300), X('common'), C(350), X('rare'), C(400), X('epic'), C(400), X('rare'), C(500), X('legend')];
-  var PREM = [I('h10'), C(200), X('rare'), I('f6'), C(300), I('futbol-5-1'), X('rare'), C(300), I('s7'), X('epic'),
-    C(400), X('rare'), C(400), I('futbol-5-2'), X('epic'), C(500), X('rare'), I('s6'), C(500), X('epic'),
-    C(600), X('rare'), C(600), X('epic'), I('h6'), C(700), X('epic'), C(800), X('legend'), I('futbol-5-0')];
+  var C = function (n) { return { t: 'coins', n: n }; }, B = function (n) { return { t: 'gems', n: n }; }, X = function (k) { return { t: 'chest', k: k }; }, I = function (id) { return { t: 'item', id: id }; };
+  var FREE = [C(100), X('common'), C(150), X('common'), I('h11'), B(10), X('common'), C(200), X('rare'), I('s8'),
+    C(200), X('common'), B(15), X('rare'), I('futbol-5-3'), C(250), X('common'), C(300), X('rare'), I('h5'),
+    B(20), X('common'), C(350), X('rare'), C(400), X('epic'), B(25), X('rare'), C(500), X('legend')];
+  var PREM = [I('h10'), B(20), X('rare'), I('f6'), C(300), I('futbol-5-1'), X('rare'), B(30), I('s7'), X('epic'),
+    C(400), X('rare'), B(30), I('futbol-5-2'), X('epic'), C(500), X('rare'), I('s6'), B(40), X('epic'),
+    C(600), X('rare'), B(40), X('epic'), I('h6'), B(50), X('epic'), C(800), X('legend'), I('futbol-5-0')];
   var CHEST_NAME = { common: 'Cofre común', rare: 'Cofre raro', epic: 'Cofre épico', legend: 'Cofre legendario' };
   function season(t) {
     var n = Math.max(0, Math.floor(((t || Date.now()) - SEASON0) / (SEASON_DAYS * 864e5)));
@@ -172,7 +199,8 @@
     return P;
   }
   function describe(r) {
-    if (r.t === 'coins') return { name: r.n + ' carrascos', icon: 'coins:' + (r.n >= 500 ? 16 : r.n >= 300 ? 12 : r.n >= 200 ? 8 : 5), rare: 0 };
+    if (r.t === 'coins') return { name: r.n + ' VCD', icon: 'coins:' + (r.n >= 500 ? 16 : r.n >= 300 ? 12 : r.n >= 200 ? 8 : 5), rare: 0 };
+    if (r.t === 'gems') return { name: r.n + ' BOB', icon: 'gems:' + (r.n >= 40 ? 3 : r.n >= 20 ? 2 : 1), rare: r.n >= 40 ? 2 : 1 };
     if (r.t === 'chest') return { name: CHEST_NAME[r.k], icon: 'chest:' + r.k, rare: { common: 0, rare: 1, epic: 2, legend: 3 }[r.k] };
     var it = ITEMS[r.id] || {};
     return { name: it.name, item: r.id, cat: it.cat, rare: it.cat === 'kit' ? 3 : 2 };
@@ -194,9 +222,10 @@
     };
   }
   function addPassXp(n) { var P = passState(), lv0 = Math.min(30, Math.floor(P.xp / PASS_XP)); P.xp += n; put('arenamix.pass.v1', P); return { before: lv0, after: Math.min(30, Math.floor(P.xp / PASS_XP)) }; }
-  // give one pass reward; an item you already own turns into carrascos
+  // give one pass reward; an item you already own turns into VCD
   function grantReward(r) {
     if (r.t === 'coins') { addCoins(r.n); return { coins: r.n, items: [] }; }
+    if (r.t === 'gems') { addGems(r.n); return { coins: 0, gems: r.n, items: [] }; }
     if (r.t === 'chest') return rollChest(r.k);
     if (owns(r.id)) { addCoins(250); return { coins: 250, items: [] }; }
     unlock(r.id);
@@ -218,7 +247,7 @@
       if (!x.ready) return;
       var r = claimPass(x.open && S.prem.indexOf(x) >= 0 ? 'prem' : 'free', x.lv);
       if (!r) return;
-      tot.coins += r.coins || 0; tot.items = tot.items.concat(r.items || []); tot.count++;
+      tot.coins += r.coins || 0; tot.gems = (tot.gems || 0) + (r.gems || 0); tot.items = tot.items.concat(r.items || []); tot.count++;
     });
     tot.milestone = { name: tot.count + (tot.count === 1 ? ' premio del pase' : ' premios del pase'), prize: 'coins', icon: 'chest:legend:open' };
     return tot;
@@ -238,11 +267,18 @@
     if (goals) lines.push({ label: goals === 1 ? '1 gol tuyo' : goals + ' goles tuyos', xp: goals * 15 });
     if (st.tackles) lines.push({ label: st.tackles + (st.tackles === 1 ? ' robo' : ' robos'), xp: st.tackles * 8 });
     if (kind === 'team' && !info.away) lines.push({ label: 'Portería a cero', xp: 20 });
-    var gain = lines.reduce(function (a, l) { return a + l.xp; }, 0);
-    var x0 = xp(), before = levelOf(x0), after = levelOf(addXp(gain)), pv = addPassXp(gain), ps = pass();
+    var gain = lines.reduce(function (a, l) { return a + l.xp; }, 0), used = [];
+    // boosts from the Tienda
+    if (useBoost('xp2')) { lines.push({ label: 'Doble XP', xp: gain }); gain *= 2; used.push('Doble XP'); }
+    var passGain = gain;
+    if (useBoost('pass2')) { passGain *= 2; used.push('Pase turbo'); }
+    var x0 = xp(), before = levelOf(x0), after = levelOf(addXp(gain)), pv = addPassXp(passGain), ps = pass();
     // coins
     var coinsGain = won ? 40 : lost ? 10 : 20, levelBonus = 0;
+    if (useBoost('vcd2')) { coinsGain *= 2; used.push('Doble VCD'); }
     for (var lv = before.level + 1; lv <= after.level; lv++) levelBonus += 100;
+    var gemsGain = 5 * (after.level - before.level);
+    if (gemsGain) addGems(gemsGain);
     var c0 = coins(); addCoins(coinsGain + levelBonus);
     // the weekly track
     var W = weekly(), w0 = W.wins;
@@ -260,13 +296,20 @@
       xpLines: lines, xpGain: gain, before: before, after: after, levelUps: after.level - before.level,
       coinsBefore: c0, coinsGain: coinsGain, levelBonus: levelBonus,
       weekBefore: w0, weekAfter: W2.wins, milestones: W2.milestones,
+      boostsUsed: used, gemsGain: gemsGain,
       pass: { before: pv.before, after: pv.after, into: ps.into, need: ps.need, ready: ps.ready },
       missions: mAfter.map(function (m, i) { return Object.assign({}, m, { was: mBefore[i] ? mBefore[i].have : 0 }); })
     };
   }
 
   window.AMProgress = {
-    coins: coins, addCoins: addCoins, xp: xp, levelOf: levelOf, level: function () { return levelOf(xp()); },
+    coins: coins, addCoins: addCoins, gems: gems, addGems: addGems, spendGems: spendGems,
+    boostList: BOOSTS, boostLeft: boostLeft, buyBoost: buyBoost, useBoost: useBoost,
+    // everything waiting to be collected, by section (for the badges on the menu)
+    pending: function () {
+      var W = weekly(), P = pass(), M = missions();
+      return { week: W.milestones.filter(function (m) { return m.reached && !m.claimed; }).length, pass: P.ready, missions: M.list.filter(function (m) { return m.done && !m.claimed; }).length };
+    }, xp: xp, levelOf: levelOf, level: function () { return levelOf(xp()); },
     weekly: weekly, claim: claim, missions: missions, claimMission: claimMission, recordMatch: recordMatch,
     items: ITEMS, itemPic: itemPic, milestones: MILESTONES,
     pass: pass, claimPass: claimPass, claimAllPass: claimAllPass, buyPremium: buyPremium, addPassXp: addPassXp

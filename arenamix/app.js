@@ -302,7 +302,7 @@
       if (window.AMHero) window.AMHero.warm();
     });
     ['team:1', 'team:2', 'team:3', 'team:4', 'pen', 'free', 'private', 'train', 'tut', 'pass'].forEach(function (k) { jobs.push(function () { if (window.AMPosters) window.AMPosters.get(k); }); });
-    ['coins:4', 'coins:5', 'coins:6', 'coins:8', 'coins:12', 'coins:14', 'coins:16', 'bag', 'boots:#E5484D', 'chest:common', 'chest:common:open', 'chest:rare', 'chest:rare:open', 'chest:epic', 'chest:epic:open', 'chest:legend', 'chest:legend:open', 'trophy', 'target', 'shield:#C07A3E'].forEach(function (k) {
+    ['coins:4', 'coins:5', 'coins:6', 'coins:8', 'coins:12', 'coins:14', 'coins:16', 'bag', 'boots:#E5484D', 'chest:common', 'chest:common:open', 'chest:rare', 'chest:rare:open', 'chest:epic', 'chest:epic:open', 'chest:legend', 'chest:legend:open', 'trophy', 'target', 'shield:#C07A3E', 'gems:1', 'gems:2', 'gems:3', 'shield:#A78BFA'].forEach(function (k) {
       jobs.push(function () { if (G()) G().prize(k); });
     });
     ['h10', 'h11', 'f6', 's6', 's7', 's8', 'h5', 'h6'].forEach(function (id) { jobs.push(function () { if (window.AMProgress) window.AMProgress.itemPic(id); }); });

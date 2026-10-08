@@ -101,7 +101,7 @@ class Component extends DCLogic {
     } catch (e) {}
     clearTimeout(this.toastT);
     this.toastT = setTimeout(() => this.setState({ toast: '' }), 1800);
-    this.setState({ toast: '¡' + a.title + '! +' + a.reward + ' carrascos', n: this.state.n + 1 });
+    this.setState({ toast: '¡' + a.title + '! +' + a.reward + ' VCD', n: this.state.n + 1 });
   }
   componentWillUnmount() { clearTimeout(this.toastT); }
   renderVals() {

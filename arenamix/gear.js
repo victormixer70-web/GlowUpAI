@@ -440,6 +440,21 @@
       var mark = coin(); mark.rotation.set(Math.PI / 2, 0, 0); mark.scale.setScalar(0.55); mark.position.set(0, 1.15, 1.36); g.add(mark);
       var pile = coinPile(7); pile.scale.setScalar(0.45); pile.position.set(1.4, 0, 0.8); g.add(pile);
       g.rotation.y = -0.3;
+    } else if (p[0] === 'gems') {
+      // BOB: cut gems (an octahedron stretched and faceted), a big one in front and smaller ones behind
+      var n = +p[1] || 1, pink = std('#FF5CC8', { r: 0.12, m: 0.3, em: '#7A1050', ei: 0.35 });
+      var gem = function (sc, x, y, z, ry) {
+        var gg = new T.Group();
+        var top = new T.Mesh(new T.CylinderGeometry(0.55, 0.95, 0.42, 8, 1), pink); top.position.y = 0.21; gg.add(top);
+        var bot = new T.Mesh(new T.ConeGeometry(0.95, 1.05, 8, 1), pink); bot.rotation.x = Math.PI; bot.position.y = -0.52; gg.add(bot);
+        var tab = new T.Mesh(new T.CylinderGeometry(0.55, 0.55, 0.02, 8), std('#FFC2EC', { r: 0.1, m: 0.2, em: '#FF8AD8', ei: 0.4 })); tab.position.y = 0.43; gg.add(tab);
+        gg.flatShading = true; gg.scale.setScalar(sc); gg.position.set(x, y, z); gg.rotation.set(0.25, ry, 0.12); return gg;
+      };
+      pink.flatShading = true;
+      g.add(gem(1, 0, 1.0, 0, 0.3));
+      if (n > 1) g.add(gem(0.6, -1.05, 0.55, -0.4, 0.8));
+      if (n > 2) g.add(gem(0.55, 1.05, 0.5, -0.3, -0.5));
+      g.rotation.y = -0.2;
     } else if (p[0] === 'trophy') {
       // a gold cup with two handles on a dark plinth with a gold band and a star
       var gold = std('#FFC53D', { r: 0.25, m: 0.85 });

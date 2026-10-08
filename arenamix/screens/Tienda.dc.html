@@ -24,17 +24,19 @@ input::placeholder{color:#8686A6}
   <div class="bc-beams"></div>
   <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; height: 390px; z-index: 3"><dc-import name="Nav" active="tienda" hint-size="80px,390px"></dc-import></div>
   <div style="position: absolute; left: 80px; top: 0; right: 0; bottom: 0; padding: 12px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px">
-    <div style="display: flex; align-items: center; gap: 14px">
-      <h1 class="bc-title" style="font-size: 30px">TIENDA</h1>
+    <div style="display: flex; align-items: center; gap: 10px">
+      <h1 class="bc-title" style="font-size: 26px">TIENDA</h1>
   <div role="tablist" aria-label="Sección" style="display: flex; gap: 4px">
-    <button type="button" role="tab" aria-selected="{{rSel}}" onClick="{{showRewards}}" class="bc-para" style="{{rewardsTab}}">RECOMPENSAS</button>
+    <button type="button" role="tab" aria-selected="{{rSel}}" onClick="{{showRewards}}" class="bc-para" style="{{rewardsTab}}">RECOMPENSAS<sc-if value="{{rewardsDot}}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; vertical-align: middle; margin-left: 6px; min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box; border-radius: 9px; background: #FF3B5C; color: #FFFFFF; font: 800 10.5px Exo2, sans-serif; align-items: center; justify-content: center; box-shadow: 0 0 8px #FF3B5C">{{rewardsN}}</span></sc-if></button>
+    <button type="button" role="tab" aria-selected="{{bSel}}" onClick="{{showBoosts}}" class="bc-para" style="{{boostsTab}}">POTENCIADORES</button>
     <button type="button" role="tab" aria-selected="{{sSel}}" onClick="{{showShop}}" class="bc-para" style="{{shopTab}}">COMPRAR</button>
   </div>
       <div style="flex: 1"></div>
-    <span class="bc-para" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 18px; background: linear-gradient(135deg, #3A2A0A, #1E1A10); box-shadow: inset 0 0 0 1px #FFC53D; color: #FFE38A; font-weight: 800; font-size: 14px">
-      <svg class="am-coin" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">C</text></svg>
-      {{coins}} carrascos
+    <span class="bc-para" style="display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; background: linear-gradient(135deg, #3A2A0A, #1E1A10); box-shadow: inset 0 0 0 1px #FFC53D; color: #FFE38A; font-weight: 800; font-size: 14px">
+      <svg class="am-coin" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">V</text></svg>
+      {{coins}}
     </span>
+    <span class="bc-para" style="display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; background: linear-gradient(135deg, #4A0F38, #1E0E1A); box-shadow: inset 0 0 0 1px #FF5CC8; color: #FFC2EC; font-weight: 800; font-size: 14px"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M7 3h10l4 6l-9 12L3 9z" fill="#FF5CC8"/><path d="M3 9h18M7 3l5 18M17 3l-5 18M7 3l2 6M17 3l-2 6" stroke="#7A1050" stroke-width="1" fill="none" opacity=".55"/><path d="M7 3h10l-2 6H9z" fill="#FFC2EC" opacity=".8"/></svg>{{gems}}</span>
     </div>
     <div style="flex: 1; min-height: 0; overflow-y: auto">
       <sc-if value="{{isRewards}}" hint-placeholder-val="{{ true }}">
@@ -65,6 +67,29 @@ input::placeholder{color:#8686A6}
           </div>
         </div>
       </sc-if>
+      <sc-if value="{{isBoosts}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 10px; height: 100%">
+          <div class="bc-tile" style="--bc-c: #FF5CC8; display: flex; align-items: center; gap: 12px; padding: 8px 16px 8px 20px">
+            <span style="flex: none; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M7 3h10l4 6l-9 12L3 9z" fill="#FF5CC8"/><path d="M3 9h18M7 3l5 18M17 3l-5 18M7 3l2 6M17 3l-2 6" stroke="#7A1050" stroke-width="1" fill="none" opacity=".55"/><path d="M7 3h10l-2 6H9z" fill="#FFC2EC" opacity=".8"/></svg></span>
+            <span style="flex: 1; font-size: 12.5px; color: #CACAE0; line-height: 1.35">Los <b style="color: #FFC2EC">BOB</b> se ganan subiendo de nivel, con las misiones diarias y en el pase de temporada. Úsalos para potenciar tus partidos.</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; flex: 1; min-height: 0">
+            <sc-for list="{{boostCards}}" as="b" hint-placeholder-count="5">
+              <div class="td-boost" style="{{b.card}}">
+                <span style="{{b.glow}}"></span>
+                <sc-if value="{{b.active}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 8px; top: 8px; z-index: 1; padding: 2px 7px; background: {{b.color}}; color: #0B0B14; font: 800 9.5px Exo2, sans-serif; letter-spacing: .5px; transform: skewX(-10deg)">ACTIVO · {{b.left}}</span></sc-if>
+                <span style="position: relative; height: 82px; display: flex; align-items: center; justify-content: center">
+                  <img src="{{b.img}}" alt="" class="am-float" style="width: 78px; height: 78px; object-fit: contain; filter: drop-shadow(0 6px 8px #000b)">
+                  <sc-if value="{{b.hasTag}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: 6px; bottom: 4px; padding: 0 6px; background: #0B0B14; box-shadow: inset 0 0 0 1.5px {{b.color}}; color: {{b.color}}; font: 800 italic 18px 'Barlow Condensed', sans-serif; transform: rotate(-8deg)">{{b.tag}}</span></sc-if>
+                </span>
+                <span style="position: relative; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 19px; line-height: 1; color: {{b.color}}">{{b.name}}</span>
+                <span style="position: relative; flex: 1; font-size: 10.5px; line-height: 1.35; color: #CACAE0">{{b.desc}}</span>
+                <button type="button" onClick="{{b.buy}}" style="{{b.btn}}"><span style="display: flex; align-items: center; gap: 5px; transform: skewX(10deg)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M7 3h10l4 6l-9 12L3 9z" fill="currentColor"/><path d="M3 9h18M7 3l5 18M17 3l-5 18M7 3l2 6M17 3l-2 6" stroke="#7A1050" stroke-width="1" fill="none" opacity=".55"/><path d="M7 3h10l-2 6H9z" fill="#FFFFFF" opacity=".5"/></svg>{{b.price}}</span></button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
       <sc-if value="{{isShop}}" hint-placeholder-val="{{ false }}">
         <div style="display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 14px; align-items: start">
           <div style="display: flex; flex-direction: column; gap: 10px">
@@ -78,17 +103,17 @@ input::placeholder{color:#8686A6}
       <a href="Taquilla.dc.html" class="bc-tile" style="--bc-c: #FFC53D; display: flex; align-items: center; gap: 12px; padding: 12px 14px 12px 18px; text-decoration: none; color: #F4F4FA">
         <img src="{{prz.hat}}" alt="" style="width: 52px; height: 52px; object-fit: contain">
         <span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 700; font-size: 14px">Sombrero de copa</span><span style="font-size: 12px; color: #A3A3C2">Ver en la Taquilla</span></span>
-        <span style="font-weight: 800; color: #FFC53D">900 C</span>
+        <span style="font-weight: 800; color: #FFC53D">900 VCD</span>
       </a>
           </div>
           <div style="display: flex; flex-direction: column; gap: 8px">
-            <h2 style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; color: #A3A3C2">PACKS DE CARRASCOS</h2>
+            <h2 style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; color: #A3A3C2">PACKS DE BOB</h2>
       <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
         <sc-for list="{{packs}}" as="p" hint-placeholder-count="4">
           <button type="button" class="am-shine" style="{{p.style}}">
             <sc-if value="{{p.hot}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; top: 8px; right: -26px; rotate: 40deg; width: 100px; text-align: center; padding: 2px 0; background: #FF5C8A; color: #fff; font-size: 9px; font-weight: 800; letter-spacing: 1px">POPULAR</span></sc-if>
             <img class="am-float" src="{{p.img}}" alt="" style="width: 92px; height: 82px; object-fit: contain; filter: drop-shadow(0 8px 10px #000a)">
-            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1">{{p.amount}}</span>
+            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 21px; line-height: 1">{{p.amount}}</span>
             <span style="font-size: 12px; font-weight: 700; color: #22D3EE">{{p.bonus}}</span>
             <span class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 36px; margin-top: auto; background: linear-gradient(135deg, #FFFFFF, #D6DEE9); color: #0B0B14; font-weight: 800; font-size: 14px">[PRECIO]</span>
           </button>
@@ -99,6 +124,7 @@ input::placeholder{color:#8686A6}
       </sc-if>
     </div>
   </div>
+  <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%) skewX(-10deg); z-index: 9; padding: 8px 18px; background: #F4F4FA; color: #0B0B14; font: 800 13px Exo2, sans-serif; white-space: nowrap; box-shadow: 0 8px 20px #000a">{{toastText}}</span></sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
@@ -109,14 +135,15 @@ class Component extends DCLogic {
   }
   renderVals() {
     const t = this.state.tab;
-    const tabStyle = (on) => 'height: 36px; padding: 0 20px; border: 0; font: 800 13px Exo2, sans-serif; letter-spacing: 1px; cursor: pointer; ' + (on ? 'background: linear-gradient(135deg, #7EF0FF, #22D3EE); color: #0B0B14;' : 'background: #17172ACC; color: #CACAE0;');
+    const tabStyle = (on) => 'position: relative; display: flex; align-items: center; white-space: nowrap; height: 34px; padding: 0 12px; border: 0; font: 800 12px Exo2, sans-serif; letter-spacing: 1px; cursor: pointer; ' + (on ? 'background: linear-gradient(135deg, #7EF0FF, #22D3EE); color: #0B0B14;' : 'background: #17172ACC; color: #CACAE0;');
     const G = window.AMGear, P = (k) => (G ? G.prize(k) : '');
     const PR = window.AMProgress, W = PR ? PR.weekly() : { wins: 0, milestones: [], daysLeft: 7 };
     // the bar runs through the milestones, which sit at 0, 25, 50, 75 and 100 %
     const AT = W.milestones.map((m) => m.at);
     let wBar = 0;
     for (let i = 0; i < AT.length; i++) { if (W.wins >= AT[i]) wBar = i * 25; else { const lo = i ? AT[i - 1] : 0; wBar = i ? (i - 1) * 25 + 25 * (W.wins - lo) / (AT[i] - lo) : 0; break; } }
-    const PACK = ['coins:6', 'coins:16', 'bag', 'chest:legend:open'];
+    const PACK = ['gems:1', 'gems:2', 'gems:3', 'chest:legend:open'];
+    const wReadyN = W.milestones.filter((m) => m.reached && !m.claimed).length;
     const pk = (amount, bonus, k) => ({ amount, bonus, hot: k === 2, img: P(PACK[k]), style: 'position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 200px; padding: 16px 10px 12px 10px; box-sizing: border-box; clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px); color: #F4F4FA; font-family: Exo2, sans-serif; cursor: pointer; background: linear-gradient(160deg, ' + ['#1C1C3A', '#1D2A4A', '#2A1F4A', '#3A2A0A'][k] + ', #121226 75%); border: 1px solid ' + ['#2E2E58', '#22D3EE88', '#9B6BFF', '#FFC53D'][k] + '; box-shadow: 0 0 ' + (6 + k * 5) + 'px ' + ['#0000', '#22D3EE44', '#9B6BFF55', '#FFC53D66'][k] + ', 0 8px 18px #0007;' });
     return {
       coins: String(PR ? PR.coins() : 2450).replace(/\B(?=(\d{3})+(?!\d))/g, '.'),
@@ -149,12 +176,36 @@ class Component extends DCLogic {
       isRewards: t === 'rewards',
       isShop: t === 'shop',
       thumb: 'position: absolute; top: 4px; bottom: 4px; width: calc(50% - 4px); left: ' + (t === 'rewards' ? '4px' : '50%') + '; border-radius: 12px; background: linear-gradient(135deg, #7EF0FF, #22D3EE); box-shadow: 0 0 14px #22D3EE88; transition: left .4s cubic-bezier(.3,1.5,.5,1);',
-      rSel: t === 'rewards' ? 'true' : 'false', sSel: t === 'shop' ? 'true' : 'false',
+      rSel: t === 'rewards' ? 'true' : 'false', sSel: t === 'shop' ? 'true' : 'false', bSel: t === 'boosts' ? 'true' : 'false',
+      isBoosts: t === 'boosts', boostsTab: tabStyle(t === 'boosts'), showBoosts: () => this.setState({ tab: 'boosts' }),
+      gems: String(PR ? PR.gems() : 0),
+      rewardsDot: wReadyN > 0, rewardsN: String(wReadyN),
+      boostCards: (PR ? PR.boostList : []).map((b) => {
+        const left = PR.boostLeft(b.id), can = PR.gems() >= b.price;
+        const img = b.id === 'chest' ? P('chest:rare') : b.id === 'vcd2' ? P('coins:8') : b.id === 'shield' ? P('shield:#A78BFA') : b.id === 'pass2' ? P('trophy') : 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cdefs%3E%3CradialGradient%20id%3D%22g%22%20cx%3D%22.35%22%20cy%3D%22.3%22%20r%3D%22.8%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%239AF5FF%22/%3E%3Cstop%20offset%3D%22.6%22%20stop-color%3D%22%2322D3EE%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%230E6F80%22/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath%20d%3D%22M50%204l40%2023v46L50%2096L10%2073V27z%22%20fill%3D%22url%28%23g%29%22%20stroke%3D%22%230B0B14%22%20stroke-width%3D%224%22/%3E%3Cpath%20d%3D%22M50%2014l31%2018v36L50%2086L19%2068V32z%22%20fill%3D%22none%22%20stroke%3D%22%23FFFFFF%22%20stroke-opacity%3D%22.5%22%20stroke-width%3D%223%22/%3E%3Cpath%20d%3D%22M56%2020L32%2054h16l-6%2026l26-38H52z%22%20fill%3D%22%23FFFFFF%22%20stroke%3D%22%230B0B14%22%20stroke-width%3D%223%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E';
+        return {
+          name: b.name, desc: b.desc, price: String(b.price), color: b.color, img, left: String(left), active: left > 0,
+          hasTag: b.id !== 'chest' && b.id !== 'shield', tag: b.id === 'xp2' ? 'XP x2' : 'x2',
+          card: 'position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 6px; padding: 12px 10px 10px; box-sizing: border-box; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: linear-gradient(165deg, ' + b.color + '26, #141428 55%, #0E0E1E); box-shadow: inset 0 0 0 1px ' + b.color + (left > 0 ? '' : '55') + (left > 0 ? ', 0 0 18px ' + b.color + '55' : '') + ';',
+          glow: 'position: absolute; left: 50%; top: 10px; width: 120px; height: 90px; margin-left: -60px; border-radius: 50%; background: radial-gradient(closest-side, ' + b.color + '44, transparent); pointer-events: none',
+          btn: 'position: relative; height: 34px; border: 0; transform: skewX(-10deg); display: flex; align-items: center; justify-content: center; font: 800 16px \'Barlow Condensed\', sans-serif; cursor: pointer; ' + (can ? 'background: linear-gradient(135deg, #FF8AD8, #FF5CC8 55%, #C2338F); color: #2A0620; box-shadow: 0 3px 0 #7A1050;' : 'background: #26264A; color: #8686A6;'),
+          buy: () => {
+            if (!can) { this.setState({ toast: 'Te faltan BOB: gánalos subiendo de nivel, con misiones y en el pase' }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2400); return; }
+            const r = PR.buyBoost(b.id);
+            if (!r) return;
+            if (window.AMSfx && window.AMSfx.coin) window.AMSfx.coin();
+            if (b.id === 'chest' && window.AMResults) window.AMResults.reward(r, () => this.forceUpdate());
+            else { this.setState({ toast: '¡' + b.name + ' activado!' }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2000); }
+            this.forceUpdate();
+          }
+        };
+      }),
+      hasToast: !!this.state.toast, toastText: this.state.toast || '',
       rewardsTab: tabStyle(t === 'rewards'),
       shopTab: tabStyle(t === 'shop'),
       showRewards: () => this.setState({ tab: 'rewards' }),
       showShop: () => this.setState({ tab: 'shop' }),
-      packs: [pk('500', 'Básico', 0), pk('1.200', '+10% extra', 1), pk('2.800', '+20% extra', 2), pk('6.500', '+30% extra', 3)]
+      packs: [pk('100 BOB', 'Básico', 0), pk('250 BOB', '+10% extra', 1), pk('600 BOB', '+20% extra', 2), pk('1.500 BOB', '+30% extra', 3)]
     };
   }
 }

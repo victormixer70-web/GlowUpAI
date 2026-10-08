@@ -39,6 +39,12 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .hm-card .go{position:relative;flex:none;width:24px;height:24px;display:flex;align-items:center;justify-content:center;transform:skewX(-12deg);background:color-mix(in srgb,var(--c) 22%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 55%,transparent);color:var(--c);transition:background .25s,color .25s}
 .hm-card:hover .go{background:var(--c);color:#0B0B14}.hm-card .go svg{transform:skewX(12deg);animation:hmArrow 1.4s ease-in-out infinite}
 .hm-card .badge{position:absolute;right:4px;top:-7px;min-width:22px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:11px;background:#FFC53D;color:#2A1C02;font:800 12px Exo2,sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #0B0B14;z-index:2}
+.hm-pass{position:relative;flex:none;width:214px;height:38px;display:flex;align-items:center;gap:8px;padding:0 12px 0 4px;box-sizing:border-box;transform:skewX(-12deg);background:linear-gradient(100deg,#FF8A3D,#C2410C 55%,#5A1E06);box-shadow:inset 0 0 0 1px #FFC53D99,0 0 16px #FF8A3D55;color:#FFFFFF;text-decoration:none;overflow:visible;transition:filter .25s}
+.hm-pass>*{transform:skewX(12deg)}.hm-pass:hover{filter:brightness(1.15)}
+.hm-pass::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,#ffffff40 45%,transparent 60%) -200% 0/200% 100% no-repeat;animation:hmSheen 4s ease-in-out infinite;pointer-events:none}
+.hm-pass-lv{flex:none;width:32px;height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:linear-gradient(180deg,#FFE38A,#FFC53D);color:#2A1C02;font-weight:800}
+.hm-pass-lv b{font:800 16px 'Barlow Condensed',sans-serif;line-height:1}
+.hm-dot{position:absolute;right:-8px;top:-9px;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:#FF3B5C;color:#FFFFFF;font:800 10.5px Exo2,sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #0B0B14;z-index:2}
 .hm-sway{animation:hmSway 3.6s ease-in-out infinite}@keyframes hmSway{0%,100%{rotate:-5deg}50%{rotate:5deg}}
 .hm-arrow{animation:hmArrow 1.2s ease-in-out infinite}
 </style>
@@ -59,7 +65,17 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <span style="font-size: 11px; font-weight: 700; color: #22D3EE">Nivel {{lv}} · {{lvPct}}%</span>
     </div>
     <span style="flex: 1"></span>
-    <a href="Tienda.dc.html" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; transform: skewX(-12deg); background: linear-gradient(135deg, #3A2A0A, #1E1A10); border: 1px solid #FFC53D; box-shadow: 0 0 12px #FFC53D44; color: #FFE38A; text-decoration: none; font-weight: 800; font-size: 15px"><span style="display: flex; align-items: center; gap: 6px; transform: skewX(12deg)"><svg class="am-coin" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">C</text></svg>{{coins}}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="3" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></span></a>
+    <!-- the season pass, right where you can see it -->
+    <a href="Pase.dc.html" class="hm-pass" aria-label="{{passAria}}">
+      <span class="hm-pass-lv"><span style="font-size: 8px; letter-spacing: 1px; line-height: 1">NV</span><b>{{passLv}}</b></span>
+      <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1">
+        <span style="display: flex; justify-content: space-between; gap: 6px; font-size: 9.5px; font-weight: 800; letter-spacing: 1px; white-space: nowrap"><span style="overflow: hidden; text-overflow: ellipsis">PASE T1</span><span style="color: #FFE38A">{{passTag}}</span></span>
+        <span style="height: 5px; background: #00000055; overflow: hidden"><i style="{{passBar}}"></i></span>
+      </span>
+      <sc-if value="{{passReady}}" hint-placeholder-val="{{ false }}"><span class="hm-dot am-pulse-gold">{{passReadyN}}</span></sc-if>
+    </a>
+    <a href="Tienda.dc.html" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; transform: skewX(-12deg); background: linear-gradient(135deg, #3A2A0A, #1E1A10); border: 1px solid #FFC53D; box-shadow: 0 0 12px #FFC53D44; color: #FFE38A; text-decoration: none; font-weight: 800; font-size: 15px"><span style="display: flex; align-items: center; gap: 6px; transform: skewX(12deg)"><svg class="am-coin" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">V</text></svg>{{coins}}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="3" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></span></a>
+    <a href="Tienda.dc.html" aria-label="{{gemsAria}}" style="display: flex; align-items: center; height: 36px; padding: 0 10px; transform: skewX(-12deg); background: linear-gradient(135deg, #4A0F38, #1E0E1A); border: 1px solid #FF5CC8; box-shadow: 0 0 12px #FF5CC844; color: #FFC2EC; text-decoration: none; font-weight: 800; font-size: 15px"><span style="display: flex; align-items: center; gap: 5px; transform: skewX(12deg)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M7 3h10l4 6l-9 12L3 9z" fill="#FF5CC8"/><path d="M3 9h18M7 3l5 18M17 3l-5 18M7 3l2 6M17 3l-2 6" stroke="#7A1050" stroke-width="1" fill="none" opacity=".55"/><path d="M7 3h10l-2 6H9z" fill="#FFC2EC" opacity=".8"/></svg>{{gems}}</span></a>
     <a href="Ajustes.dc.html" aria-label="Configuración: jugabilidad y controles" style="flex: none; display: flex; align-items: center; justify-content: center; width: 38px; height: 36px; transform: skewX(-12deg); background: #17172A; border: 1px solid #2E2E52; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: skewX(12deg)"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></a>
   </div>
 
@@ -141,7 +157,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
               <span style="height: 7px; background: #26264A"><span style="{{m.bar}}"></span></span>
             </span>
             <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; min-width: 86px">
-              <span style="font-size: 12px; font-weight: 800; color: #FFE38A">+{{m.coins}} C · +{{m.xp}} XP</span>
+              <span style="font-size: 12px; font-weight: 800; color: #FFE38A">+{{m.coins}} VCD · +{{m.xp}} XP</span>
               <sc-if value="{{m.canClaim}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{m.claim}}" class="bc-btn-gold am-shine" style="height: 28px; padding: 0 14px; font-size: 15px; cursor: pointer">RECLAMAR</button></sc-if>
             </span>
           </div>
@@ -208,6 +224,17 @@ class Component extends DCLogic {
       coins: String(PR ? PR.coins() : 2450).replace(/\B(?=(\d{3})+(?!\d))/g, '.'),
       chestImg: G ? G.prize(wReady.length ? wReady[0].icon + ':open' : next ? next.icon : 'chest:legend:open') : '',
       chestCls: wReady.length ? 'hm-wiggle' : 'am-bob',
+      gems: String(PR ? PR.gems() : 0), gemsAria: (PR ? PR.gems() : 0) + ' BOB. Ir a la tienda',
+      ...(() => {
+        const P = PR ? PR.pass() : null;
+        if (!P) return { passLv: '0', passTag: '', passBar: '', passReady: false, passReadyN: '', passAria: 'Pase de temporada' };
+        return {
+          passLv: String(P.level), passReady: P.ready > 0, passReadyN: String(P.ready),
+          passTag: P.ready ? '¡RECOGE!' : P.premium ? '★ PREMIUM' : P.level >= 30 ? 'COMPLETO' : P.into + '/' + P.need + ' XP',
+          passBar: 'display: block; height: 100%; width: ' + (P.level >= 30 ? 100 : P.into / P.need * 100).toFixed(0) + '%; background: linear-gradient(90deg, #FFE38A, #FFFFFF); box-shadow: 0 0 6px #FFE38A',
+          passAria: 'Pase de temporada, nivel ' + P.level + (P.ready ? ', ' + P.ready + ' premios por recoger' : '')
+        };
+      })(),
       chestReady: wReady.length > 0, chestReadyN: String(wReady.length), weekWins: String(W.wins),
       trophyImg: G ? G.prize('trophy') : '', shieldImg: G ? G.prize('shield:' + tr[1]) : '', targetImg: G ? G.prize('target') : '',
       achDone: String(achDone), achTotal: String(goals.length),
@@ -235,7 +262,7 @@ class Component extends DCLogic {
         claim: () => {
           const r = PR.claimMission(m.id);
           if (!r) return;
-          this.setState({ toast: '+' + r.coins + ' carrascos · +' + r.xp + ' XP' + (r.levelUp ? ' · ¡NIVEL ' + r.levelUp + '!' : '') });
+          this.setState({ toast: '+' + r.coins + ' VCD · +' + (r.gems || 0) + ' BOB · +' + r.xp + ' XP' + (r.levelUp ? ' · ¡NIVEL ' + r.levelUp + '!' : '') });
           clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2200);
           if (window.AMSfx && window.AMSfx.coin) window.AMSfx.coin();
         }
