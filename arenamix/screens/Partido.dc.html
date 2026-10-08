@@ -189,6 +189,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 </section>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"keeper":{"editor":"bool","default":false},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3,4],"default":3},"mates":{"editor":null},"label":{"editor":null},"tutorial":{"editor":"bool","default":false},"rivals":{"editor":null},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"online":{"editor":null},"aiLevel":{"editor":null},"$preview":{"width":844,"height":390}}'>
+// ball radius in the match (metres): a little bigger than a real one so it reads on a phone
+const Partido_BR = 0.17;
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -556,6 +558,7 @@ class Component extends DCLogic {
     this.dive(p, this.clamp(iy, 10.5, 19.5), t, D, Math.max(0, b.z + b.vz * t - 4.9 * t * t));
   }
   start() {
+    window.__amDbg = this;
     if (this.g.phase === 'end') this.newGame();
     // team matches open with the fans: the camera shows each end, flares lit, then kick-off
     if (this.size() >= 2 && !this.props.tutorial && !this.net && !this.introDone) {
@@ -1104,7 +1107,7 @@ class Component extends DCLogic {
   // after a goal the ball flies on into the goal: the side nets and the roof stop it, and the back of the
   // net stretches, slows it down and drops it, so it stays in the goal (it never goes through)
   netBall(dt) {
-    const b = this.g.ball, s = b.x < 30 ? -1 : 1, R = 0.23;
+    const b = this.g.ball, s = b.x < 30 ? -1 : 1, R = Partido_BR;
     if (b.z > 0 || b.vz > 0) {
       b.vz -= 9.81 * dt;
       const drag = 1 - 0.012 * Math.hypot(b.vx, b.vy, b.vz) * dt;
@@ -1565,14 +1568,13 @@ class Component extends DCLogic {
         const iz = Math.max(0, b.z + b.vz * t - 4.9 * t * t);
         const onTarget = iy > 11.4 && iy < 18.6 && iz < 2.6;
         if (t < 1.5 && onTarget) {
+          if (!(p.react > 0)) p.setY = p.y;
           p.react += dt;
-          if (p.react > D.react) {
-            ty = this.clamp(iy, 11.6, 18.4); maxV = 6.5; acc = 14;
-            // full-stretch dive towards where the ball will cross, or a jump for a high ball at him
-            // (a ball near him at chest height is caught standing up, without throwing himself to the ground)
-            const gap = Math.abs(iy - p.y), standCatch = gap < 1.2 && iz > 0.9 && iz < 2.2;
-            if (!this.noAutoDive && !p.act && t < 0.7 && !standCatch && (gap > 0.6 || iz > 2.2)) this.dive(p, iy, t, D, iz);
-          }
+          // a shot on its way: he plants his feet (a small set step, no shuffling across the goal) and,
+          // once he has read it, throws himself at it; only a ball straight at him is taken standing up
+          const gap = Math.abs(iy - p.y), standCatch = gap < 0.7 && iz > 0.6 && iz < 2.1;
+          ty = p.setY + this.clamp(iy - p.setY, -0.45, 0.45); maxV = 1.6; acc = 10;
+          if (p.react > D.react && !this.noAutoDive && !p.act && t < 0.75 && !standCatch && (gap > 0.45 || iz > 2.1)) this.dive(p, iy, t, D, iz);
         }
       } else p.react = 0;
     } else p.react = 0;
@@ -2375,7 +2377,7 @@ class Component extends DCLogic {
       [[64, 128], [192, 128], [320, 128], [448, 128]].forEach(([x, y]) => pent(x, y, 30));
       [[0, 40], [128, 40], [256, 40], [384, 40], [512, 40], [64, 225], [192, 225], [320, 225], [448, 225]].forEach(([x, y]) => pent(x, y, 24));
     });
-    this.ball3 = new T.Mesh(new T.SphereGeometry(0.23, 40, 28), window.AMBall ? window.AMBall.material() : new T.MeshStandardMaterial({ map: ballTex, roughness: 0.45 }));
+    this.ball3 = new T.Mesh(new T.SphereGeometry(Partido_BR, 40, 28), window.AMBall ? window.AMBall.material() : new T.MeshStandardMaterial({ map: ballTex, roughness: 0.45 }));
     this.ball3.castShadow = true;
     S.add(this.ball3);
     if (this.ball3.material.clone) { this.ball3.material = this.ball3.material.clone(); this.ballBase = this.ball3.material.color ? this.ball3.material.color.clone() : null; }
@@ -2604,7 +2606,7 @@ class Component extends DCLogic {
       const emit = g.phase === 'play' && g.own < 0 && (fire ? 3 : gold && sp > 7 ? 1 : 0);
       for (let e = 0; e < emit; e++) {
         const k = tr.k = (tr.k + 1) % tr.N;
-        pa.setXYZ(k, b.x - 30 + (Math.random() - 0.5) * 0.2, b.z + 0.23 + (Math.random() - 0.5) * 0.2, b.y - 15 + (Math.random() - 0.5) * 0.2);
+        pa.setXYZ(k, b.x - 30 + (Math.random() - 0.5) * 0.2, b.z + Partido_BR + (Math.random() - 0.5) * 0.2, b.y - 15 + (Math.random() - 0.5) * 0.2);
         tr.life[k] = tr.max[k] = fire ? 0.45 : 0.3;
         const c = fire ? (Math.random() < 0.5 ? [1, 0.32, 0.04] : [1, 0.62, 0.1]) : [1, 0.8, 0.25];
         tr.col.set(c, k * 3);
@@ -2793,11 +2795,11 @@ class Component extends DCLogic {
       st.m.rotation.y = Math.atan2(Math.cos(p.face), Math.sin(p.face));
       if (st.m.userData.anim) this.mocap(p, st.m, -1, dt || 0);
     });
-    this.ball3.position.copy(this.W(b.x, b.y, b.z + 0.23));
+    this.ball3.position.copy(this.W(b.x, b.y, b.z + Partido_BR));
     // the net wraps round the ball pressing into it, then springs back
     if (this.nets) {
       const ns = b.x < 30 ? -1 : 1, dep = ns < 0 ? -b.x : b.x - 60, net = this.nets[ns];
-      if (net && dep > 0 && b.y > 11.6 && b.y < 18.4) (net.press ? net.press(-ns * (b.y - 15), dep, b.z + 0.23, 0.23) : net.push(-ns * (b.y - 15), b.z + 0.23, dep - 1.37));
+      if (net && dep > 0 && b.y > 11.6 && b.y < 18.4) (net.press ? net.press(-ns * (b.y - 15), dep, b.z + Partido_BR, Partido_BR) : net.push(-ns * (b.y - 15), b.z + Partido_BR, dep - 1.37));
       for (const k in this.nets) this.nets[k].step(dt || 0);
     }
     this.ball3.visible = g.phase !== 'winners';
@@ -2805,7 +2807,7 @@ class Component extends DCLogic {
     if (bsp > 0.01 && dt) {
       if (!this.qTmp) { this.qTmp = new T.Quaternion(); this.aTmp = new T.Vector3(); }
       this.aTmp.set(b.vy / bsp, 0, -b.vx / bsp);
-      this.qTmp.setFromAxisAngle(this.aTmp, bsp * dt / 0.23);
+      this.qTmp.setFromAxisAngle(this.aTmp, bsp * dt / Partido_BR);
       this.ball3.quaternion.premultiply(this.qTmp);
     }
     const c = g.ps[g.ctl];
