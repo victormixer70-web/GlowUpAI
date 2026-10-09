@@ -75,7 +75,7 @@ input::placeholder{color:#6E6E92}
   </button>
   <span style="position: absolute; left: 270px; bottom: 12px; font-size: 10px; color: #8686A6">Tu progreso se guarda en este móvil</span>
 
-  <a href="Idioma.dc.html" aria-label="Cambiar idioma" style="position: absolute; right: 12px; top: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 14px; background: #0B0B14CC; border: 1px solid #2E2E58; color: #F4F4FA; text-decoration: none; font-weight: 700; font-size: 11px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>ES</a>
+  <a href="Idioma.dc.html" aria-label="Cambiar idioma" style="position: absolute; right: 12px; top: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 14px; background: #0B0B14CC; border: 1px solid #2E2E58; color: #F4F4FA; text-decoration: none; font-weight: 700; font-size: 11px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>{{langCode}}</a>
 
   <!-- the lanyard -->
   <svg aria-hidden="true" width="844" height="390" style="position: absolute; inset: 0; pointer-events: none"><path d="M610 -6L656 40M720 -6L676 40" stroke="#22D3EE" stroke-width="9" stroke-linecap="round"/><path d="M610 -6L656 40M720 -6L676 40" stroke="#0B0B14" stroke-opacity=".35" stroke-width="2" stroke-dasharray="3 6"/><rect x="652" y="34" width="28" height="16" rx="4" fill="#A3A3C2" stroke="#4C4C78" stroke-width="2"/></svg>
@@ -320,6 +320,7 @@ class Component extends DCLogic {
     const nmErr = O ? O.checkName(s.nameDraft) : '';
     { const ib = document.getElementById('install'); if (ib) ib.style.visibility = s.nameOpen ? 'hidden' : ''; }
     return {
+      langCode: (window.AMI18n ? window.AMI18n.lang() : 'es').toUpperCase(),
       crowdRef: this.crowdRef, canvasRef: this.canvasRef, show3d, show2d: !show3d,
       kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#0B0B14', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#17172A', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE',
       fans: this.fans.toLocaleString('es-ES'), serial: this.serial, name: name.toUpperCase(),

@@ -49,7 +49,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <a href="{{backHref}}" aria-label="Volver" style="flex: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 20px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></a>
     <svg width="26" height="26" viewBox="-50 -50 100 100" style="flex: none; animation: cfSpin 8s linear infinite; filter: drop-shadow(0 0 6px #22D3EE)"><path d="{{gearD}}" fill="#22D3EE"/><circle r="14" fill="#0B0B14"/></svg>
     <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: .5px; text-shadow: 0 3px 0 #05050A, 0 0 16px #22D3EE55">CONFIGURACIÓN</span>
-    <div role="tablist" style="margin-left: auto; display: flex; gap: 4px; padding: 4px; border-radius: 14px; background: #17172A">
+    <a href="Idioma.dc.html" aria-label="Cambiar idioma" style="margin-left: auto; display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 12px; background: #17172A; box-shadow: inset 0 0 0 1px #2E2E52, 0 3px 0 #05050A; color: #CACAE0; text-decoration: none; font: 800 12px Exo2, sans-serif; letter-spacing: .5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2.2"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c3 3 3 16 0 19M12 2.5c-3 3-3 16 0 19"/></svg>{{langLabel}}</a>
+    <div role="tablist" style="display: flex; gap: 4px; padding: 4px; border-radius: 14px; background: #17172A">
       <button type="button" role="tab" aria-selected="{{playSel}}" onClick="{{tabPlay}}" style="{{playTab}}">JUGABILIDAD</button>
       <button type="button" role="tab" aria-selected="{{ctrlSel}}" onClick="{{tabCtrl}}" style="{{ctrlTab}}">CONTROLES</button>
     </div>
@@ -212,7 +213,7 @@ class Component extends DCLogic {
     const tabSt = (on) => 'height: 32px; padding: 0 14px; border-radius: 10px; border: 0; cursor: pointer; font: 800 12px Exo2, sans-serif; letter-spacing: .5px; transition: background .25s; ' + (on ? 'background: linear-gradient(180deg, #9AF5FF, #22D3EE); color: #0B0B14; box-shadow: 0 3px 0 #0A6F80, 0 0 14px #22D3EE88;' : 'background: transparent; color: #CACAE0;');
     const play = s.tab === 'play';
     return {
-      gearD,
+      gearD, langLabel: (window.AMI18n ? window.AMI18n.lang() : 'es').toUpperCase(),
       showPlay: play, showCtrl: !play, playSel: play ? 'true' : 'false', ctrlSel: play ? 'false' : 'true',
       playTab: tabSt(play), ctrlTab: tabSt(!play),
       tabPlay: () => this.setState({ tab: 'play' }), tabCtrl: () => this.setState({ tab: 'ctrl' }),

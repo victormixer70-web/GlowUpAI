@@ -37,16 +37,17 @@ input::placeholder{color:#8686A6}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3C2" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
       <input type="search" aria-label="Buscar idioma" placeholder="Buscar idioma" style="flex: 1; border: 0; outline: none; background: transparent; color: #F4F4FA; font: 500 15px Exo2, sans-serif">
     </label>
-        <a href="Main.dc.html" class="bc-btn am-shine" style="flex: none; display: flex; align-items: center; justify-content: center; height: 42px; padding: 0 24px; text-decoration: none; font-size: 19px; white-space: nowrap">CONFIRMAR · {{current}}</a>
+        <a href="Main.dc.html" onClick="{{confirm}}" class="bc-btn am-shine" style="flex: none; display: flex; align-items: center; justify-content: center; height: 42px; padding: 0 24px; text-decoration: none; font-size: 19px; white-space: nowrap">CONFIRMAR · {{current}}</a>
   </div>
   <div style="position: absolute; left: 20px; right: 20px; top: 76px; bottom: 14px; overflow-y: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start">
         <sc-for list="{{langs}}" as="l" hint-placeholder-count="10">
       <button type="button" onClick="{{l.pick}}" class="{{l.cls}}" style="{{l.rowStyle}}">
         <span class="id-flag" aria-hidden="true" style="{{l.flag}}"></span>
         <span style="flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 2px">
-          <span style="font-size: 16px; font-weight: 700; color: #F4F4FA">{{l.native}}</span>
+          <span translate="no" style="font-size: 16px; font-weight: 700; color: #F4F4FA">{{l.native}}</span>
           <span style="font-size: 12px; color: #A3A3C2">{{l.name}}</span>
         </span>
+        <sc-if value="{{l.soon}}" hint-placeholder-val="{{ false }}"><span style="padding: 3px 8px; border-radius: 8px; background: #26264A; color: #A3A3C2; font: 800 10px Exo2, sans-serif; letter-spacing: 1px">PRONTO</span></sc-if>
         <span style="{{l.dotStyle}}"></span>
       </button>
     </sc-for>
@@ -57,7 +58,7 @@ input::placeholder{color:#8686A6}
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { picked: 'es' };
+    this.state = { picked: window.AMI18n ? window.AMI18n.lang() : 'es' };
   }
   renderVals() {
     const list = [
@@ -89,16 +90,19 @@ class Component extends DCLogic {
     };
     const flagBg = (id) => SVG[id] ? 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40" preserveAspectRatio="none">' + SVG[id] + '</svg>') + '") center / 100% 100% no-repeat, #21213A' : '#21213A';
     const langs = list.map((l) => {
-      const on = l.id === picked;
+      const on = l.id === picked, soon = !!(window.AMI18n && !window.AMI18n.ready(l.id));
       return {
+        soon,
         ...l, cls: 'id-row' + (on ? ' id-on' : ''), flag: 'background: ' + flagBg(l.id) + ';',
         rowStyle: base + (on ? 'background: linear-gradient(90deg, #22D3EE26, #1E1A3A 60%); border: 2px solid #22D3EE; box-shadow: 0 0 16px #22D3EE44, 0 3px 0 #05050A;' : 'background: #17172A; border: 2px solid transparent; box-shadow: 0 3px 0 #05050A;'),
         dotStyle: 'width: 22px; height: 22px; box-sizing: border-box; border-radius: 11px; ' + (on ? 'border: 7px solid #22D3EE; background: #0B0B14;' : 'border: 2px solid #4C4C78;'),
-        pick: () => this.setState({ picked: l.id })
+        pick: () => { if (!soon) this.setState({ picked: l.id }); }
       };
     });
     const current = list.find((l) => l.id === picked).native.toUpperCase();
-    return { langs, current };
+    return { langs, current,
+      // save the language; the app reloads in it and goes back to the start
+      confirm: (e) => { const I = window.AMI18n; if (!I || I.lang() === picked) return; e.preventDefault(); try { localStorage.setItem('arenamix.lang.v1', picked); } catch (er) {} location.hash = '#/Main'; location.reload(); } };
   }
 }
 </script>
