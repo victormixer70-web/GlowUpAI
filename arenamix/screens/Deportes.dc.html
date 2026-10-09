@@ -42,7 +42,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .hm-card .go{position:relative;flex:none;width:26px;height:26px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--c) 22%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 55%,transparent);color:var(--c);transition:background .25s,color .25s}
 .hm-card:hover .go{background:var(--c);color:#0B0B14}.hm-card .go svg{transform:skewX(0deg);animation:hmArrow 1.4s ease-in-out infinite}
 .hm-card .badge{position:absolute;right:4px;top:-7px;min-width:22px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:11px;background:#FFC53D;color:#2A1C02;font:800 12px Exo2,sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #0B0B14;z-index:2}
-.hm-pass{position:relative;flex:none;width:214px;height:38px;display:flex;align-items:center;gap:8px;padding:0 12px 0 4px;box-sizing:border-box;transform:skewX(0deg);background:linear-gradient(100deg,#FF8A3D,#C2410C 55%,#5A1E06);box-shadow:inset 0 0 0 1px #FFC53D99,0 0 16px #FF8A3D55;color:#FFFFFF;text-decoration:none;overflow:visible;transition:filter .25s}
+.hm-pass{position:relative;flex:none;width:184px;height:38px;display:flex;align-items:center;gap:8px;padding:0 12px 0 4px;box-sizing:border-box;transform:skewX(0deg);background:linear-gradient(100deg,#FF8A3D,#C2410C 55%,#5A1E06);box-shadow:inset 0 0 0 1px #FFC53D99,0 0 16px #FF8A3D55;color:#FFFFFF;text-decoration:none;overflow:visible;transition:filter .25s}
+.hm-mg{position:relative;flex:none;display:flex;align-items:center;gap:7px;height:38px;padding:0 10px 0 5px;box-sizing:border-box;border-radius:12px;background:linear-gradient(100deg,#5B2AA8,#2A1060 60%,#140A30);box-shadow:inset 0 0 0 1px #C79BFF99,0 0 14px #9B6BFF55;color:#FFFFFF;text-decoration:none}
+.hm-mg:hover{filter:brightness(1.15)}
 .hm-pass>*{transform:skewX(0deg)}.hm-pass:hover{filter:brightness(1.15)}
 .hm-pass::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,#ffffff40 45%,transparent 60%) -200% 0/200% 100% no-repeat;animation:hmSheen 4s ease-in-out infinite;pointer-events:none}
 .hm-pass-lv{flex:none;width:32px;height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:linear-gradient(180deg,#FFE38A,#FFC53D);color:#2A1C02;font-weight:800}
@@ -68,6 +70,12 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <span style="font-size: 11px; font-weight: 700; color: #22D3EE">Nivel {{lv}} · {{lvPct}}%</span>
     </div>
     <span style="flex: 1"></span>
+    <!-- the daily mini-games, next to the pass -->
+    <a href="Minijuegos.dc.html" aria-label="Minijuegos diarios: {{gamesLeft}} gratis hoy" class="hm-wheel hm-mg">
+      <span style="position: relative; flex: none; width: 30px; height: 30px"><svg width="30" height="30" viewBox="0 0 54 54" class="hm-wheel-disc"><circle cx="27" cy="27" r="25" fill="#FFC53D" stroke="#05050A" stroke-width="3"/><g transform="translate(27 27)"><path d="M0 0L0 -21A21 21 0 0 1 14.8 -14.8Z" fill="#22D3EE"/><path d="M0 0L14.8 -14.8A21 21 0 0 1 21 0Z" fill="#FF5CC8"/><path d="M0 0L21 0A21 21 0 0 1 14.8 14.8Z" fill="#53D88E"/><path d="M0 0L14.8 14.8A21 21 0 0 1 0 21Z" fill="#A78BFA"/><path d="M0 0L0 21A21 21 0 0 1 -14.8 14.8Z" fill="#FF8A3D"/><path d="M0 0L-14.8 14.8A21 21 0 0 1 -21 0Z" fill="#6FB6FF"/><path d="M0 0L-21 0A21 21 0 0 1 -14.8 -14.8Z" fill="#FF5C5C"/><path d="M0 0L-14.8 -14.8A21 21 0 0 1 0 -21Z" fill="#FFE38A"/><circle r="6" fill="#FFF2B0" stroke="#05050A" stroke-width="2"/></g></svg><svg width="9" height="10" viewBox="0 0 34 42" style="position: absolute; left: 10.5px; top: -5px"><path d="M17 40L3 12a14 14 0 1 1 28 0z" fill="#FF3B5C" stroke="#05050A" stroke-width="4"/></svg></span>
+      <span style="display: flex; flex-direction: column; line-height: 1.05"><span style="font-size: 10px; font-weight: 800; letter-spacing: .8px">MINIJUEGOS</span><span style="font-size: 9px; font-weight: 800; color: #FFE38A">{{mgSub}}</span></span>
+      <sc-if value="{{wheelReady}}" hint-placeholder-val="{{ true }}"><span class="hm-dot am-pulse-gold">{{gamesLeft}}</span></sc-if>
+    </a>
     <!-- the season pass, right where you can see it -->
     <a href="Pase.dc.html" class="hm-pass" aria-label="{{passAria}}">
       <span class="hm-pass-lv"><span style="font-size: 8px; letter-spacing: 1px; line-height: 1">NV</span><b>{{passLv}}</b></span>
@@ -96,13 +104,6 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <span class="am-pulse" style="position: absolute; left: 22px; bottom: 22px; display: flex; align-items: center; gap: 10px; height: 54px; padding: 0 26px 0 22px; transform: skewX(0deg); background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #0B0B14">
       <span style="display: flex; align-items: center; gap: 10px; transform: skewX(0deg); font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 2px">JUGAR<svg class="hm-arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B0B14" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6l-6 6"/></svg></span>
     </span>
-  </a>
-  <!-- the daily prize wheel, next to JUGAR -->
-  <a href="Minijuegos.dc.html" aria-label="Minijuegos diarios" class="hm-wheel" style="position: absolute; left: 308px; top: 226px; width: 54px; height: 54px; z-index: 3; display: block; border-radius: 50%">
-    <svg width="54" height="54" viewBox="0 0 54 54" class="hm-wheel-disc"><circle cx="27" cy="27" r="25" fill="#FFC53D" stroke="#05050A" stroke-width="3"/><g transform="translate(27 27)"><path d="M0 0L0 -21A21 21 0 0 1 14.8 -14.8Z" fill="#22D3EE"/><path d="M0 0L14.8 -14.8A21 21 0 0 1 21 0Z" fill="#FF5CC8"/><path d="M0 0L21 0A21 21 0 0 1 14.8 14.8Z" fill="#53D88E"/><path d="M0 0L14.8 14.8A21 21 0 0 1 0 21Z" fill="#A78BFA"/><path d="M0 0L0 21A21 21 0 0 1 -14.8 14.8Z" fill="#FF8A3D"/><path d="M0 0L-14.8 14.8A21 21 0 0 1 -21 0Z" fill="#6FB6FF"/><path d="M0 0L-21 0A21 21 0 0 1 -14.8 -14.8Z" fill="#FF5C5C"/><path d="M0 0L-14.8 -14.8A21 21 0 0 1 0 -21Z" fill="#FFE38A"/><circle r="6" fill="#FFF2B0" stroke="#05050A" stroke-width="2"/></g></svg>
-    <svg width="14" height="16" viewBox="0 0 34 42" style="position: absolute; left: 20px; top: -9px"><path d="M17 40L3 12a14 14 0 1 1 28 0z" fill="#FF3B5C" stroke="#05050A" stroke-width="4"/></svg>
-    <span class="hm-wheel-lbl">MINIJUEGOS</span>
-    <sc-if value="{{wheelReady}}" hint-placeholder-val="{{ true }}"><span class="hm-wheel-tag">{{gamesLeft}} GRATIS</span></sc-if>
   </a>
   <!-- your own player, in 3D, stepping out of the panel (the 2D figure only if 3D isn't available) -->
   <div style="position: absolute; left: 378px; top: 324px; width: 170px; height: 30px; margin-top: -22px; z-index: 1; pointer-events: none; border-radius: 50%; background: radial-gradient(closest-side, #22D3EE55, transparent)"></div>
@@ -280,7 +281,7 @@ class Component extends DCLogic {
       go_futbol: go('futbol'), href_futbol: href('futbol'),
       ready: String(ready), hasReady: ready > 0, achLabel: ready ? '¡Premios por reclamar!' : 'Supera retos con premio',
       heroRef: this.heroRef,
-      wheelReady: !!(window.AMJuice && window.AMJuice.daily.count() > 0), gamesLeft: String(window.AMJuice ? window.AMJuice.daily.count() : 0),
+      wheelReady: !!(window.AMJuice && window.AMJuice.daily.count() > 0), gamesLeft: String(window.AMJuice ? window.AMJuice.daily.count() : 0), mgSub: (window.AMJuice && window.AMJuice.daily.count() > 0) ? window.AMJuice.daily.count() + ' GRATIS HOY' : 'MAÑANA MÁS',
       openWheel: (e) => { if (e) e.preventDefault(); if (window.AMJuice) { window.AMJuice.wheel.open(); const re = () => { window.removeEventListener('am:wheel', re); this.forceUpdate(); }; window.addEventListener('am:wheel', re); } },
       heroTap: (e) => { if (e) { e.preventDefault(); e.stopPropagation(); } if (window.AMHero && window.AMHero.play) window.AMHero.play(); },
       hero3d: hero3d, hero2d: !hero3d,
