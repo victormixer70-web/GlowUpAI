@@ -21,7 +21,7 @@ body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 </style>
 </helmet>
-<section tabIndex="0" aria-label="Partido. Muévete con WASD o flechas, Espacio chuta o hace entrada, E pasa o cambia de jugador, F regatea o presiona, Mayúsculas esprinta" onKeyDown="{{onKeyDown}}" onKeyUp="{{onKeyUp}}" style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0D0D1A; color: #F4F4FA; font-family: Exo2, sans-serif; outline: none; user-select: none; -webkit-user-select: none">
+<section data-am-game="1" tabIndex="0" aria-label="Partido. Muévete con WASD o flechas, Espacio chuta o hace entrada, E pasa o cambia de jugador, F regatea o presiona, Mayúsculas esprinta" onKeyDown="{{onKeyDown}}" onKeyUp="{{onKeyUp}}" style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0D0D1A; color: #F4F4FA; font-family: Exo2, sans-serif; outline: none; user-select: none; -webkit-user-select: none">
   <canvas ref="{{canvasRef}}" width="844" height="390" style="position: absolute; left: 0; top: 0; width: 844px; height: 390px; display: block"></canvas>
   <div style="{{wxOverlay}}"></div>
   <sc-if value="{{no3d}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #CACAE0">Tu navegador no permite gráficos 3D (WebGL) en esta vista.</div></sc-if>

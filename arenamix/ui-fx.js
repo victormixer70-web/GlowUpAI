@@ -8,7 +8,8 @@
   if (!stage || !window.matchMedia) return;
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var GAME = /^#\/(Partido|Duelo|Baloncesto|Tenis|Voley)\b/;
-  var inGame = function () { return GAME.test(location.hash); };
+  // a game on screen, whichever screen holds it (ranked, casual, private, training...): no menu effects then
+  var inGame = function () { return GAME.test(location.hash) || !!(stage && stage.querySelector('[data-am-game]')); };
 
   var css = document.createElement('style');
   css.textContent = [
