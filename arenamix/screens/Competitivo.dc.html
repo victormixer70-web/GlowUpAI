@@ -49,7 +49,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .ko-sub{animation:koFade .4s .5s both}
 .ko-root{animation:koOut .45s 2.8s ease-in both}@keyframes koOut{to{transform:scale(1.35);filter:blur(4px)}}
 .ko-flash{opacity:0;animation:koFlash .5s 2.85s both}@keyframes koFlash{0%{opacity:0}60%{opacity:1}100%{opacity:1}}
-.em-rays{position:absolute;left:50%;top:50%;width:1400px;height:1400px;margin:-700px 0 0 -700px;background:repeating-conic-gradient(from 0deg,#FF5C8A14 0deg 9deg,transparent 9deg 22deg);animation:emRays 40s linear infinite;pointer-events:none;mask-image:radial-gradient(closest-side,#000,transparent);-webkit-mask-image:radial-gradient(closest-side,#000,transparent)}
+.em-rays{position:absolute;left:50%;top:50%;width:1400px;height:1400px;margin:-700px 0 0 -700px;background:repeating-conic-gradient(from 0deg,#FF5C8A14 0deg 8deg,transparent 10deg 22deg);animation:emRays 40s linear infinite;pointer-events:none;mask-image:radial-gradient(closest-side,#000,transparent);-webkit-mask-image:radial-gradient(closest-side,#000,transparent)}
 @keyframes emRays{to{rotate:360deg}}
 .em-blink{animation:emBlink 2.4s ease-in-out infinite}@keyframes emBlink{0%,100%{opacity:.2}50%{opacity:1}}
 .em-spot{animation:emSpot 3s ease-in-out infinite;transform-origin:50% 0}@keyframes emSpot{0%,100%{rotate:-3deg;opacity:.85}50%{rotate:3deg;opacity:1}}
@@ -82,7 +82,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 @keyframes rsStreak{from{transform:rotate(-14deg) translateX(-500px)}to{transform:rotate(-14deg) translateX(500px)}}
 .rs-vig{position:absolute;inset:0;background:radial-gradient(120% 110% at 40% 45%,transparent 50%,#000000b0 100%)}
 .rs-col>*:not(.rs-stage):not(.rs-rays){position:relative}
-.rs-rays{position:absolute;left:150px;top:200px;width:1300px;height:1300px;margin:-650px 0 0 -650px;opacity:.6;background:repeating-conic-gradient(from 0deg,var(--rc3) 0deg 8deg,transparent 8deg 20deg);animation:emRays 50s linear infinite;mask-image:radial-gradient(closest-side,#000,transparent);-webkit-mask-image:radial-gradient(closest-side,#000,transparent);pointer-events:none}
+.rs-rays{position:absolute;left:150px;top:200px;width:1300px;height:1300px;margin:-650px 0 0 -650px;opacity:.6;background:repeating-conic-gradient(from 0deg,var(--rc3) 0deg 7deg,transparent 9deg 20deg);animation:emRays 50s linear infinite;mask-image:radial-gradient(closest-side,#000,transparent);-webkit-mask-image:radial-gradient(closest-side,#000,transparent);pointer-events:none}
 .rs-spot{position:absolute;left:30px;top:-40px;width:240px;height:440px;background:linear-gradient(180deg,#FFFFFF30,#FFFFFF05 85%);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);filter:blur(4px);pointer-events:none}
 .rs-me{position:absolute;animation:rsMeIn .6s cubic-bezier(.2,1.4,.4,1) both}@keyframes rsMeIn{from{opacity:0;transform:translateY(40px) scale(.9)}}
 .rs-cup{animation:rsCup .7s .5s cubic-bezier(.2,1.8,.4,1) both}@keyframes rsCup{from{opacity:0;transform:scale(.2) rotate(-30deg)}}

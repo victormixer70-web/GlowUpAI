@@ -21,7 +21,7 @@
     // the wheel
     '.jc-wheel{position:absolute;inset:0;pointer-events:auto;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:40px;background:radial-gradient(55% 75% at 36% 50%,#3B1F7A,#16093A 60%,#05050A);animation:jcFade .25s both}',
     '@keyframes jcFade{from{opacity:0}}',
-    '.jc-wheel .rays{position:absolute;left:36%;top:50%;width:1300px;height:1300px;margin:-650px 0 0 -650px;background:repeating-conic-gradient(#FFC53D16 0 7deg,transparent 7deg 18deg);-webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent);animation:jcRays 24s linear infinite;pointer-events:none}',
+    '.jc-wheel .rays{position:absolute;left:36%;top:50%;width:1300px;height:1300px;margin:-650px 0 0 -650px;background:repeating-conic-gradient(#FFC53D16 0 6deg,transparent 8deg 18deg);-webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent);animation:jcRays 24s linear infinite;pointer-events:none}',
     '.jc-wheel.spinning .rays{animation-duration:3s}',
     '@keyframes jcRays{to{transform:rotate(360deg)}}',
     '.jc-wheel .stars i{position:absolute;width:4px;height:4px;border-radius:50%;background:#FFE38A;box-shadow:0 0 8px #FFC53D;animation:jcTw 2.4s ease-in-out infinite;pointer-events:none}',
@@ -51,7 +51,7 @@
     '.jc-wheel .close{align-self:flex-start;height:40px;padding:0 20px;border:0;border-radius:14px;background:#26264A;color:#F4F4FA;font:800 14px Exo2,sans-serif;box-shadow:inset 0 2px 0 #ffffff1c,inset 0 -3px 0 #0008,0 0 0 2px #05050A;cursor:pointer}',
     '.jc-wheel .won-card{position:absolute;left:50%;top:50%;width:300px;padding:20px 18px 18px;margin:-150px 0 0 -150px;box-sizing:border-box;z-index:5;display:flex;flex-direction:column;align-items:center;gap:6px;border-radius:26px;background:radial-gradient(120% 80% at 50% 0%,color-mix(in srgb,var(--wc) 55%,#1E1F45),#0E0E22 70%);box-shadow:0 0 0 3px #05050A,0 0 0 6px var(--wc),0 0 40px var(--wc),0 20px 40px #000c;animation:jcWin .6s cubic-bezier(.2,1.6,.4,1) both;overflow:hidden}',
     '@keyframes jcWin{from{transform:scale(.2) rotate(-12deg);opacity:0}}',
-    '.jc-wheel .won-card .wr{position:absolute;left:50%;top:40%;width:600px;height:600px;margin:-300px;background:repeating-conic-gradient(#ffffff1c 0 9deg,transparent 9deg 22deg);animation:jcRays 10s linear infinite;pointer-events:none}',
+    '.jc-wheel .won-card .wr{position:absolute;left:50%;top:40%;width:600px;height:600px;margin:-300px;background:repeating-conic-gradient(#ffffff1c 0 8deg,transparent 10deg 22deg);animation:jcRays 10s linear infinite;pointer-events:none}',
     '.jc-wheel .won-card .k{position:relative;font:800 12px Exo2,sans-serif;letter-spacing:2px;color:#FFFFFFcc}',
     '.jc-wheel .won-card img{position:relative;width:120px;height:120px;object-fit:contain;filter:drop-shadow(0 8px 10px #000a);animation:jcFloat 2s ease-in-out infinite}',
     '@keyframes jcFloat{50%{transform:translateY(-8px) rotate(4deg)}}',
