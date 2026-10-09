@@ -73,6 +73,8 @@ class Component extends DCLogic {
       { id: 'ar', code: 'AR', native: 'العربية', name: 'Árabe' },
       { id: 'tr', code: 'TR', native: 'Türkçe', name: 'Turco' }
     ];
+    // Japanese, Korean and Arabic are not offered
+    list.splice(0, list.length, ...list.filter((l) => ['ja', 'ko', 'ar'].indexOf(l.id) < 0));
     const picked = this.state.picked;
     const base = 'display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 6px 14px; box-sizing: border-box; border-radius: 14px; font-family: Exo2, sans-serif; text-align: left; cursor: pointer; ';
     // each language's flag, drawn as a small picture (3:2)
