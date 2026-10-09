@@ -12,14 +12,29 @@
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
+.cf-gear{position:absolute;pointer-events:none;opacity:.08;animation:cfSpin 40s linear infinite;will-change:transform}
+@keyframes cfSpin{to{transform:rotate(360deg)}}
+.cf-tile{position:relative;padding:9px 11px;border-radius:16px;display:flex;flex-direction:column;gap:7px;overflow:hidden;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 16%,#17172A),#121226 60%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ac) 35%,transparent),inset 0 2px 0 #ffffff10,0 6px 14px #0007}
+.cf-tile::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:4px;border-radius:0 3px 3px 0;background:var(--ac);box-shadow:0 0 10px var(--ac)}
+.cf-badge{flex:none;width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--ac) 22%,#0B0B14);box-shadow:inset 0 0 0 1.5px var(--ac),0 0 12px color-mix(in srgb,var(--ac) 45%,transparent);color:var(--ac)}
+.cf-eq{display:flex;align-items:flex-end;gap:2px;height:16px;margin-left:auto}
+.cf-eq i{width:3px;border-radius:2px;background:var(--ac);transform-origin:50% 100%;animation:cfEq .8s ease-in-out infinite alternate}
+@keyframes cfEq{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
+.cf-pick{transition:transform .2s cubic-bezier(.3,1.8,.5,1)}
+.cf-pick:active{transform:scale(.92)}
+.cf-on{animation:cfPop .35s cubic-bezier(.2,1.8,.4,1)}
+@keyframes cfPop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; overflow: hidden;  isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; display: flex; flex-direction: column; gap: 8px; padding: 10px 14px; box-sizing: border-box; user-select: none; -webkit-user-select: none">
   <div class="am-bg under"></div>
   <div class="bc-beams" style="z-index: -1"></div>
+  <svg class="cf-gear" width="260" height="260" viewBox="-50 -50 100 100" style="right: -70px; bottom: -80px"><path d="{{gearD}}" fill="#22D3EE"/></svg>
+  <svg class="cf-gear" width="150" height="150" viewBox="-50 -50 100 100" style="left: -40px; top: 120px; animation-direction: reverse; animation-duration: 26s"><path d="{{gearD}}" fill="#FF5CC8"/></svg>
   <div style="flex: none; display: flex; align-items: center; gap: 10px">
     <a href="{{backHref}}" aria-label="Volver" style="flex: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 20px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></a>
-    <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: .5px">CONFIGURACIÓN</span>
+    <svg width="26" height="26" viewBox="-50 -50 100 100" style="flex: none; animation: cfSpin 8s linear infinite; filter: drop-shadow(0 0 6px #22D3EE)"><path d="{{gearD}}" fill="#22D3EE"/><circle r="14" fill="#0B0B14"/></svg>
+    <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: .5px; text-shadow: 0 3px 0 #05050A, 0 0 16px #22D3EE55">CONFIGURACIÓN</span>
     <div role="tablist" style="margin-left: auto; display: flex; gap: 4px; padding: 4px; border-radius: 14px; background: #17172A">
       <button type="button" role="tab" aria-selected="{{playSel}}" onClick="{{tabPlay}}" style="{{playTab}}">JUGABILIDAD</button>
       <button type="button" role="tab" aria-selected="{{ctrlSel}}" onClick="{{tabCtrl}}" style="{{ctrlTab}}">CONTROLES</button>
@@ -28,14 +43,18 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{showPlay}}" hint-placeholder-val="{{ true }}">
     <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start">
       <sc-for list="{{opts}}" as="o" hint-placeholder-count="6">
-        <div class="bc-tile" style="padding: 9px 11px; border-radius: 14px; background: #17172A; border: 1px solid #26264A; display: flex; flex-direction: column; gap: 7px">
-          <div style="display: flex; flex-direction: column; gap: 2px">
-            <span style="font-size: 12px; font-weight: 800; letter-spacing: 1px">{{o.title}}</span>
-            <span style="font-size: 10.5px; line-height: 1.3; color: #A3A3C2">{{o.desc}}</span>
+        <div class="cf-tile" style="--ac: {{o.ac}}">
+          <div style="display: flex; align-items: center; gap: 9px; padding-left: 4px">
+            <span class="cf-badge"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="{{o.icon}}"/></svg></span>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+              <span style="font-size: 12px; font-weight: 800; letter-spacing: 1px">{{o.title}}</span>
+              <span style="font-size: 10px; line-height: 1.25; color: #A3A3C2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{o.desc}}</span>
+            </div>
+            <sc-if value="{{o.hasEq}}" hint-placeholder-val="{{ false }}"><span class="cf-eq" aria-hidden="true"><sc-for list="{{o.eq}}" as="q" hint-placeholder-count="5"><i style="{{q}}"></i></sc-for></span></sc-if>
           </div>
           <div role="radiogroup" aria-label="{{o.title}}" style="display: flex; gap: 5px">
             <sc-for list="{{o.choices}}" as="ch" hint-placeholder-count="3">
-              <button type="button" role="radio" aria-checked="{{ch.on}}" onClick="{{ch.pick}}" style="{{ch.style}}">{{ch.label}}</button>
+              <button type="button" role="radio" aria-checked="{{ch.on}}" onClick="{{ch.pick}}" class="{{ch.cls}}" style="{{ch.style}}">{{ch.label}}</button>
             </sc-for>
           </div>
         </div>
@@ -135,27 +154,35 @@ class Component extends DCLogic {
     const pl = s.play || {};
     // personal settings only: they change what you see, never the rules everybody plays by online
     const OPTS = [
-      { key: 'music', title: 'MÚSICA DE LOS MENÚS', desc: 'La música que suena fuera del partido.', choices: [[0.9, 'Alta'], [0.6, 'Media'], [0.3, 'Baja'], [0, 'No']] },
-      { key: 'sfx', title: 'EFECTOS DE SONIDO', desc: 'El balón, el árbitro, el público y los menús.', choices: [[1, 'Alta'], [0.8, 'Media'], [0.4, 'Baja'], [0, 'No']] },
-      { key: 'cam', title: 'CÁMARA DEL PARTIDO', desc: 'Pro: detrás de tu jugador, mirando a la portería rival.', choices: [['cerca', 'Cerca'], ['normal', 'Normal'], ['lejos', 'Lejos'], ['pro', 'Pro']] },
-      { key: 'gfx', title: 'CALIDAD GRÁFICA', desc: 'Auto: la baja sola si tu móvil va lento. Baja: menos nitidez, sin sombras.', choices: [['auto', 'Auto'], ['alta', 'Alta'], ['media', 'Media'], ['baja', 'Baja']] },
-      { key: 'names', title: 'NOMBRES SOBRE LOS JUGADORES', desc: 'Con No, solo ves el TÚ encima de tu jugador.', choices: [[true, 'Sí'], [false, 'No']] },
-      { key: 'passMark', title: 'INDICADOR DE PASE', desc: 'La flecha encima del compañero al que irá tu pase.', choices: [[true, 'Sí'], [false, 'No']] }
+      { key: 'music', ac: '#FF5CC8', icon: 'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0a3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0a3 3 0 0 1 6 0z', title: 'MÚSICA DE LOS MENÚS', desc: 'La música que suena fuera del partido.', choices: [[0.9, 'Alta'], [0.6, 'Media'], [0.3, 'Baja'], [0, 'No']] },
+      { key: 'sfx', ac: '#FFC53D', icon: 'M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14', title: 'EFECTOS DE SONIDO', desc: 'El balón, el árbitro, el público y los menús.', choices: [[1, 'Alta'], [0.8, 'Media'], [0.4, 'Baja'], [0, 'No']] },
+      { key: 'cam', ac: '#22D3EE', icon: 'M23 7l-7 5l7 5zM1 5h15v14H1z', title: 'CÁMARA DEL PARTIDO', desc: 'Pro: detrás de tu jugador, mirando a la portería rival.', choices: [['cerca', 'Cerca'], ['normal', 'Normal'], ['lejos', 'Lejos'], ['pro', 'Pro']] },
+      { key: 'gfx', ac: '#9B6BFF', icon: 'M12 2l2.4 7.4H22l-6.2 4.5l2.4 7.4L12 16.8l-6.2 4.5l2.4-7.4L2 9.4h7.6z', title: 'CALIDAD GRÁFICA', desc: 'Auto: la baja sola si tu móvil va lento. Baja: menos nitidez, sin sombras.', choices: [['auto', 'Auto'], ['alta', 'Alta'], ['media', 'Media'], ['baja', 'Baja']] },
+      { key: 'names', ac: '#53D88E', icon: 'M20 7H4v6h16zM12 13v8M8 21h8', title: 'NOMBRES SOBRE LOS JUGADORES', desc: 'Con No, solo ves el TÚ encima de tu jugador.', choices: [[true, 'Sí'], [false, 'No']] },
+      { key: 'passMark', ac: '#FF8A3D', icon: 'M5 12h14M13 6l6 6l-6 6', title: 'INDICADOR DE PASE', desc: 'La flecha encima del compañero al que irá tu pase.', choices: [[true, 'Sí'], [false, 'No']] }
     ];
-    const opts = OPTS.map((o) => ({
-      title: o.title, desc: o.desc,
-      choices: o.choices.map(([v, label]) => {
-        const on = pl[o.key] === v;
-        return {
-          label, on: on ? 'true' : 'false',
-          pick: () => this.savePlay({ ...pl, [o.key]: v }),
-          style: 'flex: 1; height: 32px; border-radius: 10px; cursor: pointer; font: 800 12px Exo2, sans-serif; ' + (on ? 'background: #22D3EE; color: #0B0B14; border: 0;' : 'background: transparent; color: #CACAE0; border: 1px solid #2E2E52;')
-        };
-      })
-    }));
-    const tabSt = (on) => 'height: 32px; padding: 0 14px; border-radius: 10px; border: 0; cursor: pointer; font: 800 12px Exo2, sans-serif; letter-spacing: .5px; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
+    const opts = OPTS.map((o) => {
+      // music and sounds: a little equaliser that dances as loud as the level you chose
+      const lvl = typeof pl[o.key] === 'number' ? pl[o.key] : 0, audio = o.key === 'music' || o.key === 'sfx';
+      return {
+        title: o.title, desc: o.desc, ac: o.ac, icon: o.icon, hasEq: audio && lvl > 0,
+        eq: [0.6, 1, 0.75, 0.9, 0.5].map((h, k) => 'height: ' + Math.round(16 * h * Math.max(0.35, lvl)) + 'px; animation-duration: ' + (0.45 + k * 0.13).toFixed(2) + 's; animation-delay: ' + (-k * 0.21).toFixed(2) + 's'),
+        choices: o.choices.map(([v, label]) => {
+          const on = pl[o.key] === v;
+          return {
+            label, on: on ? 'true' : 'false', cls: 'cf-pick' + (on ? ' cf-on' : ''),
+            pick: () => this.savePlay({ ...pl, [o.key]: v }),
+            style: 'flex: 1; height: 32px; border-radius: 10px; cursor: pointer; font: 800 12px Exo2, sans-serif; ' + (on ? 'background: linear-gradient(180deg, color-mix(in srgb, ' + o.ac + ' 70%, #fff), ' + o.ac + '); color: #0B0B14; border: 0; box-shadow: inset 0 2px 0 #fff8, 0 3px 0 color-mix(in srgb, ' + o.ac + ' 45%, #000), 0 0 12px ' + o.ac + '66;' : 'background: #0B0B1488; color: #CACAE0; border: 1px solid #2E2E52; box-shadow: 0 3px 0 #05050A;')
+          };
+        })
+      };
+    });
+    // a cog: 10 teeth round a ring
+    const gearD = (() => { let d = ''; for (let k = 0; k < 20; k++) { const a = k / 20 * Math.PI * 2, r = k % 2 ? 36 : 46, a2 = (k + 1) / 20 * Math.PI * 2; d += (k ? 'L' : 'M') + (Math.cos(a) * r).toFixed(1) + ' ' + (Math.sin(a) * r).toFixed(1) + 'L' + (Math.cos(a2) * r).toFixed(1) + ' ' + (Math.sin(a2) * r).toFixed(1); } return d + 'ZM22 0A22 22 0 1 0 -22 0A22 22 0 1 0 22 0Z'; })();
+    const tabSt = (on) => 'height: 32px; padding: 0 14px; border-radius: 10px; border: 0; cursor: pointer; font: 800 12px Exo2, sans-serif; letter-spacing: .5px; transition: background .25s; ' + (on ? 'background: linear-gradient(180deg, #9AF5FF, #22D3EE); color: #0B0B14; box-shadow: 0 3px 0 #0A6F80, 0 0 14px #22D3EE88;' : 'background: transparent; color: #CACAE0;');
     const play = s.tab === 'play';
     return {
+      gearD,
       showPlay: play, showCtrl: !play, playSel: play ? 'true' : 'false', ctrlSel: play ? 'false' : 'true',
       playTab: tabSt(play), ctrlTab: tabSt(!play),
       tabPlay: () => this.setState({ tab: 'play' }), tabCtrl: () => this.setState({ tab: 'ctrl' }),
