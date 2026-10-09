@@ -29,9 +29,17 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .st-plus1{position:absolute;right:52px;top:2px;font:800 16px 'Barlow Condensed',sans-serif;color:#FFC53D;text-shadow:0 0 8px #FFC53D;animation:stFloatUp .75s ease-out forwards;pointer-events:none}
 .st-bump{animation:stBump .35s ease-out}
 .st-ball{animation:stSpin 8s linear infinite}
-.st-holo{position:absolute;inset:0;background:conic-gradient(from var(--st-a,0deg) at 60% 40%,#ff00c855,#00e5ff55,#7dff6a55,#ffe60055,#ff00c855);mix-blend-mode:overlay;opacity:.3;animation:stHolo 6s linear infinite;pointer-events:none}
-@property --st-a{syntax:'<angle>';inherits:false;initial-value:0deg}
-@keyframes stHolo{to{--st-a:360deg}}
+.st-holo{position:absolute;top:-20%;bottom:-20%;left:-100%;width:300%;background:linear-gradient(115deg,transparent 30%,#ff00c826 38%,#00e5ff2e 44%,#7dff6a26 50%,#ffe6002e 56%,transparent 64%);animation:stHolo 5s ease-in-out infinite alternate;pointer-events:none}
+@keyframes stHolo{from{transform:translateX(-22%)}to{transform:translateX(22%)}}
+.st-rim{position:absolute;left:50%;top:50%;width:420px;height:420px;margin:-210px;animation:stSpin 4.5s linear infinite;will-change:transform}
+.st-tw{position:absolute;opacity:0;animation:stTw 2.6s ease-in-out infinite;pointer-events:none}
+@keyframes stTw{0%,100%{opacity:0;transform:scale(.3) rotate(0deg)}50%{opacity:1;transform:scale(1) rotate(90deg)}}
+.st-ember{position:absolute;bottom:0;width:4px;height:4px;border-radius:50%;opacity:0;animation:stEmber 3.4s linear infinite;pointer-events:none}
+@keyframes stEmber{0%{opacity:0;transform:translate(0,0)}15%{opacity:1}100%{opacity:0;transform:translate(var(--ex,8px),-210px)}}
+.st-turn{animation:stTurn .56s ease-in-out}
+@keyframes stTurn{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
+.st-hint{position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);white-space:nowrap;pointer-events:none;animation:stHint 3s ease-in-out infinite}
+@keyframes stHint{0%,100%{opacity:.55}50%{opacity:1}}
 .st-orbit{animation:stSpin 30s linear infinite;transform-origin:0 0}
 .st-spot{position:absolute;pointer-events:none;animation:stSpotPulse 4s ease-in-out infinite}
 @keyframes stSpotPulse{0%,100%{opacity:.75}50%{opacity:1}}
@@ -51,40 +59,93 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <!-- the card -->
   <h1 class="bc-title" style="position: absolute; left: 96px; top: 10px; margin: 0; font-size: 24px">MI JUGADOR</h1>
   <div class="st-ped" style="left: 112px; top: 262px; width: 176px; height: 176px"><i style="border: 3px dashed {{tierColor}}88"></i><i style="inset: 22px; border: 2px solid {{tierColor}}55; animation-direction: reverse; animation-duration: 9s"></i><i style="inset: 46px; background: radial-gradient(circle, {{tierColor}}66, transparent 70%); animation: none"></i></div>
-  <div onPointerMove="{{tiltMove}}" onPointerLeave="{{tiltLeave}}" style="position: absolute; left: 102px; top: 46px; width: 196px; height: 300px; perspective: 700px">
+  <!-- sparks rising from the pedestal, more of them the higher the tier -->
+  <div aria-hidden="true" style="position: absolute; left: 112px; top: 120px; width: 176px; height: 230px; pointer-events: none">
+    <sc-for list="{{embers}}" as="e" hint-placeholder-count="5"><i class="st-ember" style="{{e.style}}"></i></sc-for>
+  </div>
+  <div onPointerMove="{{tiltMove}}" onPointerLeave="{{tiltLeave}}" onClick="{{flipCard}}" role="button" aria-label="{{flipAria}}" style="position: absolute; left: 102px; top: 46px; width: 196px; height: 300px; perspective: 700px; cursor: pointer">
     <div key="{{cardKey}}" class="st-flip" style="position: relative; width: 196px; height: 300px">
       <div class="st-float" style="{{tiltStyle}}">
-        <div style="position: absolute; inset: -3px; clip-path: polygon(12% 0, 88% 0, 100% 7%, 100% 84%, 50% 100%, 0 84%, 0 7%); background: {{rimBg}}"></div>
+       <div class="{{turnClass}}" style="position: absolute; inset: 0">
+        <!-- glow behind the card -->
+        <div style="position: absolute; inset: 8px -6px -4px; clip-path: polygon(12% 0, 88% 0, 100% 7%, 100% 84%, 50% 100%, 0 84%, 0 7%); background: {{tierGlow}}; filter: blur(14px); opacity: .55"></div>
+        <!-- the foil rim: a band of light running round the edge -->
+        <div style="position: absolute; inset: -4px; clip-path: polygon(12% 0, 88% 0, 100% 7%, 100% 84%, 50% 100%, 0 84%, 0 7%); background: {{rimBg}}; overflow: hidden">
+          <i class="st-rim" style="background: conic-gradient(from 0deg, transparent 0deg, #FFFFFF 18deg, transparent 40deg, transparent 180deg, {{tierLight}} 200deg, transparent 222deg)"></i>
+        </div>
+        <sc-if value="{{front}}" hint-placeholder-val="{{ true }}">
         <div style="position: absolute; inset: 0; clip-path: polygon(12% 0, 88% 0, 100% 7%, 100% 84%, 50% 100%, 0 84%, 0 7%); background: {{cardBg}}; overflow: hidden">
+          <!-- sunburst behind the player, the tier's pattern and a huge ghost number -->
+          <div style="position: absolute; left: 132px; top: 96px; width: 420px; height: 420px; margin: -210px; background: repeating-conic-gradient({{cardInk}}1c 0 5deg, transparent 7deg 16deg); border-radius: 50%"></div>
           <div style="position: absolute; inset: 0; background: radial-gradient(120% 70% at 70% 18%, rgba(255,255,255,.55), transparent 55%)"></div>
-          <div style="position: absolute; inset: 0; background: repeating-linear-gradient(135deg, rgba(255,255,255,.08) 0 6px, transparent 6px 14px)"></div>
-          <!-- the player's crest behind the portrait -->
-          <svg width="150" height="150" viewBox="-50 -50 100 100" style="position: absolute; right: -14px; top: 12px; opacity: .22"><path d="M0 -46l38 14v26c0 26-16 44-38 52c-22-8-38-26-38-52v-26z" fill="none" stroke="{{cardInk}}" stroke-width="4"/><path d="M0 -24l7 14l15 2l-11 11l3 15l-14-7l-14 7l3-15l-11-11l15-2z" fill="{{cardInk}}"/></svg>
+          <div style="{{patternStyle}}"></div>
+          <span aria-hidden="true" style="position: absolute; right: -6px; top: 18px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 150px; line-height: 1; color: {{cardInk}}; opacity: .1; letter-spacing: -6px">{{num}}</span>
+          <span aria-hidden="true" style="position: absolute; right: 5px; top: 30px; writing-mode: vertical-rl; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 9px; letter-spacing: 4px; color: {{cardInk}}; opacity: .45">{{tier}} · ARENA MIX · {{season}}</span>
+          <!-- the player on a lit disc -->
+          <div style="position: absolute; left: 82px; top: 150px; width: 104px; height: 22px; border-radius: 50%; background: radial-gradient(closest-side, #FFFFFFAA, {{tierLight}}55 50%, transparent)"></div>
           <img src="{{cardImg}}" alt="" style="{{portrait}}">
           <sc-if value="{{noImg}}" hint-placeholder-val="{{ false }}">
-            <div style="position: absolute; right: 10px; top: 8px"><dc-import name="Avatar" primary="{{kitP}}" secondary="{{kitS}}" pattern="{{kitPat}}" shorts="{{kitSh}}" socks="{{kitSo}}" shoe="{{kitShoe}}" number="{{num}}" hat="band" hat-color="#22D3EE" face="none" w="92" hint-size="92px,163px"></dc-import></div>
+            <div style="position: absolute; right: 12px; top: 6px"><dc-import name="Avatar" primary="{{kitP}}" secondary="{{kitS}}" pattern="{{kitPat}}" shorts="{{kitSh}}" socks="{{kitSo}}" shoe="{{kitShoe}}" number="{{num}}" hat="band" hat-color="#22D3EE" face="none" w="92" hint-size="92px,163px"></dc-import></div>
           </sc-if>
-          <div style="position: absolute; left: 0; right: 0; top: 150px; height: 40px; background: linear-gradient(180deg, transparent, {{cardFade}})"></div>
+          <div style="position: absolute; left: 0; right: 0; top: 140px; height: 40px; background: linear-gradient(180deg, transparent, {{cardFade}})"></div>
           <div class="st-holo"></div>
           <div class="st-shine"></div>
+          <sc-for list="{{twinkles}}" as="t" hint-placeholder-count="4"><svg class="st-tw" width="12" height="12" viewBox="-6 -6 12 12" style="{{t.style}}"><path d="M0-6C.6-1.4 1.4-.6 6 0C1.4.6.6 1.4 0 6C-.6 1.4-1.4.6-6 0C-1.4-.6-.6-1.4 0-6z" fill="#FFFFFF"/></svg></sc-for>
+          <!-- rating, position, sport, number and level -->
           <div style="position: absolute; left: 14px; top: 14px; display: flex; flex-direction: column; align-items: center; color: {{cardInk}}">
             <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 50px; line-height: .85; text-shadow: 0 2px 0 rgba(255,255,255,.35)">{{overall}}</span>
             <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px">{{pos}}</span>
             <span style="width: 26px; height: 2px; margin: 4px 0; background: {{cardLine}}"></span>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{cardInk}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{sportPath}}"/></svg>
-            <span style="margin-top: 5px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 13px; padding: 0 5px; border: 1.5px solid {{cardInk}}; border-radius: 3px">{{num}}</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{cardInk}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{sportPath}}"/></svg>
+            <span style="margin-top: 5px; width: 30px; height: 33px; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: {{cardInk}}; color: {{tierLight}}; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; line-height: .9"><span style="font-size: 7px; letter-spacing: 1px">NV</span><span style="font-size: 14px">{{level}}</span></span>
           </div>
-          <div style="position: absolute; left: 14px; right: 14px; top: 174px; text-align: center; color: {{cardInk}}">
-            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid {{cardLine}}; padding-bottom: 3px">{{playerName}}</div>
-            <div style="display: grid; grid-template-columns: 1fr 1px 1fr; column-gap: 10px; margin-top: 5px; text-align: left">
-              <div style="display: flex; flex-direction: column"><sc-for list="{{miniL}}" as="m" hint-placeholder-count="3"><span style="font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; display: flex; gap: 6px"><b style="font-weight: 800; min-width: 26px; text-align: right">{{m.v}}</b>{{m.k}}</span></sc-for></div>
-              <span style="background: {{cardLine}}"></span>
-              <div style="display: flex; flex-direction: column"><sc-for list="{{miniR}}" as="m" hint-placeholder-count="3"><span style="font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; display: flex; gap: 6px"><b style="font-weight: 800; min-width: 26px; text-align: right">{{m.v}}</b>{{m.k}}</span></sc-for></div>
-            </div>
+          <!-- name ribbon across the card -->
+          <div style="position: absolute; left: -2px; right: -2px; top: 168px; height: 26px; clip-path: polygon(0 0, 100% 0, 96% 50%, 100% 100%, 0 100%, 4% 50%); background: linear-gradient(90deg, {{cardInk}}CC, {{cardInk}}, {{cardInk}}CC); display: flex; align-items: center; justify-content: center; gap: 6px">
+            <svg width="10" height="10" viewBox="-6 -6 12 12"><path d="M0-6L6 0L0 6L-6 0z" fill="{{tierLight}}"/></svg>
+            <span style="max-width: 140px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 19px; letter-spacing: 1.5px; color: {{tierLight}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{playerName}}</span>
+            <svg width="10" height="10" viewBox="-6 -6 12 12"><path d="M0-6L6 0L0 6L-6 0z" fill="{{tierLight}}"/></svg>
           </div>
+          <!-- six stats, each with a little bar -->
+          <div style="position: absolute; left: 16px; right: 16px; top: 200px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px 8px; color: {{cardInk}}">
+            <sc-for list="{{mini}}" as="m" hint-placeholder-count="6">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 2px">
+                <span style="display: flex; align-items: baseline; gap: 3px; font-family: 'Barlow Condensed', sans-serif; line-height: 1"><b style="font-size: 18px; font-weight: 800">{{m.v}}</b><span style="font-size: 11px; font-weight: 800; opacity: .8">{{m.k}}</span></span>
+                <span style="width: 100%; height: 3px; border-radius: 2px; background: {{cardLine}}; overflow: hidden"><span style="{{m.bar}}"></span></span>
+              </div>
+            </sc-for>
+          </div>
+          <!-- inner frame and the tier gem at the tip -->
+          <svg width="196" height="300" viewBox="0 0 196 300" style="position: absolute; inset: 0; pointer-events: none"><path d="M28 7H168L189 25V248L98 292L7 248V25Z" fill="none" stroke="{{cardInk}}" stroke-opacity=".3" stroke-width="1.5"/><path d="M98 254l9 9l-9 9l-9-9z" fill="{{cardInk}}"/><path d="M98 258l5 5l-5 5l-5-5z" fill="{{tierLight}}"/></svg>
+          <div style="{{glare}}"></div>
         </div>
+        </sc-if>
+        <!-- the back: your career so far -->
+        <sc-if value="{{back}}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; inset: 0; clip-path: polygon(12% 0, 88% 0, 100% 7%, 100% 84%, 50% 100%, 0 84%, 0 7%); background: {{backBg}}; overflow: hidden; color: #F4F4FA">
+          <div style="position: absolute; inset: 0; background: repeating-linear-gradient(45deg, {{tierLight}}10 0 2px, transparent 2px 12px)"></div>
+          <svg width="150" height="150" viewBox="-50 -50 100 100" style="position: absolute; left: 23px; top: 66px"><path d="M0 -46l38 14v26c0 26-16 44-38 52c-22-8-38-26-38-52v-26z" fill="{{tierLight}}" fill-opacity=".1"/></svg>
+          <div style="position: absolute; left: 0; right: 0; top: 16px; text-align: center">
+            <div style="font-size: 9px; font-weight: 800; letter-spacing: 3px; color: {{tierLight}}">FICHA DE CARRERA</div>
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 18px">{{playerName}}</div>
+          </div>
+          <div style="position: absolute; left: 18px; right: 18px; top: 62px; display: flex; flex-direction: column; gap: 4px">
+            <sc-for list="{{career}}" as="c" hint-placeholder-count="5">
+              <div style="display: flex; align-items: center; justify-content: space-between; height: 24px; padding: 0 9px; border-radius: 8px; background: #FFFFFF0F; box-shadow: inset 0 0 0 1px {{tierLight}}33">
+                <span style="font-size: 10.5px; font-weight: 800; color: #CACAE0">{{c.k}}</span>
+                <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; color: {{c.c}}">{{c.v}}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="position: absolute; left: 0; right: 0; top: 202px; text-align: center; font-family: 'Brush Script MT', 'Segoe Script', cursive; font-style: italic; font-size: 24px; color: {{tierLight}}; transform: rotate(-6deg)">{{signature}}</div>
+          <svg width="110" height="22" viewBox="0 0 110 22" style="position: absolute; left: 43px; top: 236px"><path d="{{barcode}}" stroke="#F4F4FA" stroke-opacity=".7"/></svg>
+          <div style="position: absolute; left: 0; right: 0; top: 260px; text-align: center; font-size: 7.5px; font-weight: 800; letter-spacing: 2px; color: #8686A6">{{serial}}</div>
+          <svg width="196" height="300" viewBox="0 0 196 300" style="position: absolute; inset: 0; pointer-events: none"><path d="M28 7H168L189 25V248L98 292L7 248V25Z" fill="none" stroke="{{tierLight}}" stroke-opacity=".45" stroke-width="1.5"/></svg>
+        </div>
+        </sc-if>
+       </div>
       </div>
     </div>
+    <span class="st-hint" style="{{hintStyle}}">{{hintText}}</span>
   </div>
   <span style="{{tierPill}}"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2l3 6.5l7 1l-5 5l1.2 7L12 18l-6.2 3.5L7 14.5l-5-5l7-1z" fill="currentColor"/></svg>{{tier}} · NV {{level}}</span>
 
@@ -303,7 +364,48 @@ class Component extends DCLogic {
     const PO = window.AMPosters, img = PO && PO.cardKey ? PO.get(PO.cardKey(), () => this.forceUpdate()) : '';
     const tl = this.tilt || { x: 0, y: 0 };
     const mini = def.stats.map((d) => ({ k: d.k, v: String(Math.round(shown(d.id))) }));
+    // the card's dressing grows with the tier: more sparkle, more sparks, a richer pattern
+    const tierN = ['BRONCE', 'PLATA', 'ORO', 'ESTRELLA', 'LEYENDA'].indexOf(tr[1]);
+    const ink = tr[4];
+    const PAT = [
+      'repeating-linear-gradient(135deg, rgba(255,255,255,.08) 0 6px, transparent 6px 14px)',
+      'repeating-linear-gradient(45deg, rgba(255,255,255,.1) 0 1px, transparent 1px 9px), repeating-linear-gradient(-45deg, rgba(255,255,255,.1) 0 1px, transparent 1px 9px)',
+      'radial-gradient(circle, rgba(255,255,255,.22) 1.2px, transparent 1.8px) 0 0 / 10px 10px, radial-gradient(circle, rgba(255,255,255,.12) 1.2px, transparent 1.8px) 5px 5px / 10px 10px',
+      'radial-gradient(circle, rgba(255,255,255,.5) 1px, transparent 1.6px) 0 0 / 23px 19px, radial-gradient(circle, rgba(255,255,255,.3) 1px, transparent 1.6px) 11px 9px / 17px 23px',
+      'linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px) 0 0 / 16px 16px, linear-gradient(0deg, rgba(255,255,255,.12) 1px, transparent 1px) 0 0 / 16px 16px'][Math.max(0, tierN)];
+    const TW = [[150, 30], [30, 128], [176, 120], [118, 58], [62, 238], [140, 236], [20, 70], [170, 196]];
+    const nTw = 2 + Math.max(0, tierN) * 1.5 | 0, nEm = 3 + Math.max(0, tierN) * 2;
+    const C = window.AMProgress && window.AMProgress.career ? window.AMProgress.career() : { played: 0, won: 0, goals: 0, best: 0 };
+    const name = (window.AMOnline ? window.AMOnline.myName() : 'Jugador');
+    let hsh = 7; for (const ch of name) hsh = (hsh * 31 + ch.charCodeAt(0)) >>> 0;
+    let bars = '', bx = 2, hb = hsh;
+    while (bx < 106) { const w = 1 + (hb & 1); bars += 'M' + bx + ' 0V22' + (w > 1 ? 'M' + (bx + 1) + ' 0V22' : ''); bx += w + 1 + ((hb >> 1) & 3); hb = (hb * 1103515245 + 12345) >>> 0; }
+    const season = 'T' + (Math.max(0, Math.floor((Date.now() - Date.UTC(2026, 9, 1)) / (30 * 864e5))) + 1);
     return {
+      front: !this.back, back: !!this.back, turnClass: this.turning ? 'st-turn' : '',
+      flipAria: this.back ? 'Ver la cara de la carta' : 'Dar la vuelta a la carta',
+      flipCard: () => {
+        if (this.turning) return;
+        this.turning = true; this.forceUpdate();
+        if (window.AMSfx && window.AMSfx.tick) window.AMSfx.tick();
+        setTimeout(() => { this.back = !this.back; this.forceUpdate(); }, 280);
+        setTimeout(() => { this.turning = false; this.forceUpdate(); }, 570);
+      },
+      hintText: '↻', hintStyle: 'right: -12px; left: auto; bottom: auto; top: 6px; transform: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; color: #0B0B14; background: ' + tr[2] + '; box-shadow: 0 0 0 2px #0B0B14, 0 0 12px ' + tr[5] + ';',
+      tierGlow: tr[5], tierLight: tr[2], season,
+      patternStyle: 'position: absolute; inset: 0; background: ' + PAT + ';',
+      twinkles: TW.slice(0, nTw).map((q, k) => ({ style: 'left: ' + q[0] + 'px; top: ' + q[1] + 'px; animation-delay: ' + (-k * 0.73).toFixed(2) + 's; animation-duration: ' + (2.2 + (k % 3) * 0.5).toFixed(1) + 's;' })),
+      embers: Array.from({ length: nEm }, (_, k) => ({ style: 'left: ' + (20 + (k * 37) % 140) + 'px; background: ' + (k % 2 ? tr[2] : '#FFFFFF') + '; box-shadow: 0 0 6px ' + tr[5] + '; --ex: ' + ((k % 3) - 1) * 14 + 'px; animation-delay: ' + (-k * 0.61).toFixed(2) + 's; animation-duration: ' + (2.8 + (k % 4) * 0.45).toFixed(2) + 's;' })),
+      glare: 'position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at ' + (50 + tl.x * 45).toFixed(0) + '% ' + (40 + tl.y * 45).toFixed(0) + '%, rgba(255,255,255,.4), transparent 42%); opacity: ' + (this.tilt ? 1 : 0) + '; transition: opacity .3s',
+      backBg: 'linear-gradient(160deg, #1D1D3C 0%, #0D0D1C 60%, ' + tr[5] + '66 100%)',
+      career: [
+        { k: 'PARTIDOS', v: String(C.played), c: '#F4F4FA' },
+        { k: 'VICTORIAS', v: String(C.won), c: '#53D88E' },
+        { k: '% VICTORIAS', v: C.played ? Math.round(C.won / C.played * 100) + '%' : '—', c: tr[2] },
+        { k: 'GOLES', v: String(C.goals), c: '#FFC53D' },
+        { k: 'MEJOR RACHA', v: String(C.best || 0), c: '#FF7A59' }],
+      signature: name, barcode: bars,
+      serial: 'AM-' + season + '-' + def.num + '-' + String(hsh % 10000).padStart(4, '0'),
       spotStyle: 'left: 40px; top: -40px; width: 320px; height: 440px; background: radial-gradient(50% 60% at 50% 55%, ' + tr[5] + '33, transparent 70%), conic-gradient(from 160deg at 50% 0%, transparent 0deg, rgba(255,255,255,.07) 14deg, rgba(255,255,255,.11) 20deg, rgba(255,255,255,.07) 26deg, transparent 40deg);',
       watermark: 'position: absolute; right: 18px; bottom: -22px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 150px; line-height: 1; letter-spacing: 4px; color: ' + tr[5] + '; opacity: .05; pointer-events: none; white-space: nowrap',
       tiltMove: (e) => {
@@ -312,7 +414,7 @@ class Component extends DCLogic {
         this.forceUpdate();
       },
       tiltLeave: () => { this.tilt = null; this.forceUpdate(); },
-      tiltStyle: 'position: absolute; inset: 0; filter: drop-shadow(0 12px 20px ' + tr[5] + '66); transform: rotateY(' + (tl.x * 14).toFixed(1) + 'deg) rotateX(' + (-tl.y * 10).toFixed(1) + 'deg); transition: transform ' + (this.tilt ? '.08s' : '.6s') + ' ease-out; transform-style: preserve-3d',
+      tiltStyle: 'position: absolute; inset: 0; transform: rotateY(' + (tl.x * 14).toFixed(1) + 'deg) rotateX(' + (-tl.y * 10).toFixed(1) + 'deg); transition: transform ' + (this.tilt ? '.08s' : '.6s') + ' ease-out; transform-style: preserve-3d',
       rimBg: 'linear-gradient(160deg, #FFFFFF, ' + tr[5] + ' 40%, ' + tr[2] + ' 60%, #FFFFFF)',
       cardImg: img, noImg: !img,
       portrait: 'position: absolute; right: -12px; top: 4px; width: 150px; height: 190px; object-fit: cover; object-position: 50% 0%; filter: drop-shadow(0 6px 8px rgba(0,0,0,.45)); opacity: ' + (img ? 1 : 0) + '; transition: opacity .5s',
@@ -329,7 +431,7 @@ class Component extends DCLogic {
       sportUpper: def.label.toUpperCase(),
       tier: tr[1], tierColor: tr[2], cardBg: tr[3], cardInk: tr[4], cardGlow: tr[5] + '66', cardLine: tr[4] + '44',
       tierPill: 'position: absolute; left: 200px; top: 356px; transform: translateX(-50%) skewX(0deg); display: flex; align-items: center; gap: 6px; white-space: nowrap; padding: 4px 16px; background: linear-gradient(90deg, ' + tr[5] + '33, #0B0B14E6); box-shadow: inset 0 0 0 1px ' + tr[5] + ', 0 0 14px ' + tr[5] + '55; color: ' + tr[2] + '; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 1.5px;',
-      mini: def.stats.map((d) => ({ k: d.k, v: String(Math.round(shown(d.id))) })),
+      mini: def.stats.map((d) => ({ k: d.k, v: String(Math.round(shown(d.id))), bar: 'display: block; height: 100%; border-radius: 2px; background: ' + ink + '; width: ' + Math.max(4, (shown(d.id) - 10) / 140 * 100).toFixed(0) + '%' })),
       kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#0B0B14', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#17172A', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE',
       grid1: ring(1 / 3), grid2: ring(2 / 3), grid3: ring(1),
       axes: def.stats.map((d, k) => ({ x: (Math.cos(ang(k)) * R).toFixed(1), y: (Math.sin(ang(k)) * R).toFixed(1), lx: (Math.cos(ang(k)) * (R + 22)).toFixed(1), ly: (Math.sin(ang(k)) * (R + 18)).toFixed(1), k: d.k + ' ' + Math.round(shown(d.id)), c: this.tierOf(stats[d.id])[2] })),

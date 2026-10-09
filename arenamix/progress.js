@@ -310,6 +310,11 @@
     var W = weekly(), w0 = W.wins;
     if (won) { W.wins++; saveWeekly(W); }
     var W2 = weekly();
+    // the career tally on the back of the player card (Perfil)
+    var C = get('arenamix.career.v1', { played: 0, won: 0, goals: 0, streak: 0, best: 0 });
+    C.played++; C.goals += goals || 0;
+    if (won) { C.won++; C.streak++; C.best = Math.max(C.best, C.streak); } else C.streak = 0;
+    put('arenamix.career.v1', C);
     // daily missions
     var M = get('arenamix.missions.v1', null); missions(); M = get('arenamix.missions.v1', null);
     var add = { played: 1, won: won ? 1 : 0, goals: goals, shots: st.shots || 0, passes: st.passes || 0, skills: st.skills || 0, tackles: st.tackles || 0, clean: kind === 'team' && !info.away ? 1 : 0 };
@@ -345,6 +350,7 @@
       var W = weekly(), P = pass(), M = missions();
       return { week: W.milestones.filter(function (m) { return m.reached && !m.claimed; }).length, pass: P.ready, missions: M.list.filter(function (m) { return m.done && !m.claimed; }).length };
     }, xp: xp, levelOf: levelOf, level: function () { return levelOf(xp()); },
+    career: function () { return get('arenamix.career.v1', { played: 0, won: 0, goals: 0, streak: 0, best: 0 }); },
     weekly: weekly, claim: claim, missions: missions, claimMission: claimMission, recordMatch: recordMatch,
     items: ITEMS, itemPic: itemPic, milestones: MILESTONES,
     pass: pass, claimPass: claimPass, claimAllPass: claimAllPass, buyPremium: buyPremium, addPassXp: addPassXp
