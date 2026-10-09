@@ -318,8 +318,14 @@ class Component extends DCLogic {
         if (N.host) {
           // a player who drops out is played by the AI from then on
           const h = N.humans.find((x) => x.id === from);
-          if (h) { N.humans = N.humans.filter((x) => x !== h); this.flashMsg(h.name + ' se ha desconectado', 2); }
-        } else { this.flashMsg('El anfitrión ha salido de la sala', 3); if (g.phase === 'play' || g.phase === 'goal') this.setupWinners(); }
+          if (h) {
+            N.humans = N.humans.filter((x) => x !== h);
+            // the whole rival side has left: the match is won by forfeit
+            if (h.team === 1 && !N.humans.some((x) => x.team === 1)) this.forfeitWin(h.name);
+            else this.flashMsg(h.name + ' se ha desconectado', 2);
+          }
+        } else if (N.mirror) this.forfeitWin('El anfitrión');
+        else { this.flashMsg('El anfitrión ha salido de la sala', 3); if (g.phase === 'play' || g.phase === 'goal') this.setupWinners(); }
         return;
       }
       if (kind !== 'msg' || !m) return;
@@ -434,6 +440,7 @@ class Component extends DCLogic {
     return Math.max(1, Math.min(4, Number(this.props.teamSize ?? 3)));
   }
   newGame() {
+    this.forfeit = false;
     // gameplay settings (Configuración > Jugabilidad)
     this.play = window.AMPlay ? window.AMPlay() : { cam: 'normal', names: true, gfx: 'alta', passMark: true };
     const P = this.props, n = this.size(), dur = P.practice ? 9999 : Number(P.duration ?? 90);
@@ -475,7 +482,7 @@ class Component extends DCLogic {
       // everyone else in the room plays a player of their own on the host's phone
       this.net.humans = (O.roster || []).filter((r) => r.id !== this.net.me).map((r) => {
         const i = ps.findIndex((p) => p.team === r.team && p.slot === r.slot && p.role !== 'gk');
-        return { id: r.id, name: r.name, home: i, i, inp: [0, 0], sprint: false, press: false, charging: false, charge: 0, q: [] };
+        return { id: r.id, name: r.name, team: r.team, home: i, i, inp: [0, 0], sprint: false, press: false, charging: false, charge: 0, q: [] };
       }).filter((h) => h.i >= 0);
       this.netListen();
     } else if (this.net) this.netListen();
@@ -620,6 +627,18 @@ class Component extends DCLogic {
     if (this.raf) return;
     this.last = performance.now();
     this.raf = requestAnimationFrame(this.tick);
+  }
+  // a rival walks out mid-match: straight to the end, and it counts as a win (3-0 unless you were already winning by more)
+  forfeitWin(name) {
+    const g = this.g;
+    if (!g || g.phase === 'winners' || g.phase === 'end' || this.forfeit) return;
+    this.forfeit = true;
+    if (g.score[0] - g.score[1] < 3) g.score = [Math.max(3, g.score[1] + 3), g.score[1]];
+    this.flashMsg((name || 'Tu rival') + ' ha abandonado · ¡VICTORIA!', 3);
+    this.setupWinners();
+    if (this.net && this.net.host && this.net.room.count()) this.hostSend(1);
+    if (this.forceUpdate) this.forceUpdate();
+    if (!this.raf) { this.last = performance.now(); this.raf = requestAnimationFrame(this.tick); }
   }
   setupWinners() {
     // end of match: the winning team lines up on the pitch to celebrate (both teams if it is a draw)
@@ -3546,12 +3565,12 @@ class Component extends DCLogic {
           rankStyle: 'display: flex; align-items: center; gap: 4px; padding: 1px 7px; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; background: #0B0B14D9; color: ' + (rk ? rk.color : '#FFFFFF') + ';'
         };
       }),
-      endText: won ? '¡VICTORIA!' : lost ? 'DERROTA' : 'EMPATE',
+      endText: this.forfeit ? '¡VICTORIA POR ABANDONO!' : won ? '¡VICTORIA!' : lost ? 'DERROTA' : 'EMPATE',
       endStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 2px; color: ' + (won ? '#22D3EE' : lost ? '#FF5C5C' : '#F4F4FA') + ';',
       finishLabel: P.onEnd ? 'CONTINUAR' : 'JUGAR OTRA VEZ',
       start: () => this.start(),
       finish: () => {
-        if (P.onEnd) P.onEnd({ home: g.score[0], away: g.score[1], stats: this.mstats });
+        if (P.onEnd) P.onEnd({ home: g.score[0], away: g.score[1], stats: this.mstats, forfeit: !!this.forfeit });
         else {
           if (this.confetti) { this.S.remove(this.confetti); this.confetti = null; }
           this.winCam = false;
