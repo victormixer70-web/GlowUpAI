@@ -13,6 +13,8 @@ body{margin:0}
 @keyframes psWiggle{0%,60%,100%{rotate:0deg;scale:1}66%{rotate:-8deg;scale:1.1}74%{rotate:7deg;scale:1.12}82%{rotate:-4deg}90%{rotate:0deg;scale:1}}
 @keyframes psPulse{0%,100%{box-shadow:0 0 0 0 #FFC53D88}50%{box-shadow:0 0 0 6px #FFC53D00}}
 @keyframes psSheen{from{background-position:-200% 0}to{background-position:200% 0}}
+@keyframes psSwayL{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(8deg)}}
+@keyframes psSwayR{0%,100%{transform:rotate(14deg)}50%{transform:rotate(-8deg)}}
 @keyframes psIn{from{opacity:0;translate:0 14px}to{opacity:1;translate:0 0}}
 .ps-track{scrollbar-width:none;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
 .ps-track::-webkit-scrollbar{display:none}
@@ -21,12 +23,30 @@ body{margin:0}
 .ps-card.rdy{cursor:pointer}
 .ps-card.rdy:active{translate:0 2px}
 .ps-claim{animation:psPulse 1.4s infinite}
+.ps-conf{position:absolute;top:-14px;width:6px;height:10px;border-radius:2px;opacity:0;animation:psFall var(--d,7s) linear infinite;will-change:transform,opacity;pointer-events:none}
+@keyframes psFall{0%{opacity:0;transform:translate(0,0) rotate(0)}10%{opacity:.85}100%{opacity:0;transform:translate(var(--dx,20px),420px) rotate(var(--r,540deg))}}
+.ps-mark{position:absolute;right:-20px;bottom:-40px;font:800 italic 260px/1 'Barlow Condensed',sans-serif;color:transparent;-webkit-text-stroke:2px #FFC53D1c;pointer-events:none;letter-spacing:-8px}
+.ps-spot{position:absolute;top:-40px;width:240px;height:460px;transform-origin:50% 0;background:linear-gradient(180deg,#FF8A3D2e,transparent 80%);clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);pointer-events:none;will-change:transform}
+.ps-band{position:absolute;left:0;right:0;top:170px;bottom:0;border-radius:14px;background:linear-gradient(180deg,#FFC53D14,#FF8A3D0a);box-shadow:inset 0 1px 0 #FFC53D33;overflow:hidden;pointer-events:none}
+.ps-band::after{content:"";position:absolute;top:0;bottom:0;width:180px;left:-200px;background:linear-gradient(100deg,transparent,#FFE38A1f,transparent);animation:psBand 5s ease-in-out infinite}
+@keyframes psBand{0%,40%{transform:translateX(0)}100%{transform:translateX(3400px)}}
+.ps-ball{position:absolute;top:138px;width:26px;height:26px;margin-left:-13px;z-index:3;pointer-events:none;filter:drop-shadow(0 0 8px #FFC53D)}
+.ps-ball svg{animation:psRoll 2s linear infinite}
+@keyframes psRoll{to{transform:rotate(360deg)}}
+.ps-star{position:absolute;left:50%;top:132px;width:70px;height:70px;margin-left:-35px;border-radius:50%;background:repeating-conic-gradient(#FFC53D66 0 10deg,transparent 14deg 30deg);-webkit-mask-image:radial-gradient(closest-side,#000 20%,transparent);mask-image:radial-gradient(closest-side,#000 20%,transparent);animation:psRoll 10s linear infinite;pointer-events:none;z-index:0}
+.ps-crown{animation:psCrown 2.4s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes psCrown{0%,100%{transform:rotate(-6deg) translateY(0)}50%{transform:rotate(6deg) translateY(-3px)}}
+.ps-card{transition:transform .2s cubic-bezier(.3,1.8,.5,1)}
+.ps-card:hover{transform:translateY(-3px)}
 .ps-gold{background:linear-gradient(110deg,#FFC53D 0%,#FFE9A8 45%,#FFC53D 55%,#E39B12 100%);background-size:200% 100%;animation:psSheen 3s linear infinite}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <div class="am-bg"></div>
   <div style="position: absolute; inset: 0; background: radial-gradient(60% 70% at 85% 110%, #FF8A3D30, transparent 70%), radial-gradient(50% 60% at 40% -10%, #FFC53D1c, transparent 70%); pointer-events: none"></div>
+  <span class="ps-mark" aria-hidden="true">T{{season}}</span>
+  <div class="ps-spot" style="left: 260px; animation: psSwayL 8s ease-in-out infinite"></div><div class="ps-spot" style="left: 600px; animation: psSwayR 10s ease-in-out infinite"></div>
+  <sc-for list="{{confetti}}" as="k" hint-placeholder-count="0"><i class="ps-conf" style="{{k}}"></i></sc-for>
   <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; height: 390px; z-index: 3"><dc-import name="Nav" active="tienda" hint-size="80px,390px"></dc-import></div>
   <div style="position: absolute; left: 80px; top: 0; right: 0; bottom: 0; padding: 10px 16px 10px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
     <!-- header: season, your pass level, premium -->
@@ -61,7 +81,7 @@ body{margin:0}
         </div>
         <div style="height: 38px"></div>
         <div style="{{premLabel}}">
-          <svg width="28" height="28" viewBox="0 0 24 24"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z" fill="#FFC53D" stroke="#7A4E0E" stroke-width="1.2" stroke-linejoin="round"/><circle cx="12" cy="5" r="1.6" fill="#FFE9A8"/><circle cx="3" cy="8" r="1.4" fill="#FFE9A8"/><circle cx="21" cy="8" r="1.4" fill="#FFE9A8"/></svg>
+          <svg class="ps-crown" width="28" height="28" viewBox="0 0 24 24"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z" fill="#FFC53D" stroke="#7A4E0E" stroke-width="1.2" stroke-linejoin="round"/><circle cx="12" cy="5" r="1.6" fill="#FFE9A8"/><circle cx="3" cy="8" r="1.4" fill="#FFE9A8"/><circle cx="21" cy="8" r="1.4" fill="#FFE9A8"/></svg>
           <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; color: #FFE38A">PREMIUM</span>
           <sc-if value="{{notPremium}}" hint-placeholder-val="{{ true }}">
             <button type="button" onClick="{{openBuy}}" class="ps-gold" style="height: 30px; border: 0; padding: 0 8px; transform: skewX(0deg); color: #2A1C02; font: 800 14px 'Barlow Condensed', sans-serif; letter-spacing: .5px; cursor: pointer">{{price}}</button>
@@ -73,10 +93,13 @@ body{margin:0}
       <div class="ps-track" onPointerDown="{{dragDown}}" onPointerMove="{{dragMove}}" onPointerUp="{{dragUp}}" onPointerCancel="{{dragUp}}" style="flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; position: relative; touch-action: pan-x">
         <div style="position: relative; width: {{trackW}}px; height: 100%">
           <!-- the progress line, through the level badges -->
+          <div class="ps-band"></div>
           <div style="position: absolute; left: 0; right: 0; top: 147px; height: 8px; background: #22223F; box-shadow: inset 0 1px 2px #000a"></div>
           <div style="{{lineFill}}"></div>
+          <span class="ps-ball" style="left: {{ballX}}px"><svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#FFFFFF" stroke="#0B0B14" stroke-width="1.6"/><path d="M12 7l3.4 2.5l-1.3 4h-4.2l-1.3-4z" fill="#0B0B14"/><path d="M12 7V3M15.4 9.5l3.8-1.2M14.1 13.5l2.3 3.3M9.9 13.5l-2.3 3.3M8.6 9.5L4.8 8.3" stroke="#0B0B14" stroke-width="1.3"/></svg></span>
           <sc-for list="{{cols}}" as="c" hint-placeholder-count="8">
             <div style="{{c.colStyle}}">
+              <sc-if value="{{c.big}}" hint-placeholder-val="{{ false }}"><i class="ps-star"></i></sc-if>
               <div class="{{c.f.cls}}" onClick="{{c.f.tap}}" style="{{c.f.card}}">
                 <span style="{{c.f.tag}}">{{c.f.tagText}}</span>
                 <img src="{{c.f.img}}" alt="" style="{{c.f.imgStyle}}">
@@ -185,14 +208,17 @@ class Component extends DCLogic {
     const cols = S.free.map((f, i) => {
       const lv = i + 1, reached = S.level >= lv, big = lv % 5 === 0;
       return {
-        lv: String(lv), f: cell(f, false), p: cell(S.prem[i], true),
+        lv: String(lv), f: cell(f, false), p: cell(S.prem[i], true), big,
         colStyle: 'position: absolute; left: ' + (i * COLW + 4) + 'px; top: 0; width: 92px; display: flex; flex-direction: column; align-items: center; gap: 0',
         badge: 'position: relative; z-index: 2; margin: 2px 0; width: ' + (big ? 34 : 28) + 'px; height: 34px; display: flex; align-items: center; justify-content: center; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: ' + (big ? 19 : 16) + 'px; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); ' + (reached ? 'background: linear-gradient(180deg, #FFE38A, #FFC53D); color: #2A1C02;' : S.level + 1 === lv ? 'background: #FF8A3D; color: #0B0B14;' : 'background: #2A2A4A; color: #8686A6;')
       };
     });
     const fillTo = S.level >= 30 ? 30 * COLW : S.level * COLW - COLW / 2 + (S.into / S.need) * COLW;
+    const CC = ['#FFC53D', '#FF8A3D', '#FFE38A', '#FF5C8A', '#22D3EE'];
+    const confetti = Array.from({ length: 14 }, (_, k) => 'left: ' + (90 + (k * 53) % 740) + 'px; background: ' + CC[k % CC.length] + '; --d: ' + (6 + (k % 5) * 1.3).toFixed(1) + 's; --dx: ' + ((k % 2 ? -1 : 1) * (14 + k * 3)) + 'px; --r: ' + (360 + k * 60) + 'deg; animation-delay: ' + (-k * 0.9).toFixed(1) + 's');
     const fmtDays = (n) => n === 1 ? '1 DÍA' : n + ' DÍAS';
     return {
+      confetti, ballX: String(Math.max(6, fillTo).toFixed(0)),
       season: String(S.season), days: fmtDays(S.daysLeft), level: String(S.level), price: S.price,
       levelText: S.level >= 30 ? '¡PASE COMPLETADO!' : 'NIVEL ' + S.level + ' → ' + (S.level + 1),
       xpText: S.level >= 30 ? '' : S.into + ' / ' + S.need + ' XP',
