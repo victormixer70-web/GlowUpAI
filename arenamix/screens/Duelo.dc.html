@@ -219,14 +219,21 @@ class Component extends DCLogic {
     this.raf = requestAnimationFrame(this.tick);
   }
   tick(now) {
-    const dt = Math.min(0.033, Math.max(0, (now - this.last) / 1000));
+    // real time even on a slow phone: a long frame is split in small steps instead of slowing the game down
+    const raw = Math.max(0, (now - this.last) / 1000), dt = Math.min(0.1, raw);
     this.last = now;
     this.clockT = (this.clockT || 0) + dt;
     if (this.replaying) this.replayStep(dt);
     else {
-      for (let i = 0; i < 4; i++) this.step(dt / 4);
+      const n = Math.max(4, Math.ceil(dt / 0.008));
+      for (let i = 0; i < n; i++) this.step(dt / n);
       this.recFrame(this.clockT);
     }
+    // still slow after the first frames of a shot: draw at a lower resolution
+    if (this.R && raw > 0.05 && raw < 0.5 && this.gfx !== 'alta') {
+      this.slowN = (this.slowN || 0) + 1;
+      if (this.slowN > 12) { this.slowN = 0; const pr = this.R.getPixelRatio(); if (pr > 0.75) { this.R.setPixelRatio(Math.max(0.75, pr - 0.25)); this.R.setSize(844, 390, false); } }
+    } else if (raw <= 0.05) this.slowN = 0;
     this.camT = (this.camT || 0) + dt;
     this.draw3D(dt);
     this.forceUpdate();
@@ -479,12 +486,14 @@ class Component extends DCLogic {
     if (typeof THREE === 'undefined' || this.R) { if (typeof THREE === 'undefined') this.no3d = true; return; }
     const T = THREE;
     let R;
-    try { R = new T.WebGLRenderer({ canvas: this.cv, antialias: true }); } catch (e) { this.no3d = true; return; }
-    const gfx = (window.AMPlay ? window.AMPlay() : {}).gfx || 'alta';
-    R.setPixelRatio(Math.min(gfx === 'alta' ? 2 : gfx === 'media' ? 1.5 : 1, window.devicePixelRatio || 1));
+    // lighter on phones: 'auto' (the default) and 'baja' draw without shadows or edge smoothing
+    const gfx = (window.AMPlay ? window.AMPlay() : {}).gfx || 'auto';
+    try { R = new T.WebGLRenderer({ canvas: this.cv, antialias: gfx === 'alta', powerPreference: 'high-performance' }); } catch (e) { this.no3d = true; return; }
+    R.setPixelRatio(Math.min(gfx === 'alta' ? 2 : gfx === 'media' ? 1.5 : 1.25, window.devicePixelRatio || 1));
     R.setSize(844, 390, false);
-    R.shadowMap.enabled = gfx !== 'baja';
-    R.shadowMap.type = T.PCFSoftShadowMap;
+    R.shadowMap.enabled = gfx === 'alta' || gfx === 'media';
+    R.shadowMap.type = T.PCFShadowMap;
+    this.gfx = gfx;
     R.outputEncoding = T.sRGBEncoding;
     R.toneMapping = T.ACESFilmicToneMapping;
     R.toneMappingExposure = 1.1;

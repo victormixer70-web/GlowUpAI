@@ -49,9 +49,10 @@ body{margin:0}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
-  <div class="am-arena" aria-hidden="true" style="z-index: -1"><i class="aa-pitch"></i><i class="aa-beam" style="left: 18%"></i><i class="aa-beam r" style="left: 82%"></i><i class="aa-flash" style="left: 12%; top: 22%"></i><i class="aa-flash" style="left: 31%; top: 30%; animation-delay: -1.1s"></i><i class="aa-flash" style="left: 66%; top: 18%; animation-delay: -2.3s"></i><i class="aa-flash" style="left: 88%; top: 26%; animation-delay: -0.6s"></i></div>
+
 
   <sc-if value="{{isList}}" hint-placeholder-val="{{ true }}">
+    <div class="am-arena" aria-hidden="true" style="z-index: -1"><i class="aa-pitch"></i><i class="aa-beam" style="left: 18%"></i><i class="aa-beam r" style="left: 82%"></i><i class="aa-flash" style="left: 12%; top: 22%"></i><i class="aa-flash" style="left: 31%; top: 30%; animation-delay: -1.1s"></i><i class="aa-flash" style="left: 66%; top: 18%; animation-delay: -2.3s"></i><i class="aa-flash" style="left: 88%; top: 26%; animation-delay: -0.6s"></i></div>
     <div style="position: absolute; left: 16px; right: 16px; top: 12px; display: flex; align-items: center; gap: 10px">
       <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 46px; height: 38px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
       <div class="mj-sign" role="heading" aria-level="1" aria-label="Minijuegos diarios"><span class="bul"><sc-for list="{{bulbs}}" as="u" hint-placeholder-count="0"><i style="{{u}}"></i></sc-for></span><sc-for list="{{signLetters}}" as="l" hint-placeholder-count="17"><b class="{{l.cls}}">{{l.ch}}</b></sc-for></div>
@@ -117,7 +118,6 @@ class Component extends DCLogic {
   constructor(props) {
     super(props);
     this.state = { game: null, shots: [], phase: 'aim', ball: null, keeper: null, msg: '', msgN: 0 };
-    this.tick = () => { this.raf = null; if (this.state.game === 'fk' && this.state.phase === 'aim') { this.forceUpdate(); this.raf = requestAnimationFrame(this.tick); } };
     this.onWheel = () => this.forceUpdate();
     window.addEventListener('am:wheel', this.onWheel);
   }
@@ -127,7 +127,7 @@ class Component extends DCLogic {
   start(game) {
     this.D().mark(game);
     this.t0 = performance.now();
-    this.setState({ game, shots: [], phase: 'aim', ball: null, keeper: null, msg: '' }, () => { if (game === 'fk') this.raf = requestAnimationFrame(this.tick); });
+    this.setState({ game, shots: [], phase: 'aim', ball: null, keeper: null, msg: '' });
   }
   // the crosshair over the goal, always moving
   cross() { const t = (performance.now() - (this.t0 || 0)) / 1000; return { x: 422 + 168 * Math.sin(t * 1.9), y: 152 + 68 * Math.sin(t * 2.9 + 0.7) }; }
@@ -136,7 +136,7 @@ class Component extends DCLogic {
     this.later(() => { this.setState({ msg: label, msgN: this.state.msgN + 1 }); if (goal && window.AMJuice && window.AMJuice.confetti) window.AMJuice.confetti(422, 150, '#53D88E'); }, 560);
     this.later(() => {
       const done = shots.length >= 3;
-      this.setState({ shots, phase: done ? 'done' : 'aim', ball: null, keeper: null, msg: '' }, () => { if (!done && this.state.game === 'fk') { this.t0 = performance.now(); this.raf = requestAnimationFrame(this.tick); } });
+      this.setState({ shots, phase: done ? 'done' : 'aim', ball: null, keeper: null, msg: '' });
     }, 1700);
   }
   shootPen(z) {
