@@ -52,7 +52,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 
   <div style="position: absolute; left: 12px; top: 10px; display: flex; align-items: center; gap: 8px">
-    <a href="Modos.dc.html" aria-label="Volver a modos" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #0B0B14CC; color: #F4F4FA">
+    <a href="{{backHref}}" onClick="{{backClick}}" aria-label="Volver" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #0B0B14CC; color: #F4F4FA">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
     </a>
     <span style="padding: 8px 12px; border-radius: 12px; background: #0B0B14CC; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1px">{{titleLabel}}</span>
@@ -85,7 +85,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <sc-if value="{{sudden}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #FFC53D">MUERTE SÚBITA</span></sc-if>
     </div>
   </sc-if>
-  <sc-if value="{{isPractice}}" hint-placeholder-val="{{ false }}">
+  <sc-if value="{{isPracticeHud}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; right: 12px; top: 10px; display: flex; gap: 6px">
       <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">TIRO</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1">{{shotLabel}}</span></span>
       <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">GOLES</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1">{{youGoals}}</span></span>
@@ -136,7 +136,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","options":["pen","free"],"default":"pen"},"mode":{"editor":"enum","options":["duel","practice"],"default":"duel"},"rivalName":{"editor":"text","default":"Kai_Striker"},"aiLevel":{"editor":null},"onEnd":{"editor":null},"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","options":["pen","free"],"default":"pen"},"mode":{"editor":"enum","options":["duel","practice","daily"],"default":"duel"},"rivalName":{"editor":"text","default":"Kai_Striker"},"aiLevel":{"editor":null},"onEnd":{"editor":null},"$preview":{"width":844,"height":390}}'>
 // penalty taker: starts the run-up at Duelo_RUN0 s (rival) and strikes Duelo_RUN s later
 const Duelo_RUN0 = 1.6, Duelo_RUN = 1.1;
 class Component extends DCLogic {
@@ -145,7 +145,9 @@ class Component extends DCLogic {
     this.state = { f: 0 };
     this.tick = this.tick.bind(this);
     this.canvasRef = (el) => { if (el && el !== this.cv) { this.cv = el; this.init3D(); } };
-    this.practice = props.mode === 'practice';
+    // daily: the lucky penalties / free kicks of the mini-games section, 3 shots and a prize
+    this.daily = props.mode === 'daily';
+    this.practice = props.mode === 'practice' || this.daily;
     this.best = 0;
     this.kind = props.kind === 'free' ? 'free' : 'pen';
     this.setup(true);
@@ -172,7 +174,7 @@ class Component extends DCLogic {
   setup(init) {
     this.st = this.loadStats();
     if (this.kind === 'pen') { this.D = 11; this.GX = 0; this.WALL = []; }
-    else this.applyFK(this.practice ? (this.fk || 0) : Math.floor(Math.random() * this.FKS().length), false);
+    else this.applyFK(this.practice && !this.daily ? (this.fk || 0) : Math.floor(Math.random() * this.FKS().length), false);
     this.sh = { you: [], rival: [] };
     this.pts = 0;
     this.turn = 'you'; this.winner = null;
@@ -437,8 +439,8 @@ class Component extends DCLogic {
             b.z = D - 0.15; b.vz = -Math.abs(b.vz) * 0.55; if (post) b.vx = -b.vx * 0.6; if (bar) b.vy = -Math.abs(b.vy) * 0.4 - 1;
             this.setResult('palo', post ? 'Al poste' : 'Al larguero');
           } else if (ox < 3.55 && c.y < 2.33) {
-            const hit = this.practice && [[GX - 3.0, 2.0], [GX + 3.0, 2.0]].some(([tx, ty]) => Math.hypot(c.x - tx, c.y - ty) < 0.5);
-            this.setResult(hit ? 'diana' : 'gol', hit ? '+3 puntos' : this.practice ? '+1 punto' : this.turn === 'you' ? 'Marcas' : 'Marca ' + (this.props.rivalName ?? 'el rival'));
+            const hit = this.practice && !this.daily && [[GX - 3.0, 2.0], [GX + 3.0, 2.0]].some(([tx, ty]) => Math.hypot(c.x - tx, c.y - ty) < 0.5);
+            this.setResult(hit ? 'diana' : 'gol', hit ? '+3 puntos' : this.daily ? '¡Gol!' : this.practice ? '+1 punto' : this.turn === 'you' ? 'Marcas' : 'Marca ' + (this.props.rivalName ?? 'el rival'));
             this.bulgeT = 0.9; this.bulgeAt = { x: c.x, y: c.y };
           } else this.setResult('fuera', c.y > 2.44 ? 'Por encima del larguero' : 'Por fuera del palo');
         }
@@ -455,7 +457,12 @@ class Component extends DCLogic {
     }
     if (this.phase === 'result' && this.pt > 2.0) {
       if (this.practice) {
-        if (this.sh.you.length >= 5) { this.phase = 'done'; this.best = Math.max(this.best, this.pts); return; }
+        if (this.sh.you.length >= (this.daily ? 3 : 5)) {
+          this.phase = 'done'; this.best = Math.max(this.best, this.pts);
+          if (this.daily && this.props.onEnd) { const g = this.sh.you.filter(Boolean).length; setTimeout(() => this.props.onEnd({ goals: g }), 300); }
+          return;
+        }
+        if (this.daily && this.kind === 'free') this.applyFK(Math.floor(Math.random() * this.FKS().length), true);
         this.resetShot();
         return;
       }
@@ -1029,7 +1036,7 @@ class Component extends DCLogic {
       return p;
     });
     this.targets = [];
-    if (this.practice) {
+    if (this.practice && !this.daily) {
       [[GX - 3.0, 2.0], [GX + 3.0, 2.0]].forEach(([x, y]) => {
         const t = new T.Mesh(new T.TorusGeometry(0.45, 0.035, 10, 40), new T.MeshStandardMaterial({ color: 0xc8f031, emissive: 0xc8f031, emissiveIntensity: 0.8 }));
         t.position.set(x, y, D - 0.02); S.add(t); this.targets.push(t);
@@ -1385,12 +1392,14 @@ class Component extends DCLogic {
       ghostPts: this.lastSwipe && this.phase !== 'aim' ? this.lastSwipe.pts.map((q) => f2(q.x) + ',' + f2(q.y)).join(' ') : '',
       ghostOp: this.replaying ? '0' : this.lastSwipe && (this.phase === 'runup' || this.phase === 'flight') ? '0.7' : this.lastSwipe && this.phase === 'result' ? Math.max(0, 0.7 - this.pt * 0.5).toFixed(2) : '0',
       swipePts: this.swipe ? this.swipe.map((q) => f2(q.x) + ',' + f2(q.y)).join(' ') : '',
-      titleLabel: this.practice ? 'ENTRENAMIENTO' : this.kind === 'pen' ? 'PENALTIS 1VS1' : 'TIROS LIBRES 1VS1',
-      isPractice: this.practice, isDuel: !this.practice,
+      backHref: this.daily ? 'Minijuegos.dc.html' : 'Modos.dc.html',
+      backClick: (e) => { if (this.daily && this.props.onEnd) { e.preventDefault(); this.phase = 'done'; this.props.onEnd({ goals: this.sh.you.filter(Boolean).length }); } },
+      titleLabel: this.daily ? (this.kind === 'pen' ? 'PENALTIS DE LA SUERTE' : 'FALTAS DE LA SUERTE') : this.practice ? 'ENTRENAMIENTO' : this.kind === 'pen' ? 'PENALTIS 1VS1' : 'TIROS LIBRES 1VS1',
+      isPractice: this.practice && !this.daily, isPracticeHud: this.practice, isDuel: !this.practice,
       penTab: tab(this.kind === 'pen'), freeTab: tab(this.kind === 'free'),
       setPen: () => { this.kind = 'pen'; this.setup(false); },
       setFree: () => { this.kind = 'free'; this.setup(false); },
-      shotLabel: Math.min(5, this.sh.you.length + (this.phase === 'aim' ? 1 : 0)) + '/5', ptsLabel: String(this.pts),
+      shotLabel: Math.min(this.daily ? 3 : 5, this.sh.you.length + (this.phase === 'aim' ? 1 : 0)) + (this.daily ? '/3' : '/5'), ptsLabel: String(this.pts),
       rivalName: this.props.rivalName ?? 'Kai_Striker',
       youDots: dots(this.sh.you, true), rivalDots: dots(this.sh.rival, false),
       youGoals: String(yg), rivalGoals: String(rg),
@@ -1409,7 +1418,7 @@ class Component extends DCLogic {
       resultText: rm[0],
       resultSub: R ? R.sub + (this.lastSpeed ? ' · ' + Math.round(this.lastSpeed * 3.6) + ' km/h' : '') : '',
       resultStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 72px; line-height: 1; letter-spacing: 2px; color: ' + rm[1] + '; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (0.4 + rs * 0.6).toFixed(2) + ');',
-      showDone: this.phase === 'done',
+      showDone: this.phase === 'done' && !this.daily,
       doneKicker: this.practice ? 'RONDA COMPLETADA' : this.kind === 'pen' ? 'TANDA DE PENALTIS' : 'DUELO DE TIROS LIBRES',
       doneTitle: this.practice ? yg + ' GOLES · ' + this.pts + ' PUNTOS' : won ? '¡GANAS EL DUELO!' : 'PIERDES EL DUELO',
       doneStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 44px; line-height: 1; letter-spacing: 2px; color: ' + (this.practice || won ? '#22D3EE' : '#FF5C5C') + ';',

@@ -94,54 +94,19 @@ body{margin:0}
   </sc-if>
 
   <sc-if value="{{isGame}}" hint-placeholder-val="{{ false }}">
-    <!-- the goal, the keeper and (for free kicks) the wall -->
-    <div style="position: absolute; left: 16px; top: 12px; display: flex; align-items: center; gap: 10px; z-index: 5">
-      <button type="button" onClick="{{quit}}" aria-label="Salir" class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 46px; height: 38px; border: 0; background: #17172A; color: #F4F4FA; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></button>
-      <h1 class="bc-title" style="font-size: 24px">{{gameTitle}}</h1>
+    <!-- the real 3D penalty / free-kick scene, 3 shots -->
+    <div style="position: absolute; inset: 0">
+      <dc-import name="Duelo" mode="daily" kind="{{duelKind}}" on-end="{{onDuel}}" hint-size="844px,390px"></dc-import>
     </div>
-    <div style="position: absolute; right: 16px; top: 16px; display: flex; gap: 8px; z-index: 5">
-      <sc-for list="{{dots}}" as="d" hint-placeholder-count="3"><span style="{{d}}"></span></sc-for>
-    </div>
-    <svg width="844" height="390" viewBox="0 0 844 390" style="position: absolute; inset: 0; pointer-events: none">
-      <defs><pattern id="mjNetG" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M0 0L12 12M12 0L0 12" stroke="#ffffff" stroke-width=".9"/></pattern></defs>
-      <path d="M262 78L276 92H568L582 78" stroke="#ffffff55" stroke-width="2" fill="none"/>
-      <g opacity=".45"><sc-for list="{{crowd}}" as="f" hint-placeholder-count="0"><circle cx="{{f.x}}" cy="{{f.y}}" r="{{f.r}}" fill="{{f.c}}"/></sc-for></g>
-      <g style="{{netStyle}}"><rect x="276" y="92" width="292" height="146" fill="url(#mjNetG)" opacity=".35"/></g>
-      <path d="M262 240V78H582V240" stroke="#FFFFFF" stroke-width="7" fill="none" stroke-linejoin="round"/>
-      <ellipse cx="422" cy="352" rx="40" ry="8" fill="#000" opacity=".3"/>
-    </svg>
-    <sc-if value="{{isPens}}" hint-placeholder-val="{{ false }}">
-      <sc-for list="{{zones}}" as="z" hint-placeholder-count="6">
-        <button type="button" class="mj-zone" onClick="{{z.pick}}" aria-label="{{z.aria}}" style="{{z.style}}"></button>
-      </sc-for>
-    </sc-if>
-    <div style="{{keeperStyle}}">
-      <svg style="{{keeperIdle}}" width="64" height="96" viewBox="0 0 64 96"><circle cx="32" cy="14" r="11" fill="#E0B48F" stroke="#05050A" stroke-width="2"/><path d="M14 30h36l4 34H10z" fill="#FF8A3D" stroke="#05050A" stroke-width="2"/><path d="M14 32L2 12M50 32L62 12" stroke="#FF8A3D" stroke-width="9" stroke-linecap="round"/><circle cx="2" cy="10" r="6" fill="#53D88E" stroke="#05050A" stroke-width="2"/><circle cx="62" cy="10" r="6" fill="#53D88E" stroke="#05050A" stroke-width="2"/><path d="M18 64v26M46 64v26" stroke="#17172A" stroke-width="10" stroke-linecap="round"/></svg>
-    </div>
-    <sc-if value="{{isFk}}" hint-placeholder-val="{{ false }}">
-      <svg width="164" height="70" viewBox="0 0 164 70" style="position: absolute; left: 340px; top: 172px; z-index: 3; {{wallStyle}}"><g fill="#1D2A6B" stroke="#05050A" stroke-width="2.5"><rect x="6" y="18" width="30" height="52" rx="12"/><rect x="46" y="14" width="30" height="56" rx="12"/><rect x="86" y="14" width="30" height="56" rx="12"/><rect x="126" y="18" width="30" height="52" rx="12"/><circle cx="21" cy="10" r="9" fill="#C68A5E"/><circle cx="61" cy="7" r="9" fill="#8D5A3B"/><circle cx="101" cy="7" r="9" fill="#E0B48F"/><circle cx="141" cy="10" r="9" fill="#C68A5E"/></g></svg>
-      <div style="{{crossStyle}}"><svg width="44" height="44" viewBox="-22 -22 44 44"><circle r="17" fill="none" stroke="#FFC53D" stroke-width="3"/><circle r="4" fill="#FFC53D"/><path d="M0 -22v8M0 14v8M-22 0h8M14 0h8" stroke="#FFC53D" stroke-width="3"/></svg></div>
-      <sc-if value="{{canShoot}}" hint-placeholder-val="{{ true }}">
-        <button type="button" onClick="{{shootFk}}" class="bc-btn-gold" style="position: absolute; right: 24px; bottom: 22px; height: 56px; padding: 0 28px; font-size: 24px; cursor: pointer; z-index: 5">¡CHUTA!</button>
-        <span style="position: absolute; left: 24px; bottom: 30px; padding: 6px 12px; border-radius: 12px; background: #0B0B14D9; font-size: 12px; font-weight: 800; color: #CACAE0; z-index: 5">Chuta cuando la mira esté donde quieras · ¡las escuadras nunca fallan!</span>
-      </sc-if>
-    </sc-if>
-    <sc-if value="{{isPensAim}}" hint-placeholder-val="{{ false }}">
-      <span style="position: absolute; left: 0; right: 0; bottom: 22px; text-align: center; font-size: 13px; font-weight: 800; color: #CACAE0; text-shadow: 0 2px 0 #05050A">Toca un sitio de la portería para chutar · el portero se tira a un lado al azar</span>
-    </sc-if>
-    <div style="{{ballStyle}}"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="#fff" stroke="#05050A" stroke-width="2.5"/><path d="M17 10l6 4.5-2.3 7h-7.4L11 14.5z" fill="#17172A"/></svg></div>
-    <sc-if value="{{hasMsg}}" hint-placeholder-val="{{ false }}">
-      <div key="{{msgKey}}" style="position: absolute; left: 0; right: 0; top: 150px; display: flex; justify-content: center; pointer-events: none; z-index: 6">
-        <span style="{{msgStyle}}">{{msg}}</span>
-      </div>
-    </sc-if>
     <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
-      <div style="position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: #05050ACC">
-        <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">{{gameTitle}}</span>
-        <span style="font: 800 italic 54px/1 'Barlow Condensed', sans-serif; color: #FFC53D; text-shadow: 0 5px 0 #05050A, 0 0 26px #FFC53D66; animation: mjMsg .5s both">{{doneTitle}}</span>
-        <span style="font: 800 22px 'Barlow Condensed', sans-serif; color: #F4F4FA">{{doneScore}}</span>
-        <span style="padding: 6px 16px; border-radius: 14px; background: #17172A; box-shadow: 0 0 0 2px #FFC53D; font-size: 15px; font-weight: 800; color: #FFE38A">Premio: {{prizeLabel}}</span>
-        <button type="button" onClick="{{claim}}" class="bc-btn-gold" style="margin-top: 6px; height: 52px; padding: 0 34px; font-size: 24px; cursor: pointer">RECOGER</button>
+      <div style="position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: radial-gradient(60% 70% at 50% 45%, #2A1C5ECC, #05050AEE)">
+        <div style="position: absolute; left: 50%; top: 45%; width: 700px; height: 700px; margin: -350px 0 0 -350px; background: repeating-conic-gradient(#FFC53D18 0 8deg, transparent 8deg 20deg); -webkit-mask-image: radial-gradient(closest-side, #000, transparent); mask-image: radial-gradient(closest-side, #000, transparent); animation: mjSpin 30s linear infinite; pointer-events: none"></div>
+        <span style="position: relative; font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">{{gameTitle}}</span>
+        <span style="position: relative; font: 800 italic 54px/1 'Barlow Condensed', sans-serif; color: #FFC53D; text-shadow: 0 5px 0 #05050A, 0 0 26px #FFC53D66; animation: mjMsg .5s both">{{doneTitle}}</span>
+        <div style="position: relative; display: flex; gap: 10px"><sc-for list="{{dots}}" as="d" hint-placeholder-count="3"><span style="{{d}}"></span></sc-for></div>
+        <span style="position: relative; font: 800 22px 'Barlow Condensed', sans-serif; color: #F4F4FA">{{doneScore}}</span>
+        <span style="position: relative; padding: 6px 16px; border-radius: 14px; background: #17172A; box-shadow: 0 0 0 2px #FFC53D; font-size: 15px; font-weight: 800; color: #FFE38A">Premio: {{prizeLabel}}</span>
+        <button type="button" onClick="{{claim}}" class="bc-btn-gold" style="position: relative; margin-top: 6px; height: 52px; padding: 0 34px; font-size: 24px; cursor: pointer">RECOGER</button>
       </div>
     </sc-if>
   </sc-if>
@@ -245,6 +210,8 @@ class Component extends DCLogic {
       netStyle: scored ? 'transform-origin: 422px 238px; animation: mjRipple .6s ease-out;' : '',
       keeperIdle: k ? '' : 'animation: mjSway 1.6s ease-in-out infinite; transform-origin: 50% 100%;',
       wallStyle: g === 'fk' && s.phase === 'fly' ? 'animation: mjJump .5s ease-out;' : '',
+      duelKind: g === 'fk' ? 'free' : 'pen',
+      onDuel: (r) => { const n = Math.max(0, Math.min(3, (r && r.goals) || 0)); this.setState({ shots: [0, 1, 2].map((i) => i < n), phase: 'done' }); if (n && window.AMJuice && window.AMJuice.confetti) window.AMJuice.confetti(422, 120, '#FFC53D'); },
       isList: !g, isGame: !!g, isPens: g === 'pens', isFk: g === 'fk', isPensAim: g === 'pens' && s.phase === 'aim',
       reset: this.countdown(),
       cards: [
@@ -252,7 +219,7 @@ class Component extends DCLogic {
         card('pens', 'PENALTIS DE LA SUERTE', '3 penaltis: que no te lo adivine el portero.', '#22D3EE', '#0C3E52', 'Pleno: 200 VCD + 2 BOB.'),
         card('fk', 'FALTAS', '3 faltas con barrera: chuta en el momento justo.', '#FF5CC8', '#4A0F38', 'Pleno: 250 VCD + 3 BOB.')
       ],
-      gameTitle: g === 'fk' ? 'FALTAS' : 'PENALTIS DE LA SUERTE',
+      gameTitle: g === 'fk' ? 'FALTAS DE LA SUERTE' : 'PENALTIS DE LA SUERTE',
       dots: [0, 1, 2].map((i) => 'width: 22px; height: 22px; border-radius: 11px; box-sizing: border-box; ' + (i < s.shots.length ? (s.shots[i] ? 'background: #53D88E; box-shadow: 0 0 10px #53D88E;' : 'background: #FF5C5C;') : 'border: 2px solid #4C4C78; background: #0B0B14CC;')),
       zones: [0, 1, 2, 3, 4, 5].map((z) => ({
         aria: 'Chutar ' + ['arriba', 'abajo'][Math.floor(z / 3)] + ' ' + ['a la izquierda', 'al centro', 'a la derecha'][z % 3],
