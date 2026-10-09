@@ -137,7 +137,7 @@ body{margin:0}
           <span>★ Corona, Bigote y Botas Oro</span>
           <span>★ Recoge al momento lo que ya hayas desbloqueado</span>
         </div>
-        <span style="font-size: 10.5px; line-height: 1.35; color: #B89B6A">Modo prueba: la pasarela de pago aún no está conectada. El premium se activa gratis y solo en este móvil.</span>
+        <span style="font-size: 10.5px; line-height: 1.35; color: #B89B6A">{{buyNote}}</span>
         <div style="display: flex; gap: 10px; margin-top: auto">
           <button type="button" onClick="{{buy}}" class="ps-gold" style="flex: 1; height: 44px; border: 0; transform: skewX(0deg); color: #2A1C02; font: 800 20px 'Barlow Condensed', sans-serif; letter-spacing: 1px; cursor: pointer">COMPRAR · {{price}}</button>
           <button type="button" onClick="{{closeBuy}}" class="bc-para" style="height: 44px; padding: 0 16px; border: 0; background: #17172A; color: #CACAE0; font: 800 13px Exo2, sans-serif; cursor: pointer">AHORA NO</button>
@@ -239,8 +239,9 @@ class Component extends DCLogic {
       openBuy: () => this.setState({ buy: true }),
       closeBuy: () => this.setState({ buy: false }),
       stop: (e) => e.stopPropagation(),
+      buyNote: PR && PR.payments && PR.payments() ? 'Pago seguro con tu cuenta de la tienda.' : 'El Pase Premium llegará muy pronto. Mientras tanto, todos los premios gratis siguen disponibles.',
       buy: () => {
-        PR.buyPremium();
+        if (!PR.buyPremium()) { this.setState({ buy: false }); return; }
         if (window.AMSfx && window.AMSfx.levelUp) window.AMSfx.levelUp();
         this.setState({ buy: false });
       },

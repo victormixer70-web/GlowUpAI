@@ -2,6 +2,8 @@
    Everything is kept on the phone (localStorage). The match screens call AMProgress.recordMatch() at the
    final whistle and get back what changed, which the results screen (results.js) plays back. */
 (function () {
+  // real-money purchases (season pass premium, BOB packs): off until the store's billing is connected
+  var PAYMENTS = false;
   function get(k, d) { try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } }
   function put(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
@@ -244,7 +246,7 @@
       season: se.n, daysLeft: se.daysLeft, xp: P.xp, level: level, into: level >= 30 ? PASS_XP : P.xp - level * PASS_XP, need: PASS_XP,
       premium: P.premium, free: free, prem: prem,
       ready: free.concat(prem).filter(function (x) { return x.ready; }).length,
-      price: '4,99 €'
+      price: PAYMENTS ? '4,99 €' : 'PRONTO'
     };
   }
   function addPassXp(n) { var P = passState(), lv0 = Math.min(30, Math.floor(P.xp / PASS_XP)); P.xp += n; put('arenamix.pass.v1', P); return { before: lv0, after: Math.min(30, Math.floor(P.xp / PASS_XP)) }; }
@@ -280,7 +282,7 @@
   }
   /* The premium purchase. There is no payment gateway yet (Google Play Billing / Stripe need a server), so this
      unlocks it on this phone only; the screen says so. */
-  function buyPremium() { var P = passState(); P.premium = true; put('arenamix.pass.v1', P); return true; }
+  function buyPremium() { if (!PAYMENTS) return false; var P = passState(); P.premium = true; put('arenamix.pass.v1', P); return true; }
 
   /* ---------- the final whistle ---------- */
   // info: { home, away, kind: 'team'|'duel'|'mg', stats: { goals, shots, passes, skills, tackles } }
@@ -351,6 +353,7 @@
       return { week: W.milestones.filter(function (m) { return m.reached && !m.claimed; }).length, pass: P.ready, missions: M.list.filter(function (m) { return m.done && !m.claimed; }).length };
     }, xp: xp, levelOf: levelOf, level: function () { return levelOf(xp()); },
     career: function () { return get('arenamix.career.v1', { played: 0, won: 0, goals: 0, streak: 0, best: 0 }); },
+    payments: function () { return PAYMENTS; },
     weekly: weekly, claim: claim, missions: missions, claimMission: claimMission, recordMatch: recordMatch,
     items: ITEMS, itemPic: itemPic, milestones: MILESTONES,
     pass: pass, claimPass: claimPass, claimAllPass: claimAllPass, buyPremium: buyPremium, addPassXp: addPassXp

@@ -385,7 +385,7 @@ class Component extends DCLogic {
     if (g.passHeld) { g.passHoldT += dt; if (g.passHoldT >= 0.3) { g.passHeld = false; if (g.phase === 'play' && this.ctx() === 'ball') this.humanPass('lob'); } }
     if (g.phase === 'play' && !g.goldenOn && this.golden()) { g.goldenOn = true; this.callout('¡BALÓN DORADO!', 'Último medio minuto: los goles valen doble', '#FFC53D'); this.vib([40, 60, 40]); }
     if (g.charging) g.charge = Math.min(1, g.charge + dt * 1.15);
-    let ix = g.jx + (g.keys.r ? 1 : 0) - (g.keys.l ? 1 : 0), iy = g.jy + (g.keys.d ? 1 : 0) - (g.keys.u ? 1 : 0);
+    let ix = g.jx + (g.keys.r ? 1 : 0) - (g.keys.l ? 1 : 0) + (g.padX || 0), iy = g.jy + (g.keys.d ? 1 : 0) - (g.keys.u ? 1 : 0) + (g.padY || 0);
     const il = Math.hypot(ix, iy);
     if (il > 1) { ix /= il; iy /= il; }
     const sm = this.inpS || [0, 0], al = 1 - Math.exp(-dt / 0.025);
@@ -660,9 +660,38 @@ class Component extends DCLogic {
     this.confetti = null;
     this.loop();
   }
+  // a game controller (Xbox, PlayStation or any standard pad, by Bluetooth or cable):
+  // left stick or d-pad moves, A shoots (hold to charge), X passes (hold to lob), B dribbles / presses,
+  // Y or LB crosses, RB or RT sprints
+  pollPad() {
+    const g = this.g, pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    let pad = null;
+    for (let i = 0; i < pads.length; i++) if (pads[i] && pads[i].connected) { pad = pads[i]; break; }
+    if (!pad) { if (this.padWas) { g.padX = g.padY = 0; g.sprint = false; this.padWas = null; } return; }
+    if (!this.padWas) { this.padWas = []; if (!this.padSaid) { this.padSaid = true; this.flashMsg('Mando conectado', 2); } }
+    const B = (k) => !!(pad.buttons[k] && (pad.buttons[k].pressed || pad.buttons[k].value > 0.5));
+    const dz = (v) => (Math.abs(v) < 0.18 ? 0 : (v - Math.sign(v) * 0.18) / 0.82);
+    g.padX = dz(pad.axes[0] || 0) + (B(15) ? 1 : 0) - (B(14) ? 1 : 0);
+    g.padY = dz(pad.axes[1] || 0) + (B(13) ? 1 : 0) - (B(12) ? 1 : 0);
+    const was = this.padWas, now = [B(0), B(1), B(2), B(3), B(4), B(5), B(6), B(7)];
+    const down = (k) => now[k] && !was[k], up = (k) => !now[k] && was[k];
+    if (g.phase === 'play') {
+      if (down(0)) this.mainPress();
+      if (up(0) && g.charging) this.doKick();
+      if (down(2)) this.passPress();
+      if (up(2)) { this.passRelease(); g.press = false; }
+      if (down(1)) this.skillPress();
+      if (up(1)) g.press = false;
+      if (down(3) || down(4)) this.humanCross();
+    }
+    const spr = now[5] || now[7];
+    if (spr !== (was[5] || was[7])) g.sprint = spr;
+    this.padWas = now;
+  }
   tick(now) {
     const dt = Math.min(0.033, Math.max(0, (now - this.last) / 1000));
     this.last = now;
+    try { this.pollPad(); } catch (e) {}
     const N = this.net;
     if (N && !N.host) this.clientStep(dt);
     else for (let i = 0; i < 3; i++) this.step(dt / 3);
@@ -1089,8 +1118,8 @@ class Component extends DCLogic {
       if (h.charging) h.charge = Math.min(1, h.charge + dt * 1.15);
       while (h.q.length) { const ev = h.q.shift(); this.withHuman(h, () => this.runEv(ev)); }
     });
-    let ix = g.jx + (g.keys.r ? 1 : 0) - (g.keys.l ? 1 : 0);
-    let iy = g.jy + (g.keys.d ? 1 : 0) - (g.keys.u ? 1 : 0);
+    let ix = g.jx + (g.keys.r ? 1 : 0) - (g.keys.l ? 1 : 0) + (g.padX || 0);
+    let iy = g.jy + (g.keys.d ? 1 : 0) - (g.keys.u ? 1 : 0) + (g.padY || 0);
     const il = Math.hypot(ix, iy);
     if (il > 1) { ix /= il; iy /= il; }
     // a touch of smoothing (≈25 ms) so finger tremor can't jerk the direction around

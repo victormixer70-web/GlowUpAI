@@ -3,6 +3,9 @@ window.AM_I18N_EN = {
   // ---------- general ----------
   'ARENA MIX, inicio': 'ARENA MIX, home',
   'Cargando ARENA MIX': 'Loading ARENA MIX',
+  'Mando conectado': 'Controller connected',
+  'Pago seguro con tu cuenta de la tienda.': 'Secure payment with your store account.',
+  'El Pase Premium llegará muy pronto. Mientras tanto, todos los premios gratis siguen disponibles.': 'The Premium Pass is coming very soon. Meanwhile, all the free rewards are still available.',
   'Gira el móvil para jugar en horizontal': 'Turn your phone to play in landscape',
   'Volver': 'Back', 'VOLVER': 'BACK', 'Cerrar': 'Close', 'Salir': 'Exit', 'SALIR': 'EXIT',
   'Volver a la tienda': 'Back to the shop', 'Volver a modos': 'Back to modes', 'Volver al perfil': 'Back to profile',
