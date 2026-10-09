@@ -12,49 +12,146 @@
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
+.lg-room{position:absolute;inset:0;pointer-events:none;overflow:hidden;background:radial-gradient(60% 80% at 18% 30%,#3A2A0A55,transparent 70%),linear-gradient(180deg,#0B0A1A,#120E26 60%,#0A0816)}
+.lg-room::before{content:"";position:absolute;left:-40px;top:-60px;width:340px;height:470px;background:conic-gradient(from 160deg at 50% 0%,transparent 0deg,#FFE9A814 12deg,#FFE9A824 20deg,#FFE9A814 28deg,transparent 40deg);animation:lgSpot 6s ease-in-out infinite alternate;transform-origin:50% 0}
+@keyframes lgSpot{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+.lg-dust{position:absolute;width:3px;height:3px;border-radius:50%;background:#FFE38A;box-shadow:0 0 6px #FFC53D;opacity:0;animation:lgDust var(--d,7s) linear infinite}
+@keyframes lgDust{0%{opacity:0;transform:translate(0,0)}15%{opacity:.8}100%{opacity:0;transform:translate(var(--dx,10px),-260px)}}
+.lg-trophy{animation:lgBob 3.2s ease-in-out infinite}
+@keyframes lgBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+.lg-grid{scrollbar-width:none}.lg-grid::-webkit-scrollbar{display:none}
+.lg-medal{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px 4px;border:0;background:transparent;color:#F4F4FA;font-family:Exo2,sans-serif;cursor:pointer;border-radius:14px;transition:background .2s}
+.lg-medal.sel{background:#FFFFFF10;box-shadow:inset 0 0 0 1.5px #FFC53D88}
+.lg-ready .lg-disc{animation:lgReady 1.6s ease-in-out infinite}
+@keyframes lgReady{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.06)}}
+.lg-rays{position:absolute;left:50%;top:38px;width:120px;height:120px;margin:-60px;border-radius:50%;background:repeating-conic-gradient(#FFE38A55 0 8deg,transparent 11deg 24deg);-webkit-mask-image:radial-gradient(closest-side,#000 30%,transparent);mask-image:radial-gradient(closest-side,#000 30%,transparent);animation:lgSpin 8s linear infinite;pointer-events:none;will-change:transform}
+@keyframes lgSpin{to{transform:rotate(360deg)}}
+.lg-shelf{grid-column:1/-1;height:10px;margin:-6px 6px 4px;border-radius:3px;background:linear-gradient(180deg,#3A2E5E,#1A1430);box-shadow:0 6px 12px #0009,0 -1px 0 #6E5CB0 inset;position:relative}
+.lg-shelf::after{content:"";position:absolute;left:10%;right:10%;top:-14px;height:14px;background:radial-gradient(50% 100% at 50% 100%,#FFC53D22,transparent)}
+.lg-burst{animation:lgBurst 1.2s cubic-bezier(.2,1.6,.4,1)}
+@keyframes lgBurst{0%{transform:scale(.6) rotate(-20deg);filter:brightness(2.5)}40%{transform:scale(1.25) rotate(8deg)}100%{transform:scale(1) rotate(0);filter:brightness(1)}}
+.lg-tab{flex:none;display:flex;align-items:center;gap:5px;height:30px;padding:0 12px;border:0;border-radius:15px;font:800 11.5px Exo2,sans-serif;letter-spacing:.5px;cursor:pointer;transition:background .2s,color .2s}
+.lg-dot{min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:8px;background:#FFC53D;color:#2A1C02;font-size:10px;display:flex;align-items:center;justify-content:center}
 </style>
 </helmet>
-<div class="bc-stage" style="position: relative; width: 844px; height: 390px; overflow: hidden; color: #F4F4FA; font-family: Exo2, sans-serif; display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; box-sizing: border-box">
-  <div class="am-bg"></div>
-  <div class="bc-beams"></div>
-  <div style="position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; flex: none">
-    <a href="Perfil.dc.html" aria-label="Volver al perfil" class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 46px; height: 38px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
-    <span class="am-float" style="position: relative; width: 44px; height: 44px; border-radius: 22px; background: {{ring}}; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px #FFC53D55"><span style="width: 36px; height: 36px; border-radius: 18px; background: #1A1424; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="#FFC53D"><path d="M7 3h10v3h3v2a5 5 0 0 1-5 5h-.3A5 5 0 0 1 13 15v2h3v3H8v-3h3v-2a5 5 0 0 1-1.7-2H9a5 5 0 0 1-5-5V6h3zM6 8a3 3 0 0 0 1.5 2.6A7 7 0 0 1 7 8zm12 0h-1a7 7 0 0 1-.5 2.6A3 3 0 0 0 18 8z"/></svg></span></span>
-    <div style="display: flex; flex-direction: column; gap: 1px">
-      <h1 class="bc-title" style="font-size: 28px; border-left-color: #FFC53D">LOGROS</h1>
-      <span style="font-size: 12px; font-weight: 700; color: #CACAE0">{{doneLabel}}</span>
+<div class="bc-stage" style="position: relative; width: 844px; height: 390px; overflow: hidden; color: #F4F4FA; font-family: Exo2, sans-serif">
+  <div class="lg-room"><sc-for list="{{dust}}" as="d" hint-placeholder-count="6"><i class="lg-dust" style="{{d}}"></i></sc-for></div>
+
+  <!-- left: the collection and the selected medal -->
+  <div style="position: absolute; left: 14px; top: 12px; width: 252px; bottom: 12px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <a href="Perfil.dc.html" aria-label="Volver al perfil" style="display: flex; align-items: center; justify-content: center; width: 42px; height: 38px; border-radius: 12px; background: #17172A; box-shadow: inset 0 0 0 1px #2E2E52; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+      <div style="display: flex; flex-direction: column; line-height: 1">
+        <span style="font-size: 10px; font-weight: 800; letter-spacing: 3px; color: #FFC53D">SALA DE</span>
+        <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 1px; text-shadow: 0 0 18px #FFC53D66">TROFEOS</h1>
+      </div>
     </div>
-    <sc-if value="{{hasReady}}" hint-placeholder-val="{{ false }}"><span class="am-pulse-gold bc-para" style="margin-left: 8px; padding: 5px 16px; background: #FFC53D; color: #2A1C02; font-weight: 800; font-size: 12px">{{readyLabel}}</span></sc-if>
-    <span class="bc-para" style="margin-left: auto; display: flex; align-items: center; gap: 6px; padding: 8px 18px; background: linear-gradient(135deg, #3A2A0A, #1E1A10); box-shadow: inset 0 0 0 1px #FFC53D; font-weight: 800; font-size: 15px; color: #FFE38A"><svg class="am-coin" width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#B8860B" stroke-width="2"/></svg>{{coins}}</span>
-  </div>
-  <div style="position: relative; z-index: 1; flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; padding: 2px 2px 2px 0">
-    <sc-for list="{{items}}" as="a" hint-placeholder-count="6">
-      <div style="{{a.style}}">
-        <div style="{{a.iconBox}}"><sc-if value="{{a.is_ball}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#F4F4FA"/><path d="M12 7l3 2.2-1.1 3.5h-3.8L9 9.2z" fill="#17172A"/></svg></sc-if><sc-if value="{{a.is_trophy}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M7 3h10v3h3v2a5 5 0 0 1-5 5h-.3A5 5 0 0 1 13 15v2h3v3H8v-3h3v-2a5 5 0 0 1-1.7-2H9a5 5 0 0 1-5-5V6h3z" fill="#FFC53D"/></svg></sc-if><sc-if value="{{a.is_goal}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M3 6h18v12h-2V8H5v10H3z" fill="#F4F4FA"/><path d="M5 8h14v10H5z" fill="none" stroke="#8C8CB0" stroke-width=".8" stroke-dasharray="1.5 1.5"/><circle cx="14" cy="14" r="3" fill="#22D3EE"/></svg></sc-if><sc-if value="{{a.is_fire}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-4-1-6 1-9z" fill="#FF8A3D"/></svg></sc-if><sc-if value="{{a.is_shield}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="#53D88E"/></svg></sc-if><sc-if value="{{a.is_multi}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><circle cx="8" cy="8" r="4" fill="#F4F4FA"/><circle cx="16" cy="8" r="4" fill="#FF8A3D"/><circle cx="8" cy="16" r="4" fill="#E5484D"/><circle cx="16" cy="16" r="4" fill="#FFC53D"/></svg></sc-if><sc-if value="{{a.is_rank}}" hint-placeholder-val="{{ false }}"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="#6FB6FF"/><path d="M12 7l1.5 3 3.3.5-2.4 2.3.6 3.2-3-1.6-3 1.6.6-3.2-2.4-2.3 3.3-.5z" fill="#F4F4FA"/></svg></sc-if></div>
-        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
-          <span style="font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{a.title}}</span>
-          <span style="font-size: 11px; color: #A3A3C2">{{a.desc}}</span>
-          <div style="display: flex; align-items: center; gap: 6px"><div style="flex: 1; height: 8px; border-radius: 4px; background: #26264A; box-shadow: inset 0 1px 2px #0008; overflow: hidden"><div class="am-bar-shine" style="{{a.bar}}"></div></div><span style="font-size: 11px; font-weight: 800; color: #CACAE0">{{a.prog}}</span></div>
-        </div>
-        <div style="flex: none; width: 104px; display: flex; flex-direction: column; align-items: center; gap: 4px">
-          <span style="display: flex; align-items: center; gap: 4px; font-weight: 800; font-size: 13px; color: #FFC53D"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#B8860B" stroke-width="2"/></svg>+{{a.reward}}</span>
-          <sc-if value="{{a.canClaim}}" hint-placeholder-val="{{ false }}"><button type="button" class="bc-btn-gold am-shine" onClick="{{a.claim}}" style="height: 32px; padding: 0 16px; font-size: 16px; color: #2A1C02; font: 800 12px Exo2, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #2F8A57">RECLAMAR</button></sc-if>
-          <sc-if value="{{a.isClaimed}}" hint-placeholder-val="{{ false }}"><span style="display: flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 10px; background: #53D88E22; border: 1px solid #53D88E66; font-size: 11px; font-weight: 800; color: #53D88E"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg>Reclamado</span></sc-if>
-          <sc-if value="{{a.isLocked}}" hint-placeholder-val="{{ true }}"><span style="font-size: 11px; font-weight: 700; color: #6E6E90">En curso</span></sc-if>
+    <!-- the collection: a trophy inside a ring that fills as you complete it -->
+    <div style="position: relative; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 18px; background: linear-gradient(135deg, #3A2A0ACC, #17142ACC); box-shadow: inset 0 0 0 1.5px #FFC53D66, 0 8px 18px #0008">
+      <div style="position: relative; flex: none; width: 78px; height: 78px">
+        <svg width="78" height="78" viewBox="0 0 78 78" style="position: absolute; inset: 0; transform: rotate(-90deg)"><circle cx="39" cy="39" r="34" fill="#0B0B14" stroke="#2E2E52" stroke-width="6"/><circle cx="39" cy="39" r="34" fill="none" stroke="url(#lg-ring)" stroke-width="6" stroke-linecap="round" stroke-dasharray="{{ringDash}}"/><defs><linearGradient id="lg-ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF3B0"/><stop offset="1" stop-color="#FFB020"/></linearGradient></defs></svg>
+        <svg class="lg-trophy" width="40" height="40" viewBox="0 0 24 24" style="position: absolute; left: 19px; top: 17px"><path d="M7 3h10v3h3v2a5 5 0 0 1-5 5h-.3A5 5 0 0 1 13 15v2h3v3H8v-3h3v-2a5 5 0 0 1-1.7-2H9a5 5 0 0 1-5-5V6h3zM6 8a3 3 0 0 0 1.5 2.6A7 7 0 0 1 7 8zm12 0h-1a7 7 0 0 1-.5 2.6A3 3 0 0 0 18 8z" fill="#FFC53D"/><path d="M9 4h2v6a3 3 0 0 1-2-2z" fill="#FFF3B0" opacity=".7"/></svg>
+      </div>
+      <div style="min-width: 0; display: flex; flex-direction: column; gap: 3px">
+        <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 2px; color: #CACAE0">COLECCIONISTA</span>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; color: {{collColor}}; text-shadow: 0 0 12px {{collColor}}88">{{collTier}}</span>
+        <span style="font-size: 12px; font-weight: 800">{{doneLabel}}</span>
+        <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 800; color: #FFE38A"><svg class="am-coin" width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#B8860B" stroke-width="2"/></svg>{{coins}}</span>
+      </div>
+    </div>
+    <!-- the selected medal, up close -->
+    <div style="position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 12px 14px 12px; border-radius: 18px; background: linear-gradient(180deg, #1C1B3ACC, #0F0F20E6); box-shadow: inset 0 0 0 1px {{selC}}66, 0 8px 18px #0008; overflow: hidden">
+      <div style="position: absolute; left: 50%; top: 10px; width: 160px; height: 120px; margin-left: -80px; background: radial-gradient(closest-side, {{selC}}44, transparent); pointer-events: none"></div>
+      <div style="display: flex; align-items: center; gap: 12px; align-self: stretch">
+        <svg width="58" height="66" viewBox="-30 -36 60 68" style="flex: none; overflow: visible"><path d="M-14-34h10l6 18h-10zM14-34H4l-6 18h10z" fill="{{selRib}}"/><circle r="24" cy="6" fill="{{selRim}}"/><circle r="18" cy="6" fill="{{selFace}}"/><g transform="translate(-11 -5) scale(.92)"><path d="{{selIcon}}" fill="{{selInk}}"/></g></svg>
+        <div style="min-width: 0; display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 9px; font-weight: 800; letter-spacing: 2px; color: {{selC}}">{{selTier}}</span>
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 21px; line-height: 1.05">{{selTitle}}</span>
+          <span style="font-size: 11px; color: #A3A3C2; line-height: 1.3">{{selDesc}}</span>
         </div>
       </div>
-    </sc-for>
+      <div style="align-self: stretch; display: flex; align-items: center; gap: 8px; margin-top: 4px">
+        <div style="flex: 1; height: 10px; border-radius: 5px; background: #26264A; box-shadow: inset 0 1px 2px #0008; overflow: hidden"><div class="am-bar-shine" style="{{selBar}}"></div></div>
+        <span style="font-size: 12px; font-weight: 800; color: #CACAE0">{{selProg}}</span>
+      </div>
+      <span style="flex: 1"></span>
+      <div style="align-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <span style="display: flex; align-items: center; gap: 5px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; color: #FFC53D"><svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#B8860B" stroke-width="2"/></svg>+{{selReward}}</span>
+        <sc-if value="{{selCan}}" hint-placeholder-val="{{ false }}"><button type="button" class="bc-btn-gold am-shine" onClick="{{selClaim}}" style="height: 38px; padding: 0 18px; border-radius: 12px; color: #2A1C02; font: 800 14px Exo2, sans-serif; letter-spacing: 1px; cursor: pointer">¡RECLAMAR!</button></sc-if>
+        <sc-if value="{{selGot}}" hint-placeholder-val="{{ false }}"><span style="display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 12px; background: #53D88E22; box-shadow: inset 0 0 0 1px #53D88E88; font-size: 12px; font-weight: 800; color: #53D88E"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg>EN TU VITRINA</span></sc-if>
+        <sc-if value="{{selLeft}}" hint-placeholder-val="{{ true }}"><span style="padding: 6px 12px; border-radius: 12px; background: #FFFFFF0D; font-size: 12px; font-weight: 800; color: #A3A3C2">{{selLeftText}}</span></sc-if>
+      </div>
+    </div>
   </div>
+
+  <!-- right: tabs and the shelves of medals -->
+  <div style="position: absolute; left: 280px; right: 12px; top: 12px; bottom: 0; display: flex; flex-direction: column; gap: 8px">
+    <div role="tablist" aria-label="Categorías" style="display: flex; align-items: center; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px">
+      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="6">
+        <button type="button" role="tab" class="lg-tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}<span style="opacity: .7">{{t.count}}</span><sc-if value="{{t.hasReady}}" hint-placeholder-val="{{ false }}"><span class="lg-dot">{{t.ready}}</span></sc-if></button>
+      </sc-for>
+    </div>
+    <div class="lg-grid" style="flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px 6px; align-content: start; padding: 4px 2px 14px">
+      <sc-for list="{{cells}}" as="c" hint-placeholder-count="10">
+        <sc-if value="{{c.shelf}}" hint-placeholder-val="{{ false }}"><div class="lg-shelf"></div></sc-if>
+        <sc-if value="{{c.medal}}" hint-placeholder-val="{{ true }}">
+        <button type="button" class="{{c.cls}}" onClick="{{c.pick}}" aria-label="{{c.aria}}">
+          <sc-if value="{{c.ready}}" hint-placeholder-val="{{ false }}"><i class="lg-rays"></i></sc-if>
+          <svg class="lg-disc {{c.burst}}" width="72" height="80" viewBox="-36 -42 72 80" style="overflow: visible; position: relative">
+            <path d="M-17-40h12l7 22h-12zM17-40H5l-7 22h12z" fill="{{c.rib}}"/>
+            <circle r="31" cy="6" fill="none" stroke="#26264A" stroke-width="4"/>
+            <circle r="31" cy="6" fill="none" stroke="{{c.ringC}}" stroke-width="4" stroke-linecap="round" stroke-dasharray="{{c.dash}}" transform="rotate(-90 0 6)"/>
+            <circle r="25" cy="6" fill="{{c.rim}}"/>
+            <circle r="19" cy="6" fill="{{c.face}}"/>
+            <path d="M-12 -6a19 19 0 0 1 24 -6" stroke="#FFFFFF" stroke-opacity="{{c.gloss}}" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <g transform="translate(-11 -5) scale(.92)"><path d="{{c.icon}}" fill="{{c.ink}}"/></g>
+            <sc-if value="{{c.got}}" hint-placeholder-val="{{ false }}"><g transform="translate(20 24)"><circle r="8" fill="#53D88E" stroke="#0B0B14" stroke-width="2"/><path d="M-3.5 0l2.5 2.5l4.5-5" stroke="#0B0B14" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></sc-if>
+            <sc-if value="{{c.locked}}" hint-placeholder-val="{{ true }}"><g transform="translate(20 24)"><circle r="8" fill="#17172A" stroke="#3A3A64" stroke-width="1.5"/><text y="3.5" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="9" fill="#CACAE0">{{c.pct}}</text></g></sc-if>
+          </svg>
+          <span style="{{c.titleStyle}}">{{c.title}}</span>
+        </button>
+        </sc-if>
+      </sc-for>
+    </div>
+  </div>
+
   <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; pointer-events: none"><span class="am-bob" style="padding: 12px 22px; border-radius: 16px; background: linear-gradient(135deg, #FFE38A, #FFC53D); box-shadow: 0 0 30px #FFC53DAA, 0 8px 20px #000A; color: #0B0B14; font-weight: 800; font-size: 14px; box-shadow: 0 6px 20px #0008">{{toastText}}</span></div>
+    <div style="position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; pointer-events: none; z-index: 5"><span class="am-bob" style="padding: 12px 22px; border-radius: 16px; background: linear-gradient(135deg, #FFE38A, #FFC53D); color: #0B0B14; font-weight: 800; font-size: 14px; box-shadow: 0 0 30px #FFC53DAA, 0 8px 20px #000A">{{toastText}}</span></div>
   </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+// medal icons, drawn on a 24x24 grid and filled
+const Lg_ICON = {
+  ball: 'M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20zM12 6.5l3.6 2.6l-1.4 4.2H9.8L8.4 9.1z',
+  trophy: 'M7 3h10v3h3v2a5 5 0 0 1-5 5h-.3A5 5 0 0 1 13 15v2h3v3H8v-3h3v-2a5 5 0 0 1-1.7-2H9a5 5 0 0 1-5-5V6h3zM6 8a3 3 0 0 0 1.5 2.6A7 7 0 0 1 7 8zm12 0h-1a7 7 0 0 1-.5 2.6A3 3 0 0 0 18 8z',
+  goal: 'M2 5h20v14h-2.5V7.5h-15V19H2zM14 11.5a3 3 0 1 0 0 6a3 3 0 1 0 0-6z',
+  fire: 'M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6c0 2 1 3 2 3c0-4-1-6 1-9z',
+  shield: 'M12 2l8 3v6c0 5-3.5 9-8 11c-4.5-2-8-6-8-11V5z',
+  multi: 'M8 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM16 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM8 12a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM16 12a4 4 0 1 0 0 8a4 4 0 1 0 0-8z',
+  rank: 'M12 2l2.9 6.3l6.9.8l-5.1 4.7l1.4 6.8L12 17.2l-6.1 3.4l1.4-6.8L2.2 9.1l6.9-.8z'
+};
+// medal metals by how hard the goal is (its reward)
+const Lg_TIER = [
+  { max: 100, name: 'BRONCE', c: '#E3A56E', rim: 'url(#lgm-b)', face: '#7A4422', rib: '#C2410C', ink: '#FFD7B0' },
+  { max: 300, name: 'PLATA', c: '#D6DEE9', rim: 'url(#lgm-s)', face: '#5C6678', rib: '#2563EB', ink: '#FFFFFF' },
+  { max: 800, name: 'ORO', c: '#FFC53D', rim: 'url(#lgm-g)', face: '#A8760F', rib: '#DC2626', ink: '#FFF3B0' },
+  { max: 1e9, name: 'DIAMANTE', c: '#7FE3FF', rim: 'url(#lgm-d)', face: '#1B6FA8', rib: '#7C3AED', ink: '#E6FCFF' }
+];
+const Lg_TABS = [['all', 'TODOS'], ['ball', 'PARTIDOS'], ['trophy', 'VICTORIAS'], ['goal', 'GOLES'], ['fire', 'RACHAS'], ['special', 'ESPECIALES']];
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { toast: '', n: 0 };
+    this.state = { toast: '', n: 0, tab: 'all', sel: null };
+    // the medal metals, shared by every medal on the shelves
+    if (!document.getElementById('lgm-defs')) {
+      const d = document.createElement('div'); d.id = 'lgm-defs'; d.setAttribute('aria-hidden', 'true'); d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+      const g = (id, a, b, c) => '<linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + a + '"/><stop offset=".5" stop-color="' + b + '"/><stop offset="1" stop-color="' + c + '"/></linearGradient>';
+      d.innerHTML = '<svg><defs>' + g('lgm-b', '#FFD7B0', '#E6A672', '#8A4A22') + g('lgm-s', '#FFFFFF', '#C9D3E0', '#6B7689') + g('lgm-g', '#FFF3B0', '#FFC53D', '#B7791F') + g('lgm-d', '#E6FCFF', '#7FE3FF', '#1B6FA8') + g('lgm-l', '#3A3A5C', '#26264A', '#17172A') + '</defs></svg>';
+      document.body.appendChild(d);
+    }
+    this.onDown = (e) => { const st = document.getElementById('stage'), r = st && st.getBoundingClientRect(); if (r) this.lastXY = { x: (e.clientX - r.left) / (r.width / 844), y: (e.clientY - r.top) / (r.width / 844) }; };
+    document.addEventListener('pointerdown', this.onDown, true);
   }
   store(key, def) { try { const v = JSON.parse(localStorage.getItem(key) || 'null'); return v == null ? def : v; } catch (e) { return def; } }
   achievements() {
@@ -98,34 +195,70 @@ class Component extends DCLogic {
       localStorage.setItem('arenamix.ach.v1', JSON.stringify(cl));
       if (window.AMProgress) window.AMProgress.addCoins(a.reward); else localStorage.setItem('arenamix.wallet.v1', JSON.stringify({ coins: this.coins() + a.reward }));
     } catch (e) {}
+    this.burst = a.id; clearTimeout(this.burstT); this.burstT = setTimeout(() => { this.burst = null; this.forceUpdate(); }, 1400);
+    if (window.AMJuice && window.AMJuice.confetti) { const r = this.lastXY || { x: 140, y: 250 }; window.AMJuice.confetti(r.x, r.y, '#FFC53D'); }
     clearTimeout(this.toastT);
     this.toastT = setTimeout(() => this.setState({ toast: '' }), 1800);
     this.setState({ toast: '¡' + a.title + '! +' + a.reward + ' VCD', n: this.state.n + 1 });
   }
-  componentWillUnmount() { clearTimeout(this.toastT); }
+  componentWillUnmount() { clearTimeout(this.toastT); clearTimeout(this.burstT); document.removeEventListener('pointerdown', this.onDown, true); }
+  tierOf(a) { return Lg_TIER.find((t) => a.reward <= t.max); }
+  catOf(a) { return ['ball', 'trophy', 'goal', 'fire'].indexOf(a.icon) >= 0 ? a.icon : 'special'; }
   renderVals() {
     const cl = this.claimed(), list = this.achievements();
-    // ready to claim first, then in progress (closest first), claimed last
-    const rank = (a) => (a.cur >= a.goal ? (cl[a.id] ? 2 : 0) : 1);
+    const state = (a) => (a.cur >= a.goal ? (cl[a.id] ? 'got' : 'ready') : 'locked');
+    // ready to claim first, then in progress (closest first), the ones in your cabinet last
+    const rank = (a) => ({ ready: 0, locked: 1, got: 2 })[state(a)];
     const sorted = list.slice().sort((x, y) => rank(x) - rank(y) || (y.cur / y.goal) - (x.cur / x.goal));
-    const items = sorted.map((a) => {
-      const done = a.cur >= a.goal, got = !!cl[a.id], ready = done && !got;
-      const o = {
-        title: a.title, desc: a.desc, reward: String(a.reward), prog: a.cur + '/' + a.goal,
-        canClaim: ready, isClaimed: got, isLocked: !done,
-        claim: () => this.claim(a),
-        bar: 'height: 8px; border-radius: 4px; width: ' + Math.round(a.cur / a.goal * 100) + '%; background: ' + (done ? 'linear-gradient(90deg, #53D88E, #9DF5C0)' : 'linear-gradient(90deg, #22D3EE, #7EF0FF)') + '; box-shadow: 0 0 8px ' + (done ? '#53D88E' : '#22D3EE') + ';',
-        iconBox: 'flex: none; width: 48px; height: 48px; border-radius: 0; clip-path: inset(0 round 12px); display: flex; align-items: center; justify-content: center; ' + (ready ? 'background: radial-gradient(circle at 35% 30%, #FFE38A, #D9A520); box-shadow: 0 0 16px #FFC53D88;' : got ? 'background: #0B0B14; filter: grayscale(.6);' : 'background: linear-gradient(160deg, #22224A, #0F0F20); border: 1px solid #2E2E58;'),
-        style: 'position: relative; display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 16px; clip-path: inset(0 round 14px); box-shadow: inset 4px 0 0 ' + (ready ? '#FFC53D' : got ? '#53D88E' : '#3A3F7A') + '; ' + (ready ? 'background: linear-gradient(110deg, #4A3508, #201808 70%);' : got ? 'background: #121220; opacity: .7;' : 'background: linear-gradient(110deg, #1F2350, #13142C 70%);')
-      };
-      Object.keys({ ball: 1, trophy: 1, goal: 1, fire: 1, shield: 1, multi: 1, rank: 1 }).forEach((k) => { o['is_' + k] = a.icon === k; });
-      return o;
+    // the order is fixed while you look at a tab: a medal you claim stays put and shines there
+    const tab = this.state.tab;
+    if (!this.order || this.order.tab !== tab) this.order = { tab, ids: sorted.filter((a) => tab === 'all' || this.catOf(a) === tab).map((a) => a.id) };
+    const shown = this.order.ids.map((id) => list.find((a) => a.id === id)).filter(Boolean);
+    const sel = list.find((a) => a.id === this.state.sel) || shown[0] || sorted[0];
+    const C = 2 * Math.PI * 31;
+    const cells = [];
+    shown.forEach((a, i) => {
+      const t = this.tierOf(a), s = state(a), f = a.cur / a.goal, on = s !== 'locked';
+      cells.push({
+        medal: true, shelf: false, ready: s === 'ready', got: s === 'got', locked: s === 'locked',
+        cls: 'lg-medal' + (s === 'ready' ? ' lg-ready' : '') + (sel && sel.id === a.id ? ' sel' : ''),
+        burst: this.burst === a.id ? 'lg-burst' : '',
+        aria: a.title + ': ' + (s === 'got' ? 'conseguido' : s === 'ready' ? 'listo para reclamar' : a.cur + ' de ' + a.goal),
+        pick: () => { this.setState({ sel: a.id }); if (s === 'ready') this.claim(a); },
+        rib: on ? t.rib : '#2A2A48', rim: on ? t.rim : 'url(#lgm-l)', face: on ? t.face : '#121224', ink: on ? t.ink : '#4A4A72', gloss: on ? '.55' : '.08',
+        icon: Lg_ICON[a.icon] || Lg_ICON.rank,
+        ringC: s === 'ready' ? '#FFC53D' : s === 'got' ? '#53D88E' : '#22D3EE',
+        dash: (C * (s === 'locked' ? f : 1)).toFixed(1) + ' ' + C.toFixed(1),
+        pct: Math.floor(f * 100) + '%',
+        title: a.title,
+        titleStyle: 'max-width: 100%; font-size: 10.5px; font-weight: 800; line-height: 1.15; text-align: center; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: ' + (s === 'ready' ? '#FFE38A' : s === 'got' ? '#F4F4FA' : '#8C8CB0') + ';'
+      });
+      if (i % 5 === 4 || i === shown.length - 1) cells.push({ shelf: true, medal: false });
     });
     const got = list.filter((a) => cl[a.id]).length;
-    const ready = list.filter((a) => a.cur >= a.goal && !cl[a.id]).length, pct = got / list.length * 360;
-    return { items, coins: this.fmt(this.coins()), doneLabel: got + ' de ' + list.length + ' conseguidos',
-      ring: 'conic-gradient(#FFC53D ' + pct.toFixed(0) + 'deg, #2E2E52 ' + pct.toFixed(0) + 'deg)',
-      hasReady: ready > 0, readyLabel: ready === 1 ? '¡1 premio por reclamar!' : '¡' + ready + ' premios por reclamar!', toast: !!this.state.toast, toastText: this.state.toast };
+    const ready = list.filter((a) => state(a) === 'ready').length;
+    const frac = got / list.length, RC = 2 * Math.PI * 34;
+    const coll = frac >= 1 ? ['LEYENDA', '#7FE3FF'] : frac >= 0.6 ? ['ORO', '#FFC53D'] : frac >= 0.3 ? ['PLATA', '#D6DEE9'] : ['BRONCE', '#E3A56E'];
+    const st = sel ? this.tierOf(sel) : Lg_TIER[0], ss = sel ? state(sel) : 'locked', son = ss !== 'locked';
+    const tabs = Lg_TABS.map(([id, label]) => {
+      const inCat = list.filter((a) => id === 'all' || this.catOf(a) === id), r = inCat.filter((a) => state(a) === 'ready').length, on = id === tab;
+      return { label, sel: on ? 'true' : 'false', count: inCat.filter((a) => cl[a.id]).length + '/' + inCat.length, ready: String(r), hasReady: r > 0,
+        style: on ? 'background: linear-gradient(135deg, #FFE38A, #FFC53D); color: #2A1C02; box-shadow: 0 3px 0 #9A6A0A, 0 0 14px #FFC53D66;' : 'background: #17172ACC; color: #CACAE0; box-shadow: inset 0 0 0 1px #2E2E52;',
+        pick: () => this.setState({ tab: id, sel: null }) };
+    });
+    return {
+      dust: Array.from({ length: 8 }, (_, k) => 'left: ' + (30 + k * 101 % 800) + 'px; bottom: ' + (k * 23 % 60) + 'px; --dx: ' + ((k % 3) - 1) * 16 + 'px; --d: ' + (6 + k % 4) + 's; animation-delay: ' + (-k * 0.9).toFixed(1) + 's'),
+      cells, tabs, coins: this.fmt(this.coins()),
+      doneLabel: got + ' de ' + list.length + ' logros' + (ready ? ' · ' + ready + ' por reclamar' : ''),
+      ringDash: (RC * frac).toFixed(1) + ' ' + RC.toFixed(1), collTier: coll[0], collColor: coll[1],
+      selC: son ? st.c : '#22D3EE', selTier: 'MEDALLA DE ' + st.name, selTitle: sel ? sel.title : '', selDesc: sel ? sel.desc : '',
+      selRib: son ? st.rib : '#2A2A48', selRim: son ? st.rim : 'url(#lgm-l)', selFace: son ? st.face : '#121224', selInk: son ? st.ink : '#4A4A72', selIcon: sel ? Lg_ICON[sel.icon] || Lg_ICON.rank : '',
+      selBar: sel ? 'height: 10px; border-radius: 5px; width: ' + Math.round(sel.cur / sel.goal * 100) + '%; background: ' + (son ? 'linear-gradient(90deg, #53D88E, #9DF5C0)' : 'linear-gradient(90deg, #22D3EE, #7EF0FF)') + ';' : '',
+      selProg: sel ? sel.cur + '/' + sel.goal : '', selReward: sel ? String(sel.reward) : '0',
+      selCan: ss === 'ready', selGot: ss === 'got', selLeft: ss === 'locked', selLeftText: sel ? 'Te faltan ' + (sel.goal - sel.cur) : '',
+      selClaim: () => sel && this.claim(sel),
+      toast: !!this.state.toast, toastText: this.state.toast
+    };
   }
 }
 </script>
