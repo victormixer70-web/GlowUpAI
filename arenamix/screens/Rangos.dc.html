@@ -34,6 +34,13 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 @keyframes rgCloud{from{transform:translateX(-260px)}to{transform:translateX(1100px)}}
 .rg-spark i{position:absolute;bottom:-6px;width:4px;height:4px;border-radius:50%;background:var(--rc);box-shadow:0 0 8px var(--rc);opacity:0;will-change:transform,opacity;animation:rgUp 6s linear infinite}
 @keyframes rgUp{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-330px);opacity:0}}
+.rg-shoot{position:absolute;width:90px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#FFFFFF);opacity:0;transform:rotate(-24deg);animation:rgShoot 7s ease-in infinite}
+@keyframes rgShoot{0%,82%{opacity:0;translate:0 0}85%{opacity:1}100%{opacity:0;translate:-320px 140px}}
+.rg-flag{transform-origin:0 50%;animation:rgWave 1.2s ease-in-out infinite alternate}
+@keyframes rgWave{from{transform:skewY(-6deg) scaleX(.94)}to{transform:skewY(5deg) scaleX(1.04)}}
+.rg-ped{position:absolute;left:50%;width:150px;height:26px;margin-left:-75px;border-radius:50%;pointer-events:none}
+.rg-bar{height:8px;border-radius:4px;background:#0B0B14;box-shadow:inset 0 1px 2px #000a;overflow:hidden}
+.rg-bar i{display:block;height:100%;border-radius:4px}
 .rg-step{display:flex;align-items:center;gap:6px;padding:0 8px;min-width:0;border-radius:12px;box-shadow:inset 0 2px 0 #ffffff14,inset 0 -3px 0 #0007}
 </style>
 </helmet>
@@ -46,6 +53,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <svg class="rg-mt f" viewBox="0 0 1000 240" preserveAspectRatio="none"><path d="M0 240L0 150L70 110L120 135L190 60L250 115L320 80L380 120L450 30L520 100L590 70L650 120L720 40L790 95L860 65L930 110L1000 80L1000 240Z" fill="color-mix(in srgb, var(--rc) 22%, #1A1440)"/><path d="M190 60L205 75L180 82ZM450 30L468 50L440 58ZM720 40L736 58L708 64Z" fill="#ffffff44"/></svg>
     <svg class="rg-mt m" viewBox="0 0 1000 180" preserveAspectRatio="none"><path d="M0 180L0 120L90 70L160 110L250 50L330 100L410 60L500 115L590 55L680 105L760 70L850 120L930 75L1000 100L1000 180Z" fill="#15112E"/></svg>
     <svg class="rg-mt n" viewBox="0 0 1000 120" preserveAspectRatio="none"><path d="M0 120L0 70L120 40L220 75L340 30L460 70L580 35L700 80L820 45L920 75L1000 55L1000 120Z" fill="#0C0A1E"/></svg>
+    <i class="rg-shoot" style="left: 760px; top: 30px"></i><i class="rg-shoot" style="left: 560px; top: 70px; animation-delay: -3.4s; animation-duration: 9s"></i>
     <div class="rg-spark"><sc-for list="{{sparks}}" as="k" hint-placeholder-count="0"><i style="{{k}}"></i></sc-for></div>
   </div>
   <!-- header -->
@@ -59,6 +67,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <section style="{{heroStyle}}">
     <div style="position: absolute; left: 50%; top: 92px; width: 300px; height: 300px; margin: -150px 0 0 -150px; border-radius: 50%; background: repeating-conic-gradient({{heroC}}33 0 9deg, transparent 11deg 24deg); -webkit-mask-image: radial-gradient(closest-side, #000, transparent); mask-image: radial-gradient(closest-side, #000, transparent); animation: rgSpin 30s linear infinite; pointer-events: none"></div>
     <div key="{{heroKey}}" style="position: relative; display: flex; flex-direction: column; align-items: center; animation: rgPop .45s cubic-bezier(.2,1.6,.4,1) both">
+      <span class="rg-ped" style="top: 104px; background: radial-gradient(closest-side, {{heroC}}AA, {{heroC}}22 60%, transparent)"></span>
       <svg width="118" height="124" viewBox="-6 -12 76 82" style="animation: rgFloat 3s ease-in-out infinite; filter: drop-shadow(0 8px 12px #000a) drop-shadow(0 0 18px {{heroC}}88)">
         <sc-if value="{{heroWings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{heroC}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{heroC}}"/></sc-if>
         <path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{heroC}}"/>
@@ -67,8 +76,17 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{heroC}}"/>
         <sc-if value="{{heroCrown}}" hint-placeholder-val="{{ false }}"><path d="M20 6L21 -7L27 -1L32 -9L37 -1L43 -7L44 6Z" fill="#FFC53D" stroke="#7A4E0E" stroke-width="1.5" stroke-linejoin="round"/></sc-if>
       </svg>
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 34px; line-height: 1; color: {{heroText}}; text-shadow: 0 4px 0 #05050A, 0 0 20px {{heroC}}66">{{heroName}}</span>
+      <span style="position: relative; padding: 2px 26px 4px; clip-path: polygon(0 0, 100% 0, 92% 50%, 100% 100%, 0 100%, 8% 50%); background: linear-gradient(90deg, {{heroC2}}, {{heroC2}}EE 50%, {{heroC2}}); font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 32px; line-height: 1; color: {{heroText}}; text-shadow: 0 3px 0 #05050A, 0 0 20px {{heroC}}66">{{heroName}}</span>
       <span style="margin-top: 4px; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #CACAE0">{{heroSub}}</span>
+    </div>
+    <!-- where you stand against this rank -->
+    <div key="{{heroKey}}p" style="position: relative; width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 14px; background: #0B0B14AA; box-shadow: inset 0 0 0 1px {{heroC}}44; display: flex; flex-direction: column; gap: 5px; animation: rgPop .4s .1s cubic-bezier(.2,1.6,.4,1) both">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px">
+        <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 1.5px; color: {{heroText}}">{{progTitle}}</span>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 15px; color: {{progColor}}">{{progRight}}</span>
+      </div>
+      <div class="rg-bar"><i style="{{progBar}}"></i></div>
+      <span style="font-size: 10.5px; font-weight: 700; color: #CACAE0">{{progText}}</span>
     </div>
     <!-- its three divisions, as steps -->
     <div style="position: relative; display: flex; align-items: flex-end; gap: 6px; margin-top: 10px; width: 100%">
@@ -104,13 +122,15 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <sc-if value="{{r.locked}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: 6px; top: 2px; width: 18px; height: 18px; border-radius: 9px; background: #0B0B14; display: flex; align-items: center; justify-content: center"><svg width="10" height="10" viewBox="0 0 24 24" fill="#8686A6"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg></span></sc-if>
       </button>
     </sc-for>
+    <!-- the summit: a flag waving over Élite -->
+    <svg width="34" height="44" viewBox="0 0 34 44" style="{{flagStyle}}"><path d="M3 2V44" stroke="#E6E9F0" stroke-width="2.5" stroke-linecap="round"/><g class="rg-flag"><path d="M4 3h26l-6 8l6 8H4z" fill="#FFC53D"/><path d="M12 7l1.3 2.6 2.9.4-2.1 2 .5 2.9L12 13.5l-2.6 1.4.5-2.9-2.1-2 2.9-.4z" fill="#7A4E0E"/></g></svg>
     <!-- you, on the climb -->
     <div style="{{pinStyle}}">
       <span style="display: flex; align-items: center; gap: 6px; padding: 3px 9px 3px 3px; border-radius: 16px; background: #22D3EE; color: #0B0B14; box-shadow: 0 0 0 2px #05343C, 0 4px 0 #05343C, 0 0 16px #22D3EE88; white-space: nowrap">
         <img src="{{me}}" alt="" style="width: 24px; height: 24px; border-radius: 12px; object-fit: cover; object-position: 50% 0; background: #0B0B14">
         <b style="font: 800 11px Exo2, sans-serif">TÚ · {{myLabel}}</b>
       </span>
-      <span style="order: -1; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 8px solid #22D3EE"></span>
+      <span style="{{pinArrow}}"></span>
     </div>
   </div>
 
@@ -146,6 +166,25 @@ class Component extends DCLogic {
     let all = {};
     try { all = JSON.parse(localStorage.getItem('arenamix.mmr.v1') || '{}') || {}; } catch (e) {}
     return Object.keys(all).filter((k) => k.indexOf('futbol:') === 0).reduce((m, k) => Math.max(m, Number(all[k]) || 0), 0);
+  }
+  // how you stand against the rank on show: climbing it, still to reach it, or already past it
+  progress(R, i, mi, mmr, mdiv, mstep) {
+    const r = R[i], wins = (n) => Math.max(1, Math.ceil(n / 25));
+    if (i === mi) {
+      const lo = r.start + mdiv * mstep, hi = mdiv < 2 ? lo + mstep : (i < R.length - 1 ? R[i + 1].start : lo + mstep);
+      const f = Math.max(0, Math.min(1, (mmr - lo) / Math.max(1, hi - lo))), left = Math.max(0, hi - mmr);
+      const goal = mdiv < 2 ? 'División ' + (mdiv + 2) : i < R.length - 1 ? R[i + 1].name : 'la cima';
+      return { progTitle: 'TU PROGRESO · DIVISIÓN ' + (mdiv + 1), progRight: Math.round(f * 100) + '%', progColor: '#22D3EE',
+        progBar: 'width: ' + (f * 100).toFixed(1) + '%; background: linear-gradient(90deg, ' + r.c2 + ', ' + r.c1 + ', #FFFFFF); box-shadow: 0 0 8px ' + r.c1,
+        progText: 'Te faltan ' + this.fmt(left) + ' MMR para ' + goal + ' (≈ ' + wins(left) + ' victorias)' };
+    }
+    if (i > mi) {
+      const left = r.start - mmr;
+      return { progTitle: 'BLOQUEADO', progRight: this.fmt(r.start) + ' MMR', progColor: '#8686A6',
+        progBar: 'width: ' + Math.max(3, Math.min(100, mmr / Math.max(1, r.start) * 100)).toFixed(1) + '%; background: #3A3A64',
+        progText: 'Te faltan ' + this.fmt(left) + ' MMR (≈ ' + wins(left) + ' victorias)' };
+    }
+    return { progTitle: 'SUPERADO', progRight: '✓', progColor: '#53D88E', progBar: 'width: 100%; background: linear-gradient(90deg, #2F8A57, #53D88E)', progText: 'Ya has pasado por aquí. ¡Sigue subiendo!' };
   }
   tierOf(m) { const R = this.ranks(); let i = R.length - 1; while (i > 0 && m < R[i].start) i--; return i; }
   fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
@@ -190,8 +229,11 @@ class Component extends DCLogic {
         labelStyle: 'position: relative; margin-top: -2px; padding: 1px 7px; border-radius: 8px; background: #0B0B14D9; font: 800 10px Exo2, sans-serif; white-space: nowrap; color: ' + (x.id === sel ? x.text : k > mi ? '#6A6A8A' : '#CACAE0') + ';',
         pick: () => this.setState({ sel: x.id })
       })),
-      pinStyle: 'position: absolute; left: ' + px.toFixed(0) + 'px; top: ' + (py + 34).toFixed(0) + 'px; translate: -50% 0; display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 2; animation: rgPin 1.8s ease-in-out infinite;',
-      me, myLabel: mt.name + ' ' + (mdiv + 1) + ' · ' + this.fmt(mmr) + ' MMR'
+      pinArrow: py > 90 ? 'width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #22D3EE' : 'order: -1; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 8px solid #22D3EE',
+      flagStyle: 'position: absolute; left: ' + (P[R.length - 1][0] + 14) + 'px; top: ' + (P[R.length - 1][1] - 70) + 'px; pointer-events: none; filter: drop-shadow(0 0 8px #FFC53D88)',
+      ...this.progress(R, i, mi, mmr, mdiv, mstep),
+      pinStyle: 'position: absolute; left: ' + px.toFixed(0) + 'px; top: ' + (py > 90 ? py - 92 : py + 34).toFixed(0) + 'px; translate: -50% 0; display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 2; animation: rgPin 1.8s ease-in-out infinite;',
+      me, myLabel: this.fmt(mmr) + ' MMR'
     };
   }
 }
