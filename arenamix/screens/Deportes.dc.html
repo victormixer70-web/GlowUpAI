@@ -11,6 +11,9 @@
 <style>
 @keyframes hmPop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
 @keyframes hmWiggle{0%,62%,100%{rotate:0deg;scale:1}66%{rotate:-9deg;scale:1.08}72%{rotate:8deg;scale:1.1}78%{rotate:-6deg}84%{rotate:4deg}90%{rotate:0deg;scale:1}}
+.hm-wheel-disc{animation:amSpin 9s linear infinite;filter:drop-shadow(0 4px 6px #000a) drop-shadow(0 0 10px #FFC53D66)}
+.hm-wheel:hover .hm-wheel-disc{animation-duration:2s}
+.hm-wheel-tag{position:absolute;left:50%;bottom:-10px;translate:-50% 0;padding:2px 7px;border-radius:8px;background:#FF3B5C;color:#FFFFFF;font:800 9.5px Exo2,sans-serif;letter-spacing:.5px;white-space:nowrap;box-shadow:0 0 0 2px #05050A,0 0 10px #FF3B5C;animation:amPulse 1.4s ease-in-out infinite}
 .hm-wiggle{animation:hmWiggle 2.2s ease-in-out infinite;transform-origin:50% 90%}
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
@@ -93,10 +96,16 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <span style="display: flex; align-items: center; gap: 10px; transform: skewX(0deg); font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 2px">JUGAR<svg class="hm-arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B0B14" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6l-6 6"/></svg></span>
     </span>
   </a>
+  <!-- the daily prize wheel, next to JUGAR -->
+  <button type="button" onClick="{{openWheel}}" aria-label="Ruleta diaria" class="hm-wheel" style="position: absolute; left: 308px; top: 226px; width: 54px; height: 54px; z-index: 3; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer">
+    <svg width="54" height="54" viewBox="0 0 54 54" class="hm-wheel-disc"><circle cx="27" cy="27" r="25" fill="#FFC53D" stroke="#05050A" stroke-width="3"/><g transform="translate(27 27)"><path d="M0 0L0 -21A21 21 0 0 1 14.8 -14.8Z" fill="#22D3EE"/><path d="M0 0L14.8 -14.8A21 21 0 0 1 21 0Z" fill="#FF5CC8"/><path d="M0 0L21 0A21 21 0 0 1 14.8 14.8Z" fill="#53D88E"/><path d="M0 0L14.8 14.8A21 21 0 0 1 0 21Z" fill="#A78BFA"/><path d="M0 0L0 21A21 21 0 0 1 -14.8 14.8Z" fill="#FF8A3D"/><path d="M0 0L-14.8 14.8A21 21 0 0 1 -21 0Z" fill="#6FB6FF"/><path d="M0 0L-21 0A21 21 0 0 1 -14.8 -14.8Z" fill="#FF5C5C"/><path d="M0 0L-14.8 -14.8A21 21 0 0 1 0 -21Z" fill="#FFE38A"/><circle r="6" fill="#FFF2B0" stroke="#05050A" stroke-width="2"/></g></svg>
+    <svg width="14" height="16" viewBox="0 0 34 42" style="position: absolute; left: 20px; top: -9px"><path d="M17 40L3 12a14 14 0 1 1 28 0z" fill="#FF3B5C" stroke="#05050A" stroke-width="4"/></svg>
+    <sc-if value="{{wheelReady}}" hint-placeholder-val="{{ true }}"><span class="hm-wheel-tag">¡GRATIS!</span></sc-if>
+  </button>
   <!-- your own player, in 3D, stepping out of the panel (the 2D figure only if 3D isn't available) -->
   <div style="position: absolute; left: 378px; top: 324px; width: 170px; height: 30px; margin-top: -22px; z-index: 1; pointer-events: none; border-radius: 50%; background: radial-gradient(closest-side, #22D3EE55, transparent)"></div>
   <sc-if value="{{hero3d}}" hint-placeholder-val="{{ true }}">
-    <div ref="{{heroRef}}" style="position: absolute; left: 362px; top: 52px; width: 200px; height: 290px; z-index: 2; pointer-events: none; filter: drop-shadow(0 12px 16px #000C)"></div>
+    <div ref="{{heroRef}}" role="button" aria-label="Tu jugador: tócalo para que haga una jugada" onClick="{{heroTap}}" style="position: absolute; left: 362px; top: 52px; width: 200px; height: 290px; z-index: 2; cursor: pointer; filter: drop-shadow(0 12px 16px #000C)"></div>
   </sc-if>
   <sc-if value="{{hero2d}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; left: 408px; top: 72px; z-index: 2; pointer-events: none; filter: drop-shadow(0 12px 16px #000C); animation: hmPlayer 3.4s ease-in-out infinite">
@@ -269,6 +278,9 @@ class Component extends DCLogic {
       go_futbol: go('futbol'), href_futbol: href('futbol'),
       ready: String(ready), hasReady: ready > 0, achLabel: ready ? '¡Premios por reclamar!' : 'Supera retos con premio',
       heroRef: this.heroRef,
+      wheelReady: !!(window.AMJuice && window.AMJuice.wheel.ready()),
+      openWheel: (e) => { if (e) e.preventDefault(); if (window.AMJuice) { window.AMJuice.wheel.open(); const re = () => { window.removeEventListener('am:wheel', re); this.forceUpdate(); }; window.addEventListener('am:wheel', re); } },
+      heroTap: (e) => { if (e) { e.preventDefault(); e.stopPropagation(); } if (window.AMHero && window.AMHero.play) window.AMHero.play(); },
       hero3d: hero3d, hero2d: !hero3d,
       face: hero3d ? 'assets/chars/' + window.AMChars.pref() + '.png' : '', hasFace: hero3d, noFace: !hero3d,
       kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#0B0B14', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#17172A', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE'

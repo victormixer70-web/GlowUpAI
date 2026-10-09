@@ -265,6 +265,14 @@
     f.style.left = (15 + 68.4 * p).toFixed(2) + '%'; f.style.opacity = p >= 0.995 ? '0' : '1'; t.textContent = v + '%';
     if (box) box.setAttribute('aria-valuenow', String(v));
   }
+  // tips that take turns on the loading screen
+  var TIPS = ['Mejora tu control del balón y domina la liga.', 'Mantén CHUT para cargar el tiro: más carga, más altura.', 'Con SPRINT y PASE juntos mandas el balón al hueco.', 'Mantén PASE para bombear el balón por encima.', 'Regatea en el momento justo y te sale una filigrana perfecta.', 'Llena la barra SÚPER y tu próximo chut saldrá ardiendo.', 'En el último medio minuto los goles valen doble.', 'Gira la ruleta diaria: un premio gratis cada día.', 'Equípate en la Taquilla y luce tu estilo en el campo.'];
+  var tipK = 0, tipT = setInterval(function () {
+    var el = document.getElementById('ld-tip');
+    if (!el || finished) { clearInterval(tipT); return; }
+    el.style.opacity = '0';
+    setTimeout(function () { tipK = (tipK + 1) % TIPS.length; el.textContent = TIPS[tipK]; el.style.opacity = '1'; }, 300);
+  }, 2200);
   function pump() {
     if (finished) return;
     var target = Math.min(done / total, Math.min(1, (Date.now() - t0) / MIN_MS));

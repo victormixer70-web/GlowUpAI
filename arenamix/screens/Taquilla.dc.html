@@ -589,6 +589,9 @@ class Component extends DCLogic {
       const equip = { ...s.equip, [sport]: { ...s.equip[sport], [s.cat]: selItem.id } };
       this.saveLocker(equip, (extra && extra.bought) || s.bought);
       this.setState({ equip, preview: null, ...(extra || {}) });
+      // your player shows it off: a full turn and a burst of confetti
+      this.spin = 13 * (Math.random() < 0.5 ? -1 : 1);
+      if (window.AMJuice && window.AMJuice.confetti) window.AMJuice.confetti(300, 150, '#22D3EE');
     };
     const sportObj = SPORTS.find((x) => x.id === sport);
     const league = L[sport][Number(kitItem.id.split('-')[1])];

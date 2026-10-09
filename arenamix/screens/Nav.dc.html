@@ -19,6 +19,15 @@ body{margin:0}
 .nv-item .ic{display:flex;transition:scale .35s cubic-bezier(.3,1.8,.5,1),filter .3s}
 .nv-item[aria-current="page"] .ic{scale:1.14;filter:drop-shadow(0 2px 0 #0006)}
 .nv-item:not([aria-current="page"]):hover{background:#ffffff0a}
+/* the active icon hops in, then keeps a little life of its own */
+.nv-item[aria-current="page"] .ic{animation:nvHop .6s cubic-bezier(.3,1.8,.5,1) both}
+@keyframes nvHop{from{translate:0 8px;rotate:-12deg}55%{translate:0 -7px;rotate:8deg}to{translate:0 0;rotate:0deg}}
+.nv-item[aria-current="page"] .ic>*{animation:var(--nv-idle) 2.4s .6s ease-in-out infinite;transform-origin:50% 20%}
+.nv-item:nth-child(1){--nv-idle:nvBeat}.nv-item:nth-child(2){--nv-idle:nvSway}.nv-item:nth-child(3){--nv-idle:nvBag}.nv-item:nth-child(4){--nv-idle:nvBob}
+@keyframes nvBeat{0%,60%,100%{transform:scale(1)}70%{transform:scale(1.14)}80%{transform:scale(.97)}90%{transform:scale(1.08)}}
+@keyframes nvSway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+@keyframes nvBag{0%,55%,100%{transform:translateY(0)}65%{transform:translateY(-4px) rotate(-6deg)}75%{transform:translateY(0)}85%{transform:translateY(-2px) rotate(5deg)}}
+@keyframes nvBob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) translateY(-1px)}}
 .nv-item:not([aria-current="page"]):active{translate:0 2px}
 </style>
 </helmet>

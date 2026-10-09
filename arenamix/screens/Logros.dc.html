@@ -96,7 +96,7 @@ class Component extends DCLogic {
     cl[a.id] = true;
     try {
       localStorage.setItem('arenamix.ach.v1', JSON.stringify(cl));
-      localStorage.setItem('arenamix.wallet.v1', JSON.stringify({ coins: this.coins() + a.reward }));
+      if (window.AMProgress) window.AMProgress.addCoins(a.reward); else localStorage.setItem('arenamix.wallet.v1', JSON.stringify({ coins: this.coins() + a.reward }));
     } catch (e) {}
     clearTimeout(this.toastT);
     this.toastT = setTimeout(() => this.setState({ toast: '' }), 1800);

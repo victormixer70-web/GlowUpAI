@@ -7,12 +7,14 @@
 
   /* ---------- coins ---------- */
   function coins() { return (get('arenamix.wallet.v1', null) || { coins: 2450 }).coins; }
-  function addCoins(n) { var w = get('arenamix.wallet.v1', null) || { coins: 2450 }; w.coins = Math.max(0, w.coins + n); put('arenamix.wallet.v1', w); return w.coins; }
+  // every change to the wallet is announced, so the screen can fly coins to the counter
+  function told(kind, n, total) { try { if (n) window.dispatchEvent(new CustomEvent('am:wallet', { detail: { kind: kind, delta: n, total: total } })); } catch (e) {} }
+  function addCoins(n) { var w = get('arenamix.wallet.v1', null) || { coins: 2450 }; w.coins = Math.max(0, w.coins + n); put('arenamix.wallet.v1', w); told('vcd', n, w.coins); return w.coins; }
 
   /* ---------- BOB: the gems (premium currency). Earned on level ups, daily missions and the season pass;
      spent on boosts in the Tienda ---------- */
   function gems() { return (get('arenamix.gems.v1', null) || { n: 60 }).n; }
-  function addGems(n) { var g = get('arenamix.gems.v1', null) || { n: 60 }; g.n = Math.max(0, g.n + n); put('arenamix.gems.v1', g); return g.n; }
+  function addGems(n) { var g = get('arenamix.gems.v1', null) || { n: 60 }; g.n = Math.max(0, g.n + n); put('arenamix.gems.v1', g); told('bob', n, g.n); return g.n; }
   function spendGems(n) { if (gems() < n) return false; addGems(-n); return true; }
 
 
@@ -315,6 +317,13 @@
     M.list.forEach(function (x) { var p = POOL.find(function (m) { return m.id === x.id; }); if (p) x.have = Math.min(p.n, x.have + (add[p.key] || 0)); });
     put('arenamix.missions.v1', M);
     var mAfter = missions().list;
+    // notices for what this match unlocked (shown over whatever screen comes next)
+    var notes = [];
+    if (after.level > before.level) notes.push({ title: '¡SUBES DE NIVEL!', sub: 'Ya eres nivel ' + after.level + (gemsGain ? ' · +' + gemsGain + ' BOB' : ''), color: '#FFC53D', icon: 'level' });
+    if (pv.after > pv.before) notes.push({ title: '¡PASE NIVEL ' + pv.after + '!', sub: 'Tienes premios del pase de temporada', color: '#FF8A3D', icon: 'pass' });
+    mAfter.forEach(function (m, i) { if (m.done && !(mBefore[i] && mBefore[i].done)) notes.push({ title: '¡MISIÓN COMPLETADA!', sub: m.text || m.title || 'Recoge tu premio en inicio', color: '#53D88E', icon: 'mission' }); });
+    if (W2.wins > w0 && W2.milestones.some(function (m) { return m.at === W2.wins; })) notes.push({ title: '¡PREMIO SEMANAL!', sub: W2.wins + ' victorias: recógelo en la Tienda', color: '#22D3EE', icon: 'gift' });
+    notes.forEach(function (n, k) { setTimeout(function () { try { window.dispatchEvent(new CustomEvent('am:toast', { detail: n })); } catch (e) {} }, 4500 + k * 200); });
     return {
       home: info.home, away: info.away, won: won, lost: lost,
       xpLines: lines, xpGain: gain, before: before, after: after, levelUps: after.level - before.level,
@@ -330,7 +339,7 @@
     coins: coins, addCoins: addCoins, gems: gems, addGems: addGems, spendGems: spendGems,
     boostList: BOOSTS, boostLeft: boostLeft, buyBoost: buyBoost, useBoost: useBoost,
     aiPref: aiPref, setAiPref: setAiPref, aiLevel: aiLevel,
-    celebList: CELEBS, celebs: celebState, buyCeleb: buyCeleb, equipCeleb: equipCeleb,
+    celebList: CELEBS, celebs: celebState, buyCeleb: buyCeleb, equipCeleb: equipCeleb, rollChest: rollChest,
     // everything waiting to be collected, by section (for the badges on the menu)
     pending: function () {
       var W = weekly(), P = pass(), M = missions();
