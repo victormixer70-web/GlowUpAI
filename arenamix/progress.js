@@ -13,8 +13,8 @@
 
   /* ---------- BOB: the gems (premium currency). Earned on level ups, daily missions and the season pass;
      spent on boosts in the Tienda ---------- */
-  function gems() { return (get('arenamix.gems.v1', null) || { n: 60 }).n; }
-  function addGems(n) { var g = get('arenamix.gems.v1', null) || { n: 60 }; g.n = Math.max(0, g.n + n); put('arenamix.gems.v1', g); told('bob', n, g.n); return g.n; }
+  function gems() { return (get('arenamix.gems.v1', null) || { n: 20 }).n; }
+  function addGems(n) { var g = get('arenamix.gems.v1', null) || { n: 20 }; g.n = Math.max(0, g.n + n); put('arenamix.gems.v1', g); told('bob', n, g.n); return g.n; }
   function spendGems(n) { if (gems() < n) return false; addGems(-n); return true; }
 
 
@@ -197,9 +197,9 @@
     var x = M.list.find(function (m) { return m.id === id; }), p = POOL.find(function (m) { return m.id === id; });
     if (!x || !p || x.claimed || x.have < p.n) return null;
     x.claimed = true; put('arenamix.missions.v1', M);
-    addCoins(p.coins); addGems(3); var before = levelOf(xp()); var after = levelOf(addXp(p.xp)); addPassXp(p.xp);
-    if (after.level > before.level) addGems(5 * (after.level - before.level));
-    return { coins: p.coins, gems: 3, xp: p.xp, levelUp: after.level > before.level ? after.level : 0 };
+    addCoins(p.coins); var before = levelOf(xp()); var after = levelOf(addXp(p.xp)); addPassXp(p.xp);
+    if (after.level > before.level) addGems(2 * (after.level - before.level));
+    return { coins: p.coins, gems: 0, xp: p.xp, levelUp: after.level > before.level ? after.level : 0 };
   }
 
   /* ---------- the season pass: 30 levels, a free row for everyone and a premium row for pass holders ----------
@@ -207,12 +207,12 @@
      (matches and missions); every level needs 300. Premium is bought once per season (payment still to wire up). */
   var SEASON0 = new Date(2026, 9, 5).getTime(), SEASON_DAYS = 42, PASS_XP = 300;
   var C = function (n) { return { t: 'coins', n: n }; }, B = function (n) { return { t: 'gems', n: n }; }, X = function (k) { return { t: 'chest', k: k }; }, I = function (id) { return { t: 'item', id: id }; };
-  var FREE = [C(100), X('common'), C(150), X('common'), I('h11'), B(10), X('common'), C(200), X('rare'), I('s8'),
-    C(200), X('common'), B(15), X('rare'), I('futbol-5-3'), C(250), X('common'), C(300), X('rare'), I('h5'),
-    B(20), X('common'), C(350), X('rare'), C(400), X('epic'), B(25), X('rare'), C(500), X('legend')];
-  var PREM = [I('h10'), B(20), X('rare'), I('f6'), C(300), I('futbol-5-1'), X('rare'), B(30), I('s7'), X('epic'),
-    C(400), X('rare'), B(30), I('futbol-5-2'), X('epic'), C(500), X('rare'), I('s6'), B(40), X('epic'),
-    C(600), X('rare'), B(40), X('epic'), I('h6'), B(50), X('epic'), C(800), X('legend'), I('futbol-5-0')];
+  var FREE = [C(100), X('common'), C(150), X('common'), I('h11'), B(3), X('common'), C(200), X('rare'), I('s8'),
+    C(200), X('common'), B(5), X('rare'), I('futbol-5-3'), C(250), X('common'), C(300), X('rare'), I('h5'),
+    B(5), X('common'), C(350), X('rare'), C(400), X('epic'), B(8), X('rare'), C(500), X('legend')];
+  var PREM = [I('h10'), B(5), X('rare'), I('f6'), C(300), I('futbol-5-1'), X('rare'), B(8), I('s7'), X('epic'),
+    C(400), X('rare'), B(8), I('futbol-5-2'), X('epic'), C(500), X('rare'), I('s6'), B(10), X('epic'),
+    C(600), X('rare'), B(10), X('epic'), I('h6'), B(15), X('epic'), C(800), X('legend'), I('futbol-5-0')];
   var CHEST_NAME = { common: 'Cofre común', rare: 'Cofre raro', epic: 'Cofre épico', legend: 'Cofre legendario' };
   function season(t) {
     var n = Math.max(0, Math.floor(((t || Date.now()) - SEASON0) / (SEASON_DAYS * 864e5)));
@@ -303,7 +303,7 @@
     var coinsGain = won ? 40 : lost ? 10 : 20, levelBonus = 0;
     if (useBoost('vcd2')) { coinsGain *= 2; used.push('Doble VCD'); }
     for (var lv = before.level + 1; lv <= after.level; lv++) levelBonus += 100;
-    var gemsGain = 5 * (after.level - before.level);
+    var gemsGain = 2 * (after.level - before.level);
     if (gemsGain) addGems(gemsGain);
     var c0 = coins(); addCoins(coinsGain + levelBonus);
     // the weekly track

@@ -144,15 +144,15 @@
   // ---- the daily prize wheel ----
   var SEG = [
     { label: '50', sub: 'VCD', kind: 'vcd', n: 50, c: '#22D3EE' },
-    { label: '10', sub: 'BOB', kind: 'bob', n: 10, c: '#FF5CC8' },
+    { label: '1', sub: 'BOB', kind: 'bob', n: 1, c: '#FF5CC8' },
     { label: '150', sub: 'VCD', kind: 'vcd', n: 150, c: '#FFC53D' },
     { label: 'COFRE', sub: 'común', kind: 'chest', k: 'common', c: '#53D88E' },
-    { label: '25', sub: 'BOB', kind: 'bob', n: 25, c: '#A78BFA' },
+    { label: '3', sub: 'BOB', kind: 'bob', n: 3, c: '#A78BFA' },
     { label: '300', sub: 'VCD', kind: 'vcd', n: 300, c: '#FF8A3D' },
     { label: 'COFRE', sub: 'raro', kind: 'chest', k: 'rare', c: '#6FB6FF' },
-    { label: '5', sub: 'BOB', kind: 'bob', n: 5, c: '#FF5C5C' }
+    { label: '100', sub: 'VCD', kind: 'vcd', n: 100, c: '#FF5C5C' }
   ];
-  var WEIGHT = [22, 10, 16, 12, 6, 6, 4, 24];
+  var WEIGHT = [24, 6, 18, 12, 2, 7, 4, 27];
   var day = function () { var d = new Date(); return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate(); };
   var ready = function () { try { var w = JSON.parse(localStorage.getItem('arenamix.wheel.v1') || 'null'); return !w || w.day !== day(); } catch (e) { return true; } };
   var disc = function () {
@@ -183,6 +183,7 @@
       if (!ready()) return;
       hub.disabled = true;
       try { localStorage.setItem('arenamix.wheel.v1', JSON.stringify({ day: day() })); } catch (e) {}
+      setTimeout(function () { daily.check(); }, 6500);
       // pick a prize by weight, then turn the wheel so it stops under the pin
       var tot = WEIGHT.reduce(function (a, b) { return a + b; }, 0), r = Math.random() * tot, k = 0;
       while (r > WEIGHT[k]) { r -= WEIGHT[k]; k++; }
@@ -205,8 +206,34 @@
   // daily mini-games: one go each per day
   var daily = {
     ready: function (id) { if (id === 'wheel') return ready(); try { var d = JSON.parse(localStorage.getItem('arenamix.daily.v1') || 'null'); return !d || d.day !== day() || !d[id]; } catch (e) { return true; } },
-    mark: function (id) { var d = null; try { d = JSON.parse(localStorage.getItem('arenamix.daily.v1') || 'null'); } catch (e) {} if (!d || d.day !== day()) d = { day: day() }; d[id] = 1; try { localStorage.setItem('arenamix.daily.v1', JSON.stringify(d)); } catch (e) {} },
-    count: function () { return ['wheel', 'pens', 'fk'].filter(function (id) { return daily.ready(id); }).length; }
+    mark: function (id) { setTimeout(function () { daily.check(); }, 2200); var d = null; try { d = JSON.parse(localStorage.getItem('arenamix.daily.v1') || 'null'); } catch (e) {} if (!d || d.day !== day()) d = { day: day() }; d[id] = 1; try { localStorage.setItem('arenamix.daily.v1', JSON.stringify(d)); } catch (e) {} },
+    count: function () { return ['wheel', 'pens', 'fk'].filter(function (id) { return daily.ready(id); }).length; },
+    // weekly streak: playing all three on a day adds a day; skipping a day starts again
+    REWARDS: [{ t: 'vcd', n: 50 }, { t: 'vcd', n: 80 }, { t: 'chest', k: 'common' }, { t: 'vcd', n: 120 }, { t: 'bob', n: 1 }, { t: 'vcd', n: 150 }, { t: 'bob', n: 3, chest: 'rare' }],
+    streak: function () {
+      var st = null; try { st = JSON.parse(localStorage.getItem('arenamix.streak.v1') || 'null'); } catch (e) {}
+      st = st || { n: 0, last: 0 };
+      var y = new Date(); y.setDate(y.getDate() - 1); var yd = y.getFullYear() * 10000 + (y.getMonth() + 1) * 100 + y.getDate();
+      if (st.last !== day() && st.last !== yd) st = { n: 0, last: st.last };
+      return { n: st.n, today: st.last === day() };
+    },
+    check: function () {
+      if (daily.count() > 0) return;
+      var st = daily.streak();
+      if (st.today) return;
+      var n = st.n % 7 + 1;
+      try { localStorage.setItem('arenamix.streak.v1', JSON.stringify({ n: n, last: day() })); } catch (e) {}
+      var r = daily.REWARDS[n - 1], P = window.AMProgress;
+      setTimeout(function () {
+        toast({ title: '¡RACHA DÍA ' + n + '!', sub: n === 7 ? 'Semana completa: ¡premio gordo!' : 'Vuelve mañana para seguir la racha', color: '#FF8A3D', icon: 'gift' });
+        if (!P) return;
+        if (r.t === 'vcd') P.addCoins(r.n);
+        if (r.t === 'bob') P.addGems(r.n);
+        var ck = r.t === 'chest' ? r.k : r.chest;
+        if (ck && P.rollChest) { var out = P.rollChest(ck); out.milestone = { name: 'Racha de minijuegos', prize: 'chest', chest: ck }; setTimeout(function () { if (window.AMResults) window.AMResults.reward(out, function () {}); }, 1400); }
+        window.dispatchEvent(new Event('am:wheel'));
+      }, 1800);
+    }
   };
   window.AMJuice = { daily: daily, fly: fly, toast: toast, confetti: function (x, y, c) { mount(); confetti(x, y, c); }, wheel: { open: open, ready: ready } };
 })();
