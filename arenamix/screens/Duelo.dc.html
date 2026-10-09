@@ -198,7 +198,7 @@ class Component extends DCLogic {
     this.D = f.D; this.GX = f.GX;
     const sg = f.GX >= 0 ? 1 : -1, cx = (f.GX - sg * 1.2) * 9.15 / f.D;
     this.WALL = Array.from({ length: f.n }, (_, k) => +(cx + (k - (f.n - 1) / 2) * 0.55).toFixed(2));
-    if (rebuild && this.R) { this.buildScene(); this.camSnap = true; }
+    if (rebuild && this.R) this.relayout();
   }
   resetShot() {
     this.b = { x: 0, y: 0.11, z: 0, vx: 0, vy: 0, vz: 0, curve: 0 };
@@ -219,6 +219,12 @@ class Component extends DCLogic {
     this.raf = requestAnimationFrame(this.tick);
   }
   tick(now) {
+    // never let one bad frame stop the game: log it and keep the loop going
+    try { this.frame(now); } catch (e) { console.error('Duelo', e); }
+    const busy = ['defend', 'runup', 'flight', 'result'].includes(this.phase) || this.camT < 1.2 || !!this.charge || !!this.replaying;
+    this.raf = busy ? requestAnimationFrame(this.tick) : null;
+  }
+  frame(now) {
     // real time even on a slow phone: a long frame is split in small steps instead of slowing the game down
     const raw = Math.max(0, (now - this.last) / 1000), dt = Math.min(0.1, raw);
     this.last = now;
@@ -237,8 +243,6 @@ class Component extends DCLogic {
     this.camT = (this.camT || 0) + dt;
     this.draw3D(dt);
     this.forceUpdate();
-    const busy = ['defend', 'runup', 'flight', 'result'].includes(this.phase) || this.camT < 1.2 || !!this.charge;
-    this.raf = busy ? requestAnimationFrame(this.tick) : null;
   }
   integrate(b, dt) {
     const sp = Math.hypot(b.vx, b.vy, b.vz);
@@ -921,6 +925,7 @@ class Component extends DCLogic {
   }
   buildScene() {
     const T = THREE, D = this.D, GX = this.GX;
+    if (this.S) { this.disposeScene(this.S); this.S = null; this.env = null; this.wallPool = []; this.targetMat = null; this.targetGeo = null; }
     const S = new T.Scene();
     S.background = new T.Color(0x0b1430);
     S.fog = new T.Fog(0x0b1430, 70, 170);
@@ -936,6 +941,10 @@ class Component extends DCLogic {
       const R0 = this.R;
       if (R0) SKY.env(R0).then((e) => { if (!e || this.R !== R0) return; S.environment = e; hemi.intensity = 0.3; });
     }
+    // everything that belongs to the ground (pitch, stands, lights, goal) hangs from one group: a new
+    // free-kick spot just slides it, no rebuilding the stadium between shots
+    const E = new T.Group(); S.add(E);
+    this.env = E; this.envD = D; this.envGX = GX;
     const sun = new T.DirectionalLight(0xfff4e0, 1.25);
     sun.position.set(-18, 32, D - 18);
     sun.target.position.set(GX * 0.5, 0, D * 0.6);
@@ -943,8 +952,8 @@ class Component extends DCLogic {
     sun.shadow.mapSize.set(2048, 2048);
     Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 22, bottom: -14, near: 5, far: 90 });
     sun.shadow.bias = -0.0005;
-    S.add(sun); S.add(sun.target);
-    const fill = new T.DirectionalLight(0x9fc3ff, 0.35); fill.position.set(20, 18, D + 25); S.add(fill);
+    E.add(sun); E.add(sun.target);
+    const fill = new T.DirectionalLight(0x9fc3ff, 0.35); fill.position.set(20, 18, D + 25); E.add(fill);
 
     const zMin = Math.min(-30, D - 61.5), zMax = D + 14, W = 100, L = zMax - zMin, ppm = 20;
     const tex = this.canvasTex(W * ppm, L * ppm, (c, w, h) => {
@@ -966,15 +975,15 @@ class Component extends DCLogic {
     pitch.rotation.x = -Math.PI / 2;
     pitch.position.set(0, 0, (zMin + zMax) / 2);
     pitch.receiveShadow = true;
-    S.add(pitch);
+    E.add(pitch);
     const apron = new T.Mesh(new T.PlaneGeometry(400, 400), this.mat(0x0a3a0c, { roughness: 1 }));
-    apron.rotation.x = -Math.PI / 2; apron.position.y = -0.01; S.add(apron);
+    apron.rotation.x = -Math.PI / 2; apron.position.y = -0.01; E.add(apron);
 
     // stadium: a full bowl. Stand behind the goal (ultras in the middle), both touchline stands, and the
     // stand at the far end, behind the penalty taker (it fills the background when you play in goal)
     const teamCols = [['#FF8A3D', '#0B0B14'], ['#3EA6FF', '#F4F4FA']];
     const far = D - 61;
-    this.fans = this.buildStadium(S, [
+    this.fans = this.buildStadium(E, [
       ['goal', 0, D + 9, 81, 0, () => true, (w) => Math.abs(w.x) < 15],
       ['west', -40.5, D - 26, 70, -Math.PI / 2, () => true],
       ['east', 40.5, D - 26, 70, Math.PI / 2, () => true],
@@ -993,23 +1002,23 @@ class Component extends DCLogic {
     });
     adTex.wrapS = T.RepeatWrapping; adTex.repeat.set(2, 1);
     const adMat = new T.MeshStandardMaterial({ map: adTex, emissive: 0xffffff, emissiveMap: adTex, emissiveIntensity: 0.9 });
-    const board = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); board.position.set(0, 0.45, D + 7); S.add(board);
-    const board2 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); board2.position.set(0, 0.45, far + 2); S.add(board2);
-    [-1, 1].forEach((s) => { const sb = new T.Mesh(new T.BoxGeometry(0.15, 0.9, 50), adMat); sb.position.set(36 * s, 0.45, D - 18); S.add(sb); });
+    const board = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); board.position.set(0, 0.45, D + 7); E.add(board);
+    const board2 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); board2.position.set(0, 0.45, far + 2); E.add(board2);
+    [-1, 1].forEach((s) => { const sb = new T.Mesh(new T.BoxGeometry(0.15, 0.9, 50), adMat); sb.position.set(36 * s, 0.45, D - 18); E.add(sb); });
 
     // floodlights
     const glowTex = this.canvasTex(128, 128, (c) => { const g = c.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(220,232,255,0.5)'); g.addColorStop(1, 'rgba(220,232,255,0)'); c.fillStyle = g; c.fillRect(0, 0, 128, 128); });
     [[-66, D + 30], [66, D + 30], [-66, D - 50], [66, D - 50]].forEach(([x, z]) => {
-      const pole = new T.Mesh(new T.CylinderGeometry(0.4, 0.7, 36, 8), this.mat(0x2a3556)); pole.position.set(x, 18, z); S.add(pole);
+      const pole = new T.Mesh(new T.CylinderGeometry(0.4, 0.7, 36, 8), this.mat(0x2a3556)); pole.position.set(x, 18, z); E.add(pole);
       const panel = new T.Mesh(new T.BoxGeometry(6, 3, 0.4), new T.MeshStandardMaterial({ color: 0xffffff, emissive: 0xf4f8ff, emissiveIntensity: 1.6 }));
-      panel.position.set(x, 36, z); panel.lookAt(0, 0, D / 2); S.add(panel);
+      panel.position.set(x, 36, z); panel.lookAt(0, 0, D / 2); E.add(panel);
       const sp = new T.Sprite(new T.SpriteMaterial({ map: glowTex, blending: T.AdditiveBlending, depthWrite: false, transparent: true, opacity: SKY ? 0.3 : 0.85 }));
-      sp.scale.set(30, 30, 1); sp.position.set(x, 36, z); S.add(sp);
+      sp.scale.set(30, 30, 1); sp.position.set(x, 36, z); E.add(sp);
     });
 
     // goal: a real 11-a-side goal (white frame, box net, padded poles behind); the back of the net gives
     const GOALm = window.AMNet.goal(7.32, 2.44, 2);
-    GOALm.group.position.set(GX, 0, D); S.add(GOALm.group);
+    GOALm.group.position.set(GX, 0, D); E.add(GOALm.group);
     this.net = GOALm.net;
 
     // ball
@@ -1039,22 +1048,55 @@ class Component extends DCLogic {
     this.shooterYou = this.makePlayer({ you: true, sport: 'futbol', shirt: 0xff8a3d, shorts: 0x141b2d, socks: 0xf2f5fa, number: '10', trimCss: '#0B0B14' });
     this.shooterRival = this.makePlayer({ shirt: 0x3ea6ff, shorts: 0xf2f5fa, socks: 0x3ea6ff, number: '9', trimCss: '#F4F4FA', hair: 0xc9a227, boot: 0xf2f5fa });
     S.add(this.shooterYou); S.add(this.shooterRival);
-    this.wallMen = this.WALL.map((x, i) => {
-      const p = this.makePlayer({ shirt: 0xe5484d, shorts: 0xf4f4f6, socks: 0xe5484d, hair: [0x241811, 0xc9a227, 0x3a2418][i % 3], number: String(4 + i), trimCss: '#F4F4F6', boot: 0xf2f5fa });
-      p.rotation.y = Math.PI; p.position.set(x, 0, 9.15); p.scale.set(0.95, 0.82, 0.95); this.pose(p, { wall: true }); S.add(p);
-      return p;
-    });
-    this.targets = [];
-    if (this.practice && !this.daily) {
-      [[GX - 3.0, 2.0], [GX + 3.0, 2.0]].forEach(([x, y]) => {
-        const t = new T.Mesh(new T.TorusGeometry(0.45, 0.035, 10, 40), new T.MeshStandardMaterial({ color: 0xc8f031, emissive: 0xc8f031, emissiveIntensity: 0.8 }));
-        t.position.set(x, y, D - 0.02); S.add(t); this.targets.push(t);
-      });
-    }
+    this.wallMen = []; this.targets = [];
+    this.placeWallAndTargets();
     this.tapRing = new T.Mesh(new T.TorusGeometry(0.4, 0.04, 10, 40), new T.MeshBasicMaterial({ color: 0x3ea6ff, transparent: true, opacity: 0.9 }));
     this.tapRing.visible = false;
     S.add(this.tapRing);
     this.draw3D(0);
+  }
+  // the wall (as many men as this free kick has) and the practice targets
+  placeWallAndTargets() {
+    const T = THREE, S = this.S, D = this.D, GX = this.GX;
+    this.wallPool = this.wallPool || [];
+    this.wallMen.forEach((p) => { p.visible = false; });
+    this.wallMen = this.WALL.map((x, i) => {
+      // reuse the men already made: making a player builds his kit textures, slow on a phone
+      let p = this.wallPool[i];
+      if (!p || p.parent !== S) {
+        p = this.makePlayer({ shirt: 0xe5484d, shorts: 0xf4f4f6, socks: 0xe5484d, hair: [0x241811, 0xc9a227, 0x3a2418][i % 3], number: String(4 + i), trimCss: '#F4F4F6', boot: 0xf2f5fa });
+        p.rotation.y = Math.PI; p.scale.set(0.95, 0.82, 0.95); this.pose(p, { wall: true }); S.add(p);
+        this.wallPool[i] = p;
+      }
+      p.visible = true; p.position.set(x, 0, 9.15);
+      return p;
+    });
+    this.targets.forEach((t) => S.remove(t));
+    this.targets = [];
+    if (this.practice && !this.daily) {
+      this.targetMat = this.targetMat || new T.MeshStandardMaterial({ color: 0xc8f031, emissive: 0xc8f031, emissiveIntensity: 0.8 });
+      this.targetGeo = this.targetGeo || new T.TorusGeometry(0.45, 0.035, 10, 40);
+      [[GX - 3.0, 2.0], [GX + 3.0, 2.0]].forEach(([x, y]) => {
+        const t = new T.Mesh(this.targetGeo, this.targetMat);
+        t.position.set(x, y, D - 0.02); S.add(t); this.targets.push(t);
+      });
+    }
+  }
+  // a new free-kick spot: slide the ground under the same scene
+  relayout() {
+    if (!this.env) { this.buildScene(); return; }
+    this.env.position.set(this.GX - this.envGX, 0, this.D - this.envD);
+    this.placeWallAndTargets();
+    this.camSnap = true;
+  }
+  // free the old scene on the graphics card before building another one
+  disposeScene(S) {
+    if (!S) return;
+    S.traverse((o) => {
+      if (o.geometry) o.geometry.dispose();
+      const ms = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];
+      ms.forEach((m) => { ['map', 'emissiveMap', 'normalMap', 'roughnessMap', 'alphaMap'].forEach((k) => { if (m[k] && m[k].dispose) m[k].dispose(); }); m.dispose(); });
+    });
   }
   viewTargets() {
     const D = this.D, GX = this.GX, T = THREE;
@@ -1151,7 +1193,11 @@ class Component extends DCLogic {
     // the net wraps round the ball pressing into it, then springs back
     if (this.net) {
       const GX = this.GX ?? 0;
-      if (b.z > D && Math.abs(b.x - GX) < 3.66) this.net.push(b.x - GX, b.y, b.z - (D + 2 - 0.11));
+      // the goal's net: press(across, depth past the line, height, radius); older nets took push()
+      if (b.z > D && Math.abs(b.x - GX) < 3.66) {
+        if (this.net.press) this.net.press(b.x - GX, b.z - D, b.y, 0.11);
+        else if (this.net.push) this.net.push(b.x - GX, b.y, b.z - (D + 2 - 0.11));
+      }
       this.net.step(dt || 0);
     }
     // tap ring
