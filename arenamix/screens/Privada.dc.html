@@ -12,6 +12,18 @@
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
+.pv-pitch{position:absolute;left:14px;right:14px;top:112px;bottom:70px;border-radius:16px;overflow:hidden;pointer-events:none;background:linear-gradient(90deg,#FF8A3D22,transparent 30%,transparent 70%,#3EA6FF22),repeating-linear-gradient(90deg,#17603333 0 54px,#14552D33 54px 108px);box-shadow:inset 0 0 0 2px #FFFFFF14}
+.pv-pitch::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:#FFFFFF22}
+.pv-pitch::after{content:"";position:absolute;left:50%;top:50%;width:90px;height:90px;margin:-45px;border-radius:50%;box-shadow:inset 0 0 0 2px #FFFFFF22}
+.pv-vs{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#FFE38A,#FFC53D 60%,#B7791F);color:#2A1C02;font:800 italic 18px 'Barlow Condensed',sans-serif;box-shadow:0 0 0 3px #0B0B14,0 0 18px #FFC53D88;z-index:2;animation:pvVs 1.6s ease-in-out infinite;pointer-events:none}
+@keyframes pvVs{0%,100%{transform:scale(1)}50%{transform:scale(1.12) rotate(-6deg)}}
+.pv-av{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 12px Exo2,sans-serif;color:#0B0B14;box-shadow:0 0 0 2px #0B0B14}
+.pv-code{display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 8px;border-radius:6px;background:linear-gradient(90deg,#3A2A0A,#2A1E06);box-shadow:inset 0 0 0 1.5px #FFC53D;-webkit-mask-image:radial-gradient(circle at 0 50%,transparent 5px,#000 5.5px),radial-gradient(circle at 100% 50%,transparent 5px,#000 5.5px);-webkit-mask-composite:source-in;mask-composite:intersect}
+.pv-go{position:relative;display:flex;align-items:center;gap:10px}
+.pv-go .rg{position:absolute;inset:0;border-radius:14px;box-shadow:0 0 0 2px #22D3EE;opacity:0;animation:pvRing 2.2s ease-out infinite;pointer-events:none}
+@keyframes pvRing{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.15,1.5)}}
+.pv-ball{animation:pvSpin 1.4s linear infinite}
+@keyframes pvSpin{to{transform:rotate(360deg)}}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; overflow: hidden;  isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif">
@@ -22,7 +34,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
     </a>
     <span class="bc-title" style="position: absolute; left: 66px; top: 14px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px">PARTIDA PRIVADA · {{sportName}}</span>
-    <span style="position: absolute; left: 66px; top: 46px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: #A3A3C2; white-space: nowrap">Código <b style="color: #FFC53D; letter-spacing: 3px; font-size: 15px">{{code}}</b><span style="{{netDot}}"></span>{{netLabel}}</span>
+    <span style="position: absolute; left: 66px; top: 46px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: #A3A3C2; white-space: nowrap">Código <span class="pv-code"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2.6" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><b style="color: #FFE38A; letter-spacing: 3px; font-size: 15px">{{code}}</b></span><span style="{{netDot}}"></span>{{netLabel}}</span>
     <div style="position: absolute; right: 14px; top: 12px; display: flex; gap: 6px">
       <input aria-label="Tu nombre en la sala" value="{{myName}}" onInput="{{onName}}" onBlur="{{saveName}}" maxlength="16" style="width: 120px; height: 38px; padding: 0 10px; box-sizing: border-box; border-radius: 12px; border: 1px solid #2E2E52; background: #0B0B14; color: #F4F4FA; font: 800 13px Exo2, sans-serif">
       <sc-if value="{{isGuest}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{leaveRoom}}" style="height: 40px; padding: 0 14px; border: 1px solid #FF8A8E; border-radius: 12px; background: #2A1420; color: #FF8A8E; font: 800 13px Exo2, sans-serif; cursor: pointer">Salir de la sala</button></sc-if>
@@ -41,24 +53,26 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <div style="position: absolute; left: 14px; top: 72px; right: 14px; display: flex; gap: 6px; flex-wrap: wrap">
       <sc-for list="{{formats}}" as="f" hint-placeholder-count="6"><button type="button" onClick="{{f.pick}}" style="{{f.style}}">{{f.title}}</button></sc-for>
     </div>
-    <div style="position: absolute; left: 14px; top: 116px; right: 14px; bottom: 74px; display: flex; gap: 14px">
+    <div class="pv-pitch" aria-hidden="true"></div>
+    <span class="pv-vs" aria-hidden="true" style="top: 216px">VS</span>
+    <div style="position: absolute; left: 24px; top: 120px; right: 24px; bottom: 78px; display: flex; gap: 60px">
       <div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
         <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE">EQUIPO NARANJA</span>
         <sc-for list="{{teamA}}" as="p" hint-placeholder-count="2">
-          <button type="button" onClick="{{p.tap}}" style="{{p.style}}"><span>{{p.name}}</span><span style="{{p.tagStyle}}">{{p.tag}}</span></button>
+          <button type="button" onClick="{{p.tap}}" style="{{p.style}}"><span class="pv-av" style="{{p.avStyle}}">{{p.ini}}</span><span style="flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</span><span style="{{p.tagStyle}}">{{p.tag}}</span></button>
         </sc-for>
       </div>
       <div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
         <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #FF8A8E">EQUIPO RIVAL</span>
         <sc-for list="{{teamB}}" as="p" hint-placeholder-count="2">
-          <button type="button" onClick="{{p.tap}}" style="{{p.style}}"><span>{{p.name}}</span><span style="{{p.tagStyle}}">{{p.tag}}</span></button>
+          <button type="button" onClick="{{p.tap}}" style="{{p.style}}"><span class="pv-av" style="{{p.avStyle}}">{{p.ini}}</span><span style="flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</span><span style="{{p.tagStyle}}">{{p.tag}}</span></button>
         </sc-for>
       </div>
     </div>
     <div style="position: absolute; left: 14px; right: 14px; bottom: 12px; display: flex; align-items: center; gap: 14px">
       <span style="flex: 1; font-size: 11px; line-height: 1.45; color: #A3A3C2">{{note}}</span>
       <sc-if value="{{canKeep}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">TU POSICIÓN</span><div style="display: flex; gap: 3px; padding: 3px; border-radius: 11px; background: #17172A"><button type="button" onClick="{{setField}}" style="{{fieldStyle}}">CAMPO</button><button type="button" onClick="{{setKeeper}}" style="{{keeperStyle}}">PORTERO</button></div></div></sc-if>
-      <button type="button" onClick="{{startMatch}}" class="bc-btn am-shine" style="flex: none; height: 52px; padding: 0 34px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">{{startLabel}}</button>
+      <button type="button" onClick="{{startMatch}}" class="bc-btn am-shine pv-go" style="flex: none; height: 52px; padding: 0 30px 0 20px; border: 0; border-radius: 14px; background: linear-gradient(180deg, #9AF5FF, #22D3EE 60%, #0EA5C0); color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; cursor: pointer; box-shadow: inset 0 2px 0 #FFFFFFAA, 0 5px 0 #0E8FA3, 0 0 20px #22D3EE66"><span class="rg"></span><span class="rg" style="animation-delay: -1.1s"></span><svg class="pv-ball" width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#FFFFFF" stroke="#0B0B14" stroke-width="1.6"/><path d="M12 7l3.4 2.5l-1.3 4h-4.2l-1.3-4z" fill="#0B0B14"/><path d="M12 7V3M15.4 9.5l3.8-1.2M14.1 13.5l2.3 3.3M9.9 13.5l-2.3 3.3M8.6 9.5L4.8 8.3" stroke="#0B0B14" stroke-width="1.3"/></svg>{{startLabel}}</button>
     </div>
     <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
       <div style="position: absolute; left: 0; right: 0; top: 160px; display: flex; justify-content: center; pointer-events: none"><span style="max-width: 460px; padding: 10px 16px; border-radius: 12px; background: #F4F4FA; color: #0B0B14; font-size: 13px; font-weight: 800; text-align: center">{{toastText}}</span></div>
@@ -294,8 +308,9 @@ class Component extends DCLogic {
       fieldStyle: segS(!s.keeper), keeperStyle: segS(!!s.keeper),
       setField: () => this.setState({ keeper: false }), setKeeper: () => this.setState({ keeper: true }),
       asKeeper: n === 4 && !!s.keeper,
-        name, tag,
-        style: 'display: flex; justify-content: space-between; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; font: 800 13px Exo2, sans-serif; color: #F4F4FA; text-align: left; cursor: ' + (you ? 'default' : 'pointer') + '; ' + (you ? 'background: #10303A; border: 1px solid #22D3EE;' : kind === 'friend' ? 'background: #1E1A3A; border: 1px dashed #A78BFA;' : 'background: #17172A; border: 1px solid #26264A;'),
+        name, tag, ini: (name || '?').replace(/^IA\s*/, '').trim().charAt(0).toUpperCase() || 'IA',
+        avStyle: 'background: ' + (you ? '#22D3EE' : occ ? '#53D88E' : kind === 'friend' ? '#A78BFA' : tn === 0 ? '#FF8A3D' : '#3EA6FF') + ';',
+        style: 'display: flex; justify-content: space-between; align-items: center; gap: 8px; height: 40px; padding: 0 12px 0 7px; border-radius: 12px; box-shadow: 0 3px 0 #05050A; font: 800 13px Exo2, sans-serif; color: #F4F4FA; text-align: left; cursor: ' + (you ? 'default' : 'pointer') + '; ' + (you ? 'background: #10303A; border: 1px solid #22D3EE;' : kind === 'friend' ? 'background: #1E1A3A; border: 1px dashed #A78BFA;' : 'background: #17172A; border: 1px solid #26264A;'),
         tagStyle: 'font-size: 10px; letter-spacing: .5px; color: ' + (you ? '#22D3EE' : kind === 'player' ? '#53D88E' : kind === 'friend' ? '#A78BFA' : '#8686A6') + ';',
         tap: () => {
           if (you || occ) return;

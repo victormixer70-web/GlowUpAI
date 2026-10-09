@@ -24,7 +24,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .lg-medal.sel{background:#FFFFFF10;box-shadow:inset 0 0 0 1.5px #FFC53D88}
 .lg-ready .lg-disc{animation:lgReady 1.6s ease-in-out infinite}
 @keyframes lgReady{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.06)}}
-.lg-rays{position:absolute;left:50%;top:38px;width:120px;height:120px;margin:-60px;border-radius:50%;background:repeating-conic-gradient(#FFE38A55 0 8deg,transparent 11deg 24deg);-webkit-mask-image:radial-gradient(closest-side,#000 30%,transparent);mask-image:radial-gradient(closest-side,#000 30%,transparent);animation:lgSpin 8s linear infinite;pointer-events:none;will-change:transform}
+.lg-rays{z-index:0;position:absolute;left:50%;top:38px;width:120px;height:120px;margin:-60px;border-radius:50%;background:repeating-conic-gradient(#FFE38A55 0 8deg,transparent 11deg 24deg);-webkit-mask-image:radial-gradient(closest-side,#000 30%,transparent);mask-image:radial-gradient(closest-side,#000 30%,transparent);animation:lgSpin 8s linear infinite;pointer-events:none;will-change:transform}
 @keyframes lgSpin{to{transform:rotate(360deg)}}
 .lg-shelf{grid-column:1/-1;height:10px;margin:-6px 6px 4px;border-radius:3px;background:linear-gradient(180deg,#3A2E5E,#1A1430);box-shadow:0 6px 12px #0009,0 -1px 0 #6E5CB0 inset;position:relative}
 .lg-shelf::after{content:"";position:absolute;left:10%;right:10%;top:-14px;height:14px;background:radial-gradient(50% 100% at 50% 100%,#FFC53D22,transparent)}
@@ -97,7 +97,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <sc-if value="{{c.medal}}" hint-placeholder-val="{{ true }}">
         <button type="button" class="{{c.cls}}" onClick="{{c.pick}}" aria-label="{{c.aria}}">
           <sc-if value="{{c.ready}}" hint-placeholder-val="{{ false }}"><i class="lg-rays"></i></sc-if>
-          <svg class="lg-disc {{c.burst}}" width="72" height="80" viewBox="-36 -42 72 80" style="overflow: visible; position: relative">
+          <svg class="lg-disc {{c.burst}}" width="72" height="80" viewBox="-36 -42 72 80" style="overflow: visible; position: relative; z-index: 1">
             <path d="M-17-40h12l7 22h-12zM17-40H5l-7 22h12z" fill="{{c.rib}}"/>
             <circle r="31" cy="6" fill="none" stroke="#26264A" stroke-width="4"/>
             <circle r="31" cy="6" fill="none" stroke="{{c.ringC}}" stroke-width="4" stroke-linecap="round" stroke-dasharray="{{c.dash}}" transform="rotate(-90 0 6)"/>
@@ -231,7 +231,7 @@ class Component extends DCLogic {
         dash: (C * (s === 'locked' ? f : 1)).toFixed(1) + ' ' + C.toFixed(1),
         pct: Math.floor(f * 100) + '%',
         title: a.title,
-        titleStyle: 'max-width: 100%; font-size: 10.5px; font-weight: 800; line-height: 1.15; text-align: center; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: ' + (s === 'ready' ? '#FFE38A' : s === 'got' ? '#F4F4FA' : '#8C8CB0') + ';'
+        titleStyle: 'position: relative; z-index: 1; max-width: 100%; font-size: 10.5px; font-weight: 800; line-height: 1.15; text-align: center; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: ' + (s === 'ready' ? '#FFE38A' : s === 'got' ? '#F4F4FA' : '#8C8CB0') + ';'
       });
       if (i % 5 === 4 || i === shown.length - 1) cells.push({ shelf: true, medal: false });
     });
