@@ -20,6 +20,20 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .cf-eq{display:flex;align-items:flex-end;gap:2px;height:16px;margin-left:auto}
 .cf-eq i{width:3px;border-radius:2px;background:var(--ac);transform-origin:50% 100%;animation:cfEq .8s ease-in-out infinite alternate}
 @keyframes cfEq{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
+.cf-sl{display:flex;flex-direction:column;gap:4px;padding:7px 9px;border-radius:12px;background:#0B0B1466;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ac) 35%,transparent)}
+.cf-sl label{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:1px;color:#CACAE0}
+.cf-sl label b{margin-left:auto;padding:1px 7px;border-radius:7px;background:var(--ac);color:#0B0B14;font-size:11px}
+.cf-sl input{-webkit-appearance:none;appearance:none;width:100%;height:10px;border-radius:5px;margin:2px 0;background:linear-gradient(90deg,var(--ac) var(--p),#26264A var(--p));box-shadow:inset 0 1px 2px #000a;outline:none}
+.cf-sl input::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#FFFFFF;border:3px solid var(--ac);box-shadow:0 2px 0 #0008,0 0 10px var(--ac);cursor:pointer}
+.cf-sl input::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#FFFFFF;border:3px solid var(--ac);box-shadow:0 0 10px var(--ac);cursor:pointer}
+.cf-hand{position:absolute;pointer-events:none;z-index:5;animation:cfHand 2.6s ease-in-out infinite;filter:drop-shadow(0 3px 3px #000a)}
+@keyframes cfHand{0%,15%{transform:translate(0,0) scale(1);opacity:0}25%{opacity:1}35%{transform:translate(0,0) scale(.85)}75%{transform:translate(-46px,-30px) scale(.85);opacity:1}90%,100%{transform:translate(-46px,-30px) scale(1);opacity:0}}
+.cf-crowd{position:absolute;left:0;right:0;top:26px;height:22px;background:radial-gradient(circle,#FF8A3D 1.4px,transparent 2px) 0 2px/9px 7px,radial-gradient(circle,#3EA6FF 1.4px,transparent 2px) 4px 5px/9px 7px,linear-gradient(180deg,#1A1A30,#10101E);box-shadow:0 2px 0 #22D3EE66}
+.cf-crowd::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:linear-gradient(90deg,#22D3EE,#FFC53D,#FF5CC8,#22D3EE);opacity:.8}
+.cf-man{position:absolute;width:12px;height:12px;border-radius:50%;border:2px solid #0B0B14;box-shadow:0 3px 0 #0006}
+.cf-tips{display:flex;flex-direction:column;gap:5px;padding:9px 10px;border-radius:14px;background:linear-gradient(135deg,#1E1A3A,#121226);box-shadow:inset 0 0 0 1px #9B6BFF55}
+.cf-tips span{display:flex;align-items:flex-start;gap:6px;font-size:10px;line-height:1.3;color:#CACAE0}
+.cf-tips i{flex:none;width:8px;height:8px;margin-top:3px;border-radius:50%}
 .cf-pick{transition:transform .2s cubic-bezier(.3,1.8,.5,1)}
 .cf-pick:active{transform:scale(.92)}
 .cf-on{animation:cfPop .35s cubic-bezier(.2,1.8,.4,1)}
@@ -68,20 +82,36 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{showCtrl}}" hint-placeholder-val="{{ false }}">
     <div style="flex: 1; min-height: 0; display: flex; gap: 14px">
       <div style="flex: none; width: 236px; display: flex; flex-direction: column; gap: 8px">
-        <div class="bc-tile" style="display: flex; flex-direction: column; gap: 5px; padding: 10px; border-radius: 14px; background: #17172A; border: 1px solid #26264A">
-          <label for="cf-size" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>TAMAÑO DE BOTONES</span><span style="color: #F4F4FA">{{sizeTxt}}</span></label>
-          <input id="cf-size" type="range" min="60" max="140" step="5" value="{{sizeVal}}" onInput="{{onSize}}" style="width: 100%; accent-color: #22D3EE">
-          <label for="cf-joy" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>TAMAÑO DEL JOYSTICK</span><span style="color: #F4F4FA">{{joyTxt}}</span></label>
-          <input id="cf-joy" type="range" min="60" max="140" step="5" value="{{joyVal}}" onInput="{{onJoy}}" style="width: 100%; accent-color: #22D3EE">
-          <label for="cf-alpha" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>OPACIDAD</span><span style="color: #F4F4FA">{{alphaTxt}}</span></label>
-          <input id="cf-alpha" type="range" min="40" max="100" step="5" value="{{alphaVal}}" onInput="{{onAlpha}}" style="width: 100%; accent-color: #22D3EE">
+        <div class="cf-tile" style="--ac: #22D3EE; gap: 6px; padding: 9px 9px 9px 13px">
+          <div class="cf-sl" style="--ac: #22D3EE">
+            <label for="cf-size"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>BOTONES<b>{{sizeTxt}}</b></label>
+            <input id="cf-size" type="range" min="60" max="140" step="5" value="{{sizeVal}}" onInput="{{onSize}}" style="--p: {{sizeP}}%">
+          </div>
+          <div class="cf-sl" style="--ac: #9B6BFF">
+            <label for="cf-joy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>JOYSTICK<b>{{joyTxt}}</b></label>
+            <input id="cf-joy" type="range" min="60" max="140" step="5" value="{{joyVal}}" onInput="{{onJoy}}" style="--p: {{joyP}}%">
+          </div>
+          <div class="cf-sl" style="--ac: #FFC53D">
+            <label for="cf-alpha"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 0 18z" fill="currentColor"/><circle cx="12" cy="12" r="9"/></svg>OPACIDAD<b>{{alphaTxt}}</b></label>
+            <input id="cf-alpha" type="range" min="40" max="100" step="5" value="{{alphaVal}}" onInput="{{onAlpha}}" style="--p: {{alphaP}}%">
+          </div>
         </div>
-        <span style="font-size: 11px; line-height: 1.45; color: #A3A3C2">Arrastra los botones en la vista previa para colocarlos donde quieras. Se guarda solo.</span>
-        <button type="button" onClick="{{resetAll}}" style="margin-top: auto; height: 38px; border-radius: 12px; border: 1px solid #FF8A8E; background: transparent; color: #FF8A8E; font: 800 13px Exo2, sans-serif; cursor: pointer">Restablecer controles</button>
+        <div class="cf-tips">
+          <span><i style="background: #F4F4FA"></i>Arrastra los botones de la vista previa para ponerlos donde quieras. Se guarda solo.</span>
+          <span><i style="background: #FFC53D"></i>Mantén CHUT para cargar el tiro: cuanto más, más fuerte.</span>
+          <span><i style="background: #22D3EE"></i>SPRINT corre más, pero cansa.</span>
+        </div>
+        <button type="button" onClick="{{resetAll}}" style="margin-top: auto; height: 36px; border-radius: 12px; border: 0; background: #2A1018; color: #FF8A8E; box-shadow: inset 0 0 0 1.5px #FF8A8E, 0 3px 0 #05050A; font: 800 13px Exo2, sans-serif; cursor: pointer">↺ Restablecer controles</button>
       </div>
       <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
-        <div onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" style="position: relative; width: 500px; height: 231px; border-radius: 14px; overflow: hidden; border: 1px solid #2E2E52; background: linear-gradient(180deg, #0B0B14 0%, #0B0B14 11%, #1E7A3E 11%, #23874A 60%, #1E7A3E 100%); touch-action: none">
-          <div style="position: absolute; left: 0; right: 0; top: 0; height: 26px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 16px; color: #F4F4FA">0 – 0</div>
+        <div onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" style="position: relative; width: 500px; height: 231px; border-radius: 14px; overflow: hidden; border: 1px solid #2E2E52; background: repeating-linear-gradient(90deg, #1F8A45 0 50px, #1A7A3C 50px 100px); box-shadow: inset 0 0 40px #000a, 0 0 0 2px #22D3EE44, 0 10px 24px #0008; touch-action: none">
+          <div class="cf-crowd"></div>
+          <div style="position: absolute; left: -2px; top: 98px; width: 46px; height: 92px; border: 2px solid #FFFFFF66; border-left: 0"></div>
+          <div style="position: absolute; right: -2px; top: 98px; width: 46px; height: 92px; border: 2px solid #FFFFFF66; border-right: 0"></div>
+          <span class="cf-man" style="left: 200px; top: 120px; background: #FF8A3D"></span><span class="cf-man" style="left: 300px; top: 150px; background: #3EA6FF"></span><span class="cf-man" style="left: 330px; top: 100px; background: #3EA6FF"></span><span class="cf-man" style="left: 160px; top: 165px; background: #FF8A3D"></span>
+          <span style="position: absolute; left: 214px; top: 130px; width: 8px; height: 8px; border-radius: 50%; background: #FFFFFF; border: 1.5px solid #0B0B14"></span>
+          <svg class="cf-hand" width="30" height="30" viewBox="0 0 24 24" style="right: 30px; bottom: 30px"><path d="M8 13V5a1.5 1.5 0 0 1 3 0v6M11 11V4a1.5 1.5 0 0 1 3 0v7M14 11V5a1.5 1.5 0 0 1 3 0v8c0 4-3 8-7 8c-3 0-5-2-6-5l-2-4a1.5 1.5 0 0 1 2.5-1.5L8 13" fill="#FFFFFF" stroke="#0B0B14" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          <div style="position: absolute; left: 0; right: 0; top: 0; height: 26px; display: flex; align-items: center; justify-content: center; background: #0B0B14"><span style="display: flex; align-items: center; height: 18px; border-radius: 9px; overflow: hidden; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 13px; box-shadow: 0 0 0 1.5px #22D3EE66"><span style="padding: 0 8px; background: #FF8A3D; color: #0B0B14">TÚ</span><span style="padding: 0 8px; background: #F4F4FA; color: #0B0B14">0 – 0</span><span style="padding: 0 8px; background: #3EA6FF; color: #0B0B14">RIV</span><span style="padding: 0 8px; background: #17172A; color: #22D3EE">02:00</span></span></div>
           <div style="position: absolute; left: 50%; top: 26px; bottom: 0; width: 2px; background: #FFFFFF66"></div>
           <div style="position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px; border-radius: 50%; border: 2px solid #FFFFFF66"></div>
           <div style="{{joyStyle}}"><div style="{{knobStyle}}"></div></div>
@@ -189,6 +219,7 @@ class Component extends DCLogic {
       opts, resetPlay: () => this.savePlay({ music: 0.6, sfx: 0.8, cam: 'normal', names: true, gfx: 'auto', passMark: true }),
       backHref: 'Deportes.dc.html',
       btns, chars,
+      sizeP: String(Math.round((c.size * 100 - 60) / 80 * 100)), joyP: String(Math.round((c.joy * 100 - 60) / 80 * 100)), alphaP: String(Math.round((c.alpha * 100 - 40) / 60 * 100)),
       sizeVal: String(Math.round(c.size * 100)), sizeTxt: Math.round(c.size * 100) + '%',
       joyVal: String(Math.round(c.joy * 100)), joyTxt: Math.round(c.joy * 100) + '%',
       alphaVal: String(Math.round(c.alpha * 100)), alphaTxt: Math.round(c.alpha * 100) + '%',
