@@ -262,7 +262,7 @@
   function setProgress(p) {
     var v = Math.round(p * 100), f = document.getElementById('ld-fill'), t = document.getElementById('ld-pct'), box = document.getElementById('loading');
     if (!f || !t) return;
-    f.style.width = (36.04 * p).toFixed(2) + '%'; t.textContent = v + '%';
+    f.style.left = (15 + 68.4 * p).toFixed(2) + '%'; f.style.opacity = p >= 0.995 ? '0' : '1'; t.textContent = v + '%';
     if (box) box.setAttribute('aria-valuenow', String(v));
   }
   function pump() {

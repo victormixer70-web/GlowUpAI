@@ -31,9 +31,13 @@
   #loading { position: fixed; inset: 0; z-index: 5; background: #05060a; overflow: hidden; transition: opacity .45s ease; font-family: 'Rajdhani', system-ui, sans-serif; }
   #loading.out { opacity: 0; pointer-events: none; }
   /* the artwork is 1024x576 (16:9); this box covers the screen keeping that ratio, so the live bar lands exactly on the drawn one */
-  #loading .art { position: absolute; left: 50%; top: 50%; width: max(100vw, 177.78vh); height: max(56.25vw, 100vh); transform: translate(-50%, -50%); background: url(icons/loading-bg.jpg) center / 100% 100% no-repeat; }
-  #loading .fill { position: absolute; left: 30.29%; top: 70.21%; width: 0%; height: 2.22%; border-radius: 99px; background: #FFFFFF; box-shadow: 0 0 8px rgba(255,255,255,.85), 0 0 18px rgba(170,205,255,.5); }
-  #loading .pct { position: absolute; left: 67.4%; top: 69.4%; height: 3.9%; display: flex; align-items: center; color: #F4F4FA; font-weight: 600; font-size: max(1.5vw, 2.67vh); letter-spacing: .04em; }
+  #loading .art { position: absolute; left: 50%; top: 50%; width: max(100vw, 177.78vh); height: max(56.25vw, 100vh); transform: translate(-50%, -50%); background: url(icons/loading-bg.jpg?v=2) center / 100% 100% no-repeat; }
+  /* the row of balls is the progress bar: the ones still to load are dimmed and switch on as it loads */
+  #loading .fill { position: absolute; left: 15%; right: 16.2%; top: 64.8%; height: 7.4%; -webkit-backdrop-filter: grayscale(1) brightness(.55); backdrop-filter: grayscale(1) brightness(.55); -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%), linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, transparent, #000 2.5%), linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent); mask-composite: intersect; transition: left .12s linear, opacity .3s; }
+  #loading .pct::before { content: ''; position: absolute; inset: -7%; border-radius: 50%; background: conic-gradient(#22D3EE, transparent 28%, #FFC53D 50%, transparent 78%, #22D3EE); -webkit-mask-image: radial-gradient(closest-side, transparent 88%, #000 90%, #000 99%, transparent); mask-image: radial-gradient(closest-side, transparent 88%, #000 90%, #000 99%, transparent); animation: ldSpin 1.3s linear infinite; }
+  @keyframes ldSpin { to { transform: rotate(360deg); } }
+  /* the live percentage in the medallion, over the picture's own number */
+  #loading .pct { position: absolute; left: 50.15%; top: 66.8%; width: 11.2%; height: 19.9%; transform: translate(-50%, -50%); border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 40%, #12305A, #071226 62%, #030812); box-shadow: 0 0 0 3px #BFF6FF, 0 0 22px #22D3EE, inset 0 0 22px #22D3EEAA; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: max(2.6vw, 4.6vh); letter-spacing: .02em; text-shadow: 0 0 12px #9BEFFF, 0 3px 0 #05060A; z-index: 1; }
   #rotate { display: none; position: fixed; inset: 0; z-index: 10; background: #0B0B14; color: #F4F4FA; align-items: center; justify-content: center; flex-direction: column; gap: 14px; font: 700 16px Exo2, system-ui, sans-serif; text-align: center; padding: 24px; }
   body.portrait #rotate { display: flex; }
   #rotate svg { animation: turn 1.6s ease-in-out infinite; }
@@ -68,7 +72,7 @@
 <script src="stadium.js?v=7"></script>
 <script src="ball.js?v=48"></script>
 <script src="music.js?v=1"></script>
-<script src="app.js?v=60"></script>
+<script src="app.js?v=61"></script>
 <script src="ui-fx.js?v=16"></script>
 </body>
 </html>
