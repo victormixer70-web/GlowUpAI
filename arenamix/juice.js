@@ -202,5 +202,11 @@
       }, 4700);
     };
   };
-  window.AMJuice = { fly: fly, toast: toast, confetti: function (x, y, c) { mount(); confetti(x, y, c); }, wheel: { open: open, ready: ready } };
+  // daily mini-games: one go each per day
+  var daily = {
+    ready: function (id) { if (id === 'wheel') return ready(); try { var d = JSON.parse(localStorage.getItem('arenamix.daily.v1') || 'null'); return !d || d.day !== day() || !d[id]; } catch (e) { return true; } },
+    mark: function (id) { var d = null; try { d = JSON.parse(localStorage.getItem('arenamix.daily.v1') || 'null'); } catch (e) {} if (!d || d.day !== day()) d = { day: day() }; d[id] = 1; try { localStorage.setItem('arenamix.daily.v1', JSON.stringify(d)); } catch (e) {} },
+    count: function () { return ['wheel', 'pens', 'fk'].filter(function (id) { return daily.ready(id); }).length; }
+  };
+  window.AMJuice = { daily: daily, fly: fly, toast: toast, confetti: function (x, y, c) { mount(); confetti(x, y, c); }, wheel: { open: open, ready: ready } };
 })();

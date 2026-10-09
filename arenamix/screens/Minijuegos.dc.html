@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Minijuegos diarios</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+@keyframes mjIn{from{opacity:0;transform:translateY(24px) scale(.92)}}
+@keyframes mjSpin{to{transform:rotate(360deg)}}
+@keyframes mjBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes mjPulse{0%,100%{box-shadow:0 0 0 2px #05050A,0 5px 0 #05050A,0 0 0 0 var(--mc)}50%{box-shadow:0 0 0 2px #05050A,0 5px 0 #05050A,0 0 0 8px transparent}}
+@keyframes mjMsg{from{opacity:0;transform:scale(.3) rotate(-10deg)}60%{transform:scale(1.15) rotate(3deg)}to{opacity:1;transform:scale(1) rotate(-3deg)}}
+@keyframes mjZone{0%,100%{opacity:.35}50%{opacity:.75}}
+.mj-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;width:236px;height:268px;padding:14px 12px 12px;box-sizing:border-box;border:0;border-radius:24px;cursor:pointer;color:#F4F4FA;font-family:Exo2,sans-serif;text-align:center;overflow:hidden;animation:mjIn .5s cubic-bezier(.2,1.4,.4,1) both;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.mj-card:hover{transform:translateY(-5px) rotate(-1deg)}
+.mj-card .art{position:relative;width:150px;height:118px;display:flex;align-items:center;justify-content:center}
+.mj-card h3{margin:0;font:800 italic 26px/1 'Barlow Condensed',sans-serif;letter-spacing:.5px;text-shadow:0 3px 0 #05050A}
+.mj-card p{margin:0;font-size:11.5px;font-weight:700;line-height:1.35;color:#DADAF0;flex:1}
+.mj-go{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:40px;border-radius:14px;font:800 italic 19px 'Barlow Condensed',sans-serif;letter-spacing:1px}
+.mj-zone{position:absolute;border:0;padding:0;cursor:pointer;border-radius:10px;background:radial-gradient(closest-side,#22D3EE55,transparent);box-shadow:inset 0 0 0 2px #22D3EE88;animation:mjZone 1.4s ease-in-out infinite}
+.mj-zone:hover{background:radial-gradient(closest-side,#FFC53D88,transparent);box-shadow:inset 0 0 0 2px #FFC53D}
+</style>
+</helmet>
+<div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
+  <div class="am-arena" aria-hidden="true" style="z-index: -1"><i class="aa-pitch"></i><i class="aa-beam" style="left: 18%"></i><i class="aa-beam r" style="left: 82%"></i><i class="aa-flash" style="left: 12%; top: 22%"></i><i class="aa-flash" style="left: 31%; top: 30%; animation-delay: -1.1s"></i><i class="aa-flash" style="left: 66%; top: 18%; animation-delay: -2.3s"></i><i class="aa-flash" style="left: 88%; top: 26%; animation-delay: -0.6s"></i></div>
+
+  <sc-if value="{{isList}}" hint-placeholder-val="{{ true }}">
+    <div style="position: absolute; left: 16px; right: 16px; top: 12px; display: flex; align-items: center; gap: 10px">
+      <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 46px; height: 38px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+      <h1 class="bc-title" style="font-size: 28px">MINIJUEGOS DIARIOS</h1>
+      <span style="flex: 1"></span>
+      <span class="bc-para" style="display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; background: #17172AE6; font-size: 12px; font-weight: 800; color: #CACAE0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>Nuevos en {{reset}}</span>
+    </div>
+    <div style="position: absolute; left: 0; right: 0; top: 68px; display: flex; justify-content: center; gap: 18px">
+      <sc-for list="{{cards}}" as="c" hint-placeholder-count="3">
+        <button type="button" class="mj-card" onClick="{{c.open}}" aria-label="{{c.title}}" style="{{c.style}}">
+          <span class="art">
+            <sc-if value="{{c.isWheel}}" hint-placeholder-val="{{ false }}">
+              <svg width="112" height="112" viewBox="0 0 54 54" style="animation: mjSpin 7s linear infinite; filter: drop-shadow(0 6px 8px #000a)"><circle cx="27" cy="27" r="25" fill="#FFC53D" stroke="#05050A" stroke-width="2.5"/><g transform="translate(27 27)"><path d="M0 0L0 -21A21 21 0 0 1 14.8 -14.8Z" fill="#22D3EE"/><path d="M0 0L14.8 -14.8A21 21 0 0 1 21 0Z" fill="#FF5CC8"/><path d="M0 0L21 0A21 21 0 0 1 14.8 14.8Z" fill="#53D88E"/><path d="M0 0L14.8 14.8A21 21 0 0 1 0 21Z" fill="#A78BFA"/><path d="M0 0L0 21A21 21 0 0 1 -14.8 14.8Z" fill="#FF8A3D"/><path d="M0 0L-14.8 14.8A21 21 0 0 1 -21 0Z" fill="#6FB6FF"/><path d="M0 0L-21 0A21 21 0 0 1 -14.8 -14.8Z" fill="#FF5C5C"/><path d="M0 0L-14.8 -14.8A21 21 0 0 1 0 -21Z" fill="#FFE38A"/><circle r="6" fill="#FFF2B0" stroke="#05050A" stroke-width="1.5"/></g></svg>
+              <svg width="20" height="24" viewBox="0 0 34 42" style="position: absolute; left: 65px; top: -2px"><path d="M17 40L3 12a14 14 0 1 1 28 0z" fill="#FF3B5C" stroke="#05050A" stroke-width="3"/></svg>
+            </sc-if>
+            <sc-if value="{{c.isPens}}" hint-placeholder-val="{{ false }}">
+              <svg width="150" height="110" viewBox="0 0 150 110"><rect x="12" y="10" width="126" height="64" fill="none" stroke="#FFFFFF" stroke-width="5"/><path d="M12 10l10 10h106l10-10M22 20v54M128 20v54" stroke="#ffffff55" stroke-width="2" fill="none"/><path d="M24 22h102v50H24z" fill="url(#mjNet)" opacity=".5"/><defs><pattern id="mjNet" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 0L8 8M8 0L0 8" stroke="#fff" stroke-width=".8"/></pattern></defs><g style="animation: mjBob 1.6s ease-in-out infinite"><circle cx="104" cy="36" r="11" fill="#fff" stroke="#05050A" stroke-width="2.5"/><path d="M104 30l5 4-2 6h-6l-2-6z" fill="#17172A"/></g><path d="M75 100 Q 92 70 100 44" stroke="#FFC53D" stroke-width="3" stroke-dasharray="5 5" fill="none"/><circle cx="75" cy="100" r="7" fill="#fff" stroke="#05050A" stroke-width="2"/></svg>
+            </sc-if>
+            <sc-if value="{{c.isFk}}" hint-placeholder-val="{{ false }}">
+              <svg width="150" height="110" viewBox="0 0 150 110"><rect x="12" y="8" width="126" height="60" fill="none" stroke="#FFFFFF" stroke-width="5"/><path d="M24 20h102v46H24z" fill="url(#mjNet2)" opacity=".45"/><defs><pattern id="mjNet2" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 0L8 8M8 0L0 8" stroke="#fff" stroke-width=".8"/></pattern></defs><g fill="#1D2A6B" stroke="#05050A" stroke-width="2"><rect x="50" y="52" width="12" height="30" rx="5"/><rect x="64" y="50" width="12" height="32" rx="5"/><rect x="78" y="52" width="12" height="30" rx="5"/><circle cx="56" cy="47" r="5"/><circle cx="70" cy="45" r="5"/><circle cx="84" cy="47" r="5"/></g><path d="M40 104 Q 20 40 116 22" stroke="#FFC53D" stroke-width="3" stroke-dasharray="5 5" fill="none"/><g style="animation: mjBob 1.6s ease-in-out infinite"><circle cx="116" cy="22" r="9" fill="#fff" stroke="#05050A" stroke-width="2.5"/></g><circle cx="40" cy="104" r="6" fill="#fff" stroke="#05050A" stroke-width="2"/></svg>
+            </sc-if>
+          </span>
+          <h3 style="{{c.titleStyle}}">{{c.title}}</h3>
+          <p>{{c.desc}}</p>
+          <span class="mj-go" style="{{c.btnStyle}}">{{c.btn}}</span>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isGame}}" hint-placeholder-val="{{ false }}">
+    <!-- the goal, the keeper and (for free kicks) the wall -->
+    <div style="position: absolute; left: 16px; top: 12px; display: flex; align-items: center; gap: 10px; z-index: 5">
+      <button type="button" onClick="{{quit}}" aria-label="Salir" class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 46px; height: 38px; border: 0; background: #17172A; color: #F4F4FA; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></button>
+      <h1 class="bc-title" style="font-size: 24px">{{gameTitle}}</h1>
+    </div>
+    <div style="position: absolute; right: 16px; top: 16px; display: flex; gap: 8px; z-index: 5">
+      <sc-for list="{{dots}}" as="d" hint-placeholder-count="3"><span style="{{d}}"></span></sc-for>
+    </div>
+    <svg width="844" height="390" viewBox="0 0 844 390" style="position: absolute; inset: 0; pointer-events: none">
+      <defs><pattern id="mjNetG" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M0 0L12 12M12 0L0 12" stroke="#ffffff" stroke-width=".9"/></pattern></defs>
+      <path d="M262 78L276 92H568L582 78" stroke="#ffffff55" stroke-width="2" fill="none"/>
+      <rect x="276" y="92" width="292" height="146" fill="url(#mjNetG)" opacity=".35"/>
+      <path d="M262 240V78H582V240" stroke="#FFFFFF" stroke-width="7" fill="none" stroke-linejoin="round"/>
+      <ellipse cx="422" cy="352" rx="40" ry="8" fill="#000" opacity=".3"/>
+    </svg>
+    <sc-if value="{{isPens}}" hint-placeholder-val="{{ false }}">
+      <sc-for list="{{zones}}" as="z" hint-placeholder-count="6">
+        <button type="button" class="mj-zone" onClick="{{z.pick}}" aria-label="{{z.aria}}" style="{{z.style}}"></button>
+      </sc-for>
+    </sc-if>
+    <div style="{{keeperStyle}}">
+      <svg width="64" height="96" viewBox="0 0 64 96"><circle cx="32" cy="14" r="11" fill="#E0B48F" stroke="#05050A" stroke-width="2"/><path d="M14 30h36l4 34H10z" fill="#FF8A3D" stroke="#05050A" stroke-width="2"/><path d="M14 32L2 12M50 32L62 12" stroke="#FF8A3D" stroke-width="9" stroke-linecap="round"/><circle cx="2" cy="10" r="6" fill="#53D88E" stroke="#05050A" stroke-width="2"/><circle cx="62" cy="10" r="6" fill="#53D88E" stroke="#05050A" stroke-width="2"/><path d="M18 64v26M46 64v26" stroke="#17172A" stroke-width="10" stroke-linecap="round"/></svg>
+    </div>
+    <sc-if value="{{isFk}}" hint-placeholder-val="{{ false }}">
+      <svg width="164" height="70" viewBox="0 0 164 70" style="position: absolute; left: 340px; top: 172px; z-index: 3"><g fill="#1D2A6B" stroke="#05050A" stroke-width="2.5"><rect x="6" y="18" width="30" height="52" rx="12"/><rect x="46" y="14" width="30" height="56" rx="12"/><rect x="86" y="14" width="30" height="56" rx="12"/><rect x="126" y="18" width="30" height="52" rx="12"/><circle cx="21" cy="10" r="9" fill="#C68A5E"/><circle cx="61" cy="7" r="9" fill="#8D5A3B"/><circle cx="101" cy="7" r="9" fill="#E0B48F"/><circle cx="141" cy="10" r="9" fill="#C68A5E"/></g></svg>
+      <div style="{{crossStyle}}"><svg width="44" height="44" viewBox="-22 -22 44 44"><circle r="17" fill="none" stroke="#FFC53D" stroke-width="3"/><circle r="4" fill="#FFC53D"/><path d="M0 -22v8M0 14v8M-22 0h8M14 0h8" stroke="#FFC53D" stroke-width="3"/></svg></div>
+      <sc-if value="{{canShoot}}" hint-placeholder-val="{{ true }}">
+        <button type="button" onClick="{{shootFk}}" class="bc-btn-gold" style="position: absolute; right: 24px; bottom: 22px; height: 56px; padding: 0 28px; font-size: 24px; cursor: pointer; z-index: 5">¡CHUTA!</button>
+        <span style="position: absolute; left: 24px; bottom: 30px; padding: 6px 12px; border-radius: 12px; background: #0B0B14D9; font-size: 12px; font-weight: 800; color: #CACAE0; z-index: 5">Chuta cuando la mira esté donde quieras · ¡las escuadras nunca fallan!</span>
+      </sc-if>
+    </sc-if>
+    <sc-if value="{{isPensAim}}" hint-placeholder-val="{{ false }}">
+      <span style="position: absolute; left: 0; right: 0; bottom: 22px; text-align: center; font-size: 13px; font-weight: 800; color: #CACAE0; text-shadow: 0 2px 0 #05050A">Toca un sitio de la portería para chutar · el portero se tira a un lado al azar</span>
+    </sc-if>
+    <div style="{{ballStyle}}"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="#fff" stroke="#05050A" stroke-width="2.5"/><path d="M17 10l6 4.5-2.3 7h-7.4L11 14.5z" fill="#17172A"/></svg></div>
+    <sc-if value="{{hasMsg}}" hint-placeholder-val="{{ false }}">
+      <div key="{{msgKey}}" style="position: absolute; left: 0; right: 0; top: 150px; display: flex; justify-content: center; pointer-events: none; z-index: 6">
+        <span style="{{msgStyle}}">{{msg}}</span>
+      </div>
+    </sc-if>
+    <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: #05050ACC">
+        <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">{{gameTitle}}</span>
+        <span style="font: 800 italic 54px/1 'Barlow Condensed', sans-serif; color: #FFC53D; text-shadow: 0 5px 0 #05050A, 0 0 26px #FFC53D66; animation: mjMsg .5s both">{{doneTitle}}</span>
+        <span style="font: 800 22px 'Barlow Condensed', sans-serif; color: #F4F4FA">{{doneScore}}</span>
+        <span style="padding: 6px 16px; border-radius: 14px; background: #17172A; box-shadow: 0 0 0 2px #FFC53D; font-size: 15px; font-weight: 800; color: #FFE38A">Premio: {{prizeLabel}}</span>
+        <button type="button" onClick="{{claim}}" class="bc-btn-gold" style="margin-top: 6px; height: 52px; padding: 0 34px; font-size: 24px; cursor: pointer">RECOGER</button>
+      </div>
+    </sc-if>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { game: null, shots: [], phase: 'aim', ball: null, keeper: null, msg: '', msgN: 0 };
+    this.tick = () => { this.raf = null; if (this.state.game === 'fk' && this.state.phase === 'aim') { this.forceUpdate(); this.raf = requestAnimationFrame(this.tick); } };
+    this.onWheel = () => this.forceUpdate();
+    window.addEventListener('am:wheel', this.onWheel);
+  }
+  componentWillUnmount() { window.removeEventListener('am:wheel', this.onWheel); if (this.raf) cancelAnimationFrame(this.raf); (this.timers || []).forEach(clearTimeout); }
+  later(f, ms) { (this.timers = this.timers || []).push(setTimeout(f, ms)); }
+  D() { return window.AMJuice ? window.AMJuice.daily : { ready: () => true, mark: () => {}, count: () => 3 }; }
+  start(game) {
+    this.D().mark(game);
+    this.t0 = performance.now();
+    this.setState({ game, shots: [], phase: 'aim', ball: null, keeper: null, msg: '' }, () => { if (game === 'fk') this.raf = requestAnimationFrame(this.tick); });
+  }
+  // the crosshair over the goal, always moving
+  cross() { const t = (performance.now() - (this.t0 || 0)) / 1000; return { x: 422 + 168 * Math.sin(t * 1.9), y: 152 + 68 * Math.sin(t * 2.9 + 0.7) }; }
+  after(goal, label) {
+    const shots = this.state.shots.concat([goal]);
+    this.later(() => this.setState({ msg: label, msgN: this.state.msgN + 1 }), 560);
+    this.later(() => {
+      const done = shots.length >= 3;
+      this.setState({ shots, phase: done ? 'done' : 'aim', ball: null, keeper: null, msg: '' }, () => { if (!done && this.state.game === 'fk') { this.t0 = performance.now(); this.raf = requestAnimationFrame(this.tick); } });
+    }, 1700);
+  }
+  shootPen(z) {
+    if (this.state.phase !== 'aim') return;
+    const col = z % 3, row = Math.floor(z / 3), kc = Math.floor(Math.random() * 3);
+    const goal = kc !== col, X = [315, 422, 529], Y = [122, 196];
+    this.setState({ phase: 'fly', ball: { x: X[col] + (Math.random() - 0.5) * 30, y: Y[row] + (Math.random() - 0.5) * 20 }, keeper: { col: kc, high: Math.random() < 0.5 } });
+    this.after(goal, goal ? '¡GOL!' : '¡PARADA!');
+  }
+  shootFk() {
+    if (this.state.phase !== 'aim') return;
+    const c = this.cross();
+    let res, keeper = null;
+    if (c.x < 266 || c.x > 578 || c.y < 82) res = 'out';
+    else if (c.y > 182 && c.x > 340 && c.x < 504) res = 'wall';
+    else if (c.y < 116 && Math.abs(c.x - 422) > 110) res = 'goal';
+    else { const save = Math.abs(c.x - 422) < 60 || Math.random() < 0.3; res = save ? 'save' : 'goal'; keeper = { col: c.x < 370 ? 0 : c.x > 474 ? 2 : 1, high: c.y < 150 }; }
+    if (!keeper) keeper = { col: Math.floor(Math.random() * 3), high: Math.random() < 0.5 };
+    const end = res === 'wall' ? { x: c.x, y: 200 } : res === 'out' ? { x: c.x + (c.x < 422 ? -30 : 30), y: c.y - 20 } : c;
+    this.setState({ phase: 'fly', ball: end, keeper, fk: true });
+    this.after(res === 'goal', res === 'goal' ? (c.y < 116 && Math.abs(c.x - 422) > 110 ? '¡ESCUADRA!' : '¡GOLAZO!') : res === 'wall' ? '¡A LA BARRERA!' : res === 'out' ? '¡FUERA!' : '¡PARADA!');
+  }
+  prize() {
+    const g = this.state.shots.filter((x) => x).length, fk = this.state.game === 'fk';
+    const T = fk ? [[30, 0], [80, 0], [150, 0], [250, 15]] : [[30, 0], [60, 0], [120, 0], [200, 10]];
+    return { g, vcd: T[g][0], bob: T[g][1] };
+  }
+  countdown() {
+    const d = new Date(), m = new Date(d); m.setHours(24, 0, 0, 0);
+    const mins = Math.max(0, Math.round((m - d) / 60000));
+    return Math.floor(mins / 60) + ' h ' + String(mins % 60).padStart(2, '0') + ' min';
+  }
+  renderVals() {
+    const s = this.state, D = this.D();
+    const card = (id, title, desc, col, col2, prize) => {
+      const ok = D.ready(id);
+      return {
+        title, desc: desc + ' ' + prize, isWheel: id === 'wheel', isPens: id === 'pens', isFk: id === 'fk',
+        style: '--mc: ' + col + '; background: radial-gradient(120% 70% at 50% 20%, ' + col2 + ', #11112A 70%); box-shadow: inset 0 2px 0 #ffffff22, inset 0 -4px 0 #0008, inset 0 0 0 2px ' + col + (ok ? '' : '44') + ', 0 10px 24px #0008' + (ok ? ', 0 0 22px ' + col + '55' : '') + ';' + (ok ? '' : ' filter: saturate(.55) brightness(.85);'),
+        titleStyle: 'color: ' + col + ';',
+        btn: ok ? '¡JUGAR GRATIS!' : 'MAÑANA',
+        btnStyle: ok ? 'background: linear-gradient(180deg, ' + col + ', color-mix(in srgb, ' + col + ' 70%, #000)); color: #0B0B14; box-shadow: inset 0 2px 0 #fff8, 0 0 0 2px #05050A, 0 4px 0 #05050A; animation: mjPulse 1.6s ease-in-out infinite;' : 'background: #26264A; color: #8686A6; box-shadow: 0 0 0 2px #05050A;',
+        open: () => {
+          if (id === 'wheel') { if (window.AMJuice) window.AMJuice.wheel.open(); return; }
+          if (!ok) return;
+          this.start(id);
+        }
+      };
+    };
+    const g = s.game, k = s.keeper, c = g === 'fk' && s.phase === 'aim' ? this.cross() : { x: -99, y: -99 };
+    const kx = k ? [-104, 0, 104][k.col] : 0, krot = k ? [-62, 0, 62][k.col] : 0, ky = k ? (k.high ? -46 : -6) : 0;
+    const ballStart = g === 'fk' ? { x: 470, y: 336 } : { x: 422, y: 336 };
+    const b = s.ball || ballStart, flying = !!s.ball;
+    const pr = g ? this.prize() : { g: 0, vcd: 0, bob: 0 };
+    return {
+      isList: !g, isGame: !!g, isPens: g === 'pens', isFk: g === 'fk', isPensAim: g === 'pens' && s.phase === 'aim',
+      reset: this.countdown(),
+      cards: [
+        card('wheel', 'RULETA', 'Una tirada gratis: VCD, BOB o un cofre.', '#FFC53D', '#5A3E0C', ''),
+        card('pens', 'PENALTIS DE LA SUERTE', '3 penaltis: elige dónde chutar y que no lo adivine el portero.', '#22D3EE', '#0C3E52', 'Hasta 200 VCD + 10 BOB.'),
+        card('fk', 'FALTAS', '3 faltas con barrera: chuta en el momento justo.', '#FF5CC8', '#4A0F38', 'Hasta 250 VCD + 15 BOB.')
+      ],
+      gameTitle: g === 'fk' ? 'FALTAS' : 'PENALTIS DE LA SUERTE',
+      dots: [0, 1, 2].map((i) => 'width: 22px; height: 22px; border-radius: 11px; box-sizing: border-box; ' + (i < s.shots.length ? (s.shots[i] ? 'background: #53D88E; box-shadow: 0 0 10px #53D88E;' : 'background: #FF5C5C;') : 'border: 2px solid #4C4C78; background: #0B0B14CC;')),
+      zones: [0, 1, 2, 3, 4, 5].map((z) => ({
+        aria: 'Chutar ' + ['arriba', 'abajo'][Math.floor(z / 3)] + ' ' + ['a la izquierda', 'al centro', 'a la derecha'][z % 3],
+        style: 'left: ' + (272 + (z % 3) * 102) + 'px; top: ' + (88 + Math.floor(z / 3) * 74) + 'px; width: 96px; height: 68px;' + (s.phase !== 'aim' ? ' display: none;' : ''),
+        pick: () => this.shootPen(z)
+      })),
+      keeperStyle: 'position: absolute; left: 390px; top: 144px; z-index: 2; transition: transform ' + (k ? '.42s cubic-bezier(.2,.8,.3,1)' : '.3s') + '; transform: translate(' + kx + 'px, ' + ky + 'px) rotate(' + krot + 'deg);',
+      ballStyle: 'position: absolute; left: 0; top: 0; z-index: 4; width: 34px; height: 34px; margin: -17px 0 0 -17px; transform: translate(' + b.x.toFixed(0) + 'px, ' + b.y.toFixed(0) + 'px) scale(' + (flying ? 0.55 : 1) + ') rotate(' + (flying ? 720 : 0) + 'deg); transition: ' + (flying ? (s.fk ? 'transform .55s cubic-bezier(.3,.1,.5,1)' : 'transform .5s cubic-bezier(.2,.7,.4,1)') : 'none') + ';',
+      crossStyle: 'position: absolute; left: 0; top: 0; z-index: 4; pointer-events: none; transform: translate(' + (c.x - 22).toFixed(0) + 'px, ' + (c.y - 22).toFixed(0) + 'px);',
+      canShoot: g === 'fk' && s.phase === 'aim',
+      shootFk: () => this.shootFk(),
+      hasMsg: !!s.msg, msg: s.msg, msgKey: 'm' + s.msgN,
+      msgStyle: 'font: 800 italic 58px/1 \'Barlow Condensed\', sans-serif; letter-spacing: 1px; color: ' + (/GOL|ESCUADRA/.test(s.msg) ? '#53D88E' : '#FF5C5C') + '; text-shadow: 0 5px 0 #05050A, 0 0 24px currentColor; animation: mjMsg .45s cubic-bezier(.2,1.6,.4,1) both;',
+      isDone: s.phase === 'done',
+      doneTitle: pr.g === 3 ? '¡PLENO!' : pr.g === 2 ? '¡MUY BIEN!' : pr.g === 1 ? '¡NO ESTÁ MAL!' : '¡OTRA VEZ SERÁ!',
+      doneScore: pr.g + ' de 3 goles',
+      prizeLabel: pr.vcd + ' VCD' + (pr.bob ? ' + ' + pr.bob + ' BOB' : ''),
+      claim: () => {
+        const P = window.AMProgress, p2 = this.prize();
+        this.setState({ game: null, phase: 'aim', shots: [] });
+        setTimeout(() => { if (P) { P.addCoins(p2.vcd); if (p2.bob) setTimeout(() => P.addGems(p2.bob), 500); } }, 150);
+      },
+      quit: () => { if (this.state.phase === 'done') return; this.setState({ phase: 'done' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
