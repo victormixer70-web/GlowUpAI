@@ -34,6 +34,16 @@ input::placeholder{color:#8686A6}
 @keyframes mdChalk{to{stroke-dashoffset:-26}}
 .md-cone{position:absolute;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:16px solid #FF8A3D;filter:drop-shadow(0 3px 2px #000a)}
 @keyframes mdGlow{0%,100%{box-shadow:0 0 0 2px var(--mc),0 0 22px var(--mc),0 18px 30px #000c}50%{box-shadow:0 0 0 2px var(--mc),0 0 38px var(--mc),0 18px 30px #000c}}
+.md-sweep{position:absolute;inset:0;border-radius:18px;overflow:hidden;pointer-events:none}
+.md-sweep::after{content:"";position:absolute;top:-20%;bottom:-20%;left:-70%;width:45%;background:linear-gradient(100deg,transparent,#FFFFFF30,transparent);transform:skewX(-14deg);animation:mdSweep 4.5s ease-in-out infinite}
+@keyframes mdSweep{0%,65%{left:-70%}100%{left:140%}}
+.md-rib{position:absolute;top:14px;right:-30px;width:110px;padding:3px 0;transform:rotate(40deg);text-align:center;font:800 9px Exo2,sans-serif;letter-spacing:1px;color:#0B0B14;box-shadow:0 2px 6px #0008}
+.md-arrow{position:absolute;top:110px;width:38px;height:38px;border-radius:50%;border:0;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;background:#0B0B14CC;box-shadow:inset 0 0 0 2px var(--ac),0 0 14px var(--ac);color:var(--ac);transition:transform .2s cubic-bezier(.3,1.8,.5,1)}
+.md-arrow:active{transform:scale(.88)}
+.md-arrow svg{animation:mdNudge 1.6s ease-in-out infinite}
+@keyframes mdNudge{0%,100%{translate:0 0}50%{translate:var(--nx,3px) 0}}
+.md-dots2{position:absolute;left:50%;top:268px;transform:translateX(-50%);display:flex;gap:6px;z-index:20}
+.md-dots2 i{width:7px;height:7px;border-radius:4px;background:#FFFFFF33;transition:width .3s,background .3s}
 @keyframes mdFloat{0%,100%{translate:0 0}50%{translate:0 -6px}}
 </style>
 </helmet>
@@ -80,10 +90,15 @@ input::placeholder{color:#8686A6}
         <img src="{{m.img}}" alt="" draggable="false" style="{{m.imgStyle}}">
         <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 110px; background: linear-gradient(180deg, transparent, #07070FEE 70%); pointer-events: none"></span>
         <span style="{{m.tagStyle}}">{{m.tag}}</span>
+        <sc-if value="{{m.hasRib}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; inset: 0; border-radius: 18px; overflow: hidden; pointer-events: none"><span class="md-rib" style="background: {{m.ribC}}">{{m.rib}}</span></span></sc-if>
+        <sc-if value="{{m.isOn}}" hint-placeholder-val="{{ false }}"><span class="md-sweep"></span></sc-if>
         <span style="position: absolute; left: 12px; right: 10px; bottom: 30px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: {{m.size}}px; line-height: .92; letter-spacing: -.5px; text-align: left; color: #F4F4FA; text-shadow: 0 3px 0 #07070F, 0 0 18px {{m.glow}}">{{m.title}}</span>
         <span style="position: absolute; left: 13px; bottom: 12px; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: {{m.sub}}">{{m.kicker}}</span>
       </button>
     </sc-for>
+    <sc-if value="{{canPrev}}" hint-placeholder-val="{{ false }}"><button type="button" class="md-arrow" aria-label="Modo anterior" onClick="{{prev}}" style="left: 236px; --ac: {{accent}}; --nx: -3px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7l7 7"/></svg></button></sc-if>
+    <sc-if value="{{canNext}}" hint-placeholder-val="{{ true }}"><button type="button" class="md-arrow" aria-label="Modo siguiente" onClick="{{next}}" style="left: 490px; --ac: {{accent}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7l-7 7"/></svg></button></sc-if>
+    <div class="md-dots2" aria-hidden="true"><sc-for list="{{pager}}" as="d" hint-placeholder-count="5"><i style="{{d}}"></i></sc-for></div>
   </div>
 
   <!-- what you picked, in one line, and the big button -->
@@ -222,7 +237,7 @@ class Component extends DCLogic {
     const all = this.store('arenamix.mmr.v1') || {};
     return all[sport + ':' + id] || 0;
   }
-  posterKey(m) { return m.kind === 'team' ? 'team:' + m.n : m.duel === 'pen' ? 'pen' : m.duel === 'free' ? 'free' : m.kind === 'private' ? 'private' : m.id === 'tut' ? 'tut' : m.id === 'libre' ? 'team:1' : 'train'; }
+  posterKey(m) { return m.kind === 'team' ? 'team:' + m.n : m.duel === 'pen' ? 'pen' : m.duel === 'free' ? 'free' : m.kind === 'private' ? 'private' : m.id === 'tut' ? 'tut' : m.id === 'libre' ? 'pen' : 'train'; }
   renderVals() {
     const s = this.state, C = this.catalog(s.sport);
     let list;
@@ -235,6 +250,8 @@ class Component extends DCLogic {
     const placingOf = (m) => this.placeOf(S, s.sport + ':' + m.id).g < 5;
     const CAT = { comp: ['#FFC53D', '#3A2A0A'], casual: ['#22D3EE', '#0A2A33'], train: ['#53D88E', '#0A2A1A'] }[s.cat];
     const P = window.AMPosters;
+    // a corner ribbon on the modes worth pointing out
+    const RIB = { m1: ['POPULAR', '#FF5C8A'], libre: ['NUEVO', '#53D88E'], private: ['AMIGOS', '#22D3EE'], m4: ['CAOS', '#FF8A3D'] };
     const cards = list.map((m, i) => {
       const off = i - ci, a = Math.abs(off), on = off === 0;
       const mmr = comp ? this.mmrOf(s.sport, m.id) : 0, R = this.rankOf(mmr);
@@ -246,7 +263,8 @@ class Component extends DCLogic {
       const kicker = m.kind === 'team' ? 'PARTIDO · ' + m.n + ' CONTRA ' + m.n : m.kind === 'duel' ? 'DUELO · CARA A CARA' : m.kind === 'private' ? 'ONLINE · CÓDIGO DE SALA' : 'PRÁCTICA';
       const title = m.kind === 'team' ? m.n + ' VS ' + m.n : m.title;
       return {
-        title, tag, kicker, img, on: on ? 'true' : 'false', aria: title + '. ' + m.desc,
+        title, tag, kicker, img, on: on ? 'true' : 'false', isOn: on,
+        hasRib: !!RIB[m.id], rib: (RIB[m.id] || [])[0] || '', ribC: (RIB[m.id] || [])[1] || '', aria: title + '. ' + m.desc,
         size: title.length > 12 ? 30 : title.length > 7 ? 36 : 54,
         glow: on ? CAT[0] + '88' : 'transparent', sub: on ? CAT[0] : '#A3A3C2',
         style: 'transform: translateX(' + tx + 'px) translateZ(' + (-a * 60) + 'px) rotateY(' + (-Math.sign(off) * Math.min(2, a) * 16) + 'deg) scale(' + sc + '); z-index: ' + (10 - a) + '; opacity: ' + (a > 2 ? 0 : a === 2 ? 0.55 : 1) + '; pointer-events: ' + (a > 2 ? 'none' : 'auto') + '; filter: ' + (on ? 'none' : 'brightness(.62) saturate(.8)') + ';' + (on ? ' animation: mdFloat 3.2s ease-in-out infinite;' : ''),
@@ -265,8 +283,13 @@ class Component extends DCLogic {
       { id: 'train', label: 'ENTRENAR', color: '#53D88E', icon: 'M12 3l7 18H5zM8 14h8M10 9h4' }
     ];
     const go = (d) => { const j = ci + d; if (j >= 0 && j < list.length) this.setState({ id: list[j].id }); };
+    const nav = {
+      canPrev: ci > 0, canNext: ci < list.length - 1, prev: () => go(-1), next: () => go(1), accent: CAT[0],
+      pager: list.map((_, k) => k === ci ? 'width: 20px; background: ' + CAT[0] + '; box-shadow: 0 0 8px ' + CAT[0] : '')
+    };
     const href = !cur ? '#' : s.cat === 'train' ? cur.href : cur.kind === 'private' ? 'Privada.dc.html' : comp ? 'Competitivo.dc.html' : 'Rapida.dc.html';
     return {
+      ...nav,
       tabs: TABS.map((t, i) => ({
         label: t.label, icon: t.icon, sel: i === ti ? 'true' : 'false',
         style: 'position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; height: 32px; width: 132px; justify-content: center; border: 0; background: none; font: 800 11.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (i === ti ? '#0B0B14' : t.color) + ';',
