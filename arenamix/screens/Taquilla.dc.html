@@ -20,6 +20,18 @@ input::placeholder{color:#8686A6}
 .tq-ring i{position:absolute;inset:0;border-radius:50%;animation:tqRing 6s linear infinite}
 .tq-item{transition:translate .2s,box-shadow .2s}
 .tq-item:hover{translate:0 -3px}
+.tq-locker{position:absolute;top:24px;bottom:92px;border-radius:4px 4px 0 0;background:linear-gradient(90deg,#1E2752,#2A3466 45%,#1A2148);box-shadow:inset 0 0 0 1.5px #3A4680,inset -3px 0 0 #10142C}
+.tq-locker::before{content:"";position:absolute;left:10px;right:10px;top:14px;height:34px;background:repeating-linear-gradient(180deg,#0B0E22 0 3px,transparent 3px 7px);border-radius:2px;opacity:.8}
+.tq-locker::after{content:"";position:absolute;right:7px;top:46%;width:4px;height:22px;border-radius:2px;background:linear-gradient(180deg,#C9D3E0,#6B7689);box-shadow:0 0 4px #000a}
+.tq-locker b{position:absolute;left:50%;top:58px;transform:translateX(-50%);padding:1px 5px;border-radius:3px;background:#C9D3E0;color:#10142C;font:800 9px 'Barlow Condensed',sans-serif;letter-spacing:.5px}
+.tq-mine{box-shadow:inset 0 0 0 2px var(--kc),0 0 18px var(--kc);background:linear-gradient(90deg,#26306A,#36428A 45%,#202A5E)}
+.tq-dust{position:absolute;width:3px;height:3px;border-radius:50%;background:#FFFFFF;opacity:0;animation:tqDust var(--d,6s) linear infinite;pointer-events:none}
+@keyframes tqDust{0%{opacity:0;transform:translate(0,0)}20%{opacity:.7}100%{opacity:0;transform:translate(var(--dx,10px),-120px)}}
+.tq-glow{position:absolute;left:96px;bottom:40px;width:260px;height:260px;border-radius:50%;pointer-events:none;animation:tqPulse 3.5s ease-in-out infinite}
+@keyframes tqPulse{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.85;transform:scale(1.06)}}
+.tq-item::after{content:"";position:absolute;inset:0;border-radius:12px;background:linear-gradient(105deg,transparent 35%,#FFFFFF22 50%,transparent 65%) -150% 0/200% 100% no-repeat;pointer-events:none;transition:background-position .6s}
+.tq-item:hover::after{background-position:150% 0}
+.tq-badge{position:absolute;right:-5px;top:-5px;z-index:2;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #0B0B14}
 .tq-3d{transition:transform .25s cubic-bezier(.3,1.6,.5,1)}.tq-item:hover .tq-3d,.tq-item:active .tq-3d{transform:scale(1.12) rotate(-5deg)}
 </style>
 </helmet>
@@ -28,13 +40,19 @@ input::placeholder{color:#8686A6}
   <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; height: 390px; z-index: 3"><dc-import name="Nav" active="taquilla" hint-size="80px,390px"></dc-import></div>
   <!-- the locker room: lockers, spotlight, a turntable and you -->
   <div style="position: absolute; left: 80px; top: 0; bottom: 0; width: 392px; overflow: hidden">
-    <div style="position: absolute; inset: 0 0 92px 0; background: repeating-linear-gradient(90deg, #1B2246 0 44px, #10142C 44px 47px); box-shadow: inset 0 -30px 40px #07070F"></div>
-    <div style="position: absolute; left: 0; right: 0; top: 18px; height: 2px; background: #2C3566"></div>
-    <div style="position: absolute; left: 0; right: 0; top: 0; height: 120px; background: repeating-linear-gradient(90deg, transparent 0 14px, #ffffff0d 14px 30px, transparent 30px 47px); mask-image: linear-gradient(180deg, transparent 20%, #000 30%, #000 40%, transparent 50%); -webkit-mask-image: linear-gradient(180deg, transparent 20%, #000 30%, #000 40%, transparent 50%)"></div>
+    <div style="position: absolute; inset: 0 0 92px 0; background: linear-gradient(180deg, #0C0F24, #141A3A)"></div>
+    <sc-for list="{{lockers}}" as="lk" hint-placeholder-count="8"><div class="{{lk.cls}}" style="{{lk.style}}"><b>{{lk.n}}</b></div></sc-for>
+    <div style="position: absolute; left: 0; right: 0; top: 18px; height: 6px; background: linear-gradient(180deg, #3A4680, #1A2148); box-shadow: 0 3px 6px #0008"></div>
+    <div style="position: absolute; left: 0; right: 0; top: 140px; bottom: 92px; background: linear-gradient(180deg, transparent, #07070FCC); pointer-events: none"></div>
+    <div class="tq-glow" style="background: radial-gradient(closest-side, {{kitGlow}}, transparent)"></div>
     <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 92px; background: linear-gradient(180deg, #2A2238, #120E1C); border-top: 2px solid #3A3460"></div>
     <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 92px; background: repeating-linear-gradient(100deg, #ffffff06 0 2px, transparent 2px 38px)"></div>
-    <div style="position: absolute; left: 96px; top: -40px; width: 200px; height: 440px; transform-origin: 50% 0; background: linear-gradient(180deg, #E8F6FF55, #E8F6FF00 85%); clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%); filter: blur(6px); mix-blend-mode: screen; animation: tqBeam 7s ease-in-out infinite; pointer-events: none"></div>
-    <div class="tq-ring" style="bottom: 62px; margin-left: 20px; width: 230px; height: 230px; margin-bottom: -115px"><i style="border: 3px dashed #22D3EE88"></i><i style="inset: 22px; border: 2px solid #7C5CFF77; animation-direction: reverse; animation-duration: 9s"></i><i style="inset: 50px; background: radial-gradient(circle, #22D3EE55, transparent 70%); animation: none"></i></div>
+    <div style="position: absolute; left: 96px; top: -40px; width: 200px; height: 440px; transform-origin: 50% 0; background: linear-gradient(180deg, #E8F6FF40, #E8F6FF00 85%); clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); animation: tqBeam 7s ease-in-out infinite; pointer-events: none; will-change: transform"></div>
+    <sc-for list="{{dust}}" as="d" hint-placeholder-count="6"><i class="tq-dust" style="{{d}}"></i></sc-for>
+    <!-- the bench -->
+    <div style="position: absolute; left: 44px; right: 10px; bottom: 112px; height: 8px; border-radius: 3px; background: linear-gradient(180deg, #B07A44, #6E4422); box-shadow: 0 5px 6px #0009"></div>
+    <div style="position: absolute; left: 62px; bottom: 92px; width: 5px; height: 20px; background: #3A3F5C"></div><div style="position: absolute; right: 30px; bottom: 92px; width: 5px; height: 20px; background: #3A3F5C"></div>
+    <div class="tq-ring" style="bottom: 62px; margin-left: 20px; width: 230px; height: 230px; margin-bottom: -115px"><i style="border: 3px dashed {{kit.primary}}AA"></i><i style="inset: 22px; border: 2px solid #22D3EE77; animation-direction: reverse; animation-duration: 9s"></i><i style="inset: 50px; background: radial-gradient(circle, #22D3EE55, transparent 70%); animation: none"></i></div>
     <sc-if value="{{show3d}}" hint-placeholder-val="{{ false }}">
       <div ref="{{canvasRef}}" role="img" aria-label="{{viewerLabel}}" onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" style="position: absolute; left: 40px; right: 0; top: 40px; bottom: 6px; width: calc(100% - 40px); height: calc(100% - 46px); display: block; touch-action: none; cursor: grab"></div>
       <span style="position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 12px; background: #0B0B14CC; border: 1px solid #2E2E58; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #CACAE0; pointer-events: none; white-space: nowrap"><svg style="animation: tqHint 1.6s ease-in-out infinite" width="16" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M8 8l-4 4l4 4M16 8l4 4l-4 4"/></svg>DESLIZA PARA GIRAR</span>
@@ -93,6 +111,8 @@ input::placeholder{color:#8686A6}
       <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 6px">
       <sc-for list="{{items}}" as="it" hint-placeholder-count="8">
         <button type="button" class="tq-item" onClick="{{it.pick}}" style="{{it.style}}">
+          <sc-if value="{{it.isOn}}" hint-placeholder-val="{{ false }}"><span class="tq-badge" style="background: #22D3EE"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0B0B14" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg></span></sc-if>
+          <sc-if value="{{it.isLocked}}" hint-placeholder-val="{{ false }}"><span class="tq-badge" style="background: #17172A; box-shadow: 0 0 0 2px #0B0B14, inset 0 0 0 1.5px {{it.lockC}}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="{{it.lockC}}" stroke-width="3" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></sc-if>
           <svg width="26" height="12" viewBox="0 0 26 12" style="position: absolute; top: -9px; left: 50%; margin-left: -13px"><path d="M13 10V5a2.5 2.5 0 1 1 2.5-2.5M2 11L13 6l11 5" fill="none" stroke="#A3A3C2" stroke-width="1.6" stroke-linecap="round"/></svg>
           <sc-if value="{{it.isKit}}" hint-placeholder-val="{{ true }}">
             <span style="{{it.jerseyStyle}}"><span style="{{it.crestStyle}}">{{it.crest}}</span></span>
@@ -127,7 +147,7 @@ input::placeholder{color:#8686A6}
         <a href="{{rewardHref}}" style="display: flex; align-items: center; height: 38px; padding: 0 14px; transform: skewX(0deg); border: 2px solid #9B6BFF; color: #C4B5FD; text-decoration: none; font-weight: 800; font-size: 12px"><span style="transform: skewX(0deg)">CÓMO CONSEGUIRLO</span></a>
       </sc-if>
       <sc-if value="{{showPremium}}" hint-placeholder-val="{{ false }}">
-        <a href="Tienda.dc.html" style="display: flex; align-items: center; height: 40px; padding: 0 16px; transform: skewX(0deg); background: linear-gradient(135deg, #FFB37A, #FF8A3D); color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px"><span style="transform: skewX(0deg)">[PRECIO]</span></a>
+        <a href="Tienda.dc.html" style="display: flex; align-items: center; height: 40px; padding: 0 16px; transform: skewX(0deg); background: linear-gradient(135deg, #FFB37A, #FF8A3D); color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px"><span style="transform: skewX(0deg)">PRONTO</span></a>
       </sc-if>
     </div>
   </div>
@@ -557,7 +577,7 @@ class Component extends DCLogic {
       if (equipped) { label = 'Equipado'; color = '#22D3EE'; }
       else if (!own && it.st === 'coins') { label = this.fmt(it.price); color = '#FFC53D'; }
       else if (!own && it.st === 'reward') { label = it.req; color = '#CACAE0'; }
-      else if (!own && it.st === 'premium') { label = '[PRECIO]'; color = '#FF8A3D'; }
+      else if (!own && it.st === 'premium') { label = 'Pronto'; color = '#FF8A3D'; }
       const k = {};
       ['none', 'band', 'cap', 'top', 'chef', 'viking', 'prop', 'crown', 'sprout', 'phones', 'sun', 'round', 'star', 'd3', 'ski', 'stache'].forEach((x) => { k[x] = it.kind === x; });
       return {
@@ -567,7 +587,7 @@ class Component extends DCLogic {
         crest: it.crest || '',
         crestStyle: s.cat === 'equipos' ? 'position: absolute; left: 24%; top: 28%; width: 13px; height: 13px; ' + ({ shield: 'border-radius: 2px 2px 7px 7px;', circle: 'border-radius: 50%;', diamond: 'clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);' })[it.crestShape] + ' background: ' + it.secondary + '; color: ' + it.primary + '; font: 800 6px Exo2, sans-serif; display: flex; align-items: center; justify-content: center; letter-spacing: -.3px;' : '',
         jerseyStyle: s.cat === 'equipos' ? 'position: relative; display: block; width: 46px; height: 44px; background: ' + this.jerseyBg(it.primary, it.secondary, it.pattern) + '; clip-path: polygon(32% 0, 68% 0, 100% 18%, 88% 42%, 78% 36%, 78% 100%, 22% 100%, 22% 36%, 12% 42%, 0 18%); filter: drop-shadow(0 2px 0 #00000055);' : '',
-        isCoins: !own && it.st === 'coins',
+        isCoins: !own && it.st === 'coins', isOn: equipped, isLocked: !own, lockC: it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D',
         isReward: !own && it.st === 'reward',
         style: (() => { const rc = equipped ? '#22D3EE' : own ? '#8A93C8' : it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D'; return 'position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 98px; margin-top: 8px; padding: 8px 3px 5px 3px; box-sizing: border-box; border-radius: 12px; font-family: Exo2, sans-serif; cursor: pointer; min-width: 0; background: linear-gradient(180deg, ' + rc + '30, #141428 70%); border: ' + (sel ? '2px solid ' + rc : '1px solid ' + rc + '55') + '; border-top: 3px solid ' + rc + '; box-shadow: ' + (sel ? '0 0 14px ' + rc + '88, 0 6px 12px #0008' : '0 6px 12px #0006') + ';'; })(),
         labelStyle: 'display: flex; align-items: center; gap: 3px; max-width: 100%; white-space: nowrap; overflow: hidden; font-size: 10.5px; font-weight: 800; color: ' + color + ';',
@@ -628,6 +648,10 @@ class Component extends DCLogic {
       catThumb: 'position: absolute; top: 3px; bottom: 3px; left: calc(3px + ' + ci + ' * (100% - 6px) / 4); width: calc((100% - 6px) / 4); border-radius: 11px; background: linear-gradient(135deg, #7EF0FF, #22D3EE); box-shadow: 0 0 12px #22D3EE88; transition: left .4s cubic-bezier(.3,1.5,.5,1);',
       gridKey: s.cat + ':' + li,
       kitTeam: kitItem.name, kitLeague: league.name,
+      // the locker room: a row of lockers, yours (behind the player) lit in your kit's colour
+      lockers: Array.from({ length: 8 }, (_, k) => ({ n: k === 4 ? (window.AMOnline ? window.AMOnline.myName() : 'TÚ').toUpperCase().slice(0, 10) : String([3, 7, 11, 5, 10, 8, 14, 21][k]), cls: 'tq-locker' + (k === 4 ? ' tq-mine' : ''), style: 'left: ' + (k * 49 + 1) + 'px; width: 46px; --kc: ' + kitItem.primary + '88;' + (k === 4 ? ' z-index: 0;' : '') })),
+      kitGlow: kitItem.primary + '66',
+      dust: Array.from({ length: 7 }, (_, k) => 'left: ' + (150 + k * 13) + 'px; top: ' + (120 + (k * 37) % 150) + 'px; --dx: ' + ((k % 3) - 1) * 12 + 'px; --d: ' + (5 + k % 4) + 's; animation-delay: ' + (-k * 0.8).toFixed(1) + 's'),
       isTeams: s.cat === 'equipos',
       kit: kitItem,
       kitName: kitItem.name + ' · ' + league.name,
