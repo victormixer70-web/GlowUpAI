@@ -245,6 +245,43 @@
     lArm: 'mixamorigLeftArm', lFore: 'mixamorigLeftForeArm', rArm: 'mixamorigRightArm', rFore: 'mixamorigRightForeArm'
   };
 
+  // how far back the torso goes at chest height (in the character's own space, at rest), measured once per model
+  var backCache = {};
+  function backOf(id, model, at) {
+    if (backCache[id] !== undefined) return backCache[id];
+    var v = new T.Vector3(), minZ = Infinity;
+    model.updateMatrixWorld(true);
+    model.traverse(function (m) {
+      if (!m.isSkinnedMesh || !m.userData.kitable) return;
+      var pos = m.geometry.attributes.position, step = Math.max(1, Math.floor(pos.count / 6000));
+      for (var i = 0; i < pos.count; i += step) {
+        v.fromBufferAttribute(pos, i);
+        if (m.boneTransform) m.boneTransform(i, v);
+        v.applyMatrix4(m.matrixWorld);
+        if (Math.abs(v.y - at.y) < 0.09 && Math.abs(v.x - at.x) < 0.1 && v.z < minZ) minZ = v.z;
+      }
+    });
+    backCache[id] = isFinite(minZ) ? minZ : null;
+    return backCache[id];
+  }
+  var texCache = {};
+  function backTex(num, name, col) {
+    var k = num + '|' + name + '|' + col;
+    if (texCache[k]) return texCache[k];
+    var cv = document.createElement('canvas'); cv.width = 256; cv.height = 256;
+    var c = cv.getContext('2d');
+    c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineJoin = 'round';
+    if (name) {
+      var nm = name.toUpperCase().slice(0, 12), fs = Math.min(46, 330 / Math.max(5, nm.length));
+      c.font = '800 ' + fs + 'px "Barlow Condensed", Arial'; c.lineWidth = 7; c.strokeStyle = 'rgba(5,5,10,.75)';
+      c.strokeText(nm, 128, 40); c.fillStyle = col; c.fillText(nm, 128, 40);
+    }
+    c.font = '800 168px "Barlow Condensed", Arial'; c.lineWidth = 12; c.strokeStyle = 'rgba(5,5,10,.8)';
+    c.strokeText(num, 128, name ? 152 : 132); c.fillStyle = col; c.fillText(num, 128, name ? 152 : 132);
+    var t = new T.CanvasTexture(cv); t.encoding = T.sRGBEncoding; t.anisotropy = 4;
+    texCache[k] = t;
+    return t;
+  }
   function make(o) {
     o = o || {};
     var id = o.char || (o.you ? pref() : null);
@@ -339,6 +376,20 @@
       a.position.copy(r.wp).negate().applyQuaternion(q).multiplyScalar(1 / r.ws);
       a.add(obj); headBone.add(a);
     });
+    // the shirt number (and your name) printed on the back: a patch riding on the chest bone
+    var chest = by['mixamorigSpine2'] || by['mixamorigSpine1'];
+    if (o.number && chest && !o.noNumber) {
+      var rc = info.get(chest), bz = backOf(id, model, rc.wp);
+      if (bz != null) {
+        var tex = backTex(String(o.number), o.backName || '', o.numCol || (typeof o.trimCss === 'string' ? o.trimCss : '#F4F4FA'));
+        var plate = new T.Mesh(new T.PlaneGeometry(0.3, 0.3), new T.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.8, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
+        plate.position.set(rc.wp.x, rc.wp.y - 0.03, bz - 0.012); plate.rotation.y = Math.PI; plate.renderOrder = 2;
+        var pa = new T.Group(), pq = rc.wq.clone().invert();
+        pa.quaternion.copy(pq); pa.scale.setScalar(1 / rc.ws);
+        pa.position.copy(rc.wp).negate().applyQuaternion(pq).multiplyScalar(1 / rc.ws);
+        pa.add(plate); chest.add(pa);
+      }
+    }
     socket(head, by[BONES.neck], I, false);
     socket(arms[0].elb, by[BONES.rFore], rz(Math.PI / 2), false); socket(arms[1].elb, by[BONES.lFore], rz(Math.PI / 2 * -1), false);
     socket(arms[0].sho, by[BONES.rArm], rz(Math.PI / 2), false); socket(arms[1].sho, by[BONES.lArm], rz(-Math.PI / 2), false);

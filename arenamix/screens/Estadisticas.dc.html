@@ -137,13 +137,13 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
           <svg width="150" height="150" viewBox="-50 -50 100 100" style="position: absolute; left: 23px; top: 66px"><path d="M0 -46l38 14v26c0 26-16 44-38 52c-22-8-38-26-38-52v-26z" fill="{{tierLight}}" fill-opacity=".1"/></svg>
           <div style="position: absolute; left: 0; right: 0; top: 16px; text-align: center">
             <div style="font-size: 9px; font-weight: 800; letter-spacing: 3px; color: {{tierLight}}">FICHA DE CARRERA</div>
-            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 18px">{{playerName}}</div>
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 18px" translate="no">{{playerName}}<span style="margin-left: 6px; color: {{tierLight}}">#{{dorsal}}</span></div>
           </div>
-          <div style="position: absolute; left: 18px; right: 18px; top: 62px; display: flex; flex-direction: column; gap: 4px">
-            <sc-for list="{{career}}" as="c" hint-placeholder-count="5">
-              <div style="display: flex; align-items: center; justify-content: space-between; height: 24px; padding: 0 9px; border-radius: 8px; background: #FFFFFF0F; box-shadow: inset 0 0 0 1px {{tierLight}}33">
-                <span style="font-size: 10.5px; font-weight: 800; color: #CACAE0">{{c.k}}</span>
-                <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; color: {{c.c}}">{{c.v}}</span>
+          <div style="position: absolute; left: 14px; right: 14px; top: 58px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px">
+            <sc-for list="{{career}}" as="c" hint-placeholder-count="10">
+              <div style="display: flex; flex-direction: column; justify-content: center; height: 26px; padding: 0 7px; border-radius: 7px; background: #FFFFFF0F; box-shadow: inset 0 0 0 1px {{tierLight}}33">
+                <span style="font-size: 7.5px; font-weight: 800; letter-spacing: .5px; color: #A3A3C2; white-space: nowrap">{{c.k}}</span>
+                <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 15px; line-height: 1; color: {{c.c}}">{{c.v}}</span>
               </div>
             </sc-for>
           </div>
@@ -413,12 +413,21 @@ class Component extends DCLogic {
       embers: Array.from({ length: nEm }, (_, k) => ({ style: 'left: ' + (20 + (k * 37) % 140) + 'px; background: ' + (k % 2 ? tr[2] : '#FFFFFF') + '; box-shadow: 0 0 6px ' + tr[5] + '; --ex: ' + ((k % 3) - 1) * 14 + 'px; animation-delay: ' + (-k * 0.61).toFixed(2) + 's; animation-duration: ' + (2.8 + (k % 4) * 0.45).toFixed(2) + 's;' })),
       glare: 'position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at ' + (50 + tl.x * 45).toFixed(0) + '% ' + (40 + tl.y * 45).toFixed(0) + '%, rgba(255,255,255,.4), transparent 42%); opacity: ' + (this.tilt ? 1 : 0) + '; transition: opacity .3s',
       backBg: 'linear-gradient(160deg, #1D1D3C 0%, #0D0D1C 60%, ' + tr[5] + '66 100%)',
-      career: [
-        { k: 'PARTIDOS', v: String(C.played), c: '#F4F4FA' },
-        { k: 'VICTORIAS', v: String(C.won), c: '#53D88E' },
-        { k: '% VICTORIAS', v: C.played ? Math.round(C.won / C.played * 100) + '%' : '—', c: tr[2] },
-        { k: 'GOLES', v: String(C.goals), c: '#FFC53D' },
-        { k: 'MEJOR RACHA', v: String(C.best || 0), c: '#FF7A59' }],
+      career: (() => {
+        let TR = {}; try { TR = JSON.parse(localStorage.getItem('arenamix.trophies.v1') || '{}') || {}; } catch (e) {}
+        return [
+          { k: 'PARTIDOS', v: String(C.played), c: '#F4F4FA' },
+          { k: 'VICTORIAS', v: String(C.won) + (C.played ? ' · ' + Math.round(C.won / C.played * 100) + '%' : ''), c: '#53D88E' },
+          { k: 'GOLES', v: String(C.goals), c: '#FFC53D' },
+          { k: 'RÉCORD EN UN PARTIDO', v: String(C.topGoals || 0) + (C.hats ? ' · ' + C.hats + ' HT' : ''), c: '#FFC53D' },
+          { k: 'PASES', v: String(C.passes || 0), c: '#22D3EE' },
+          { k: 'FILIGRANAS', v: String(C.skills || 0), c: '#FF5CC8' },
+          { k: 'ROBOS', v: String(C.tackles || 0), c: '#A78BFA' },
+          { k: 'MEJOR RACHA', v: String(C.best || 0), c: '#FF7A59' },
+          { k: 'COPAS', v: String(TR.copa || 0), c: '#FFC53D' },
+          { k: 'LIGAS', v: String(TR.liga || 0), c: '#C9CAE0' }];
+      })(),
+      dorsal: (() => { try { return String(+localStorage.getItem('arenamix.dorsal.v1') || 10); } catch (e) { return '10'; } })(),
       signature: name, barcode: bars,
       serial: 'AM-' + season + '-' + def.num + '-' + String(hsh % 10000).padStart(4, '0'),
       spotStyle: 'left: 40px; top: -40px; width: 320px; height: 440px; background: radial-gradient(50% 60% at 50% 55%, ' + tr[5] + '33, transparent 70%), conic-gradient(from 160deg at 50% 0%, transparent 0deg, rgba(255,255,255,.07) 14deg, rgba(255,255,255,.11) 20deg, rgba(255,255,255,.07) 26deg, transparent 40deg);',

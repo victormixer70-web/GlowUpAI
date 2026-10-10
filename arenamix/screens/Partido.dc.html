@@ -2871,6 +2871,8 @@ class Component extends DCLogic {
     }
     return this._homeKit;
   }
+  // your shirt number, chosen when you signed (the name screen)
+  myDorsal() { try { return String(+localStorage.getItem('arenamix.dorsal.v1') || 10); } catch (e) { return '10'; } }
   syncPlayers() {
     const g = this.g, P = this.props;
     if (this.meshFor === g.ps) return;
@@ -2886,7 +2888,8 @@ class Component extends DCLogic {
         shirt: new THREE.Color(gk ? (home ? '#FFC53D' : '#2FBF71') : home ? hc : ac),
         shorts: new THREE.Color(home ? (P.homeColor ? '#17172A' : this.homeKit().shorts) : '#F4F4F6'),
         socks: new THREE.Color(gk ? '#17172A' : home ? (P.homeColor ? hc : this.homeKit().socks) : ac),
-        boot: home ? (P.homeColor ? 0xc8f031 : this.homeKit().shoe) : 0xf2f5fa, gloves: gk, number: gk ? '1' : nums[p.team][p.slot],
+        boot: home ? (P.homeColor ? 0xc8f031 : this.homeKit().shoe) : 0xf2f5fa, gloves: gk, number: gk ? '1' : idx === g.ctl && !this.net ? this.myDorsal() : nums[p.team][p.slot] === this.myDorsal() && home ? '14' : nums[p.team][p.slot],
+        backName: gk ? '' : idx === g.ctl && !this.net && window.AMOnline ? window.AMOnline.myName() : String(p.name || '').split(/[_\s]/)[0],
         trimCss: gk ? '#17172A' : home ? ht : at,
         hair: [0x241811, 0xc9a227, 0x3a2418, 0x141b2d][Math.floor(Math.random() * 4)],
         char: p.look ? p.look.char : undefined

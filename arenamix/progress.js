@@ -316,6 +316,8 @@
     // the career tally on the back of the player card (Perfil)
     var C = get('arenamix.career.v1', { played: 0, won: 0, goals: 0, streak: 0, best: 0 });
     C.played++; C.goals += goals || 0;
+    C.passes = (C.passes || 0) + (st.passes || 0); C.skills = (C.skills || 0) + (st.skills || 0); C.tackles = (C.tackles || 0) + (st.tackles || 0);
+    C.topGoals = Math.max(C.topGoals || 0, goals || 0); if ((goals || 0) >= 3) C.hats = (C.hats || 0) + 1;
     if (won) { C.won++; C.streak++; C.best = Math.max(C.best, C.streak); } else C.streak = 0;
     put('arenamix.career.v1', C);
     // daily missions
