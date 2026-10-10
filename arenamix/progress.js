@@ -287,11 +287,12 @@
   /* ---------- the final whistle ---------- */
   // info: { home, away, kind: 'team'|'duel'|'mg', stats: { goals, shots, passes, skills, tackles } }
   function recordMatch(info) {
-    var st = info.stats || {}, won = info.home > info.away, lost = info.home < info.away, kind = info.kind || 'team';
+    var pen = info.pen && info.home === info.away ? info.pen : null;
+    var st = info.stats || {}, won = info.home > info.away || !!(pen && pen[0] > pen[1]), lost = info.home < info.away || !!(pen && pen[0] < pen[1]), kind = info.kind || 'team';
     var goals = st.goals != null ? st.goals : (kind === 'team' ? 0 : info.home || 0);
     // experience
     var lines = [{ label: 'Partido jugado', xp: 50 }];
-    if (won) lines.push({ label: 'Victoria', xp: 60 }); else if (!lost) lines.push({ label: 'Empate', xp: 25 });
+    if (won) lines.push({ label: pen ? 'Victoria en los penaltis' : 'Victoria', xp: pen ? 45 : 60 }); else if (!lost) lines.push({ label: 'Empate', xp: 25 }); else if (pen) lines.push({ label: 'Empate (penaltis perdidos)', xp: 20 });
     if (goals) lines.push({ label: goals === 1 ? '1 gol tuyo' : goals + ' goles tuyos', xp: goals * 15 });
     if (st.tackles) lines.push({ label: st.tackles + (st.tackles === 1 ? ' robo' : ' robos'), xp: st.tackles * 8 });
     if (kind === 'team' && !info.away) lines.push({ label: 'Portería a cero', xp: 20 });
@@ -332,7 +333,7 @@
     if (W2.wins > w0 && W2.milestones.some(function (m) { return m.at === W2.wins; })) notes.push({ title: '¡PREMIO SEMANAL!', sub: W2.wins + ' victorias: recógelo en la Tienda', color: '#22D3EE', icon: 'gift' });
     notes.forEach(function (n, k) { setTimeout(function () { try { window.dispatchEvent(new CustomEvent('am:toast', { detail: n })); } catch (e) {} }, 4500 + k * 200); });
     return {
-      home: info.home, away: info.away, won: won, lost: lost,
+      home: info.home, away: info.away, pen: pen, won: won, lost: lost,
       xpLines: lines, xpGain: gain, before: before, after: after, levelUps: after.level - before.level,
       coinsBefore: c0, coinsGain: coinsGain, levelBonus: levelBonus,
       weekBefore: w0, weekAfter: W2.wins, milestones: W2.milestones,

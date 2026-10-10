@@ -72,7 +72,7 @@
       '<div class="bg"></div><div class="rays"></div>' +
       '<div class="k">FINAL DEL PARTIDO</div>' +
       '<div class="t">' + (S.won ? '¡VICTORIA!' : S.lost ? 'DERROTA' : 'EMPATE') + '</div>' +
-      '<div class="sc">' + S.home + ' – ' + S.away + '</div>' +
+      '<div class="sc">' + S.home + ' – ' + S.away + (S.pen ? ' <small style="font-size:.45em;opacity:.8">(' + S.pen[0] + '–' + S.pen[1] + ' pen.)</small>' : '') + '</div>' +
       '<div class="row">' +
         '<div class="pn" style="--pc:#22D3EE;animation-delay:.25s"><div class="h">EXPERIENCIA</div><div class="lv">' + S.before.level + '</div>' +
           '<div class="xpls" style="display:flex;flex-direction:column;gap:4px;margin-top:10px;margin-right:52px">' +

@@ -122,6 +122,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 @keyframes lbRing{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.08,1.5)}}
 .lb-ball{animation:lbSpin 1.4s linear infinite}
 .lb-grass{position:absolute;left:-30%;right:-30%;bottom:-30px;height:180px;transform:perspective(420px) rotateX(62deg);transform-origin:50% 100%;background:repeating-linear-gradient(90deg,#1A6B38 0 60px,#165E31 60px 120px);-webkit-mask-image:linear-gradient(0deg,#000 20%,transparent 90%);mask-image:linear-gradient(0deg,#000 20%,transparent 90%);opacity:.55;pointer-events:none}
+.rs-score{position:relative}.rs-pen{position:absolute;left:50%;top:100%;translate:-50% 4px;padding:2px 8px;border-radius:6px;background:#FFC53D;color:#1A1204;font:800 italic 12px 'Barlow Condensed',sans-serif;letter-spacing:1px;white-space:nowrap}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; overflow: hidden;  isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif">
@@ -282,6 +283,10 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{isTeamMatch}}" hint-placeholder-val="{{ false }}">
     <dc-import name="Partido" ai-level="{{aiLevel}}" ranks="{{ranks}}" keeper="{{asKeeper}}" label="{{matchLabel}}" mode="{{matchMode}}" duration="{{duration}}" team-size="{{teamSize}}" autostart="{{ true }}" home-name="Invitado_4821" mates="{{mates}}" rivals="{{rivals}}" away-name="{{oppName}}" away-color="{{oppColor}}" away-trim="{{oppTrim}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
+  <!-- a draw in Competitivo: penalty shoot-out -->
+  <sc-if value="{{isShootout}}" hint-placeholder-val="{{ false }}">
+    <dc-import name="Duelo" ai-level="{{aiLevel}}" kind="pen" shootout="{{ true }}" rival-name="{{oppName}}" on-end="{{onPens}}" hint-size="844px,390px"></dc-import>
+  </sc-if>
   <sc-if value="{{isDuelMatch}}" hint-placeholder-val="{{ false }}">
     <dc-import name="Duelo" ai-level="{{aiLevel}}" kind="{{duelKind}}" rival-name="{{oppName}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
@@ -350,7 +355,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <!-- broadcast scoreboard -->
         <div class="rs-board">
           <span class="rs-team" style="background: linear-gradient(90deg, #22D3EE, #0E8FA3); color: #0B0B14">{{rsHome}}</span>
-          <span class="rs-score"><b class="rs-d1">{{rsH}}</b><i>–</i><b class="rs-d2">{{rsA}}</b></span>
+          <span class="rs-score"><b class="rs-d1">{{rsH}}</b><i>–</i><b class="rs-d2">{{rsA}}</b><sc-if value="{{rsHasPen}}" hint-placeholder-val="{{ false }}"><em class="rs-pen">{{rsPen}}</em></sc-if></span>
           <span class="rs-team" style="background: linear-gradient(270deg, {{rsAwayC}}, #2A2A4A); color: #FFFFFF; justify-content: flex-end">{{rsAway}}</span>
         </div>
         <div class="rs-panel">
@@ -652,7 +657,7 @@ class Component extends DCLogic {
     // lifetime record (Profile and achievements) and the coin reward for the match
     try {
       const R = JSON.parse(localStorage.getItem('arenamix.record.v1') || 'null') || {};
-      const w = r.home > r.away, l = r.home < r.away;
+      const w = this.won(r), l = this.lost(r);
       const add = (k) => {
         const s = R[k] || (R[k] = { played: 0, won: 0, lost: 0, drawn: 0, gf: 0, ga: 0, clean: 0, streak: 0, best: 0 });
         s.played++; if (w) s.won++; else if (l) s.lost++; else s.drawn++;
@@ -663,14 +668,22 @@ class Component extends DCLogic {
       localStorage.setItem('arenamix.record.v1', JSON.stringify(R));
       // experience, coins, the weekly track and the daily missions, then the results screen plays it back
       if (window.AMProgress) {
-        const sum = window.AMProgress.recordMatch({ home: r.home || 0, away: r.away || 0, kind, stats: r.stats });
+        const sum = window.AMProgress.recordMatch({ home: r.home || 0, away: r.away || 0, pen: r.pen, kind, stats: r.stats });
         if (window.AMResults && !r.tutorial) setTimeout(() => window.AMResults.show(sum), 60);
       }
     } catch (e) {}
   }
+  // a draw in a ranked team match is settled from the spot (not online: the shoot-out is against the AI keeper)
+  won(r) { return !!r && (r.home > r.away || (r.home === r.away && !!r.pen && r.pen[0] > r.pen[1])); }
+  lost(r) { return !!r && (r.home < r.away || (r.home === r.away && !!r.pen && r.pen[0] < r.pen[1])); }
   finish(r) {
+    const s0 = this.state;
+    if (this.pl.kind === 'team' && !this.props.casual && !s0.online && r && !r.pen && !r.tutorial && !r.forfeit && r.home === r.away && this.sport === 'futbol') {
+      this.setState({ phase: 'shootout', penFor: r });
+      return;
+    }
     this.recordMatch(this.sport, this.pl.kind, r);
-    const s = this.state, casual = !!this.props.casual, w = r.home > r.away, l = r.home < r.away;
+    const s = this.state, casual = !!this.props.casual, w = this.won(r), l = this.lost(r);
     let mmr = s.mmr;
     if (!casual && s.placing) {
       const S = this.season(), p = { ...s.place, res: s.place.res.concat([w ? 'w' : l ? 'l' : 'd']) };
@@ -716,7 +729,7 @@ class Component extends DCLogic {
     const prevSeason = (S.prev || {})[this.key];
     const prog = Math.max(0, Math.min(1, (shownMmr - R.lo) / (R.hi - R.lo)));
     const pip = (n) => (R.div >= n ? R.text : '#2E2E52');
-    const res = s.res, won = res && res.home > res.away, lost = res && res.home < res.away;
+    const res = s.res, won = this.won(res), lost = this.lost(res);
     const n = pl.kind === 'team' ? pl.n : 1, total = n * 2;
     const found = Math.min(total, 1 + Math.floor(this.t / Math.max(0.3, (this.findAt || 3) / total)));
     const rankChanged = s.phase === 'result' && !casual && after.idx !== before.idx && this.t > 1.7;
@@ -861,6 +874,7 @@ class Component extends DCLogic {
           rsAwayC: m ? m.color : '#FF5C8A',
           rsH: res ? String(res.home) : '0', rsA: res ? String(res.away) : '0',
           rsShield: !!this.shieldUsed,
+          rsHasPen: !!(res && res.pen), rsPen: res && res.pen ? res.pen[0] + '–' + res.pen[1] + ' pen.' : '',
           rsFlashes: Array.from({ length: 22 }, (_, k) => 'left: ' + (rnd(k + 200) * 844).toFixed(0) + 'px; top: ' + (70 + rnd(k + 300) * 150).toFixed(0) + 'px; animation-duration: ' + (1.6 + rnd(k + 400) * 2.6).toFixed(2) + 's; animation-delay: -' + (rnd(k + 500) * 4).toFixed(2) + 's'),
           rsBits: won ? Array.from({ length: 34 }, (_, k) => 'left: ' + (rnd(k) * 844).toFixed(0) + 'px; background: ' + CC[k % 6] + '; animation-duration: ' + (2.4 + rnd(k + 50) * 2.2).toFixed(2) + 's; animation-delay: -' + (rnd(k + 9) * 4).toFixed(2) + 's') : [],
           rsDrops: lost ? Array.from({ length: 40 }, (_, k) => 'left: ' + (rnd(k) * 900).toFixed(0) + 'px; animation-duration: ' + (0.7 + rnd(k + 3) * 0.5).toFixed(2) + 's; animation-delay: -' + (rnd(k + 7) * 1.2).toFixed(2) + 's') : []
@@ -885,6 +899,8 @@ class Component extends DCLogic {
       search: () => { this.findAt = 2 + n * 0.6 + Math.random() * 1.5; this.pre = this.makeMatch(); this.koFx = {}; this.arcs = []; this.seen = 1; this.setState({ phase: 'search', online: null }); this.startOnline(n); this.anim(); },
       cancel: () => { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; this.endOnline(); this.setState({ phase: 'lobby' }); },
       onEnd: (r) => this.finish(r),
+      isShootout: s.phase === 'shootout',
+      onPens: (p) => { const r = s.penFor || { home: 0, away: 0 }; this.finish({ ...r, pen: [p.home || 0, p.away || 0] }); },
       onScore: (score) => this.finish({ home: score, away: m ? m.target : 0 }),
       again: () => { this.endOnline(); this.setState({ phase: 'lobby', prevMmr: s.mmr, res: null, match: null, justPlaced: false, online: null }); }
     };
