@@ -490,6 +490,21 @@
       [0, 1, 2].forEach(function (k) { var f = mesh(new T.BoxGeometry(0.02, 0.36, 0.26), std('#53D88E', { r: 0.5 }), 0, 1.2, 0); f.rotation.y = k * Math.PI / 3; dart.add(f); });
       dart.scale.setScalar(1.45); dart.position.set(0.05, 1.4, 0.2); dart.rotation.set(-0.75, 0, -0.75); g.add(dart);
       g.rotation.y = 0.25;
+    } else if (p[0] === 'trail') {
+      // a ball flying out of a glowing trail of its colour
+      var tc = p[1] || '#22D3EE', glow = std(tc, { r: 0.4, em: tc, ei: 0.9 });
+      var ball = mesh(new T.IcosahedronGeometry(0.85, 1), std('#F4F4FA', { r: 0.35 }), 0.9, 1.3, 0); ball.material.flatShading = true; g.add(ball);
+      [0, 1, 2].forEach(function (k) { var c = mesh(new T.ConeGeometry(0.55 - k * 0.12, 2.6 - k * 0.5, 18, 1, true), std(tc, { r: 0.5, em: tc, ei: 0.6 - k * 0.15, side: T.DoubleSide }), -0.9 - k * 0.2, 1.3 + (k - 1) * 0.5, 0); c.rotation.z = Math.PI / 2; c.material.transparent = true; c.material.opacity = 0.85 - k * 0.2; g.add(c); });
+      [-1.6, -2.3, -1.2].forEach(function (x0, k) { g.add(mesh(new T.SphereGeometry(0.12 + k * 0.03, 10, 8), glow, x0, 0.5 + k * 0.9, 0.3)); });
+      g.rotation.set(0.1, -0.35, 0.18);
+    } else if (p[0] === 'celeb') {
+      // a star burst in the celebration's colour, with sparks
+      var cc = p[1] || '#FFC53D', shp = new T.Shape();
+      for (var q = 0; q < 10; q++) { var aa = -Math.PI / 2 + q * Math.PI / 5, rr = q % 2 ? 0.55 : 1.35; if (q) shp.lineTo(Math.cos(aa) * rr, -Math.sin(aa) * rr); else shp.moveTo(Math.cos(aa) * rr, -Math.sin(aa) * rr); }
+      var sb = new T.Mesh(new T.ExtrudeGeometry(shp, { depth: 0.35, bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.08, bevelSegments: 3 }), std(cc, { r: 0.3, m: 0.4, em: cc, ei: 0.25 }));
+      sb.position.set(0, 1.4, 0); g.add(sb);
+      [[1.5, 2.4], [-1.5, 2.2], [1.6, 0.4], [-1.4, 0.5], [0, 2.9]].forEach(function (pp, k) { g.add(mesh(new T.OctahedronGeometry(0.14 + (k % 2) * 0.06), std('#FFFFFF', { r: 0.2, em: '#FFFFFF', ei: 0.6 }), pp[0], pp[1], 0.3)); });
+      g.rotation.y = -0.25;
     } else if (p[0] === 'boots') {
       var b = boot(p[1] || '#E5484D'); b.rotation.y = 0.45; g.add(b);
       var sp = hat('sprout'); sp.scale.setScalar(0.9); sp.position.set(-0.5, -0.1, 0); g.add(sp);

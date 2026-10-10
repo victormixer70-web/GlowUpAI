@@ -481,6 +481,7 @@ class Component extends DCLogic {
   newGame() {
     this.forfeit = false;
     this.clips = []; this.hl = null; this.hlDone = false;
+    try { this.myTrail = window.AMProgress && window.AMProgress.trailOn ? window.AMProgress.trailOn() : null; } catch (e) { this.myTrail = null; }
     // gameplay settings (Configuración > Jugabilidad)
     this.play = window.AMPlay ? window.AMPlay() : { cam: 'normal', names: true, gfx: 'alta', passMark: true };
     const P = this.props, n = this.size(), dur = P.practice ? 9999 : Number(P.duration ?? 90);
@@ -1274,9 +1275,9 @@ class Component extends DCLogic {
           // swoop in a zigzag towards the corner flag
           const zz = Math.sin(T0 * 3.2) * 0.9, ux = dx / n, uy = dy / n;
           if (n > 1.5) { tvx = (ux - uy * zz) * 6.2; tvy = (uy + ux * zz) * 6.2; }
-        } else if (st === 'siu') {
+        } else if (st === 'siu' || st === 'mortal') {
           if (T0 < 1.1 && n > 1.5) { tvx = dx / n * 6.5; tvy = dy / n * 6.5; }
-        } else if (st === 'baile' || st === 'silencio') {
+        } else if (st === 'baile' || st === 'silencio' || st === 'robot' || st === 'corazon' || st === 'saludo') {
           if (T0 < 0.9 && n > 1.5) { tvx = dx / n * 6; tvy = dy / n * 6; }
         } else if (n > 1.5) { tvx = dx / n * 6; tvy = dy / n * 6; }
       }
@@ -2793,19 +2794,23 @@ class Component extends DCLogic {
     const tr = this.trail;
     if (tr && dt) {
       const pa = tr.pts.geometry.attributes.position, ca = tr.pts.geometry.attributes.color, sp = Math.hypot(b.vx, b.vy);
-      const emit = g.phase === 'play' && g.own < 0 && (fire ? 3 : gold && sp > 7 ? 1 : 0);
+      // your own trail (Tienda): behind your hard shots, while nobody has the ball
+      const mine = !fire && this.myTrail && g.last === g.ctl && sp > 12 && b.x > 0 && b.x < 60;
+      const emit = g.phase === 'play' && g.own < 0 && (fire ? 3 : mine ? 2 : gold && sp > 7 ? 1 : 0);
+      if (!tr.keep) tr.keep = new Uint8Array(tr.N);
       for (let e = 0; e < emit; e++) {
         const k = tr.k = (tr.k + 1) % tr.N;
         pa.setXYZ(k, b.x - 30 + (Math.random() - 0.5) * 0.2, b.z + Partido_BR + (Math.random() - 0.5) * 0.2, b.y - 15 + (Math.random() - 0.5) * 0.2);
-        tr.life[k] = tr.max[k] = fire ? 0.45 : 0.3;
-        const c = fire ? (Math.random() < 0.5 ? [1, 0.32, 0.04] : [1, 0.62, 0.1]) : [1, 0.8, 0.25];
-        tr.col.set(c, k * 3);
+        tr.life[k] = tr.max[k] = fire ? 0.45 : mine ? 0.42 : 0.3;
+        const M = this.myTrail, c = fire ? (Math.random() < 0.5 ? [1, 0.32, 0.04] : [1, 0.62, 0.1]) : mine ? M[(this.trailI = ((this.trailI || 0) + 1) % (M.length * 3)) / 3 | 0] : [1, 0.8, 0.25];
+        tr.col.set(c, k * 3); tr.keep[k] = mine ? 1 : 0;
       }
       for (let k = 0; k < tr.N; k++) {
         if (tr.life[k] <= 0) { if (pa.getY(k) > -50) pa.setY(k, -99); continue; }
         tr.life[k] -= dt; const f = Math.max(0, tr.life[k] / tr.max[k]);
-        // from yellow-hot to deep red as it cools
-        ca.setXYZ(k, tr.col[k * 3], tr.col[k * 3 + 1] * (0.35 + 0.65 * f), tr.col[k * 3 + 2] * f);
+        // from yellow-hot to deep red as it cools (a bought trail keeps its colours and just fades)
+        if (tr.keep[k]) ca.setXYZ(k, tr.col[k * 3] * f, tr.col[k * 3 + 1] * f, tr.col[k * 3 + 2] * f);
+        else ca.setXYZ(k, tr.col[k * 3], tr.col[k * 3 + 1] * (0.35 + 0.65 * f), tr.col[k * 3 + 2] * f);
         if (tr.life[k] <= 0) pa.setY(k, -99);
         pa.setY(k, pa.getY(k) + dt * 0.6);
       }
@@ -3571,6 +3576,31 @@ class Component extends DCLogic {
         u.body.position.x = 0.12 * w; u.body.rotation.z = 0.18 * w; u.body.position.y = -0.04 + 0.05 * Math.abs(w);
         Lg.knee.rotation.x = 0.5 + 0.3 * w; Rg.knee.rotation.x = 0.5 - 0.3 * w;
         A0.sho.rotation.set(-0.9 - 0.5 * w, 0, -0.6); A1.sho.rotation.set(-0.9 + 0.5 * w, 0, 0.6); A0.elb.rotation.x = -1.4; A1.elb.rotation.x = -1.4;
+      } else if (st === 'robot' && sp < 1.5) {
+        // the robot: stiff arms bent square, the body turning in jerky steps
+        const k4 = Math.floor(now * 4) % 4, up = k4 % 2;
+        u.body.rotation.y = [0, 0.6, 0, -0.6][k4]; u.body.position.y = up ? -0.06 : 0;
+        A0.sho.rotation.set(up ? -1.5 : 0, 0, -1.5); A1.sho.rotation.set(up ? 0 : -1.5, 0, 1.5);
+        A0.elb.rotation.x = up ? 0 : -1.6; A1.elb.rotation.x = up ? -1.6 : 0;
+        Lg.knee.rotation.x = up ? 0.35 : 0; Rg.knee.rotation.x = up ? 0 : 0.35;
+        u.head.rotation.set(0, [0, -0.5, 0, 0.5][k4], 0);
+      } else if (st === 'mortal' && T0 > 1.1) {
+        // backflip: tuck, a full turn backwards in the air, land with the arms up
+        const j = Math.min(1, (T0 - 1.1) / 0.75);
+        if (j < 1) {
+          u.body.position.y = 1.1 * Math.sin(Math.PI * j); u.body.rotation.x = -2 * Math.PI * j;
+          Lg.hip.rotation.x = -1.3 * Math.sin(Math.PI * j); Rg.hip.rotation.x = -1.3 * Math.sin(Math.PI * j); Lg.knee.rotation.x = 1.8 * Math.sin(Math.PI * j); Rg.knee.rotation.x = 1.8 * Math.sin(Math.PI * j);
+          A0.sho.rotation.set(-1.2, 0, -0.4); A1.sho.rotation.set(-1.2, 0, 0.4);
+        } else { A0.sho.rotation.set(0, 0, -2.5); A1.sho.rotation.set(0, 0, 2.5); u.body.position.y = 0.04 * Math.abs(Math.sin(now * 8)); }
+      } else if (st === 'corazon' && sp < 1.5) {
+        // heart hands over the head, swaying for the fans
+        A0.sho.rotation.set(-0.2, 0, -2.55); A1.sho.rotation.set(-0.2, 0, 2.55);
+        A0.elb.rotation.x = -1.35; A1.elb.rotation.x = -1.35;
+        u.body.rotation.z = 0.12 * Math.sin(now * 2.5); u.head.rotation.set(-0.15, 0, 0.12 * Math.sin(now * 2.5));
+      } else if (st === 'saludo' && sp < 1.5) {
+        // standing to attention, a military salute to the stand
+        A1.sho.rotation.set(-1.55, 0, 1.05); A1.elb.rotation.x = -2.35; A0.sho.rotation.set(0, 0, -0.12);
+        u.body.rotation.x = -0.06; u.head.rotation.set(-0.12, 0, 0);
       } else if (st === 'silencio' && sp < 1.5) {
         // finger to the lips at the other team's fans
         A1.sho.rotation.set(-1.3, 0, 0.45); A1.elb.rotation.x = -2.2; A0.sho.rotation.set(0, 0, -0.25);

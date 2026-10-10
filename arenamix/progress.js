@@ -33,8 +33,28 @@
     { id: 'siu', name: '¡Siuuu!', desc: 'Carrera, salto con giro y aterrizaje con los brazos abajo', price: 45, color: '#FF5C8A' },
     { id: 'avion', name: 'El avión', desc: 'Vuela en zigzag con los brazos como alas', price: 30, color: '#53D88E' },
     { id: 'baile', name: 'El baile', desc: 'Un bailecito de lado a lado para la grada', price: 40, color: '#A78BFA' },
-    { id: 'silencio', name: 'Silencio', desc: 'Dedo en los labios mirando a la afición rival', price: 35, color: '#FF8A3D' }
+    { id: 'silencio', name: 'Silencio', desc: 'Dedo en los labios mirando a la afición rival', price: 35, color: '#FF8A3D' },
+    { id: 'robot', name: 'El robot', desc: 'Baile a golpes, brazos rígidos y giros mecánicos', price: 40, color: '#3EA6FF' },
+    { id: 'mortal', name: 'Mortal atrás', desc: 'Carrerilla y voltereta hacia atrás en el aire', price: 60, color: '#FF5A1F' },
+    { id: 'corazon', name: 'Corazón', desc: 'Las manos en forma de corazón para la grada', price: 30, color: '#FF5C8A' },
+    { id: 'saludo', name: 'El saludo', desc: 'Firme y saludo militar a la afición', price: 30, color: '#53D88E' }
   ];
+  /* ---------- shot trails, bought with BOB: your hard shots leave a coloured trail in the match ---------- */
+  var TRAILS = [
+    { id: 'neon', name: 'Estela Neón', desc: 'Tus chutes fuertes dejan un rastro cian eléctrico', price: 35, color: '#22D3EE', cols: [[0.13, 0.83, 0.93], [0.6, 0.97, 1]] },
+    { id: 'toxica', name: 'Estela Tóxica', desc: 'Un rastro verde ácido que brilla en la noche', price: 40, color: '#7CFF4F', cols: [[0.49, 1, 0.31], [0.85, 1, 0.3]] },
+    { id: 'galaxia', name: 'Estela Galaxia', desc: 'Polvo de estrellas morado y blanco', price: 50, color: '#9B6BFF', cols: [[0.61, 0.42, 1], [1, 1, 1], [1, 0.36, 0.78]] },
+    { id: 'arcoiris', name: 'Estela Arcoíris', desc: 'Todos los colores detrás de tu balón', price: 60, color: '#FF5CC8', cols: [[1, 0.3, 0.3], [1, 0.6, 0.15], [1, 0.9, 0.2], [0.3, 0.9, 0.4], [0.2, 0.7, 1], [0.6, 0.4, 1]] }
+  ];
+  function trailState() { var c = get('arenamix.trails.v1', null) || {}; c.own = c.own || []; c.on = c.on || null; return c; }
+  function buyTrail(id) {
+    var c = trailState(), x = TRAILS.find(function (k) { return k.id === id; });
+    if (!x || c.own.indexOf(id) >= 0 || !spendGems(x.price)) return false;
+    c.own.push(id); c.on = id; put('arenamix.trails.v1', c); return true;
+  }
+  // equip one you own (the same one again takes it off)
+  function equipTrail(id) { var c = trailState(); if (c.own.indexOf(id) < 0) return false; c.on = c.on === id ? null : id; put('arenamix.trails.v1', c); return true; }
+  function trailOn() { var c = trailState(), x = TRAILS.find(function (k) { return k.id === c.on; }); return x ? x.cols : null; }
   function celebState() { var c = get('arenamix.celebs.v1', null) || {}; c.own = c.own || ['clasica']; c.on = c.on || 'clasica'; return c; }
   function buyCeleb(id) {
     var c = celebState(), x = CELEBS.find(function (k) { return k.id === id; });
@@ -209,12 +229,13 @@
      (matches and missions); every level needs 300. Premium is bought once per season (payment still to wire up). */
   var SEASON0 = new Date(2026, 9, 5).getTime(), SEASON_DAYS = 42, PASS_XP = 300;
   var C = function (n) { return { t: 'coins', n: n }; }, B = function (n) { return { t: 'gems', n: n }; }, X = function (k) { return { t: 'chest', k: k }; }, I = function (id) { return { t: 'item', id: id }; };
+  var CE = function (id) { return { t: 'celeb', id: id }; }, TL = function (id) { return { t: 'trail', id: id }; };
   var FREE = [C(100), X('common'), C(150), X('common'), I('h11'), B(3), X('common'), C(200), X('rare'), I('s8'),
-    C(200), X('common'), B(5), X('rare'), I('futbol-5-3'), C(250), X('common'), C(300), X('rare'), I('h5'),
+    C(200), TL('neon'), B(5), X('rare'), I('futbol-5-3'), C(250), CE('corazon'), C(300), X('rare'), I('h5'),
     B(5), X('common'), C(350), X('rare'), C(400), X('epic'), B(8), X('rare'), C(500), X('legend')];
   var PREM = [I('h10'), B(5), X('rare'), I('f6'), C(300), I('futbol-5-1'), X('rare'), B(8), I('s7'), X('epic'),
-    C(400), X('rare'), B(8), I('futbol-5-2'), X('epic'), C(500), X('rare'), I('s6'), B(10), X('epic'),
-    C(600), X('rare'), B(10), X('epic'), I('h6'), B(15), X('epic'), C(800), X('legend'), I('futbol-5-0')];
+    C(400), X('rare'), B(8), I('futbol-5-2'), X('epic'), C(500), X('rare'), I('s6'), B(10), TL('galaxia'),
+    C(600), X('rare'), B(10), X('epic'), I('h6'), CE('mortal'), X('epic'), C(800), X('legend'), I('futbol-5-0')];
   var CHEST_NAME = { common: 'Cofre común', rare: 'Cofre raro', epic: 'Cofre épico', legend: 'Cofre legendario' };
   function season(t) {
     var n = Math.max(0, Math.floor(((t || Date.now()) - SEASON0) / (SEASON_DAYS * 864e5)));
@@ -230,6 +251,8 @@
     if (r.t === 'coins') return { name: r.n + ' VCD', icon: 'coins:' + (r.n >= 500 ? 16 : r.n >= 300 ? 12 : r.n >= 200 ? 8 : 5), rare: 0 };
     if (r.t === 'gems') return { name: r.n + ' BOB', icon: 'gems:' + (r.n >= 40 ? 3 : r.n >= 20 ? 2 : 1), rare: r.n >= 40 ? 2 : 1 };
     if (r.t === 'chest') return { name: CHEST_NAME[r.k], icon: 'chest:' + r.k, rare: { common: 0, rare: 1, epic: 2, legend: 3 }[r.k] };
+    if (r.t === 'celeb') { var ce = CELEBS.find(function (k) { return k.id === r.id; }) || {}; return { name: 'Celebración: ' + ce.name, icon: 'celeb:' + ce.color, rare: 2 }; }
+    if (r.t === 'trail') { var tl = TRAILS.find(function (k) { return k.id === r.id; }) || {}; return { name: tl.name, icon: 'trail:' + tl.color, rare: 2 }; }
     var it = ITEMS[r.id] || {};
     return { name: it.name, item: r.id, cat: it.cat, rare: it.cat === 'kit' ? 3 : 2 };
   }
@@ -238,7 +261,8 @@
     var row = function (list, key, open) {
       return list.map(function (r, i) {
         var d = describe(r), lv = i + 1, got = P[key].indexOf(lv) >= 0;
-        return Object.assign(d, { lv: lv, reward: r, reached: level >= lv, open: open, claimed: got, ready: open && level >= lv && !got, owned: r.t === 'item' && owns(r.id) && !got });
+        var has = r.t === 'item' ? owns(r.id) : r.t === 'celeb' ? celebState().own.indexOf(r.id) >= 0 : r.t === 'trail' ? trailState().own.indexOf(r.id) >= 0 : false;
+        return Object.assign(d, { lv: lv, reward: r, reached: level >= lv, open: open, claimed: got, ready: open && level >= lv && !got, owned: has && !got });
       });
     };
     var free = row(FREE, 'free', true), prem = row(PREM, 'prem', P.premium);
@@ -255,6 +279,12 @@
     if (r.t === 'coins') { addCoins(r.n); return { coins: r.n, items: [] }; }
     if (r.t === 'gems') { addGems(r.n); return { coins: 0, gems: r.n, items: [] }; }
     if (r.t === 'chest') return rollChest(r.k);
+    if (r.t === 'celeb' || r.t === 'trail') {
+      var key = r.t === 'celeb' ? 'arenamix.celebs.v1' : 'arenamix.trails.v1', st = r.t === 'celeb' ? celebState() : trailState();
+      if (st.own.indexOf(r.id) >= 0) { addCoins(250); return { coins: 250, items: [] }; }
+      st.own.push(r.id); st.on = r.id; put(key, st);
+      return { coins: 0, items: [] };
+    }
     if (owns(r.id)) { addCoins(250); return { coins: 250, items: [] }; }
     unlock(r.id);
     return { coins: 0, items: [{ id: r.id, name: ITEMS[r.id].name, pic: itemPic(r.id) }] };
@@ -350,6 +380,7 @@
     boostList: BOOSTS, boostLeft: boostLeft, buyBoost: buyBoost, useBoost: useBoost,
     aiPref: aiPref, setAiPref: setAiPref, aiLevel: aiLevel,
     celebList: CELEBS, celebs: celebState, buyCeleb: buyCeleb, equipCeleb: equipCeleb, rollChest: rollChest,
+    trailList: TRAILS, trails: trailState, buyTrail: buyTrail, equipTrail: equipTrail, trailOn: trailOn,
     // everything waiting to be collected, by section (for the badges on the menu)
     pending: function () {
       var W = weekly(), P = pass(), M = missions();
