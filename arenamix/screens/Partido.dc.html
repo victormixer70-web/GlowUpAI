@@ -14,6 +14,10 @@
 @keyframes pdCo{0%{opacity:0;transform:translateX(-80px) skewX(0deg) scale(1.3)}12%{opacity:1;transform:translateX(6px) skewX(0deg) scale(1)}18%{transform:translateX(0) skewX(0deg)}}
 @keyframes pdCoS{0%,15%{opacity:0;transform:translateY(-6px)}30%{opacity:1;transform:none}}
 @keyframes pdSuper{0%,100%{box-shadow:0 5px 0 #A3361A,0 0 14px #FF7A2E}50%{box-shadow:0 5px 0 #A3361A,0 0 30px #FFB02E}}
+.pd-nar{position:absolute;left:50%;bottom:48px;z-index:6;translate:-50% 0;display:flex;align-items:stretch;max-width:430px;pointer-events:none;border-radius:8px;overflow:hidden;box-shadow:0 6px 16px #000a;animation:pdNarIn .35s cubic-bezier(.2,1.3,.4,1) both}
+.pd-nar-k{display:flex;align-items:center;gap:4px;padding:0 8px;background:#FFC53D;color:#1A1204;font:800 9px Exo2,sans-serif;letter-spacing:1.2px;white-space:nowrap}
+.pd-nar-t{padding:6px 12px;background:linear-gradient(90deg,#0B0B14F2,#17172AE6);color:#F4F4FA;font:800 italic 14px 'Barlow Condensed',sans-serif;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@keyframes pdNarIn{from{opacity:0;translate:-50% 14px}}
 @keyframes pdGold{0%,100%{box-shadow:0 0 10px #FFC53D88}50%{box-shadow:0 0 22px #FFC53D}}
 .pd-co-t{display:inline-block;padding:4px 18px 2px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-style:italic;font-size:34px;line-height:1;letter-spacing:1px;text-shadow:0 4px 0 #05050A;animation:pdCo .5s cubic-bezier(.2,1.4,.4,1) both}
 .pd-co-s{margin-top:4px;padding:2px 10px;background:#0B0B14D9;font:800 11px Exo2,sans-serif;letter-spacing:1px;color:#F4F4FA;animation:pdCoS .7s both}
@@ -73,6 +77,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </sc-if>
 
+  <sc-if value="{{hasNar}}" hint-placeholder-val="{{ false }}">
+    <div key="{{narKey}}" class="pd-nar" translate="no" style="{{narFade}}"><span class="pd-nar-k"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4"/></svg>{{narWho}}</span><span class="pd-nar-t">{{narText}}</span></div>
+  </sc-if>
   <sc-if value="{{hasTutTarget}}" hint-placeholder-val="{{ false }}">
     <div style="{{tutTargetStyle}}"><svg width="70" height="44" viewBox="-35 -22 70 44"><ellipse rx="30" ry="17" fill="#FFC53D" fill-opacity=".25" stroke="#FFC53D" stroke-width="3"/></svg></div>
   </sc-if>
@@ -192,6 +199,34 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"keeper":{"editor":"bool","default":false},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3,4],"default":3},"mates":{"editor":null},"label":{"editor":null},"tutorial":{"editor":"bool","default":false},"rivals":{"editor":null},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"online":{"editor":null},"aiLevel":{"editor":null},"practice":{"editor":"bool","default":false},"$preview":{"width":844,"height":390}}'>
 // ball radius in the match (metres): a little bigger than a real one so it reads on a phone
+// the commentator's lines: [Spanish, English]. {n} = a player's name, {s} = a number or the score
+const AMNAR = {
+  kickoff: [['¡Rueda el balón! Empieza el partido', 'And we are under way!'], ['¡Pita el árbitro y arrancamos!', 'The referee blows, here we go!'], ['Ambiente de gala en ARENA MIX. ¡A jugar!', 'What an atmosphere at ARENA MIX. Let\'s play!']],
+  shot: [['¡Dispara {n}!', '{n} shoots!'], ['{n} lo intenta desde ahí…', '{n} tries a shot…'], ['¡Chut de {n}!', 'A strike from {n}!'], ['¡{n} prueba al portero!', '{n} tests the keeper!']],
+  shotAgainst: [['¡Cuidado, dispara {n}!', 'Watch out, {n} shoots!'], ['{n} se la juega…', '{n} goes for it…']],
+  post: [['¡AL PALO! ¡Qué cerca!', 'OFF THE POST! So close!'], ['¡La madera lo evita!', 'The woodwork says no!'], ['¡Uyyy! ¡El poste!', 'Ooooh! The post!']],
+  save: [['¡Paradón de tu portero!', 'What a save from your keeper!'], ['¡Manos seguras! Nada que hacer', 'Safe hands! Nothing doing'], ['¡Tu portero dice que no!', 'Your keeper says no!']],
+  saveAgainst: [['¡Lo para el portero rival!', 'Saved by their keeper!'], ['¡Qué reflejos del guardameta!', 'What reflexes from the keeper!'], ['¡Se lo saca de la escuadra!', 'Tipped out of the top corner!']],
+  tackle: [['¡Gran recuperación de {n}!', 'Great recovery by {n}!'], ['¡{n} corta el peligro!', '{n} snuffs out the danger!'], ['¡Qué entrada de {n}!', 'What a tackle from {n}!']],
+  skill: [['¡Filigrana de {n}!', 'A bit of magic from {n}!'], ['¡{n} se lo deja sentado!', '{n} leaves the defender on the floor!'], ['¡Olé! La grada se levanta', 'Olé! The crowd is on its feet']],
+  skillPerfect: [['¡Regate PERFECTO de {n}!', 'A PERFECT dribble from {n}!'], ['¡Qué clase tiene {n}!', 'What class from {n}!']],
+  goal: [['¡GOOOOL! ¡GOL DE {n}!', 'GOOOAL! {n} SCORES!'], ['¡GOLAZO de {n}! ¡La grada explota!', 'A WONDER GOAL from {n}! The crowd erupts!'], ['¡Adentro! ¡{n} no perdona!', 'It\'s in! {n} makes no mistake!'], ['¡GOL! ¡Qué definición de {n}!', 'GOAL! What a finish from {n}!']],
+  goalAgainst: [['Gol de {n}. Toca reaccionar', '{n} scores. Time to react'], ['{n} marca para el rival…', '{n} scores for them…'], ['Golpe duro: gol de {n}', 'A blow: {n} scores']],
+  ownGoal: [['¡En propia puerta! Qué mala suerte', 'An own goal! What bad luck'], ['¡Autogol! Nadie se lo esperaba', 'An own goal! Nobody saw that coming']],
+  equaliser: [['¡EMPATE! ¡{n} iguala el partido!', 'EQUALISER! {n} levels it!'], ['¡{n} pone las tablas! Partido nuevo', '{n} makes it level! A new game']],
+  comeback: [['¡REMONTADA! ¡{n} le da la vuelta!', 'COMEBACK! {n} turns it around!'], ['¡Qué remontada! ¡{n} pone por delante a los suyos!', 'What a comeback! {n} puts them ahead!']],
+  fireGoal: [['¡GOL DE FUEGO de {n}! ¡Imparable!', 'A FIRE GOAL from {n}! Unstoppable!']],
+  lateWinner: [['¡EN EL ÚLTIMO SUSPIRO! ¡{n}! ¡{n}!', 'AT THE VERY DEATH! {n}! {n}!'], ['¡INCREÍBLE! ¡{n} lo gana al final!', 'UNBELIEVABLE! {n} wins it at the end!']],
+  lateEqualiser: [['¡AL FINAL! ¡{n} salva el empate!', 'LATE DRAMA! {n} rescues a draw!']],
+  lateWinnerAgainst: [['¡No! ¡{n} lo gana en el último segundo!', 'No! {n} wins it in the final second!']],
+  golden: [['¡Balón dorado! Cada gol vale doble', 'Golden ball! Every goal counts double'], ['¡Últimos 30 segundos y los goles valen doble!', 'Last 30 seconds and goals count double!']],
+  last: [['¡Último arreón! Se acaba el tiempo', 'One last push! Time is running out'], ['¡Quedan segundos! ¿Habrá más?', 'Seconds left! Is there more to come?']],
+  lastTie: [['¡Empate y se acaba! ¿Quién se atreve?', 'All square and time is up! Who dares?']],
+  extra: [['¡{s} segundos de descuento!', '{s} seconds of added time!'], ['El cuarto árbitro añade {s} segundos', 'The fourth official adds {s} seconds']],
+  endWin: [['¡FINAL! Victoria por {s}. ¡Qué partidazo!', 'FULL TIME! A {s} win. What a match!'], ['¡Se acabó! ¡Ganas {s}!', 'It\'s over! You win {s}!']],
+  endLose: [['Final del partido: {s}. La próxima será', 'Full time: {s}. Next time'], ['Se acabó. {s}. Toca levantarse', 'It\'s over. {s}. Time to bounce back']],
+  endDraw: [['¡Final! Reparto de puntos: {s}', 'Full time! Honours even: {s}'], ['Empate a todo: {s}', 'All square: {s}']]
+};
 const Partido_BR = 0.17;
 class Component extends DCLogic {
   constructor(props) {
@@ -352,7 +387,7 @@ class Component extends DCLogic {
       t: 's',
       ps: g.ps.map((p, i) => [r2(p.x), r2(p.y), r2(p.vx), r2(p.vy), r3(p.face), r2(p.run), r2(p.turn || 0), r2(p.touchAnim || 0), r2(p.stam), p.kickFoot || 0, chg(i), act(p.act), p.skillCd > 0 ? 1 : 0]),
       b: [r2(b.x), r2(b.y), r2(b.z), r2(b.vx), r2(b.vy), r2(b.vz)],
-      own: g.own, hold: g.hold, sc: g.score, tm: r2(g.t), ph: g.phase, pt: r2(g.pt), con: g.concede, sci: g.sci ?? -1,
+      own: g.own, hold: g.hold, sc: g.score, tm: r2(g.t), ex: g.extra || 0, ph: g.phase, pt: r2(g.pt), con: g.concede, sci: g.sci ?? -1,
       chat: g.chat.map((c) => [g.ps.indexOf(c.p), c.text, r2(c.t)]), ctl,
       fx: g.fx ? [r2(g.fx.x), r2(g.fx.y), r2(g.fx.t)] : 0
     });
@@ -371,7 +406,7 @@ class Component extends DCLogic {
     const b = m.b;
     return {
       ps, b: { x: X(b[0]), y: Y(b[1]), z: b[2], vx: V(b[3]), vy: V(b[4]), vz: b[5] },
-      own: mi(m.own), hold: mi(m.hold), sc: M ? [m.sc[1], m.sc[0]] : m.sc, tm: m.tm, ph: m.ph, pt: m.pt, con: M ? 1 - m.con : m.con, sci: mi(m.sci),
+      own: mi(m.own), hold: mi(m.hold), sc: M ? [m.sc[1], m.sc[0]] : m.sc, tm: m.tm, ex: m.ex || 0, ph: m.ph, pt: m.pt, con: M ? 1 - m.con : m.con, sci: mi(m.sci),
       chat: m.chat.map((c) => [mi(c[0]), c[1], c[2]]), ctl: mi(m.ctl[N.me] ?? -1), fx: m.fx ? { x: X(m.fx[0]), y: Y(m.fx[1]), t: m.fx[2] } : null
     };
   }
@@ -382,8 +417,9 @@ class Component extends DCLogic {
     if (g.flashT > 0) g.flashT -= dt;
     g.chat.forEach((c) => { c.t -= dt; }); g.chat = g.chat.filter((c) => c.t > 0);
     if (g.co) { g.co.t -= dt; if (g.co.t <= 0) g.co = null; }
+    if (g.nar) { g.nar.t -= dt; if (g.nar.t <= 0) g.nar = null; }
     if (g.passHeld) { g.passHoldT += dt; if (g.passHoldT >= 0.3) { g.passHeld = false; if (g.phase === 'play' && this.ctx() === 'ball') this.humanPass('lob'); } }
-    if (g.phase === 'play' && !g.goldenOn && this.golden()) { g.goldenOn = true; this.callout('¡BALÓN DORADO!', 'Último medio minuto: los goles valen doble', '#FFC53D'); this.vib([40, 60, 40]); }
+    if (g.phase === 'play' && !g.goldenOn && this.golden()) { g.goldenOn = true; this.callout('¡BALÓN DORADO!', 'Último medio minuto: los goles valen doble', '#FFC53D'); this.vib([40, 60, 40]); this.narrate('golden', '', null, true); }
     if (g.charging) g.charge = Math.min(1, g.charge + dt * 1.15);
     let ix = g.jx + (g.keys.r ? 1 : 0) - (g.keys.l ? 1 : 0) + (g.padX || 0), iy = g.jy + (g.keys.d ? 1 : 0) - (g.keys.u ? 1 : 0) + (g.padY || 0);
     const il = Math.hypot(ix, iy);
@@ -401,7 +437,8 @@ class Component extends DCLogic {
     if (S.ph === 'play' && g.phase === 'goal') this.sfx('whistle', 1);
     const bsp = Math.hypot(S.b.vx, S.b.vy), bsp0 = this.lastBsp || 0;
     if (S !== this.lastSnap) { if (bsp - bsp0 > 5) this.sfx(bsp > 16 ? 'kick' : 'pass', Math.min(1, bsp / 28)); this.lastBsp = bsp; this.lastSnap = S; }
-    if (S.ph !== g.phase) { if (S.ph === 'goal') { g.concede = S.con; const sc = g.ps[S.sci], tm = 1 - S.con; g.scorer = sc && sc.team === tm && sc.role !== 'gk' ? 'Gol de ' + (S.sci === g.ctl ? 'TI' : sc.name) : sc ? 'Gol en propia puerta' : ''; if (S.sci === g.ctl && tm === 0) this.mstats.goals++; } g.phase = S.ph; }
+    if (S.ph !== g.phase) { if (S.ph === 'goal') { g.concede = S.con; const sc = g.ps[S.sci], tm = 1 - S.con; g.scorer = sc && sc.team === tm && sc.role !== 'gk' ? 'Gol de ' + (S.sci === g.ctl ? 'TI' : sc.name) : sc ? 'Gol en propia puerta' : ''; if (S.sci === g.ctl && tm === 0) this.mstats.goals++; this.narrate(tm === 0 ? 'goal' : 'goalAgainst', sc ? this.nameOf(S.sci) : '', null, true); } g.phase = S.ph; }
+    if (S.ex && !g.extra) { g.extra = S.ex; this.callout('+' + S.ex + ' DE DESCUENTO', 'El cuarto árbitro levanta el cartel', '#53D88E'); this.narrate('extra', '', S.ex, true); }
     const age = Math.min(0.25, (performance.now() - N.snapAt) / 1000), k = 1 - Math.exp(-dt * 14);
     g.score = S.sc; g.t = Math.max(0, S.tm - (g.phase === 'play' ? age : 0)); g.pt = S.pt + age; g.own = S.own; g.hold = S.hold; g.concede = S.con;
     if (S.ctl != null && S.ctl >= 0 && S.ctl !== g.ctl) { g.ctl = S.ctl; g.charging = false; }
@@ -599,6 +636,7 @@ class Component extends DCLogic {
     this.sfx('whistle', 1);
     this.g.phase = 'play';
     this.g.pt = 0;
+    this.narrate('kickoff', '', null, true);
     this.loop();
   }
   // the three shots of the intro: home end, away end, the whole stadium
@@ -622,6 +660,7 @@ class Component extends DCLogic {
     this.flare = null;
     g.phase = 'play'; g.pt = 0;
     this.sfx('whistle', 1);
+    this.narrate('kickoff', '', null, true);
   }
   loop() {
     if (this.raf) return;
@@ -646,6 +685,7 @@ class Component extends DCLogic {
     if (g.phase !== 'winners') this.sfx('whistle', 3);
     g.phase = 'winners'; g.pt = 0;
     const w = g.score[0] > g.score[1] ? 0 : g.score[1] > g.score[0] ? 1 : -1;
+    this.narrate(w === 0 ? 'endWin' : w === 1 ? 'endLose' : 'endDraw', '', g.score[0] + '-' + g.score[1], true);
     const team = (t) => g.ps.filter((q) => q.team === t).sort((a, b) => (a.role === 'gk') - (b.role === 'gk') || a.slot - b.slot);
     const row = w < 0 ? team(0).concat(team(1)) : team(w);
     g.win = { team: w, list: row };
@@ -689,8 +729,10 @@ class Component extends DCLogic {
     this.padWas = now;
   }
   tick(now) {
-    const dt = Math.min(0.033, Math.max(0, (now - this.last) / 1000));
+    let dt = Math.min(0.033, Math.max(0, (now - this.last) / 1000));
     this.last = now;
+    // slow motion (a late winner): the world runs at a third of the speed for a moment
+    if (this.slowT > 0) { this.slowT -= dt; dt *= 0.32; }
     try { this.pollPad(); } catch (e) {}
     const N = this.net;
     if (N && !N.host) this.clientStep(dt);
@@ -716,6 +758,41 @@ class Component extends DCLogic {
     // a message about a remote player's action goes to that player's phone
     if (this.ctxH) { if (this.net) this.net.room.sendTo(this.ctxH.id, { t: 'f', x: text, d: t || 1 }); return; }
     this.g.flash = text; this.g.flashT = t || 1;
+  }
+  // the commentator: a line along the bottom for what just happened (and, if switched on in Ajustes, read out loud).
+  // Each event has a few lines in Spanish and English; {n} is a player's name, {s} a number
+  narrate(k, n, sv, force) {
+    if (this.ctxH || this.autoplay || this.props.tutorial || this.props.practice || (this.play && this.play.narr === false)) return;
+    const g = this.g, now = performance.now() / 1000, L = AMNAR[k];
+    if (!L) return;
+    // a busy match doesn't turn into a wall of text: the small things wait their turn, the big ones always go
+    if (!force && g.nar && now - (g.narAt || 0) < 2.6) return;
+    const en = !!(window.AMI18n && window.AMI18n.lang() === 'en');
+    let pick = Math.floor(Math.random() * L.length);
+    if (L.length > 1 && pick === this.narLast) pick = (pick + 1) % L.length;
+    this.narLast = pick;
+    const text = L[pick][en ? 1 : 0].replace('{n}', n || '—').replace('{s}', sv == null ? '' : sv);
+    g.nar = { text, t: 3.2, id: (g.nar ? g.nar.id : 0) + 1 }; g.narAt = now;
+    if (this.play && this.play.narr === 'voz' && window.speechSynthesis) {
+      try {
+        const u = new SpeechSynthesisUtterance(text.replace(/[¡!¿?…·]/g, ' '));
+        u.lang = en ? 'en-GB' : 'es-ES'; u.rate = 1.12; u.pitch = 1.05; u.volume = Math.min(1, (this.play.sfx ?? 0.8) + 0.2);
+        if (force) window.speechSynthesis.cancel();
+        if (!window.speechSynthesis.speaking || force) window.speechSynthesis.speak(u);
+      } catch (e) {}
+    }
+  }
+  nameOf(i) {
+    const g = this.g, p = g.ps[i];
+    if (!p) return '';
+    return i === g.ctl ? (window.AMOnline && window.AMOnline.myName ? window.AMOnline.myName() : 'TÚ') : p.name;
+  }
+  // stoppage time: when the 90 minutes are up the fourth official adds a few seconds (more after a match with goals)
+  addedTime() {
+    const g = this.g, P = this.props;
+    if (g.extra || P.tutorial || P.practice || g.dur < 60 || this.autoplay) return 0;
+    const goals = g.score[0] + g.score[1];
+    return Math.min(30, 10 + goals * 3 + Math.floor(Math.random() * 6));
   }
   // a TV-style caption across the top ("¡AL PALO!", "¡HAT-TRICK!"...), shown on your phone only
   callout(text, sub, color) {
@@ -863,6 +940,7 @@ class Component extends DCLogic {
       if (beaten) {
         this.superAdd(perfect ? 0.4 : 0.25);
         this.callout(perfect ? '¡' + NM[trick] + ' PERFECTA!'.replace('CAÑO PERFECTA', 'CAÑO PERFECTO').replace('SOMBRERO PERFECTA', 'SOMBRERO PERFECTO') : '¡' + NM[trick] + '!', perfect ? 'Regate en el momento justo' : '', '#53D88E');
+        this.narrate(perfect ? 'skillPerfect' : 'skill', this.nameOf(g.ps.indexOf(p)));
         this.vib(25);
       } else this.flashMsg(NM[trick], 0.8);
     }
@@ -907,6 +985,26 @@ class Component extends DCLogic {
       else if (pts === 2) this.callout('¡GOL DORADO!', 'Vale doble', '#FFC53D');
     }
     if (pts === 2) g.scorer = (g.scorer ? g.scorer + ' · ' : '') + 'x2';
+    // the commentator: who scored and what it means for the match
+    {
+      const before = [g.score[0] - (team === 0 ? pts : 0), g.score[1] - (team === 1 ? pts : 0)], my = team === 0;
+      const nm = sc && sc.team === team && sc.role !== 'gk' ? this.nameOf(g.last) : '';
+      const late = !!g.extra || (g.dur >= 60 && g.t <= 12);
+      const lead = g.score[team] > g.score[1 - team], tie = g.score[0] === g.score[1], wasBehind = before[team] < before[1 - team];
+      let k = my ? 'goal' : 'goalAgainst';
+      if (!nm) k = 'ownGoal';
+      else if (late && lead && before[team] <= before[1 - team]) k = my ? 'lateWinner' : 'lateWinnerAgainst';
+      else if (late && tie) k = my ? 'lateEqualiser' : 'goalAgainst';
+      else if (my && lead && wasBehind) k = 'comeback';
+      else if (my && tie && wasBehind) k = 'equaliser';
+      else if (fire) k = 'fireGoal';
+      this.narrate(k, nm, null, true);
+      // a goal that wins it at the death: the moment and its replay in slow motion
+      if (late && (lead || tie) && before[team] <= before[1 - team] && !this.net && !this.autoplay) {
+        this.slowT = 1.4; this.rpSlow = true;
+        if (lead) this.callout(my ? '¡EN EL ÚLTIMO SUSPIRO!' : '¡JARRO DE AGUA FRÍA!', my ? 'Gol de la victoria' : 'El rival lo gana al final', my ? '#FFC53D' : '#FF5C5C');
+      }
+    }
     g.ps.forEach((p) => {
       if (p === sc && sc.team === team) p.act = { type: 'celebrate', t: 0, dur: 3, lock: true, style: g.ps.indexOf(p) === g.ctl && !this.ctxH ? this.myCeleb() : 'clasica' };
       else if (p.team === team) p.act = { type: 'cheer', t: 0, dur: 3, lock: true };
@@ -989,6 +1087,7 @@ class Component extends DCLogic {
     const fire = (g.superM || 0) >= 1 && !this.ctxH && !this.props.tutorial;
     if (this.dist(p, g.ball) > (g.own === i ? 1.7 : 1.5) || g.ball.z > 1.4) { this.flashMsg('Demasiado lejos del balón', 0.8); return; }
     this.stat('shots');
+    if (Math.random() < 0.55) this.narrate('shot', this.nameOf(i));
     // a real strike: from the backswing the body turns to the target and the leg swings through; the ball
     // leaves at the moment the foot meets it, not when you let go of the button
     p.act = { type: 'windup', t: 0, dur: 0.17 + 0.09 * charge, from: 0.04, face: dir, then: () => {
@@ -1100,7 +1199,8 @@ class Component extends DCLogic {
     if (g.flashT > 0) g.flashT -= dt;
     if (g.co) { g.co.t -= dt; if (g.co.t <= 0) g.co = null; }
     if (g.passHeld) { g.passHoldT += dt; if (g.passHoldT >= 0.3) { g.passHeld = false; if (g.phase === 'play' && this.ctx() === 'ball') this.humanPass('lob'); } }
-    if (g.phase === 'play' && !g.goldenOn && this.golden()) { g.goldenOn = true; this.callout('¡BALÓN DORADO!', 'Último medio minuto: los goles valen doble', '#FFC53D'); this.vib([40, 60, 40]); this.sfx('whistle', 1); }
+    if (g.phase === 'play' && !g.goldenOn && this.golden()) { g.goldenOn = true; this.callout('¡BALÓN DORADO!', 'Último medio minuto: los goles valen doble', '#FFC53D'); this.vib([40, 60, 40]); this.sfx('whistle', 1); this.narrate('golden', '', null, true); }
+    if (g.nar) { g.nar.t -= dt; if (g.nar.t <= 0) g.nar = null; }
     g.ps.forEach((p) => {
       p.cd = Math.max(0, p.cd - dt); p.inv = Math.max(0, p.inv - dt); p.ghost = Math.max(0, (p.ghost || 0) - dt); p.touchAnim = Math.max(0, (p.touchAnim || 0) - dt); p.skillCd = Math.max(0, p.skillCd - dt);
       p.wantsBall = Math.max(0, (p.wantsBall || 0) - dt); p.passReq = Math.max(0, (p.passReq || 0) - dt); p.shootReq = Math.max(0, (p.shootReq || 0) - dt); p.pressReq = Math.max(0, (p.pressReq || 0) - dt); p.defend = Math.max(0, (p.defend || 0) - dt);
@@ -1111,7 +1211,15 @@ class Component extends DCLogic {
     if (g.phase !== 'play') return;
     if (!this.props.tutorial && !this.props.practice) g.t -= dt;
     if (this.props.practice) this.practiceStep(dt);
-    if (g.t <= 0) { g.t = 0; g.charging = false; this.setupWinners(); return; }
+    if (g.t <= 0) {
+      const add = this.addedTime();
+      if (add) {
+        g.extra = add; g.t = add;
+        this.callout('+' + add + ' DE DESCUENTO', 'El cuarto árbitro levanta el cartel', '#53D88E');
+        this.narrate('extra', '', add, true); this.sfx('whistle', 1);
+      } else { g.t = 0; g.charging = false; this.setupWinners(); return; }
+    }
+    if (!g.extra && !g.lastMin && g.dur >= 60 && g.t <= 15 && !this.props.practice) { g.lastMin = true; this.narrate(g.score[0] === g.score[1] ? 'lastTie' : 'last', '', null, true); }
     if (g.charging) g.charge = Math.min(1, g.charge + dt * 1.15);
     if (g.recv) { g.recv.t -= dt; if (g.recv.t <= 0) g.recv = null; }
     if (this.net) this.net.humans.forEach((h) => {
@@ -1603,7 +1711,7 @@ class Component extends DCLogic {
       if (g.own !== i || g.phase !== 'play') return;
       const dir = Math.atan2(ty - p.y, gx - p.x) + (Math.random() - 0.5) * D.err * (dg > 14 ? 1 : 0.7);
       const power = this.clamp(0.45 + dg / 45 + Math.random() * 0.25, 0.4, 1), plan = this.shotPlan(p, power, dir, D.pot, 0, 1 - D.err);
-      if (this.kick(p, power, plan.dir, false, D.pot, plan.spin)) this.applyShot(plan);
+      if (this.kick(p, power, plan.dir, false, D.pot, plan.spin)) { this.applyShot(plan); if (Math.random() < 0.4) this.narrate(p.team === 0 ? 'shot' : 'shotAgainst', p.name); }
     } };
   }
   gkMove(p, i, dt) {
@@ -1722,7 +1830,7 @@ class Component extends DCLogic {
       const side = (Math.random() - 0.5) * 3;
       b.vx = Math.cos(p.face) * 5.5 - Math.sin(p.face) * side; b.vy = Math.sin(p.face) * 5.5 + Math.cos(p.face) * side; b.vz = 0.8;
       g.last = i;
-      if (i === g.ctl) { this.flashMsg('¡Entrada limpia!', 0.9); this.stat('tackles'); }
+      if (i === g.ctl) { this.flashMsg('¡Entrada limpia!', 0.9); this.stat('tackles'); this.narrate('tackle', this.nameOf(i)); }
     });
   }
   ballStep(dt) {
@@ -1787,7 +1895,7 @@ class Component extends DCLogic {
       const dx = b.x - px, dy = b.y - py, d = Math.hypot(dx, dy);
       if (d < 0.32 && d > 0 && b.z < 2.44) {
         const nx = dx / d, ny = dy / d, vn = b.vx * nx + b.vy * ny;
-        if (vn < 0) { b.vx -= 1.75 * vn * nx; b.vy -= 1.75 * vn * ny; if (Math.abs(vn) > 3) this.sfx('post'); if (Math.abs(vn) > 6) { this.callout('¡AL PALO!', '', '#FF5C5C'); this.vib(45); } }
+        if (vn < 0) { b.vx -= 1.75 * vn * nx; b.vy -= 1.75 * vn * ny; if (Math.abs(vn) > 3) this.sfx('post'); if (Math.abs(vn) > 6) { this.callout('¡AL PALO!', '', '#FF5C5C'); this.vib(45); this.narrate('post', '', null, true); } }
         b.x = px + nx * 0.32; b.y = py + ny * 0.32;
       }
     });
@@ -1816,6 +1924,7 @@ class Component extends DCLogic {
           g.hold = i; g.holdT = 0.9; g.last = i;
           if (this.props.practice && p.team === 1) { g.score[1]++; g.resetT = 1.1; g.holdT = 9; }
           if (sp > 15) this.callout('¡QUÉ PARADA!', '', p.team === 0 ? '#22D3EE' : '#FF5C5C'); else this.flashMsg(sp > 12 ? '¡PARADÓN!' : 'Atrapa el portero', 1.2);
+          if (sp > 11) this.narrate(p.team === 0 ? 'save' : 'saveAgainst', '', null, sp > 15);
         } else {
           const out = p.team === 0 ? 1 : -1, side = b.y >= p.y ? 1 : -1;
           b.vx = out * Math.max(4, Math.abs(b.vx) * 0.35); b.vy = side * (5 + Math.random() * 4); b.vz = 2.5;
@@ -1854,7 +1963,7 @@ class Component extends DCLogic {
       b.x = p.x + nx * r; b.y = p.y + ny * r;
       if (owner && p.team !== owner.team && p.role !== 'gk') {
         g.own = -1; owner.cd = 0.25;
-        if (i === g.ctl) { this.flashMsg('¡Balón cortado!', 0.8); this.stat('tackles'); this.superAdd(0.15); this.vib(20); }
+        if (i === g.ctl) { this.flashMsg('¡Balón cortado!', 0.8); this.stat('tackles'); this.superAdd(0.15); this.vib(20); if (Math.random() < 0.5) this.narrate('tackle', this.nameOf(i)); }
         else if (g.ps.indexOf(owner) === g.ctl) { this.flashMsg('Te han cortado el balón', 0.8); this.vib(35); }
         return;
       }
@@ -2807,7 +2916,8 @@ class Component extends DCLogic {
   }
   replayFrame(dt) {
     const rp = this.rp, g = this.g;
-    rp.t += dt * 0.42;
+    rp.t += dt * (this.rpSlow ? 0.28 : 0.42);
+    if (rp.t >= rp.len) this.rpSlow = false;
     if (rp.t >= rp.len) { this.rp = null; this.rpDone = true; return null; }
     const F = rp.frames;
     let k = 0; while (k < F.length - 2 && F[k + 1].at < rp.t) k++;
@@ -2835,7 +2945,7 @@ class Component extends DCLogic {
     this.lastDt = dt || 0.016;
     if (this.rp && !this.inReplayDraw) {
       const keep = this.replayFrame(dt || 0.016);
-      if (keep) { this.inReplayDraw = true; try { this.draw3D(dt * 0.42); } finally { this.inReplayDraw = false; this.restoreFrame(keep); } return; }
+      if (keep) { this.inReplayDraw = true; try { this.draw3D(dt * (this.rpSlow ? 0.28 : 0.42)); } finally { this.inReplayDraw = false; this.restoreFrame(keep); } return; }
     }
     const T = THREE, g = this.g, b = g.ball;
     this.syncPlayers();
@@ -2952,14 +3062,16 @@ class Component extends DCLogic {
       this.cam.position.copy(this.camPos);
       this.cam.lookAt(this.camLook);
     } else {
-    if (this.cam.fov !== 40) { this.cam.fov = 40; this.cam.updateProjectionMatrix(); }
+    const tvCam = this.play && this.play.cam === 'tv' && !this.props.tutorial, fovW = tvCam ? 30 : 40;
+    if (this.cam.fov !== fovW) { this.cam.fov = fovW; this.cam.updateProjectionMatrix(); }
     const fx = b.x * 0.75 + c.x * 0.25, fz = b.y * 0.75 + c.y * 0.25;
     // follow the play all the way to both touchlines, keeping it above the on-screen buttons
     const tx = Math.max(-21, Math.min(21, fx - 30)), tz = Math.max(-15, Math.min(15, fz - 15));
     const goalZoom = g.phase === 'goal' ? Math.min(1, g.pt) : 0;
     const cf = this.play && this.play.cam === 'cerca' ? 0.8 : this.play && this.play.cam === 'lejos' ? 1.25 : 1;
-    const want = new T.Vector3(tx * 0.95, (8 - goalZoom * 2) * cf, tz + (16 - goalZoom * 4) * cf);
-    const look = new T.Vector3(tx, 0, tz - 2);
+    // TV: the broadcast camera high up in the main stand, panning along the touchline
+    const want = tvCam ? new T.Vector3(tx * 0.82, 15 - goalZoom * 2.5, 34 + tz * 0.25 - goalZoom * 5) : new T.Vector3(tx * 0.95, (8 - goalZoom * 2) * cf, tz + (16 - goalZoom * 4) * cf);
+    const look = tvCam ? new T.Vector3(tx, 0, tz * 0.55 - 1) : new T.Vector3(tx, 0, tz - 2);
     const f = 1 - Math.exp(-4.5 * (dt || 1));
     this.camPos.lerp(want, f); this.camLook.lerp(look, f);
     this.cam.position.copy(this.camPos);
@@ -3513,8 +3625,8 @@ class Component extends DCLogic {
       homeName: P.homeName ?? 'Tú', awayName: P.awayName ?? 'Rival',
       homeChip: chip(hc, ht), awayChip: chip(ac, at),
       s0: String(g.score[0]), s1: String(g.score[1]),
-      clock: P.practice ? '∞' : this.fmtClock(g.t),
-      clockStyle: 'display: flex; align-items: center; margin-left: 6px; padding: 0 10px; background: ' + (this.golden() ? '#3A2A08' : '#0B0B14E6') + '; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 20px; color: ' + (g.t <= 10 && g.phase === 'play' ? '#FF5C5C' : this.golden() ? '#FFC53D' : '#F4F4FA') + ';',
+      clock: P.practice ? '∞' : (g.extra ? '+' : '') + this.fmtClock(g.t),
+      clockStyle: 'display: flex; align-items: center; margin-left: 6px; padding: 0 10px; background: ' + (g.extra ? '#0E3A22' : this.golden() ? '#3A2A08' : '#0B0B14E6') + '; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 20px; color: ' + (g.t <= 10 && g.phase === 'play' ? '#FF5C5C' : this.golden() ? '#FFC53D' : '#F4F4FA') + ';',
       scoreStyle: 'display: flex; align-items: center; gap: 8px; padding: 0 14px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 26px; line-height: 1; ' + (this.golden() ? 'background: linear-gradient(135deg, #FFE08A, #FFC53D 55%, #C98A12); color: #0B0B14;' : 'background: #F4F4FA; color: #0B0B14;'),
       wxOverlay: 'position: absolute; inset: 0; pointer-events: none; ' + ({
         noche: 'background: linear-gradient(180deg, #01030Fe6 0%, #02061Ab3 22%, #02061A33 46%, transparent 62%), radial-gradient(120% 95% at 50% 60%, transparent 55%, #000818b0 100%);',
@@ -3522,6 +3634,8 @@ class Component extends DCLogic {
         nieve: 'background: linear-gradient(180deg, #DCE4EEd0 0%, #DCE4EE70 24%, #DCE4EE26 48%, #FFFFFF14 100%);'
       }[this.wx] || 'display: none;'),
       homeC: hc, awayC: ac, isGolden: this.golden() && g.phase !== 'winners',
+      hasNar: !!g.nar && (g.phase === 'play' || g.phase === 'goal' || g.phase === 'winners'), narKey: g.nar ? 'nar' + g.nar.id : 'nar', narText: g.nar ? g.nar.text : '',
+      narWho: window.AMI18n && window.AMI18n.lang() === 'en' ? 'COMMENTARY' : 'NARRADOR', narFade: g.nar && g.nar.t < 0.4 ? 'opacity: ' + (g.nar.t / 0.4).toFixed(2) : '',
       hasCo: !!g.co, coKey: g.co ? 'co' + g.co.id : 'co', coText: g.co ? g.co.text : '', coSub: g.co ? g.co.sub : '', coHasSub: !!(g.co && g.co.sub),
       coStyle: g.co ? 'background: linear-gradient(90deg, transparent, #0B0B14E6 12%, #0B0B14E6 88%, transparent); color: ' + g.co.color + '; text-shadow: 0 4px 0 #05050A, 0 0 22px ' + g.co.color + '88;' : '',
       coFade: g.co && g.co.t < 0.35 ? 'opacity: ' + (g.co.t / 0.35).toFixed(2) + '; transition: none;' : '',
