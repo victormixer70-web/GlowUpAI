@@ -737,6 +737,8 @@ class Component extends DCLogic {
     // slow motion (a late winner): the world runs at a third of the speed for a moment
     if (this.slowT > 0) { this.slowT -= dt; dt *= 0.32; }
     try { this.pollPad(); } catch (e) {}
+    // while the ball is in play the controller is the match's, not the menus'
+    if (window.AMPad && (this.g.phase === 'play' || this.g.phase === 'goal' || this.g.phase === 'intro' || this.rp)) window.AMPad.hold();
     const N = this.net;
     if (N && !N.host) this.clientStep(dt);
     else for (let i = 0; i < 3; i++) this.step(dt / 3);

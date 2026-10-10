@@ -31,6 +31,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 
   <button type="button" aria-label="{{zoneLabel}}" onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pCancel}}" style="position: absolute; inset: 0; width: 844px; height: 390px; padding: 0; border: 0; background: transparent; touch-action: none; cursor: crosshair"></button>
 
+  <sc-if value="{{padCur}}" hint-placeholder-val="{{ false }}">
+    <div style="{{padCurStyle}}" aria-hidden="true"><svg width="54" height="54" viewBox="-27 -27 54 54"><circle r="20" fill="none" stroke="{{padCurC}}" stroke-width="3"/><circle r="20" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="{{padPow}}" transform="rotate(-90)"/><path d="M-26 0h10M16 0h10M0 -26v10M0 16v10" stroke="{{padCurC}}" stroke-width="3" stroke-linecap="round"/><circle r="3" fill="{{padCurC}}"/></svg></div>
+  </sc-if>
   <sc-if value="{{fkAim}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; left: 12px; bottom: 12px; width: 236px; padding: 10px 12px; border-radius: 14px; background: #0B0B14D9; display: flex; flex-direction: column; gap: 6px">
       <label for="fk-curve" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>EFECTO</span><span style="color: #F4F4FA">{{curveTxt}}</span></label>
@@ -155,7 +158,64 @@ class Component extends DCLogic {
   componentDidUpdate(prev) {
     if (prev.kind !== this.props.kind && this.props.kind) { this.kind = this.props.kind === 'free' ? 'free' : 'pen'; this.setup(false); }
   }
+  componentDidMount() {
+    if (window.AMPad) this.padOff = window.AMPad.on((st, pv) => this.padIn(st, pv));
+  }
+  // a game controller: the stick aims (the cross-hair on the goal, or the free-kick target), A shoots / dives,
+  // LB / RB the curve and X / Y the height of a free kick
+  padIn(st, pv) {
+    if (!this.cam || this.phase === 'done') return;
+    const A = st.b[0] && !pv.b[0], Aup = !st.b[0] && pv.b[0], dz = (v) => (Math.abs(v) < 0.2 ? 0 : v);
+    const sx = dz(st.ax) + (st.b[15] ? 1 : 0) - (st.b[14] ? 1 : 0), sy = dz(st.ay) + (st.b[13] ? 1 : 0) - (st.b[12] ? 1 : 0);
+    const dt = 1 / 60, GX = this.GX, xs = this.xSign(), cl = (v, a, b) => Math.max(a, Math.min(b, v));
+    if (this.replaying) { if (window.AMPad) window.AMPad.hold(); if (A) this.endReplay(); return; }
+    if (!['aim', 'defend', 'flight', 'runup', 'result'].includes(this.phase)) return;
+    if (window.AMPad) window.AMPad.hold();
+    const youTurn = this.turn === 'you' || this.practice;
+    if (youTurn && this.phase === 'aim') {
+      if (this.fkMode()) {
+        const a = this.aim;
+        a.x = cl(a.x + sx * xs * 3.2 * dt, GX - 5, GX + 5); a.y = cl(a.y - sy * 2.2 * dt, 0.15, 3.3);
+        if (st.b[4] && !pv.b[4]) a.s = cl(Math.round((a.s - 0.25) * 4) / 4, -1, 1);
+        if (st.b[5] && !pv.b[5]) a.s = cl(Math.round((a.s + 0.25) * 4) / 4, -1, 1);
+        if (st.b[3] && !pv.b[3]) a.h = cl(Math.round((a.h + 0.25) * 4) / 4, 0, 1);
+        if (st.b[2] && !pv.b[2]) a.h = cl(Math.round((a.h - 0.25) * 4) / 4, 0, 1);
+        if (A && !this.charge) { this.charge = { t0: performance.now() }; this.loop(); }
+        if (Aup && this.charge) this.fkShoot();
+        this.forceUpdate();
+        return;
+      }
+      // penalty: the cross-hair, hold A for power (too long and it flies), let go to shoot
+      const pa = this.padAim || (this.padAim = { x: GX, y: 1 });
+      pa.x = cl(pa.x + sx * xs * 3 * dt, GX - 3.9, GX + 3.9); pa.y = cl(pa.y - sy * 2 * dt, 0.15, 2.8);
+      this.padOn = true;
+      if (A) this.padCharge = performance.now();
+      if (Aup && this.padCharge) {
+        const c = Math.min(1, (performance.now() - this.padCharge) / 900);
+        this.padCharge = null;
+        const speed = 14 + c * (7 + 4 * this.tt('pot')), v = this.aimFor({ x: pa.x, y: pa.y + (c > 0.93 ? 0.6 : 0) }, speed, dz(st.rx) * 1.2 * xs);
+        this.lastSwipe = null;
+        this.queueShot(v, 0.9 * (1 - this.tt('pre')) / v.T);
+      }
+      this.forceUpdate();
+      return;
+    }
+    if (!youTurn && (this.phase === 'defend' || this.phase === 'flight') && !this.tap) {
+      const pa = this.padAim || (this.padAim = { x: GX, y: 1 }), k = this.k;
+      pa.x = cl(pa.x + sx * xs * 4.5 * dt, GX - 3.6, GX + 3.6); pa.y = cl(pa.y - sy * 2.6 * dt, 0.2, 2.6);
+      this.padOn = true;
+      if (A) {
+        this.tap = { x: pa.x, y: pa.y };
+        if (this.phase === 'defend') { k.early = true; k.aimX = pa.x; }
+        this.aimKeeper(pa.x, pa.y);
+        if (this.phase === 'defend') { k.decided = false; this.pendingDive = true; }
+        this.loop();
+      }
+      this.forceUpdate();
+    }
+  }
   componentWillUnmount() {
+    if (this.padOff) { this.padOff(); this.padOff = null; }
     if (this.raf) cancelAnimationFrame(this.raf);
     this.raf = null;
     if (this.R) { this.R.dispose(); this.R = null; }
@@ -201,6 +261,7 @@ class Component extends DCLogic {
     if (rebuild && this.R) this.relayout();
   }
   resetShot() {
+    this.padAim = null; this.padCharge = null;
     this.b = { x: 0, y: 0.11, z: 0, vx: 0, vy: 0, vz: 0, curve: 0 };
     // free kicks: target on goal, curve and height chosen by the player (EA FC style)
     if (!this.aim || this.aim.fk !== this.fk) this.aim = { fk: this.fk, x: this.GX + (this.GX >= 1 ? -2.3 : 2.3), y: 1.75, s: 0.45, h: 0.45 };
@@ -1433,6 +1494,14 @@ class Component extends DCLogic {
       curveVal: String(Math.round((this.aim ? this.aim.s : 0) * 100)), heightVal: String(Math.round((this.aim ? this.aim.h : 0) * 100)),
       curveTxt: sAbs < 5 ? 'Recto' : (this.aim.s > 0 ? 'Derecha ' : 'Izquierda ') + sAbs + '%',
       heightTxt: !this.aim ? '' : this.aim.h < 0.25 ? 'Tenso' : this.aim.h < 0.65 ? 'Medio' : 'Bombeado',
+      ...(() => {
+        // the controller's cross-hair (only once a controller has been used)
+        const pa = this.padAim, on = !!(this.padOn && pa && this.cam && !this.replaying && ((youTurn || this.practice) && this.phase === 'aim' && !this.fkMode() || !(youTurn || this.practice) && (this.phase === 'defend' || this.phase === 'flight') && !this.tap));
+        if (!on) return { padCur: false, padCurStyle: '', padCurC: '#22D3EE', padPow: '0 200' };
+        const q = this.toScreen(pa.x, pa.y, this.D), c = this.padCharge ? Math.min(1, (performance.now() - this.padCharge) / 900) : 0;
+        if (this.padCharge) this.loop();
+        return { padCur: true, padCurStyle: 'position: absolute; left: ' + (q.x - 27).toFixed(1) + 'px; top: ' + (q.y - 27).toFixed(1) + 'px; pointer-events: none; z-index: 5; filter: drop-shadow(0 0 6px #000)', padCurC: youTurn || this.practice ? (c > 0.93 ? '#FF5C5C' : '#22D3EE') : '#A78BFA', padPow: (c * 125.7).toFixed(1) + ' 200' };
+      })(),
       onCurve: (e) => { this.aim.s = +e.currentTarget.value / 100; this.forceUpdate(); },
       onHeight: (e) => { this.aim.h = +e.currentTarget.value / 100; this.forceUpdate(); },
       zoneStyle: 'position: absolute; left: 0; right: 0; bottom: ' + (zlo * 100).toFixed(1) + '%; height: ' + ((zhi - zlo) * 100).toFixed(1) + '%; background: #53D88E;',
@@ -1466,7 +1535,7 @@ class Component extends DCLogic {
       countLabel: cd > 0.8 ? String(Math.ceil(cd - 0.8)) : '¡CHUTA!',
       countStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 60px; line-height: 1; color: #F4F4FA; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (1.3 - ((2.4 - cd) % 0.8) * 0.4).toFixed(2) + ');',
       showHint: !this.replaying && ((this.phase === 'aim' && !this.swipe && !this.charge && !this.dragAim) || (this.phase === 'defend' && !this.tap) || (this.phase === 'flight' && !youTurn && !this.tap)),
-      hintText: this.fkMode() ? 'Arrastra la diana en la portería · ajusta efecto y altura · mantén CHUTAR y suelta en la zona verde' : youTurn ? 'Desliza desde el balón hacia la portería · más rápido = más potencia · curva el gesto para dar efecto' : 'Toca la portería donde quieras lanzarte · si te tiras antes del disparo, el rival puede leerte',
+      hintText: this.padOn ? (this.fkMode() ? 'Mando: stick = diana · LB/RB = efecto · X/Y = altura · mantén A y suelta en la zona verde' : youTurn ? 'Mando: apunta con el stick · mantén A para la potencia y suelta para chutar' : 'Mando: mueve la mira con el stick y pulsa A para lanzarte') : this.fkMode() ? 'Arrastra la diana en la portería · ajusta efecto y altura · mantén CHUTAR y suelta en la zona verde' : youTurn ? 'Desliza desde el balón hacia la portería · más rápido = más potencia · curva el gesto para dar efecto' : 'Toca la portería donde quieras lanzarte · si te tiras antes del disparo, el rival puede leerte',
       zoneLabel: youTurn ? 'Zona de tiro: desliza desde el balón hacia la portería' : 'Portería: toca donde quieras que se lance el portero',
       showResult: this.phase === 'result' && !!R && !this.replaying,
       showReplay: !!this.replaying,

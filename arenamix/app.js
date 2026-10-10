@@ -116,6 +116,123 @@
     return out;
   }
 
+  /* ---------- game controller: one reader for every screen, and moving around the menus with it ----------
+     AMPad.on(fn) calls fn(state, previous) every frame while a controller is connected (state: ax, ay, rx, ry and
+     b[] for the buttons, standard mapping). A screen that is playing calls AMPad.hold() each frame so the menu
+     navigation keeps out of the way (the match reads the controller itself). */
+  (function () {
+    var subs = [], prev = null, raf = null, holdAt = 0;
+    function read() {
+      var ps = navigator.getGamepads ? navigator.getGamepads() : [];
+      for (var i = 0; i < (ps ? ps.length : 0); i++) if (ps[i] && ps[i].connected !== false && ps[i].buttons && ps[i].buttons.length) return ps[i];
+      return null;
+    }
+    function frame() {
+      raf = null;
+      var p = null;
+      try { p = read(); } catch (e) {}
+      if (!p) { prev = null; return; }
+      var st = { ax: p.axes[0] || 0, ay: p.axes[1] || 0, rx: p.axes[2] || 0, ry: p.axes[3] || 0, b: [] };
+      for (var k = 0; k < 17; k++) { var bt = p.buttons[k]; st.b.push(!!(bt && (bt.pressed || bt.value > 0.5))); }
+      var pv = prev || st;
+      prev = st;
+      subs.slice().forEach(function (fn) { try { fn(st, pv); } catch (e) { console.error(e); } });
+      raf = requestAnimationFrame(frame);
+    }
+    function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+    window.addEventListener('gamepadconnected', kick);
+    setInterval(function () { try { if (!raf && read()) kick(); } catch (e) {} }, 1200);
+    window.AMPad = {
+      on: function (fn) { subs.push(fn); kick(); return function () { subs = subs.filter(function (f) { return f !== fn; }); }; },
+      hold: function () { holdAt = performance.now(); },
+      held: function () { return performance.now() - holdAt < 250; },
+      connected: function () { try { return !!read(); } catch (e) { return false; } }
+    };
+
+    // menus: the stick / d-pad moves a highlight between the buttons, A presses, B goes back, LB/RB change tab
+    var cur = null, rep = { dir: null, at: 0 }, SEL = 'button:not([disabled]), a[href], [role="tab"], [role="radio"], input[type="range"], input[type="text"], [tabindex]:not([tabindex="-1"])';
+    var css = document.createElement('style');
+    css.textContent = '.am-padfocus{outline:3px solid #FFC53D !important;outline-offset:3px;box-shadow:0 0 0 7px #FFC53D40,0 0 22px #FFC53DAA !important;transition:outline-color .2s}';
+    document.head.appendChild(css);
+    function visible(el) {
+      var r = el.getBoundingClientRect();
+      if (r.width < 4 || r.height < 4 || r.right < 0 || r.bottom < 0 || r.left > innerWidth || r.top > innerHeight) return false;
+      if (el.closest('[aria-hidden="true"]')) return false;
+      var cs = getComputedStyle(el);
+      if (cs.visibility === 'hidden' || cs.pointerEvents === 'none' || +cs.opacity === 0) return false;
+      // not covered by something else (a dialog on top, the results screen...)
+      var x = Math.min(innerWidth - 1, Math.max(0, r.left + r.width / 2)), y = Math.min(innerHeight - 1, Math.max(0, r.top + r.height / 2));
+      var top = document.elementFromPoint(x, y);
+      return !!top && (top === el || el.contains(top) || top.contains(el));
+    }
+    function all() { return Array.prototype.filter.call(document.querySelectorAll(SEL), function (el) { return !el.closest('.am-nopad') && visible(el); }); }
+    function setCur(el) {
+      if (cur && cur !== el) cur.classList.remove('am-padfocus');
+      cur = el;
+      if (!el) return;
+      el.classList.add('am-padfocus');
+      try { el.focus({ preventScroll: true }); } catch (e) {}
+      try { el.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) {}
+    }
+    function centre(el) { var r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+    function first(list) {
+      // the screen's main button if there is one, else the one nearest the middle
+      var main = list.filter(function (el) { return /bc-btn|tn-go|am-shine|mj-go/.test(el.className || ''); })[0];
+      if (main) return main;
+      var c = { x: innerWidth / 2, y: innerHeight / 2 };
+      return list.slice().sort(function (a, b) { var p = centre(a), q = centre(b); return Math.hypot(p.x - c.x, p.y - c.y) - Math.hypot(q.x - c.x, q.y - c.y); })[0] || null;
+    }
+    function move(dx, dy) {
+      var list = all();
+      if (!list.length) return;
+      if (!cur || list.indexOf(cur) < 0) { setCur(first(list)); return; }
+      var o = centre(cur), best = null, bs = Infinity;
+      list.forEach(function (el) {
+        if (el === cur) return;
+        var p = centre(el), vx = p.x - o.x, vy = p.y - o.y, along = vx * dx + vy * dy, side = Math.abs(vx * dy - vy * dx);
+        if (along <= 2) return;
+        var sc = along + side * 2.2;
+        if (sc < bs) { bs = sc; best = el; }
+      });
+      if (best) setCur(best);
+    }
+    function press(el) {
+      if (!el) return;
+      if (el.tagName === 'INPUT' && el.type === 'text') { el.focus(); return; }
+      var r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+      var o = { bubbles: true, cancelable: true, clientX: x, clientY: y, pointerId: 77, pointerType: 'mouse', isPrimary: true, button: 0 };
+      try { el.dispatchEvent(new PointerEvent('pointerdown', o)); el.dispatchEvent(new PointerEvent('pointerup', o)); } catch (e) {}
+      el.click();
+    }
+    function nudge(el, d) {
+      // a slider: left / right move it
+      var step = (+el.max - +el.min) / 10 || 1;
+      el.value = Math.max(+el.min, Math.min(+el.max, +el.value + d * step));
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    window.AMPad.on(function (st, pv) {
+      if (window.AMPad.held()) { if (cur) { cur.classList.remove('am-padfocus'); cur = null; } return; }
+      var now = performance.now(), dz = 0.55;
+      var dir = st.b[12] || st.ay < -dz ? 'u' : st.b[13] || st.ay > dz ? 'd' : st.b[14] || st.ax < -dz ? 'l' : st.b[15] || st.ax > dz ? 'r' : null;
+      if (dir && (dir !== rep.dir || now > rep.at)) {
+        rep.at = now + (dir !== rep.dir ? 380 : 150); rep.dir = dir;
+        if (cur && cur.tagName === 'INPUT' && cur.type === 'range' && (dir === 'l' || dir === 'r') && document.contains(cur)) nudge(cur, dir === 'l' ? -1 : 1);
+        else move(dir === 'l' ? -1 : dir === 'r' ? 1 : 0, dir === 'u' ? -1 : dir === 'd' ? 1 : 0);
+      }
+      if (!dir) rep.dir = null;
+      if (st.b[0] && !pv.b[0]) { if (cur && document.contains(cur) && visible(cur)) press(cur); else move(0, 0); }
+      if (st.b[1] && !pv.b[1]) { var back = all().filter(function (el) { return /^(Volver|Atrás|Cerrar|Back|Close)$/i.test(el.getAttribute('aria-label') || ''); })[0]; if (back) press(back); }
+      if ((st.b[4] && !pv.b[4]) || (st.b[5] && !pv.b[5])) {
+        var tabs = all().filter(function (el) { return el.getAttribute('role') === 'tab'; });
+        var i = tabs.findIndex(function (el) { return el.getAttribute('aria-selected') === 'true'; });
+        var t = tabs[(i + (st.b[5] ? 1 : -1) + tabs.length) % tabs.length];
+        if (t) press(t);
+      }
+      // the highlighted button went away (new screen): pick again on the next move
+      if (cur && !document.contains(cur)) cur = null;
+    });
+  })();
+
   /* ---------- gameplay settings (Configuración > Jugabilidad), read by the match screens ---------- */
   window.AMPlay = function () {
     // only personal settings (what you see): the rules of a match are the same for everybody online
