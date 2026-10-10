@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Torneos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+@keyframes tnIn{from{opacity:0;transform:translateY(18px) scale(.96)}}
+@keyframes tnGlow{0%,100%{filter:drop-shadow(0 0 10px #FFC53D88)}50%{filter:drop-shadow(0 0 26px #FFC53D)}}
+@keyframes tnFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+@keyframes tnRay{to{transform:rotate(360deg)}}
+@keyframes tnPulse{0%,100%{box-shadow:0 0 0 0 var(--tc),0 5px 0 #05050A}50%{box-shadow:0 0 0 7px transparent,0 5px 0 #05050A}}
+@keyframes tnShine{0%,60%{transform:translateX(-160%) rotate(14deg)}100%{transform:translateX(360%) rotate(14deg)}}
+@keyframes tnLine{to{stroke-dashoffset:-20}}
+.tn-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(90% 80% at 70% 0%,#2C1C5E 0%,#130E30 55%,#07061A 100%)}
+.tn-bg i{position:absolute;left:50%;top:-260px;width:1100px;height:1100px;margin-left:-550px;background:repeating-conic-gradient(from 0deg,#A78BFA10 0 6deg,transparent 6deg 18deg);animation:tnRay 90s linear infinite;-webkit-mask-image:radial-gradient(closest-side,#000 20%,transparent 70%);mask-image:radial-gradient(closest-side,#000 20%,transparent 70%)}
+.tn-bg b{position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(0deg,#0E3A22aa,transparent);-webkit-mask-image:repeating-linear-gradient(90deg,#000 0 60px,#0008 60px 120px);mask-image:repeating-linear-gradient(90deg,#000 0 60px,#0008 60px 120px)}
+.tn-tab{position:relative;z-index:1;display:flex;align-items:center;gap:6px;height:32px;width:122px;justify-content:center;border:0;background:none;font:800 11.5px Exo2,sans-serif;letter-spacing:.5px;cursor:pointer;transition:color .3s}
+.tn-panel{position:absolute;left:16px;right:16px;top:62px;bottom:12px;animation:tnIn .4s cubic-bezier(.2,1.3,.4,1) both}
+.tn-card{position:relative;border-radius:20px;background:linear-gradient(170deg,#1E1A48F2,#100D2AF2);box-shadow:inset 0 0 0 1px #3A3270,inset 0 2px 0 #ffffff14,0 14px 30px #0009;overflow:hidden}
+.tn-go{position:relative;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 24px;border:0;border-radius:14px;background:linear-gradient(135deg,#FFE38A,#FFC53D 55%,#F59E0B);color:#1A1204;font:800 italic 21px 'Barlow Condensed',sans-serif;letter-spacing:1px;cursor:pointer;overflow:hidden;--tc:#FFC53D88;animation:tnPulse 2s infinite}
+.tn-go::after{content:'';position:absolute;top:-30%;bottom:-30%;left:0;width:26%;background:linear-gradient(90deg,transparent,#ffffffaa,transparent);animation:tnShine 3.2s ease-in-out infinite}
+.tn-go:active{transform:translateY(2px)}
+.tn-ghost{height:34px;padding:0 14px;border-radius:11px;border:1px solid #4A4180;background:#0B0B18CC;color:#C9C2FF;font:800 11.5px Exo2,sans-serif;cursor:pointer}
+.tn-size{width:58px;height:34px;border-radius:10px;border:1px solid #3A3270;background:#0B0B18CC;color:#A3A3C2;font:800 italic 16px 'Barlow Condensed',sans-serif;cursor:pointer;transition:transform .15s}
+.tn-size.on{background:#A78BFA;border-color:#C4B5FD;color:#0B0B14;transform:translateY(-2px);box-shadow:0 3px 0 #5B3FB0,0 0 14px #A78BFA88}
+.tn-trophy{animation:tnFloat 4s ease-in-out infinite,tnGlow 3s ease-in-out infinite}
+.tn-m{position:absolute;width:168px;border-radius:9px;background:#0B0B18E6;box-shadow:inset 0 0 0 1px #2E2E58;overflow:hidden}
+.tn-m.me{box-shadow:inset 0 0 0 1.5px #22D3EE,0 0 14px #22D3EE55}
+.tn-m.next{animation:tnPulse 1.8s infinite;--tc:#22D3EE66}
+.tn-row{display:flex;align-items:center;gap:6px;height:24px;padding:0 8px;font:700 11px Exo2,sans-serif;color:#CACAE0;white-space:nowrap}
+.tn-row+.tn-row{border-top:1px solid #20204A}
+.tn-row.w{color:#F4F4FA;font-weight:800}.tn-row.l{opacity:.5}
+.tn-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.tn-row .sc{font:800 13px 'Barlow Condensed',sans-serif;min-width:12px;text-align:right}
+.tn-row .pn{font-size:9px;color:#FFC53D}
+.tn-kit{flex:none;width:11px;height:13px;border-radius:2px 2px 5px 5px}
+.tn-tr{display:grid;grid-template-columns:34px 1fr 34px 30px 30px 30px 56px 40px;align-items:center;height:38px;font:700 12.5px Exo2,sans-serif;text-align:center;border-top:1px solid #ffffff0d}
+.tn-tr .t{display:flex;align-items:center;gap:8px;text-align:left;min-width:0;white-space:nowrap}
+.tn-th{height:26px;border-top:0;font-size:9.5px;letter-spacing:1px;color:#8686A6;font-weight:800}
+.tn-tr.me{background:#22D3EE1c;color:#F4F4FA;box-shadow:inset 3px 0 0 #22D3EE;border-radius:8px}
+.tn-pos{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:7px;font:800 13px 'Barlow Condensed',sans-serif}
+.tn-reto{position:relative;display:flex;flex-direction:column;gap:8px;padding:16px 16px 14px;box-sizing:border-box;width:258px;height:300px;border-radius:22px;animation:tnIn .45s cubic-bezier(.2,1.3,.4,1) both}
+.tn-reto h3{margin:0;font:800 italic 27px/1 'Barlow Condensed',sans-serif;letter-spacing:.5px}
+.tn-reto p{margin:0;font-size:12px;font-weight:700;line-height:1.4;color:#DADAF0}
+.tn-chip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:8px;background:#0B0B18CC;font:800 10.5px Exo2,sans-serif;letter-spacing:.5px;white-space:nowrap}
+.tn-done{position:absolute;right:14px;top:14px;rotate:12deg;padding:3px 10px;border:3px solid #53D88E;border-radius:8px;color:#53D88E;font:800 italic 18px 'Barlow Condensed',sans-serif;letter-spacing:1px;background:#0B0B18CC}
+.tn-banner{position:absolute;left:50%;top:50%;z-index:9;translate:-50% -50%;width:520px;padding:20px 24px;box-sizing:border-box;border-radius:22px;text-align:center;background:linear-gradient(170deg,#2A1E5E,#120D2C);box-shadow:0 0 0 3px #FFC53D,0 20px 60px #000c,0 0 60px #FFC53D55;animation:tnIn .5s cubic-bezier(.2,1.5,.4,1) both}
+.tn-dash{stroke-dasharray:4 6;animation:tnLine 1s linear infinite}
+</style>
+</helmet>
+<div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
+  <sc-if value="{{isHub}}" hint-placeholder-val="{{ true }}">
+    <div class="tn-bg" aria-hidden="true"><i></i><b></b></div>
+    <!-- header: back, title, the three competitions -->
+    <div style="position: absolute; left: 16px; right: 16px; top: 12px; height: 40px; display: flex; align-items: center; gap: 12px">
+      <a href="Modos.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 46px; height: 38px; display: flex; align-items: center; justify-content: center; background: #17172A; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+      <h1 class="bc-title" style="font-size: 28px">TORNEOS</h1>
+      <span style="display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 10px; background: #0B0B18CC; font: 800 12px Exo2, sans-serif; color: #FFC53D"><svg width="15" height="15" viewBox="0 0 24 24" fill="#FFC53D"><path d="M7 3h10v6a5 5 0 0 1-10 0zM5 4H2v2a4 4 0 0 0 5 4M19 4h3v2a4 4 0 0 1-5 4M10 15h4v3h3v3H7v-3h3z"/></svg>{{trophyCount}}</span>
+      <span style="flex: 1"></span>
+      <div role="tablist" aria-label="Competición" style="position: relative; display: flex; padding: 3px; border-radius: 14px; background: #0B0B14CC; border: 1px solid #2E2E58">
+        <span aria-hidden="true" style="{{thumbStyle}}"></span>
+        <sc-for list="{{tabs}}" as="t" key="id">
+          <button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" class="tn-tab" style="{{t.style}}">{{t.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- ===== COPA ===== -->
+    <sc-if value="{{cupIntro}}" hint-placeholder-val="{{ false }}">
+      <div class="tn-panel" style="display: flex; gap: 14px">
+        <div class="tn-card" style="flex: none; width: 330px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+          <svg class="tn-trophy" width="150" height="150" viewBox="0 0 120 120">
+            <defs><linearGradient id="tn-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF3B0"/><stop offset=".45" stop-color="#FFC53D"/><stop offset="1" stop-color="#B7791F"/></linearGradient></defs>
+            <path d="M34 14h52v26c0 16-11 28-26 28S34 56 34 40z" fill="url(#tn-g)" stroke="#5A3A08" stroke-width="2.5"/>
+            <path d="M34 22H18v8c0 12 9 19 19 19M86 22h16v8c0 12-9 19-19 19" fill="none" stroke="url(#tn-g)" stroke-width="7" stroke-linecap="round"/>
+            <path d="M52 68h16v14H52z" fill="#D9A230" stroke="#5A3A08" stroke-width="2.5"/>
+            <path d="M38 82h44l4 14H34z" fill="url(#tn-g)" stroke="#5A3A08" stroke-width="2.5"/>
+            <rect x="30" y="96" width="60" height="12" rx="3" fill="#2A1E5E" stroke="#5A3A08" stroke-width="2.5"/>
+            <path d="M60 24l4 8l9 1l-7 6l2 9l-8-5l-8 5l2-9l-7-6l9-1z" fill="#FFF8D6" opacity=".85"/>
+            <path d="M42 18q4 20 0 34" stroke="#fff" stroke-width="3" fill="none" opacity=".45" stroke-linecap="round"/>
+          </svg>
+          <span style="font: 800 italic 34px/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; color: #FFE38A; text-shadow: 0 3px 0 #05050A, 0 0 18px #FFC53D88">COPA ARENA</span>
+          <span style="font-size: 11.5px; font-weight: 700; color: #C9C2FF; text-align: center; padding: 0 26px; line-height: 1.4">8 equipos, eliminación directa. Si hay empate, tanda de penaltis. Cada ronda, un rival más duro.</span>
+        </div>
+        <div class="tn-card" style="flex: 1; padding: 18px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
+          <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #A78BFA">TAMAÑO DE LOS EQUIPOS</span>
+          <div style="display: flex; gap: 8px">
+            <sc-for list="{{sizes}}" as="z" key="n"><button type="button" class="{{z.cls}}" onClick="{{z.pick}}">{{z.label}}</button></sc-for>
+          </div>
+          <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #A78BFA; margin-top: 4px">PREMIOS</span>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <sc-for list="{{cupPrizes}}" as="p" key="k">
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 12.5px; font-weight: 800"><span style="{{p.dot}}"></span><span style="flex: 1; color: #DADAF0">{{p.k}}</span><span style="color: #FFC53D">{{p.v}}</span></div>
+            </sc-for>
+          </div>
+          <span style="flex: 1"></span>
+          <button type="button" class="tn-go" onClick="{{newCup}}">EMPEZAR COPA</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{cupOn}}" hint-placeholder-val="{{ false }}">
+      <div class="tn-panel">
+        <!-- the bracket: quarter-finals, semis, final -->
+        <svg width="580" height="316" style="position: absolute; left: 0; top: 0; pointer-events: none" aria-hidden="true">
+          <sc-for list="{{links}}" as="l" key="k"><path d="{{l.d}}" fill="none" stroke="{{l.c}}" stroke-width="2" class="{{l.cls}}"/></sc-for>
+        </svg>
+        <sc-for list="{{roundHeads}}" as="h" key="t"><span style="{{h.style}}">{{h.t}}</span></sc-for>
+        <sc-for list="{{matches}}" as="m" key="k">
+          <div class="{{m.cls}}" style="{{m.style}}">
+            <sc-for list="{{m.rows}}" as="r" key="k">
+              <div class="{{r.cls}}"><span class="tn-kit" style="{{r.kit}}"></span><span class="nm" translate="no">{{r.name}}</span><span class="pn">{{r.pen}}</span><span class="sc">{{r.g}}</span></div>
+            </sc-for>
+          </div>
+        </sc-for>
+        <div class="tn-card" style="position: absolute; right: 0; top: 0; bottom: 0; width: 226px; padding: 16px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+          <svg class="tn-trophy" width="70" height="70" viewBox="0 0 120 120"><path d="M34 14h52v26c0 16-11 28-26 28S34 56 34 40z" fill="#FFC53D" stroke="#5A3A08" stroke-width="3"/><path d="M34 22H18v8c0 12 9 19 19 19M86 22h16v8c0 12-9 19-19 19" fill="none" stroke="#FFC53D" stroke-width="7" stroke-linecap="round"/><path d="M52 68h16v14H52zM38 82h44l4 14H34z" fill="#D9A230" stroke="#5A3A08" stroke-width="3"/><rect x="30" y="96" width="60" height="12" rx="3" fill="#2A1E5E" stroke="#5A3A08" stroke-width="3"/></svg>
+          <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #A78BFA">{{cupStage}}</span>
+          <span style="font: 800 italic 24px/1.05 'Barlow Condensed', sans-serif; letter-spacing: .5px" translate="no">{{cupHeadline}}</span>
+          <span style="font-size: 11px; font-weight: 700; color: #A3A3C2; line-height: 1.4">{{cupSub}}</span>
+          <span style="flex: 1"></span>
+          <sc-if value="{{cupCanPlay}}" hint-placeholder-val="{{ true }}"><button type="button" class="tn-go" style="width: 100%; font-size: 19px; padding: 0 10px" onClick="{{playCup}}">{{cupPlayLabel}}</button></sc-if>
+          <sc-if value="{{cupOver}}" hint-placeholder-val="{{ false }}"><button type="button" class="tn-go" style="width: 100%" onClick="{{resetCup}}">NUEVA COPA</button></sc-if>
+          <sc-if value="{{cupCanPlay}}" hint-placeholder-val="{{ true }}"><button type="button" class="tn-ghost" onClick="{{quitCup}}">Abandonar la copa</button></sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===== LIGA ===== -->
+    <sc-if value="{{lgIntro}}" hint-placeholder-val="{{ false }}">
+      <div class="tn-panel" style="display: flex; gap: 14px">
+        <div class="tn-card" style="flex: none; width: 330px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
+          <svg class="tn-trophy" width="140" height="140" viewBox="0 0 120 120">
+            <defs><linearGradient id="tn-s" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F4F4FA"/><stop offset=".5" stop-color="#A9B4D6"/><stop offset="1" stop-color="#5B6690"/></linearGradient></defs>
+            <circle cx="60" cy="52" r="38" fill="url(#tn-s)" stroke="#1E2440" stroke-width="3"/>
+            <circle cx="60" cy="52" r="28" fill="none" stroke="#1E2440" stroke-width="2" stroke-dasharray="3 5"/>
+            <path d="M60 32l6 12l13 2l-9 9l2 13l-12-6l-12 6l2-13l-9-9l13-2z" fill="#22D3EE" stroke="#1E2440" stroke-width="2"/>
+            <path d="M40 88l-8 24l14-6l8 10l6-24M80 88l8 24l-14-6l-8 10l-6-24" fill="#A78BFA" stroke="#1E2440" stroke-width="2.5" stroke-linejoin="round"/>
+          </svg>
+          <span style="font: 800 italic 34px/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; color: #E6EBFF; text-shadow: 0 3px 0 #05050A, 0 0 18px #A78BFA88">LIGA ARENA</span>
+          <span style="font-size: 11.5px; font-weight: 700; color: #C9C2FF; text-align: center; padding: 0 26px; line-height: 1.4">6 equipos, todos contra todos. 5 jornadas: 3 puntos por victoria, 1 por empate. ¡Acaba arriba!</span>
+        </div>
+        <div class="tn-card" style="flex: 1; padding: 18px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
+          <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #A78BFA">TAMAÑO DE LOS EQUIPOS</span>
+          <div style="display: flex; gap: 8px">
+            <sc-for list="{{sizes}}" as="z" key="n"><button type="button" class="{{z.cls}}" onClick="{{z.pick}}">{{z.label}}</button></sc-for>
+          </div>
+          <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #A78BFA; margin-top: 4px">PREMIOS</span>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <sc-for list="{{lgPrizes}}" as="p" key="k">
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 12.5px; font-weight: 800"><span style="{{p.dot}}"></span><span style="flex: 1; color: #DADAF0">{{p.k}}</span><span style="color: #FFC53D">{{p.v}}</span></div>
+            </sc-for>
+          </div>
+          <span style="flex: 1"></span>
+          <button type="button" class="tn-go" onClick="{{newLeague}}">EMPEZAR LIGA</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{lgOn}}" hint-placeholder-val="{{ false }}">
+      <div class="tn-panel" style="display: flex; gap: 14px">
+        <div class="tn-card" style="flex: 1; padding: 8px 12px 0">
+          <div class="tn-tr tn-th"><span>#</span><span class="t">EQUIPO</span><span>PJ</span><span>G</span><span>E</span><span>P</span><span>GOLES</span><span>PTS</span></div>
+          <sc-for list="{{table}}" as="r" key="k">
+            <div class="{{r.cls}}"><span><span class="tn-pos" style="{{r.posStyle}}">{{r.pos}}</span></span><span class="t"><span class="tn-kit" style="{{r.kit}}"></span><span translate="no" style="overflow: hidden; text-overflow: ellipsis">{{r.name}}</span></span><span>{{r.pj}}</span><span>{{r.g}}</span><span>{{r.e}}</span><span>{{r.p}}</span><span>{{r.gl}}</span><span style="font: 800 16px 'Barlow Condensed', sans-serif; color: #FFC53D">{{r.pts}}</span></div>
+          </sc-for>
+        </div>
+        <div class="tn-card" style="flex: none; width: 236px; padding: 16px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+          <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #A78BFA">{{lgStage}}</span>
+          <div style="display: flex; gap: 4px">
+            <sc-for list="{{lgDays}}" as="d" key="k"><span style="{{d}}"></span></sc-for>
+          </div>
+          <span style="font: 800 italic 24px/1.05 'Barlow Condensed', sans-serif; letter-spacing: .5px" translate="no">{{lgHeadline}}</span>
+          <span style="font-size: 11px; font-weight: 700; color: #A3A3C2; line-height: 1.4">{{lgSub}}</span>
+          <sc-if value="{{lgHasLast}}" hint-placeholder-val="{{ false }}">
+            <div style="width: 100%; display: flex; flex-direction: column; gap: 3px; padding: 8px 10px; box-sizing: border-box; border-radius: 12px; background: #0B0B18AA; text-align: left">
+              <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #8686A6">{{lgLastHead}}</span>
+              <sc-for list="{{lgLast}}" as="x" key="k"><span style="{{x.style}}" translate="no">{{x.t}}</span></sc-for>
+            </div>
+          </sc-if>
+          <span style="flex: 1"></span>
+          <sc-if value="{{lgCanPlay}}" hint-placeholder-val="{{ true }}"><button type="button" class="tn-go" style="width: 100%; font-size: 19px; padding: 0 10px" onClick="{{playLeague}}">{{lgPlayLabel}}</button></sc-if>
+          <sc-if value="{{lgOver}}" hint-placeholder-val="{{ false }}"><button type="button" class="tn-go" style="width: 100%" onClick="{{resetLeague}}">NUEVA LIGA</button></sc-if>
+          <sc-if value="{{lgCanPlay}}" hint-placeholder-val="{{ true }}"><button type="button" class="tn-ghost" onClick="{{quitLeague}}">Abandonar la liga</button></sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===== RETOS DEL DÍA ===== -->
+    <sc-if value="{{isRetos}}" hint-placeholder-val="{{ false }}">
+      <div class="tn-panel" style="display: flex; gap: 14px; justify-content: center">
+        <sc-for list="{{retos}}" as="r" key="id">
+          <div class="tn-reto" style="{{r.style}}">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span style="{{r.badge}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="{{r.icon}}"/></svg></span>
+              <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 2px; color: {{r.c}}">RETO {{r.num}}</span>
+            </div>
+            <h3>{{r.title}}</h3>
+            <p>{{r.desc}}</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px">
+              <span class="tn-chip" style="color: #C9C2FF">{{r.setup}}</span>
+              <span class="tn-chip" style="color: #FFC53D">+{{r.reward}} VCD</span>
+            </div>
+            <span style="flex: 1"></span>
+            <sc-if value="{{r.done}}" hint-placeholder-val="{{ false }}"><span class="tn-done">¡HECHO!</span></sc-if>
+            <button type="button" class="tn-go" style="{{r.btn}}" onClick="{{r.play}}">{{r.label}}</button>
+          </div>
+        </sc-for>
+      </div>
+      <span style="position: absolute; left: 0; right: 0; bottom: 4px; text-align: center; font-size: 10px; font-weight: 700; color: #8686A6">Retos nuevos cada día · {{retosLeft}}</span>
+    </sc-if>
+
+    <sc-if value="{{hasBanner}}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; inset: 0; z-index: 8; background: #05050ACC" onClick="{{closeBanner}}"></div>
+      <div class="tn-banner">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: 3px; color: #A78BFA">{{bannerKicker}}</div>
+        <div style="font: 800 italic 40px/1.05 'Barlow Condensed', sans-serif; letter-spacing: 1px; color: #FFE38A; text-shadow: 0 3px 0 #05050A; margin: 6px 0">{{bannerTitle}}</div>
+        <div style="font-size: 13px; font-weight: 700; color: #DADAF0">{{bannerSub}}</div>
+        <button type="button" class="tn-go" style="margin: 14px auto 0" onClick="{{closeBanner}}">¡GENIAL!</button>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <sc-if value="{{isMatch}}" hint-placeholder-val="{{ false }}">
+    <dc-import name="Partido" ai-level="{{m_ai}}" label="{{m_label}}" mode="comp" duration="{{m_dur}}" team-size="{{m_n}}" autostart="{{ true }}" home-name="{{m_home}}" mates="{{m_mates}}" rivals="{{m_rivals}}" away-name="{{m_away}}" away-color="{{m_color}}" away-trim="{{m_trim}}" start-score="{{m_start}}" on-end="{{onMatchEnd}}" hint-size="844px,390px"></dc-import>
+  </sc-if>
+  <sc-if value="{{isShootout}}" hint-placeholder-val="{{ false }}">
+    <dc-import name="Duelo" ai-level="{{m_ai}}" kind="pen" shootout="{{ true }}" rival-name="{{m_away}}" on-end="{{onPens}}" hint-size="844px,390px"></dc-import>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+// the clubs of the tournaments: [name, shirt, trim]
+const TN_CLUBS = [
+  ['Villaduna Blanco', '#F4F4F6', '#C9A227'], ['Puerto Brisa Azulgrana', '#A50044', '#1A3E8C'], ['Montealto Rojiblanco', '#CB3524', '#F4F4F6'],
+  ['Campoverde Verdiblanco', '#0BB363', '#F4F4F6'], ['Valdeoro Amarillo', '#FFE135', '#005187'], ['Altamar Celeste', '#8AC3EE', '#F4F4F6'],
+  ['Northwick Rojo', '#EF0107', '#F4F4F6'], ['Ashvale Granate', '#670E36', '#95BFE5'], ['Harbour Bay Rojinegro', '#DA291C', '#141B2D'],
+  ['Brightmoor Albiazul', '#0057B8', '#F4F4F6'], ['Valloro Nerazzurro', '#0068A8', '#141B2D'], ['Bergheim Rojo', '#DC052D', '#F4F4F6'],
+  ['Montclair Azul', '#004170', '#DA291C'], ['Isla Coral Bermellón', '#E20613', '#141B2D'], ['Faro Norte Blanquiazul', '#007FC8', '#F4F4F6'],
+  ['Pinar Azul', '#0050A0', '#F4F4F6'], ['Sierra Clara Azul', '#005999', '#F4F4F6'], ['Robledo Rojo', '#D91A21', '#0A346F']
+];
+const TN_NAMES = ['Kai_Striker', 'LunaGol_09', 'ToroVeloz', 'Mika10', 'Zeta_FC', 'Nico_Volea', 'Sara_Crack', 'Dani_Muro', 'Bruno7', 'Iker_Rayo', 'Vega_22', 'Leo_Tiki', 'Noa_Golazo', 'Rafa_Pared', 'Alba_Top', 'Hugo_Chut', 'Eva_Regate', 'Tomi_9'];
+// the challenges of the day: a match with a twist, and what you must do in it
+const TN_RETOS = [
+  { id: 'remontada', title: 'LA REMONTADA', icon: 'M3 17l6-6l4 4l8-8M14 7h7v7', c: '#FF8A3D', desc: 'Empiezas perdiendo 0-2. Dale la vuelta y gana el partido.', n: 3, dur: 120, ai: 0.45, start: [0, 2], setup: '3 VS 3 · 0-2', reward: 300, ok: (r) => r.home > r.away },
+  { id: 'muro', title: 'EL MURO', icon: 'M12 3l8 3v6c0 5-4 8-8 9c-4-1-8-4-8-9V6z', c: '#22D3EE', desc: 'Gana sin encajar ni un solo gol.', n: 2, dur: 90, ai: 0.5, setup: '2 VS 2', reward: 200, ok: (r) => r.home > r.away && r.away === 0 },
+  { id: 'pichichi', title: 'PICHICHI', icon: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18M12 7l4 3l-1.5 5h-5L8 10z', c: '#FFC53D', desc: 'Marca tú mismo 3 goles en un 1 contra 1.', n: 1, dur: 120, ai: 0.4, setup: '1 VS 1', reward: 250, ok: (r) => (r.stats && r.stats.goals || 0) >= 3 },
+  { id: 'gigante', title: 'TUMBA AL GIGANTE', icon: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z', c: '#FF5C5C', desc: 'Gana a la IA en su nivel más difícil.', n: 1, dur: 90, ai: 0.95, setup: '1 VS 1 · DIFÍCIL', reward: 250, ok: (r) => r.home > r.away },
+  { id: 'agonia', title: 'AL LÍMITE', icon: 'M12 7v5l3 2M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18', c: '#A78BFA', desc: '45 segundos, empate a 1. Marca el gol de la victoria.', n: 2, dur: 45, ai: 0.5, start: [1, 1], setup: '2 VS 2 · 45 S', reward: 200, ok: (r) => r.home > r.away },
+  { id: 'paliza', title: 'EXHIBICIÓN', icon: 'M13 2L4 14h7l-1 8l9-12h-7z', c: '#53D88E', desc: 'Gana por 3 goles o más de diferencia.', n: 3, dur: 120, ai: 0.4, setup: '3 VS 3', reward: 250, ok: (r) => r.home - r.away >= 3 },
+  { id: 'tikitaka', title: 'TIKI-TAKA', icon: 'M5 12h14M13 6l6 6l-6 6', c: '#22D3EE', desc: 'Da 8 pases y gana el partido.', n: 4, dur: 120, ai: 0.45, setup: '4 VS 4', reward: 200, ok: (r) => r.home > r.away && (r.stats && r.stats.passes || 0) >= 8 },
+  { id: 'artista', title: 'EL ARTISTA', icon: 'M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z', c: '#FF5CC8', desc: 'Haz 3 filigranas y no pierdas.', n: 2, dur: 90, ai: 0.4, setup: '2 VS 2', reward: 200, ok: (r) => r.home >= r.away && (r.stats && r.stats.skills || 0) >= 3 }
+];
+const TN_ROUND = ['CUARTOS', 'SEMIFINAL', 'FINAL'];
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const sel = this.store('arenamix.sel') || {};
+    const tab = sel.cat === 'tour' && ['copa', 'liga', 'retos'].includes(sel.id) ? sel.id : 'copa';
+    this.state = { tab, phase: 'hub', size: 3, banner: null, cfg: null };
+  }
+  store(key, val) {
+    try {
+      if (val === undefined) return JSON.parse(localStorage.getItem(key) || 'null');
+      if (val === null) localStorage.removeItem(key); else localStorage.setItem(key, JSON.stringify(val));
+    } catch (e) {}
+    return null;
+  }
+  me() { return window.AMOnline && window.AMOnline.myName ? window.AMOnline.myName() : 'Tú'; }
+  myClub() { return [this.me() + ' FC', '#22D3EE', '#0B0B14']; }
+  shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  names(n, avoid) {
+    const out = [], pool = this.shuffle(TN_NAMES).filter((x) => !(avoid || []).includes(x));
+    for (let k = 0; k < n; k++) out.push(pool[k % pool.length]);
+    return out;
+  }
+  // a match between two AI clubs: goals from their strengths, penalties if it must have a winner
+  simMatch(sa, sb, needWinner) {
+    const goals = (s, o) => { const lam = Math.max(0.3, 1.4 + (s - o) * 2.2); let k = 0, p = Math.exp(-lam), c = p, u = Math.random(); while (u > c && k < 7) { k++; p *= lam / k; c += p; } return k; };
+    const g = [goals(sa, sb), goals(sb, sa)];
+    let pen = null;
+    if (needWinner && g[0] === g[1]) { const a = 3 + Math.floor(Math.random() * 3); let b = 3 + Math.floor(Math.random() * 3); if (a === b) b = Math.random() < 0.5 + (sb - sa) * 0.5 ? a + 1 : a - 1; pen = [a, b]; }
+    return { g, pen };
+  }
+  winnerOf(m) { return m.g[0] > m.g[1] || (m.g[0] === m.g[1] && m.pen && m.pen[0] > m.pen[1]) ? 0 : 1; }
+
+  /* ---------- copa ---------- */
+  cup() { return this.store('arenamix.cup.v1'); }
+  newCup() {
+    const clubs = this.shuffle(TN_CLUBS).slice(0, 7).map((c, k) => ({ c, str: 0.3 + k * 0.07 + Math.random() * 0.08 }));
+    const teams = this.shuffle([{ c: this.myClub(), str: 0.5, me: true }].concat(clubs));
+    const C = { n: this.state.size, teams, rounds: [[[0, 1], [2, 3], [4, 5], [6, 7]]], res: [[]], round: 0, out: false, champ: false, paid: false };
+    this.store('arenamix.cup.v1', C);
+    this.forceUpdate();
+  }
+  myIdx(C) { return C.teams.findIndex((t) => t.me); }
+  myCupMatch(C) {
+    const me = this.myIdx(C), R = C.rounds[C.round] || [];
+    const i = R.findIndex((p) => p[0] === me || p[1] === me);
+    return i < 0 ? null : { i, pair: R[i], home: R[i][0] === me };
+  }
+  // after your match: the rest of the round, then the next round's draw (and to the end if you are out)
+  advanceCup(C, myRes) {
+    const R = C.rounds[C.round], me = this.myIdx(C), res = [];
+    R.forEach((p, i) => {
+      if (p[0] === me || p[1] === me) { const home = p[0] === me; res[i] = home ? myRes : { g: [myRes.g[1], myRes.g[0]], pen: myRes.pen ? [myRes.pen[1], myRes.pen[0]] : null }; }
+      else res[i] = this.simMatch(C.teams[p[0]].str, C.teams[p[1]].str, true);
+    });
+    C.res[C.round] = res;
+    const winners = R.map((p, i) => p[this.winnerOf(res[i])]);
+    if (!winners.includes(me)) C.out = true;
+    if (winners.length === 1) { C.done = true; C.champ = winners[0] === me; C.round++; return; }
+    const next = []; for (let k = 0; k < winners.length; k += 2) next.push([winners[k], winners[k + 1]]);
+    C.rounds.push(next); C.res.push([]); C.round++;
+    if (C.out) this.advanceCup(C, null);
+  }
+  cupPrize(C) {
+    // what your run is worth: the round you reached
+    const me = this.myIdx(C);
+    let wins = 0;
+    C.rounds.forEach((R, k) => R.forEach((p, i) => { const m = C.res[k] && C.res[k][i]; if (m && (p[0] === me || p[1] === me) && p[this.winnerOf(m)] === me) wins++; }));
+    return [[60, 'Eliminado en cuartos'], [150, 'Eliminado en semifinales'], [350, 'Subcampeón'], [1000, '¡CAMPEÓN DE LA COPA!']][Math.min(3, wins)];
+  }
+
+  /* ---------- liga ---------- */
+  league() { return this.store('arenamix.league.v1'); }
+  newLeague() {
+    const clubs = this.shuffle(TN_CLUBS).slice(0, 5).map((c, k) => ({ c, str: 0.3 + k * 0.1 + Math.random() * 0.08 }));
+    const teams = [{ c: this.myClub(), str: 0.5, me: true }].concat(this.shuffle(clubs));
+    // round robin (circle method): 5 matchdays of 3 matches
+    const ids = [0, 1, 2, 3, 4, 5], days = [];
+    for (let r = 0; r < 5; r++) {
+      const d = [];
+      for (let k = 0; k < 3; k++) { const a = ids[k], b = ids[5 - k]; d.push(r % 2 ? [b, a] : [a, b]); }
+      days.push(d);
+      ids.splice(1, 0, ids.pop());
+    }
+    const L = { n: this.state.size, teams, days, res: [], day: 0, done: false, paid: false };
+    this.store('arenamix.league.v1', L);
+    this.forceUpdate();
+  }
+  tableOf(L) {
+    const T = L.teams.map((t, k) => ({ k, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0 }));
+    L.res.forEach((day, d) => day.forEach((m, i) => {
+      const [a, b] = L.days[d][i], A = T[a], B = T[b];
+      A.pj++; B.pj++; A.gf += m.g[0]; A.gc += m.g[1]; B.gf += m.g[1]; B.gc += m.g[0];
+      if (m.g[0] > m.g[1]) { A.g++; B.p++; A.pts += 3; } else if (m.g[0] < m.g[1]) { B.g++; A.p++; B.pts += 3; } else { A.e++; B.e++; A.pts++; B.pts++; }
+    }));
+    return T.sort((x, y) => y.pts - x.pts || (y.gf - y.gc) - (x.gf - x.gc) || y.gf - x.gf || x.k - y.k);
+  }
+  myLeagueMatch(L) {
+    const d = L.days[L.day];
+    if (!d) return null;
+    const i = d.findIndex((p) => L.teams[p[0]].me || L.teams[p[1]].me);
+    return { i, pair: d[i], home: L.teams[d[i][0]].me };
+  }
+  advanceLeague(L, myRes) {
+    const d = L.days[L.day], res = [];
+    d.forEach((p, i) => {
+      const meHome = L.teams[p[0]].me, meAway = L.teams[p[1]].me;
+      if (meHome) res[i] = myRes; else if (meAway) res[i] = { g: [myRes.g[1], myRes.g[0]] };
+      else res[i] = this.simMatch(L.teams[p[0]].str, L.teams[p[1]].str, false);
+    });
+    L.res.push(res); L.day++;
+    if (L.day >= L.days.length) L.done = true;
+  }
+  lgPrize(pos) { return [[800, '¡CAMPEÓN DE LIGA!'], [400, 'Subcampeón'], [200, 'Tercer puesto'], [100, 'Cuarto puesto'], [60, 'Quinto puesto'], [40, 'Sexto puesto']][pos]; }
+
+  /* ---------- retos ---------- */
+  today() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  todays() {
+    const key = this.today();
+    let h = 0; for (const ch of key) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    const pool = TN_RETOS.slice(), out = [];
+    while (out.length < 3) { h = (h * 1103515245 + 12345) >>> 0; out.push(pool.splice(h % pool.length, 1)[0]); }
+    return out;
+  }
+  retosDone() { const R = this.store('arenamix.retos.v1'); return R && R.day === this.today() ? R.done : []; }
+
+  /* ---------- playing a match ---------- */
+  play(cfg) {
+    const mates = this.names(cfg.n - 1), rivals = this.names(cfg.n, mates);
+    rivals[0] = rivals[0] || 'Rival';
+    this.setState({ phase: 'match', cfg: Object.assign({ mates, rivals }, cfg) });
+  }
+  record(r) {
+    // the lifetime record and the experience/coins of any match, like every other mode
+    try {
+      const R = this.store('arenamix.record.v1') || {};
+      const w = r.home > r.away || (r.pen && r.pen[0] > r.pen[1]), l = r.home < r.away || (r.pen && r.pen[0] < r.pen[1]);
+      ['all', 'futbol'].forEach((k) => {
+        const s = R[k] || (R[k] = { played: 0, won: 0, lost: 0, drawn: 0, gf: 0, ga: 0, clean: 0, streak: 0, best: 0 });
+        s.played++; if (w) s.won++; else if (l) s.lost++; else s.drawn++;
+        s.gf += r.home || 0; s.ga += r.away || 0; if (!r.away) s.clean++;
+        s.streak = w ? s.streak + 1 : 0; s.best = Math.max(s.best, s.streak);
+      });
+      this.store('arenamix.record.v1', R);
+      if (window.AMProgress) {
+        const sum = window.AMProgress.recordMatch({ home: r.home || 0, away: r.away || 0, pen: r.pen, kind: 'team', stats: r.stats });
+        if (window.AMResults) setTimeout(() => window.AMResults.show(sum), 60);
+      }
+    } catch (e) {}
+  }
+  trophies() { return this.store('arenamix.trophies.v1') || { copa: 0, liga: 0 }; }
+  addTrophy(k) { const T = this.trophies(); T[k] = (T[k] || 0) + 1; this.store('arenamix.trophies.v1', T); }
+  pay(n) { if (window.AMProgress && window.AMProgress.addCoins) window.AMProgress.addCoins(n); }
+  matchEnd(r) {
+    const cfg = this.state.cfg || {};
+    if (r && r.tutorial) { this.setState({ phase: 'hub' }); return; }
+    // a cup tie can't end level: penalties
+    if (cfg.kind === 'cup' && !r.pen && r.home === r.away) { this.setState({ phase: 'shootout', penFor: r }); return; }
+    this.record(r);
+    let banner = null;
+    if (cfg.kind === 'cup') {
+      const C = this.cup();
+      if (C) {
+        // your result, seen from your side (you first)
+        this.advanceCup(C, { g: [r.home, r.away], pen: r.pen || null });
+        if ((C.out || C.done) && !C.paid) {
+          C.paid = true; const [n, t] = this.cupPrize(C); this.pay(n);
+          if (C.champ) this.addTrophy('copa');
+          banner = { k: 'COPA ARENA', t, s: '+' + n + ' VCD' + (C.champ ? ' · El trofeo va a tus vitrinas' : '') };
+        }
+        this.store('arenamix.cup.v1', C);
+      }
+    } else if (cfg.kind === 'liga') {
+      const L = this.league();
+      if (L) {
+        this.advanceLeague(L, { g: [r.home, r.away] });
+        if (L.done && !L.paid) {
+          L.paid = true; const pos = this.tableOf(L).findIndex((x) => L.teams[x.k].me), [n, t] = this.lgPrize(pos); this.pay(n);
+          if (pos === 0) this.addTrophy('liga');
+          banner = { k: 'LIGA ARENA · FINAL', t, s: '+' + n + ' VCD' + (pos === 0 ? ' · El trofeo va a tus vitrinas' : '') };
+        }
+        this.store('arenamix.league.v1', L);
+      }
+    } else if (cfg.kind === 'reto') {
+      const R = TN_RETOS.find((x) => x.id === cfg.reto), done = this.retosDone();
+      if (R && !done.includes(R.id) && R.ok(r)) {
+        this.store('arenamix.retos.v1', { day: this.today(), done: done.concat([R.id]) }); this.pay(R.reward);
+        banner = { k: 'RETO DEL DÍA', t: '¡RETO SUPERADO!', s: R.title + ' · +' + R.reward + ' VCD' };
+      } else if (R && !done.includes(R.id)) banner = { k: 'RETO DEL DÍA', t: 'CASI…', s: 'No lo has conseguido esta vez. ¡Inténtalo otra vez!' };
+    }
+    this.setState({ phase: 'hub', banner, penFor: null });
+  }
+  renderVals() {
+    const s = this.state, tab = s.tab, C = this.cup(), L = this.league(), TR = this.trophies();
+    const kit = (c) => 'background: linear-gradient(135deg, ' + c[1] + ' 55%, ' + c[2] + ' 55%); box-shadow: 0 0 0 1px #05050A';
+    const TABS = [['copa', 'COPA', '#FFC53D'], ['liga', 'LIGA', '#22D3EE'], ['retos', 'RETOS DEL DÍA', '#FF5CC8']], ti = TABS.findIndex((t) => t[0] === tab);
+    const out = {
+      isHub: s.phase === 'hub', isMatch: s.phase === 'match', isShootout: s.phase === 'shootout',
+      trophyCount: String((TR.copa || 0) + (TR.liga || 0)),
+      tabs: TABS.map(([id, label, c], i) => ({ id, label, sel: i === ti ? 'true' : 'false', style: 'color: ' + (i === ti ? '#0B0B14' : c), pick: () => { this.setState({ tab: id }); try { const S = this.store('arenamix.sel') || {}; this.store('arenamix.sel', { ...S, cat: 'tour', id }); } catch (e) {} } })),
+      thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 122) + 'px; width: 122px; height: 32px; border-radius: 11px; background: ' + TABS[ti][2] + '; box-shadow: 0 0 16px ' + TABS[ti][2] + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s',
+      sizes: [1, 2, 3, 4].map((n) => ({ n: String(n), label: n + ' VS ' + n, cls: 'tn-size' + (n === s.size ? ' on' : ''), pick: () => this.setState({ size: n }) })),
+      cupPrizes: [['Campeón', '1.000 VCD + trofeo', '#FFC53D'], ['Subcampeón', '350 VCD', '#C9CAE0'], ['Semifinal', '150 VCD', '#CD7F32'], ['Cuartos', '60 VCD', '#6E6E92']].map(([k, v, c]) => ({ k, v, dot: 'width: 10px; height: 10px; border-radius: 3px; background: ' + c })),
+      lgPrizes: [['1.º', '800 VCD + trofeo', '#FFC53D'], ['2.º', '400 VCD', '#C9CAE0'], ['3.º', '200 VCD', '#CD7F32'], ['4.º a 6.º', '40-100 VCD', '#6E6E92']].map(([k, v, c]) => ({ k, v, dot: 'width: 10px; height: 10px; border-radius: 3px; background: ' + c })),
+      newCup: () => this.newCup(), newLeague: () => this.newLeague(),
+      cupIntro: tab === 'copa' && !C, cupOn: tab === 'copa' && !!C,
+      lgIntro: tab === 'liga' && !L, lgOn: tab === 'liga' && !!L, isRetos: tab === 'retos',
+      hasBanner: !!s.banner, bannerKicker: s.banner ? s.banner.k : '', bannerTitle: s.banner ? s.banner.t : '', bannerSub: s.banner ? s.banner.s : '',
+      closeBanner: () => this.setState({ banner: null }),
+      onMatchEnd: (r) => this.matchEnd(r),
+      onPens: (p) => { const r = s.penFor || { home: 0, away: 0 }; this.matchEnd({ ...r, pen: [p.home || 0, p.away || 0] }); }
+    };
+    // the match being played
+    const cf = s.cfg || {};
+    Object.assign(out, {
+      m_ai: cf.ai ?? 0.5, m_label: cf.label || 'TORNEO', m_dur: cf.dur || 90, m_n: cf.n || 3, m_home: this.me(), m_mates: cf.mates || [], m_rivals: cf.rivals || [],
+      m_away: cf.away || 'Rival', m_color: cf.color || '#A78BFA', m_trim: cf.trim || '#F4F4FA', m_start: cf.start || null
+    });
+    // ----- the cup bracket -----
+    if (C) {
+      const me = this.myIdx(C), X = [0, 196, 392], W = 168, H = 50;
+      const yOf = (r, i) => r === 0 ? 22 + i * 74 : r === 1 ? 22 + 37 + i * 148 : 22 + 111;
+      const matches = [], links = [];
+      const mm = !C.out && !C.done ? this.myCupMatch(C) : null;
+      [0, 1, 2].forEach((r) => {
+        const R = C.rounds[r];
+        const count = [4, 2, 1][r];
+        for (let i = 0; i < count; i++) {
+          const p = R ? R[i] : null, res = C.res[r] && C.res[r][i];
+          const w = res ? this.winnerOf(res) : -1, mine = p && (p[0] === me || p[1] === me), next = mm && r === C.round && mm.i === i;
+          const rows = [0, 1].map((k) => {
+            const t = p ? C.teams[p[k]] : null;
+            return { k: String(k), name: t ? (t.me ? t.c[0] : t.c[0]) : 'Por decidir', kit: t ? kit(t.c) : 'background: #2E2E58', g: res ? String(res.g[k]) : '', pen: res && res.pen ? '(' + res.pen[k] + ')' : '', cls: 'tn-row' + (res ? (w === k ? ' w' : ' l') : '') + (t && t.me ? ' me' : '') };
+          });
+          matches.push({ k: r + '-' + i, rows, cls: 'tn-m' + (mine ? ' me' : '') + (next ? ' next' : ''), style: 'left: ' + X[r] + 'px; top: ' + yOf(r, i) + 'px' });
+          if (r < 2) {
+            const y0 = yOf(r, i) + H / 2, y1 = yOf(r + 1, Math.floor(i / 2)) + H / 2, x0 = X[r] + W, x1 = X[r + 1], xm = (x0 + x1) / 2;
+            const lit = res && p && p[w] === me;
+            links.push({ k: r + '-' + i, d: 'M' + x0 + ' ' + y0 + 'H' + xm + 'V' + y1 + 'H' + x1, c: lit ? '#22D3EE' : '#3A3270', cls: lit ? 'tn-dash' : '' });
+          }
+        }
+      });
+      const champ = C.done ? C.teams[C.rounds[2][0][this.winnerOf(C.res[2][0])]] : null;
+      const opp = mm ? C.teams[mm.pair[mm.home ? 1 : 0]] : null;
+      Object.assign(out, {
+        matches, links,
+        roundHeads: TN_ROUND.map((t, r) => ({ t, style: 'position: absolute; left: ' + X[r] + 'px; top: 0; width: ' + W + 'px; text-align: center; font-size: 9.5px; font-weight: 800; letter-spacing: 2px; color: ' + (r === C.round && !C.out && !C.done ? '#22D3EE' : '#8686A6') })),
+        cupStage: C.done && C.champ ? '¡CAMPEÓN!' : C.out ? 'ELIMINADO' : C.done ? 'COPA TERMINADA' : TN_ROUND[C.round] + ' · ' + C.n + ' VS ' + C.n,
+        cupHeadline: champ ? champ.c[0] : opp ? 'vs ' + opp.c[0] : '',
+        cupSub: C.done && C.champ ? 'Has ganado la Copa Arena. El trofeo ya está en tus vitrinas.' : champ ? (C.out ? 'Ganó la copa. Tú quedaste fuera, ¡la próxima es tuya!' : 'Ganó la copa.') : opp ? 'Rival de ' + ['nivel bajo', 'nivel medio', 'nivel alto'][Math.min(2, Math.floor(opp.str * 3.2 - 0.6))] + '. Si hay empate, penaltis.' : '',
+        cupCanPlay: !!mm, cupOver: !mm,
+        cupPlayLabel: mm ? 'JUGAR ' + TN_ROUND[C.round] : '',
+        playCup: () => {
+          if (!mm) return;
+          const ai = Math.min(0.92, 0.32 + C.round * 0.16 + opp.str * 0.3);
+          this.play({ kind: 'cup', n: C.n, ai, dur: 90, away: opp.c[0], color: opp.c[1], trim: opp.c[2], label: 'COPA · ' + TN_ROUND[C.round] });
+        },
+        resetCup: () => { this.store('arenamix.cup.v1', null); this.forceUpdate(); },
+        quitCup: () => { if (window.confirm && !window.confirm('¿Abandonar la copa? Perderás tu sitio en el cuadro.')) return; this.store('arenamix.cup.v1', null); this.forceUpdate(); }
+      });
+    } else Object.assign(out, { matches: [], links: [], roundHeads: [], cupStage: '', cupHeadline: '', cupSub: '', cupCanPlay: false, cupOver: false, cupPlayLabel: '', playCup: () => {}, resetCup: () => {}, quitCup: () => {} });
+    // ----- the league -----
+    if (L) {
+      const T = this.tableOf(L), mm = !L.done ? this.myLeagueMatch(L) : null, opp = mm ? L.teams[mm.pair[mm.home ? 1 : 0]] : null;
+      const pos = T.findIndex((x) => L.teams[x.k].me);
+      const PC = ['#FFC53D', '#C9CAE0', '#CD7F32'];
+      const last = L.res.length ? L.res[L.res.length - 1] : null, lastDay = L.days[L.res.length - 1];
+      Object.assign(out, {
+        table: T.map((x, k) => ({ k: String(x.k), pos: String(k + 1), name: L.teams[x.k].c[0], kit: kit(L.teams[x.k].c), pj: String(x.pj), g: String(x.g), e: String(x.e), p: String(x.p), gl: x.gf + ':' + x.gc, pts: String(x.pts), cls: 'tn-tr' + (L.teams[x.k].me ? ' me' : ''), posStyle: k < 3 ? 'background: ' + PC[k] + '; color: #0B0B14' : 'background: #17172A; color: #A3A3C2' })),
+        lgStage: L.done ? 'LIGA TERMINADA' : 'JORNADA ' + (L.day + 1) + ' DE 5 · ' + L.n + ' VS ' + L.n,
+        lgDays: L.days.map((_, k) => 'width: 26px; height: 6px; border-radius: 3px; background: ' + (k < L.day ? '#22D3EE' : k === L.day && !L.done ? '#FFC53D' : '#2E2E58')),
+        lgHeadline: L.done ? (pos === 0 ? '¡CAMPEÓN!' : pos + 1 + '.º PUESTO') : 'vs ' + opp.c[0],
+        lgSub: L.done ? (pos === 0 ? 'Nadie sumó más puntos que tú. El trofeo ya está en tus vitrinas.' : 'Vas ' + (pos + 1) + '.º. ¡Prueba otra liga!') : 'Vas ' + (pos + 1) + '.º con ' + T[pos].pts + ' puntos.',
+        lgHasLast: !!last, lgLastHead: 'JORNADA ' + L.res.length,
+        lgLast: last ? last.map((m, i) => { const [a, b] = lastDay[i], mine = L.teams[a].me || L.teams[b].me; return { k: String(i), t: L.teams[a].c[0].split(' ')[0] + ' ' + m.g[0] + '-' + m.g[1] + ' ' + L.teams[b].c[0].split(' ')[0], style: 'font-size: 11px; font-weight: ' + (mine ? 800 : 600) + '; color: ' + (mine ? '#22D3EE' : '#CACAE0') + '; white-space: nowrap; overflow: hidden; text-overflow: ellipsis' }; }) : [],
+        lgCanPlay: !!mm, lgOver: !mm, lgPlayLabel: mm ? 'JUGAR JORNADA ' + (L.day + 1) : '',
+        playLeague: () => {
+          if (!mm) return;
+          const ai = Math.min(0.9, 0.3 + opp.str * 0.6);
+          this.play({ kind: 'liga', n: L.n, ai, dur: 90, away: opp.c[0], color: opp.c[1], trim: opp.c[2], label: 'LIGA · JORNADA ' + (L.day + 1) });
+        },
+        resetLeague: () => { this.store('arenamix.league.v1', null); this.forceUpdate(); },
+        quitLeague: () => { if (window.confirm && !window.confirm('¿Abandonar la liga?')) return; this.store('arenamix.league.v1', null); this.forceUpdate(); }
+      });
+    } else Object.assign(out, { table: [], lgStage: '', lgDays: [], lgHeadline: '', lgSub: '', lgHasLast: false, lgLastHead: '', lgLast: [], lgCanPlay: false, lgOver: false, lgPlayLabel: '', playLeague: () => {}, resetLeague: () => {}, quitLeague: () => {} });
+    // ----- today's challenges -----
+    const done = this.retosDone();
+    const now = new Date(), mid = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1), hl = Math.max(0, mid - now), hh = Math.floor(hl / 36e5), mn = Math.floor((hl % 36e5) / 6e4);
+    out.retosLeft = 'se renuevan en ' + hh + ' h ' + mn + ' min';
+    out.retos = this.todays().map((R, k) => {
+      const ok = done.includes(R.id);
+      return {
+        id: R.id, num: String(k + 1), title: R.title, desc: R.desc, setup: R.setup, reward: String(R.reward), icon: R.icon, c: R.c, done: ok,
+        style: 'background: linear-gradient(170deg, color-mix(in srgb, ' + R.c + ' 22%, #1B1840), #0F0D28 70%); box-shadow: inset 0 0 0 1px color-mix(in srgb, ' + R.c + ' 45%, transparent), 0 14px 30px #0009; animation-delay: ' + (k * 0.08).toFixed(2) + 's;' + (ok ? ' filter: saturate(.6);' : ''),
+        badge: 'display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 11px; background: ' + R.c + '; color: #0B0B14; box-shadow: 0 0 14px ' + R.c + '88',
+        label: ok ? 'JUGAR OTRA VEZ' : '¡ACEPTO!',
+        btn: ok ? 'background: #26264A; color: #C9C2FF; animation: none' : '',
+        play: () => this.play({ kind: 'reto', reto: R.id, n: R.n, ai: R.ai, dur: R.dur, start: R.start || null, away: TN_CLUBS[(k * 5 + 3) % TN_CLUBS.length][0], color: TN_CLUBS[(k * 5 + 3) % TN_CLUBS.length][1], trim: TN_CLUBS[(k * 5 + 3) % TN_CLUBS.length][2], label: 'RETO · ' + R.title })
+      };
+    });
+    return out;
+  }
+}
+</script>
+</body>
+</html>

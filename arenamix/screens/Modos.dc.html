@@ -71,7 +71,7 @@ input::placeholder{color:#8686A6}
   <!-- header: back, title, the three kinds of play -->
   <div style="position: absolute; left: 96px; right: 12px; top: 10px; height: 40px; display: flex; align-items: center; gap: 10px; z-index: 4">
     <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 44px; height: 36px; display: flex; align-items: center; justify-content: center; background: #17172A; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
-    <h1 class="bc-title" style="font-size: 26px">¿A QUÉ JUGAMOS?</h1>
+    <h1 class="bc-title" style="font-size: 23px; white-space: nowrap">¿A QUÉ JUGAMOS?</h1>
     <span style="flex: 1"></span>
     <div role="tablist" aria-label="Tipo de partida" style="position: relative; display: flex; gap: 0; padding: 3px; border-radius: 14px; background: #0B0B14CC; border: 1px solid #2E2E58">
       <span aria-hidden="true" style="{{thumbStyle}}"></span>
@@ -150,6 +150,9 @@ class Component extends DCLogic {
       futbol: { name: 'FÚTBOL', c1: '#145A33', c2: '#22914F', modes: teams(false).concat([
         { id: 'pens', title: 'PENALTIS', kind: 'duel', duel: 'pen', desc: 'Tanda de 5 tiros y 5 paradas por turnos. Muerte súbita.' },
         { id: 'fk', title: 'TIROS LIBRES', kind: 'duel', duel: 'free', desc: '7 escenarios distintos, con barrera.' }]),
+        tour: [{ id: 'copa', title: 'COPA ARENA', href: 'Torneo.dc.html', kind: 'tour', desc: '8 equipos, eliminación directa contra la IA. Empate = penaltis. Gana el trofeo.' },
+          { id: 'liga', title: 'LIGA ARENA', href: 'Torneo.dc.html', kind: 'tour', desc: '6 equipos, todos contra todos en 5 jornadas. Acaba primero en la tabla.' },
+          { id: 'retos', title: 'RETOS DEL DÍA', href: 'Torneo.dc.html', kind: 'tour', desc: '3 partidos con truco cada día: remontadas, goleadas, porterías a cero…' }],
         train: [{ id: 'libre', title: 'CAMPO LIBRE', href: 'EntrenoLibre.dc.html', desc: 'Tú contra el portero en el estadio de Competitivo: chuta desde donde quieras, sin reloj.' }, { id: 'train', title: 'PENALTIS Y FALTAS', href: 'Entrenamiento.dc.html', desc: 'Práctica libre con dianas y todos los escenarios.' }, { id: 'tut', title: 'TUTORIAL', href: 'Tutorial.dc.html', desc: 'Repasa los controles paso a paso.' }] },
       baloncesto: { name: 'BALONCESTO', c1: '#7A3B12', c2: '#C2652A', modes: teams(true).concat([
         { id: 'three', title: 'CONCURSO DE TRIPLES', kind: 'mg', comp: 'Baloncesto', mode: 'three', unit: 'puntos', rival: [6, 16], desc: '15 balones en 5 posiciones y 60 segundos; el último de cada posición vale doble.' },
@@ -242,25 +245,26 @@ class Component extends DCLogic {
     const s = this.state, C = this.catalog(s.sport);
     let list;
     if (s.cat === 'train') list = C.train;
+    else if (s.cat === 'tour') list = C.tour || [];
     else list = C.modes.concat(s.cat === 'casual' ? [{ id: 'private', title: 'PARTIDA PRIVADA', kind: 'private', desc: 'Juega online con tus amigos con un código de sala. Los huecos los rellena la IA.' }] : []);
     list = list.filter((m) => !m.soon);
     let ci = Math.max(0, list.findIndex((m) => m.id === s.id));
     const cur = list[ci];
     const comp = s.cat === 'comp', S = this.season();
     const placingOf = (m) => this.placeOf(S, s.sport + ':' + m.id).g < 5;
-    const CAT = { comp: ['#FFC53D', '#3A2A0A'], casual: ['#22D3EE', '#0A2A33'], train: ['#53D88E', '#0A2A1A'] }[s.cat];
+    const CAT = { comp: ['#FFC53D', '#3A2A0A'], casual: ['#22D3EE', '#0A2A33'], train: ['#53D88E', '#0A2A1A'], tour: ['#A78BFA', '#1E1240'] }[s.cat];
     const P = window.AMPosters;
     // a corner ribbon on the modes worth pointing out
-    const RIB = { m1: ['POPULAR', '#FF5C8A'], libre: ['NUEVO', '#53D88E'], private: ['AMIGOS', '#22D3EE'], m4: ['CAOS', '#FF8A3D'] };
+    const RIB = { m1: ['POPULAR', '#FF5C8A'], libre: ['NUEVO', '#53D88E'], private: ['AMIGOS', '#22D3EE'], m4: ['CAOS', '#FF8A3D'], copa: ['TROFEO', '#FFC53D'], retos: ['DIARIO', '#FF5CC8'] };
     const cards = list.map((m, i) => {
       const off = i - ci, a = Math.abs(off), on = off === 0;
       const mmr = comp ? this.mmrOf(s.sport, m.id) : 0, R = this.rankOf(mmr);
-      const tag = comp ? (placingOf(m) ? 'CLASIF. ' + this.placeOf(S, s.sport + ':' + m.id).g + '/5' : R.label.toUpperCase()) : s.cat === 'casual' ? (m.kind === 'private' ? 'CON AMIGOS' : 'SIN RANGO') : 'LIBRE';
+      const tag = comp ? (placingOf(m) ? 'CLASIF. ' + this.placeOf(S, s.sport + ':' + m.id).g + '/5' : R.label.toUpperCase()) : s.cat === 'casual' ? (m.kind === 'private' ? 'CON AMIGOS' : 'SIN RANGO') : s.cat === 'tour' ? 'CONTRA LA IA' : 'LIBRE';
       const img = P ? P.get(this.posterKey(m), () => this.forceUpdate()) : '';
       // the carousel: the chosen card in the middle, the others fanned out and turned away
       const tx = off === 0 ? 0 : Math.sign(off) * (a === 1 ? 182 : a === 2 ? 318 : 420);
       const sc = a === 0 ? 1.06 : a === 1 ? 0.84 : 0.7;
-      const kicker = m.kind === 'team' ? 'PARTIDO · ' + m.n + ' CONTRA ' + m.n : m.kind === 'duel' ? 'DUELO · CARA A CARA' : m.kind === 'private' ? 'ONLINE · CÓDIGO DE SALA' : 'PRÁCTICA';
+      const kicker = m.kind === 'team' ? 'PARTIDO · ' + m.n + ' CONTRA ' + m.n : m.kind === 'duel' ? 'DUELO · CARA A CARA' : m.kind === 'private' ? 'ONLINE · CÓDIGO DE SALA' : m.kind === 'tour' ? (m.id === 'retos' ? 'DESAFÍOS · CADA DÍA' : 'TORNEO · UN JUGADOR') : 'PRÁCTICA';
       const title = m.kind === 'team' ? m.n + ' VS ' + m.n : m.title;
       return {
         title, tag, kicker, img, on: on ? 'true' : 'false', isOn: on,
@@ -276,10 +280,11 @@ class Component extends DCLogic {
     });
     const mmr = cur && comp ? this.mmrOf(s.sport, cur.id) : 0, R = this.rankOf(mmr);
     const curPlacing = cur && comp && placingOf(cur), curPc = cur ? this.placeOf(S, s.sport + ':' + cur.id) : null;
-    const ti = ['comp', 'casual', 'train'].indexOf(s.cat);
+    const ti = ['comp', 'casual', 'tour', 'train'].indexOf(s.cat);
     const TABS = [
       { id: 'comp', label: 'COMPETITIVO', color: '#FFC53D', icon: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4' },
       { id: 'casual', label: 'INFORMAL', color: '#22D3EE', icon: 'M12 21a9 9 0 1 0 0-18a9 9 0 0 0 0 18M8 14s1.5 2 4 2s4-2 4-2M9 9h.01M15 9h.01' },
+      { id: 'tour', label: 'TORNEOS', color: '#A78BFA', icon: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z' },
       { id: 'train', label: 'ENTRENAR', color: '#53D88E', icon: 'M12 3l7 18H5zM8 14h8M10 9h4' }
     ];
     const go = (d) => { const j = ci + d; if (j >= 0 && j < list.length) this.setState({ id: list[j].id }); };
@@ -287,21 +292,21 @@ class Component extends DCLogic {
       canPrev: ci > 0, canNext: ci < list.length - 1, prev: () => go(-1), next: () => go(1), accent: CAT[0],
       pager: list.map((_, k) => k === ci ? 'width: 20px; background: ' + CAT[0] + '; box-shadow: 0 0 8px ' + CAT[0] : '')
     };
-    const href = !cur ? '#' : s.cat === 'train' ? cur.href : cur.kind === 'private' ? 'Privada.dc.html' : comp ? 'Competitivo.dc.html' : 'Rapida.dc.html';
+    const href = !cur ? '#' : s.cat === 'train' || s.cat === 'tour' ? cur.href : cur.kind === 'private' ? 'Privada.dc.html' : comp ? 'Competitivo.dc.html' : 'Rapida.dc.html';
     return {
       ...nav,
       tabs: TABS.map((t, i) => ({
         label: t.label, icon: t.icon, sel: i === ti ? 'true' : 'false',
-        style: 'position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; height: 32px; width: 132px; justify-content: center; border: 0; background: none; font: 800 11.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (i === ti ? '#0B0B14' : t.color) + ';',
+        style: 'position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; height: 32px; width: 108px; justify-content: center; border: 0; background: none; font: 800 11.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (i === ti ? '#0B0B14' : t.color) + ';',
         pick: () => { if (i !== ti) this.setState({ cat: t.id, id: null }); }
       })),
-      thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 132) + 'px; width: 132px; height: 32px; border-radius: 11px; background: ' + TABS[ti].color + '; box-shadow: 0 0 16px ' + TABS[ti].color + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s, box-shadow .3s;',
+      thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 108) + 'px; width: 108px; height: 32px; border-radius: 11px; background: ' + TABS[ti].color + '; box-shadow: 0 0 16px ' + TABS[ti].color + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s, box-shadow .3s;',
       spot: 'position: absolute; left: 50%; top: 150px; width: 380px; height: 150px; margin-left: -190px; border-radius: 50%; background: radial-gradient(closest-side, ' + CAT[0] + '33, transparent); pointer-events: none;',
       cards,
       bgVars: '--c: ' + CAT[0] + ';',
-      bgComp: comp, bgCasual: s.cat === 'casual', bgTrain: s.cat === 'train',
-      bgWord: (() => { const w = { comp: 'COMPETITIVO', casual: 'INFORMAL', train: 'ENTRENAMIENTO' }[s.cat] + ' · '; return w.repeat(4) + w.repeat(4); })(),
-      bgSparks: comp ? Array.from({ length: 16 }, (_, k) => { const r = (n) => { const x = Math.sin((k + n) * 91.3) * 43758.5; return x - Math.floor(x); }; return 'left: ' + (40 + r(1) * 680).toFixed(0) + 'px; animation-duration: ' + (3 + r(2) * 3).toFixed(2) + 's; animation-delay: -' + (r(3) * 6).toFixed(2) + 's'; }) : [],
+      bgComp: comp || s.cat === 'tour', bgCasual: s.cat === 'casual', bgTrain: s.cat === 'train',
+      bgWord: (() => { const w = { comp: 'COMPETITIVO', casual: 'INFORMAL', tour: 'TORNEOS', train: 'ENTRENAMIENTO' }[s.cat] + ' · '; return w.repeat(4) + w.repeat(4); })(),
+      bgSparks: comp || s.cat === 'tour' ? Array.from({ length: 16 }, (_, k) => { const r = (n) => { const x = Math.sin((k + n) * 91.3) * 43758.5; return x - Math.floor(x); }; return 'left: ' + (40 + r(1) * 680).toFixed(0) + 'px; animation-duration: ' + (3 + r(2) * 3).toFixed(2) + 's; animation-delay: -' + (r(3) * 6).toFixed(2) + 's'; }) : [],
       swDown: (e) => { this.sw = { x: e.clientX, t: performance.now() }; },
       swUp: (e) => {
         const w = this.sw; this.sw = null;
@@ -312,7 +317,7 @@ class Component extends DCLogic {
       listKey: s.cat,
       selDesc: cur ? cur.desc : '',
       showRank: comp && !!cur,
-      showDiff: !comp && !!cur && cur.kind !== 'private' && cur.id !== 'tut',
+      showDiff: !comp && !!cur && cur.kind !== 'private' && cur.kind !== 'tour' && cur.id !== 'tut',
       diffs: (() => {
         const A = window.AMProgress, now = A && A.aiPref ? A.aiPref() : 'normal';
         return [['facil', 'FÁCIL', '#53D88E'], ['normal', 'NORMAL', '#22D3EE'], ['dificil', 'DIFÍCIL', '#FF5C5C']].map(([id, label, c]) => ({
@@ -326,7 +331,7 @@ class Component extends DCLogic {
       seasonLabel: 'T' + S.num + ' · ' + S.daysLeft + (S.daysLeft === 1 ? ' día' : ' días'),
       rankBar: 'height: 6px; box-shadow: 0 0 8px ' + R.text + '; background: ' + R.text + '; width: ' + (Math.max(0, Math.min(1, (mmr - R.lo) / (R.hi - R.lo))) * 100).toFixed(1) + '%;',
       playHref: href,
-      playLabel: s.cat === 'train' ? 'ENTRENAR' : cur && cur.kind === 'private' ? 'CREAR SALA' : comp ? 'BUSCAR PARTIDA' : 'JUGAR',
+      playLabel: s.cat === 'train' ? 'ENTRENAR' : s.cat === 'tour' ? 'ENTRAR' : cur && cur.kind === 'private' ? 'CREAR SALA' : comp ? 'BUSCAR PARTIDA' : 'JUGAR',
       saveSel: () => { if (cur) this.store('arenamix.sel', { sport: s.sport, cat: s.cat, id: cur.id }); }
     };
   }
