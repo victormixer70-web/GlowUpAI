@@ -147,7 +147,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <div onPointerDown="{{skipReplay}}" style="position: absolute; inset: 0; z-index: 30; cursor: pointer">
       <span style="position: absolute; left: 0; right: 0; top: 0; height: 34px; background: #000"></span>
       <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 34px; background: #000"></span>
-      <span style="position: absolute; left: 18px; top: 46px; display: flex; align-items: center; gap: 8px; padding: 4px 14px 4px 10px; transform: skewX(0deg); background: #0B0B14E6; border-left: 4px solid #FF5C5C; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 2px"><span style="width: 9px; height: 9px; border-radius: 5px; background: #FF5C5C; box-shadow: 0 0 8px #FF5C5C; animation: pdLive 1s infinite"></span>REPETICIÓN</span>
+      <span style="position: absolute; left: 18px; top: 46px; display: flex; align-items: center; gap: 8px; padding: 4px 14px 4px 10px; transform: skewX(0deg); background: #0B0B14E6; border-left: 4px solid #FF5C5C; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 2px"><span style="width: 9px; height: 9px; border-radius: 5px; background: #FF5C5C; box-shadow: 0 0 8px #FF5C5C; animation: pdLive 1s infinite"></span>{{replayTag}}</span>
+      <sc-if value="{{hlOn}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 18px; top: 82px; padding: 3px 12px; background: #FFC53D; color: #1A1204; font: 800 12px Exo2, sans-serif; letter-spacing: 1px">{{hlLine}}</span></sc-if>
       <span style="position: absolute; right: 18px; bottom: 44px; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #CACAE0">TOCA PARA SALTAR</span>
       <span style="position: absolute; left: 0; right: 0; top: 7px; text-align: center; font-size: 12px; font-weight: 800; letter-spacing: 3px; color: #FFC53D">{{scorerText}}</span>
     </div>
@@ -182,7 +183,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         </sc-if>
       </div>
     </sc-for>
-    <div style="position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center">
+    <div style="position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; gap: 12px">
+      <sc-if value="{{hasHL}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{replayHL}}" style="height: 50px; padding: 0 20px; border: 1.5px solid #FFC53D; border-radius: 14px; background: #0B0B14CC; color: #FFC53D; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 19px; letter-spacing: 1.5px; cursor: pointer; display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8L6 20z"/></svg>RESUMEN</button></sc-if>
       <button type="button" onClick="{{finish}}" style="height: 50px; padding: 0 40px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">{{finishLabel}}</button>
     </div>
   </sc-if>
@@ -478,6 +480,7 @@ class Component extends DCLogic {
   }
   newGame() {
     this.forfeit = false;
+    this.clips = []; this.hl = null; this.hlDone = false;
     // gameplay settings (Configuración > Jugabilidad)
     this.play = window.AMPlay ? window.AMPlay() : { cam: 'normal', names: true, gfx: 'alta', passMark: true };
     const P = this.props, n = this.size(), dur = P.practice ? 9999 : Number(P.duration ?? 90);
@@ -739,6 +742,7 @@ class Component extends DCLogic {
     else for (let i = 0; i < 3; i++) this.step(dt / 3);
     if (N && N.host) this.hostSend(dt);
     this.recordFrame();
+    if (this.g.phase === 'winners' && !this.hlDone && !this.hl && (this.clips || []).length && this.g.pt > 2.2 && !this.autoplay) { this.hlDone = true; this.playHL(); }
     this.autoGfx(now);
     this.crowdT = (this.crowdT || 0) - dt;
     if (this.crowdT <= 0) { this.crowdT = 0.25; this.sfx('crowd', this.crowdLevel()); }
@@ -2913,12 +2917,31 @@ class Component extends DCLogic {
     let acc = 0; frames.forEach((f) => { f.at = acc; acc += f.dt; });
     this.rp = { frames, t: 0, len: acc, cam: null };
     this.rbuf = [];
+    // every goal is kept for the highlights at the end of the match
+    const g = this.g, played = g.dur - g.t + (g.extra ? g.dur : 0);
+    (this.clips || (this.clips = [])).push({ frames, len: acc, side: g.concede, label: g.scorer || 'Gol', score: g.score[0] + '-' + g.score[1], min: Math.max(1, Math.round(Math.min(g.dur, played) / g.dur * 90)) });
+    if (this.clips.length > 8) this.clips.shift();
+  }
+  // the highlights: every goal of the match again, one after another, before the final line-up
+  playHL() {
+    const C = (this.clips || []).slice(-5);
+    if (!C.length) return;
+    this.hl = { list: C, i: -1 };
+    this.nextHL();
+  }
+  nextHL() {
+    const H = this.hl;
+    if (!H) return;
+    H.i++;
+    if (H.i >= H.list.length) { this.hl = null; this.rp = null; this.rpDone = false; this.winCam = false; return; }
+    const c = H.list[H.i];
+    this.rp = { frames: c.frames, t: 0, len: c.len, cam: null, side: c.side, hl: true };
   }
   replayFrame(dt) {
     const rp = this.rp, g = this.g;
-    rp.t += dt * (this.rpSlow ? 0.28 : 0.42);
+    rp.t += dt * (rp.hl ? 0.6 : this.rpSlow ? 0.28 : 0.42);
     if (rp.t >= rp.len) this.rpSlow = false;
-    if (rp.t >= rp.len) { this.rp = null; this.rpDone = true; return null; }
+    if (rp.t >= rp.len) { this.rp = null; if (rp.hl) { this.nextHL(); if (!this.rp) return null; return this.replayFrame(0); } this.rpDone = true; return null; }
     const F = rp.frames;
     let k = 0; while (k < F.length - 2 && F[k + 1].at < rp.t) k++;
     const A = F[k], B = F[k + 1] || A, u = B.at > A.at ? Math.min(1, (rp.t - A.at) / (B.at - A.at)) : 0;
@@ -2945,7 +2968,7 @@ class Component extends DCLogic {
     this.lastDt = dt || 0.016;
     if (this.rp && !this.inReplayDraw) {
       const keep = this.replayFrame(dt || 0.016);
-      if (keep) { this.inReplayDraw = true; try { this.draw3D(dt * (this.rpSlow ? 0.28 : 0.42)); } finally { this.inReplayDraw = false; this.restoreFrame(keep); } return; }
+      if (keep) { this.inReplayDraw = true; try { this.draw3D(dt * (this.rp && this.rp.hl ? 0.6 : this.rpSlow ? 0.28 : 0.42)); } finally { this.inReplayDraw = false; this.restoreFrame(keep); } return; }
     }
     const T = THREE, g = this.g, b = g.ball;
     this.syncPlayers();
@@ -2987,7 +3010,7 @@ class Component extends DCLogic {
       if (net && dep > 0 && b.y > 11.6 && b.y < 18.4) (net.press ? net.press(-ns * (b.y - 15), dep, b.z + Partido_BR, Partido_BR) : net.push(-ns * (b.y - 15), b.z + Partido_BR, dep - 1.37));
       for (const k in this.nets) this.nets[k].step(dt || 0);
     }
-    this.ball3.visible = g.phase !== 'winners';
+    this.ball3.visible = g.phase !== 'winners' || !!this.inReplayDraw;
     const bsp = Math.hypot(b.vx, b.vy);
     if (bsp > 0.01 && dt) {
       if (!this.qTmp) { this.qTmp = new T.Quaternion(); this.aTmp = new T.Vector3(); }
@@ -2997,7 +3020,7 @@ class Component extends DCLogic {
     }
     const c = g.ps[g.ctl];
     if (this.inReplayDraw) {
-      const gx = (this.g.concede === 1 ? 60 : 0) - 30, sg = gx > 0 ? 1 : -1, bz = b.y - 15;
+      const gx = ((this.rp && this.rp.side != null ? this.rp.side : this.g.concede) === 1 ? 60 : 0) - 30, sg = gx > 0 ? 1 : -1, bz = b.y - 15;
       const want = new T.Vector3(gx - sg * 9.5, 2.1, Math.max(-11, Math.min(11, bz * 0.5)) + 9.5);
       const look = new T.Vector3(b.x - 30, Math.min(1.6, b.z * 0.6 + 0.6), bz);
       const rp = this.rp;
@@ -3662,14 +3685,18 @@ class Component extends DCLogic {
       // CENTRO: team modes, with the ball, left of PASE
       crossBtnStyle: n > 1 && ctx === 'ball' && !gkc && !P.tutorial ? btn(186, 16, 56, '#FFC53D', '#B7871A', 13) : 'display: none;',
       sprintBtnStyle: btn(98, 92, 56, sprintOn ? '#FFC53D' : '#22D3EE', '#0E8FA3', 14, glow(tutI === 2)),
-      showGoal: g.phase === 'goal' && !this.rp, scorerText: g.scorer,
+      showGoal: g.phase === 'goal' && !this.rp, scorerText: this.hl ? '' : g.scorer,
       showReplay: !!this.rp,
       hasVoice: !!this.voice && g.phase !== 'winners',
       micOn: this.voice && this.voice.on ? 'true' : 'false', micMuted: !(this.voice && this.voice.on),
       micLabel: this.voice && this.voice.on ? 'HABLANDO' : 'VOZ', micAria: this.voice && this.voice.on ? 'Silenciar tu micrófono' : 'Activar tu micrófono para hablar con tus compañeros',
       micStyle: 'position: absolute; right: 14px; top: 50px; z-index: 5; display: flex; align-items: center; gap: 5px; height: 30px; padding: 0 12px; border-radius: 15px; font: 800 11px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; ' + (this.voice && this.voice.on ? 'background: #53D88E; color: #0B0B14; border: 0; box-shadow: 0 0 12px #53D88E;' : 'background: #0B0B14CC; color: #CACAE0; border: 1px solid #2E2E58;'),
       toggleMic: (e) => { e.preventDefault(); const V = this.voice; if (!V) return; V.setMic(!V.on).then((ok) => { if (!ok) this.flashMsg('No se pudo usar el micrófono', 1.5); this.forceUpdate(); }); },
-      skipReplay: (e) => { e.preventDefault(); if (this.rp) this.rp.t = this.rp.len; },
+      skipReplay: (e) => { e.preventDefault(); if (this.hl) { this.hl = null; this.rp = null; this.rpDone = false; this.winCam = false; return; } if (this.rp) this.rp.t = this.rp.len; },
+      replayTag: this.hl ? 'MEJORES MOMENTOS' : 'REPETICIÓN', hlOn: !!this.hl,
+      hlLine: this.hl && this.hl.list[this.hl.i] ? (this.hl.i + 1) + '/' + this.hl.list.length + ' · MIN ' + this.hl.list[this.hl.i].min + '\' · ' + this.hl.list[this.hl.i].label + ' · ' + this.hl.list[this.hl.i].score : '',
+      hasHL: g.phase === 'winners' && !this.hl && (this.clips || []).length > 0,
+      replayHL: () => this.playHL(),
       isTut: !!(P.tutorial && g.tut && g.tut.i < 7),
       tutKicker: g.tut ? 'TUTORIAL · PASO ' + Math.min(7, g.tut.i + 1) + ' DE 7' : '',
       tutText: g.tut && g.tut.i < 7 ? this.tutSteps()[g.tut.i] : '',
@@ -3680,7 +3707,7 @@ class Component extends DCLogic {
       showReady: g.phase === 'ready',
       readyTitle: (P.coach ? 'MODO ENTRENADOR' : mode === 'comp' ? 'PARTIDO CLASIFICATORIO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA') + ' · ' + n + ' VS ' + n,
       showEnd: g.phase === 'end',
-      showWin: g.phase === 'winners',
+      showWin: g.phase === 'winners' && !this.hl,
       hud: g.phase !== 'winners' && g.phase !== 'intro' && !this.rp,
       showIntro: g.phase === 'intro',
       skipIntro: (e) => { e.preventDefault(); this.endIntro(); },
