@@ -717,19 +717,20 @@ class Component extends DCLogic {
     const dz = (v) => (Math.abs(v) < 0.18 ? 0 : (v - Math.sign(v) * 0.18) / 0.82);
     g.padX = dz(pad.axes[0] || 0) + (B(15) ? 1 : 0) - (B(14) ? 1 : 0);
     g.padY = dz(pad.axes[1] || 0) + (B(13) ? 1 : 0) - (B(12) ? 1 : 0);
-    const was = this.padWas, now = [B(0), B(1), B(2), B(3), B(4), B(5), B(6), B(7)];
+    // PlayStation layout: X (0) pass, ○ (1) shoot, □ (2) tackle, △ / L1 cross, R2 sprint, R3 (11) skill move
+    const was = this.padWas, now = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(B);
     const down = (k) => now[k] && !was[k], up = (k) => !now[k] && was[k];
     if (g.phase === 'play') {
-      if (down(0)) this.mainPress();
-      if (up(0) && g.charging) this.doKick();
-      if (down(2)) this.passPress();
-      if (up(2)) { this.passRelease(); g.press = false; }
-      if (down(1)) this.skillPress();
-      if (up(1)) g.press = false;
+      if (down(1)) this.mainPress();
+      if (up(1) && g.charging) this.doKick();
+      if (down(0)) this.passPress();
+      if (up(0)) { this.passRelease(); g.press = false; }
+      if (down(2)) { const c = this.ctx(); if (c === 'gk') this.keeperDive(); else if (c !== 'ball' && c !== 'gkball') this.humanSlide(); }
+      if (down(11)) this.skillPress();
+      if (up(11)) g.press = false;
       if (down(3) || down(4)) this.humanCross();
     }
-    const spr = now[5] || now[7];
-    if (spr !== (was[5] || was[7])) g.sprint = spr;
+    if (now[7] !== was[7]) g.sprint = now[7];
     this.padWas = now;
   }
   tick(now) {

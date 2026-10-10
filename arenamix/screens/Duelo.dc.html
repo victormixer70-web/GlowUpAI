@@ -165,7 +165,8 @@ class Component extends DCLogic {
   // LB / RB the curve and X / Y the height of a free kick
   padIn(st, pv) {
     if (!this.cam || this.phase === 'done') return;
-    const A = st.b[0] && !pv.b[0], Aup = !st.b[0] && pv.b[0], dz = (v) => (Math.abs(v) < 0.2 ? 0 : v);
+    // shoot / dive with ○ (as in the match) or X
+    const sh = (q) => q.b[0] || q.b[1], A = sh(st) && !sh(pv), Aup = !sh(st) && sh(pv), dz = (v) => (Math.abs(v) < 0.2 ? 0 : v);
     const sx = dz(st.ax) + (st.b[15] ? 1 : 0) - (st.b[14] ? 1 : 0), sy = dz(st.ay) + (st.b[13] ? 1 : 0) - (st.b[12] ? 1 : 0);
     const dt = 1 / 60, GX = this.GX, xs = this.xSign(), cl = (v, a, b) => Math.max(a, Math.min(b, v));
     if (this.replaying) { if (window.AMPad) window.AMPad.hold(); if (A) this.endReplay(); return; }
@@ -1535,7 +1536,7 @@ class Component extends DCLogic {
       countLabel: cd > 0.8 ? String(Math.ceil(cd - 0.8)) : '¡CHUTA!',
       countStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 60px; line-height: 1; color: #F4F4FA; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (1.3 - ((2.4 - cd) % 0.8) * 0.4).toFixed(2) + ');',
       showHint: !this.replaying && ((this.phase === 'aim' && !this.swipe && !this.charge && !this.dragAim) || (this.phase === 'defend' && !this.tap) || (this.phase === 'flight' && !youTurn && !this.tap)),
-      hintText: this.padOn ? (this.fkMode() ? 'Mando: stick = diana · LB/RB = efecto · X/Y = altura · mantén A y suelta en la zona verde' : youTurn ? 'Mando: apunta con el stick · mantén A para la potencia y suelta para chutar' : 'Mando: mueve la mira con el stick y pulsa A para lanzarte') : this.fkMode() ? 'Arrastra la diana en la portería · ajusta efecto y altura · mantén CHUTAR y suelta en la zona verde' : youTurn ? 'Desliza desde el balón hacia la portería · más rápido = más potencia · curva el gesto para dar efecto' : 'Toca la portería donde quieras lanzarte · si te tiras antes del disparo, el rival puede leerte',
+      hintText: this.padOn ? (this.fkMode() ? 'Mando: stick = diana · L1/R1 = efecto · □/△ = altura · mantén ○ y suelta en la zona verde' : youTurn ? 'Mando: apunta con el stick · mantén ○ para la potencia y suelta para chutar' : 'Mando: mueve la mira con el stick y pulsa ○ para lanzarte') : this.fkMode() ? 'Arrastra la diana en la portería · ajusta efecto y altura · mantén CHUTAR y suelta en la zona verde' : youTurn ? 'Desliza desde el balón hacia la portería · más rápido = más potencia · curva el gesto para dar efecto' : 'Toca la portería donde quieras lanzarte · si te tiras antes del disparo, el rival puede leerte',
       zoneLabel: youTurn ? 'Zona de tiro: desliza desde el balón hacia la portería' : 'Portería: toca donde quieras que se lance el portero',
       showResult: this.phase === 'result' && !!R && !this.replaying,
       showReplay: !!this.replaying,
