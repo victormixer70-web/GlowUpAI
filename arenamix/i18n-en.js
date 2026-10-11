@@ -4,6 +4,7 @@ window.AM_I18N_EN = {
   'ARENA MIX, inicio': 'ARENA MIX, home',
   'Cargando ARENA MIX': 'Loading ARENA MIX',
   'Mando conectado': 'Controller connected',
+  'TU EQUIPO · #/4': 'YOUR TEAM · #/4',
   'MISIONES': 'MISSIONS',
   'INVITAR': 'INVITE',
   'EVENTO': 'EVENT',
