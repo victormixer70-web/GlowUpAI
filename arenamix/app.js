@@ -177,7 +177,7 @@
     function centre(el) { var r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
     function first(list) {
       // the screen's main button if there is one, else the one nearest the middle
-      var main = list.filter(function (el) { return /bc-btn|tn-go|am-shine|mj-go/.test(el.className || ''); })[0];
+      var main = list.filter(function (el) { return /lb-play|bc-btn|tn-go|am-shine|mj-go/.test(el.className || ''); })[0];
       if (main) return main;
       var c = { x: innerWidth / 2, y: innerHeight / 2 };
       return list.slice().sort(function (a, b) { var p = centre(a), q = centre(b); return Math.hypot(p.x - c.x, p.y - c.y) - Math.hypot(q.x - c.x, q.y - c.y); })[0] || null;
