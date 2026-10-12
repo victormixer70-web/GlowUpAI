@@ -128,6 +128,39 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .lb-road .bar{position:relative;flex:1;height:8px;border-radius:4px;background:#ffffff14;overflow:hidden}
 .lb-road .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
 .lb-road .bar b{position:absolute;top:0;bottom:0;width:2px;background:#05050A88}
+/* ===== night-stadium theme: navy glass, floodlight cyan, gold only for what matters ===== */
+.lb-tile,.lb-week,.lb-road,.lb-party,.lb-mode,.hm-mg,.lb-pill,.lb-social{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.lb-tile{background:radial-gradient(90% 70% at 50% 25%,#38BDF840,transparent 70%),linear-gradient(170deg,#12306AE6,#071433F2) !important;box-shadow:inset 0 2px 0 #9FE8FF40,inset 0 -4px 0 #0008,inset 0 0 0 1.5px #38BDF877,0 0 0 2px #020617,0 5px 0 #020617,0 0 18px #38BDF833 !important}
+.lb-tile span{color:#E6F6FF;text-shadow:0 2px 0 #020617,0 0 10px #38BDF866}
+.lb-tile:hover{box-shadow:inset 0 2px 0 #9FE8FF40,inset 0 -4px 0 #0008,inset 0 0 0 2px #7DD3FC,0 0 0 2px #020617,0 5px 0 #020617,0 0 24px #38BDF877 !important}
+.lb-tile b{color:#7DD3FC !important}
+.lb-week{background:linear-gradient(170deg,#0F2A5CE0,#071433EE) !important;box-shadow:inset 0 0 0 1px #38BDF866,0 6px 14px #0008 !important}
+.lb-week>span:first-child{color:#7DD3FC !important}
+.lb-event{background:linear-gradient(120deg,#2563EB,#1E3A8A 55%,#0B1E4D) !important;box-shadow:inset 0 2px 0 #BFE3FF55,inset 0 0 0 1.5px #60A5FA,0 0 0 2px #020617,0 4px 0 #020617,0 0 20px #3B82F677 !important}
+.lb-event span{color:#F0F8FF}
+.lb-mode{box-shadow:0 0 0 2px #020617,0 5px 0 #020617,inset 0 0 0 1.5px #38BDF888,0 0 18px #38BDF833 !important;background:#071433 !important}
+.lb-mode .shade{background:linear-gradient(180deg,transparent 25%,#071433F2 85%) !important}
+.lb-mode .chg{color:#7DD3FC !important}
+.lb-slot{color:#9FE8FF}
+.lb-slot svg{fill:#38BDF814 !important;stroke:#7DD3FCAA !important}
+.lb-slot.in svg{stroke-dasharray:none}
+.lb-slot .plus{background:#38BDF8 !important;box-shadow:0 0 0 3px #020617,0 0 16px #38BDF8 !important}
+.lb-party{background:#071433D9 !important;box-shadow:inset 0 0 0 1px #38BDF877 !important;color:#9FE8FF !important}
+.lb-road{background:#071433D9 !important;box-shadow:inset 0 0 0 1px #38BDF855 !important}
+.lb-plate .nm{background:#071433E6 !important;box-shadow:inset 0 0 0 1px #38BDF866 !important}
+.lb-plate .rk{background:#071433E6 !important}
+.lb-plate .dr{background:#38BDF8 !important}
+.lb-stage i{border-color:#7DD3FCCC !important;box-shadow:0 0 22px #38BDF8AA,inset 0 0 18px #38BDF866 !important}
+.lb-stage i+i{border-color:#BAE6FD88 !important;box-shadow:none !important}
+.lb-stage b{background:radial-gradient(closest-side,#38BDF866,#1D4ED822 60%,transparent) !important}
+/* top bar */
+.hm-mg{background:linear-gradient(100deg,#163B7A,#0B1E4D 60%,#071433) !important;box-shadow:inset 0 0 0 1px #60A5FAAA,0 0 14px #3B82F655 !important}
+.hm-pass{background:linear-gradient(100deg,#1E3A8A,#0B1E4D 60%,#071433) !important;box-shadow:inset 0 0 0 1px #FFC53DAA,0 0 14px #FFC53D33 !important}
+.lb-pill{background:linear-gradient(135deg,#0F2A5C,#071433) !important;border-color:#38BDF877 !important;box-shadow:0 0 12px #38BDF833 !important}
+.lb-coins{border-color:#FFC53DAA !important;color:#FFE38A !important}
+.lb-gems{border-color:#FF5CC8AA !important}
+.lb-social{background:linear-gradient(135deg,#0F2A5C,#071433) !important;border-color:#38BDF877 !important;color:#9FE8FF !important;box-shadow:0 0 12px #38BDF833 !important}
+.lb-spark{background:#BAE6FD !important;box-shadow:0 0 8px #38BDF8 !important}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(90% 120% at 40% 0%, #1D2350 0%, #0D0F24 45%, #07070F 100%); color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -161,10 +194,10 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       </span>
       <sc-if value="{{passReady}}" hint-placeholder-val="{{ false }}"><span class="hm-dot am-pulse-gold">{{passReadyN}}</span></sc-if>
     </a>
-    <a href="Tienda.dc.html" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; transform: skewX(0deg); background: linear-gradient(135deg, #3A2A0A, #1E1A10); border: 1px solid #FFC53D; box-shadow: 0 0 12px #FFC53D44; color: #FFE38A; text-decoration: none; font-weight: 800; font-size: 15px"><span style="display: flex; align-items: center; gap: 6px; transform: skewX(0deg)"><svg class="am-coin" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">V</text></svg>{{coins}}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="3" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></span></a>
-    <a href="Tienda.dc.html" aria-label="{{gemsAria}}" style="display: flex; align-items: center; height: 36px; padding: 0 10px; transform: skewX(0deg); background: linear-gradient(135deg, #4A0F38, #1E0E1A); border: 1px solid #FF5CC8; box-shadow: 0 0 12px #FF5CC844; color: #FFC2EC; text-decoration: none; font-weight: 800; font-size: 15px"><span style="display: flex; align-items: center; gap: 5px; transform: skewX(0deg)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M7 3h10l4 6l-9 12L3 9z" fill="#FF5CC8"/><path d="M3 9h18M7 3l5 18M17 3l-5 18M7 3l2 6M17 3l-2 6" stroke="#7A1050" stroke-width="1" fill="none" opacity=".55"/><path d="M7 3h10l-2 6H9z" fill="#FFC2EC" opacity=".8"/></svg>{{gems}}</span></a>
+    <a href="Tienda.dc.html" class="lb-pill lb-coins" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; transform: skewX(0deg); background: linear-gradient(135deg, #3A2A0A, #1E1A10); border: 1px solid #FFC53D; box-shadow: 0 0 12px #FFC53D44; color: #FFE38A; text-decoration: none; font-weight: 800; font-size: 15px"><span style="display: flex; align-items: center; gap: 6px; transform: skewX(0deg)"><svg class="am-coin" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">V</text></svg>{{coins}}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="3" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></span></a>
+    <a href="Tienda.dc.html" aria-label="{{gemsAria}}" class="lb-pill lb-gems" style="display: flex; align-items: center; height: 36px; padding: 0 10px; transform: skewX(0deg); background: linear-gradient(135deg, #4A0F38, #1E0E1A); border: 1px solid #FF5CC8; box-shadow: 0 0 12px #FF5CC844; color: #FFC2EC; text-decoration: none; font-weight: 800; font-size: 15px"><span style="display: flex; align-items: center; gap: 5px; transform: skewX(0deg)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M7 3h10l4 6l-9 12L3 9z" fill="#FF5CC8"/><path d="M3 9h18M7 3l5 18M17 3l-5 18M7 3l2 6M17 3l-2 6" stroke="#7A1050" stroke-width="1" fill="none" opacity=".55"/><path d="M7 3h10l-2 6H9z" fill="#FFC2EC" opacity=".8"/></svg>{{gems}}</span></a>
     <a href="Social.dc.html" class="lb-social" aria-label="Social: amigos y solicitudes"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c3 .2 5.5 2.3 5.5 5.8"/></svg><sc-if value="{{hasReq}}" hint-placeholder-val="{{ false }}"><em>{{reqN}}</em></sc-if></a>
-    <a href="Ajustes.dc.html" aria-label="Configuración: jugabilidad y controles" style="flex: none; display: flex; align-items: center; justify-content: center; width: 38px; height: 36px; transform: skewX(0deg); background: #17172A; border: 1px solid #2E2E52; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: skewX(0deg)"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></a>
+    <a href="Ajustes.dc.html" class="lb-pill lb-gear" aria-label="Configuración: jugabilidad y controles" style="flex: none; display: flex; align-items: center; justify-content: center; width: 38px; height: 36px; transform: skewX(0deg); background: #17172A; border: 1px solid #2E2E52; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: skewX(0deg)"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></a>
   </div>
 
   <!-- ===== LOBBY: your player on stage, the party slots, shortcuts on the left, the mode and PLAY on the right ===== -->
