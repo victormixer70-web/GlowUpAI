@@ -125,9 +125,12 @@
      seat; if none is open, host the first free code. If that code was taken a moment ago by someone else
      searching, join them instead, so two people who search at the same moment end up together. on: update(M), start(M), error(text). */
   var SLOTS = 4;
-  function matchmake(queue, n, name, look, on) {
+  // party: the names of your friends (with you) — you host the room, they sit on your team, strangers fill the rest
+  function matchmake(queue, n, name, look, on, party) {
     on = on || {};
-    var M = { room: null, isHost: false, roster: [], started: false, cancelled: false, firstJoin: 0, hostK: 0 };
+    party = party && party.length > 1 ? party.map(function (x) { return String(x).toLowerCase(); }) : null;
+    var M = { room: null, isHost: false, roster: [], started: false, cancelled: false, firstJoin: 0, hostK: 0, party: party, code: '' };
+    var inParty = function (nm) { return !!party && party.indexOf(String(nm).toLowerCase()) >= 0; };
     var call = function (k) { var f = on[k]; if (f) try { f(M); } catch (e) { console.error(e); } };
     var codeOf = function (k) { return 'Q' + queue + 'K' + k; };
     // knock on the rooms ks all at once; cb(room) for the first that gives you a seat, cb(null) if none does
@@ -156,7 +159,15 @@
         setTimeout(no, 3500);
       });
     }
-    function balanceSeat() {
+    function freeOn(t) { for (var s = 0; s < n; s++) if (!M.roster.some(function (x) { return x.team === t && x.slot === s; })) return [t, s]; return null; }
+    function balanceSeat(nm) {
+      if (party) {
+        // friends on the leader's team; strangers on the other side, or on ours if a friend's seat is left over
+        if (inParty(nm)) return freeOn(0) || freeOn(1);
+        var waiting = party.filter(function (p) { return !M.roster.some(function (x) { return String(x.name).toLowerCase() === p; }); }).length;
+        var free0 = 0; for (var q = 0; q < n; q++) if (!M.roster.some(function (x) { return x.team === 0 && x.slot === q; })) free0++;
+        return freeOn(1) || (free0 > waiting ? freeOn(0) : null);
+      }
       var cnt = [0, 0]; M.roster.forEach(function (x) { cnt[x.team]++; });
       var order = cnt[1] <= cnt[0] ? [1, 0] : [0, 1];
       for (var a = 0; a < 2; a++) for (var s = 0; s < n; s++) if (!M.roster.some(function (x) { return x.team === order[a] && x.slot === s; })) return [order[a], s];
@@ -167,9 +178,9 @@
       if (M.cancelled) return;
       if (k > SLOTS) { call('error'); return; }
       var r = room(true, codeOf(k), name, {
-        open: function () { M.room = r; M.isHost = true; M.hostK = k; M.roster = [{ id: r.me, name: name, team: 0, slot: 0, look: look, host: true }]; call('update'); },
+        open: function () { M.room = r; M.isHost = true; M.hostK = k; M.code = codeOf(k); M.roster = [{ id: r.me, name: name, team: 0, slot: 0, look: look, host: true }]; call('hosted'); call('update'); },
         join: function (id, nm) {
-          var seat = M.started ? null : balanceSeat();
+          var seat = M.started ? null : balanceSeat(nm);
           if (!seat) { r.sendTo(id, { t: 'full' }); return; }
           M.roster.push({ id: id, name: nm, team: seat[0], slot: seat[1], look: null });
           if (!M.firstJoin) M.firstJoin = Date.now();
@@ -183,7 +194,8 @@
         error: function (text, type) {
           if (M.room === r && type !== 'unavailable-id') return;
           try { r.close(); } catch (e) {}
-          // taken a moment ago by someone else searching: sit in their room instead
+          // taken a moment ago by someone else searching: sit in their room instead (a party always hosts its own)
+          if (party) { host(k + 1); return; }
           seek([k], function (r2) { if (r2) { M.room = r2; M.isHost = false; call('update'); } else host(k + 1); });
         }
       });
@@ -195,9 +207,34 @@
         if (r) { M.room = r; M.isHost = false; call('update'); } else host(1);
       });
     }
+    // everyone in the party has come in
+    M.partyIn = function () { return !party || party.every(function (p) { return M.roster.some(function (x) { return String(x.name).toLowerCase() === p; }); }); };
     M.start = function () { if (!M.isHost || M.started) return; M.started = true; M.room.send({ t: 'start', roster: M.roster }); call('start'); };
     M.cancel = function () { M.cancelled = true; if (M.room) M.room.close(); M.room = null; };
-    search();
+    if (party) host(1); else search();
+    return M;
+  }
+  // a friend of the leader: straight into the leader's search room (by its code)
+  function follow(code, name, look, on) {
+    on = on || {};
+    var M = { room: null, isHost: false, roster: [], started: false, cancelled: false, firstJoin: 0, follower: true };
+    var call = function (k) { var f = on[k]; if (f) try { f(M); } catch (e) { console.error(e); } };
+    var tries = 6;
+    (function go() {
+      if (M.cancelled) return;
+      var r = room(false, code, name, {
+        open: function () { M.room = r; r.send({ t: 'hello', name: name, look: look }); },
+        msg: function (id, m) {
+          if (m.t === 'lobby') { M.roster = m.roster; call('update'); }
+          else if (m.t === 'start') { M.started = true; M.roster = m.roster; call('start'); }
+          else if (m.t === 'full') { call('error'); }
+        },
+        error: function () { try { r.close(); } catch (e) {} if (M.room === r) M.room = null; if (--tries > 0 && !M.cancelled) setTimeout(go, 1500); else call('error'); },
+        leave: function () { if (!M.started && !M.cancelled) { M.room = null; call('error'); } }
+      });
+    })();
+    M.start = function () {};
+    M.cancel = function () { M.cancelled = true; if (M.room) M.room.close(); M.room = null; };
     return M;
   }
 
@@ -238,6 +275,6 @@
     available: available, myName: myName, setName: setName, hasName: hasName, checkName: checkName, suggestName: suggestName, newCode: newCode,
     host: function (code, name, on) { return room(true, code, name, on); },
     join: function (code, name, on) { return room(false, code, name, on); },
-    matchmake: matchmake, voice: voice
+    matchmake: matchmake, follow: follow, voice: voice
   };
 })();

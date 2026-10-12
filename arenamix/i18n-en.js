@@ -4,6 +4,7 @@ window.AM_I18N_EN = {
   'ARENA MIX, inicio': 'ARENA MIX, home',
   'Cargando ARENA MIX': 'Loading ARENA MIX',
   'Mando conectado': 'Controller connected',
+  'El líder ha cancelado la búsqueda': 'The leader cancelled the search',
   'SOCIAL': 'SOCIAL',
   'INVITA A TU EQUIPO': 'INVITE TO YOUR TEAM',
   'EN LÍNEA': 'ONLINE',

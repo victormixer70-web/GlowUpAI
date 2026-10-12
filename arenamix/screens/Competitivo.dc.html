@@ -406,11 +406,23 @@ class Component extends DCLogic {
     const placing = !props.casual && pc.g < 5;
     const mmr = placing ? 0 : this.mmrOf(this.sport, this.pl.id);
     this.state = { phase: 'lobby', mmr, prevMmr: mmr, match: null, res: null, delta: 0, placing, place: pc, justPlaced: false, notice: !!S.notice && !props.casual };
+    // playing with friends: the leader searches for the party, the friends follow into the leader's room
+    const lead = this.store('arenamix.partyLead'), fol = this.store('arenamix.mmFollow');
+    try { localStorage.removeItem('arenamix.partyLead'); localStorage.removeItem('arenamix.mmFollow'); } catch (e) {}
+    if (lead && Date.now() - lead.at < 30000 && this.pl.kind === 'team') this.autoParty = 'lead';
+    else if (fol && Date.now() - fol.at < 30000 && this.pl.kind === 'team') { this.autoParty = 'follow'; this.followCode = fol.code; }
     this.tick = this.tick.bind(this);
     this.globeRef = (el) => { this.gcv = el || null; };
     this.t = 0;
   }
-  componentWillUnmount() { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; this.endOnline(); }
+  componentDidMount() {
+    if (this.autoParty) setTimeout(() => {
+      const n = this.pl.n;
+      this.findAt = 2 + n * 0.6; this.pre = this.makeMatch(); this.koFx = {}; this.arcs = []; this.seen = 1;
+      this.setState({ phase: 'search', online: null }); this.startOnline(n); this.anim();
+    }, 300);
+  }
+  componentWillUnmount() { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; if (this.mm && this.mm.isHost && this.mm.party && !this.mm.started && window.AMSocial) window.AMSocial.partySend({ t: 'mmStop' }); this.endOnline(); }
   endOnline() { if (this.mm) { this.mm.cancel(); this.mm = null; } }
   // look for real players for a team match (same mode, same size), with the AI as the back-up
   startOnline(n) {
@@ -419,8 +431,11 @@ class Component extends DCLogic {
     const A = window.AMChars, o = A ? A.outfit('futbol') : null;
     const look = { char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none' };
     this.endOnline();
-    this.mm = O.matchmake((this.props.casual ? 'r' : 'c') + this.pl.n, this.pl.n, O.myName(), look, {
+    const SO = window.AMSocial, party = SO && SO.partyNames ? SO.partyNames() : null;
+    const handlers = {
       update: () => this.forceUpdate(),
+      // the party's room is open: tell the friends where it is
+      hosted: (M) => { if (M.party && SO) SO.partySend({ t: 'mm', code: M.code, cat: this.props.casual ? 'casual' : 'comp', id: this.pl.id }); },
       start: (M) => {
         const me = M.roster.find((x) => x.id === M.room.me);
         if (!me) return;
@@ -429,7 +444,9 @@ class Component extends DCLogic {
         this.anim();
       },
       error: () => { this.endOnline(); }
-    });
+    };
+    if (this.autoParty === 'follow' && this.followCode && O.follow) { this.mm = O.follow(this.followCode, O.myName(), look, handlers); this.followCode = null; return; }
+    this.mm = O.matchmake((this.props.casual ? 'r' : 'c') + this.pl.n, this.pl.n, O.myName(), look, handlers, party && party.length > 1 && party.length <= this.pl.n ? party : null);
   }
   catalog(sport) {
     const team = (n, soon) => ({ id: 'm' + n, title: n + 'VS' + n, kind: 'team', n, soon, desc: soon ? 'Partido por equipos. Lo estamos preparando.' : n === 1 ? 'Tú contra otro jugador, con porteros.' : n + ' contra ' + n + ', con porteros.' });
@@ -541,9 +558,10 @@ class Component extends DCLogic {
     const M = this.mm;
     if (s.phase === 'search' && M && !M.cancelled) {
       // a host with company starts when the room is full, or 10 s after the first player came in
-      if (M.isHost && M.roster.length > 1 && !M.started && Date.now() - M.firstJoin > 10000) M.start();
+      if (M.isHost && M.roster.length > 1 && !M.started && (!M.partyIn || M.partyIn()) && Date.now() - M.firstJoin > 10000) M.start();
+      if (M.isHost && M.party && !M.started && M.roster.length >= 2 * this.pl.n) M.start();
       // nobody else searching after a while: say so (and let the player choose what to do)
-      if (this.t > this.findAt + 20 && M.roster.length <= 1) { M.cancel(); this.mm = null; this.t = 0; this.setState({ phase: 'empty', emptyWhy: 'nobody' }); }
+      if (this.t > this.findAt + 20 && M.roster.length <= 1 && !M.follower) { M.cancel(); this.mm = null; this.t = 0; this.setState({ phase: 'empty', emptyWhy: 'nobody' }); }
     } else if (s.phase === 'search' && this.pl.kind === 'team') {
       // online modes with no connection to the matchmaking service: nobody can be found
       if (this.t > 8) { this.endOnline(); this.t = 0; this.setState({ phase: 'empty', emptyWhy: 'offline' }); }

@@ -320,6 +320,9 @@ class Component extends DCLogic {
     const toSocial = () => { try { localStorage.setItem('arenamix.social.tab', JSON.stringify({ tab: st && st.friends.length ? 'friends' : 'search', invite: true })); } catch (e) {} };
     const member = P && !P.leader, withParty = !!P && P.leader && P.members.length > 1;
     const n0 = /^m\d$/.test(selId) ? +selId.slice(1) : 2, fmt = 'm' + Math.min(4, Math.max(n0, P ? P.members.length : 1, 2));
+    // Competitivo / Informal team modes: the leader searches a real match for the whole party (strangers fill the rest)
+    const sel = this.store('arenamix.sel', {}) || {}, mmCat = sel.cat === 'comp' || sel.cat === 'casual' ? sel.cat : null;
+    const mmOk = withParty && mmCat && /^m\d$/.test(selId);
     return {
       partyN: String(P ? P.members.length : 1),
       hasReq: !!(SO && SO.pending() > 0), reqN: String(SO ? SO.pending() : 0),
@@ -337,10 +340,15 @@ class Component extends DCLogic {
       }),
       playCls: 'lb-play' + (member ? ' wait' : ''),
       playLabel: member ? 'ESPERANDO AL LÍDER' : withParty ? 'JUGAR' : 'JUGAR',
-      playHref: member ? '#' : withParty ? 'Privada.dc.html' : href,
+      playHref: member ? '#' : mmOk ? (mmCat === 'comp' ? 'Competitivo.dc.html' : 'Rapida.dc.html') : withParty ? 'Privada.dc.html' : href,
       playTap: (e) => {
         if (member) { if (e) e.preventDefault(); return; }
         try { localStorage.setItem('arenamix.sport', JSON.stringify('futbol')); } catch (x) {}
+        if (mmOk) {
+          // the team must fit the party: 3 friends need at least 3 VS 3
+          try { localStorage.setItem('arenamix.sel', JSON.stringify({ sport: 'futbol', cat: mmCat, id: fmt })); localStorage.setItem('arenamix.partyLead', JSON.stringify({ at: Date.now() })); } catch (x) {}
+          return;
+        }
         if (withParty) SO.launch(fmt);
       }
     };

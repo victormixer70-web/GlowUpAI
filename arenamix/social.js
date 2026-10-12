@@ -152,9 +152,18 @@
         if (m.t === 'go') {
           // the leader pressed PLAY: to the private room, on the leader's team
           try { localStorage.setItem('arenamix.privJoin', JSON.stringify({ code: m.code, at: Date.now() })); } catch (e) {}
-          leave(true);
           location.hash = '#/Privada';
         }
+        if (m.t === 'mm') {
+          // the leader is searching a Competitivo / Informal match: into the same search room, same mode
+          try {
+            localStorage.setItem('arenamix.sel', JSON.stringify({ sport: 'futbol', cat: m.cat, id: m.id }));
+            localStorage.setItem('arenamix.mmFollow', JSON.stringify({ code: m.code, cat: m.cat, id: m.id, at: Date.now() }));
+          } catch (e) {}
+          var dest = m.cat === 'comp' ? '#/Competitivo' : '#/Rapida';
+          if (location.hash === dest) { location.hash = '#/Deportes'; setTimeout(function () { location.hash = dest; }, 80); } else location.hash = dest;
+        }
+        if (m.t === 'mmStop') notify('El líder ha cancelado la búsqueda');
       },
       leave: function () { if (party !== P) return; notify(hostName + ' ha cerrado el equipo'); party = null; changed(); },
       error: function (t) { if (party !== P) return; notify('No se ha podido entrar en el equipo'); party = null; changed(); }
@@ -179,9 +188,11 @@
     var code = window.AMOnline.newCode();
     try { localStorage.setItem('arenamix.privHost', JSON.stringify({ code: code, fmt: fmt || ('m' + Math.max(2, P.members.length)), party: P.members.map(function (x) { return x.name; }), at: Date.now() })); } catch (e) {}
     P.room.send({ t: 'go', code: code });
-    setTimeout(function () { if (party === P) leave(true); }, 600);
     return true;
   }
+  // the leader's search room is open: bring the party in (Competitivo / Informal with friends)
+  function partySend(m) { var P = party; if (P && P.leader && P.room) P.room.send(m); }
+  function partyNames() { return party && party.leader ? party.members.map(function (x) { return x.name; }) : null; }
 
   /* ---------- on-screen: invitations and little notices, on any screen ---------- */
   function box() {
@@ -253,7 +264,7 @@
     reject: function (name) { S.incoming = drop(S.incoming, name); save(); send(name, { t: 'frej', name: me() }); },
     cancel: function (name) { S.outgoing = drop(S.outgoing, name); save(); },
     remove: function (name) { S.friends = drop(S.friends, name); save(); send(name, { t: 'funf', name: me() }); },
-    invite: invite, leave: function () { leave(); }, launch: launch,
+    invite: invite, leave: function () { leave(); }, launch: launch, partySend: partySend, partyNames: partyNames,
     kick: function (name) { var P = party; if (!P || !P.leader) return; var x = P.members.find(function (y) { return same(y.name, name) && !y.leader; }); if (x && P.room.conns[x.id]) try { P.room.conns[x.id].close(); } catch (e) {} },
     isOn: isOn, pending: function () { return S.incoming.length; }
   };
