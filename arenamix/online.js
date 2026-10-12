@@ -34,7 +34,7 @@
       return n;
     } catch (e) { return 'Jugador'; }
   }
-  function setName(n) { try { localStorage.setItem('arenamix.name.v1', String(n).slice(0, 16)); localStorage.setItem('arenamix.namechosen.v1', '1'); } catch (e) {} }
+  function setName(n) { try { localStorage.setItem('arenamix.name.v1', String(n).slice(0, 16)); localStorage.setItem('arenamix.namechosen.v1', '1'); } catch (e) {} if (window.AMSocial) setTimeout(function () { window.AMSocial.restart(); }, 50); }
   // has the player picked a name yet (the first time in, the login screen asks for one)
   function hasName() { try { return localStorage.getItem('arenamix.namechosen.v1') === '1' && !!localStorage.getItem('arenamix.name.v1'); } catch (e) { return true; } }
   // what is wrong with a name, or '' when it is fine

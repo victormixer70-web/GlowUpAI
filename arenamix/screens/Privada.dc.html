@@ -117,10 +117,17 @@ class Component extends DCLogic {
     this.code = window.AMOnline ? window.AMOnline.newCode() : Array.from({ length: 5 }, () => abc[Math.floor(Math.random() * abc.length)]).join('');
     const first = fm.find((m) => m.id === 'm2') || fm[0];
     this.myName = window.AMOnline ? window.AMOnline.myName() : 'Jugador';
-    this.state = { fmt: first.id, slots: {}, phase: 'room', res: null, showJoin: false, joinCode: '', toast: '', target: 0, net: 'off', roster: [], name: this.myName };
+    // coming from the lobby with a party: this room has the code the friends were sent, and they play on my team
+    let fmt0 = first.id;
+    const ph = this.store('arenamix.privHost'), pj = this.store('arenamix.privJoin');
+    if (ph && Date.now() - ph.at < 60000) { this.code = ph.code; if (this.C.modes.some((m) => m.id === ph.fmt && !m.soon)) fmt0 = ph.fmt; this.party = ph.party || []; }
+    if (pj && Date.now() - pj.at < 60000) this.pendingJoin = pj.code;
+    try { localStorage.removeItem('arenamix.privHost'); localStorage.removeItem('arenamix.privJoin'); } catch (e) {}
+    this.state = { fmt: fmt0, slots: {}, phase: 'room', res: null, showJoin: false, joinCode: '', toast: '', target: 0, net: 'off', roster: [], name: this.myName };
   }
   /* ---------- online room: this phone hosts a room under its code until it joins someone else's ---------- */
-  componentDidMount() { if (this.sport === 'futbol') this.openHost(); this.pingT = setInterval(() => { if (this.room && this.state.phase === 'room') this.forceUpdate(); }, 2000); }
+  componentDidMount() {
+    if (this.pendingJoin) { this.joinTries = 6; this.joinRoom(this.pendingJoin); } else if (this.sport === 'futbol') this.openHost(); this.pingT = setInterval(() => { if (this.room && this.state.phase === 'room') this.forceUpdate(); }, 2000); }
   look() {
     const A = window.AMChars, o = A ? A.outfit('futbol') : null;
     return { char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none' };
@@ -134,7 +141,8 @@ class Component extends DCLogic {
       open: () => { if (this.room !== room) return; this.setState({ net: 'host', roster: [{ id: room.me, name: this.myName, team: 0, slot: 0, look: this.look(), host: true }] }); },
       join: (id, name) => {
         if (this.room !== room) return;
-        const seat = this.freeSeat([1, 0]);
+        const mate = (this.party || []).some((p) => p.toLowerCase() === String(name).toLowerCase());
+        const seat = this.freeSeat(mate ? [0, 1] : [1, 0]);
         if (!seat || this.state.phase === 'match') { room.sendTo(id, { t: 'full', why: seat ? 'La partida ya ha empezado.' : 'La sala está llena.' }); return; }
         this.setRoster(this.state.roster.concat([{ id, name, team: seat[0], slot: seat[1], look: null }]));
         this.say(name + ' ha entrado en la sala');
@@ -165,7 +173,7 @@ class Component extends DCLogic {
     if (this.room) this.room.close();
     this.setState({ net: 'connecting', roster: [] });
     const room = this.room = O.join(code, this.myName, {
-      open: () => { if (this.room !== room) return; this.setState({ net: 'guest' }); room.send({ t: 'hello', name: this.myName, look: this.look() }); },
+      open: () => { if (this.room !== room) return; this.joinTries = 0; this.setState({ net: 'guest' }); room.send({ t: 'hello', name: this.myName, look: this.look() }); },
       msg: (id, m) => {
         if (this.room !== room) return;
         if (m.t === 'lobby') this.setState({ roster: m.roster, fmt: m.fmt, hostCode: m.code });
@@ -173,7 +181,12 @@ class Component extends DCLogic {
         if (m.t === 'full') { this.say(m.why); this.backHome(); }
       },
       leave: () => { if (this.room !== room) return; this.say('El anfitrión ha cerrado la sala'); if (this.state.phase !== 'match') this.backHome(); },
-      error: (text) => { if (this.room !== room) return; this.say(text); this.backHome(); }
+      error: (text) => {
+        if (this.room !== room) return;
+        // the leader's room may still be opening: try again a few times
+        if (this.joinTries > 0) { this.joinTries--; this.room = null; try { room.close(); } catch (e) {} this.setState({ net: 'connecting' }); setTimeout(() => this.joinRoom(code), 1500); return; }
+        this.say(text); this.backHome();
+      }
     });
   }
   backHome() { if (this.room) { this.room.close(); this.room = null; } this.setState({ phase: 'room', res: null }); setTimeout(() => this.openHost(), 300); }

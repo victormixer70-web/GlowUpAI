@@ -77,6 +77,13 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .lb-bg .floor{position:absolute;left:-30%;right:-30%;bottom:-60px;height:220px;transform:perspective(320px) rotateX(58deg);transform-origin:50% 100%;background:repeating-linear-gradient(90deg,#1F7A3E 0 60px,#1A6A35 60px 120px);-webkit-mask-image:linear-gradient(0deg,#000 20%,transparent 90%);mask-image:linear-gradient(0deg,#000 20%,transparent 90%);opacity:.9}
 .lb-bg .crowd{position:absolute;left:0;right:0;top:150px;height:60px;background:radial-gradient(3px 3px at 10px 20px,#FFC53D88,transparent),radial-gradient(3px 3px at 40px 40px,#22D3EE88,transparent),radial-gradient(2px 2px at 70px 15px,#FF5CC888,transparent),radial-gradient(3px 3px at 100px 35px,#ffffff66,transparent);background-size:120px 60px;opacity:.5;animation:lbTwinkle 2.5s steps(2) infinite}
 @keyframes lbTwinkle{50%{opacity:.25}}
+.lb-slot.in{opacity:1}
+.lb-slot.in svg{stroke-dasharray:none;stroke-width:2.5}
+.lb-slot .ini{position:absolute;top:30px;width:30px;height:30px;border-radius:15px;font:800 16px/30px 'Barlow Condensed',sans-serif;text-align:center;color:#0B0B14;box-shadow:0 0 0 3px #05050A}
+.lb-social{position:relative;flex:none;display:flex;align-items:center;justify-content:center;width:38px;height:36px;background:#17172A;border:1px solid #A78BFA;color:#C4B5FD;box-shadow:0 0 10px #A78BFA44}
+.lb-social em{position:absolute;right:-6px;top:-7px;min-width:17px;height:17px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:#FF3B5C;color:#fff;font:800 10px/17px Exo2,sans-serif;font-style:normal;text-align:center;box-shadow:0 0 0 2px #0B0B14}
+.lb-play.wait{background:linear-gradient(180deg,#3A3270,#26264A);box-shadow:inset 0 0 0 2px #A78BFA88,0 0 0 3px #05050A,0 7px 0 #05050A;animation:none;color:#C4B5FD}
+.lb-play.wait .lbl{font-size:20px;text-shadow:none}
 /* ===== lobby ===== */
 .lb-stage{position:absolute;left:260px;top:270px;width:300px;height:120px;pointer-events:none;z-index:1}
 .lb-stage b{position:absolute;left:20px;right:20px;top:24px;height:62px;border-radius:50%;background:radial-gradient(closest-side,#22D3EE55,#7C5CFF22 60%,transparent);filter:blur(2px)}
@@ -95,7 +102,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .lb-week{position:absolute;left:96px;top:238px;width:160px;height:62px;box-sizing:border-box;padding:8px 10px;border-radius:16px;display:flex;flex-direction:column;justify-content:center;gap:4px;text-decoration:none;color:#F4F4FA;background:linear-gradient(170deg,#2E1C5CE6,#120D2CE6);box-shadow:inset 0 0 0 1px #A78BFA66,0 6px 14px #0008}
 .lb-slot{position:absolute;width:68px;height:196px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-decoration:none;color:#C4B5FD;z-index:2;opacity:.75;transition:opacity .2s,transform .2s}
 .lb-slot:hover{opacity:1 !important;filter:brightness(1.2)}
-.lb-party{position:absolute;left:258px;top:62px;padding:3px 9px;border-radius:8px;background:#05050ACC;box-shadow:inset 0 0 0 1px #A78BFA66;font:800 9.5px Exo2,sans-serif;letter-spacing:1px;color:#C4B5FD;z-index:2}
+.lb-party{position:absolute;left:258px;top:62px;text-decoration:none;padding:3px 9px;border-radius:8px;background:#05050ACC;box-shadow:inset 0 0 0 1px #A78BFA66;font:800 9.5px Exo2,sans-serif;letter-spacing:1px;color:#C4B5FD;z-index:2}
 .lb-slot svg{position:absolute;top:22px;fill:#C4B5FD12;stroke:#C4B5FD88;stroke-width:2;stroke-dasharray:5 5}
 .lb-slot .plus{position:absolute;top:76px;width:30px;height:30px;border-radius:15px;background:#A78BFA;color:#0B0B14;font:800 22px/30px Exo2,sans-serif;text-align:center;box-shadow:0 0 0 3px #05050A,0 0 14px #A78BFA;animation:lbPulse 2s ease-in-out infinite}
 .lb-slot .lbl{margin-bottom:22px;padding:2px 8px;border-radius:7px;background:#05050ACC;font:800 9.5px Exo2,sans-serif;letter-spacing:1px}
@@ -157,6 +164,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </a>
     <a href="Tienda.dc.html" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; transform: skewX(0deg); background: linear-gradient(135deg, #3A2A0A, #1E1A10); border: 1px solid #FFC53D; box-shadow: 0 0 12px #FFC53D44; color: #FFE38A; text-decoration: none; font-weight: 800; font-size: 15px"><span style="display: flex; align-items: center; gap: 6px; transform: skewX(0deg)"><svg class="am-coin" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><text x="12" y="16" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#7A4E0E">V</text></svg>{{coins}}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="3" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></span></a>
     <a href="Tienda.dc.html" aria-label="{{gemsAria}}" style="display: flex; align-items: center; height: 36px; padding: 0 10px; transform: skewX(0deg); background: linear-gradient(135deg, #4A0F38, #1E0E1A); border: 1px solid #FF5CC8; box-shadow: 0 0 12px #FF5CC844; color: #FFC2EC; text-decoration: none; font-weight: 800; font-size: 15px"><span style="display: flex; align-items: center; gap: 5px; transform: skewX(0deg)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M7 3h10l4 6l-9 12L3 9z" fill="#FF5CC8"/><path d="M3 9h18M7 3l5 18M17 3l-5 18M7 3l2 6M17 3l-2 6" stroke="#7A1050" stroke-width="1" fill="none" opacity=".55"/><path d="M7 3h10l-2 6H9z" fill="#FFC2EC" opacity=".8"/></svg>{{gems}}</span></a>
+    <a href="Social.dc.html" class="lb-social" aria-label="Social: amigos y solicitudes"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c3 .2 5.5 2.3 5.5 5.8"/></svg><sc-if value="{{hasReq}}" hint-placeholder-val="{{ false }}"><em>{{reqN}}</em></sc-if></a>
     <a href="Ajustes.dc.html" aria-label="Configuración: jugabilidad y controles" style="flex: none; display: flex; align-items: center; justify-content: center; width: 38px; height: 36px; transform: skewX(0deg); background: #17172A; border: 1px solid #2E2E52; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: skewX(0deg)"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></a>
   </div>
 
@@ -178,20 +186,16 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <span style="display: flex; gap: 3px"><sc-for list="{{weekSegs}}" as="w" hint-placeholder-count="5"><span style="{{w}}"></span></sc-for></span>
   </a>
 
-  <!-- the party: you and three empty spots to fill a 4 VS 4 team with friends -->
-  <a href="Privada.dc.html" class="lb-slot" style="left: 258px; top: 124px;" aria-label="Invitar a un amigo a tu equipo: crea una sala privada">
-    <svg width="58" height="118" viewBox="0 0 64 130" aria-hidden="true"><circle cx="32" cy="22" r="15"/><path d="M8 126V70c0-16 10-26 24-26s24 10 24 26v56"/></svg>
-    <span class="plus">+</span><span class="lbl">INVITAR</span>
-  </a>
-  <a href="Privada.dc.html" class="lb-slot" style="left: 476px; top: 124px;" aria-label="Invitar a un amigo a tu equipo: crea una sala privada">
-    <svg width="58" height="118" viewBox="0 0 64 130" aria-hidden="true"><circle cx="32" cy="22" r="15"/><path d="M8 126V70c0-16 10-26 24-26s24 10 24 26v56"/></svg>
-    <span class="plus">+</span><span class="lbl">INVITAR</span>
-  </a>
-  <a href="Privada.dc.html" class="lb-slot" style="left: 560px; top: 100px; transform: scale(.86); opacity: .6;" aria-label="Invitar a un amigo a tu equipo: crea una sala privada">
-    <svg width="58" height="118" viewBox="0 0 64 130" aria-hidden="true"><circle cx="32" cy="22" r="15"/><path d="M8 126V70c0-16 10-26 24-26s24 10 24 26v56"/></svg>
-    <span class="plus">+</span><span class="lbl">INVITAR</span>
-  </a>
-  <span class="lb-party" aria-hidden="true">TU EQUIPO · {{partyN}}/4</span>
+  <!-- the party: you and three spots, filled by the friends in your team or a button to invite them -->
+  <sc-for list="{{slots}}" as="sl" key="k">
+    <a href="Social.dc.html" onClick="{{sl.tap}}" class="{{sl.cls}}" style="{{sl.style}}" aria-label="{{sl.aria}}">
+      <svg width="58" height="118" viewBox="0 0 64 130" aria-hidden="true" style="{{sl.svg}}"><circle cx="32" cy="22" r="15"/><path d="M8 126V70c0-16 10-26 24-26s24 10 24 26v56"/></svg>
+      <sc-if value="{{sl.free}}" hint-placeholder-val="{{ true }}"><span class="plus">+</span></sc-if>
+      <sc-if value="{{sl.filled}}" hint-placeholder-val="{{ false }}"><span class="ini" style="{{sl.iniStyle}}">{{sl.ini}}</span></sc-if>
+      <span class="lbl" translate="no" style="{{sl.lblStyle}}">{{sl.label}}</span>
+    </a>
+  </sc-for>
+  <a href="Social.dc.html" class="lb-party">TU EQUIPO · {{partyN}}/4</a>
   <!-- you, in 3D, on the stage (the 2D figure only if 3D isn't available) -->
   <sc-if value="{{hero3d}}" hint-placeholder-val="{{ true }}">
     <div ref="{{heroRef}}" role="button" aria-label="Tu jugador: tócalo para que haga una jugada" onClick="{{heroTap}}" style="position: absolute; left: 300px; top: 50px; width: 220px; height: 296px; z-index: 3; cursor: pointer; filter: drop-shadow(0 14px 18px #000C)"></div>
@@ -220,9 +224,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <span class="ttl">{{modeTitle}}</span>
     <span class="chg"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h13l-3-3M20 17H7l3 3"/></svg>CAMBIAR MODO</span>
   </a>
-  <a href="{{playHref}}" onClick="{{go_futbol}}" class="lb-play" aria-label="Jugar: {{modeTitle}}" style="z-index: 2">
+  <a href="{{playHref}}" onClick="{{playTap}}" class="{{playCls}}" aria-label="Jugar: {{modeTitle}}" style="z-index: 2">
     <span class="hm-ring"></span><span class="hm-ring" style="animation-delay: -1.1s"></span>
-    <span class="lbl">JUGAR</span>
+    <span class="lbl">{{playLabel}}</span>
   </a>
 
   <!-- bottom: the rank road -->
@@ -271,7 +275,8 @@ class Component extends DCLogic {
       else if (!el && this.heroEl) { if (window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; }
     };
   }
-  componentWillUnmount() { if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; }
+  componentDidMount() { if (window.AMSocial) { window.AMSocial.start(); this.soOff = window.AMSocial.on(() => this.forceUpdate()); } }
+  componentWillUnmount() { if (this.soOff) this.soOff(); if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; }
   store(key, def) { try { const v = JSON.parse(localStorage.getItem(key) || 'null'); return v == null ? def : v; } catch (e) { return def; } }
   // the lobby's mode card, its PLAY, the event and the stage sparks
   lobbyVals(tr, mmr, lo, hi, nextRank, mDone, done) {
@@ -299,9 +304,45 @@ class Component extends DCLogic {
       rankBar: 'width: ' + Math.max(4, Math.min(100, (mmr - lo) / (hi - lo) * 100)).toFixed(0) + '%; background: linear-gradient(90deg, ' + tr[1] + ', ' + tr[2] + '); box-shadow: 0 0 8px ' + tr[2],
       roadTicks: [25, 50, 75].map((p) => 'left: ' + p + '%'),
       hasNextRank: !!nextRank, nextRankUp: (nextRank || '').toUpperCase(),
-      missLeft: mDone < 3, partyN: '1',
+      missLeft: mDone < 3,
+      ...this.partyVals(id, href),
       dorsal: (() => { try { return String(+localStorage.getItem('arenamix.dorsal.v1') || 10); } catch (e) { return '10'; } })(),
       sparks: Array.from({ length: 12 }, (_, k) => 'left: ' + (290 + rnd(k + 1) * 240).toFixed(0) + 'px; animation-delay: -' + (rnd(k + 7) * 5).toFixed(2) + 's; animation-duration: ' + (4 + rnd(k + 3) * 3).toFixed(2) + 's; background: ' + (k % 3 ? '#FFE38A' : '#22D3EE'))
+    };
+  }
+  // the party in the lobby: friends in the spots next to you, and PLAY takes everyone into a private room
+  partyVals(selId, href) {
+    const SO = window.AMSocial, st = SO ? SO.state() : null, P = st && st.party;
+    const others = P ? P.members.filter((m) => m.name !== st.me) : [];
+    const COLS = ['#22D3EE', '#FFC53D', '#FF5CC8', '#53D88E', '#A78BFA', '#FF8A3D', '#3EA6FF'];
+    const colOf = (n) => { let h = 0; for (const c of String(n)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return COLS[h % COLS.length]; };
+    const POS = [[258, 124, ''], [476, 124, ''], [560, 100, ' transform: scale(.86);']];
+    const toSocial = () => { try { localStorage.setItem('arenamix.social.tab', JSON.stringify({ tab: st && st.friends.length ? 'friends' : 'search', invite: true })); } catch (e) {} };
+    const member = P && !P.leader, withParty = !!P && P.leader && P.members.length > 1;
+    const n0 = /^m\d$/.test(selId) ? +selId.slice(1) : 2, fmt = 'm' + Math.min(4, Math.max(n0, P ? P.members.length : 1, 2));
+    return {
+      partyN: String(P ? P.members.length : 1),
+      hasReq: !!(SO && SO.pending() > 0), reqN: String(SO ? SO.pending() : 0),
+      slots: POS.map(([x, y, tf], k) => {
+        const m = others[k], c = m ? colOf(m.name) : '#C4B5FD';
+        return {
+          k: String(k), free: !m, filled: !!m, ini: m ? m.name.charAt(0).toUpperCase() : '', label: m ? m.name : 'INVITAR',
+          cls: 'lb-slot' + (m ? ' in' : ''), aria: m ? m.name + ' está en tu equipo' : 'Invitar a un amigo a tu equipo',
+          style: 'left: ' + x + 'px; top: ' + y + 'px;' + tf + (m ? '' : k === 2 ? ' opacity: .6;' : ''),
+          svg: m ? 'fill: ' + c + '33; stroke: ' + c : '',
+          iniStyle: 'background: ' + c,
+          lblStyle: m ? 'color: ' + c + '; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap' : '',
+          tap: toSocial
+        };
+      }),
+      playCls: 'lb-play' + (member ? ' wait' : ''),
+      playLabel: member ? 'ESPERANDO AL LÍDER' : withParty ? 'JUGAR' : 'JUGAR',
+      playHref: member ? '#' : withParty ? 'Privada.dc.html' : href,
+      playTap: (e) => {
+        if (member) { if (e) e.preventDefault(); return; }
+        try { localStorage.setItem('arenamix.sport', JSON.stringify('futbol')); } catch (x) {}
+        if (withParty) SO.launch(fmt);
+      }
     };
   }
   renderVals() {

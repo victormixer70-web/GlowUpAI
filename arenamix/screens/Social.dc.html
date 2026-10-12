@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Social</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+@keyframes soIn{from{opacity:0;transform:translateY(14px)}}
+@keyframes soDot{0%,100%{box-shadow:0 0 0 0 #53D88E88}50%{box-shadow:0 0 0 5px #53D88E00}}
+.so-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(80% 90% at 30% 0%,#2A1C5E 0%,#120E30 55%,#07061A 100%)}
+.so-bg i{position:absolute;border-radius:50%;filter:blur(40px);opacity:.35}
+.so-tab{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:6px;height:32px;width:132px;border:0;background:none;font:800 11.5px Exo2,sans-serif;letter-spacing:.5px;cursor:pointer;transition:color .3s}
+.so-tab em{min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:#FF3B5C;color:#fff;font:800 10px/18px Exo2,sans-serif;font-style:normal}
+.so-list{position:absolute;left:96px;top:104px;width:504px;bottom:12px;overflow-y:auto;scrollbar-width:none;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:64px;gap:8px;align-content:start}
+.so-list::-webkit-scrollbar{display:none}
+.so-card{position:relative;display:flex;align-items:center;gap:9px;padding:0 8px 0 10px;border-radius:16px;background:linear-gradient(170deg,#1E1A48F2,#100D2AF2);box-shadow:inset 0 0 0 1px #3A3270;animation:soIn .35s cubic-bezier(.2,1.3,.4,1) both}
+.so-card.on{box-shadow:inset 0 0 0 1px #53D88E77,0 0 14px #53D88E22}
+.so-av{position:relative;flex:none;width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;font:800 18px 'Barlow Condensed',sans-serif;color:#0B0B14}
+.so-av i{position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:6px;box-shadow:0 0 0 2px #100D2A}
+.so-av i.on{background:#53D88E;animation:soDot 1.6s infinite}.so-av i.off{background:#5E5E80}
+.so-nm{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.so-nm b{font:800 14px Exo2,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.so-nm span{font-size:10px;font-weight:800;letter-spacing:.5px}
+.so-btn{flex:none;height:30px;padding:0 11px;border:0;border-radius:10px;font:800 11.5px Exo2,sans-serif;cursor:pointer;white-space:nowrap}
+.so-btn.go{background:linear-gradient(135deg,#FFE38A,#FFC53D);color:#1A1204;box-shadow:0 3px 0 #B7791F}
+.so-btn.ok{background:#53D88E;color:#0B0B14;box-shadow:0 3px 0 #2E8A57}
+.so-btn.no{background:#ffffff14;color:#CACAE0}
+.so-btn.dim{background:#26264A;color:#8686A6;cursor:default}
+.so-x{flex:none;width:26px;height:26px;border:0;border-radius:13px;background:transparent;color:#6E6E92;font:800 14px Exo2,sans-serif;cursor:pointer}
+.so-x:hover{background:#FF5C5C22;color:#FF8A8E}
+.so-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;height:220px;text-align:center;color:#A3A3C2;font-size:12.5px;font-weight:700;line-height:1.45}
+.so-party{position:absolute;left:612px;right:12px;top:12px;bottom:12px;padding:12px;box-sizing:border-box;border-radius:20px;background:linear-gradient(170deg,#2E1C5CEE,#120D2CEE);box-shadow:inset 0 0 0 1px #A78BFA66,0 14px 30px #0009;display:flex;flex-direction:column;gap:7px}
+.so-slot{display:flex;align-items:center;gap:8px;height:46px;padding:0 8px;border-radius:12px;background:#0B0B18AA;box-shadow:inset 0 0 0 1px #3A3270}
+.so-slot.free{box-shadow:inset 0 0 0 1.5px #A78BFA55;background:transparent;border:0;color:#C4B5FD;cursor:pointer;font:800 11.5px Exo2,sans-serif;width:100%}
+.so-search{display:flex;gap:8px;align-items:center}
+.so-search input{flex:1;min-width:0;height:42px;padding:0 14px;border-radius:12px;border:1px solid #3A3270;background:#07070FCC;color:#F4F4FA;font:800 15px Exo2,sans-serif;outline:0}
+.so-search input:focus{border-color:#22D3EE;box-shadow:0 0 0 3px #22D3EE33}
+</style>
+</helmet>
+<div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
+  <div class="so-bg" aria-hidden="true"><i style="left: 80px; top: 200px; width: 260px; height: 200px; background: #7C5CFF"></i><i style="left: 420px; top: -60px; width: 300px; height: 200px; background: #22D3EE"></i></div>
+  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; height: 390px; z-index: 3"><dc-import name="Nav" active="social" hint-size="80px,390px"></dc-import></div>
+
+  <!-- header: title, your status and your name, the three tabs -->
+  <div style="position: absolute; left: 96px; width: 504px; top: 12px; display: flex; align-items: center; gap: 10px">
+    <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 44px; height: 36px; display: flex; align-items: center; justify-content: center; background: #17172A; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+    <h1 class="bc-title" style="font-size: 26px; white-space: nowrap">{{title}}</h1>
+    <span style="{{statusStyle}}"><i style="{{statusDot}}"></i>{{statusText}}</span>
+    <span style="flex: 1"></span>
+    <button type="button" onClick="{{shareName}}" style="flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; padding: 0; border: 0; background: none; color: #F4F4FA; cursor: pointer; text-align: right">
+      <span style="font-size: 8.5px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">TU NOMBRE · TOCA PARA COMPARTIR</span>
+      <span style="font: 800 15px Exo2, sans-serif; color: #22D3EE" translate="no">{{me}}</span>
+    </button>
+  </div>
+  <div role="tablist" aria-label="Social" style="position: absolute; left: 96px; top: 58px; display: flex; padding: 3px; border-radius: 14px; background: #0B0B14CC; border: 1px solid #2E2E58">
+    <span aria-hidden="true" style="{{thumbStyle}}"></span>
+    <sc-for list="{{tabs}}" as="t" key="id">
+      <button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" class="so-tab" style="{{t.style}}">{{t.label}}<sc-if value="{{t.hasN}}" hint-placeholder-val="{{ false }}"><em>{{t.n}}</em></sc-if></button>
+    </sc-for>
+  </div>
+
+  <!-- friends -->
+  <sc-if value="{{isFriends}}" hint-placeholder-val="{{ true }}">
+    <div class="so-list">
+      <sc-for list="{{friends}}" as="f" key="name">
+        <div class="{{f.cls}}">
+          <span class="so-av" style="{{f.av}}">{{f.ini}}<i class="{{f.dot}}"></i></span>
+          <span class="so-nm"><b translate="no">{{f.name}}</b><span style="{{f.subStyle}}">{{f.sub}}</span></span>
+          <button type="button" class="{{f.btnCls}}" onClick="{{f.invite}}">{{f.btn}}</button>
+          <button type="button" class="so-x" aria-label="Quitar de amigos" onClick="{{f.remove}}">✕</button>
+        </div>
+      </sc-for>
+      <sc-if value="{{noFriends}}" hint-placeholder-val="{{ false }}">
+        <div class="so-empty">
+          <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M17 8v6M14 11h6"/></svg>
+          <span>Aún no tienes amigos en ARENA MIX.<br>Busca a tus amigos por su nombre de jugador en <b style="color: #22D3EE">BUSCAR</b>.</span>
+          <button type="button" class="so-btn go" onClick="{{toSearch}}">BUSCAR AMIGOS</button>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- requests -->
+  <sc-if value="{{isReqs}}" hint-placeholder-val="{{ false }}">
+    <div class="so-list">
+      <sc-for list="{{incoming}}" as="r" key="name">
+        <div class="so-card on">
+          <span class="so-av" style="{{r.av}}">{{r.ini}}</span>
+          <span class="so-nm"><b translate="no">{{r.name}}</b><span style="color: #FFC53D">QUIERE SER TU AMIGO</span></span>
+          <button type="button" class="so-btn ok" onClick="{{r.accept}}">ACEPTAR</button>
+          <button type="button" class="so-x" aria-label="Rechazar" onClick="{{r.reject}}">✕</button>
+        </div>
+      </sc-for>
+      <sc-for list="{{outgoing}}" as="r" key="name">
+        <div class="so-card">
+          <span class="so-av" style="{{r.av}}">{{r.ini}}</span>
+          <span class="so-nm"><b translate="no">{{r.name}}</b><span style="color: #8686A6">ENVIADA · ESPERANDO</span></span>
+          <button type="button" class="so-btn no" onClick="{{r.cancel}}">CANCELAR</button>
+        </div>
+      </sc-for>
+      <sc-if value="{{noReqs}}" hint-placeholder-val="{{ false }}">
+        <div class="so-empty"><span>No tienes solicitudes pendientes.<br>Las que te envíen aparecerán aquí.</span></div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- search -->
+  <sc-if value="{{isSearch}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 96px; top: 104px; width: 504px; display: flex; flex-direction: column; gap: 12px">
+      <form class="so-search" onSubmit="{{doSearch}}">
+        <input type="text" placeholder="Nombre de jugador exacto" aria-label="Nombre de jugador" maxLength="16" autocomplete="off" autocapitalize="off" spellcheck="false" value="{{query}}" onInput="{{onQuery}}" translate="no">
+        <button type="submit" class="so-btn go" style="height: 42px; padding: 0 18px; font-size: 13px">BUSCAR</button>
+      </form>
+      <sc-if value="{{hasResult}}" hint-placeholder-val="{{ false }}">
+        <div class="so-card" style="height: 70px; {{resStyle}}">
+          <span class="so-av" style="{{resAv}}">{{resIni}}<i class="{{resDot}}"></i></span>
+          <span class="so-nm"><b translate="no">{{resName}}</b><span style="{{resSubStyle}}">{{resSub}}</span></span>
+          <sc-if value="{{resCanAdd}}" hint-placeholder-val="{{ false }}"><button type="button" class="so-btn go" onClick="{{addResult}}">{{resBtn}}</button></sc-if>
+        </div>
+      </sc-if>
+      <span style="font-size: 11.5px; font-weight: 700; color: #A3A3C2; line-height: 1.5">{{searchHint}}</span>
+    </div>
+  </sc-if>
+
+  <!-- your party -->
+  <div class="so-party">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <span style="font: 800 italic 20px/1 'Barlow Condensed', sans-serif; letter-spacing: .5px">TU EQUIPO</span>
+      <span style="font-size: 11px; font-weight: 800; color: #C4B5FD">{{partyN}}/4</span>
+    </div>
+    <sc-for list="{{partySlots}}" as="p" key="k">
+      <sc-if value="{{p.filled}}" hint-placeholder-val="{{ true }}">
+        <div class="so-slot">
+          <span class="so-av" style="{{p.av}}; width: 32px; height: 32px; font-size: 15px">{{p.ini}}</span>
+          <span class="so-nm"><b translate="no" style="font-size: 12.5px">{{p.name}}</b><span style="color: {{p.tagC}}">{{p.tag}}</span></span>
+          <sc-if value="{{p.canKick}}" hint-placeholder-val="{{ false }}"><button type="button" class="so-x" aria-label="Sacar del equipo" onClick="{{p.kick}}">✕</button></sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{p.free}}" hint-placeholder-val="{{ false }}">
+        <button type="button" class="so-slot free" onClick="{{toFriends}}"><span style="width: 32px; height: 32px; border-radius: 16px; border: 1.5px dashed #A78BFA88; display: flex; align-items: center; justify-content: center; font-size: 18px">+</span>Hueco libre · invita</button>
+      </sc-if>
+    </sc-for>
+    <span style="flex: 1"></span>
+    <span style="font-size: 10px; font-weight: 700; color: #A3A3C2; line-height: 1.4">{{partyNote}}</span>
+    <sc-if value="{{inParty}}" hint-placeholder-val="{{ false }}"><button type="button" class="so-btn no" style="width: 100%" onClick="{{leaveParty}}">{{leaveLabel}}</button></sc-if>
+    <a href="Deportes.dc.html" class="so-btn go" style="display: flex; align-items: center; justify-content: center; text-decoration: none; height: 38px; font-size: 14px">IR AL LOBBY</a>
+  </div>
+  <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
+    <span role="status" style="position: absolute; left: 96px; width: 504px; bottom: 16px; z-index: 5; padding: 9px 14px; box-sizing: border-box; border-radius: 12px; background: #F4F4FA; color: #0B0B14; font-size: 12.5px; font-weight: 800; text-align: center">{{toast}}</span>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let tab = 'friends', invite = false;
+    try { const t = JSON.parse(localStorage.getItem('arenamix.social.tab') || 'null'); if (t) { tab = t.tab || tab; invite = !!t.invite; } localStorage.removeItem('arenamix.social.tab'); } catch (e) {}
+    this.state = { tab, invite, query: '', result: null, toast: '' };
+  }
+  componentDidMount() {
+    if (window.AMSocial) { window.AMSocial.start(); this.off = window.AMSocial.on(() => this.forceUpdate()); }
+    this.tk = setInterval(() => this.forceUpdate(), 4000);
+  }
+  componentWillUnmount() { if (this.off) this.off(); clearInterval(this.tk); }
+  say(t) { this.setState({ toast: t }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2600); }
+  renderVals() {
+    const s = this.state, SO = window.AMSocial, st = SO ? SO.state() : { me: 'Jugador', online: false, taken: false, friends: [], incoming: [], outgoing: [], party: null };
+    const COLS = ['#22D3EE', '#FFC53D', '#FF5CC8', '#53D88E', '#A78BFA', '#FF8A3D', '#3EA6FF'];
+    const colOf = (n) => { let h = 0; for (const c of String(n)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return COLS[h % COLS.length]; };
+    const av = (n) => 'background: ' + colOf(n);
+    const ini = (n) => String(n || '?').charAt(0).toUpperCase();
+    const P = st.party, inParty = !!P && P.members.length > 0, leader = !P || P.leader;
+    const memberNames = P ? P.members.map((m) => m.name.toLowerCase()) : [];
+    const TABS = [['friends', 'AMIGOS', '#22D3EE', st.friends.length], ['reqs', 'SOLICITUDES', '#FFC53D', st.incoming.length], ['search', 'BUSCAR', '#A78BFA', 0]];
+    const ti = Math.max(0, TABS.findIndex((t) => t[0] === s.tab));
+    const r = s.result;
+    const members = P ? P.members : [{ name: st.me, leader: true }];
+    return {
+      title: s.invite ? 'INVITA A TU EQUIPO' : 'SOCIAL', me: st.me,
+      statusText: st.taken ? 'NOMBRE EN USO' : st.online ? 'EN LÍNEA' : 'CONECTANDO…',
+      statusStyle: 'display: flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 8px; background: #0B0B18CC; font: 800 10px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap; color: ' + (st.taken ? '#FF8A8E' : st.online ? '#53D88E' : '#FFC53D'),
+      statusDot: 'width: 7px; height: 7px; border-radius: 4px; background: currentColor; box-shadow: 0 0 6px currentColor',
+      tabs: TABS.map(([id, label, c, n], i) => ({ id, label, n: String(n), hasN: id === 'reqs' ? n > 0 : false, sel: i === ti ? 'true' : 'false', style: 'color: ' + (i === ti ? '#0B0B14' : c), pick: () => this.setState({ tab: id }) })),
+      thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 132) + 'px; width: 132px; height: 32px; border-radius: 11px; background: ' + TABS[ti][2] + '; box-shadow: 0 0 14px ' + TABS[ti][2] + '88; transition: left .4s cubic-bezier(.3,1.4,.45,1), background .3s',
+      isFriends: s.tab === 'friends', isReqs: s.tab === 'reqs', isSearch: s.tab === 'search',
+      toSearch: () => this.setState({ tab: 'search' }), toFriends: () => this.setState({ tab: 'friends' }),
+      noFriends: st.friends.length === 0,
+      friends: st.friends.map((f, k) => {
+        const inP = memberNames.includes(f.name.toLowerCase());
+        return {
+          name: f.name, ini: ini(f.name), av: av(f.name), dot: f.on ? 'on' : 'off', cls: 'so-card' + (f.on ? ' on' : ''),
+          sub: inP ? 'EN TU EQUIPO' : f.on ? 'EN LÍNEA' : 'DESCONECTADO', subStyle: 'color: ' + (inP ? '#A78BFA' : f.on ? '#53D88E' : '#6E6E92'),
+          btn: inP ? 'EN EQUIPO' : 'INVITAR', btnCls: 'so-btn ' + (f.on && !inP && leader ? 'go' : 'dim'),
+          invite: () => {
+            if (inP) return;
+            if (!f.on) { this.say(f.name + ' no está conectado ahora. Cuando abra el juego podrás invitarle.'); return; }
+            if (!leader) { this.say('Solo el líder del equipo puede invitar'); return; }
+            SO.invite(f.name);
+          },
+          remove: () => { if (window.confirm && !window.confirm('¿Quitar a ' + f.name + ' de tus amigos?')) return; SO.remove(f.name); }
+        };
+      }),
+      incoming: st.incoming.map((n) => ({ name: n, ini: ini(n), av: av(n), accept: () => { SO.accept(n); this.say('¡Ahora sois amigos!'); }, reject: () => SO.reject(n) })),
+      outgoing: st.outgoing.map((n) => ({ name: n, ini: ini(n), av: av(n), cancel: () => SO.cancel(n) })),
+      noReqs: !st.incoming.length && !st.outgoing.length,
+      query: s.query,
+      onQuery: (e) => this.setState({ query: e.currentTarget.value.replace(/\s/g, '').slice(0, 16), result: null }),
+      doSearch: (e) => {
+        e.preventDefault();
+        const q = s.query.trim();
+        if (q.length < 3) { this.say('Escribe el nombre completo (mínimo 3 letras)'); return; }
+        if (!SO) return;
+        this.setState({ result: { name: q, state: 'busy' } });
+        SO.find(q, (res) => { if (this.state.query.trim() === q) this.setState({ result: { name: q, state: res } }); });
+      },
+      hasResult: !!r,
+      resName: r ? r.name : '', resIni: r ? ini(r.name) : '', resAv: r ? av(r.name) : '',
+      resDot: r && (r.state === 'online' || r.state === 'friend') ? 'on' : 'off',
+      resSub: !r ? '' : r.state === 'busy' ? 'BUSCANDO…' : r.state === 'me' ? 'ERES TÚ' : r.state === 'friend' ? 'YA ES TU AMIGO' : r.state === 'online' ? 'EN LÍNEA AHORA' : st.outgoing.some((n) => n.toLowerCase() === r.name.toLowerCase()) ? 'SOLICITUD ENVIADA' : 'NO ESTÁ CONECTADO (O NO EXISTE)',
+      resSubStyle: 'color: ' + (r && r.state === 'online' ? '#53D88E' : r && r.state === 'busy' ? '#FFC53D' : '#A3A3C2'),
+      resStyle: r && r.state === 'online' ? 'box-shadow: inset 0 0 0 1px #53D88E88, 0 0 16px #53D88E33' : '',
+      resCanAdd: !!r && (r.state === 'online' || r.state === 'offline') && !st.outgoing.some((n) => n.toLowerCase() === r.name.toLowerCase()),
+      resBtn: r && r.state === 'online' ? 'AÑADIR' : 'ENVIAR IGUAL',
+      addResult: () => { SO.request(r.name, (ok) => this.say(ok ? 'Solicitud enviada a ' + r.name : 'Se la enviaremos a ' + r.name + ' cuando se conecte')); this.forceUpdate(); },
+      searchHint: st.online ? 'Pide a tu amigo su nombre de jugador exacto (lo ve arriba a la derecha en esta pantalla). Solo puedes encontrar a quien tenga el juego abierto; si no, la solicitud se envía cuando se conecte.' : st.taken ? 'Otro jugador conectado usa tu mismo nombre: cámbialo en la sala privada para que tus amigos te encuentren.' : 'Conectando con el servidor…',
+      partyN: String(members.length),
+      partySlots: Array.from({ length: 4 }, (_, k) => {
+        const m = members[k];
+        return m ? { k: String(k), filled: true, free: false, name: m.name, ini: ini(m.name), av: av(m.name), tag: m.leader ? 'LÍDER' : 'LISTO', tagC: m.leader ? '#FFC53D' : '#53D88E', canKick: !!P && P.leader && !m.leader, kick: () => SO.kick(m.name) }
+          : { k: String(k), filled: false, free: true, name: '', ini: '', av: '', tag: '', tagC: '', canKick: false, kick: () => {} };
+      }),
+      inParty: !!P && P.members.length > 1 || (!!P && !P.leader),
+      leaveLabel: P && P.leader ? 'DISOLVER EQUIPO' : 'SALIR DEL EQUIPO',
+      leaveParty: () => SO.leave(),
+      partyNote: P && !P.leader ? 'Estás en el equipo de ' + P.hostName + '. Cuando pulse JUGAR, entraréis juntos.' : members.length > 1 ? 'Elige el modo en el lobby y pulsa JUGAR: tus amigos entrarán contigo en tu equipo.' : 'Invita a amigos conectados para jugar juntos en tu equipo.',
+      shareName: () => {
+        const text = 'Agrégame en ARENA MIX: mi nombre es ' + st.me;
+        if (navigator.share) navigator.share({ title: 'ARENA MIX', text }).catch(() => {});
+        else if (navigator.clipboard) navigator.clipboard.writeText(st.me).then(() => this.say('Nombre copiado'), () => {});
+      },
+      hasToast: !!s.toast, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>
