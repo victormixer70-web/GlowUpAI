@@ -102,7 +102,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .lb-week{position:absolute;left:96px;top:238px;width:160px;height:62px;box-sizing:border-box;padding:8px 10px;border-radius:16px;display:flex;flex-direction:column;justify-content:center;gap:4px;text-decoration:none;color:#F4F4FA;background:linear-gradient(170deg,#2E1C5CE6,#120D2CE6);box-shadow:inset 0 0 0 1px #A78BFA66,0 6px 14px #0008}
 .lb-slot{position:absolute;width:68px;height:196px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-decoration:none;color:#C4B5FD;z-index:2;opacity:.75;transition:opacity .2s,transform .2s}
 .lb-slot:hover{opacity:1 !important;filter:brightness(1.2)}
-.lb-party{position:absolute;left:258px;top:62px;text-decoration:none;padding:3px 9px;border-radius:8px;background:#05050ACC;box-shadow:inset 0 0 0 1px #A78BFA66;font:800 9.5px Exo2,sans-serif;letter-spacing:1px;color:#C4B5FD;z-index:2}
+.lb-party{position:absolute;left:520px;top:64px;text-decoration:none;padding:3px 9px;border-radius:8px;background:#05050ACC;box-shadow:inset 0 0 0 1px #A78BFA66;font:800 9.5px Exo2,sans-serif;letter-spacing:1px;color:#C4B5FD;z-index:2}
 .lb-slot svg{position:absolute;top:22px;fill:#C4B5FD12;stroke:#C4B5FD88;stroke-width:2;stroke-dasharray:5 5}
 .lb-slot .plus{position:absolute;top:76px;width:30px;height:30px;border-radius:15px;background:#A78BFA;color:#0B0B14;font:800 22px/30px Exo2,sans-serif;text-align:center;box-shadow:0 0 0 3px #05050A,0 0 14px #A78BFA;animation:lbPulse 2s ease-in-out infinite}
 .lb-slot .lbl{margin-bottom:22px;padding:2px 8px;border-radius:7px;background:#05050ACC;font:800 9.5px Exo2,sans-serif;letter-spacing:1px}
@@ -162,10 +162,10 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .lb-social{background:linear-gradient(135deg,#0F2A5C,#071433) !important;border-color:#38BDF877 !important;color:#9FE8FF !important;box-shadow:0 0 12px #38BDF833 !important}
 .lb-spark{background:#BAE6FD !important;box-shadow:0 0 8px #38BDF8 !important}
 /* ===== lobby layout v3: players standing on the grass ===== */
-.lb-bg .photo{object-position:50% 80% !important}
+.lb-bg .photo{object-position:50% 80% !important;animation:none !important}
 .lb-bg .shade{background:linear-gradient(90deg,#04081ACC 0%,#04081A40 26%,transparent 44%,transparent 64%,#04081A40 76%,#04081ACC 100%),linear-gradient(180deg,#04081AAA 0%,transparent 20%) !important}
 .lb-bg .glow{display:none}
-.lb-stage{left:300px !important;top:289px !important;width:220px !important;height:60px !important}
+.lb-stage{left:300px !important;top:316px !important;width:220px !important;height:60px !important}
 .lb-stage i{display:none !important}
 .lb-stage b{left:10px !important;right:10px !important;top:14px !important;height:34px !important;border-radius:50% !important;filter:blur(1px) !important;background:radial-gradient(closest-side,#000000CC,#00000066 55%,transparent) !important}
 .lb-stage::before{content:'';position:absolute;left:-40px;right:-40px;top:-6px;height:74px;border-radius:50%;background:radial-gradient(closest-side,#E8FFF055,#9BE8B022 50%,transparent);mix-blend-mode:screen}
@@ -174,7 +174,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .lb-wide span{margin:0 !important;font-size:18px !important}
 .lb-wide small{position:relative;margin-top:3px;font:700 9.5px/1.25 Exo2,sans-serif;color:#B6D8F2}
 .lb-week{top:274px !important;height:70px !important}
-.lb-plate{left:310px !important;top:338px !important}
+.lb-plate{left:310px !important;top:64px !important;z-index:4 !important}
 .lb-slot{z-index:2}
 .lb-mode{top:130px !important;height:120px !important}
 .lb-play{top:260px !important;height:110px !important}
@@ -246,7 +246,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <a href="Social.dc.html" class="lb-party">TU EQUIPO · {{partyN}}/4</a>
   <!-- you, in 3D, on the stage (the 2D figure only if 3D isn't available) -->
   <sc-if value="{{hero3d}}" hint-placeholder-val="{{ true }}">
-    <div ref="{{heroRef}}" role="button" aria-label="Tu jugador: tócalo para que haga una jugada" onClick="{{heroTap}}" style="position: absolute; left: 300px; top: 52px; width: 220px; height: 300px; z-index: 3; cursor: pointer; filter: drop-shadow(0 14px 18px #000C)"></div>
+    <div ref="{{heroRef}}" role="button" aria-label="Tu jugador: tócalo para que haga una jugada" onClick="{{heroTap}}" style="position: absolute; left: 290px; top: 70px; width: 240px; height: 318px; z-index: 3; cursor: pointer; filter: drop-shadow(0 14px 18px #000C)"></div>
   </sc-if>
   <sc-if value="{{hero2d}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; left: 341px; top: 70px; z-index: 3; pointer-events: none; filter: drop-shadow(0 12px 16px #000C); animation: hmPlayer 3.4s ease-in-out infinite">
@@ -357,7 +357,7 @@ class Component extends DCLogic {
     const others = P ? P.members.filter((m) => m.name !== st.me) : [];
     const COLS = ['#22D3EE', '#FFC53D', '#FF5CC8', '#53D88E', '#A78BFA', '#FF8A3D', '#3EA6FF'];
     const colOf = (n) => { let h = 0; for (const c of String(n)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return COLS[h % COLS.length]; };
-    const POS = [[262, 178, ''], [484, 178, ''], [568, 160, ' transform: scale(.86);']];
+    const POS = [[258, 206, ''], [494, 206, ''], [574, 190, ' transform: scale(.86);']];
     const toSocial = () => { try { localStorage.setItem('arenamix.social.tab', JSON.stringify({ tab: st && st.friends.length ? 'friends' : 'search', invite: true })); } catch (e) {} };
     const member = P && !P.leader, withParty = !!P && P.leader && P.members.length > 1;
     const n0 = /^m\d$/.test(selId) ? +selId.slice(1) : 2, fmt = 'm' + Math.min(4, Math.max(n0, P ? P.members.length : 1, 2));
