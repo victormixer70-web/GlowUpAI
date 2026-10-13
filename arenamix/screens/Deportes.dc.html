@@ -190,6 +190,15 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .lb-mode{top:146px !important;height:106px !important}
 .lb-mode .ttl{font-size:24px !important}
 .lb-play{top:262px !important;height:104px !important}
+/* ===== lobby v5: PLAY tucked into the corner, out of the players' way ===== */
+.lb-mode{left:690px !important;width:142px !important;top:196px !important;height:84px !important;border-radius:14px !important}
+.lb-mode .ttl{font-size:20px !important;bottom:20px !important}
+.lb-mode .cat{font-size:8px !important}
+.lb-mode .chg{font-size:8px !important;bottom:6px !important}
+.lb-play{left:690px !important;width:142px !important;top:290px !important;height:82px !important;border-radius:18px !important;animation:none !important}
+.lb-play .lbl{font-size:38px !important}
+.lb-play .hm-ring{display:none}
+.lb-party{left:690px !important;top:170px !important;width:142px;text-align:center;box-sizing:border-box}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(90% 120% at 40% 0%, #1D2350 0%, #0D0F24 45%, #07070F 100%); color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -351,7 +360,7 @@ class Component extends DCLogic {
     const others = P ? P.members.filter((m) => m.name !== st.me) : [];
     const COLS = ['#22D3EE', '#FFC53D', '#FF5CC8', '#53D88E', '#A78BFA', '#FF8A3D', '#3EA6FF'];
     const colOf = (n) => { let h = 0; for (const c of String(n)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return COLS[h % COLS.length]; };
-    const POS = [[258, 206, ''], [494, 206, ''], [574, 190, ' transform: scale(.86);']];
+    const POS = [[232, 206, ''], [500, 206, ''], [574, 188, ' transform: scale(.84);']];
     const toSocial = () => { try { localStorage.setItem('arenamix.social.tab', JSON.stringify({ tab: st && st.friends.length ? 'friends' : 'search', invite: true })); } catch (e) {} };
     const member = P && !P.leader, withParty = !!P && P.leader && P.members.length > 1;
     const n0 = /^m\d$/.test(selId) ? +selId.slice(1) : 2, fmt = 'm' + Math.min(4, Math.max(n0, P ? P.members.length : 1, 2));
