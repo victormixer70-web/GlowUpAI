@@ -199,12 +199,14 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .lb-play .lbl{font-size:38px !important}
 .lb-play .hm-ring{display:none}
 .lb-party{left:690px !important;top:170px !important;width:142px;text-align:center;box-sizing:border-box}
+.lb-bg .grain{position:absolute;inset:0;background:url(assets/grain.png) 0 0/160px 160px;opacity:.09;mix-blend-mode:overlay}
+.lb-bg .photo{image-rendering:auto;filter:contrast(1.04) saturate(1.05)}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(90% 120% at 40% 0%, #1D2350 0%, #0D0F24 45%, #07070F 100%); color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <div class="am-bg"></div>
   <!-- the lobby's backdrop: a floodlit stadium at night -->
-  <div class="lb-bg" aria-hidden="true"><img class="photo" src="assets/lobby_bg.jpg" alt=""><i class="shade"></i><i class="glow"></i></div>
+  <div class="lb-bg" aria-hidden="true"><img class="photo" src="assets/lobby_bg.jpg?v=3" alt=""><i class="shade"></i><i class="glow"></i><i class="grain"></i></div>
   <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; height: 390px; z-index: 3"><dc-import name="Nav" active="jugar" hint-size="80px,390px"></dc-import></div>
   <!-- top bar: you, your coins, settings -->
   <div style="position: absolute; left: 96px; right: 12px; top: 10px; height: 44px; display: flex; align-items: center; gap: 10px; z-index: 1">
