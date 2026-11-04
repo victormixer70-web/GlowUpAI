@@ -63,12 +63,98 @@
         }, null, function () { if (onStep) onStep(); res(false); });
       });
     }))).then(function () {
+      try { footballers(); } catch (e) { console.warn('kit transplant', e); }
       var ok = ready();
       if (ok) waiters.splice(0).forEach(function (f) { try { f(); } catch (e) {} });
       return ok;
     });
     return loading;
   }
+  /* ---------- everyone a footballer ----------
+     Dani is the only model that comes in a football kit. The other realistic models (same Mixamo rig) get
+     Dani's shirt, shorts, socks and boots in place of their street clothes: every kit vertex is carried
+     from Dani's bones to the same bones of the other skeleton, scaled to the model's height. */
+  var KIT_SRC = 'dani', KIT_MESH = /(Shorts|Shirt|Socks|Shoes|Body)$/;
+  // models with no legs under their trousers borrow Dani's (thigh to ankle), tinted to their skin
+  var LEGS = { leo: '#F2E2D8', nico: '#8A6450', remy: '#D9B497' };
+  // per model fit: offsets from each bone scaled a bit (borrowed legs sit just inside the model's own skin)
+  var FIT = { remy: { Shorts: 1.1, Shirt: 1.04, Body: 0.94 } };
+  var WEAR = { leo: /Ch23_(Suit|Belt|Shirt|Pants|Shoes)$/, nico: /Ch28_(Sneakers|Pants|Hoody)$/, remy: /^(Shoes|Tops|Bottoms)$/ };
+  var DROP = { ty: /Scarf/ };
+  function footballers() {
+    var src = tpl[KIT_SRC];
+    Object.keys(DROP).forEach(function (id) {
+      var t = tpl[id]; if (!t) return;
+      var rm = []; t.root.traverse(function (m) { if (m.isMesh && DROP[id].test(m.name)) rm.push(m); });
+      rm.forEach(function (m) { m.parent.remove(m); });
+    });
+    if (!src) return;
+    src.root.updateMatrixWorld(true);
+    var srcH = src.box.max.y - src.box.min.y;
+    Object.keys(WEAR).forEach(function (id) {
+      var t = tpl[id]; if (!t) return;
+      var root = t.root; root.updateMatrixWorld(true);
+      var tb = {}; root.traverse(function (b) { if (b.isBone && !tb[b.name]) tb[b.name] = b; });
+      var old = []; root.traverse(function (m) { if (m.isSkinnedMesh && WEAR[id].test(m.name)) old.push(m); });
+      if (!old.length) return;
+      var ref = old[0], k = (t.box.max.y - t.box.min.y) / srcH, inv = new T.Matrix4().copy(ref.matrixWorld).invert();
+      var made = [];
+      src.root.traverse(function (m) {
+        if (!m.isSkinnedMesh || !KIT_MESH.test(m.name)) return;
+        var sb = m.skeleton.bones, bones = sb.map(function (b) { return tb[b.name]; });
+        if (bones.some(function (b) { return !b; })) return;
+        var isBody = /Body$/.test(m.name);
+        if (isBody && !LEGS[id]) return;
+        var sp = sb.map(function (b) { return new T.Vector3().setFromMatrixPosition(b.matrixWorld); });
+        var tp = bones.map(function (b) { return new T.Vector3().setFromMatrixPosition(b.matrixWorld); });
+        var geo = m.geometry.clone();
+        if (isBody) {
+          // keep only the triangles the leg bones move
+          var bn = sb.map(function (b) { return b.name; }), gi = geo.index, sI = geo.attributes.skinIndex, sW = geo.attributes.skinWeight, keep = [];
+          var legV = function (x) { var best = 0, bw = -1; for (var q = 0; q < 4; q++) { var ww = sW.array[x * 4 + q]; if (ww > bw) { bw = ww; best = sI.array[x * 4 + q]; } } return /(UpLeg|Leg)$/.test(bn[best] || ''); };
+          for (var f = 0; f < gi.count; f += 3) { var a = gi.getX(f), b2 = gi.getX(f + 1), c2 = gi.getX(f + 2); if (legV(a) && legV(b2) && legV(c2)) keep.push(a, b2, c2); }
+          geo.setIndex(keep);
+        }
+        var pos = geo.attributes.position, si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight;
+        var part = (m.name.match(/(Shorts|Shirt|Socks|Shoes|Body)$/) || [])[1], kf = k * ((FIT[id] || {})[part] || 1);
+        var v = new T.Vector3(), acc = new T.Vector3(), d = new T.Vector3();
+        for (var i = 0; i < pos.count; i++) {
+          v.fromBufferAttribute(m.geometry.attributes.position, i);
+          m.boneTransform(i, v); v.applyMatrix4(m.matrixWorld);
+          acc.set(0, 0, 0);
+          var tw = 0;
+          for (var j = 0; j < 4; j++) {
+            var w = sw.array[i * 4 + j]; if (!(w > 0)) continue;
+            var bi = si.array[i * 4 + j];
+            d.copy(v).sub(sp[bi]).multiplyScalar(kf).add(tp[bi]);
+            acc.addScaledVector(d, w); tw += w;
+          }
+          if (tw > 0) acc.multiplyScalar(1 / tw); else acc.copy(v);
+          acc.applyMatrix4(inv);
+          pos.setXYZ(i, acc.x, acc.y, acc.z);
+        }
+        pos.needsUpdate = true; geo.computeBoundingSphere();
+        var mat = m.material;
+        if (isBody) { mat = m.material.clone(); mat.color = new T.Color(LEGS[id]); }
+        var nm = new T.SkinnedMesh(geo, mat);
+        nm.name = isBody ? 'Legs_Body' : m.name; nm.castShadow = true; nm.frustumCulled = false;
+        nm.position.copy(ref.position); nm.quaternion.copy(ref.quaternion); nm.scale.copy(ref.scale);
+        made.push({ mesh: nm, bones: bones });
+      });
+      if (!made.length) return;
+      var parent = ref.parent;
+      old.forEach(function (m) { m.parent.remove(m); });
+      made.forEach(function (o) {
+        parent.add(o.mesh); o.mesh.updateMatrixWorld(true);
+        o.mesh.bind(new T.Skeleton(o.bones), o.mesh.matrixWorld.clone());
+      });
+      root.updateMatrixWorld(true);
+      prepKit(root, t.box);
+    });
+  }
+  // the cartoon models are one piece: their clothes are painted as a kit when no outfit is given
+  var PAINT = { ty: 1, vegas: 1, granny: 1 };
+  var HOME_KIT = { primary: '#F4F6FA', secondary: '#1E3A8A', pattern: 'solid', shorts: '#1E2A55', socks: '#F4F6FA', shoe: '#1A1D24' };
   function onReady(f) { if (ready()) f(); else waiters.push(f); }
 
   /* ---------- kits: the outfit chosen in Taquilla painted over each character's own clothes ----------
@@ -123,7 +209,7 @@
       var lum = [1, 1, 1, 1, 1].map(function (d, z) { return cnt[z] ? Math.max(0.02, sum[z] / cnt[z]) : 0.2; });
       m.userData.kitLum = [lum[1], lum[2], lum[3], lum[4]];
       m.userData.kitable = true;
-      m.userData.keepSkin = /elvis/i.test(m.name) ? 1 : 0;
+      m.userData.keepSkin = 0;
     });
   }
   /* head size and where the eyes are, from the vertices the head bone moves (T-pose, model units):
@@ -302,6 +388,7 @@
     // dress the character: an explicit kit, your Taquilla outfit, or the team colours the game passes
     var kit = o.kit || (o.you && !o.noOutfit ? outfit(o.sport) : null);
     if (!kit && o.shirt != null) kit = { primary: o.shirt, secondary: o.trimCss, pattern: 'solid', shorts: o.shorts, socks: o.socks, shoe: o.boot };
+    if (!kit && PAINT[id]) kit = HOME_KIT;
     if (kit) model.traverse(function (m) { if (m.isSkinnedMesh && m.userData.kitable) m.material = kitMaterial(m.material, kit, new T.Vector4().fromArray(m.userData.kitLum), m.userData.keepSkin); });
     var gear = [];
     // the accessories only go on your own character, not on teammates who share the kit
