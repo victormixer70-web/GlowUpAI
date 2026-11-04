@@ -151,6 +151,94 @@
       root.updateMatrixWorld(true);
       prepKit(root, t.box);
     });
+    ['dani', 'leo', 'nico'].forEach(addArms);
+  }
+  /* ---------- sleeves and size (Taquilla) ---------- */
+  var FIT_KEY = 'arenamix.fit.v1', FIT_DEF = { sleeve: 'short', size: 'M' };
+  // how much the shirt and shorts are let out, in metres
+  var SIZES = { S: -0.0025, M: 0, L: 0.012, XL: 0.026 };
+  function fitPref() {
+    try { var v = JSON.parse(localStorage.getItem(FIT_KEY) || 'null'); if (v) return { sleeve: v.sleeve === 'long' ? 'long' : 'short', size: SIZES[v.size] != null ? v.size : 'M' }; } catch (e) {}
+    return { sleeve: FIT_DEF.sleeve, size: FIT_DEF.size };
+  }
+  function setFit(f) { try { localStorage.setItem(FIT_KEY, JSON.stringify(fitPref() && Object.assign(fitPref(), f))); } catch (e) {} }
+  // skin tone of the arms bared by short sleeves
+  var SKIN = { ty: '#F6CBAA', vegas: '#F0C29C', granny: '#BFD3C6', dani: '#C99A7E', leo: '#D9AE93', nico: '#5E3E2E', remy: '#D2A88A' };
+  /* models with nothing under the shirt get arms: a tube along the arm bones, as thick as the sleeve
+     around it, skinned to the shoulder, elbow and wrist */
+  function addArms(id) {
+    var t = tpl[id]; if (!t) return;
+    var shirt = null; t.root.traverse(function (m) { if (m.isSkinnedMesh && /Shirt$/.test(m.name)) shirt = m; });
+    if (!shirt) return;
+    t.root.updateMatrixWorld(true);
+    var by = {}; t.root.traverse(function (b) { if (b.isBone && !by[b.name]) by[b.name] = b; });
+    var sp = []; var pos = shirt.geometry.attributes.position, v = new T.Vector3();
+    for (var i = 0; i < pos.count; i += 1) { v.fromBufferAttribute(pos, i); shirt.boneTransform(i, v); v.applyMatrix4(shirt.matrixWorld); sp.push(v.clone()); }
+    var mat = new T.MeshStandardMaterial({ color: new T.Color(SKIN[id] || '#D9AE93').convertSRGBToLinear(), roughness: 0.62, metalness: 0 });
+    mat.skinning = true;
+    var inv = new T.Matrix4().copy(shirt.matrixWorld).invert(), H = t.box.max.y - t.box.min.y;
+    ['Left', 'Right'].forEach(function (side) {
+      var bA = by['mixamorig' + side + 'Arm'], bF = by['mixamorig' + side + 'ForeArm'], bH = by['mixamorig' + side + 'Hand'];
+      if (!bA || !bF || !bH) return;
+      var pA = new T.Vector3().setFromMatrixPosition(bA.matrixWorld), pF = new T.Vector3().setFromMatrixPosition(bF.matrixWorld), pH = new T.Vector3().setFromMatrixPosition(bH.matrixWorld);
+      var at = function (u) { return u <= 1 ? pA.clone().lerp(pF, u) : pF.clone().lerp(pH, u - 1); };
+      var dirAt = function (u) { return (u <= 1 ? pF.clone().sub(pA) : pH.clone().sub(pF)).normalize(); };
+      // sleeve radius along the arm (bins of u), from the shirt vertices around it
+      var NB = 20, rs = [], i2, b;
+      for (b = 0; b < NB; b++) rs.push([]);
+      sp.forEach(function (q) {
+        var best = null;
+        [[pA, pF, 0], [pF, pH, 1]].forEach(function (sg) {
+          var d = sg[1].clone().sub(sg[0]), L2 = d.lengthSq(), tt = q.clone().sub(sg[0]).dot(d) / L2;
+          if (tt < 0 || tt > 1) return;
+          var dist = q.distanceTo(sg[0].clone().addScaledVector(d, tt));
+          if (!best || dist < best.d) best = { d: dist, u: sg[2] + tt };
+        });
+        if (best && best.d < H * 0.07) rs[Math.min(NB - 1, Math.floor(best.u / 2 * NB))].push(best.d);
+      });
+      var rad = rs.map(function (a) { if (!a.length) return null; a.sort(function (x, y) { return x - y; }); return a[Math.floor(a.length * 0.35)]; });
+      var radAt = function (u) {
+        var k = Math.max(0, Math.min(NB - 1, Math.floor(u / 2 * NB))), r = rad[k];
+        for (var j = 1; r == null && j < NB; j++) r = rad[Math.max(0, k - j)] || rad[Math.min(NB - 1, k + j)];
+        // a little inside the sleeve, tapering to the wrist
+        var lim = H * (u < 1 ? 0.034 - 0.008 * u : 0.026 - 0.008 * (u - 1));
+        return Math.min(r != null ? r * 0.82 : lim, lim);
+      };
+      var RING = 14, us = [], u0 = 0.3, u1 = 1.97;
+      for (var s2 = 0; s2 <= 22; s2++) us.push(u0 + (u1 - u0) * s2 / 22);
+      var P = [], SI = [], SW = [], IDX = [], ref = new T.Vector3(0, 0, 1);
+      var rad0 = us.map(radAt);
+      // smooth the radii
+      var rsm = rad0.map(function (r, k) { return (rad0[Math.max(0, k - 1)] + r * 2 + rad0[Math.min(rad0.length - 1, k + 1)]) / 4; });
+      us.forEach(function (u, k) {
+        var c = at(u), d = dirAt(u), x = new T.Vector3().crossVectors(d, ref); if (x.lengthSq() < 1e-6) x.set(1, 0, 0); x.normalize();
+        var y = new T.Vector3().crossVectors(d, x).normalize();
+        for (var r = 0; r < RING; r++) {
+          var a = r / RING * Math.PI * 2, p2 = c.clone().addScaledVector(x, Math.cos(a) * rsm[k]).addScaledVector(y, Math.sin(a) * rsm[k] * 0.92).applyMatrix4(inv);
+          P.push(p2.x, p2.y, p2.z);
+          // weights: shoulder bone, blended over the elbow, then the forearm (and the hand at the end)
+          var wF = Math.max(0, Math.min(1, (u - 0.85) / 0.3)), wH = Math.max(0, Math.min(1, (u - 1.85) / 0.12));
+          SI.push(0, 1, 2, 0); SW.push(1 - wF, wF * (1 - wH), wF * wH, 0);
+        }
+      });
+      for (var k2 = 0; k2 < us.length - 1; k2++) for (var r2 = 0; r2 < RING; r2++) {
+        var a0 = k2 * RING + r2, a1 = k2 * RING + (r2 + 1) % RING, b0 = a0 + RING, b1 = a1 + RING;
+        IDX.push(a0, b0, a1, a1, b0, b1);
+      }
+      var geo = new T.BufferGeometry();
+      geo.setAttribute('position', new T.Float32BufferAttribute(P, 3));
+      geo.setAttribute('skinIndex', new T.Uint16BufferAttribute(SI, 4));
+      geo.setAttribute('skinWeight', new T.Float32BufferAttribute(SW, 4));
+      geo.setIndex(IDX); geo.computeVertexNormals();
+      // the winding may face inwards depending on the side: flip so normals point out
+      var c0 = at(1), n0 = new T.Vector3().fromBufferAttribute(geo.attributes.normal, 11 * RING), p0 = new T.Vector3().fromBufferAttribute(geo.attributes.position, 11 * RING).applyMatrix4(shirt.matrixWorld);
+      if (n0.transformDirection(shirt.matrixWorld).dot(p0.sub(c0)) < 0) { for (var f = 0; f < IDX.length; f += 3) { var tmp = IDX[f + 1]; IDX[f + 1] = IDX[f + 2]; IDX[f + 2] = tmp; } geo.setIndex(IDX); geo.computeVertexNormals(); }
+      var mesh = new T.SkinnedMesh(geo, mat);
+      mesh.name = side + 'Arm_Body'; mesh.castShadow = true; mesh.frustumCulled = false; mesh.userData.bareArms = true;
+      mesh.position.copy(shirt.position); mesh.quaternion.copy(shirt.quaternion); mesh.scale.copy(shirt.scale);
+      shirt.parent.add(mesh); mesh.updateMatrixWorld(true);
+      mesh.bind(new T.Skeleton([bA, bF, bH]), mesh.matrixWorld.clone());
+    });
   }
   // the cartoon models are one piece: their clothes are painted as a kit when no outfit is given
   var PAINT = { ty: 1, vegas: 1, granny: 1 };
@@ -182,7 +270,19 @@
       if (Array.isArray(mt) || mt.transparent || !mt.map) return;
       var geo = m.geometry, pos = geo.attributes.position, si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight, uv = geo.attributes.uv;
       if (!si || !sw) return;
-      var n = pos.count, kit = new Float32Array(n * 3), names = m.skeleton.bones.map(function (b) { return b.name; });
+      var n = pos.count, kit = new Float32Array(n * 3), arm = new Float32Array(n), names = m.skeleton.bones.map(function (b) { return b.name; });
+      // where each bone sits at rest, for the sleeve coordinate (0 shoulder .. 1 elbow .. 2 wrist)
+      var bwp = {}; m.skeleton.bones.forEach(function (b) { bwp[b.name] = new T.Vector3().setFromMatrixPosition(b.matrixWorld); });
+      var armAt = function (bn, p) {
+        var mm = /^(mixamorig)?(Left|Right)(Arm|ForeArm|Hand)/.exec(bn); if (!mm) return -1;
+        var pre = (mm[1] || '') + mm[2];
+        if (mm[3] !== 'Arm' && mm[3] !== 'ForeArm') return 2;
+        var a = bwp[pre + mm[3]], b = bwp[pre + (mm[3] === 'Arm' ? 'ForeArm' : 'Hand')];
+        if (!a || !b) return mm[3] === 'Arm' ? 0.5 : 1.5;
+        var dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z, L2 = dx * dx + dy * dy + dz * dz || 1;
+        var t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy + (p.z - a.z) * dz) / L2));
+        return (mm[3] === 'Arm' ? 0 : 1) + t;
+      };
       // texture pixels, to know each zone's average brightness (the recolour keeps relative shading)
       var px = null, W = 128, Hh = 128;
       try {
@@ -196,6 +296,7 @@
         var z = zoneOf(names[best] || '');
         v.fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld);
         kit[i * 3] = z; kit[i * 3 + 1] = (v.x - cx) / H; kit[i * 3 + 2] = (v.y - box.min.y) / H;
+        arm[i] = z === 1 ? armAt(names[best] || '', v) : -1;
         if (px && uv && z) {
           var u = uv.getX(i), w2 = uv.getY(i);
           u -= Math.floor(u); w2 -= Math.floor(w2);
@@ -206,6 +307,12 @@
         }
       }
       geo.setAttribute('aKit', new T.Float32BufferAttribute(kit, 3));
+      geo.setAttribute('aArm', new T.Float32BufferAttribute(arm, 1));
+      // model units per metre (the kit is let out or taken in by a few centimetres)
+      var ws = new T.Vector3(); m.getWorldScale(ws);
+      m.userData.unit = (H / HEIGHT) / (ws.x || 1);
+      // a separate shirt (a body under it) is cut short; a one-piece model is painted skin instead
+      m.userData.sleeveCut = /shirt|tops/i.test(m.name) ? 1 : 0;
       var lum = [1, 1, 1, 1, 1].map(function (d, z) { return cnt[z] ? Math.max(0.02, sum[z] / cnt[z]) : 0.2; });
       m.userData.kitLum = [lum[1], lum[2], lum[3], lum[4]];
       m.userData.kitable = true;
@@ -277,22 +384,24 @@
     if (c == null) return new T.Color(fb);
     return (c.isColor ? c.clone() : new T.Color(c)).convertSRGBToLinear();
   }
-  function kitMaterial(base, kit, lum, keepSkin) {
+  function kitMaterial(base, kit, lum, keepSkin, fit, unit, sleeveCut, skin) {
     var m = base.clone();
     var U = {
       uKitA: { value: col(kit.primary, '#ffffff') }, uKitB: { value: col(kit.secondary, '#141B2D') },
       uShorts: { value: col(kit.shorts, '#141B2D') }, uSocks: { value: col(kit.socks, '#ffffff') }, uShoes: { value: col(kit.shoe, '#F2F5FA') },
-      uPat: { value: PAT[kit.pattern] || 0 }, uLum: { value: lum }, uKeepSkin: { value: keepSkin || 0 }
+      uPat: { value: PAT[kit.pattern] || 0 }, uLum: { value: lum }, uKeepSkin: { value: keepSkin || 0 },
+      uPaint: { value: kit.none ? 0 : 1 }, uInflate: { value: (fit && fit.inflate || 0) * (unit || 1) },
+      uSleeve: { value: fit && fit.sleeve === 'long' ? 0 : (sleeveCut ? 1 : 2) }, uSkin: { value: col(skin, '#E8B896') }
     };
     m.onBeforeCompile = function (sh) {
       Object.keys(U).forEach(function (k) { sh.uniforms[k] = U[k]; });
       sh.vertexShader = sh.vertexShader
-        .replace('#include <common>', '#include <common>\nattribute vec3 aKit;\nvarying vec4 vZone;\nvarying vec2 vKitP;')
-        .replace('#include <begin_vertex>', '#include <begin_vertex>\nvZone = vec4(step(0.5, aKit.x) * step(aKit.x, 1.5), step(1.5, aKit.x) * step(aKit.x, 2.5), step(2.5, aKit.x) * step(aKit.x, 3.5), step(3.5, aKit.x));\nvKitP = aKit.yz;');
+        .replace('#include <common>', '#include <common>\nattribute vec3 aKit;\nattribute float aArm;\nvarying vec4 vZone;\nvarying vec2 vKitP;\nvarying float vArm;\nuniform float uInflate;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\nvArm = aArm;\ntransformed += objectNormal * uInflate * (step(0.5, aKit.x) * step(aKit.x, 2.5));\nvZone = vec4(step(0.5, aKit.x) * step(aKit.x, 1.5), step(1.5, aKit.x) * step(aKit.x, 2.5), step(2.5, aKit.x) * step(aKit.x, 3.5), step(3.5, aKit.x));\nvKitP = aKit.yz;');
       sh.fragmentShader = sh.fragmentShader
         .replace('#include <common>', ['#include <common>', 'varying vec4 vZone;', 'varying vec2 vKitP;',
           'uniform vec3 uKitA; uniform vec3 uKitB; uniform vec3 uShorts; uniform vec3 uSocks; uniform vec3 uShoes;',
-          'uniform float uPat; uniform vec4 uLum; uniform float uKeepSkin;',
+          'uniform float uPat; uniform vec4 uLum; uniform float uKeepSkin; uniform float uPaint; uniform float uSleeve; uniform vec3 uSkin;', 'varying float vArm;',
           'float kitPattern(vec2 p) {',
           '  if (uPat < 0.5) return 0.0;',
           '  if (uPat < 1.5) return step(0.5, fract(p.x * 14.0 + 0.25));',
@@ -305,6 +414,9 @@
           '  return step(abs(p.y - 0.66), 0.03);',
           '}'].join('\n'))
         .replace('#include <map_fragment>', ['#include <map_fragment>',
+          // short sleeves end halfway down the upper arm
+          'float bare = step(0.5, uSleeve) * step(0.55, vArm) * step(vArm, 1.98);',
+          'if (bare > 0.5 && uSleeve < 1.5) discard;',
           '{',
           '  vec3 c = diffuseColor.rgb, sc = pow(max(c, vec3(0.0)), vec3(1.0 / 2.2));',
           '  float lum = dot(c, vec3(0.2126, 0.7152, 0.0722));',
@@ -314,10 +426,11 @@
           '  vec3 kitC = shirt * vZone.x + uShorts * vZone.y + uSocks * vZone.z + uShoes * vZone.w;',
           '  float w = clamp(vZone.x * (1.0 - skin) + vZone.y + vZone.z + vZone.w, 0.0, 1.0);',
           '  vec3 painted = kitC * clamp(lum / zl, 0.35, 1.6);',
-          '  diffuseColor.rgb = mix(c, painted, w);',
+          '  diffuseColor.rgb = mix(c, painted, w * uPaint);',
+          '  if (bare > 0.5) diffuseColor.rgb = uSkin * clamp(lum / max(zl, 0.0001), 0.55, 1.25);',
           '}'].join('\n'));
     };
-    m.customProgramCacheKey = function () { return 'amkit1'; };
+    m.customProgramCacheKey = function () { return 'amkit2'; };
     return m;
   }
   // the outfit equipped in Taquilla for a sport (null if none saved yet)
@@ -389,7 +502,13 @@
     var kit = o.kit || (o.you && !o.noOutfit ? outfit(o.sport) : null);
     if (!kit && o.shirt != null) kit = { primary: o.shirt, secondary: o.trimCss, pattern: 'solid', shorts: o.shorts, socks: o.socks, shoe: o.boot };
     if (!kit && PAINT[id]) kit = HOME_KIT;
-    if (kit) model.traverse(function (m) { if (m.isSkinnedMesh && m.userData.kitable) m.material = kitMaterial(m.material, kit, new T.Vector4().fromArray(m.userData.kitLum), m.userData.keepSkin); });
+    // sleeves and size: yours from Taquilla, everyone else in short sleeves and their own size
+    var fit = o.fit || ((o.you || o.gear) ? fitPref() : FIT_DEF), fz = SIZES[fit.size] != null ? SIZES[fit.size] : 0;
+    var fk = { sleeve: fit.sleeve, inflate: fz }, short = fit.sleeve !== 'long';
+    model.traverse(function (m) {
+      if (m.isSkinnedMesh && m.userData.kitable) m.material = kitMaterial(m.material, kit || { none: 1 }, new T.Vector4().fromArray(m.userData.kitLum), m.userData.keepSkin, fk, m.userData.unit, m.userData.sleeveCut, SKIN[id]);
+      if (m.userData.bareArms) m.visible = short;
+    });
     var gear = [];
     // the accessories only go on your own character, not on teammates who share the kit
     if (kit && (o.you || o.gear) && !o.noGear) dress(id, kit, g, s, holder.position, function (obj) { gear.push(obj); });
@@ -559,5 +678,5 @@
     return g;
   }
 
-  window.AMChars = { list: LIST, pref: pref, setPref: setPref, load: load, ready: ready, onReady: onReady, make: make, clip: clipInfo, outfit: outfit };
+  window.AMChars = { fitPref: fitPref, setFit: setFit, sizes: Object.keys(SIZES), list: LIST, pref: pref, setPref: setPref, load: load, ready: ready, onReady: onReady, make: make, clip: clipInfo, outfit: outfit };
 })();

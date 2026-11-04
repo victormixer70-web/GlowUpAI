@@ -86,6 +86,20 @@ input::placeholder{color:#8686A6}
     </div>
   </div>
 
+  <!-- the fit: sleeves and size -->
+  <div role="group" aria-label="Corte" style="position: absolute; left: 388px; top: 112px; width: 70px; display: flex; flex-direction: column; gap: 5px; padding: 7px 6px; box-sizing: border-box; border-radius: 12px; background: #0B0B14CC; border: 1px solid #2E2E58; z-index: 2">
+    <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE; text-align: center">MANGA</span>
+    <sc-for list="{{sleeveBtns}}" as="sb" hint-placeholder-count="2">
+      <button type="button" aria-pressed="{{sb.on}}" onClick="{{sb.pick}}" style="{{sb.style}}">{{sb.label}}</button>
+    </sc-for>
+    <span style="margin-top: 3px; font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE; text-align: center">TALLA</span>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px">
+      <sc-for list="{{sizeBtns}}" as="zb" hint-placeholder-count="4">
+        <button type="button" aria-pressed="{{zb.on}}" onClick="{{zb.pick}}" style="{{zb.style}}">{{zb.label}}</button>
+      </sc-for>
+    </div>
+  </div>
+
   <!-- the rail: categories, leagues, the clothes on hangers, and the action -->
   <div style="position: absolute; left: 462px; top: 0; right: 0; bottom: 0; border-radius: 24px 0 0 24px; background: linear-gradient(160deg, #191936F2, #0E0E1EF2)"></div>
   <div style="position: absolute; left: 462px; top: 24px; width: 4px; bottom: 24px; border-radius: 2px; background: linear-gradient(180deg, #22D3EE, #7C5CFF); box-shadow: 0 0 12px #22D3EE"></div>
@@ -225,7 +239,7 @@ class Component extends DCLogic {
     if (!w || !h) return;
     if (V.sz !== w + 'x' + h) { V.sz = w + 'x' + h; R.setSize(w, h, false); this.cam.aspect = w / h; this.cam.updateProjectionMatrix(); }
     // rebuild the character when the character or the outfit being looked at changes (kept between visits)
-    const key = this.want.char + '|' + JSON.stringify(this.want.kit);
+    const key = this.want.char + '|' + JSON.stringify(this.want.kit) + '|' + JSON.stringify(A.fitPref ? A.fitPref() : {});
     if (key !== V.modelKey && A.ready()) {
       if (V.model) V.S.remove(V.model);
       V.model = A.make({ char: this.want.char, kit: this.want.kit, noRing: true, gear: true });
@@ -630,7 +644,13 @@ class Component extends DCLogic {
         textStyle: c.id === 'clasico' ? 'font: 800 8px Exo2, sans-serif; color: #F4F4FA;' : 'display: none;'
       };
     });
+    const A2 = window.AMChars, fitNow = A2 && A2.fitPref ? A2.fitPref() : { sleeve: 'short', size: 'M' };
+    const fitBtn = (on) => 'height: 26px; padding: 0; border-radius: 8px; font: 800 11px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14; border: 0; box-shadow: 0 2px 0 #0E8FA3;' : 'background: #17172A; color: #CACAE0; border: 1px solid #2E2E52;');
+    const setFit = (f) => { if (A2 && A2.setFit) { A2.setFit(f); window.AMSfx && window.AMSfx.tap && window.AMSfx.tap(); this.forceUpdate(); } };
+    const sleeveBtns = [['short', 'CORTA'], ['long', 'LARGA']].map(([id, label]) => ({ label, on: String(fitNow.sleeve === id), style: fitBtn(fitNow.sleeve === id), pick: () => setFit({ sleeve: id }) }));
+    const sizeBtns = (A2 && A2.sizes || ['S', 'M', 'L', 'XL']).map((id) => ({ label: id, on: String(fitNow.size === id), style: fitBtn(fitNow.size === id), pick: () => setFit({ size: id }) }));
     return {
+      sleeveBtns, sizeBtns,
       show3d, show2d: !show3d, charChips, canvasRef: this.canvasRef,
       viewerLabel: 'Tu personaje con la equipación ' + kitItem.name + '. Desliza para girarlo.',
       pDown: (e) => { e.preventDefault(); try { e.currentTarget.setPointerCapture(e.pointerId); } catch (er) {} this.drag = { id: e.pointerId, x: e.clientX, t: performance.now() }; this.spin = 0; },

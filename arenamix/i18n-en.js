@@ -425,7 +425,7 @@ window.AM_I18N_EN = {
   'VESTUARIO · FÚTBOL': 'LOCKER ROOM · FOOTBALL', 'EQUIPOS': 'KITS', 'CABEZA': 'HEAD', 'CARA': 'FACE', 'CALZADO': 'BOOTS', 'EQUIPACIÓN': 'KIT', 'ACCESORIO': 'ACCESSORY', 'COFRE': 'CHEST',
   'Liga España': 'Spanish League', 'Liga Inglaterra': 'English League', 'Liga Italia': 'Italian League', 'Liga Alemania': 'German League', 'Liga Francia': 'French League',
   'Liga Turquía': 'Turkish League', 'Liga Japón': 'Japanese League', 'Liga Brasil': 'Brazilian League', 'Liga Polonia': 'Polish League', 'Liga Europa': 'European League', 'Liga Norteamérica': 'North American League',
-  'Equipado': 'Equipped', 'En propiedad': 'Owned', 'Lo llevas puesto': 'You’re wearing it', 'Puesto': 'On', 'EQUIPAR': 'EQUIP', 'PROBÁNDOTELO': 'TRYING IT ON', 'CÓMO CONSEGUIRLO': 'HOW TO GET IT',
+  'Equipado': 'Equipped', 'En propiedad': 'Owned', 'Lo llevas puesto': 'You’re wearing it', 'Puesto': 'On', 'EQUIPAR': 'EQUIP', 'PROBÁNDOTELO': 'TRYING IT ON', 'MANGA': 'SLEEVES', 'CORTA': 'SHORT', 'LARGA': 'LONG', 'TALLA': 'SIZE', 'CÓMO CONSEGUIRLO': 'HOW TO GET IT',
   'DESLIZA PARA GIRAR': 'SWIPE TO TURN', 'Clásico': 'Classic', 'En tu taquilla': 'In your locker', 'Disponible por VCD': 'Available for VCD', 'Objeto premium': 'Premium item', 'Te faltan VCD': 'Not enough VCD',
   'Pase nv. #': 'Pass lv. #', 'Premium nv. #': 'Premium lv. #',
   // cosmetics

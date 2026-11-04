@@ -49,7 +49,7 @@
     bst = null;
     return true;
   }
-  function heroKey() { var A = window.AMChars; return A ? A.pref() + '|' + JSON.stringify(A.outfit('futbol') || {}) : ''; }
+  function heroKey() { var A = window.AMChars; return A ? A.pref() + '|' + JSON.stringify(A.outfit('futbol') || {}) + '|' + JSON.stringify(A.fitPref ? A.fitPref() : {}) : ''; }
   // your character for the home screen (kept, rebuilt only when you change character or kit)
   function prepare() {
     var V = viewer(), A = window.AMChars;
