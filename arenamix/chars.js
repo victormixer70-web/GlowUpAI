@@ -13,7 +13,7 @@
     { id: 'nico', name: 'Nico', file: 'assets/chars/nico.glb' },
     { id: 'dani', name: 'Dani', file: 'assets/chars/dani.glb' }
   ];
-  var KEY = 'arenamix.char.v1', HEIGHT = 1.86;
+  var KEY = 'arenamix.char.v1', HEIGHT = 1.86, NECK_H = 1.55;
   var tpl = {}, loading = null, waiters = [], ANIM = null;
 
   function pref() {
@@ -57,7 +57,8 @@
           root.updateMatrixWorld(true);
           var box = new T.Box3().setFromObject(root);
           prepKit(root, box);
-          tpl[c.id] = { root: root, box: box, head: measureHead(root) };
+          var nb = null; root.traverse(function (b) { if (b.isBone && b.name === 'mixamorigNeck') nb = b; });
+          tpl[c.id] = { root: root, box: box, head: measureHead(root), neck: nb ? new T.Vector3().setFromMatrixPosition(nb.matrixWorld).y - box.min.y : (box.max.y - box.min.y) * 0.83 };
           if (onStep) onStep();
           res(true);
         }, null, function () { if (onStep) onStep(); res(false); });
@@ -152,6 +153,111 @@
       prepKit(root, t.box);
     });
     ['dani', 'leo', 'nico'].forEach(addArms);
+    Object.keys(HEADS).forEach(headOnBody);
+    // the same build for everyone: torsos as wide as Dani's (measured, so close models barely change)
+    var w0 = torsoW('dani');
+    LIST.forEach(function (c) { var t = tpl[c.id], w = torsoW(c.id); if (t && w0 && w) t.wx = Math.max(0.85, Math.min(1.15, w0 / w)); });
+  }
+  // width of the torso (hips to chest) at rest, in units of the neck height
+  function torsoW(id) {
+    var t = tpl[id]; if (!t) return 0;
+    var box = new T.Box3(), v = new T.Vector3();
+    t.root.updateMatrixWorld(true);
+    t.root.traverse(function (m) {
+      if (!m.isSkinnedMesh || m.userData.bareArms) return;
+      var names = m.skeleton.bones.map(function (b) { return b.name; }), pos = m.geometry.attributes.position, si = m.geometry.attributes.skinIndex, sw = m.geometry.attributes.skinWeight;
+      if (!si || !sw) return;
+      for (var i = 0; i < pos.count; i += 2) {
+        var best = 0, bw = -1;
+        for (var k = 0; k < 4; k++) { var w = sw.array[i * 4 + k]; if (w > bw) { bw = w; best = si.array[i * 4 + k]; } }
+        if (!/(Hips|Spine|Spine1|Spine2)$/.test(names[best] || '')) continue;
+        v.fromBufferAttribute(pos, i); m.boneTransform(i, v); v.applyMatrix4(m.matrixWorld); box.expandByPoint(v);
+      }
+    });
+    return box.isEmpty() ? 0 : (box.max.x - box.min.x) / (t.neck || 1);
+  }
+  /* ---------- cartoon characters on the footballer body ----------
+     Ty, Big Vegas and Granny keep their head (face, hair, glasses...) on Dani's body and kit, so everyone
+     has the same height and build. The head is cut from the model (what the head bone moves), scaled to a
+     slightly big footballer head and fixed on Dani's head bone; Dani's skin is tinted to theirs. */
+  var HEADS = { ty: { skin: '#EDB898', size: 1.38, lift: 0.07 }, vegas: { skin: '#E6B08C', size: 1.22, lift: 0.07 }, granny: { skin: '#B9CFC2', size: 1.25, lift: 0.07 } };
+  var DANI_SKIN = new T.Color('#C99A7E');
+  function headOnBody(id) {
+    var src = tpl[id], base = tpl[KIT_SRC], cfg = HEADS[id];
+    if (!src || !base || !cfg) return;
+    var root = T.SkeletonUtils.clone(base.root);
+    root.updateMatrixWorld(true); src.root.updateMatrixWorld(true);
+    var by = {}; root.traverse(function (b) { if (b.isBone && !by[b.name]) by[b.name] = b; });
+    var sby = {}; src.root.traverse(function (b) { if (b.isBone && !sby[b.name]) sby[b.name] = b; });
+    var hB = by.mixamorigHead, sH = sby.mixamorigHead;
+    if (!hB || !sH) return;
+    var under = {}; sH.traverse(function (b) { if (b.isBone) under[b.name] = 1; });
+    var dHead = {}; hB.traverse(function (b) { if (b.isBone) dHead[b.name] = 1; });
+    var tint = new T.Color(cfg.skin), sk = { r: tint.r / DANI_SKIN.r, g: tint.g / DANI_SKIN.g, b: tint.b / DANI_SKIN.b };
+    var drop = [];
+    root.traverse(function (m) {
+      if (!m.isSkinnedMesh) return;
+      if (/Hair|Eyelashes/.test(m.name)) { drop.push(m); return; }
+      if (m.userData.bareArms) { m.material = m.material.clone(); m.material.color = new T.Color(cfg.skin).convertSRGBToLinear(); return; }
+      if (!/Body$/.test(m.name)) return;
+      // Dani's skin without his head, tinted
+      var geo = m.geometry.clone(), names = m.skeleton.bones.map(function (b) { return b.name; }), si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight, gi = geo.index, keep = [];
+      var isHead = function (x) { var best = 0, bw = -1; for (var q = 0; q < 4; q++) { var w = sw.array[x * 4 + q]; if (w > bw) { bw = w; best = si.array[x * 4 + q]; } } return !!dHead[names[best]]; };
+      for (var f = 0; f < gi.count; f += 3) { var a = gi.getX(f), b = gi.getX(f + 1), c = gi.getX(f + 2); if (!(isHead(a) && isHead(b) && isHead(c))) keep.push(a, b, c); }
+      geo.setIndex(keep); m.geometry = geo;
+      m.material = m.material.clone(); m.material.color = new T.Color(sk.r, sk.g, sk.b);
+    });
+    drop.forEach(function (m) { m.parent.remove(m); });
+    // the cartoon head, in the cartoon model's world space, then moved onto Dani's head bone
+    var pS = new T.Vector3().setFromMatrixPosition(sH.matrixWorld), pD = new T.Vector3().setFromMatrixPosition(hB.matrixWorld);
+    var sw0 = src.head.skull.max.x - src.head.skull.min.x, dw0 = base.head.skull.max.x - base.head.skull.min.x;
+    var k = cfg.size * dw0 / (sw0 || 1);
+    // the chin where Dani's chin is, the face centred on his
+    var sc0 = src.head.skull.getCenter(new T.Vector3()), dc0 = base.head.skull.getCenter(new T.Vector3());
+    var shift = new T.Vector3(dc0.x - (pD.x + (sc0.x - pS.x) * k), base.head.skull.min.y + (cfg.lift || 0) * (base.head.skull.max.y - base.head.skull.min.y) - (pD.y + (src.head.skull.min.y - pS.y) * k), dc0.z - (pD.z + (sc0.z - pS.z) * k));
+    var nmW = new T.Matrix3();
+    var holder = new T.Group(); holder.matrixAutoUpdate = false;
+    holder.matrix.copy(hB.matrixWorld).invert(); holder.name = 'CartoonHead';
+    hB.add(holder);
+    var skull = new T.Box3(), all = new T.Box3(), v = new T.Vector3();
+    src.root.traverse(function (m) {
+      if (!m.isSkinnedMesh || /Hands/.test(m.name)) return;
+      var geo = m.geometry, pos = geo.attributes.position, si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight;
+      if (!si || !sw) return;
+      var names = m.skeleton.bones.map(function (b) { return b.name; }), n = pos.count, P = new Float32Array(n * 3), inHead = new Uint8Array(n);
+      var nrm = geo.attributes.normal, N = nrm ? new Float32Array(n * 3) : null, nv = new T.Vector3();
+      nmW.getNormalMatrix(m.matrixWorld);
+      for (var i = 0; i < n; i++) {
+        var best = 0, bw = -1;
+        for (var q = 0; q < 4; q++) { var w = sw.array[i * 4 + q]; if (w > bw) { bw = w; best = si.array[i * 4 + q]; } }
+        inHead[i] = under[names[best]] ? 1 : 0;
+        v.fromBufferAttribute(pos, i); m.boneTransform(i, v); v.applyMatrix4(m.matrixWorld);
+        v.sub(pS).multiplyScalar(k).add(pD).add(shift);
+        if (N) { nv.fromBufferAttribute(nrm, i).applyMatrix3(nmW).normalize(); N[i * 3] = nv.x; N[i * 3 + 1] = nv.y; N[i * 3 + 2] = nv.z; }
+        P[i * 3] = v.x; P[i * 3 + 1] = v.y; P[i * 3 + 2] = v.z;
+      }
+      var idx = geo.index, keep = [];
+      if (idx) { for (var f = 0; f < idx.count; f += 3) { var a = idx.getX(f), b = idx.getX(f + 1), c = idx.getX(f + 2); if (inHead[a] && inHead[b] && inHead[c]) keep.push(a, b, c); } }
+      else for (var f2 = 0; f2 < n; f2 += 3) if (inHead[f2] && inHead[f2 + 1] && inHead[f2 + 2]) keep.push(f2, f2 + 1, f2 + 2);
+      if (!keep.length) return;
+      var g2 = new T.BufferGeometry();
+      g2.setAttribute('position', new T.Float32BufferAttribute(P, 3));
+      if (geo.attributes.uv) g2.setAttribute('uv', geo.attributes.uv);
+      g2.setIndex(keep);
+      if (N) g2.setAttribute('normal', new T.Float32BufferAttribute(N, 3)); else g2.computeVertexNormals();
+      var hair = /hair/i.test(m.name);
+      keep.forEach(function (x) { v.set(P[x * 3], P[x * 3 + 1], P[x * 3 + 2]); all.expandByPoint(v); if (!hair) skull.expandByPoint(v); });
+      var mats = [].concat(m.material).map(function (mt) { var c2 = mt.clone(); c2.skinning = false; c2.morphTargets = false; return c2; });
+      var mesh = new T.Mesh(g2, Array.isArray(m.material) ? mats : mats[0]);
+      // keep the material groups of multi-material meshes
+      if (Array.isArray(m.material) && geo.groups) geo.groups.forEach(function (gr) { g2.addGroup(gr.start, gr.count, gr.materialIndex); });
+      mesh.name = 'Head_' + m.name; mesh.castShadow = true; mesh.frustumCulled = false;
+      holder.add(mesh);
+    });
+    root.updateMatrixWorld(true);
+    var box = new T.Box3().setFromObject(root);
+    tpl[id] = { root: root, box: box, neck: base.neck, head: { skull: skull.isEmpty() ? base.head.skull : skull, all: all.isEmpty() ? base.head.all : all, eyes: null, front: null } };
+    HEADFIX[id] = {};
   }
   /* ---------- sleeves and size (Taquilla) ---------- */
   var FIT_KEY = 'arenamix.fit.v1', FIT_DEF = { sleeve: 'short', size: 'M' };
@@ -494,14 +600,15 @@
     }
     var t = tpl[id], model = T.SkeletonUtils.clone(t.root);
     var g = new T.Group(), holder = new T.Group();
-    var size = t.box.getSize(new T.Vector3()), s = HEIGHT / size.y;
+    // everyone the same height: the neck at the same height (hair and big heads don't shrink the body)
+    var s = NECK_H / t.neck;
     holder.scale.setScalar(s);
     holder.position.set(-(t.box.min.x + t.box.max.x) / 2 * s, -t.box.min.y * s, -(t.box.min.z + t.box.max.z) / 2 * s);
     holder.add(model); g.add(holder);
     // dress the character: an explicit kit, your Taquilla outfit, or the team colours the game passes
     var kit = o.kit || (o.you && !o.noOutfit ? outfit(o.sport) : null);
     if (!kit && o.shirt != null) kit = { primary: o.shirt, secondary: o.trimCss, pattern: 'solid', shorts: o.shorts, socks: o.socks, shoe: o.boot };
-    if (!kit && PAINT[id]) kit = HOME_KIT;
+
     // sleeves and size: yours from Taquilla, everyone else in short sleeves and their own size
     var fit = o.fit || ((o.you || o.gear) ? fitPref() : FIT_DEF), fz = SIZES[fit.size] != null ? SIZES[fit.size] : 0;
     var fk = { sleeve: fit.sleeve, inflate: fz }, short = fit.sleeve !== 'long';
@@ -673,6 +780,8 @@
     model.traverse(function (m) {
       if (m.isMesh) m.onBeforeRender = function (r) { var f = r.info.render.frame; if (f !== lastFrame) { lastFrame = f; apply(); model.updateMatrixWorld(true); } };
     });
+    // and the same build: the torso as wide as everyone else's (a finishing touch on top of the pose)
+    if (t.wx && Math.abs(t.wx - 1) > 0.01) { holder.scale.x *= t.wx; holder.scale.z *= t.wx; holder.position.x *= t.wx; holder.position.z *= t.wx; }
     g.userData = { body: body, legs: legs, arms: arms, head: head, mixamo: id, apply: apply, anim: anim };
     apply();
     return g;
