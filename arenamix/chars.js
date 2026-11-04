@@ -82,6 +82,7 @@
   var FIT = { remy: { Shorts: 1.1, Shirt: 1.04, Body: 0.94 } };
   var WEAR = { leo: /Ch23_(Suit|Belt|Shirt|Pants|Shoes)$/, nico: /Ch28_(Sneakers|Pants|Hoody)$/, remy: /^(Shoes|Tops|Bottoms)$/ };
   var DROP = { ty: /Scarf/ };
+  var TRIM = { remy: /(Spine|Spine1|Spine2|Shoulder)$/ };
   function footballers() {
     var src = tpl[KIT_SRC];
     Object.keys(DROP).forEach(function (id) {
@@ -145,6 +146,15 @@
       if (!made.length) return;
       var parent = ref.parent;
       old.forEach(function (m) { m.parent.remove(m); });
+      // skin of the torso that the old (lower cut) shirt showed would poke through the new one
+      if (TRIM[id]) root.traverse(function (m) {
+        if (!m.isSkinnedMesh || !/^Body$|_Body$/.test(m.name) || m.name === 'Legs_Body') return;
+        var geo = m.geometry.clone(), names = m.skeleton.bones.map(function (b) { return b.name; }), si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight, gi = geo.index, keep = [];
+        if (!gi) return;
+        var tor = function (x) { var best = 0, bw = -1; for (var q = 0; q < 4; q++) { var w = sw.array[x * 4 + q]; if (w > bw) { bw = w; best = si.array[x * 4 + q]; } } return TRIM[id].test(names[best] || ''); };
+        for (var f = 0; f < gi.count; f += 3) { var a2 = gi.getX(f), b2 = gi.getX(f + 1), c2 = gi.getX(f + 2); if (!(tor(a2) || tor(b2) || tor(c2))) keep.push(a2, b2, c2); }
+        geo.setIndex(keep); m.geometry = geo;
+      });
       made.forEach(function (o) {
         parent.add(o.mesh); o.mesh.updateMatrixWorld(true);
         o.mesh.bind(new T.Skeleton(o.bones), o.mesh.matrixWorld.clone());
@@ -176,93 +186,173 @@
     });
     return box.isEmpty() ? 0 : (box.max.x - box.min.x) / (t.neck || 1);
   }
-  /* ---------- cartoon characters on the footballer body ----------
-     Ty, Big Vegas and Granny keep their head (face, hair, glasses...) on Dani's body and kit, so everyone
-     has the same height and build. The head is cut from the model (what the head bone moves), scaled to a
-     slightly big footballer head and fixed on Dani's head bone; Dani's skin is tinted to theirs. */
-  var HEADS = { ty: { skin: '#EDB898', size: 1.0, maxW: 1.12, lift: 0.04 }, vegas: { skin: '#E6B08C', size: 1.0, maxW: 1.12, lift: 0.04 }, granny: { skin: '#B9CFC2', size: 1.0, maxW: 1.12, lift: 0.04 } };
-  var DANI_SKIN = new T.Color('#C99A7E');
+  /* ---------- cartoon characters as real footballers ----------
+     Ty, Big Vegas and Granny get a real face (the head of one of the realistic models) on Dani's body and kit,
+     and keep what makes them who they are: what their cartoon head has that isn't skin (hair, cap, curlers,
+     glasses...), fitted over the real skull. Everyone has the same height and build. */
+  var HEADS = {
+    // minY: only what is above this height of the skull (hair, cap, glasses; not chin or collar)
+    ty: { face: 'remy', keep: /Hair/, grow: 1.03 },
+    vegas: { face: 'leo', keep: null, minY: 0.34, skinD: 0.3, grow: 1.05, up: 0.1 },
+    granny: { face: 'dani', keep: null, minY: 0.36, grow: 1.06 }
+  };
+  // Dani's skin tinted to each face's (multiplier on his texture), and the colour of the bare arms
+  var FACE_TINT = { dani: '#FFFFFF', leo: '#F2E2D8', remy: '#D9B497' };
+  var FACE_ARM = { dani: '#C99A7E', leo: '#D9AE93', remy: '#D2A88A' };
+  // the bones the head bone carries
+  function headSet(root) {
+    var hb = null, set = {};
+    root.traverse(function (b) { if (b.isBone && b.name === 'mixamorigHead' && !hb) hb = b; });
+    if (hb) hb.traverse(function (b) { if (b.isBone) set[b.name] = 1; });
+    return { bone: hb, set: set };
+  }
+  function domBone(sw, si, i) { var best = 0, bw = -1; for (var q = 0; q < 4; q++) { var w = sw.array[i * 4 + q]; if (w > bw) { bw = w; best = si.array[i * 4 + q]; } } return best; }
+  /* the head pieces of a model, in its world space: [{ P, N, uv, idx, groups, material, name }]
+     triTest(mesh, a, b, c, P) decides which triangles to keep */
+  function headPieces(t, meshTest, triTest) {
+    var out = [], hs = headSet(t.root), v = new T.Vector3(), nv = new T.Vector3(), nmW = new T.Matrix3();
+    t.root.updateMatrixWorld(true);
+    t.root.traverse(function (m) {
+      if (!m.isSkinnedMesh || !meshTest(m)) return;
+      var geo = m.geometry, pos = geo.attributes.position, si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight, nrm = geo.attributes.normal;
+      if (!si || !sw) return;
+      var names = m.skeleton.bones.map(function (b) { return b.name; }), n = pos.count;
+      var P = new Float32Array(n * 3), N = new Float32Array(n * 3), inH = new Uint8Array(n);
+      nmW.getNormalMatrix(m.matrixWorld);
+      for (var i = 0; i < n; i++) {
+        inH[i] = hs.set[names[domBone(sw, si, i)]] ? 1 : 0;
+        v.fromBufferAttribute(pos, i); m.boneTransform(i, v); v.applyMatrix4(m.matrixWorld);
+        P[i * 3] = v.x; P[i * 3 + 1] = v.y; P[i * 3 + 2] = v.z;
+        if (nrm) { nv.fromBufferAttribute(nrm, i).applyMatrix3(nmW).normalize(); N[i * 3] = nv.x; N[i * 3 + 1] = nv.y; N[i * 3 + 2] = nv.z; }
+      }
+      var idx = geo.index, cnt = idx ? idx.count : n, keep = [];
+      var groups = geo.groups && geo.groups.length ? geo.groups : [{ start: 0, count: cnt, materialIndex: 0 }], ng = [];
+      groups.forEach(function (gr) {
+        var st = keep.length;
+        for (var f = gr.start; f < gr.start + gr.count; f += 3) {
+          var a = idx ? idx.getX(f) : f, b = idx ? idx.getX(f + 1) : f + 1, c = idx ? idx.getX(f + 2) : f + 2;
+          if (inH[a] && inH[b] && inH[c] && triTest(m, a, b, c, gr.materialIndex)) keep.push(a, b, c);
+        }
+        if (keep.length > st) ng.push({ start: st, count: keep.length - st, materialIndex: gr.materialIndex });
+      });
+      if (keep.length) out.push({ P: P, N: nrm ? N : null, uv: geo.attributes.uv, idx: keep, groups: ng, material: m.material, name: m.name });
+    });
+    return out;
+  }
+  // texture colour under a vertex (sRGB 0..1), for telling skin from hair and accessories
+  var pixCache = new Map();
+  function texel(mt, uv, i) {
+    var img = mt && mt.map && mt.map.image; if (!img || !uv) return null;
+    var px = pixCache.get(img);
+    if (!px) { try { var cv = document.createElement('canvas'); cv.width = 256; cv.height = 256; var c = cv.getContext('2d'); c.drawImage(img, 0, 0, 256, 256); px = c.getImageData(0, 0, 256, 256).data; } catch (e) { px = null; } pixCache.set(img, px || 0); }
+    if (!px) return null;
+    var u = uv.getX(i), w = uv.getY(i); u -= Math.floor(u); w -= Math.floor(w);
+    if (mt.map.flipY !== false) w = 1 - w;
+    var o = (Math.min(255, Math.floor(w * 256)) * 256 + Math.min(255, Math.floor(u * 256))) * 4;
+    return [px[o] / 255, px[o + 1] / 255, px[o + 2] / 255];
+  }
+  // pieces → meshes on a holder (fixed to a bone), each vertex moved by fn(vector)
+  function placePieces(pieces, holder, fn, box, boxHair) {
+    var v = new T.Vector3();
+    pieces.forEach(function (pc) {
+      var n = pc.P.length / 3, P = new Float32Array(n * 3);
+      for (var i = 0; i < n; i++) { v.set(pc.P[i * 3], pc.P[i * 3 + 1], pc.P[i * 3 + 2]); fn(v); P[i * 3] = v.x; P[i * 3 + 1] = v.y; P[i * 3 + 2] = v.z; }
+      var g2 = new T.BufferGeometry();
+      g2.setAttribute('position', new T.Float32BufferAttribute(P, 3));
+      if (pc.uv) g2.setAttribute('uv', pc.uv);
+      g2.setIndex(pc.idx);
+      if (pc.N) g2.setAttribute('normal', new T.Float32BufferAttribute(pc.N, 3)); else g2.computeVertexNormals();
+      pc.groups.forEach(function (gr) { g2.addGroup(gr.start, gr.count, gr.materialIndex); });
+      var mats = [].concat(pc.material).map(function (mt) { var c2 = mt.clone(); c2.skinning = false; c2.morphTargets = false; return c2; });
+      var mesh = new T.Mesh(g2, mats.length > 1 ? mats : mats[0]);
+      if (mats.length === 1) g2.clearGroups();
+      mesh.name = 'Head_' + pc.name; mesh.castShadow = true; mesh.frustumCulled = false;
+      pc.idx.forEach(function (x) { v.set(P[x * 3], P[x * 3 + 1], P[x * 3 + 2]); (pc.hair ? boxHair : box).expandByPoint(v); });
+      holder.add(mesh);
+    });
+  }
   function headOnBody(id) {
-    var src = tpl[id], base = tpl[KIT_SRC], cfg = HEADS[id];
-    if (!src || !base || !cfg) return;
+    var src = tpl[id], base = tpl[KIT_SRC], cfg = HEADS[id], face = tpl[cfg && cfg.face];
+    if (!src || !base || !cfg || !face) return;
     var root = T.SkeletonUtils.clone(base.root);
-    root.updateMatrixWorld(true); src.root.updateMatrixWorld(true);
-    var by = {}; root.traverse(function (b) { if (b.isBone && !by[b.name]) by[b.name] = b; });
-    var sby = {}; src.root.traverse(function (b) { if (b.isBone && !sby[b.name]) sby[b.name] = b; });
-    var hB = by.mixamorigHead, sH = sby.mixamorigHead;
-    if (!hB || !sH) return;
-    var under = {}; sH.traverse(function (b) { if (b.isBone) under[b.name] = 1; });
-    var dHead = {}; hB.traverse(function (b) { if (b.isBone) dHead[b.name] = 1; });
-    var tint = new T.Color(cfg.skin), sk = { r: tint.r / DANI_SKIN.r, g: tint.g / DANI_SKIN.g, b: tint.b / DANI_SKIN.b };
+    root.updateMatrixWorld(true);
+    var dh = headSet(root), hB = dh.bone, fh = headSet(face.root), sh = headSet(src.root);
+    if (!hB || !fh.bone || !sh.bone) return;
+    var ownFace = cfg.face === KIT_SRC, tint = new T.Color(FACE_TINT[cfg.face] || '#FFFFFF');
     var drop = [];
     root.traverse(function (m) {
       if (!m.isSkinnedMesh) return;
-      if (/Hair|Eyelashes/.test(m.name)) { drop.push(m); return; }
-      if (m.userData.bareArms) { m.material = m.material.clone(); m.material.color = new T.Color(cfg.skin).convertSRGBToLinear(); return; }
+      if (/Hair$/.test(m.name) || (!ownFace && /Eyelashes$/.test(m.name))) { drop.push(m); return; }
+      if (m.userData.bareArms) { m.material = m.material.clone(); m.material.color = new T.Color(FACE_ARM[cfg.face] || '#C99A7E').convertSRGBToLinear(); return; }
       if (!/Body$/.test(m.name)) return;
-      // Dani's skin without his head, tinted
+      m.material = m.material.clone(); m.material.color = tint.clone();
+      if (ownFace) return;
+      // Dani's skin without his head (the top of the neck stays, so no gap shows under the new one)
       var geo = m.geometry.clone(), names = m.skeleton.bones.map(function (b) { return b.name; }), si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight, gi = geo.index, keep = [];
-      // the top of the neck stays (up to under the chin) so no gap shows below the new head
       var hp = geo.attributes.position, hv = new T.Vector3(), cut = base.head.skull.min.y + (base.head.skull.max.y - base.head.skull.min.y) * 0.07;
-      var isHead = function (x) { var best = 0, bw = -1; for (var q = 0; q < 4; q++) { var w = sw.array[x * 4 + q]; if (w > bw) { bw = w; best = si.array[x * 4 + q]; } } if (!dHead[names[best]]) return false; hv.fromBufferAttribute(hp, x); m.boneTransform(x, hv); hv.applyMatrix4(m.matrixWorld); return hv.y > cut; };
+      var isHead = function (x) { if (!dh.set[names[domBone(sw, si, x)]]) return false; hv.fromBufferAttribute(hp, x); m.boneTransform(x, hv); hv.applyMatrix4(m.matrixWorld); return hv.y > cut; };
       for (var f = 0; f < gi.count; f += 3) { var a = gi.getX(f), b = gi.getX(f + 1), c = gi.getX(f + 2); if (!(isHead(a) && isHead(b) && isHead(c))) keep.push(a, b, c); }
       geo.setIndex(keep); m.geometry = geo;
-      m.material = m.material.clone(); m.material.color = new T.Color(sk.r, sk.g, sk.b);
     });
     drop.forEach(function (m) { m.parent.remove(m); });
-    // the cartoon head, in the cartoon model's world space, then moved onto Dani's head bone
-    var pS = new T.Vector3().setFromMatrixPosition(sH.matrixWorld), pD = new T.Vector3().setFromMatrixPosition(hB.matrixWorld);
-    var sw0 = src.head.skull.max.x - src.head.skull.min.x, dw0 = base.head.skull.max.x - base.head.skull.min.x;
-    // a footballer's head: as tall as Dani's face (times size), and no wider than a real head would be
-    var sh0 = src.head.skull.max.y - src.head.skull.min.y, dh0 = base.head.skull.max.y - base.head.skull.min.y;
-    var kv = cfg.size * dh0 / (sh0 || 1), kh = Math.min(kv, cfg.maxW * dw0 / (sw0 || 1));
-    var k = new T.Vector3(kh, kv, kh), ik = new T.Vector3(1 / kh, 1 / kv, 1 / kh);
-    // the chin where Dani's chin is, the face centred on his
-    var sc0 = src.head.skull.getCenter(new T.Vector3()), dc0 = base.head.skull.getCenter(new T.Vector3());
-    var shift = new T.Vector3(dc0.x - (pD.x + (sc0.x - pS.x) * kh), base.head.skull.min.y + (cfg.lift || 0) * dh0 - (pD.y + (src.head.skull.min.y - pS.y) * kv), dc0.z - (pD.z + (sc0.z - pS.z) * kh));
-    var nmW = new T.Matrix3();
-    var holder = new T.Group(); holder.matrixAutoUpdate = false;
-    holder.matrix.copy(hB.matrixWorld).invert(); holder.name = 'CartoonHead';
+    var holder = new T.Group(); holder.matrixAutoUpdate = false; holder.name = 'NewHead';
+    holder.matrix.copy(hB.matrixWorld).invert();
     hB.add(holder);
-    var skull = new T.Box3(), all = new T.Box3(), v = new T.Vector3();
-    src.root.traverse(function (m) {
-      if (!m.isSkinnedMesh || /Hands/.test(m.name)) return;
-      var geo = m.geometry, pos = geo.attributes.position, si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight;
-      if (!si || !sw) return;
-      var names = m.skeleton.bones.map(function (b) { return b.name; }), n = pos.count, P = new Float32Array(n * 3), inHead = new Uint8Array(n);
-      var nrm = geo.attributes.normal, N = nrm ? new Float32Array(n * 3) : null, nv = new T.Vector3();
-      nmW.getNormalMatrix(m.matrixWorld);
-      for (var i = 0; i < n; i++) {
-        var best = 0, bw = -1;
-        for (var q = 0; q < 4; q++) { var w = sw.array[i * 4 + q]; if (w > bw) { bw = w; best = si.array[i * 4 + q]; } }
-        inHead[i] = under[names[best]] ? 1 : 0;
-        v.fromBufferAttribute(pos, i); m.boneTransform(i, v); v.applyMatrix4(m.matrixWorld);
-        v.sub(pS).multiply(k).add(pD).add(shift);
-        if (N) { nv.fromBufferAttribute(nrm, i).applyMatrix3(nmW).multiply(ik).normalize(); N[i * 3] = nv.x; N[i * 3 + 1] = nv.y; N[i * 3 + 2] = nv.z; }
-        P[i * 3] = v.x; P[i * 3 + 1] = v.y; P[i * 3 + 2] = v.z;
-      }
-      var idx = geo.index, keep = [];
-      if (idx) { for (var f = 0; f < idx.count; f += 3) { var a = idx.getX(f), b = idx.getX(f + 1), c = idx.getX(f + 2); if (inHead[a] && inHead[b] && inHead[c]) keep.push(a, b, c); } }
-      else for (var f2 = 0; f2 < n; f2 += 3) if (inHead[f2] && inHead[f2 + 1] && inHead[f2 + 2]) keep.push(f2, f2 + 1, f2 + 2);
-      if (!keep.length) return;
-      var g2 = new T.BufferGeometry();
-      g2.setAttribute('position', new T.Float32BufferAttribute(P, 3));
-      if (geo.attributes.uv) g2.setAttribute('uv', geo.attributes.uv);
-      g2.setIndex(keep);
-      if (N) g2.setAttribute('normal', new T.Float32BufferAttribute(N, 3)); else g2.computeVertexNormals();
-      var hair = /hair/i.test(m.name);
-      keep.forEach(function (x) { v.set(P[x * 3], P[x * 3 + 1], P[x * 3 + 2]); all.expandByPoint(v); if (!hair) skull.expandByPoint(v); });
-      var mats = [].concat(m.material).map(function (mt) { var c2 = mt.clone(); c2.skinning = false; c2.morphTargets = false; return c2; });
-      var mesh = new T.Mesh(g2, Array.isArray(m.material) ? mats : mats[0]);
-      // keep the material groups of multi-material meshes
-      if (Array.isArray(m.material) && geo.groups) geo.groups.forEach(function (gr) { g2.addGroup(gr.start, gr.count, gr.materialIndex); });
-      mesh.name = 'Head_' + m.name; mesh.castShadow = true; mesh.frustumCulled = false;
-      holder.add(mesh);
+    var pD = new T.Vector3().setFromMatrixPosition(hB.matrixWorld);
+    // the real face: the head of the face model, moved from its head bone to Dani's, at Dani's scale
+    var real = { min: base.head.skull.min.clone(), max: base.head.skull.max.clone() };
+    if (!ownFace) {
+      var pF = new T.Vector3().setFromMatrixPosition(fh.bone.matrixWorld), kf = (base.neck || 1) / (face.neck || 1);
+      var fp = headPieces(face, function (m) { return !/Hair|Shirt|Tops|Hoody|Suit|Scarf/i.test(m.name); }, function () { return true; });
+      var fb = new T.Box3(), fbh = new T.Box3();
+      placePieces(fp, holder, function (v) { v.sub(pF).multiplyScalar(kf).add(pD); }, fb, fbh);
+      // where the new skull is (eyes and lashes don't count)
+      var sk0 = face.head.skull;
+      real.min.copy(sk0.min).sub(pF).multiplyScalar(kf).add(pD); real.max.copy(sk0.max).sub(pF).multiplyScalar(kf).add(pD);
+    }
+    // what the cartoon head has that isn't skin, over the real skull
+    var cs = src.head.skull, cc = cs.getCenter(new T.Vector3()), rc = new T.Vector3().addVectors(real.min, real.max).multiplyScalar(0.5);
+    var sx = (real.max.x - real.min.x) / (cs.max.x - cs.min.x || 1), sy = (real.max.y - real.min.y) / (cs.max.y - cs.min.y || 1), sz = (real.max.z - real.min.z) / (cs.max.z - cs.min.z || 1);
+    var grow = cfg.grow || 1.05, yMin = cs.min.y + (cs.max.y - cs.min.y) * (cfg.minY || 0);
+    // skin colour of the cartoon face: the texel at the front of the face
+    var skinRef = null;
+    var ap = headPieces(src, function (m) { return !/Hands|Eyes|Mouth|Brows|Lash/i.test(m.name) && (!cfg.keep || cfg.keep.test(m.name)); }, function (m, a, b, c, mi) {
+      if (cfg.keep) return true;
+      var Pm = m.geometry.attributes.position, cy = 0, vv = new T.Vector3();
+      [a, b, c].forEach(function (x) { vv.fromBufferAttribute(Pm, x); m.boneTransform(x, vv); vv.applyMatrix4(m.matrixWorld); cy += vv.y / 3; });
+      if (cy < yMin) return false;
+      var mt = [].concat(m.material)[mi] || [].concat(m.material)[0];
+      if (/lens/i.test(mt.name || '')) return true;
+      var uv = m.geometry.attributes.uv;
+      if (!skinRef) skinRef = faceSkin(src, m, mt);
+      var ta = texel(mt, uv, a), tb = texel(mt, uv, b), tc = texel(mt, uv, c);
+      if (!ta || !tb || !tc || !skinRef) return true;
+      if (cfg.noLight && (ta[0] + ta[1] + ta[2] + tb[0] + tb[1] + tb[2] + tc[0] + tc[1] + tc[2]) / 9 > 0.6) return false;
+      var d = 0; [ta, tb, tc].forEach(function (t2) { d += Math.abs(t2[0] - skinRef[0]) + Math.abs(t2[1] - skinRef[1]) + Math.abs(t2[2] - skinRef[2]); });
+      return d / 3 > (cfg.skinD || 0.22);
     });
+    ap.forEach(function (pc) { pc.hair = true; });
+    var ab = new T.Box3(), abh = new T.Box3();
+    placePieces(ap, holder, function (v) {
+      v.sub(cc); v.x *= sx * grow; v.y *= sy * grow; v.z *= sz * grow; v.add(rc); v.y += (cfg.up || 0) * (real.max.y - real.min.y);
+    }, ab, abh);
     root.updateMatrixWorld(true);
-    var box = new T.Box3().setFromObject(root);
-    tpl[id] = { root: root, box: box, neck: base.neck, head: { skull: skull.isEmpty() ? base.head.skull : skull, all: all.isEmpty() ? base.head.all : all, eyes: null, front: null } };
+    var skull = new T.Box3(real.min, real.max), all = skull.clone().union(abh);
+    tpl[id] = { root: root, box: new T.Box3().setFromObject(root), neck: base.neck, head: { skull: skull, all: all, eyes: null, front: null } };
     HEADFIX[id] = {};
+  }
+  // the skin colour at the front of a cartoon face (sRGB), sampled from its texture
+  function faceSkin(t, m, mt) {
+    var geo = m.geometry, pos = geo.attributes.position, uv = geo.attributes.uv, si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight;
+    var hs = headSet(t.root), names = m.skeleton.bones.map(function (b) { return b.name; }), sk = t.head.skull, cx = (sk.min.x + sk.max.x) / 2;
+    var y0 = sk.min.y + (sk.max.y - sk.min.y) * 0.25, y1 = sk.min.y + (sk.max.y - sk.min.y) * 0.45, best = -Infinity, bi = -1, v = new T.Vector3();
+    for (var i = 0; i < pos.count; i++) {
+      if (!hs.set[names[domBone(sw, si, i)]]) continue;
+      v.fromBufferAttribute(pos, i); m.boneTransform(i, v); v.applyMatrix4(m.matrixWorld);
+      if (v.y < y0 || v.y > y1 || Math.abs(v.x - cx) > (sk.max.x - sk.min.x) * 0.12) continue;
+      if (v.z > best) { best = v.z; bi = i; }
+    }
+    return bi >= 0 ? texel(mt, uv, bi) : null;
   }
   /* ---------- sleeves and size (Taquilla) ---------- */
   var FIT_KEY = 'arenamix.fit.v1', FIT_DEF = { sleeve: 'short', size: 'M' };
