@@ -180,7 +180,7 @@
      Ty, Big Vegas and Granny keep their head (face, hair, glasses...) on Dani's body and kit, so everyone
      has the same height and build. The head is cut from the model (what the head bone moves), scaled to a
      slightly big footballer head and fixed on Dani's head bone; Dani's skin is tinted to theirs. */
-  var HEADS = { ty: { skin: '#EDB898', size: 1.38, lift: 0.07 }, vegas: { skin: '#E6B08C', size: 1.22, lift: 0.07 }, granny: { skin: '#B9CFC2', size: 1.25, lift: 0.07 } };
+  var HEADS = { ty: { skin: '#EDB898', size: 1.0, maxW: 1.12, lift: 0.04 }, vegas: { skin: '#E6B08C', size: 1.0, maxW: 1.12, lift: 0.04 }, granny: { skin: '#B9CFC2', size: 1.0, maxW: 1.12, lift: 0.04 } };
   var DANI_SKIN = new T.Color('#C99A7E');
   function headOnBody(id) {
     var src = tpl[id], base = tpl[KIT_SRC], cfg = HEADS[id];
@@ -202,7 +202,9 @@
       if (!/Body$/.test(m.name)) return;
       // Dani's skin without his head, tinted
       var geo = m.geometry.clone(), names = m.skeleton.bones.map(function (b) { return b.name; }), si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight, gi = geo.index, keep = [];
-      var isHead = function (x) { var best = 0, bw = -1; for (var q = 0; q < 4; q++) { var w = sw.array[x * 4 + q]; if (w > bw) { bw = w; best = si.array[x * 4 + q]; } } return !!dHead[names[best]]; };
+      // the top of the neck stays (up to under the chin) so no gap shows below the new head
+      var hp = geo.attributes.position, hv = new T.Vector3(), cut = base.head.skull.min.y + (base.head.skull.max.y - base.head.skull.min.y) * 0.07;
+      var isHead = function (x) { var best = 0, bw = -1; for (var q = 0; q < 4; q++) { var w = sw.array[x * 4 + q]; if (w > bw) { bw = w; best = si.array[x * 4 + q]; } } if (!dHead[names[best]]) return false; hv.fromBufferAttribute(hp, x); m.boneTransform(x, hv); hv.applyMatrix4(m.matrixWorld); return hv.y > cut; };
       for (var f = 0; f < gi.count; f += 3) { var a = gi.getX(f), b = gi.getX(f + 1), c = gi.getX(f + 2); if (!(isHead(a) && isHead(b) && isHead(c))) keep.push(a, b, c); }
       geo.setIndex(keep); m.geometry = geo;
       m.material = m.material.clone(); m.material.color = new T.Color(sk.r, sk.g, sk.b);
@@ -211,10 +213,13 @@
     // the cartoon head, in the cartoon model's world space, then moved onto Dani's head bone
     var pS = new T.Vector3().setFromMatrixPosition(sH.matrixWorld), pD = new T.Vector3().setFromMatrixPosition(hB.matrixWorld);
     var sw0 = src.head.skull.max.x - src.head.skull.min.x, dw0 = base.head.skull.max.x - base.head.skull.min.x;
-    var k = cfg.size * dw0 / (sw0 || 1);
+    // a footballer's head: as tall as Dani's face (times size), and no wider than a real head would be
+    var sh0 = src.head.skull.max.y - src.head.skull.min.y, dh0 = base.head.skull.max.y - base.head.skull.min.y;
+    var kv = cfg.size * dh0 / (sh0 || 1), kh = Math.min(kv, cfg.maxW * dw0 / (sw0 || 1));
+    var k = new T.Vector3(kh, kv, kh), ik = new T.Vector3(1 / kh, 1 / kv, 1 / kh);
     // the chin where Dani's chin is, the face centred on his
     var sc0 = src.head.skull.getCenter(new T.Vector3()), dc0 = base.head.skull.getCenter(new T.Vector3());
-    var shift = new T.Vector3(dc0.x - (pD.x + (sc0.x - pS.x) * k), base.head.skull.min.y + (cfg.lift || 0) * (base.head.skull.max.y - base.head.skull.min.y) - (pD.y + (src.head.skull.min.y - pS.y) * k), dc0.z - (pD.z + (sc0.z - pS.z) * k));
+    var shift = new T.Vector3(dc0.x - (pD.x + (sc0.x - pS.x) * kh), base.head.skull.min.y + (cfg.lift || 0) * dh0 - (pD.y + (src.head.skull.min.y - pS.y) * kv), dc0.z - (pD.z + (sc0.z - pS.z) * kh));
     var nmW = new T.Matrix3();
     var holder = new T.Group(); holder.matrixAutoUpdate = false;
     holder.matrix.copy(hB.matrixWorld).invert(); holder.name = 'CartoonHead';
@@ -232,8 +237,8 @@
         for (var q = 0; q < 4; q++) { var w = sw.array[i * 4 + q]; if (w > bw) { bw = w; best = si.array[i * 4 + q]; } }
         inHead[i] = under[names[best]] ? 1 : 0;
         v.fromBufferAttribute(pos, i); m.boneTransform(i, v); v.applyMatrix4(m.matrixWorld);
-        v.sub(pS).multiplyScalar(k).add(pD).add(shift);
-        if (N) { nv.fromBufferAttribute(nrm, i).applyMatrix3(nmW).normalize(); N[i * 3] = nv.x; N[i * 3 + 1] = nv.y; N[i * 3 + 2] = nv.z; }
+        v.sub(pS).multiply(k).add(pD).add(shift);
+        if (N) { nv.fromBufferAttribute(nrm, i).applyMatrix3(nmW).multiply(ik).normalize(); N[i * 3] = nv.x; N[i * 3 + 1] = nv.y; N[i * 3 + 2] = nv.z; }
         P[i * 3] = v.x; P[i * 3 + 1] = v.y; P[i * 3 + 2] = v.z;
       }
       var idx = geo.index, keep = [];
