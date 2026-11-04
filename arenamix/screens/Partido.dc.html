@@ -2307,6 +2307,8 @@ class Component extends DCLogic {
     if (this.wx === 'nieve' && pitch.material.color) pitch.material.color.lerp(new T.Color(0xffffff), 0.18);
     if (this.wx === 'lluvia' && pitch.material.roughness != null) pitch.material.roughness = Math.min(pitch.material.roughness, 0.55);
     pitch.rotation.x = -Math.PI / 2; pitch.receiveShadow = true; S.add(pitch);
+    // blades of grass with real depth near the camera (more layers on better graphics; none on low)
+    { const nL = this.gfxNow === 'alta' ? 8 : this.gfxNow === 'media' ? 5 : 0; if (nL && window.AMGrass && window.AMGrass.shells && this.wx !== 'nieve') S.add(window.AMGrass.shells(tex, PW, PH, nL)); }
     const apron = new T.Mesh(new T.PlaneGeometry(500, 500), this.mat(0x0a3a0c, { roughness: 1 }));
     apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; S.add(apron);
     // ---------- big open-air stadium: two tiers on three sides, ultras behind each goal ----------
