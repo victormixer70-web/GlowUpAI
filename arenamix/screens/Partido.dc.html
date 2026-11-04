@@ -2249,32 +2249,127 @@ class Component extends DCLogic {
       out.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); out.setAttribute('normal', new T.Float32BufferAttribute(nor, 3)); out.setAttribute('color', new T.Float32BufferAttribute(colA, 3));
       return out;
     };
-    const arm = (x, up, out) => part(new T.CylinderGeometry(0.052, 0.045, 0.58, 3, 1, true), 1, (g2) => {
-      g2.translate(0, -0.29, 0);
-      g2.rotateZ(up ? Math.PI - out * Math.sign(x) : 0.12 * Math.sign(x));
-      if (up) g2.rotateX(-0.25);
-      g2.translate(x, 0.86, 0.02);
-    });
-    const fanBase = () => [
-      part(new T.CylinderGeometry(0.15, 0.14, 0.36, 4, 1, true), 0.22, (g2) => { g2.scale(1, 1, 0.75); g2.translate(0, 0.18, 0); }),
-      part(new T.CylinderGeometry(0.21, 0.155, 0.52, 5, 1, true), 1, (g2) => { g2.scale(1, 1, 0.62); g2.translate(0, 0.62, 0); }),
-      part(new T.CylinderGeometry(0.07, 0.21, 0.12, 5, 1, true), 1, (g2) => { g2.scale(1, 1, 0.62); g2.translate(0, 0.94, 0); }),
+    /* ---- fans: people with a real build (legs, hips, torso and shoulders, two-part arms, neck, head with a
+       nose, hair or a beanie), in six looks: t-shirt or hoodie, scarf round the neck or held up over the head,
+       arms down, up, one up or clapping. One mesh per look; the parts are coloured per fan in the shader:
+       shirt (instance colour), skin, hair, the team's second colour (scarf, beanie) and fixed colours
+       (trousers, shoes). The level of detail follows the graphics setting. */
+    const LQ = this.gfxNow === 'alta' ? 2 : this.gfxNow === 'media' ? 1 : 0;
+    const SEG = [4, 6, 8][LQ], HSEG = [5, 7, 10][LQ];
+    const PART = { shirt: 0, skin: 1, alt: 2, hair: 3, raw: 4 };
+    const fanPart = (geo, part, shade) => {
+      const gg = geo.index ? geo.toNonIndexed() : geo, n = gg.attributes.position.count;
+      const c = new Float32Array(n * 3), pa = new Float32Array(n).fill(part);
+      const col3 = typeof shade === 'number' ? [shade, shade, shade] : shade;
+      for (let k = 0; k < n; k++) c.set(col3, k * 3);
+      gg.setAttribute('color', new T.Float32BufferAttribute(c, 3)); gg.setAttribute('aPart', new T.Float32BufferAttribute(pa, 1));
+      if (gg.attributes.uv) gg.deleteAttribute('uv');
+      return gg;
+    };
+    const mergeFan = (parts) => {
+      let n = 0; parts.forEach((g2) => { n += g2.attributes.position.count; });
+      const out = new T.BufferGeometry(), names = ['position', 'normal', 'color', 'aPart'], arrs = names.map((nm) => new Float32Array(n * (nm === 'aPart' ? 1 : 3)));
+      let o = 0;
+      parts.forEach((g2) => { names.forEach((nm, i) => arrs[i].set(g2.attributes[nm].array, o * (nm === 'aPart' ? 1 : 3))); o += g2.attributes.position.count; });
+      names.forEach((nm, i) => out.setAttribute(nm, new T.Float32BufferAttribute(arrs[i], nm === 'aPart' ? 1 : 3)));
+      out.scale(0.72, 0.72, 0.72);
+      return out;
+    };
+    const lin = (hex) => { const c = new T.Color(hex).convertSRGBToLinear(); return [c.r, c.g, c.b]; };
+    const Y = new T.Vector3(0, 1, 0);
+    // a tapered tube from point a to point b
+    const limb = (a, b, r1, r2, part, shade) => {
+      const A = new T.Vector3(...a), B = new T.Vector3(...b), d = B.clone().sub(A), L = d.length();
+      const geo = new T.CylinderGeometry(r2, r1, L, SEG, 1, true);
+      geo.applyMatrix4(new T.Matrix4().makeRotationFromQuaternion(new T.Quaternion().setFromUnitVectors(Y, d.normalize())));
+      geo.translate((A.x + B.x) / 2, (A.y + B.y) / 2, (A.z + B.z) / 2);
+      return fanPart(geo, part, shade);
+    };
+    const ball = (r, at, sx, sy, sz, part, shade, w, h) => { const geo = new T.SphereGeometry(r, w || HSEG, h || Math.max(3, HSEG - 3)); geo.scale(sx, sy, sz); geo.translate(...at); return fanPart(geo, part, shade); };
+    // arm poses: [elbow, wrist] for the right arm (+x is the fan's left; mirrored for the other side)
+    const POSE = {
+      down: [[0.235, 1.13, 0.03], [0.25, 0.87, 0.07]],
+      up: [[0.34, 1.7, 0.03], [0.43, 1.96, 0.06]],
+      clap: [[0.23, 1.15, 0.13], [0.05, 1.27, 0.3]],
+      scarf: [[0.31, 1.69, 0.06], [0.37, 1.95, 0.09]]
+    };
+    const DENIM = lin('#2B3954'), BLACK = lin('#17181D'), WHITE = lin('#E9ECF2'), SOLE = lin('#2A2A30');
+    const fanLook = (o) => {
+      const P = [], pants = o.pants || DENIM;
+      // legs and shoes
+      [-1, 1].forEach((sd) => {
+        P.push(limb([sd * 0.09, 0.93, 0], [sd * 0.1, 0.5, 0.02], 0.08, 0.064, PART.raw, pants));
+        P.push(limb([sd * 0.1, 0.5, 0.02], [sd * 0.1, 0.09, 0], 0.064, 0.05, PART.raw, pants));
+        const sh = new T.BoxGeometry(0.11, 0.09, 0.26); sh.translate(sd * 0.1, 0.045, 0.05); P.push(fanPart(sh, PART.raw, o.shoes || WHITE));
+      });
+      // hips, torso, shoulders
+      { const g2 = new T.CylinderGeometry(0.165, 0.155, 0.22, SEG, 1, true); g2.scale(1, 1, 0.68); g2.translate(0, 0.98, 0); P.push(fanPart(g2, PART.raw, pants)); }
+      { const g2 = new T.CylinderGeometry(0.205, 0.165, 0.5, SEG + 2, 2, true); g2.scale(1, 1, 0.62); g2.translate(0, 1.2, 0); P.push(fanPart(g2, PART.shirt, 1)); }
+      P.push(ball(0.205, [0, 1.43, 0], 1, 0.42, 0.62, PART.shirt, 1, SEG + 2, 4));
+      if (o.hood) P.push(ball(0.12, [0, 1.47, -0.1], 1.1, 0.6, 0.8, PART.shirt, 0.85, SEG, 4));
+      // arms: upper arm (sleeve), forearm (skin in a t-shirt), hand
+      const arms = o.arms || ['down', 'down'];
+      [-1, 1].forEach((sd, i) => {
+        const [e, w] = POSE[arms[i]], E = [sd * e[0], e[1], e[2]], W = [sd * w[0], w[1], w[2]];
+        P.push(limb([sd * 0.2, 1.41, 0], E, 0.062, 0.052, PART.shirt, 1));
+        P.push(limb(E, W, 0.05, 0.04, o.hood ? PART.shirt : PART.skin, 1));
+        const d = new T.Vector3(...W).sub(new T.Vector3(...E)).normalize().multiplyScalar(0.05);
+        P.push(ball(0.045, [W[0] + d.x, W[1] + d.y, W[2] + d.z], 1, 1.2, 0.8, PART.skin, 1, SEG, 3));
+      });
+      // neck, head, nose, ears
+      P.push(limb([0, 1.45, 0], [0, 1.56, 0.01], 0.055, 0.05, PART.skin, 0.9));
+      P.push(ball(0.11, [0, 1.66, 0.01], 0.88, 1.08, 0.95, PART.skin, 1));
+      { const n2 = new T.ConeGeometry(0.019, 0.045, 4); n2.rotateX(Math.PI / 2); n2.translate(0, 1.645, 0.112); P.push(fanPart(n2, PART.skin, 0.92)); }
+      if (LQ > 0) [-1, 1].forEach((sd) => P.push(ball(0.022, [sd * 0.097, 1.66, 0.0], 0.5, 1, 0.8, PART.skin, 0.9, 4, 3)));
+      // hair, or a beanie with a bobble
+      if (o.beanie) {
+        const b2 = new T.SphereGeometry(0.124, HSEG, 4, 0, Math.PI * 2, 0, Math.PI * 0.46); b2.scale(0.9, 1.05, 0.98); b2.translate(0, 1.68, 0.005); P.push(fanPart(b2, PART.alt, 1));
+        P.push(ball(0.032, [0, 1.81, 0], 1, 1, 1, PART.shirt, 1, 5, 3));
+      } else {
+        const h2 = new T.SphereGeometry(0.119, HSEG, 4, 0, Math.PI * 2, 0, Math.PI * (o.longHair ? 0.62 : 0.5)); h2.rotateX(-0.42); h2.scale(0.9, 1.06, 0.98); h2.translate(0, 1.675, -0.004); P.push(fanPart(h2, PART.hair, 1));
+      }
+      // the scarf: round the neck with an end hanging down, or stretched between the hands over the head
+      if (o.scarf === 'neck') {
+        const t2 = new T.TorusGeometry(0.085, 0.032, 4, SEG + 2); t2.rotateX(Math.PI / 2); t2.translate(0, 1.5, 0.01); P.push(fanPart(t2, PART.alt, 1));
+        const e2 = new T.BoxGeometry(0.075, 0.3, 0.025); e2.translate(0.07, 1.33, 0.125); P.push(fanPart(e2, PART.alt, 0.92));
+      } else if (o.scarf === 'up') {
+        const w = POSE.scarf[1], s2 = new T.BoxGeometry(w[0] * 2 + 0.16, 0.15, 0.02); s2.translate(0, w[1] + 0.07, w[2] + 0.02); P.push(fanPart(s2, PART.alt, 1));
+      }
+      return mergeFan(P);
+    };
+    // the looks: 0 arms down in a t-shirt · 1 hoodie and scarf · 2 arms up · 3 one arm up, beanie
+    // · 4 scarf held up (the ultras' classic) · 5 clapping, beanie
+    const fanLooks = [
+      fanLook({ arms: ['down', 'down'] }),
+      fanLook({ arms: ['down', 'down'], hood: true, scarf: 'neck', pants: BLACK, shoes: SOLE }),
+      fanLook({ arms: ['up', 'up'], longHair: true }),
+      fanLook({ arms: ['down', 'up'], hood: true, beanie: true, pants: BLACK }),
+      fanLook({ arms: ['scarf', 'scarf'], scarf: 'up', shoes: SOLE }),
+      fanLook({ arms: ['clap', 'clap'], beanie: true, scarf: 'neck' })
     ];
-    const fanPoses = [
-      merge(fanBase().concat([arm(-0.24, false), arm(0.24, false)])),
-      merge(fanBase().concat([arm(-0.22, true, 0.3), arm(0.22, true, 0.3)])),
-      merge(fanBase().concat([arm(-0.24, false), arm(0.22, true, 0.15)]))
-    ];
-    // head: skin colour below, hair painted on the top and back
-    const headGeo = merge([part(new T.SphereGeometry(0.118, 5, 3), 1, (g2) => { g2.scale(0.9, 1.1, 0.95); g2.translate(0, 1.07, 0); })]);
-    { const hp = headGeo.attributes.position, hc = headGeo.attributes.color; for (let k = 0; k < hp.count; k++) { if (hp.getY(k) > 1.1 || (hp.getZ(k) < -0.05 && hp.getY(k) > 1.02)) hc.setXYZ(k, 0.12, 0.12, 0.12); } }
+    const LOOKW = { ultra: [0.08, 0.14, 0.24, 0.14, 0.32, 0.08], fan: [0.42, 0.2, 0.1, 0.08, 0.04, 0.16] };
+    const pickLook = (ultra) => { const w = ultra ? LOOKW.ultra : LOOKW.fan; let r = Math.random(); for (let k = 0; k < w.length; k++) { r -= w[k]; if (r <= 0) return k; } return 0; };
+    const HAIRS = ['#1B1410', '#2E1E14', '#3B2A1E', '#0E0D0C', '#6B4A2B', '#B08A56', '#8E3B1E', '#8A8A8A'];
+    const fanMat = () => {
+      const m = new T.MeshStandardMaterial({ roughness: 0.82, vertexColors: true });
+      m.onBeforeCompile = (sh) => {
+        sh.vertexShader = sh.vertexShader
+          .replace('#include <common>', '#include <common>\nattribute float aPart;\nattribute vec3 aSkin;\nattribute vec3 aHair;\nattribute vec3 aAlt;')
+          .replace('#include <color_vertex>', ['vColor = color;', 'vec3 pc = vec3(1.0);',
+            '#ifdef USE_INSTANCING_COLOR', 'if (aPart < 0.5) pc = instanceColor;', '#endif',
+            'if (aPart > 0.5 && aPart < 1.5) pc = aSkin;', 'else if (aPart > 1.5 && aPart < 2.5) pc = aAlt;', 'else if (aPart > 2.5 && aPart < 3.5) pc = aHair;',
+            'vColor *= pc;'].join('\n'));
+      };
+      m.customProgramCacheKey = () => 'amfan1';
+      return m;
+    };
     const seatGeo = new T.BoxGeometry(0.46, 0.42, 0.07); seatGeo.translate(0, 0.21, -0.3);
     const seatSpots = [], stepSpots = [];
     const skins = [0xc68a5e, 0xe0b48f, 0x8d5a3b, 0xf1c9a5, 0x6b4129, 0xb9794f];
     const sections = new Map();
     const put = (key, team, ultra, wx, wy, wz, rotY, colHex) => {
       if (!sections.has(key)) sections.set(key, { team, ultra, items: [] });
-      sections.get(key).items.push({ wx, wy, wz, rotY, col: colHex, skin: skins[Math.floor(Math.random() * skins.length)] });
+      sections.get(key).items.push({ wx, wy, wz, rotY, col: colHex, skin: skins[Math.floor(Math.random() * skins.length)], hair: HAIRS[Math.floor(Math.random() * HAIRS.length)] });
     };
     const neutral = ['#2A3044', '#F2F5FA', '#1C2540'];
     const fanColor = (team, ultra, row) => {
@@ -2397,23 +2492,33 @@ class Component extends DCLogic {
     const m4 = new T.Matrix4(), q = new T.Quaternion(), sc = new T.Vector3(1, 1, 1), pos = new T.Vector3(), col = new T.Color(), up = new T.Vector3(0, 1, 0);
     sections.forEach((sec) => {
       const n = sec.items.length, grp = new T.Group();
-      // pose per fan: ultras mostly arms up, the rest mostly arms down
-      const poseOf = sec.items.map(() => { const r = Math.random(); return sec.ultra ? (r < 0.5 ? 1 : r < 0.75 ? 2 : 0) : (r < 0.76 ? 0 : r < 0.9 ? 2 : 1); });
-      const counts = [0, 0, 0]; poseOf.forEach((k) => counts[k]++);
-      const bodies = fanPoses.map((geo, k) => new T.InstancedMesh(geo, new T.MeshStandardMaterial({ roughness: 0.85, vertexColors: true }), Math.max(1, counts[k])));
-      const heads = new T.InstancedMesh(headGeo, new T.MeshStandardMaterial({ roughness: 0.7, vertexColors: true }), n);
-      const at = [0, 0, 0];
+      // a look per fan: ultras mostly with scarves held up and arms up, the rest mostly calm
+      const lookOf = sec.items.map(() => pickLook(sec.ultra));
+      const counts = fanLooks.map(() => 0); lookOf.forEach((k) => counts[k]++);
+      const [tc1, tc2] = teamCols[sec.team], cA = new T.Color(tc1).convertSRGBToLinear(), cB = new T.Color(tc2).convertSRGBToLinear();
+      const bodies = fanLooks.map((geo, k) => {
+        const c = Math.max(1, counts[k]), g2 = new T.BufferGeometry();
+        ['position', 'normal', 'color', 'aPart'].forEach((nm) => g2.setAttribute(nm, geo.attributes[nm]));
+        ['aSkin', 'aHair', 'aAlt'].forEach((nm) => g2.setAttribute(nm, new T.InstancedBufferAttribute(new Float32Array(c * 3), 3)));
+        g2.boundingSphere = new T.Sphere(new T.Vector3(0, 0.6, 0), 1.4);
+        const im = new T.InstancedMesh(g2, fanMat(), c); im.frustumCulled = false;
+        return im;
+      });
+      const at = fanLooks.map(() => 0), tmpC = new T.Color();
       sec.items.forEach((it, i) => {
         q.setFromAxisAngle(up, it.rotY + (Math.random() - 0.5) * 0.4);
         const s = 0.9 + Math.random() * 0.2; sc.set(s, s * (0.94 + Math.random() * 0.12), s);
         m4.compose(pos.set(it.wx, it.wy, it.wz), q, sc);
-        const k = poseOf[i], bm = bodies[k], j = at[k]++;
-        bm.setMatrixAt(j, m4); heads.setMatrixAt(i, m4);
+        const k = lookOf[i], bm = bodies[k], j = at[k]++, ga = bm.geometry.attributes;
+        bm.setMatrixAt(j, m4);
         bm.setColorAt(j, col.set(it.col).convertSRGBToLinear());
-        heads.setColorAt(i, col.setHex(it.skin).convertSRGBToLinear());
+        tmpC.setHex(it.skin).convertSRGBToLinear(); ga.aSkin.setXYZ(j, tmpC.r, tmpC.g, tmpC.b);
+        tmpC.set(it.hair).convertSRGBToLinear(); ga.aHair.setXYZ(j, tmpC.r, tmpC.g, tmpC.b);
+        // the scarf / beanie in the team colour the shirt isn't
+        const alt = col.equals(cA) ? cB : cA; ga.aAlt.setXYZ(j, alt.r, alt.g, alt.b);
       });
-      bodies.forEach((bm, k) => { bm.count = counts[k]; grp.add(bm); });
-      grp.add(heads); S.add(grp);
+      bodies.forEach((bm, k) => { bm.count = counts[k]; if (counts[k]) grp.add(bm); });
+      S.add(grp);
       const mid = sec.items[Math.floor(n / 2)];
       // a few fans of this block who can hold up a flare
       const spots = []; for (let j = 0; j < Math.min(10, n); j++) { const it = sec.items[Math.floor(Math.random() * n)]; spots.push([it.wx, it.wy, it.wz]); }
@@ -2684,11 +2789,11 @@ class Component extends DCLogic {
     // the stadium's two big video screens (one behind each goal): a live scoreboard
     this.screens = null;
     if (STAD) {
-      const cv = document.createElement('canvas'); cv.width = 512; cv.height = 256;
+      const hi = this.gfxNow !== 'baja', cv = document.createElement('canvas'); cv.width = hi ? 1024 : 512; cv.height = hi ? 512 : 256;
       const tex = new T.CanvasTexture(cv); tex.encoding = T.sRGBEncoding;
       const mat = new T.MeshBasicMaterial({ map: tex, toneMapped: false });
       [-1, 1].forEach((sx) => { const m = new T.Mesh(new T.PlaneGeometry(12.4, 6.1), mat); const [kx, kz] = this.stadK || [1, 1]; m.scale.set(kz, 1, 1); m.position.set(sx * 40.9 * kx, 9.1, 0.2 * kz); m.rotation.y = sx > 0 ? -Math.PI / 2 : Math.PI / 2; S.add(m); });
-      this.screens = { cv, tex, key: '' };
+      this.screens = { cv, tex, key: '', hi };
     }
     // night: glowing floodlight heads above the stadium model
     if (this.wx === 'noche' && STAD) [[-46, -36], [46, -36], [-46, 30], [46, 30]].forEach(([x, z]) => {
@@ -2717,37 +2822,103 @@ class Component extends DCLogic {
       wall(36, -33, 0, Math.PI / 2); wall(36, 33, 0, Math.PI / 2);
     }
   }
+  /* the stadium's video screens, like a TV broadcast on an LED wall: the two crests in their colours, the
+     score in big lit digits, the clock with a progress bar and a LIVE tag, an ad ticker running along the
+     bottom; a full-screen GOAL with the scorer's name when a goal goes in, and the teams shown in the intro */
   drawScreens() {
     const V = this.screens;
     if (!V) return;
-    const g = this.g, P = this.props, intro = g.phase === 'intro' ? this.introShot() : -1;
-    const key = [g.phase, intro, g.score[0], g.score[1], Math.ceil(g.t), this.golden()].join('|');
+    const g = this.g, P = this.props, intro = g.phase === 'intro' ? this.introShot() : -1, now = performance.now() / 1000;
+    const goal = g.phase === 'goal', anim = V.hi ? Math.floor(now * (goal ? 12 : 8)) : 0;
+    const key = [g.phase, intro, g.score[0], g.score[1], Math.ceil(g.t), this.golden(), anim].join('|');
     if (key === V.key) return;
     V.key = key;
     const c = V.cv.getContext('2d'), w = 512, h = 256;
+    c.setTransform(V.cv.width / w, 0, 0, V.cv.height / h, 0, 0);
     const hc = P.homeColor ?? this.homeKit().primary, ac = this.awayCol();
     const hn = (P.homeName ?? 'Tu equipo').toUpperCase(), an = (P.awayName ?? 'Rival').toUpperCase();
-    const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#0B1030'); gr.addColorStop(1, '#05060F');
-    c.fillStyle = gr; c.fillRect(0, 0, w, h);
-    c.fillStyle = 'rgba(255,255,255,0.04)'; for (let y = 0; y < h; y += 4) c.fillRect(0, y, w, 1);
-    c.textAlign = 'center'; c.textBaseline = 'middle';
     const font = (px) => 'italic 800 ' + px + 'px Barlow Condensed, Arial';
-    const fit = (txt, px, maxW) => { let k = px; c.font = font(k); while (c.measureText(txt).width > maxW && k > 14) { k -= 2; c.font = font(k); } };
-    if (intro === 0 || intro === 1) {
-      // the end being shown: its team, in its colours
+    const fit = (txt, px, maxW) => { let k = px; c.font = font(k); while (c.measureText(txt).width > maxW && k > 12) { k -= 2; c.font = font(k); } };
+    const glow = (col, b) => { c.shadowColor = col; c.shadowBlur = b; };
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    // background: deep navy with a soft light in the middle and a sweeping diagonal shine
+    const bg = c.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, '#0A1238'); bg.addColorStop(1, '#03050F');
+    c.fillStyle = bg; c.fillRect(0, 0, w, h);
+    const rg = c.createRadialGradient(w / 2, h * 0.45, 10, w / 2, h * 0.45, w * 0.55); rg.addColorStop(0, 'rgba(34,211,238,0.16)'); rg.addColorStop(1, 'rgba(34,211,238,0)');
+    c.fillStyle = rg; c.fillRect(0, 0, w, h);
+    const crest = (x, y, r, col, letter) => {
+      c.save(); glow(col, 14);
+      c.beginPath(); c.moveTo(x - r, y - r * 0.95); c.lineTo(x + r, y - r * 0.95); c.lineTo(x + r, y + r * 0.15); c.quadraticCurveTo(x + r * 0.95, y + r * 0.85, x, y + r * 1.15); c.quadraticCurveTo(x - r * 0.95, y + r * 0.85, x - r, y + r * 0.15); c.closePath();
+      c.fillStyle = col; c.fill(); c.shadowBlur = 0; c.lineWidth = 4; c.strokeStyle = 'rgba(255,255,255,0.9)'; c.stroke();
+      c.fillStyle = 'rgba(0,0,0,0.18)'; c.fillRect(x - r, y - r * 0.95, r, r * 1.1);
+      c.font = font(r * 1.05); c.lineWidth = 5; c.strokeStyle = 'rgba(5,8,20,0.75)'; c.strokeText(letter, x, y + r * 0.05); c.fillStyle = '#FFFFFF'; c.fillText(letter, x, y + r * 0.05);
+      c.restore();
+    };
+    const ticker = () => {
+      c.fillStyle = '#060A1E'; c.fillRect(0, h - 30, w, 30);
+      c.fillStyle = '#22D3EE'; c.fillRect(0, h - 30, w, 2);
+      const msg = '  ARENA MIX  ·  ¡VAMOS, ' + hn + '!  ·  MINIJUEGOS · TORNEOS · PASE DE TEMPORADA  ·  SIGUE AL EQUIPO  ·';
+      c.font = font(20); c.textAlign = 'left';
+      const tw = c.measureText(msg).width, off = V.hi ? (now * 60) % tw : 0;
+      c.fillStyle = '#DCE6FF'; for (let x = -off; x < w; x += tw) c.fillText(msg, x, h - 14);
+      c.textAlign = 'center';
+    };
+    if (goal) {
+      // GOAL: the scoring team's colours flashing, the word huge, the scorer underneath
+      const tm = 1 - (g.concede ?? 0), col = tm === 0 ? hc : ac, flash = (anim % 4) < 2;
+      const gg = c.createLinearGradient(0, 0, w, h); gg.addColorStop(0, col); gg.addColorStop(1, '#05060F');
+      c.globalAlpha = flash ? 0.95 : 0.7; c.fillStyle = gg; c.fillRect(0, 0, w, h); c.globalAlpha = 1;
+      for (let k = 0; k < 14; k++) { const a = k / 14 * Math.PI * 2 + now * 0.8; c.fillStyle = 'rgba(255,255,255,0.06)'; c.beginPath(); c.moveTo(w / 2, h * 0.42); c.arc(w / 2, h * 0.42, w, a, a + 0.12); c.closePath(); c.fill(); }
+      c.save(); glow('#FFFFFF', 22); fit('¡GOOOL!', 128, w - 30); c.fillStyle = '#FFFFFF'; c.fillText('¡GOOOL!', w / 2, h * 0.4); c.restore();
+      const by = (g.scorer || '').toUpperCase();
+      if (by) { fit(by, 34, w - 50); c.fillStyle = '#FFE38A'; c.fillText(by, w / 2, h * 0.72); }
+      c.font = font(26); c.fillStyle = '#FFFFFF'; c.fillText(hn.slice(0, 10) + '  ' + g.score[0] + ' – ' + g.score[1] + '  ' + an.slice(0, 10), w / 2, h - 24);
+    } else if (intro === 0 || intro === 1) {
+      // the end being shown: its team, its crest and colours
       const col = intro === 0 ? hc : ac, nm = intro === 0 ? hn : an;
-      c.fillStyle = col; c.fillRect(0, 0, w, 14); c.fillRect(0, h - 14, w, 14);
-      c.fillStyle = '#FFFFFF'; c.font = font(34); c.fillText('¡VAMOS!', w / 2, 64);
-      fit(nm, 76, w - 40); c.fillStyle = col; c.fillText(nm, w / 2, 140);
-      c.fillStyle = '#C8CCE0'; c.font = font(26); c.fillText('ARENA MIX', w / 2, 210);
+      c.fillStyle = col; c.fillRect(0, 0, w, 10); c.fillRect(0, h - 40, w, 10);
+      crest(110, 112, 54, col, nm[0] || 'A');
+      c.textAlign = 'left'; c.fillStyle = '#FFFFFF'; c.font = font(30); c.fillText('¡VAMOS!', 190, 70);
+      fit(nm, 66, w - 210); c.save(); glow(col, 16); c.fillStyle = '#FFFFFF'; c.fillText(nm, 190, 126); c.restore();
+      c.fillStyle = '#9FB2D8'; c.font = font(22); c.fillText('SALTAN AL CAMPO', 190, 172);
+      c.textAlign = 'center'; ticker();
     } else {
-      c.fillStyle = '#22D3EE'; c.font = font(28); c.fillText(g.phase === 'intro' ? 'EN DIRECTO' : this.golden() ? '★ BALÓN DORADO ★' : 'ARENA MIX', w / 2, 34);
-      c.fillStyle = hc; c.fillRect(24, 74, 14, 96); c.fillStyle = ac; c.fillRect(w - 38, 74, 14, 96);
-      fit(hn, 38, 150); c.fillStyle = '#FFFFFF'; c.fillText(hn, 120, 100);
-      fit(an, 38, 150); c.fillText(an, w - 120, 100);
-      c.font = font(96); c.fillStyle = this.golden() ? '#FFC53D' : '#FFFFFF'; c.fillText(g.score[0] + ' – ' + g.score[1], w / 2, 132);
-      c.fillStyle = '#C8CCE0'; c.font = font(34); c.fillText(this.fmtClock(g.t), w / 2, 214);
+      // top bar: LIVE tag and the competition
+      c.fillStyle = 'rgba(255,255,255,0.06)'; c.fillRect(0, 0, w, 36);
+      const live = (anim % 8) < 6;
+      c.fillStyle = '#E11D48'; c.fillRect(14, 8, 92, 20);
+      c.fillStyle = live ? '#FFFFFF' : '#FFB4C4'; c.beginPath(); c.arc(26, 18, 5, 0, Math.PI * 2); c.fill();
+      c.font = font(17); c.fillStyle = '#FFFFFF'; c.fillText('EN DIRECTO', 66, 19);
+      c.font = font(22); c.fillStyle = this.golden() ? '#FFC53D' : '#22D3EE';
+      c.fillText(g.phase === 'intro' ? 'ARENA MIX · PREVIA' : this.golden() ? '★ BALÓN DORADO ★' : 'ARENA MIX · LIGA', w / 2 + 40, 19);
+      // crests and names
+      crest(66, 104, 38, hc, hn[0] || 'A'); crest(w - 66, 104, 38, ac, an[0] || 'B');
+      fit(hn, 26, 120); c.fillStyle = '#FFFFFF'; c.fillText(hn, 66, 166);
+      fit(an, 26, 120); c.fillText(an, w - 66, 166);
+      // the score: two lit panels
+      const sc = (x, v) => {
+        c.fillStyle = '#050816'; c.fillRect(x - 52, 60, 104, 104);
+        c.strokeStyle = 'rgba(34,211,238,0.5)'; c.lineWidth = 2; c.strokeRect(x - 52, 60, 104, 104);
+        c.save(); glow(this.golden() ? '#FFC53D' : '#7EF0FF', 16); c.font = font(96); c.fillStyle = this.golden() ? '#FFE38A' : '#FFFFFF'; c.fillText(String(v), x, 114); c.restore();
+      };
+      sc(w / 2 - 62, g.score[0]); sc(w / 2 + 62, g.score[1]);
+      c.font = font(40); c.fillStyle = '#7EF0FF'; c.fillText(':', w / 2, 110);
+      // clock and a bar for the time left
+      c.fillStyle = '#0B1434'; c.fillRect(w / 2 - 70, 174, 140, 34);
+      c.font = font(30); c.fillStyle = '#FFFFFF'; c.fillText(this.fmtClock(g.t), w / 2, 192);
+      const dur = Math.max(1, g.dur || 90), u = Math.max(0, Math.min(1, 1 - g.t / dur));
+      c.fillStyle = 'rgba(255,255,255,0.12)'; c.fillRect(w / 2 - 110, 214, 220, 5);
+      c.fillStyle = '#22D3EE'; c.fillRect(w / 2 - 110, 214, 220 * u, 5);
+      ticker();
     }
+    // LED wall: a fine pixel grid and scanlines over everything, and a moving shine
+    c.shadowBlur = 0;
+    c.fillStyle = 'rgba(0,0,0,0.22)'; for (let y = 0; y < h; y += 3) c.fillRect(0, y, w, 1);
+    if (V.hi) { c.fillStyle = 'rgba(0,0,0,0.14)'; for (let x = 0; x < w; x += 3) c.fillRect(x, 0, 1, h); }
+    const sx = ((now * 0.25) % 1.6 - 0.3) * w, sh = c.createLinearGradient(sx - 60, 0, sx + 60, 0);
+    sh.addColorStop(0, 'rgba(255,255,255,0)'); sh.addColorStop(0.5, 'rgba(255,255,255,0.07)'); sh.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = sh; c.fillRect(0, 0, w, h);
+    c.setTransform(1, 0, 0, 1, 0, 0);
     V.tex.needsUpdate = true;
   }
   // tifos unroll in the intro (each end in its shot) and when that end's team scores; flares come and go
