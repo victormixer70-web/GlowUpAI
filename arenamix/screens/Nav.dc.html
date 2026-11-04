@@ -18,7 +18,8 @@ body{margin:0}
 @keyframes nvDot{0%,100%{scale:1}50%{scale:1.18}}
 .nv-item .ic{display:flex;transition:scale .35s cubic-bezier(.3,1.8,.5,1),filter .3s}
 .nv-item[aria-current="page"] .ic{scale:1.14;filter:drop-shadow(0 2px 0 #0006)}
-.nv-item:not([aria-current="page"]):hover{background:#ffffff0a}
+.nv-item:not([aria-current="page"]):hover{background:rgba(255,255,255,.06)}
+.nv-item{font:700 9.5px Exo2,sans-serif !important;letter-spacing:.6px !important}
 /* the active icon hops in, then keeps a little life of its own */
 .nv-item[aria-current="page"] .ic{animation:nvHop .6s cubic-bezier(.3,1.8,.5,1) both}
 @keyframes nvHop{from{translate:0 8px;rotate:-12deg}55%{translate:0 -7px;rotate:8deg}to{translate:0 0;rotate:0deg}}
@@ -31,7 +32,7 @@ body{margin:0}
 .nv-item:not([aria-current="page"]):active{translate:0 2px}
 </style>
 </helmet>
-<nav aria-label="Principal" style="position: relative; width: 80px; height: 390px; box-sizing: border-box; padding: 10px 8px; overflow: hidden; background: linear-gradient(180deg, #17173A 0%, #0E0E22 55%, #09090F 100%); display: flex; flex-direction: column; align-items: center">
+<nav aria-label="Principal" style="position: relative; width: 80px; height: 390px; box-sizing: border-box; padding: 10px 8px; overflow: hidden; background: linear-gradient(180deg, rgba(16,28,62,.92) 0%, rgba(8,14,34,.94) 60%, rgba(5,8,20,.96) 100%); border-right: 1px solid rgba(186,230,253,.14); display: flex; flex-direction: column; align-items: center">
   <span aria-hidden="true" style="position: absolute; inset: 0; background: repeating-linear-gradient(135deg, #ffffff06 0 2px, transparent 2px 12px); pointer-events: none"></span>
   <span aria-hidden="true" style="position: absolute; right: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, #22D3EE, #7C5CFF, #FFC53D, #22D3EE) 0 0 / 100% 200%; animation: nvEdge 6s linear infinite; pointer-events: none"></span>
   <a href="Deportes.dc.html" aria-label="ARENA MIX, inicio" style="position: relative; z-index: 1; display: block; width: 44px; height: 44px; margin-bottom: 8px">
@@ -54,10 +55,10 @@ body{margin:0}
       <span class="ic"><span style="{{faceRing}}"><img src="{{face}}" alt="" style="{{faceImg}}"><svg width="18" height="18" viewBox="0 0 24 24" style="{{faceFallback}}"><circle cx="12" cy="8" r="4.5" fill="#0B0B14"/><path d="M3.5 22a8.5 8.5 0 0 1 17 0z" fill="#0B0B14"/></svg></span></span>Perfil
     <sc-if value="{{b3on}}" hint-placeholder-val="{{ false }}"><span class="nv-dot">{{b3}}</span></sc-if></a>
   </div>
-  <a href="Tienda.dc.html" aria-label="{{coinsAria}}" style="position: relative; z-index: 1; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 4px; width: 64px; height: 30px; box-sizing: border-box; border-radius: 12px; background: #FFC53D14; border: 1px solid #FFC53D55; color: #FFE38A; text-decoration: none; font: 800 11px Exo2, sans-serif">
+  <a href="Tienda.dc.html" aria-label="{{coinsAria}}" style="position: relative; z-index: 1; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 4px; width: 64px; height: 30px; box-sizing: border-box; border-radius: 11px; background: linear-gradient(160deg, rgba(255,197,61,.16), rgba(8,14,34,.6)); border: 1px solid rgba(255,214,102,.4); box-shadow: inset 0 1px 0 rgba(255,255,255,.14); color: #FFE38A; text-decoration: none; font: 800 11px Exo2, sans-serif">
     <svg class="am-coin" width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/><path d="M12 8v8" stroke="#B7791F" stroke-width="1.8"/></svg>{{coins}}
   </a>
-  <a href="Ajustes.dc.html" aria-label="Ajustes" style="position: relative; z-index: 1; margin-top: 6px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 16px; background: #ffffff0a; border: 1px solid #2E2E58; color: #A3A3C2">
+  <a href="Ajustes.dc.html" aria-label="Ajustes" style="position: relative; z-index: 1; margin-top: 6px; display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 11px; background: linear-gradient(160deg, rgba(30,48,92,.6), rgba(8,14,34,.7)); border: 1px solid rgba(186,230,253,.22); box-shadow: inset 0 1px 0 rgba(255,255,255,.14); color: #DDF2FF">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3a1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8a1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5a1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
   </a>
 </nav>
@@ -83,9 +84,9 @@ class Component extends DCLogic {
     let coins = 2450;
     try { const w = JSON.parse(localStorage.getItem('arenamix.wallet.v1') || 'null'); if (w && w.coins != null) coins = w.coins; } catch (e) {}
     const A = window.AMChars, pref = A ? A.pref() : 'clasico', face = pref !== 'clasico' ? 'assets/chars/' + pref + '.png' : '';
-    const item = (i) => 'color: ' + (i === cur ? '#0B0B14' : '#B4B4D0') + ';';
+    const item = (i) => 'color: ' + (i === cur ? '#FFFFFF' : '#9FB0CC') + ';';
     const v = {
-      pillStyle: 'position: absolute; z-index: 0; left: 8px; top: ' + (62 + pos * 62) + 'px; width: 64px; height: 56px; border-radius: 16px; background: linear-gradient(160deg, ' + COL[pos] + 'EE, ' + COL[pos] + ' 55%, ' + DEEP[pos] + '); box-shadow: 0 0 18px ' + COL[pos] + '88, inset 0 1px 0 #ffffffaa, 0 4px 0 ' + DEEP[pos] + '; transition: top .5s cubic-bezier(.3,1.35,.45,1), background .4s, box-shadow .4s;',
+      pillStyle: 'position: absolute; z-index: 0; left: 8px; top: ' + (62 + pos * 62) + 'px; width: 64px; height: 56px; box-sizing: border-box; border-radius: 16px; background: linear-gradient(160deg, ' + COL[pos] + '55, ' + COL[pos] + '1F 60%, rgba(8,14,34,.4)); border: 1px solid ' + COL[pos] + '99; box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 6px 18px ' + COL[pos] + '40; transition: top .5s cubic-bezier(.3,1.35,.45,1), background .4s, box-shadow .4s, border-color .4s;',
       barStyle: 'position: absolute; left: -8px; top: 12px; width: 4px; height: 32px; border-radius: 0 3px 3px 0; background: ' + COL[pos] + '; box-shadow: 0 0 10px ' + COL[pos] + '; animation: nvGlow 1.6s ease-in-out infinite;',
       coins: coins >= 100000 ? Math.round(coins / 1000) + 'k' : String(coins).replace(/\B(?=(\d{3})+(?!\d))/g, '.'),
       coinsAria: coins.toLocaleString('es-ES') + ' VCD. Ir a la tienda',
@@ -110,7 +111,8 @@ class Component extends DCLogic {
     const badge = [pend.missions + ach, 0, pend.week + pend.pass, pm > 0 ? '!' : 0];
     badge.forEach((n, i) => { v['b' + i + 'on'] = !!n; v['b' + i] = String(n); });
     // the active icon turns dark on its coloured tile; the others keep their colour
-    v.c0 = cur === 0 ? '#F4F4FA' : COL[0]; v.c1 = cur === 1 ? '#F4F4FA' : COL[1]; v.c2 = cur === 2 ? '#FFF3C4' : COL[2];
+    v.c0 = COL[0]; v.c1 = COL[1]; v.c2 = COL[2];
+    for (let i = 0; i < 4; i++) v['c' + i] = COL[i];
     return v;
   }
 }
