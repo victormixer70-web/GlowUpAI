@@ -4341,7 +4341,9 @@ class Component extends DCLogic {
     if (d > far) { const mx = dx / d * (d - far), my = dy / d * (d - far); j.bx += mx; j.by += my; j.sx += mx / j.k; j.sy += my / j.k; dx = dx / d * far; dy = dy / d * far; d = far; }
     const kd = Math.min(d, R);
     j.kx = d > 0 ? dx / d * kd : 0; j.ky = d > 0 ? dy / d * kd : 0;
-    const dead = 14, m = d <= dead ? 0 : Math.min(1, (d - dead) / (R * 0.75 - dead));
+    // sensitivity (Configuración): how little thumb travel gives full speed
+    const SK = { baja: 1.0, normal: 0.75, alta: 0.52 }[(this.play && this.play.sens) || 'normal'] || 0.75;
+    const dead = 14, m = d <= dead ? 0 : Math.min(1, (d - dead) / (R * SK - dead));
     const curve = Math.min(1, 0.12 + m * 0.95) * (m > 0 ? 1 : 0);
     this.g.jx = d > 0 ? dx / d * curve : 0; this.g.jy = d > 0 ? dy / d * curve : 0;
   }
