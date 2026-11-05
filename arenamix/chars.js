@@ -168,6 +168,7 @@
     // the same build for everyone: torsos as wide as Dani's (measured, so close models barely change)
     var w0 = torsoW('dani');
     LIST.forEach(function (c) { var t = tpl[c.id], w = torsoW(c.id); if (t && w0 && w) t.wx = Math.max(0.85, Math.min(1.15, w0 / w)); });
+    LIST.forEach(function (c) { prepMuscle(c.id); });
   }
   // width of the torso (hips to chest) at rest, in units of the neck height
   function torsoW(id) {
@@ -429,6 +430,49 @@
     mesh.bind(new T.Skeleton([bS, bN, bH]), mesh.matrixWorld.clone());
   }
   var NECK = { leo: '#E8BFA8', nico: '#5E3C2C', remy: '#EBC6B4' };
+  /* ---------- build: athletes, not office workers ----------
+     Every skinned mesh gets aMus (metres to push out along the normal, from the bones that move each vertex):
+     x for the upper body (chest, shoulders, arms, neck), y for the legs and hips. The same push goes on skin
+     and clothes alike, so the shirt still covers the chest it covers now. BUILD scales it per character. */
+  var MUS = {
+    Spine2: [0.030, 0], Spine1: [0.015, 0], Spine: [0.006, 0], Neck: [0.016, 0],
+    LeftShoulder: [0.030, 0], RightShoulder: [0.030, 0], LeftArm: [0.028, 0], RightArm: [0.028, 0],
+    LeftForeArm: [0.016, 0], RightForeArm: [0.016, 0],
+    Hips: [0, 0.008], LeftUpLeg: [0, 0.014], RightUpLeg: [0, 0.014]
+  };
+  // men strong; women in good shape (toned, lighter up top)
+  var BUILD = { granny: [0.35, 0.8] };
+  function prepMuscle(id) {
+    var t = tpl[id]; if (!t) return;
+    var H = t.box.max.y - t.box.min.y;
+    t.root.updateMatrixWorld(true);
+    t.root.traverse(function (m) {
+      if (!m.isSkinnedMesh) return;
+      var geo = m.geometry, si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight; if (!si || !sw) return;
+      var ws = new T.Vector3(); m.getWorldScale(ws);
+      m.userData.musUnit = (H / HEIGHT) / (ws.x || 1);
+      if (geo.attributes.aMus) return;
+      var names = m.skeleton.bones.map(function (b) { return MUS[b.name.replace('mixamorig', '')] || null; }), n = geo.attributes.position.count, a = new Float32Array(n * 2), any = false;
+      for (var i = 0; i < n; i++) for (var k = 0; k < 4; k++) {
+        var w = sw.array[i * 4 + k], mu = w > 0 && names[si.array[i * 4 + k]]; if (!mu) continue;
+        a[i * 2] += w * mu[0]; a[i * 2 + 1] += w * mu[1]; any = true;
+      }
+      if (!any) return;
+      geo.setAttribute('aMus', new T.Float32BufferAttribute(a, 2));
+    });
+  }
+  function muscleMat(mat, unit, k) {
+    var m = mat.clone(), prev = mat.onBeforeCompile, key = mat.customProgramCacheKey ? mat.customProgramCacheKey() : '';
+    var U = { value: new T.Vector2(k[0] * unit, k[1] * unit) };
+    m.onBeforeCompile = function (sh, r) {
+      if (prev) prev.call(this, sh, r);
+      sh.uniforms.uMus = U;
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec2 aMus;\nuniform vec2 uMus;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed += objectNormal * dot(aMus, uMus);');
+    };
+    m.customProgramCacheKey = function () { return key + '|mus'; };
+    return m;
+  }
   function addArms(id) {
     var t = tpl[id]; if (!t) return;
     var shirt = null; t.root.traverse(function (m) { if (m.isSkinnedMesh && /Shirt$/.test(m.name)) shirt = m; });
@@ -772,6 +816,13 @@
     model.traverse(function (m) {
       if (m.isSkinnedMesh && m.userData.kitable) m.material = kitMaterial(m.material, kit || { none: 1 }, new T.Vector4().fromArray(m.userData.kitLum), m.userData.keepSkin, fk, m.userData.unit, m.userData.sleeveCut, SKIN[id]);
       if (m.userData.bareArms) m.visible = short;
+    });
+    var bk = BUILD[id] || [1, 1]; if (window.__amMusK != null) bk = [bk[0] * window.__amMusK, bk[1] * window.__amMusK];
+    model.traverse(function (m) {
+      if (!m.isSkinnedMesh || !m.geometry.attributes.aMus || !m.userData.musUnit) return;
+      // clothes a touch more than skin, so a bulge of skin never shows through them
+      var ku = m.userData.musUnit * (m.userData.kitable ? 1.18 : 1);
+      m.material = Array.isArray(m.material) ? m.material.map(function (x) { return muscleMat(x, ku, bk); }) : muscleMat(m.material, ku, bk);
     });
     var gear = [], sig = SIGNATURE[id];
     // a character's own accessories (Vegas's shades, Granny's cap and glasses) unless the Taquilla gives others
