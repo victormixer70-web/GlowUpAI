@@ -31,7 +31,11 @@
     { id: 'penalty', clip: 'penalty', dur: 1.45, kick: 0.62, v: [-1.2, 3.6, 5.4] },
     { id: 'pass', clip: 'pass', dur: 0.55, kick: 0.22, v: [2.6, 0.6, 2.2] },
     { id: 'spin', clip: 'idle', dur: 0.9, spin: true },
-    { id: 'juggle', clip: 'idle', dur: 2.2, juggle: true }
+    { id: 'juggle', clip: 'idle', dur: 2.2, juggle: true },
+    // celebrations: a jump with a spin, a knee slide, the ball thrown up in the air
+    { id: 'jump', clip: 'idle', dur: 1.3, jump: true },
+    { id: 'slide', clip: 'slide', dur: 1.4 },
+    { id: 'throwin', clip: 'throwin', dur: 1.5 }
   ];
   var act = null, nextAuto = 0, ball = null, bst = null;
   function ensureBall(V) {
@@ -76,7 +80,7 @@
     m.visible = true;
     var now = performance.now(), t = (now - t0) / 1000;
     if (!nextAuto) nextAuto = now + 6000;
-    if (!act && now > nextAuto) { play(); nextAuto = now + 9000 + Math.random() * 6000; }
+    if (!act && now > nextAuto) { play(); nextAuto = now + 6000 + Math.random() * 5000; }
     // a slow sway, turned a little towards the panel
     var baseRot = -0.35 + Math.sin(t * 0.5) * 0.12, extra = 0;
     var an = m.userData.anim, layers = [];
@@ -87,6 +91,7 @@
       if (k >= a.dur) { act = null; nextAuto = now + 9000 + Math.random() * 6000; }
       else {
         if (a.spin) extra = Math.PI * 2 * (k / a.dur) * (k / a.dur) * (3 - 2 * (k / a.dur));
+        if (a.jump) { var u = k / a.dur; m.position.y = Math.max(0, Math.sin(Math.min(1, u * 1.25) * Math.PI)) * 0.3; extra = Math.PI * 2 * Math.min(1, u * 1.25); }
         if (an && A.clip(a.clip) && a.clip !== 'idle') layers.push({ id: a.clip, t: k, w: Math.max(0, w) });
         if (an && A.clip('idle')) layers.unshift({ id: 'idle', t: t, w: a.clip === 'idle' ? 1 : Math.max(0, 1 - w) });
         // the ball: at the feet, struck at the moment of the kick, flies off; or kept up in the air
@@ -111,6 +116,7 @@
       var p2 = ballAt(); B.position.set(p2[0], p2[1], p2[2]); B.visible = true;
       B.scale.setScalar(Math.min(1, B.scale.x + 0.08));
     }
+    if (!act || !act.a.jump) m.position.y = 0;
     m.rotation.y = baseRot + extra;
     if (an && A.clip('idle')) an.layers = layers.length ? layers : [{ id: 'idle', t: t, w: 1 }];
     var fov = V.cam.fov * Math.PI / 360;

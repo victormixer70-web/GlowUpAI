@@ -287,6 +287,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .lb-mode .chg{background:linear-gradient(90deg,#8B5CF6,#EC4899) !important;border-color:rgba(255,255,255,.45) !important;color:#FFFFFF !important}
 .lb-bg .photo{filter:contrast(1.06) saturate(1.3) !important}
 .lb-slot{opacity:.95 !important}
+.lb-slot .pic{position:absolute;top:18px;width:66px;height:66px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px #FFFFFFCC,0 0 18px #A855F7;animation:hmFloatPic 3s ease-in-out infinite}
+@keyframes hmFloatPic{0%,100%{translate:0 0}50%{translate:0 -4px}}
+.lb-slot .pic+.ini{top:68px;width:24px;height:24px;font-size:13px;line-height:24px}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(90% 120% at 40% 0%, #1D2350 0%, #0D0F24 45%, #07070F 100%); color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -337,7 +340,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <a href="Social.dc.html" onClick="{{sl.tap}}" class="{{sl.cls}}" style="{{sl.style}}" aria-label="{{sl.aria}}">
       <svg width="58" height="118" viewBox="0 0 64 130" aria-hidden="true" style="{{sl.svg}}"><circle cx="32" cy="22" r="15"/><path d="M8 126V70c0-16 10-26 24-26s24 10 24 26v56"/></svg>
       <sc-if value="{{sl.free}}" hint-placeholder-val="{{ true }}"><span class="plus">+</span></sc-if>
-      <sc-if value="{{sl.filled}}" hint-placeholder-val="{{ false }}"><span class="ini" style="{{sl.iniStyle}}">{{sl.ini}}</span></sc-if>
+      <sc-if value="{{sl.filled}}" hint-placeholder-val="{{ false }}"><img class="pic" src="{{sl.pic}}" alt=""><span class="ini" style="{{sl.iniStyle}}">{{sl.ini}}</span></sc-if>
       <span class="lbl" translate="no" style="{{sl.lblStyle}}">{{sl.label}}</span>
     </a>
   </sc-for>
@@ -467,6 +470,8 @@ class Component extends DCLogic {
           style: 'left: ' + x + 'px; top: ' + y + 'px;' + tf + (m ? '' : k === 2 ? ' opacity: .6;' : ''),
           svg: m ? 'fill: ' + c + '33; stroke: ' + c : '',
           iniStyle: 'background: ' + c,
+          // a friend in your team shows up as a player (a portrait picked from their name)
+          pic: m ? 'assets/chars/' + (m.look && m.look.char && m.look.char !== 'clasico' ? m.look.char : ['ty', 'vegas', 'granny', 'remy', 'leo', 'nico', 'dani'][[...m.name].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7) % 7]) + '.png' : '',
           lblStyle: m ? 'color: ' + c + '; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap' : '',
           tap: toSocial
         };
