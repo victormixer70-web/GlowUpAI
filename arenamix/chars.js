@@ -441,7 +441,7 @@
     Hips: [0, 0.008], LeftUpLeg: [0, 0.014], RightUpLeg: [0, 0.014]
   };
   // men strong; women in good shape (toned, lighter up top)
-  var BUILD = { granny: [0.35, 0.8] };
+  var BUILD = {};
   function prepMuscle(id) {
     var t = tpl[id]; if (!t) return;
     var H = t.box.max.y - t.box.min.y;
