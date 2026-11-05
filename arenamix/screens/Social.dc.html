@@ -69,8 +69,8 @@ body{margin:0}
     <div class="so-list">
       <sc-for list="{{friends}}" as="f" key="name">
         <div class="{{f.cls}}">
-          <span class="so-av" style="{{f.av}}">{{f.ini}}<i class="{{f.dot}}"></i></span>
-          <span class="so-nm"><b translate="no">{{f.name}}</b><span style="{{f.subStyle}}">{{f.sub}}</span></span>
+          <button type="button" onClick="{{f.open}}" aria-label="Ver perfil de {{f.name}}" style="display: contents; cursor: pointer"><span class="so-av" style="{{f.av}}">{{f.ini}}<i class="{{f.dot}}"></i></span>
+          <span class="so-nm" style="text-align: left"><b translate="no">{{f.name}}</b><span style="{{f.subStyle}}">{{f.sub}}</span></span></button>
           <button type="button" class="{{f.btnCls}}" onClick="{{f.invite}}">{{f.btn}}</button>
           <button type="button" class="so-x" aria-label="Quitar de amigos" onClick="{{f.remove}}">✕</button>
         </div>
@@ -153,6 +153,21 @@ body{margin:0}
   <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
     <span role="status" style="position: absolute; left: 96px; width: 504px; bottom: 16px; z-index: 5; padding: 9px 14px; box-sizing: border-box; border-radius: 12px; background: #F4F4FA; color: #150925; font-size: 12.5px; font-weight: 800; text-align: center">{{toast}}</span>
   </sc-if>
+  <sc-if value="{{hasProf}}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{closeProf}}" style="position: absolute; inset: 0; z-index: 30; background: #04020FCC; display: flex; align-items: center; justify-content: center">
+      <div onClick="{{stopProf}}" style="position: relative; width: 420px; padding: 18px; box-sizing: border-box; border-radius: 22px; display: flex; gap: 16px; align-items: center; background: radial-gradient(80% 60% at 20% 20%, #22D3EE66, transparent 70%), linear-gradient(160deg, #4C1D95, #1A0B44); box-shadow: inset 0 0 0 1.5px #C4B5FD, 0 20px 50px #000a">
+        <img src="{{profPic}}" alt="" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 4px #fff, 0 0 22px #22D3EE">
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 2px; color: #C4B5FD">PERFIL DE AMIGO</span>
+          <b translate="no" style="font: 800 italic 26px/1 'Barlow Condensed', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{profName}}</b>
+          <span style="{{profStStyle}}">{{profSt}}</span>
+          <span style="font-size: 11px; font-weight: 700; color: #E9D5FF">{{profSince}}</span>
+          <span style="font-size: 10px; color: #C4B5FD">Juega con él en una partida privada o en tu equipo para ver su rango.</span>
+          <div style="display: flex; gap: 6px; margin-top: 4px"><button type="button" class="so-btn go" onClick="{{profInvite}}">INVITAR AL EQUIPO</button><button type="button" class="so-btn dim" onClick="{{closeProf}}">CERRAR</button></div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
@@ -191,12 +206,23 @@ class Component extends DCLogic {
       isFriends: s.tab === 'friends', isReqs: s.tab === 'reqs', isSearch: s.tab === 'search',
       toSearch: () => this.setState({ tab: 'search' }), toFriends: () => this.setState({ tab: 'friends' }),
       noFriends: st.friends.length === 0,
+      ...(() => {
+        const f = s.prof && st.friends.find((x) => x.name === s.prof);
+        if (!f) return { hasProf: false };
+        const P = ['ty', 'vegas', 'granny', 'remy', 'leo', 'nico', 'dani'], d = f.since ? new Date(f.since) : null;
+        return { hasProf: true, profName: f.name, profPic: 'assets/chars/' + P[[...f.name].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) % 7] + '.png',
+          profSt: f.on ? '● EN LÍNEA' : '● DESCONECTADO', profStStyle: 'font-size: 11px; font-weight: 800; color: ' + (f.on ? '#4ADE80' : '#94A3B8'),
+          profSince: d && !isNaN(d) ? 'Amigos desde el ' + d.toLocaleDateString('es-ES') : 'Tu amigo en ARENA MIX',
+          closeProf: () => this.setState({ prof: null }), stopProf: (e) => e.stopPropagation(),
+          profInvite: () => { this.setState({ prof: null }); if (f.on && SO) SO.invite(f.name); else this.say(f.name + ' no está conectado ahora.'); } };
+      })(),
       friends: st.friends.map((f, k) => {
         const inP = memberNames.includes(f.name.toLowerCase());
         return {
           name: f.name, ini: ini(f.name), av: av(f.name), dot: f.on ? 'on' : 'off', cls: 'so-card' + (f.on ? ' on' : ''),
           sub: inP ? 'EN TU EQUIPO' : f.on ? 'EN LÍNEA' : 'DESCONECTADO', subStyle: 'color: ' + (inP ? '#A78BFA' : f.on ? '#53D88E' : '#6E6E92'),
           btn: inP ? 'EN EQUIPO' : 'INVITAR', btnCls: 'so-btn ' + (f.on && !inP && leader ? 'go' : 'dim'),
+          open: () => this.setState({ prof: f.name }),
           invite: () => {
             if (inP) return;
             if (!f.on) { this.say(f.name + ' no está conectado ahora. Cuando abra el juego podrás invitarle.'); return; }
