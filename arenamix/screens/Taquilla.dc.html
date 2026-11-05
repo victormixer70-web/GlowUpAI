@@ -141,6 +141,13 @@ input::placeholder{color:#8686A6}
         </sc-for>
       </div>
     </sc-if>
+    <sc-if value="{{notTeams}}" hint-placeholder-val="{{ false }}">
+      <div role="radiogroup" aria-label="Rareza" style="display: flex; gap: 5px; flex: none">
+        <sc-for list="{{rarChips}}" as="rc" hint-placeholder-count="5">
+          <button type="button" role="radio" aria-checked="{{rc.on}}" onClick="{{rc.pick}}" style="{{rc.style}}">{{rc.label}}</button>
+        </sc-for>
+      </div>
+    </sc-if>
     <div key="{{gridKey}}" style="flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; padding-top: 2px">
       <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 6px">
       <sc-for list="{{items}}" as="it" hint-placeholder-count="8">
@@ -279,8 +286,13 @@ class Component extends DCLogic {
     }
     // frame the whole body, a little lower than centre so the chips below don't cover the feet
     const fit = Math.max(2.95 / (2 * Math.tan(this.cam.fov * Math.PI / 360)), 1.1 / (2 * Math.tan(this.cam.fov * Math.PI / 360) * this.cam.aspect));
-    this.cam.position.set(0, 1.2, fit);
-    this.cam.lookAt(0, 0.98, 0);
+    // the camera moves in on what you are looking at: the head for hats and glasses, the feet for boots
+    const FOC = { cabeza: [1.55, 0.4, 1.55], cara: [1.52, 0.36, 1.52], calzado: [0.4, 0.58, 0.14] }[this.state.cat];
+    const tgt = FOC ? { y: FOC[0], d: fit * FOC[1], ly: FOC[2] } : { y: 1.2, d: fit, ly: 0.98 };
+    const cf = this.camF || (this.camF = { ...tgt }), kk = 1 - Math.pow(0.02, dt);
+    cf.y += (tgt.y - cf.y) * kk; cf.d += (tgt.d - cf.d) * kk; cf.ly += (tgt.ly - cf.ly) * kk;
+    this.cam.position.set(0, cf.y, cf.d);
+    this.cam.lookAt(0, cf.ly, 0);
     R.render(this.S, this.cam);
   }
   /* saves the locker, plus the resolved outfit per sport that the games dress your character in
@@ -612,7 +624,7 @@ class Component extends DCLogic {
 
     const list = s.cat === 'equipos'
       ? L[sport][li].teams.map((t, ti) => this.teamItem(sport, li, ti, L))
-      : X[s.cat];
+      : X[s.cat].filter((it) => s.rarF == null || it.kind === 'none' || it.rar === s.rarF);
     const selId = s.preview && s.preview.cat === s.cat ? s.preview.id : eq[s.cat];
     const items = list.map((it) => {
       const own = owned(it);
@@ -712,7 +724,12 @@ class Component extends DCLogic {
       lockers: Array.from({ length: 8 }, (_, k) => ({ n: k === 4 ? (window.AMOnline ? window.AMOnline.myName() : 'TÚ').toUpperCase().slice(0, 10) : String([3, 7, 11, 5, 10, 8, 14, 21][k]), cls: 'tq-locker' + (k === 4 ? ' tq-mine' : ''), style: 'left: ' + (k * 49 + 1) + 'px; width: 46px; --lc: ' + ['#22D3EE', '#A855F7', '#EC4899', '#F97316', '#3B82F6', '#FACC15', '#22C55E', '#F43F5E'][k] + '; --kc: ' + kitItem.primary + '88;' + (k === 4 ? ' z-index: 0;' : '') })),
       kitGlow: kitItem.primary + '66',
       dust: Array.from({ length: 7 }, (_, k) => 'left: ' + (150 + k * 13) + 'px; top: ' + (120 + (k * 37) % 150) + 'px; --dx: ' + ((k % 3) - 1) * 12 + 'px; --d: ' + (5 + k % 4) + 's; animation-delay: ' + (-k * 0.8).toFixed(1) + 's'),
-      isTeams: s.cat === 'equipos',
+      isTeams: s.cat === 'equipos', notTeams: s.cat !== 'equipos',
+      rarChips: [[null, 'TODAS', '#E9D5FF']].concat(Taq_RAR.map((r, i) => [i, r[0], r[1]])).map(([v, label, c]) => {
+        const on = (s.rarF ?? null) === v;
+        return { label, on: on ? 'true' : 'false', pick: () => this.setState({ rarF: v }),
+          style: 'flex: none; height: 26px; padding: 0 10px; border-radius: 13px; font: 800 9.5px Exo2, sans-serif; letter-spacing: .6px; cursor: pointer; ' + (on ? 'background: ' + c + '; color: #150925; border: 0; box-shadow: 0 0 10px ' + c + 'AA;' : 'background: ' + c + '2A; color: ' + c + '; border: 1px solid ' + c + '88;') };
+      }),
       kit: kitItem,
       kitName: kitItem.name + ' · ' + league.name,
       shoe: shoeItem.color,
