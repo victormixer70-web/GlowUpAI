@@ -12,6 +12,13 @@
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
+.pf-av{position:relative;flex:none;width:84px;height:84px;padding:0;border-radius:50%;overflow:hidden;border:3px solid #FFFFFF;background:#331C58;box-shadow:0 0 0 3px #22D3EE,0 0 20px #22D3EE;cursor:pointer}
+.pf-edit{position:absolute;right:8px;bottom:8px;width:22px;height:22px;border-radius:11px;background:#22D3EE;color:#150925;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff}
+.pf-title{display:flex;align-items:center;gap:4px;height:20px;padding:0 9px;border:0;border-radius:10px;background:linear-gradient(90deg,#FDE68A,#F59E0B);color:#2A1400;font:800 10px Exo2,sans-serif;letter-spacing:.8px;cursor:pointer;box-shadow:0 0 10px #F59E0B88}
+.pf-tro{display:flex;gap:6px}
+.pf-tro span{display:flex;align-items:center;gap:3px;padding:2px 7px;border-radius:9px;background:#1A0B3ACC;font:800 11px Exo2,sans-serif;color:#fff}
+.pf-tro span.off{opacity:.4;filter:grayscale(1)}
+
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; overflow: hidden;  isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; display: flex; gap: 14px; padding: 12px 14px; box-sizing: border-box">
@@ -23,9 +30,11 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <span class="bc-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 28px; letter-spacing: 2px">PERFIL</span>
     </div>
     <div style="flex: 1; min-height: 0; border-radius: 18px; background: radial-gradient(70% 55% at 50% 30%, #22D3EE99, transparent 70%), radial-gradient(70% 60% at 100% 100%, #EC489988, transparent 70%), linear-gradient(160deg, #4F46E5, #7C3AED 50%, #9D174D); border: 1.5px solid #C4B5FD; box-shadow: inset 0 1px 0 #ffffff44, 0 0 20px #7C3AED66; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px">
-      <div style="width: 104px; height: 104px; border-radius: 52px; overflow: hidden; border: 3px solid #FFFFFF; background: #331C58; box-shadow: 0 0 0 3px #22D3EE, 0 0 20px #22D3EE"><svg width="104" height="104" viewBox="64 12 72 72"><rect x="64" y="12" width="72" height="72" fill="#331C58"/><rect x="92" y="60" width="16" height="22" fill="#A66A43"/><path d="M62 82Q100 70 138 82V100H62Z" fill="#FF8A3D"/><path d="M86 78Q100 92 114 78" stroke="#150925" stroke-width="5" fill="none"/><circle cx="100" cy="44" r="24" fill="#B9794F"/><ellipse cx="91" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><ellipse cx="109" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><path d="M93 56q7 5 14 0" stroke="#5A2E1E" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M76 42Q76 16 100 16Q124 16 124 42Q118 30 104 30Q96 26 88 30Q80 32 76 42Z" fill="#241811"/><rect x="75" y="29" width="50" height="9" rx="4" fill="#22D3EE"/></svg></div>
+      <button type="button" onClick="{{nextPic}}" aria-label="Cambiar foto de perfil" class="pf-av"><img src="{{pic}}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block"><span class="pf-edit"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4"/></svg></span></button>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1" translate="no">{{myName}}</span>
+      <button type="button" onClick="{{nextTitle}}" class="pf-title" aria-label="Cambiar título: {{title}}">{{title}}<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 10l5 5l5-5"/></svg></button>
       <span style="font-size: 12px; font-weight: 700; color: #E0E7FF">Nv. {{myLv}} · {{bestRank}}</span>
+      <div class="pf-tro" aria-label="Vitrina de trofeos"><sc-for list="{{trophies}}" as="tr" hint-placeholder-count="3"><span class="{{tr.cls}}" title="{{tr.name}}"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M7 3h10v5a5 5 0 0 1-10 0zM7 5H4a3 3 0 0 0 3.5 4M17 5h3a3 3 0 0 1-3.5 4M10 14h4v3h3v3H7v-3h3z" fill="{{tr.c}}"/></svg><b>{{tr.n}}</b></span></sc-for></div>
       <span style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 10px; background: #1A0B3ACC; border: 1px solid #FFC53D88; font-weight: 800; font-size: 14px; color: #FFC53D"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#B8860B" stroke-width="2"/></svg>{{coins}} VCD</span>
     </div>
     <a href="Logros.dc.html" class="am-shine am-pulse-gold" style="position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, #FDE68A, #FBBF24 45%, #F97316); color: #150925; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; box-shadow: 0 5px 0 #B8860B">
@@ -95,6 +104,24 @@ class Component extends DCLogic {
       A('r3', 'rank', 'Campeón', 'Llega a Campeón en cualquier modo', top >= 3075 ? 1 : 0, 1, 1500)
     ];
   }
+  // profile picture, title and trophy cabinet
+  extrasVals() {
+    const PICS = ['ty', 'vegas', 'granny', 'remy', 'leo', 'nico', 'dani'];
+    const A = window.AMChars, me = A && A.pref() !== 'clasico' ? A.pref() : 'dani';
+    const pic = this.store('arenamix.avatar.v1', me);
+    const R = this.store('arenamix.record.v1', {}), all = R.all || {}, C = this.store('arenamix.career.v1', {}) || {}, T = this.store('arenamix.trophies.v1', { copa: 0, liga: 0 }) || {};
+    const TITLES = [['Novato', true], ['Goleador', (all.gf || 0) >= 10], ['Rey del regate', (C.skills || 0) >= 50], ['Muro defensivo', (all.clean || 0) >= 5], ['Imparable', (all.best || 0) >= 5], ['Veterano', (all.played || 0) >= 50], ['Campeón de Copa', (T.copa || 0) > 0], ['Rey de la Liga', (T.liga || 0) > 0], ['Hat-trick', (C.hats || 0) > 0]];
+    const open = TITLES.filter((t) => t[1]).map((t) => t[0]);
+    const cur = open.indexOf(this.store('arenamix.title.v1', 'Novato')) >= 0 ? this.store('arenamix.title.v1', 'Novato') : 'Novato';
+    const put = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} this.forceUpdate(); };
+    const tro = [['Copa Arena', T.copa || 0, '#FBBF24'], ['Liga Arena', T.liga || 0, '#C084FC'], ['Retos', (this.store('arenamix.retos.v1', {}) || {}).done ? ((this.store('arenamix.retos.v1', {}) || {}).done.length) : 0, '#22D3EE']];
+    return {
+      pic: 'assets/chars/' + (PICS.indexOf(pic) >= 0 ? pic : me) + '.png',
+      nextPic: () => put('arenamix.avatar.v1', PICS[(PICS.indexOf(pic) + 1) % PICS.length]),
+      title: cur.toUpperCase(), nextTitle: () => put('arenamix.title.v1', open[(open.indexOf(cur) + 1) % open.length]),
+      trophies: tro.map(([name, n, c]) => ({ name: name + ': ' + n, n: String(n), c, cls: n ? '' : 'off' }))
+    };
+  }
   claimed() { return this.store('arenamix.ach.v1', {}); }
   coins() { const W = this.store('arenamix.wallet.v1', null); return W && typeof W.coins === 'number' ? W.coins : 2450; }
   fmt(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
@@ -118,6 +145,7 @@ class Component extends DCLogic {
     const w = (a, c) => 'width: ' + pct(a) + '%; background: ' + c + ';';
     return {
       myLv: String(window.AMProgress ? window.AMProgress.level().level : 1),
+      ...this.extrasVals(),
       tiles, tabs, sportKey: s.sport, myName: window.AMOnline ? window.AMOnline.myName() : 'Tú',
       thumb: 'position: absolute; top: 4px; bottom: 4px; left: calc(4px + ' + ti + ' * (100% - 8px) / 2); width: calc((100% - 8px) / 2); border-radius: 12px; background: linear-gradient(135deg, #FFFFFF, #7EF0FF 40%, #22D3EE); box-shadow: 0 0 14px #22D3EE; transition: left .4s cubic-bezier(.3,1.5,.5,1);', coins: this.fmt(this.coins()), bestRank: best,
       hasBadge: ready > 0, badge: String(ready),
