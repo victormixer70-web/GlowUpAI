@@ -81,6 +81,38 @@
     var out = []; for (var i = 0; i < n; i++) out.push(L[(i * 3 + 1) % L.length]);
     return out;
   }
+  // the gold cup on its plinth (the season pass and the cup share it)
+  function trophy(sc) {
+    var gold = new T.MeshStandardMaterial({ color: new T.Color('#FFC53D').convertSRGBToLinear(), metalness: 0.7, roughness: 0.25, emissive: new T.Color('#5A3A00'), emissiveIntensity: 0.4 });
+    var cup = new T.Group();
+    var prof = [[0, 0], [0.36, 0], [0.36, 0.1], [0.14, 0.18], [0.1, 0.5], [0.16, 0.56], [0.34, 0.75], [0.42, 1.05], [0.44, 1.25], [0.4, 1.27], [0, 1.0]].map(function (q) { return new T.Vector2(q[0], q[1]); });
+    cup.add(new T.Mesh(new T.LatheGeometry(prof, 40), gold));
+    [-1, 1].forEach(function (sd) { var h = new T.Mesh(new T.TorusGeometry(0.17, 0.035, 10, 24, Math.PI * 1.2), gold); h.position.set(sd * 0.46, 1.0, 0); h.rotation.z = sd > 0 ? -Math.PI * 0.6 : Math.PI * 1.6; cup.add(h); });
+    var base = new T.Mesh(new T.CylinderGeometry(0.42, 0.5, 0.5, 30), std('#2A1B6E', { r: 0.4 })); base.position.y = 0.25;
+    var band = new T.Mesh(new T.CylinderGeometry(0.505, 0.505, 0.07, 30), new T.MeshBasicMaterial({ color: 0xa855f7 })); band.position.y = 0.36;
+    cup.position.set(0, 0.5, 0); cup.scale.setScalar(0.95);
+    var g = new T.Group(); g.add(base); g.add(band); g.add(cup); g.scale.setScalar(sc || 1); return g;
+  }
+  // a board with text drawn on it (a league table, today's challenges)
+  function textBoard(w, h, draw) {
+    var c = document.createElement('canvas'); c.width = 512; c.height = Math.round(512 * h / w);
+    draw(c.getContext('2d'), c.width, c.height);
+    var tx = new T.CanvasTexture(c); tx.encoding = T.sRGBEncoding;
+    var g = new T.Group();
+    var fr = new T.Mesh(new T.BoxGeometry(w + 0.12, h + 0.12, 0.08), std('#1A1448', { r: 0.4 })); g.add(fr);
+    var face = new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshBasicMaterial({ map: tx, toneMapped: false })); face.position.z = 0.045; g.add(face);
+    return g;
+  }
+  // bits of confetti hanging in the air
+  function confetti(S, n, box) {
+    var cols = ['#FFC53D', '#22D3EE', '#EC4899', '#A855F7', '#FFFFFF'];
+    for (var i = 0; i < n; i++) {
+      var r = function (k) { var x = Math.sin((i + 1) * (k + 3) * 12.9898) * 43758.5453; return x - Math.floor(x); };
+      var q = new T.Mesh(new T.PlaneGeometry(0.09, 0.05), new T.MeshBasicMaterial({ color: new T.Color(cols[i % cols.length]), side: T.DoubleSide }));
+      q.position.set(box[0] + r(1) * (box[1] - box[0]), box[2] + r(2) * (box[3] - box[2]), box[4] + r(3) * (box[5] - box[4]));
+      q.rotation.set(r(4) * 6, r(5) * 6, r(6) * 6); S.add(q);
+    }
+  }
   function build(key) {
     var S = scene(), A = window.AMChars, me = A ? A.pref() : 'ty', you = me !== 'clasico';
     var add = function (o) { if (o) S.add(o); return o; };
@@ -131,6 +163,64 @@
       add(ball(-0.2, 1.1));
       add(player({ char: you ? me : 'ty', kit: homeKit(), you: true, x: -0.9, z: 1.6, face: Math.PI - 0.6, t: 0.3 }));
       look = { pos: [1.4, 3.0, 9.8], at: [0, 0.75, -0.5] };
+    } else if (kind === 'copa') {
+      // the cup: you and your team round the trophy, gold light and confetti
+      add(patch(3.6));
+      var tr = trophy(1.25); tr.position.set(0, 0, -0.6); S.add(tr);
+      var mt = others(2);
+      add(player({ char: mt[0], kit: homeKit(), x: -1.35, z: -0.9, face: 0.45, t: 0.8 }));
+      add(player({ char: mt[1], kit: homeKit(), x: 1.35, z: -0.9, face: -0.45, t: 1.4 }));
+      add(player({ char: you ? me : 'ty', kit: homeKit(), you: true, x: -0.75, z: 0.7, face: 0.25, t: 0.2 }));
+      var gl = new T.PointLight(0xffc53d, 2.2, 7); gl.position.set(0, 2.6, 1.0); S.add(gl);
+      confetti(S, 60, [-2.4, 2.4, 1.2, 3.6, -1.6, 1.2]);
+      look = { pos: [0, 2.3, 8.6], at: [0, 1.05, -0.3] };
+    } else if (kind === 'liga') {
+      // the league: the table on a big board behind, you and your rival face to face
+      add(patch(3.6));
+      add(line(0, -3.5, 0, 3.5));
+      var tb = textBoard(3.4, 2.0, function (c, w, h) {
+        var g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#2B1270'); g.addColorStop(1, '#12082F'); c.fillStyle = g; c.fillRect(0, 0, w, h);
+        c.fillStyle = '#A855F7'; c.fillRect(0, 0, w, 44);
+        c.font = 'italic 800 32px Barlow Condensed, Arial'; c.fillStyle = '#FFFFFF'; c.textBaseline = 'middle'; c.fillText('LIGA ARENA · CLASIFICACIÓN', 18, 23);
+        var rows = [['1', 'TU EQUIPO', '13', '#FFC53D'], ['2', 'RAYO', '11', '#22D3EE'], ['3', 'ATLÉTICO MIX', '9', '#EC4899'], ['4', 'DEPORTIVO', '7', '#4ADE80'], ['5', 'UNIÓN', '4', '#F97316'], ['6', 'REAL ARENA', '2', '#94A3B8']];
+        rows.forEach(function (r, i) {
+          var y = 66 + i * 34;
+          if (i === 0) { c.fillStyle = 'rgba(255,197,61,.22)'; c.fillRect(8, y - 15, w - 16, 30); }
+          c.fillStyle = r[3]; c.fillRect(18, y - 11, 8, 22);
+          c.font = '800 24px Arial'; c.fillStyle = '#FFFFFF'; c.fillText(r[0], 38, y + 1);
+          c.font = 'italic 800 25px Barlow Condensed, Arial'; c.fillText(r[1], 70, y + 1);
+          c.textAlign = 'right'; c.fillStyle = i === 0 ? '#FFE38A' : '#DDD6FE'; c.fillText(r[2] + ' PTS', w - 22, y + 1); c.textAlign = 'left';
+        });
+      });
+      tb.position.set(0, 2.0, -2.6); S.add(tb);
+      add(ball(0, 0.5));
+      var rv = others(1)[0];
+      add(player({ char: you ? me : 'ty', kit: homeKit(), you: true, x: -1.0, z: 0.4, face: Math.PI / 2 - 0.5, t: 0.3 }));
+      add(player({ char: rv, kit: KIT_AWAY, x: 1.0, z: 0.2, face: -Math.PI / 2 + 0.5, t: 1.1 }));
+      look = { pos: [0, 2.5, 9.6], at: [0, 1.25, -0.6] };
+    } else if (kind === 'retos') {
+      // today's challenges: targets glowing in the goal and the day's three challenges on a board
+      add(patch(3.6));
+      var mg = window.AMNet && window.AMNet.goal ? window.AMNet.goal(3.2, 1.5, 1.0) : null;
+      if (mg) { mg.group.rotation.y = Math.PI; mg.group.position.set(0.3, 0, -2.4); add(mg.group); }
+      [[-0.9, 1.15, 0xec4899], [1.5, 1.15, 0x22d3ee], [0.3, 0.45, 0xffc53d]].forEach(function (t) {
+        var ring = new T.Mesh(new T.TorusGeometry(0.28, 0.045, 12, 36), new T.MeshBasicMaterial({ color: t[2] }));
+        ring.position.set(t[0], t[1], -2.3); S.add(ring);
+        var dot = new T.Mesh(new T.CircleGeometry(0.1, 20), new T.MeshBasicMaterial({ color: t[2] })); dot.position.set(t[0], t[1], -2.31); S.add(dot);
+        var pl = new T.PointLight(t[2], 0.8, 2.5); pl.position.set(t[0], t[1], -1.9); S.add(pl);
+      });
+      var rb = textBoard(1.5, 1.25, function (c, w, h) {
+        var g = c.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#DB2777'); g.addColorStop(1, '#7C3AED'); c.fillStyle = g; c.fillRect(0, 0, w, h);
+        c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = '#FFFFFF';
+        c.font = 'italic 800 56px Barlow Condensed, Arial'; c.fillText('HOY', w / 2, 70);
+        c.font = 'italic 800 150px Barlow Condensed, Arial'; c.fillStyle = '#FFE38A'; c.fillText('3', w / 2, 210);
+        c.font = 'italic 800 52px Barlow Condensed, Arial'; c.fillStyle = '#FFFFFF'; c.fillText('RETOS', w / 2, 330);
+        c.font = '800 40px Arial'; c.fillText('★ ★ ★', w / 2, 390);
+      });
+      rb.position.set(-2.0, 1.25, -1.2); rb.rotation.y = 0.45; S.add(rb);
+      add(ball(0.15, 1.3));
+      add(player({ char: you ? me : 'ty', kit: homeKit(), you: true, x: 0.9, z: 1.9, face: Math.PI - 0.35, t: 0.4 }));
+      look = { pos: [0.6, 2.4, 9.4], at: [-0.1, 1.0, -0.8] };
     } else if (kind === 'tut') {
       add(patch(3.2));
       add(cone(-1.5, -0.6)); add(cone(1.5, -0.6));
