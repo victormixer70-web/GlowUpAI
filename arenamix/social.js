@@ -106,7 +106,60 @@
       return;
     }
     if (m.t === 'invno') { notify(from + ' no puede jugar ahora'); return; }
+    if (/^club/.test(m.t)) clubMsg(from, m);
   }
+
+  /* ---------- clubs: a group of friends with a crest, a wall and the week's wins. Kept on every member's phone
+     and synced peer to peer: the owner keeps the member list and sends it round when it changes ---------- */
+  var CKEY = 'arenamix.club.v1', IKEY = 'arenamix.clubinv.v1';
+  function club() { try { return JSON.parse(localStorage.getItem(CKEY) || 'null'); } catch (e) { return null; } }
+  function putClub(c) { try { if (c) localStorage.setItem(CKEY, JSON.stringify(c)); else localStorage.removeItem(CKEY); } catch (e) {} changed(); }
+  function clubInvites() { try { return JSON.parse(localStorage.getItem(IKEY) || '[]') || []; } catch (e) { return []; } }
+  function putInvites(l) { try { localStorage.setItem(IKEY, JSON.stringify(l)); } catch (e) {} changed(); }
+  function myWins() { try { return (JSON.parse(localStorage.getItem('arenamix.weekly.v1') || 'null') || {}).wins || 0; } catch (e) { return 0; } }
+  function others(c) { return (c.members || []).filter(function (x) { return !same(x.name, me()); }); }
+  function broadcast(c, m) { others(c).forEach(function (x) { send(x.name, Object.assign({ name: me() }, m)); }); }
+  function mine(c) { return c && same(c.owner, me()); }
+  function syncOut(c) { if (mine(c)) broadcast(c, { t: 'clubsync', club: c }); }
+  function clubMsg(from, m) {
+    var c = club();
+    if (m.t === 'clubinv' && m.club) {
+      if (c && c.id === m.club.id) return;
+      var l = clubInvites().filter(function (x) { return x.id !== m.club.id; }); l.push({ id: m.club.id, from: from, club: m.club, at: Date.now() });
+      putInvites(l); notify('🛡️ ' + from + ' te invita al club ' + m.club.name, 'Clubes.dc.html'); return;
+    }
+    if (!c || m.id !== c.id && !(m.club && m.club.id === c.id)) return;
+    if (m.t === 'clubjoin' && mine(c)) {
+      if (!(c.members || []).some(function (x) { return same(x.name, from); })) { c.members.push({ name: from, role: 'Miembro', wins: m.wins || 0, since: Date.now() }); c.wall = (c.wall || []).concat([{ sys: 1, t: from + ' se ha unido al club', at: Date.now() }]).slice(-40); }
+      putClub(c); syncOut(c); return;
+    }
+    if (m.t === 'clubleave') { c.members = (c.members || []).filter(function (x) { return !same(x.name, from); }); c.wall = (c.wall || []).concat([{ sys: 1, t: from + ' ha salido del club', at: Date.now() }]).slice(-40); putClub(c); syncOut(c); return; }
+    if (m.t === 'clubsync' && m.club && same(c.owner, from)) { var keep = c.wall || []; var nc = m.club; nc.wall = mergeWall(keep, nc.wall || []); if (!(nc.members || []).some(function (x) { return same(x.name, me()); })) { putClub(null); notify('Ya no estás en el club ' + c.name); return; } putClub(nc); return; }
+    if (m.t === 'clubmsg' && m.text) { c.wall = mergeWall(c.wall || [], [{ n: from, t: String(m.text).slice(0, 80), at: m.at || Date.now() }]); putClub(c); if (mine(c)) syncOut(c); return; }
+    if (m.t === 'clubstat') { (c.members || []).forEach(function (x) { if (same(x.name, from)) x.wins = m.wins || 0; }); putClub(c); if (mine(c)) syncOut(c); return; }
+  }
+  function mergeWall(a, b) { var all = a.concat(b), out = [], k = {}; all.sort(function (x, y) { return x.at - y.at; }).forEach(function (x) { var id = (x.n || '') + '|' + x.at + '|' + x.t; if (!k[id]) { k[id] = 1; out.push(x); } }); return out.slice(-40); }
+  var CLUB = {
+    get: club, invites: clubInvites,
+    create: function (o) {
+      var c = { id: idOf(me()) + '-' + Date.now().toString(36), name: String(o.name || 'Mi Club').slice(0, 20), tag: String(o.tag || '').toUpperCase().slice(0, 4), color: o.color || '#2563EB', shape: o.shape || 'shield', motto: String(o.motto || '').slice(0, 50),
+        owner: me(), created: Date.now(), members: [{ name: me(), role: 'Presidente', wins: myWins(), since: Date.now() }], wall: [{ sys: 1, t: 'Club fundado por ' + me(), at: Date.now() }] };
+      putClub(c); return c;
+    },
+    edit: function (o) { var c = club(); if (!mine(c)) return; Object.assign(c, o); putClub(c); syncOut(c); },
+    invite: function (name) { var c = club(); if (!c) return; send(name, { t: 'clubinv', name: me(), club: { id: c.id, name: c.name, tag: c.tag, color: c.color, shape: c.shape, motto: c.motto, owner: c.owner, members: c.members } }, function (ok) { notify(ok ? 'Invitación enviada a ' + name : name + ' no está conectado ahora'); }); },
+    accept: function (id) {
+      var inv = clubInvites().find(function (x) { return x.id === id; }); if (!inv) return;
+      var c = inv.club; c.members = (c.members || []).concat([{ name: me(), role: 'Miembro', wins: myWins(), since: Date.now() }]); c.wall = [{ sys: 1, t: 'Te has unido al club', at: Date.now() }];
+      putClub(c); putInvites(clubInvites().filter(function (x) { return x.id !== id; }));
+      send(c.owner, { t: 'clubjoin', name: me(), id: c.id, wins: myWins() });
+    },
+    decline: function (id) { putInvites(clubInvites().filter(function (x) { return x.id !== id; })); },
+    leave: function () { var c = club(); if (!c) return; if (mine(c)) { c.members = others(c); if (c.members.length) { c.owner = c.members[0].name; c.members[0].role = 'Presidente'; broadcast(c, { t: 'clubsync', club: c }); } } else send(c.owner, { t: 'clubleave', name: me(), id: c.id }); putClub(null); },
+    say: function (text) { var c = club(); if (!c || !String(text || '').trim()) return; var m = { n: me(), t: String(text).slice(0, 80), at: Date.now() }; c.wall = mergeWall(c.wall || [], [m]); putClub(c); broadcast(c, { t: 'clubmsg', id: c.id, text: m.t, at: m.at }); },
+    stat: function () { var c = club(); if (!c) return; (c.members || []).forEach(function (x) { if (same(x.name, me())) x.wins = myWins(); }); putClub(c); if (mine(c)) syncOut(c); else send(c.owner, { t: 'clubstat', name: me(), id: c.id, wins: myWins() }); },
+    online: function (name) { return same(name, me()) || isOn(name); }
+  };
   function befriend(name) {
     if (!has(S.friends, name)) S.friends.push({ name: name, since: Date.now() });
     S.outgoing = drop(S.outgoing, name); S.incoming = drop(S.incoming, name);
@@ -235,6 +288,7 @@
 
   /* ---------- the API the screens use ---------- */
   window.AMSocial = {
+    club: CLUB,
     start: start, restart: restart,
     on: function (fn) { subs.push(fn); return function () { subs = subs.filter(function (f) { return f !== fn; }); }; },
     state: function () {
