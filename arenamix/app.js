@@ -336,10 +336,13 @@
     var btn = document.createElement('button');
     btn.id = 'install';
     btn.type = 'button';
-    btn.textContent = 'Instalar app';
-    btn.setAttribute('style', 'position:fixed;left:12px;bottom:12px;z-index:20;height:44px;padding:0 18px;border:0;border-radius:22px;background:#22D3EE;color:#0B0B14;font:800 15px Exo2,system-ui,sans-serif;box-shadow:0 4px 0 #0E8FA3,0 8px 24px #0008;cursor:pointer');
+    // a small round chip in the corner (it used to cover the pitch and your player)
+    btn.setAttribute('aria-label', 'Instalar app');
+    btn.title = 'Instalar app';
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5l5-5M5 20h14"/></svg>';
+    btn.setAttribute('style', 'position:fixed;left:10px;bottom:10px;z-index:20;width:36px;height:36px;padding:0;border:1.5px solid #FFFFFF99;border-radius:18px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#22D3EE,#8B5CF6);color:#FFFFFF;box-shadow:0 4px 12px #0008;cursor:pointer;opacity:.9');
     var tip = document.createElement('div');
-    tip.setAttribute('style', 'display:none;position:fixed;left:12px;bottom:66px;z-index:20;max-width:260px;padding:12px 14px;border-radius:14px;background:#17172A;border:1px solid #2E2E52;color:#F4F4FA;font:600 13px/1.45 Exo2,system-ui,sans-serif');
+    tip.setAttribute('style', 'display:none;position:fixed;left:10px;bottom:54px;z-index:20;max-width:260px;padding:12px 14px;border-radius:14px;background:#17172A;border:1px solid #2E2E52;color:#F4F4FA;font:600 13px/1.45 Exo2,system-ui,sans-serif');
     tip.innerHTML = isIOS ? 'En iPhone: toca el botón <b>Compartir</b> (cuadrado con flecha) y elige <b>Añadir a pantalla de inicio</b>.' : 'Abre el menú del navegador <b>⋮</b> y elige <b>Instalar aplicación</b> o <b>Añadir a pantalla de inicio</b>.';
     btn.addEventListener('click', function (e) {
       e.stopPropagation();

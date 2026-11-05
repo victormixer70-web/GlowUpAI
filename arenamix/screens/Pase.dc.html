@@ -139,7 +139,7 @@ body{margin:0}
         </div>
         <span style="font-size: 10.5px; line-height: 1.35; color: #B89B6A">{{buyNote}}</span>
         <div style="display: flex; gap: 10px; margin-top: auto">
-          <button type="button" onClick="{{buy}}" class="ps-gold" style="flex: 1; height: 44px; border: 0; transform: skewX(0deg); color: #2A1C02; font: 800 20px 'Barlow Condensed', sans-serif; letter-spacing: 1px; cursor: pointer">COMPRAR · {{price}}</button>
+          <button type="button" onClick="{{buy}}" class="ps-gold" style="flex: 1; height: 44px; border: 0; transform: skewX(0deg); color: #2A1C02; font: 800 20px 'Barlow Condensed', sans-serif; letter-spacing: 1px; cursor: pointer">{{buyLabel}}</button>
           <button type="button" onClick="{{closeBuy}}" class="bc-para" style="height: 44px; padding: 0 16px; border: 0; background: #251443; color: #CACAE0; font: 800 13px Exo2, sans-serif; cursor: pointer">AHORA NO</button>
         </div>
       </div>
@@ -224,7 +224,7 @@ class Component extends DCLogic {
     const fmtDays = (n) => n === 1 ? '1 DÍA' : n + ' DÍAS';
     return {
       confetti, ballX: String(Math.max(6, fillTo).toFixed(0)),
-      season: String(S.season), days: fmtDays(S.daysLeft), level: String(S.level), price: S.price,
+      buyLabel: /€/.test(S.price) ? 'COMPRAR · ' + S.price : S.price, season: String(S.season), days: fmtDays(S.daysLeft), level: String(S.level), price: S.price,
       levelText: S.level >= 30 ? '¡PASE COMPLETADO!' : 'NIVEL ' + S.level + ' → ' + (S.level + 1),
       xpText: S.level >= 30 ? '' : S.into + ' / ' + S.need + ' XP',
       xpBar: 'height: 9px; width: ' + (S.level >= 30 ? 100 : S.into / S.need * 100).toFixed(1) + '%; background: linear-gradient(90deg, #22D3EE, #A855F7, #EC4899, #FFC53D); box-shadow: 0 0 10px #EC489988',

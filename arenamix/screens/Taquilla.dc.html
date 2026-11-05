@@ -182,7 +182,7 @@ input::placeholder{color:#8686A6}
         <a href="{{rewardHref}}" style="display: flex; align-items: center; height: 38px; padding: 0 14px; transform: skewX(0deg); border: 2px solid #9B6BFF; color: #C4B5FD; text-decoration: none; font-weight: 800; font-size: 12px"><span style="transform: skewX(0deg)">CÓMO CONSEGUIRLO</span></a>
       </sc-if>
       <sc-if value="{{showPremium}}" hint-placeholder-val="{{ false }}">
-        <a href="Tienda.dc.html" style="display: flex; align-items: center; height: 40px; padding: 0 16px; transform: skewX(0deg); background: linear-gradient(135deg, #FFB37A, #FF8A3D); color: #150925; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px"><span style="transform: skewX(0deg)">PRONTO</span></a>
+        <span style="display: flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border-radius: 10px; border: 1.5px dashed #FFFFFFAA; background: #00000033; color: #FFFFFFDD; font-weight: 800; font-size: 11px; letter-spacing: 1px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>PRÓXIMAMENTE</span>
       </sc-if>
     </div>
   </div>
@@ -622,7 +622,7 @@ class Component extends DCLogic {
       if (equipped) { label = 'Equipado'; color = '#22D3EE'; }
       else if (!own && it.st === 'coins') { label = this.fmt(it.price); color = '#FFC53D'; }
       else if (!own && it.st === 'reward') { label = it.req; color = '#CACAE0'; }
-      else if (!own && it.st === 'premium') { label = 'Pronto'; color = '#FF8A3D'; }
+      else if (!own && it.st === 'premium') { label = 'Próximamente'; color = '#FDBA74'; }
       const k = {};
       ['none', 'band', 'cap', 'top', 'chef', 'viking', 'prop', 'crown', 'sprout', 'phones', 'sun', 'round', 'star', 'd3', 'ski', 'stache'].forEach((x) => { k[x] = it.kind === x; });
       return {
