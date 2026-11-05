@@ -69,11 +69,25 @@ body{margin:0}
 .tn-size{background:#ffffff14!important;border-color:#ffffff33!important;color:#fff!important}
 .tn-size.on{background:var(--tc,#A78BFA)!important;color:#150925!important;box-shadow:0 3px 0 #0006,0 0 14px var(--tc,#A78BFA)!important}
 .tn-reto{overflow:hidden;isolation:isolate}
-.tn-retoimg{position:absolute;left:0;right:0;top:128px;height:120px;width:100%;object-fit:cover;object-position:50% 45%;z-index:-1;opacity:.9;-webkit-mask-image:linear-gradient(180deg,transparent,#000 25%,#000 70%,transparent);mask-image:linear-gradient(180deg,transparent,#000 25%,#000 70%,transparent);filter:hue-rotate(0deg) saturate(1.2)}
+.tn-retoimg{position:absolute;left:0;right:0;top:168px;height:96px;width:100%;object-fit:cover;object-position:50% 45%;z-index:-1;opacity:.9;-webkit-mask-image:linear-gradient(180deg,transparent,#000 25%,#000 70%,transparent);mask-image:linear-gradient(180deg,transparent,#000 25%,#000 70%,transparent);filter:hue-rotate(0deg) saturate(1.2)}
 .tn-reto h3{text-shadow:0 3px 0 #0D0418,0 0 16px var(--rc)}
 .tn-reto .tn-chip{background:#00000044;border:1px solid #ffffff2a}
 .tn-reto{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--rc) 70%,#fff),0 0 22px color-mix(in srgb,var(--rc) 35%,transparent),0 14px 30px #0009!important}
 .tn-bg{background:radial-gradient(60% 70% at 15% 10%,#7C3AED99,transparent 65%),radial-gradient(55% 70% at 95% 95%,#DB277788,transparent 62%),radial-gradient(90% 80% at 70% 0%,#2C1C8E 0%,#200C5B 55%,#130635 100%)!important}
+
+/* text v2: gradient titles, feature pills, section labels with an icon and a fading rule */
+.tn-big{font:800 italic 38px/1 'Barlow Condensed',sans-serif;letter-spacing:1.5px;background:linear-gradient(180deg,#FFFFFF 15%,color-mix(in srgb,var(--tc) 75%,#fff) 60%,var(--tc));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #0D0418) drop-shadow(0 0 14px color-mix(in srgb,var(--tc) 60%,transparent))}
+.tn-feats{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;padding:0 12px}
+.tn-feats span{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:10px;background:#00000055;border:1px solid color-mix(in srgb,var(--tc) 60%,transparent);font:800 10.5px Exo2,sans-serif;color:#FFFFFF;white-space:nowrap}
+.tn-feats svg{color:var(--tc)}
+.tn-lead{font:700 italic 11px Exo2,sans-serif;color:color-mix(in srgb,var(--tc) 35%,#fff);opacity:.9;text-align:center;padding:0 18px}
+.tn-sec{display:flex;align-items:center;gap:6px;font:800 10px Exo2,sans-serif;letter-spacing:2px;color:color-mix(in srgb,var(--tc) 70%,#fff)}
+.tn-sec svg{flex:none;width:20px;height:20px;padding:4px;box-sizing:border-box;border-radius:7px;background:var(--tc);color:#150925}
+.tn-sec i{flex:1;height:2px;border-radius:1px;background:linear-gradient(90deg,var(--tc),transparent)}
+.tn-reto{--tc:var(--rc)}
+.tn-reto>div,.tn-reto>p,.tn-reto>h3{position:relative;z-index:1}
+.tn-reto p{font:700 11.5px/1.4 Exo2,sans-serif!important;color:#FFFFFFE6!important;padding:6px 9px;border-radius:10px;background:#00000040;border-left:3px solid var(--rc)}
+.tn-reto h3{background:linear-gradient(180deg,#FFFFFF 20%,color-mix(in srgb,var(--rc) 55%,#fff));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none!important;filter:drop-shadow(0 3px 0 #0D0418) drop-shadow(0 0 12px color-mix(in srgb,var(--rc) 70%,transparent))}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -97,15 +111,14 @@ body{margin:0}
     <sc-if value="{{cupIntro}}" hint-placeholder-val="{{ false }}">
       <div class="tn-panel" style="display: flex; gap: 14px">
         <div class="tn-card tn-hero tn-gold" style="flex: none; width: 330px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; padding-bottom: 16px"><img class="tn-heroimg" src="{{copaImg}}" alt=""><i class="tn-herofade"></i><span class="tn-tag">TORNEO · ELIMINATORIAS</span>
-          <span style="font: 800 italic 34px/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; color: #FFE38A; text-shadow: 0 3px 0 #0D0418, 0 0 18px #FFC53D88">COPA ARENA</span>
-          <span style="font-size: 11.5px; font-weight: 700; color: #C9C2FF; text-align: center; padding: 0 26px; line-height: 1.4">8 equipos, eliminación directa. Si hay empate, tanda de penaltis. Cada ronda, un rival más duro.</span>
+          <span class="tn-big">COPA ARENA</span><div class="tn-feats"><span><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8l9-12h-7z"/></svg>8 equipos</span><span><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8l9-12h-7z"/></svg>Eliminación directa</span><span><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8l9-12h-7z"/></svg>Empate = penaltis</span></div><span class="tn-lead">Cada ronda, un rival más duro. ¿Llegarás a la final?</span>
         </div>
         <div class="tn-card tn-side tn-gold" style="flex: 1; padding: 18px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
-          <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #A78BFA">TAMAÑO DE LOS EQUIPOS</span>
+          <span class="tn-sec"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a4 4 0 1 0 0-8a4 4 0 0 0 0 8M2 21v-1a6 6 0 0 1 12 0v1M17 11a3 3 0 1 0 0-6M18 15a5 5 0 0 1 4 5v1"/></svg>TAMAÑO DE LOS EQUIPOS<i></i></span>
           <div style="display: flex; gap: 8px">
             <sc-for list="{{sizes}}" as="z" key="n"><button type="button" class="{{z.cls}}" onClick="{{z.pick}}">{{z.label}}</button></sc-for>
           </div>
-          <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #A78BFA; margin-top: 4px">PREMIOS</span>
+          <span class="tn-sec" style="margin-top: 4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg>PREMIOS<i></i></span>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px">
             <sc-for list="{{cupPrizes}}" as="p" key="k">
               <div class="tn-prize" style="{{p.tile}}"><span class="md">{{p.n}}</span><span style="flex: 1">{{p.k}}</span><b>{{p.v}}</b></div>
@@ -147,15 +160,14 @@ body{margin:0}
     <sc-if value="{{lgIntro}}" hint-placeholder-val="{{ false }}">
       <div class="tn-panel" style="display: flex; gap: 14px">
         <div class="tn-card tn-hero tn-violet" style="flex: none; width: 330px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; padding-bottom: 16px"><img class="tn-heroimg" src="{{ligaImg}}" alt=""><i class="tn-herofade"></i><span class="tn-tag">LIGA · 5 JORNADAS</span>
-          <span style="font: 800 italic 34px/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; color: #E6EBFF; text-shadow: 0 3px 0 #0D0418, 0 0 18px #A78BFA88">LIGA ARENA</span>
-          <span style="font-size: 11.5px; font-weight: 700; color: #C9C2FF; text-align: center; padding: 0 26px; line-height: 1.4">6 equipos, todos contra todos. 5 jornadas: 3 puntos por victoria, 1 por empate. ¡Acaba arriba!</span>
+          <span class="tn-big">LIGA ARENA</span><div class="tn-feats"><span><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8l9-12h-7z"/></svg>6 equipos</span><span><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8l9-12h-7z"/></svg>5 jornadas</span><span><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h7l-1 8l9-12h-7z"/></svg>Victoria 3 pts · Empate 1</span></div><span class="tn-lead">Todos contra todos. ¡Acaba primero en la tabla!</span>
         </div>
         <div class="tn-card tn-side tn-violet" style="flex: 1; padding: 18px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
-          <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #A78BFA">TAMAÑO DE LOS EQUIPOS</span>
+          <span class="tn-sec"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a4 4 0 1 0 0-8a4 4 0 0 0 0 8M2 21v-1a6 6 0 0 1 12 0v1M17 11a3 3 0 1 0 0-6M18 15a5 5 0 0 1 4 5v1"/></svg>TAMAÑO DE LOS EQUIPOS<i></i></span>
           <div style="display: flex; gap: 8px">
             <sc-for list="{{sizes}}" as="z" key="n"><button type="button" class="{{z.cls}}" onClick="{{z.pick}}">{{z.label}}</button></sc-for>
           </div>
-          <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #A78BFA; margin-top: 4px">PREMIOS</span>
+          <span class="tn-sec" style="margin-top: 4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg>PREMIOS<i></i></span>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px">
             <sc-for list="{{lgPrizes}}" as="p" key="k">
               <div class="tn-prize" style="{{p.tile}}"><span class="md">{{p.n}}</span><span style="flex: 1">{{p.k}}</span><b>{{p.v}}</b></div>
@@ -202,7 +214,7 @@ body{margin:0}
           <div class="tn-reto" style="{{r.style}}"><img class="tn-retoimg" src="{{retosImg}}" alt="" aria-hidden="true">
             <div style="display: flex; align-items: center; gap: 8px">
               <span style="{{r.badge}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="{{r.icon}}"/></svg></span>
-              <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 2px; color: {{r.c}}">RETO {{r.num}}</span>
+              <span style="padding: 2px 8px; border-radius: 8px; background: #00000055; font-size: 9.5px; font-weight: 800; letter-spacing: 2px; color: #FFFFFF; box-shadow: inset 0 0 0 1px {{r.c}}">RETO {{r.num}} DE 3</span>
             </div>
             <h3>{{r.title}}</h3>
             <p>{{r.desc}}</p>
