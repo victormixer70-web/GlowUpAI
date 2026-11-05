@@ -334,6 +334,9 @@
     var x0 = xp(), before = levelOf(x0), after = levelOf(addXp(gain)), pv = addPassXp(passGain), ps = pass();
     // coins
     var coinsGain = won ? 40 : lost ? 10 : 20, levelBonus = 0;
+    // win streak bonus: +10 VCD per win in a row (up to +50)
+    var Cs = get('arenamix.career.v1', { streak: 0 }), streakNow = won ? (Cs.streak || 0) + 1 : 0, streakBonus = won && streakNow >= 2 ? Math.min(5, streakNow) * 10 : 0;
+    coinsGain += streakBonus;
     if (useBoost('vcd2')) { coinsGain *= 2; used.push('Doble VCD'); }
     for (var lv = before.level + 1; lv <= after.level; lv++) levelBonus += 100;
     var gemsGain = 2 * (after.level - before.level);
@@ -369,7 +372,7 @@
       xpLines: lines, xpGain: gain, before: before, after: after, levelUps: after.level - before.level,
       coinsBefore: c0, coinsGain: coinsGain, levelBonus: levelBonus,
       weekBefore: w0, weekAfter: W2.wins, milestones: W2.milestones,
-      boostsUsed: used, gemsGain: gemsGain,
+      boostsUsed: used, gemsGain: gemsGain, streak: streakNow, streakBonus: streakBonus,
       stats: { goals: goals || 0, shots: st.shots || 0, passes: st.passes || 0, skills: st.skills || 0, tackles: st.tackles || 0, poss: st.poss != null ? st.poss : null },
       pass: { before: pv.before, after: pv.after, into: ps.into, need: ps.need, ready: ps.ready },
       missions: mAfter.map(function (m, i) { return Object.assign({}, m, { was: mBefore[i] ? mBefore[i].have : 0 }); })
@@ -377,6 +380,7 @@
   }
 
   window.AMProgress = {
+    streak: function () { return get('arenamix.career.v1', { streak: 0 }).streak || 0; },
     coins: coins, addCoins: addCoins, gems: gems, addGems: addGems, spendGems: spendGems,
     boostList: BOOSTS, boostLeft: boostLeft, buyBoost: buyBoost, useBoost: useBoost,
     aiPref: aiPref, setAiPref: setAiPref, aiLevel: aiLevel,

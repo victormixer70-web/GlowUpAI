@@ -290,6 +290,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .lb-slot .pic{position:absolute;top:18px;width:66px;height:66px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px #FFFFFFCC,0 0 18px #A855F7;animation:hmFloatPic 3s ease-in-out infinite}
 @keyframes hmFloatPic{0%,100%{translate:0 0}50%{translate:0 -4px}}
 .lb-slot .pic+.ini{top:68px;width:24px;height:24px;font-size:13px;line-height:24px}
+.lb-streak{white-space:nowrap;flex:none;margin-left:6px;padding:4px 10px;border-radius:12px;background:linear-gradient(135deg,#F97316,#DC2626);font:800 11px Exo2,sans-serif;letter-spacing:.8px;color:#fff;box-shadow:0 0 14px #F97316AA;animation:lbStreak 1.2s ease-in-out infinite}
+@keyframes lbStreak{0%,100%{scale:1}50%{scale:1.08}}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(90% 120% at 40% 0%, #1D2350 0%, #0D0F24 45%, #07070F 100%); color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -307,6 +309,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <span style="font-weight: 800; font-size: 14px">{{name}}</span>
       <span style="font-size: 11px; font-weight: 700; color: #22D3EE">Nivel {{lv}} · {{lvPct}}%</span>
     </div>
+    <sc-if value="{{hasStreak}}" hint-placeholder-val="{{ false }}"><span class="lb-streak" title="Victorias seguidas">🔥 {{streakN}} SEGUIDAS</span></sc-if>
     <span style="flex: 1"></span>
     <!-- the season pass, right where you can see it -->
     <a href="Pase.dc.html" class="hm-pass" aria-label="{{passAria}}">
@@ -460,6 +463,7 @@ class Component extends DCLogic {
     const sel = this.store('arenamix.sel', {}) || {}, mmCat = sel.cat === 'comp' || sel.cat === 'casual' ? sel.cat : null;
     const mmOk = withParty && mmCat && /^m\d$/.test(selId);
     return {
+      hasStreak: !!(window.AMProgress && window.AMProgress.streak && window.AMProgress.streak() >= 2), streakN: String(window.AMProgress && window.AMProgress.streak ? window.AMProgress.streak() : 0),
       partyN: String(P ? P.members.length : 1),
       hasReq: !!(SO && SO.pending() > 0), reqN: String(SO ? SO.pending() : 0),
       slots: POS.map(([x, y, tf], k) => {
