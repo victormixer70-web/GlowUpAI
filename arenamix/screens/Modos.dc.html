@@ -52,6 +52,22 @@ input::placeholder{color:#8686A6}
 .md-dots2{position:absolute;left:50%;top:268px;transform:translateX(-50%);display:flex;gap:6px;z-index:20}
 .md-dots2 i{width:7px;height:7px;border-radius:4px;background:#FFFFFF33;transition:width .3s,background .3s}
 @keyframes mdFloat{0%,100%{translate:0 0}50%{translate:0 -6px}}
+
+/* decorated card edges: a gradient frame in the tab's colour, an inner hairline, and glowing corner brackets */
+.md-card::before{content:"";position:absolute;inset:0;border-radius:18px;padding:3px;background:linear-gradient(140deg,var(--mc),#FFFFFF 22%,color-mix(in srgb,var(--mc) 60%,#A855F7) 50%,#EC4899 78%,var(--mc));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);opacity:.75;z-index:3;pointer-events:none;transition:opacity .3s}
+.md-card[aria-pressed="true"]::before{opacity:1;background-size:300% 300%;animation:mdFrame 3s linear infinite}
+@keyframes mdFrame{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+.md-card .md-in{position:absolute;inset:5px;border-radius:14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),inset 0 1px 0 rgba(255,255,255,.3);pointer-events:none;z-index:3}
+.md-card .md-cn{position:absolute;width:16px;height:16px;z-index:4;pointer-events:none;border:3px solid var(--mc);filter:drop-shadow(0 0 4px var(--mc));opacity:.7;transition:opacity .3s,transform .3s}
+.md-card .md-cn.a{left:-2px;top:-2px;border-right:0;border-bottom:0;border-radius:12px 0 0 0}
+.md-card .md-cn.b{right:-2px;top:-2px;border-left:0;border-bottom:0;border-radius:0 12px 0 0}
+.md-card .md-cn.c{left:-2px;bottom:-2px;border-right:0;border-top:0;border-radius:0 0 0 12px}
+.md-card .md-cn.d{right:-2px;bottom:-2px;border-left:0;border-top:0;border-radius:0 0 12px 0}
+.md-card[aria-pressed="true"] .md-cn{opacity:1;border-color:#FFFFFF;filter:drop-shadow(0 0 6px var(--mc)) drop-shadow(0 0 2px var(--mc))}
+.md-card[aria-pressed="true"] .md-cn.a{transform:translate(-2px,-2px)}.md-card[aria-pressed="true"] .md-cn.b{transform:translate(2px,-2px)}
+.md-card[aria-pressed="true"] .md-cn.c{transform:translate(-2px,2px)}.md-card[aria-pressed="true"] .md-cn.d{transform:translate(2px,2px)}
+.md-card .md-bar{position:absolute;left:22%;right:22%;bottom:-1px;height:3px;border-radius:3px;z-index:4;background:linear-gradient(90deg,transparent,var(--mc),#FFFFFF,var(--mc),transparent);opacity:.6;pointer-events:none}
+.md-card[aria-pressed="true"] .md-bar{opacity:1;box-shadow:0 0 10px var(--mc)}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -99,6 +115,7 @@ input::placeholder{color:#8686A6}
         <sc-if value="{{m.isOn}}" hint-placeholder-val="{{ false }}"><span class="md-sweep"></span></sc-if>
         <span style="{{m.titleStyle}}">{{m.title}}</span>
         <span style="{{m.kickStyle}}">{{m.kicker}}</span>
+        <span class="md-in"></span><span class="md-cn a"></span><span class="md-cn b"></span><span class="md-cn c"></span><span class="md-cn d"></span><span class="md-bar"></span>
       </button>
     </sc-for>
   </div>
@@ -274,7 +291,7 @@ class Component extends DCLogic {
         title, tag, kicker, img, on: on ? 'true' : 'false', isOn: on,
         hasRib: !!RIB[m.id], rib: (RIB[m.id] || [])[0] || '', ribC: (RIB[m.id] || [])[1] || '', aria: title + '. ' + m.desc,
         glow: on ? CAT[0] + '88' : 'transparent', sub: on ? CAT[0] : '#A3A3C2',
-        style: 'left: ' + cx.toFixed(1) + 'px; top: ' + cy.toFixed(1) + 'px; width: ' + cw.toFixed(1) + 'px; height: ' + ch.toFixed(1) + 'px; z-index: ' + (on ? 2 : 1) + '; animation-delay: ' + (i * 0.04).toFixed(2) + 's; filter: ' + (on ? 'none' : 'brightness(.78) saturate(.9)') + ';',
+        style: '--mc: ' + CAT[0] + '; left: ' + cx.toFixed(1) + 'px; top: ' + cy.toFixed(1) + 'px; width: ' + cw.toFixed(1) + 'px; height: ' + ch.toFixed(1) + 'px; z-index: ' + (on ? 2 : 1) + '; animation-delay: ' + (i * 0.04).toFixed(2) + 's; filter: ' + (on ? 'none' : 'brightness(.78) saturate(.9)') + ';',
         bg: 'position: absolute; inset: 0; border-radius: 18px; overflow: hidden; background: radial-gradient(120% 80% at 50% 25%, ' + CAT[1] + ' 0%, #1C0E43 60%, #0F061E 100%); --mc: ' + CAT[0] + '; ' + (on ? 'animation: mdGlow 2.4s ease-in-out infinite;' : 'box-shadow: 0 0 0 1px #7C5CFF66, 0 10px 20px #000a;'),
         imgStyle: 'opacity: ' + (img ? 1 : 0) + ';',
         tagStyle: 'position: absolute; left: 10px; top: 10px; padding: 3px 9px; border-radius: 9px; background: ' + (on ? CAT[0] : '#251443CC') + '; color: ' + (on ? '#150925' : '#CACAE0') + '; font: 800 9.5px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap;',
