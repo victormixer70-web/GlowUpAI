@@ -27,7 +27,7 @@ body{margin:0}
 @keyframes psFall{0%{opacity:0;transform:translate(0,0) rotate(0)}10%{opacity:.85}100%{opacity:0;transform:translate(var(--dx,20px),420px) rotate(var(--r,540deg))}}
 .ps-mark{position:absolute;right:-20px;bottom:-40px;font:800 italic 260px/1 'Barlow Condensed',sans-serif;color:transparent;-webkit-text-stroke:2px #FFC53D1c;pointer-events:none;letter-spacing:-8px}
 .ps-spot{position:absolute;top:-40px;width:240px;height:460px;transform-origin:50% 0;background:linear-gradient(180deg,#FF8A3D2e,transparent 80%);clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);pointer-events:none;will-change:transform}
-.ps-band{position:absolute;left:0;right:0;top:170px;bottom:0;border-radius:14px;background:linear-gradient(180deg,#FFC53D14,#FF8A3D0a);box-shadow:inset 0 1px 0 #FFC53D33;overflow:hidden;pointer-events:none}
+.ps-band{position:absolute;left:0;right:0;top:170px;bottom:0;border-radius:14px;background:linear-gradient(90deg,#F59E0B2E,#EC48992E 50%,#D946EF2E);box-shadow:inset 0 1px 0 #FFC53D66;overflow:hidden;pointer-events:none}
 .ps-band::after{content:"";position:absolute;top:0;bottom:0;width:180px;left:-200px;background:linear-gradient(100deg,transparent,#FFE38A1f,transparent);animation:psBand 5s ease-in-out infinite}
 @keyframes psBand{0%,40%{transform:translateX(0)}100%{transform:translateX(3400px)}}
 .ps-ball{position:absolute;top:138px;width:26px;height:26px;margin-left:-13px;z-index:3;pointer-events:none;filter:drop-shadow(0 0 8px #FFC53D)}
@@ -43,7 +43,7 @@ body{margin:0}
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <div class="am-bg"></div>
-  <div style="position: absolute; inset: 0; background: radial-gradient(60% 70% at 85% 110%, #FF8A3D30, transparent 70%), radial-gradient(50% 60% at 40% -10%, #FFC53D1c, transparent 70%); pointer-events: none"></div>
+  <div style="position: absolute; inset: 0; background: radial-gradient(60% 70% at 85% 110%, #EC489966, transparent 70%), radial-gradient(50% 60% at 40% -10%, #FFC53D55, transparent 70%), radial-gradient(45% 60% at 5% 90%, #22D3EE44, transparent 70%); pointer-events: none"></div>
   <span class="ps-mark" aria-hidden="true">T{{season}}</span>
   <div class="ps-spot" style="left: 260px; animation: psSwayL 8s ease-in-out infinite"></div><div class="ps-spot" style="left: 600px; animation: psSwayR 10s ease-in-out infinite"></div>
   <sc-for list="{{confetti}}" as="k" hint-placeholder-count="0"><i class="ps-conf" style="{{k}}"></i></sc-for>
@@ -63,7 +63,7 @@ body{margin:0}
         </span>
         <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 4px">
           <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px"><span style="color: #CACAE0">{{levelText}}</span><span style="color: #FFC53D">{{xpText}}</span></div>
-          <div style="height: 9px; background: #2E1A58; box-shadow: inset 0 1px 2px #000a; transform: skewX(0deg); overflow: hidden"><div class="am-bar-shine" style="{{xpBar}}"></div></div>
+          <div style="height: 9px; border-radius: 5px; background: #2E1A58; box-shadow: inset 0 1px 2px #000a; transform: skewX(0deg); overflow: hidden"><div class="am-bar-shine" style="{{xpBar}}"></div></div>
         </div>
       </div>
       <sc-if value="{{canClaimAll}}" hint-placeholder-val="{{ false }}">
@@ -74,10 +74,10 @@ body{margin:0}
     <div style="position: relative; flex: 1; min-height: 0; display: flex; gap: 8px">
       <!-- row labels -->
       <div style="flex: none; width: 104px; display: flex; flex-direction: column; gap: 0">
-        <div style="height: 132px; box-sizing: border-box; padding: 12px 10px; display: flex; flex-direction: column; justify-content: center; gap: 4px; clip-path: inset(0 round 12px); background: linear-gradient(160deg, #202958, #1E0F3D); border: 1px solid #22D3EE55">
+        <div style="height: 132px; box-sizing: border-box; padding: 12px 10px; display: flex; flex-direction: column; justify-content: center; gap: 4px; clip-path: inset(0 round 12px); background: radial-gradient(90% 60% at 30% 20%, #22D3EE88, transparent 72%), linear-gradient(160deg, #1D4ED8, #312E81 60%, #1E1B4B); border: 1.5px solid #7EF0FF">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-2-4-6-4-6-1s6 1 6 1s6 2 6-1s-4-3-6 1"/></svg>
           <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; color: #7EF0FF">GRATIS</span>
-          <span style="font-size: 10px; line-height: 1.3; color: #A3A3C2">Para todos los jugadores</span>
+          <span style="font-size: 10px; line-height: 1.3; color: #CFFAFE">Para todos los jugadores</span>
         </div>
         <div style="height: 38px"></div>
         <div style="{{premLabel}}">
@@ -94,7 +94,7 @@ body{margin:0}
         <div style="position: relative; width: {{trackW}}px; height: 100%">
           <!-- the progress line, through the level badges -->
           <div class="ps-band"></div>
-          <div style="position: absolute; left: 0; right: 0; top: 147px; height: 8px; background: #341D5F; box-shadow: inset 0 1px 2px #000a"></div>
+          <div style="position: absolute; left: 0; right: 0; top: 147px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #312E81, #581C87, #831843); box-shadow: inset 0 1px 2px #000a, 0 0 0 1px #C4B5FD44"></div>
           <div style="{{lineFill}}"></div>
           <span class="ps-ball" style="left: {{ballX}}px"><svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#FFFFFF" stroke="#150925" stroke-width="1.6"/><path d="M12 7l3.4 2.5l-1.3 4h-4.2l-1.3-4z" fill="#150925"/><path d="M12 7V3M15.4 9.5l3.8-1.2M14.1 13.5l2.3 3.3M9.9 13.5l-2.3 3.3M8.6 9.5L4.8 8.3" stroke="#150925" stroke-width="1.3"/></svg></span>
           <sc-for list="{{cols}}" as="c" hint-placeholder-count="8">
@@ -182,20 +182,25 @@ class Component extends DCLogic {
     const PR = window.AMProgress, G = window.AMGear;
     const S = PR ? PR.pass() : { season: 1, daysLeft: 42, level: 0, into: 0, need: 300, premium: false, free: [], prem: [], ready: 0, price: '' };
     const COLW = 100;
-    const RC = ['#3A3A66', '#3EA6FF', '#9B6BFF', '#FFC53D'];
+    const RC = ['#A78BFA', '#38BDF8', '#E879F9', '#FFC53D'];
+    // the free row cycles cool colours, the premium row warm ones; rarer prizes glow stronger
+    const FREEC = ['#22D3EE', '#3B82F6', '#14B8A6', '#8B5CF6', '#06B6D4'], PREMC = ['#F59E0B', '#F97316', '#EC4899', '#E11D48', '#D946EF'];
     const cell = (x, prem) => {
       const key = x.item ? 'i:' + x.item : x.icon;
       const img = this.pic(key + (x.ready && x.reward.t === 'chest' ? ':open' : ''), () => x.item ? PR.itemPic(x.item) : (G ? G.prize(x.icon + (x.ready && x.reward.t === 'chest' ? ':open' : '')) : ''));
       const locked = prem && !S.premium, rc = RC[x.rare];
       const tagText = x.reward.t === 'item' ? (x.cat === 'kit' ? 'EQUIPACIÓN' : 'ACCESORIO') : x.reward.t === 'chest' ? 'COFRE' : '';
-      const bg = x.claimed ? (prem ? '#2A2208, #210E2A' : '#1A244F, #1E0F3D') : x.ready ? '#3A2A0A, #1E1A10' : prem ? '#2A1E0C, #220F30' : '#2C1858, #211140';
+      const hue = (prem ? PREMC : FREEC)[(x.lv - 1) % 5], glowA = x.rare >= 2 ? 'EE' : 'BB';
+      const bgFull = x.claimed ? 'linear-gradient(165deg, ' + (prem ? '#3A2A10, #2A1030' : '#1E2E62, #1E1450') + ')'
+        : x.ready ? 'radial-gradient(90% 60% at 50% 35%, #FFE38AAA, transparent 72%), linear-gradient(165deg, #A16207, #4A1D04)'
+        : 'radial-gradient(90% 55% at 50% 35%, ' + hue + glowA + ', transparent 72%), radial-gradient(80% 50% at 100% 100%, ' + rc + '44, transparent 70%), linear-gradient(165deg, color-mix(in srgb, ' + hue + ' 68%, #2A1070), color-mix(in srgb, ' + hue + ' 30%, #1C0C44))';
       return {
         name: x.owned ? x.name + ' (ya lo tienes)' : x.name, img, ready: x.ready, claimed: x.claimed, locked: locked && !x.claimed,
         waiting: !x.ready && !x.claimed && !locked, tagText,
         cls: 'ps-card' + (x.ready ? ' rdy' : ''),
         tag: tagText ? 'position: absolute; left: 0; top: 0; padding: 2px 6px; font-size: 8.5px; font-weight: 800; letter-spacing: 1px; color: #150925; background: ' + rc + ';' : 'display: none',
         imgStyle: 'width: 66px; height: 62px; object-fit: contain; filter: drop-shadow(0 5px 6px #000a)' + (locked && !x.claimed ? ' grayscale(.35) brightness(.8)' : '') + '; opacity: ' + (img ? 1 : 0) + '; transition: opacity .3s',
-        card: 'position: relative; width: 92px; height: 132px; box-sizing: border-box; padding: 14px 4px 7px 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; clip-path: inset(0 round 12px); background: linear-gradient(165deg, ' + bg + '); border: 1px solid ' + (x.ready ? '#FFC53D' : rc + (x.rare ? 'AA' : '')) + '; ' + (x.ready ? 'box-shadow: 0 0 16px #FFC53D66;' : x.rare >= 2 && !x.claimed ? 'box-shadow: 0 0 10px ' + rc + '33;' : '') + (x.claimed ? ' opacity: .7;' : ''),
+        card: 'position: relative; width: 92px; height: 132px; box-sizing: border-box; padding: 14px 4px 7px 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; clip-path: inset(0 round 12px); background: ' + bgFull + '; border: 1.5px solid ' + (x.ready ? '#FFE38A' : x.claimed ? rc + '66' : 'color-mix(in srgb, ' + hue + ' 60%, #FFFFFF)') + '; box-shadow: inset 0 1px 0 #ffffff33; ' + (x.ready ? 'box-shadow: 0 0 16px #FFC53D66;' : x.rare >= 2 && !x.claimed ? 'box-shadow: 0 0 10px ' + rc + '33;' : '') + (x.claimed ? ' opacity: .7;' : ''),
         tap: () => {
           if (!x.ready) { if (locked) this.setState({ buy: true }); return; }
           const r = PR.claimPass(prem ? 'prem' : 'free', x.lv);
@@ -222,7 +227,7 @@ class Component extends DCLogic {
       season: String(S.season), days: fmtDays(S.daysLeft), level: String(S.level), price: S.price,
       levelText: S.level >= 30 ? '¡PASE COMPLETADO!' : 'NIVEL ' + S.level + ' → ' + (S.level + 1),
       xpText: S.level >= 30 ? '' : S.into + ' / ' + S.need + ' XP',
-      xpBar: 'height: 9px; width: ' + (S.level >= 30 ? 100 : S.into / S.need * 100).toFixed(1) + '%; background: linear-gradient(90deg, #FF8A3D, #FFC53D); box-shadow: 0 0 10px #FFC53D88',
+      xpBar: 'height: 9px; width: ' + (S.level >= 30 ? 100 : S.into / S.need * 100).toFixed(1) + '%; background: linear-gradient(90deg, #22D3EE, #A855F7, #EC4899, #FFC53D); box-shadow: 0 0 10px #EC489988',
       isPremium: S.premium, notPremium: !S.premium,
       canClaimAll: S.ready > 1, readyN: String(S.ready),
       claimAll: () => {
@@ -231,9 +236,9 @@ class Component extends DCLogic {
         if (window.AMResults) window.AMResults.reward(r, () => this.forceUpdate()); else this.forceUpdate();
         this.forceUpdate();
       },
-      premLabel: 'height: 132px; box-sizing: border-box; padding: 10px; display: flex; flex-direction: column; justify-content: center; gap: 5px; clip-path: inset(0 round 12px); background: linear-gradient(160deg, #4A2E08, #1E1408); border: 1px solid #FFC53D' + (S.premium ? '' : '88') + '; box-shadow: 0 0 ' + (S.premium ? 18 : 8) + 'px #FFC53D44',
+      premLabel: 'height: 132px; box-sizing: border-box; padding: 10px; display: flex; flex-direction: column; justify-content: center; gap: 5px; clip-path: inset(0 round 12px); background: radial-gradient(90% 60% at 30% 20%, #FFE38A99, transparent 72%), linear-gradient(160deg, #D97706, #9D174D 65%, #4C0519); border: 1.5px solid #FFE38A' + (S.premium ? '' : 'CC') + '; box-shadow: 0 0 ' + (S.premium ? 18 : 8) + 'px #FFC53D44',
       trackW: String(30 * COLW + 8),
-      lineFill: 'position: absolute; left: 0; top: 147px; height: 8px; width: ' + Math.max(0, fillTo).toFixed(0) + 'px; background: linear-gradient(90deg, #FF8A3D, #FFC53D); box-shadow: 0 0 10px #FFC53D; transition: width .6s',
+      lineFill: 'position: absolute; left: 0; top: 147px; height: 8px; width: ' + Math.max(0, fillTo).toFixed(0) + 'px; border-radius: 4px; background: linear-gradient(90deg, #22D3EE, #A855F7 40%, #EC4899 70%, #FFC53D); box-shadow: 0 0 12px #EC4899; transition: width .6s',
       cols,
       showBuy: this.state.buy,
       openBuy: () => this.setState({ buy: true }),
