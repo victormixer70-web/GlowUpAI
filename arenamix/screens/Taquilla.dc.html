@@ -20,7 +20,7 @@ input::placeholder{color:#8686A6}
 .tq-ring i{position:absolute;inset:0;border-radius:50%;animation:tqRing 6s linear infinite}
 .tq-item{transition:translate .2s,box-shadow .2s}
 .tq-item:hover{translate:0 -3px}
-.tq-locker{position:absolute;top:24px;bottom:92px;border-radius:4px 4px 0 0;background:linear-gradient(90deg,#1E2752,#2A3466 45%,#291C6B);box-shadow:inset 0 0 0 1.5px #3A4680,inset -3px 0 0 #1C1145}
+.tq-locker{position:absolute;top:24px;bottom:92px;border-radius:4px 4px 0 0;background:linear-gradient(90deg,color-mix(in srgb,var(--lc,#3A4680) 55%,#1A1050),color-mix(in srgb,var(--lc,#3A4680) 80%,#3A2A90) 45%,color-mix(in srgb,var(--lc,#3A4680) 45%,#120A3A));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--lc,#3A4680) 70%,#fff),inset -3px 0 0 #1C1145,0 0 14px color-mix(in srgb,var(--lc,#3A4680) 35%,transparent)}
 .tq-locker::before{content:"";position:absolute;left:10px;right:10px;top:14px;height:34px;background:repeating-linear-gradient(180deg,#150C38 0 3px,transparent 3px 7px);border-radius:2px;opacity:.8}
 .tq-locker::after{content:"";position:absolute;right:7px;top:46%;width:4px;height:22px;border-radius:2px;background:linear-gradient(180deg,#C9D3E0,#6B7689);box-shadow:0 0 4px #000a}
 .tq-locker b{position:absolute;left:50%;top:58px;transform:translateX(-50%);padding:1px 5px;border-radius:3px;background:#C9D3E0;color:#1C1145;font:800 9px 'Barlow Condensed',sans-serif;letter-spacing:.5px}
@@ -40,14 +40,14 @@ input::placeholder{color:#8686A6}
   <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; height: 390px; z-index: 3"><dc-import name="Nav" active="taquilla" hint-size="80px,390px"></dc-import></div>
   <!-- the locker room: lockers, spotlight, a turntable and you -->
   <div style="position: absolute; left: 80px; top: 0; bottom: 0; width: 392px; overflow: hidden">
-    <div style="position: absolute; inset: 0 0 92px 0; background: linear-gradient(180deg, #160D3B, #211658)"></div>
+    <div style="position: absolute; inset: 0 0 92px 0; background: radial-gradient(60% 60% at 50% 30%, #7C3AED88, transparent 70%), linear-gradient(180deg, #2A1170, #4C1D95 60%, #6B1F7E)"></div>
     <sc-for list="{{lockers}}" as="lk" hint-placeholder-count="8"><div class="{{lk.cls}}" style="{{lk.style}}"><b>{{lk.n}}</b></div></sc-for>
-    <div style="position: absolute; left: 0; right: 0; top: 18px; height: 6px; background: linear-gradient(180deg, #3A4680, #291C6B); box-shadow: 0 3px 6px #0008"></div>
-    <div style="position: absolute; left: 0; right: 0; top: 140px; bottom: 92px; background: linear-gradient(180deg, transparent, #0F061ECC); pointer-events: none"></div>
+    <div style="position: absolute; left: 0; right: 0; top: 18px; height: 6px; background: linear-gradient(90deg, #22D3EE, #A855F7, #EC4899, #FACC15); box-shadow: 0 3px 10px #A855F7AA"></div>
+    <div style="position: absolute; left: 0; right: 0; top: 140px; bottom: 92px; background: linear-gradient(180deg, transparent, #2A0E4A99); pointer-events: none"></div>
     <div class="tq-glow" style="background: radial-gradient(closest-side, {{kitGlow}}, transparent)"></div>
-    <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 92px; background: linear-gradient(180deg, #3F1D56, #1E0C30); border-top: 2px solid #3A3460"></div>
+    <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 92px; background: radial-gradient(70% 90% at 50% 0%, #EC489966, transparent 70%), linear-gradient(180deg, #7E2A8E, #3A1266 55%, #1E0A3E); border-top: 3px solid #F0ABFC; box-shadow: 0 -4px 18px #EC489988"></div>
     <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 92px; background: repeating-linear-gradient(100deg, #ffffff06 0 2px, transparent 2px 38px)"></div>
-    <div style="position: absolute; left: 96px; top: -40px; width: 200px; height: 440px; transform-origin: 50% 0; background: linear-gradient(180deg, #E8F6FF40, #E8F6FF00 85%); clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); animation: tqBeam 7s ease-in-out infinite; pointer-events: none; will-change: transform"></div>
+    <div style="position: absolute; left: 96px; top: -40px; width: 200px; height: 440px; transform-origin: 50% 0; background: linear-gradient(180deg, #FDE68A66, #F0ABFC33 45%, #E8F6FF00 85%); clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); animation: tqBeam 7s ease-in-out infinite; pointer-events: none; will-change: transform"></div>
     <sc-for list="{{dust}}" as="d" hint-placeholder-count="6"><i class="tq-dust" style="{{d}}"></i></sc-for>
     <!-- the bench -->
     <div style="position: absolute; left: 44px; right: 10px; bottom: 112px; height: 8px; border-radius: 3px; background: linear-gradient(180deg, #B07A44, #6E4422); box-shadow: 0 5px 6px #0009"></div>
@@ -64,7 +64,7 @@ input::placeholder{color:#8686A6}
     </sc-if>
     <!-- title and the kit's swing tag -->
     <div style="position: absolute; left: 14px; top: 12px; display: flex; align-items: center; gap: 10px">
-      <h1 style="margin: 0; padding: 2px 14px; transform: skewX(0deg); background: #150925CC; border-left: 4px solid #22D3EE; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 1px; line-height: 1.1">TAQUILLA</h1>
+      <h1 style="margin: 0; padding: 2px 14px; transform: skewX(0deg); background: linear-gradient(135deg, #7C3AED, #C026D3 55%, #DB2777); border-radius: 12px; box-shadow: inset 0 2px 0 #ffffff40, 0 0 18px #C026D388; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 1px; line-height: 1.1">TAQUILLA</h1>
     </div>
     <div style="position: absolute; right: 14px; top: 10px; transform-origin: 50% 0; animation: tqTag 3s ease-in-out infinite; display: flex; flex-direction: column; align-items: center">
       <span style="width: 2px; height: 12px; background: #A3A3C2"></span>
@@ -87,7 +87,7 @@ input::placeholder{color:#8686A6}
   </div>
 
   <!-- the fit: sleeves and size -->
-  <div role="group" aria-label="Corte" style="position: absolute; left: 388px; top: 112px; width: 70px; display: flex; flex-direction: column; gap: 5px; padding: 7px 6px; box-sizing: border-box; border-radius: 12px; background: #150925CC; border: 1px solid #2E2E58; z-index: 2">
+  <div role="group" aria-label="Corte" style="position: absolute; left: 388px; top: 112px; width: 70px; display: flex; flex-direction: column; gap: 5px; padding: 7px 6px; box-sizing: border-box; border-radius: 12px; background: linear-gradient(170deg, #4C1D95E6, #831843E6); border: 1px solid #F0ABFC88; box-shadow: 0 0 14px #C026D366; z-index: 2">
     <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE; text-align: center">MANGA</span>
     <sc-for list="{{sleeveBtns}}" as="sb" hint-placeholder-count="2">
       <button type="button" aria-pressed="{{sb.on}}" onClick="{{sb.pick}}" style="{{sb.style}}">{{sb.label}}</button>
@@ -101,8 +101,8 @@ input::placeholder{color:#8686A6}
   </div>
 
   <!-- the rail: categories, leagues, the clothes on hangers, and the action -->
-  <div style="position: absolute; left: 462px; top: 0; right: 0; bottom: 0; border-radius: 24px 0 0 24px; background: linear-gradient(160deg, #281553F2, #190C32F2)"></div>
-  <div style="position: absolute; left: 462px; top: 24px; width: 4px; bottom: 24px; border-radius: 2px; background: linear-gradient(180deg, #22D3EE, #7C5CFF); box-shadow: 0 0 12px #22D3EE"></div>
+  <div style="position: absolute; left: 462px; top: 0; right: 0; bottom: 0; border-radius: 24px 0 0 24px; background: radial-gradient(60% 45% at 100% 0%, #EC489966, transparent 70%), radial-gradient(60% 50% at 0% 100%, #22D3EE44, transparent 70%), linear-gradient(160deg, #4C1D95F2, #2E1065F2 55%, #4A0E4EF2)"></div>
+  <div style="position: absolute; left: 462px; top: 24px; width: 4px; bottom: 24px; border-radius: 2px; background: linear-gradient(180deg, #22D3EE, #A855F7, #EC4899, #FACC15); box-shadow: 0 0 12px #A855F7"></div>
   <div style="position: absolute; left: 498px; right: 14px; top: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 8px">
     <div style="display: flex; align-items: center; justify-content: space-between">
       <span style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #22D3EE">VESTUARIO · FÚTBOL</span>
@@ -603,7 +603,7 @@ class Component extends DCLogic {
         jerseyStyle: s.cat === 'equipos' ? 'position: relative; display: block; width: 46px; height: 44px; background: ' + this.jerseyBg(it.primary, it.secondary, it.pattern) + '; clip-path: polygon(32% 0, 68% 0, 100% 18%, 88% 42%, 78% 36%, 78% 100%, 22% 100%, 22% 36%, 12% 42%, 0 18%); filter: drop-shadow(0 2px 0 #00000055);' : '',
         isCoins: !own && it.st === 'coins', isOn: equipped, isLocked: !own, lockC: it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D',
         isReward: !own && it.st === 'reward',
-        style: (() => { const rc = equipped ? '#22D3EE' : own ? '#8A93C8' : it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D'; return 'position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 98px; margin-top: 8px; padding: 8px 3px 5px 3px; box-sizing: border-box; border-radius: 12px; font-family: Exo2, sans-serif; cursor: pointer; min-width: 0; background: linear-gradient(180deg, ' + rc + '30, #211140 70%); border: ' + (sel ? '2px solid ' + rc : '1px solid ' + rc + '55') + '; border-top: 3px solid ' + rc + '; box-shadow: ' + (sel ? '0 0 14px ' + rc + '88, 0 6px 12px #0008' : '0 6px 12px #0006') + ';'; })(),
+        style: (() => { const rc = equipped ? '#22D3EE' : own ? '#8A93C8' : it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D'; return 'position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 98px; margin-top: 8px; padding: 8px 3px 5px 3px; box-sizing: border-box; border-radius: 12px; font-family: Exo2, sans-serif; cursor: pointer; min-width: 0; background: radial-gradient(90% 60% at 50% 25%, ' + rc + '55, transparent 75%), linear-gradient(180deg, #5B2BB0, #2E1270 70%); border: ' + (sel ? '2px solid ' + rc : '1px solid ' + rc + '55') + '; border-top: 3px solid ' + rc + '; box-shadow: ' + (sel ? '0 0 14px ' + rc + '88, 0 6px 12px #0008' : '0 6px 12px #0006') + ';'; })(),
         labelStyle: 'display: flex; align-items: center; gap: 3px; max-width: 100%; white-space: nowrap; overflow: hidden; font-size: 10.5px; font-weight: 800; color: ' + color + ';',
         pick: () => this.setState({ preview: { cat: s.cat, id: it.id } })
       };
@@ -669,7 +669,7 @@ class Component extends DCLogic {
       gridKey: s.cat + ':' + li,
       kitTeam: kitItem.name, kitLeague: league.name,
       // the locker room: a row of lockers, yours (behind the player) lit in your kit's colour
-      lockers: Array.from({ length: 8 }, (_, k) => ({ n: k === 4 ? (window.AMOnline ? window.AMOnline.myName() : 'TÚ').toUpperCase().slice(0, 10) : String([3, 7, 11, 5, 10, 8, 14, 21][k]), cls: 'tq-locker' + (k === 4 ? ' tq-mine' : ''), style: 'left: ' + (k * 49 + 1) + 'px; width: 46px; --kc: ' + kitItem.primary + '88;' + (k === 4 ? ' z-index: 0;' : '') })),
+      lockers: Array.from({ length: 8 }, (_, k) => ({ n: k === 4 ? (window.AMOnline ? window.AMOnline.myName() : 'TÚ').toUpperCase().slice(0, 10) : String([3, 7, 11, 5, 10, 8, 14, 21][k]), cls: 'tq-locker' + (k === 4 ? ' tq-mine' : ''), style: 'left: ' + (k * 49 + 1) + 'px; width: 46px; --lc: ' + ['#22D3EE', '#A855F7', '#EC4899', '#F97316', '#3B82F6', '#FACC15', '#22C55E', '#F43F5E'][k] + '; --kc: ' + kitItem.primary + '88;' + (k === 4 ? ' z-index: 0;' : '') })),
       kitGlow: kitItem.primary + '66',
       dust: Array.from({ length: 7 }, (_, k) => 'left: ' + (150 + k * 13) + 'px; top: ' + (120 + (k * 37) % 150) + 'px; --dx: ' + ((k % 3) - 1) * 12 + 'px; --d: ' + (5 + k % 4) + 's; animation-delay: ' + (-k * 0.8).toFixed(1) + 's'),
       isTeams: s.cat === 'equipos',
