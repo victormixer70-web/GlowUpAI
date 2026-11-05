@@ -24,8 +24,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
     <div style="flex: 1; min-height: 0; border-radius: 18px; background: radial-gradient(70% 55% at 50% 30%, #22D3EE99, transparent 70%), radial-gradient(70% 60% at 100% 100%, #EC489988, transparent 70%), linear-gradient(160deg, #4F46E5, #7C3AED 50%, #9D174D); border: 1.5px solid #C4B5FD; box-shadow: inset 0 1px 0 #ffffff44, 0 0 20px #7C3AED66; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px">
       <div style="width: 104px; height: 104px; border-radius: 52px; overflow: hidden; border: 3px solid #FFFFFF; background: #331C58; box-shadow: 0 0 0 3px #22D3EE, 0 0 20px #22D3EE"><svg width="104" height="104" viewBox="64 12 72 72"><rect x="64" y="12" width="72" height="72" fill="#331C58"/><rect x="92" y="60" width="16" height="22" fill="#A66A43"/><path d="M62 82Q100 70 138 82V100H62Z" fill="#FF8A3D"/><path d="M86 78Q100 92 114 78" stroke="#150925" stroke-width="5" fill="none"/><circle cx="100" cy="44" r="24" fill="#B9794F"/><ellipse cx="91" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><ellipse cx="109" cy="47" rx="2.6" ry="3.4" fill="#1A1210"/><path d="M93 56q7 5 14 0" stroke="#5A2E1E" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M76 42Q76 16 100 16Q124 16 124 42Q118 30 104 30Q96 26 88 30Q80 32 76 42Z" fill="#241811"/><rect x="75" y="29" width="50" height="9" rx="4" fill="#22D3EE"/></svg></div>
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1">Invitado_4821</span>
-      <span style="font-size: 12px; font-weight: 700; color: #E0E7FF">Nv. 12 · {{bestRank}}</span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1" translate="no">{{myName}}</span>
+      <span style="font-size: 12px; font-weight: 700; color: #E0E7FF">Nv. {{myLv}} · {{bestRank}}</span>
       <span style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 10px; background: #1A0B3ACC; border: 1px solid #FFC53D88; font-weight: 800; font-size: 14px; color: #FFC53D"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#B8860B" stroke-width="2"/></svg>{{coins}} VCD</span>
     </div>
     <a href="Logros.dc.html" class="am-shine am-pulse-gold" style="position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, #FDE68A, #FBBF24 45%, #F97316); color: #150925; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; box-shadow: 0 5px 0 #B8860B">
@@ -117,7 +117,8 @@ class Component extends DCLogic {
     let best = 'Sin rango'; if (Object.keys(mmr).length) tiers.forEach(([n, v]) => { if (top >= v) best = 'Mejor rango: ' + n; });
     const w = (a, c) => 'width: ' + pct(a) + '%; background: ' + c + ';';
     return {
-      tiles, tabs, sportKey: s.sport,
+      myLv: String(window.AMProgress ? window.AMProgress.level().level : 1),
+      tiles, tabs, sportKey: s.sport, myName: window.AMOnline ? window.AMOnline.myName() : 'Tú',
       thumb: 'position: absolute; top: 4px; bottom: 4px; left: calc(4px + ' + ti + ' * (100% - 8px) / 2); width: calc((100% - 8px) / 2); border-radius: 12px; background: linear-gradient(135deg, #FFFFFF, #7EF0FF 40%, #22D3EE); box-shadow: 0 0 14px #22D3EE; transition: left .4s cubic-bezier(.3,1.5,.5,1);', coins: this.fmt(this.coins()), bestRank: best,
       hasBadge: ready > 0, badge: String(ready),
       totalLabel: r.played + ' partidos',

@@ -789,7 +789,7 @@ class Component extends DCLogic {
         // my rank as it was during the match (before this result was applied)
         const meR = s.wasPlacing ? null : this.rankOf(s.prevMmr), opR = this.rankOf(m.rivalMmr[0]);
         const card = (name, R, mine) => ({ name, rank: R ? R.label : 'Sin clasificar', c1: R ? R.c1 : '#5A5A7A', c2: R ? R.c2 : '#3F2460', text: R ? R.text : '#A3A3C2', wings: !!(R && R.wings), nameColor: mine ? '#22D3EE' : '#F4F4FA', pop: 'transform: scale(' + Math.min(1, 0.4 + this.t * 2).toFixed(2) + ');' });
-        const me = card('Invitado_4821', meR, true), op = card(m.rivals[0], opR, false);
+        const me = card(window.AMOnline ? window.AMOnline.myName() : 'Tú', meR, true), op = card(m.rivals[0], opR, false);
         return won ? [me] : lost ? [op] : [me, op];
       })(),
       toResult: () => { this.setState({ phase: 'result' }); this.anim(); },
@@ -798,6 +798,7 @@ class Component extends DCLogic {
         const rk = (mm) => { const R = this.rankOf(mm); return { label: R.label, color: R.text }; };
         const out = {};
         out['Invitado_4821'] = placing ? { label: 'Sin clasificar', color: '#A3A3C2' } : rk(s.mmr);
+        if (window.AMOnline) out[window.AMOnline.myName()] = out['Invitado_4821'];
         m.mates.forEach((x, i) => { out[x] = rk(m.mateMmr[i]); });
         m.rivals.forEach((x, i) => { out[x] = rk(m.rivalMmr[i]); });
         return out;

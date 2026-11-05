@@ -297,6 +297,8 @@ const AMNAR = {
   endDraw: [['¡Final! Reparto de puntos: {s}', 'Full time! Honours even: {s}'], ['Empate a todo: {s}', 'All square: {s}']]
 };
 const Partido_BR = 0.17;
+// the guest placeholder name the screens pass stands for you: shown as your real player name
+const Partido_me = (n) => n != null && /^Invitado_\d+$/.test(n) && window.AMOnline && window.AMOnline.myName ? (window.AMOnline.myName() || n) : n;
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -585,7 +587,7 @@ class Component extends DCLogic {
     const mates = Array.isArray(P.mates) ? P.mates : [P.mateName ?? 'Compañero', P.mate2Name ?? 'Compañero 2', 'Compañero 3'];
     const rivals = Array.isArray(P.rivals) ? P.rivals : [P.awayName ?? 'Rival', P.away2Name ?? 'Rival 2', P.away3Name ?? 'Rival 3', 'Rival 4'];
     const keeper = this.keeperMode();
-    let homeNames = keeper ? mates.concat(['Compañero 4', 'Compañero 5']) : [P.homeName ?? 'Tú'].concat(mates), awayNames = rivals;
+    let homeNames = keeper ? mates.concat(['Compañero 4', 'Compañero 5']) : [Partido_me(P.homeName) ?? 'Tú'].concat(mates), awayNames = rivals;
     // online: the room's players (the host's phone runs the match; a guest on the other team sees it
     // mirrored, so on every phone your own team plays left to right in your kit)
     this.mstats = { goals: 0, shots: 0, passes: 0, skills: 0, tackles: 0 };
@@ -602,7 +604,7 @@ class Component extends DCLogic {
     const ps = [];
     for (let k = 0; k < n; k++) ps.push({ team: 0, role: (this.net ? k !== this.net.mySlot : k) || keeper ? 'mate' : 'human', slot: k, name: homeNames[k] });
     if (!P.practice) for (let k = 0; k < n; k++) ps.push({ team: 1, role: 'ai', slot: k, name: awayNames[k] });
-    ps.push({ team: 0, role: 'gk', slot: -1, name: keeper ? (P.homeName ?? 'Tú') : 'Portero' }, { team: 1, role: 'gk', slot: -1, name: 'Portero' });
+    ps.push({ team: 0, role: 'gk', slot: -1, name: keeper ? (Partido_me(P.homeName) ?? 'Tú') : 'Portero' }, { team: 1, role: 'gk', slot: -1, name: 'Portero' });
     if (this.net) ps.forEach((p) => { if (p.role !== 'gk') p.look = this.look(p.team, p.slot); });
     ps.forEach((p) => Object.assign(p, { x: 30, y: 15, vx: 0, vy: 0, face: p.team ? Math.PI : 0, run: Math.random() * 6, cd: 0, inv: 0, skillCd: 0, stam: 1, think: 0, turn: 0, act: null, react: 0 }));
     this.g = {
@@ -2827,7 +2829,7 @@ class Component extends DCLogic {
     this.amb = null;
     if (STAD && this.endSeats) {
       const P = this.props, hk = this.homeKit();
-      const cols = [[P.homeColor ?? hk.primary, P.homeTrim ?? hk.secondary, (P.homeName ?? 'Tu equipo').toUpperCase()], [this.awayCol(), P.awayTrim ?? '#F4F4FA', (P.awayName ?? 'Rival').toUpperCase()]];
+      const cols = [[P.homeColor ?? hk.primary, P.homeTrim ?? hk.secondary, (Partido_me(P.homeName) ?? 'Tu equipo').toUpperCase()], [this.awayCol(), P.awayTrim ?? '#F4F4FA', (P.awayName ?? 'Rival').toUpperCase()]];
       [0, 1].forEach((team) => {
         const sx = team === 0 ? -1 : 1, [c1, c2, name] = cols[team];
         const es = this.endSeats.filter((q) => q[0] * sx > 31 && Math.abs(q[2]) < 13);
@@ -2934,7 +2936,7 @@ class Component extends DCLogic {
     const c = V.cv.getContext('2d'), w = 512, h = 256;
     c.setTransform(V.cv.width / w, 0, 0, V.cv.height / h, 0, 0);
     const hc = P.homeColor ?? this.homeKit().primary, ac = this.awayCol();
-    const hn = (P.homeName ?? 'Tu equipo').toUpperCase(), an = (P.awayName ?? 'Rival').toUpperCase();
+    const hn = (Partido_me(P.homeName) ?? 'Tu equipo').toUpperCase(), an = (P.awayName ?? 'Rival').toUpperCase();
     const font = (px) => 'italic 800 ' + px + 'px Barlow Condensed, Arial';
     const fit = (txt, px, maxW) => { let k = px; c.font = font(k); while (c.measureText(txt).width > maxW && k > 12) { k -= 2; c.font = font(k); } };
     const glow = (col, b) => { c.shadowColor = col; c.shadowBlur = b; };
@@ -3919,7 +3921,7 @@ class Component extends DCLogic {
     const ldV = (() => {
       const L = this.ld; if (!L || !L.on) return { ldOn: false };
       const n0 = this.size(), mode = P.mode || 'test';
-      const hn = (P.homeName ?? 'Tu equipo').toUpperCase(), an = (P.awayName ?? 'Rival').toUpperCase();
+      const hn = (Partido_me(P.homeName) ?? 'Tu equipo').toUpperCase(), an = (P.awayName ?? 'Rival').toUpperCase();
       const list = (team, col) => g.ps.filter((q) => q.team === team && q.role !== 'gk').slice(0, 4).map((q, i) => ({
         n: String(i + 1), name: q.name || (g.ps.indexOf(q) === g.ctl ? 'TÚ' : 'IA'),
         tag: g.ps.indexOf(q) === g.ctl ? 'TÚ' : q.role === 'ai' ? (this.net ? 'ONLINE' : 'IA') : q.role === 'mate' ? 'EQUIPO' : '',
@@ -3991,7 +3993,7 @@ class Component extends DCLogic {
       rings, kickFxStyle,
       hasPassMark: !!passQ && g.phase === 'play' && (!this.play || this.play.passMark !== false),
       passMarkStyle: 'position: absolute; left: 0; top: 0; pointer-events: none; transform: translate(' + (pm.x - 9).toFixed(1) + 'px, ' + (pm.y - 34).toFixed(1) + 'px);',
-      homeName: P.homeName ?? 'Tú', awayName: P.awayName ?? 'Rival',
+      homeName: Partido_me(P.homeName) ?? 'Tú', awayName: P.awayName ?? 'Rival',
       homeChip: chip(hc, ht), awayChip: chip(ac, at),
       s0: String(g.score[0]), s1: String(g.score[1]),
       clock: P.practice ? '∞' : (g.extra ? '+' : '') + this.fmtClock(g.t),
@@ -4059,7 +4061,7 @@ class Component extends DCLogic {
       skipIntro: (e) => { e.preventDefault(); this.endIntro(); },
       introKey: 'in' + (g.phase === 'intro' ? this.introShot() : 0),
       ...(() => {
-        const k = g.phase === 'intro' ? this.introShot() : 0, hn = (P.homeName ?? 'Tu equipo').toUpperCase(), an = (P.awayName ?? 'Rival').toUpperCase();
+        const k = g.phase === 'intro' ? this.introShot() : 0, hn = (Partido_me(P.homeName) ?? 'Tu equipo').toUpperCase(), an = (P.awayName ?? 'Rival').toUpperCase();
         const col = k === 0 ? hc : k === 1 ? ac : '#FFC53D';
         return {
           introKicker: k === 0 ? 'AFICIÓN LOCAL' : k === 1 ? 'AFICIÓN VISITANTE' : (this.wx === 'noche' ? 'PARTIDO NOCTURNO' : this.wx === 'lluvia' ? 'BAJO LA LLUVIA' : this.wx === 'nieve' ? 'PARTIDO CON NIEVE' : 'ARENA MIX') + ' · ' + n + ' VS ' + n,
@@ -4069,7 +4071,7 @@ class Component extends DCLogic {
         };
       })(),
       winKicker: g.phase === 'winners' ? (g.win.team < 0 ? 'FINAL DEL PARTIDO' : 'GANADORES') : '',
-      winTitle: g.phase !== 'winners' ? '' : g.win.team < 0 ? 'EMPATE' : g.win.team === 0 ? (P.homeName ?? 'TU EQUIPO') : (P.awayName ?? 'RIVAL'),
+      winTitle: g.phase !== 'winners' ? '' : g.win.team < 0 ? 'EMPATE' : g.win.team === 0 ? (Partido_me(P.homeName) ?? 'TU EQUIPO') : (P.awayName ?? 'RIVAL'),
       winTitleStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 48px; line-height: 1; letter-spacing: 1px; text-shadow: 0 4px 0 #0B0B14; color: ' + (g.phase === 'winners' && g.win.team === 1 ? '#FF8A8E' : '#22D3EE') + '; transform: scale(' + Math.min(1, 0.5 + g.pt * 1.5).toFixed(2) + ');',
       winTags: g.phase !== 'winners' ? [] : g.win.list.map((q) => {
         const s = SP(q.x, q.y, 2.75), me = q === h, rk = (P.ranks || {})[q.name];
