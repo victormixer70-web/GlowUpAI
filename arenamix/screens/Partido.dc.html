@@ -590,7 +590,7 @@ class Component extends DCLogic {
     let homeNames = keeper ? mates.concat(['Compañero 4', 'Compañero 5']) : [Partido_me(P.homeName) ?? 'Tú'].concat(mates), awayNames = rivals;
     // online: the room's players (the host's phone runs the match; a guest on the other team sees it
     // mirrored, so on every phone your own team plays left to right in your kit)
-    this.mstats = { goals: 0, shots: 0, passes: 0, skills: 0, tackles: 0 };
+    this.mstats = { goals: 0, shots: 0, passes: 0, skills: 0, tackles: 0 }; this.poss = [0, 0];
     const O = P.online;
     this.net = O && O.room ? { room: O.room, host: !!O.isHost, me: O.me, mirror: !O.isHost && O.myTeam === 1, mySlot: O.mySlot || 0, humans: [], snapT: 0, inT: 0, snap: null } : null;
     if (this.net) {
@@ -3072,6 +3072,8 @@ class Component extends DCLogic {
   }
   // per frame: ball look and trail, weather, flares
   fxFrame(dt) {
+    // possession: time each side has the ball in open play
+    { const g0 = this.g; if (g0 && g0.phase === 'play' && dt) { const oi = g0.own >= 0 ? g0.own : g0.hold; const op = oi >= 0 && g0.ps[oi]; if (op) { this.poss = this.poss || [0, 0]; this.poss[op.team] += dt; } } }
     this.drawScreens();
     this.crowdFx(dt);
     const T = THREE, g = this.g, b = g.ball, bm = this.ball3 && this.ball3.material;
@@ -4088,6 +4090,7 @@ class Component extends DCLogic {
       finishLabel: P.onEnd ? 'CONTINUAR' : 'JUGAR OTRA VEZ',
       start: () => this.start(),
       finish: () => {
+        if (this.mstats) { const pz = this.poss || [1, 1]; this.mstats.poss = Math.round(pz[0] / Math.max(0.01, pz[0] + pz[1]) * 100); }
         if (P.onEnd) P.onEnd({ home: g.score[0], away: g.score[1], stats: this.mstats, forfeit: !!this.forfeit });
         else {
           if (this.confetti) { this.S.remove(this.confetti); this.confetti = null; }

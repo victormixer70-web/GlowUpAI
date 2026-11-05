@@ -48,6 +48,13 @@
     '#am-res .mi .pb{height:6px;background:#26264A}#am-res .mi .pb i{display:block;height:100%;background:#53D88E;box-shadow:0 0 8px #53D88E;transition:width 1s cubic-bezier(.3,1.2,.4,1)}',
     '#am-res .go{position:absolute;right:28px;bottom:16px;height:56px;padding:0 34px;border:0;transform:skewX(0deg);background:linear-gradient(135deg,#7EF0FF,#22D3EE 55%,#0EA5C0);box-shadow:0 5px 0 #0E8FA3;color:#0B0B14;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-style:italic;font-size:26px;letter-spacing:2px;cursor:pointer;animation:amResUp .4s 1.6s both}',
     '#am-res .go span{display:inline-block;transform:skewX(0deg)}',
+    '#am-res .mvp{position:absolute;left:28px;top:14px;width:178px;height:98px;display:flex;align-items:center;gap:10px;padding:0 12px;box-sizing:border-box;clip-path:inset(0 round 14px);background:linear-gradient(140deg,#7C3AEDDD,#DB2777CC);box-shadow:inset 0 0 0 1.5px #F0ABFC;animation:amResUp .45s .2s both}',
+    '#am-res .mvp .nt{flex:none;width:58px;height:64px;display:flex;align-items:center;justify-content:center;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:linear-gradient(160deg,#FFF3B0,#FBBF24 55%,#D97706);color:#2A1400;font:800 26px "Barlow Condensed",sans-serif}',
+    '#am-res .mvp .tg{font-size:9px;font-weight:800;letter-spacing:2px;color:#FDE7F3}#am-res .mvp>div:last-child{min-width:0}#am-res .mvp b{display:block;font:800 italic 17px/1 "Barlow Condensed",sans-serif;margin:3px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#am-res .mvp small{font-size:10px;font-weight:700;color:#FCE7F3}',
+    '#am-res .mvp .star{display:inline-block;white-space:nowrap;margin-top:4px;padding:1px 7px;border-radius:8px;background:#FBBF24;color:#2A1400;font-size:9px;font-weight:800;letter-spacing:1px;animation:amResPop .5s 1s both}',
+    '#am-res .mst{position:absolute;right:28px;top:14px;width:210px;height:98px;padding:8px 12px;box-sizing:border-box;clip-path:inset(0 round 14px);background:linear-gradient(140deg,#1D4ED8DD,#0E7490CC);box-shadow:inset 0 0 0 1.5px #A5F3FC;animation:amResUp .45s .3s both;display:flex;flex-direction:column;gap:3px}',
+    '#am-res .mst .r{display:flex;justify-content:space-between;font-size:10.5px;font-weight:800;color:#E0F2FE}#am-res .mst .r b{color:#FFFFFF}',
+    '#am-res .mst .pz{display:flex;height:7px;border-radius:4px;overflow:hidden;margin:1px 0 2px;background:#0B1030}#am-res .mst .pz i{display:block;height:100%;background:linear-gradient(90deg,#22D3EE,#7EF0FF);transition:width 1.2s cubic-bezier(.3,1,.4,1)}#am-res .mst .pz u{flex:1;background:#F472B6}',
     '#am-res .spark{position:absolute;width:8px;height:8px;border-radius:2px;pointer-events:none;animation:amResSpark 1.3s ease-out forwards}',
     '@keyframes amResSpark{from{transform:translate(0,0) rotate(0);opacity:1}to{transform:translate(var(--dx),var(--dy)) rotate(540deg);opacity:0}}'
   ].join('\n');
@@ -73,6 +80,15 @@
       '<div class="k">FINAL DEL PARTIDO</div>' +
       '<div class="t">' + (S.won ? '¡VICTORIA!' : S.lost ? 'DERROTA' : 'EMPATE') + '</div>' +
       '<div class="sc">' + S.home + ' – ' + S.away + (S.pen ? ' <small style="font-size:.45em;opacity:.8">(' + S.pen[0] + '–' + S.pen[1] + ' pen.)</small>' : '') + '</div>' +
+      (function () {
+        var st = S.stats || {}, g = st.goals || 0;
+        var nota = Math.max(4, Math.min(10, 6 + g * 1.2 + (st.tackles || 0) * 0.3 + (st.passes || 0) * 0.04 + (st.skills || 0) * 0.12 + (st.shots || 0) * 0.08 + (S.won ? 0.6 : S.lost ? -0.4 : 0)));
+        var mvp = nota >= 7.5, nm = window.AMOnline ? window.AMOnline.myName() : 'TÚ';
+        var row = function (k, v) { return '<div class="r"><span>' + k + '</span><b>' + v + '</b></div>'; };
+        return '<div class="mvp"><div class="nt">' + nota.toFixed(1).replace('.', ',') + '</div><div><div class="tg">TU NOTA</div><b>' + esc(String(nm).toUpperCase().slice(0, 12)) + '</b><small>' + (g ? g + (g === 1 ? ' gol' : ' goles') : 'Sin goles') + ' · ' + (st.tackles || 0) + ' robos</small>' + (mvp ? '<br><span class="star">★ MVP</span>' : '') + '</div></div>' +
+          '<div class="mst">' + (st.poss != null ? '<div class="r"><span>POSESIÓN</span><b>' + st.poss + '% – ' + (100 - st.poss) + '%</b></div><div class="pz"><i data-w="' + st.poss + '" style="width:50%"></i><u></u></div>' : '') +
+          row('TIROS', st.shots || 0) + row('PASES', st.passes || 0) + row('REGATES', st.skills || 0) + (st.poss == null ? row('ROBOS', st.tackles || 0) : '') + '</div>';
+      })() +
       '<div class="row">' +
         '<div class="pn" style="--pc:#22D3EE;animation-delay:.25s"><div class="h">EXPERIENCIA</div><div class="lv">' + S.before.level + '</div>' +
           '<div class="xpls" style="display:flex;flex-direction:column;gap:4px;margin-top:10px;margin-right:52px">' +
@@ -128,6 +144,7 @@
       q('.cv').textContent = fmt(Math.round(S.coinsBefore + (S.coinsGain + S.levelBonus) * ec));
       if (tc > 0 && tc < 1 && sfx && sfx.coin && Math.random() < 0.25) sfx.coin();
       // the weekly dots light up to this week's wins, the new one in gold
+      if (t > 0.8 && !popped.poss) { popped.poss = 1; var pzi = q('.mst .pz i'); if (pzi) pzi.style.width = pzi.getAttribute('data-w') + '%'; }
       if (t > 1.2 && !popped.week) {
         popped.week = 1;
         el.querySelectorAll('.dots i').forEach(function (d) { var n = +d.getAttribute('data-n'); if (n <= S.weekAfter) d.classList.add(n > S.weekBefore ? 'new' : 'on'); });

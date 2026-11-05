@@ -370,6 +370,7 @@
       coinsBefore: c0, coinsGain: coinsGain, levelBonus: levelBonus,
       weekBefore: w0, weekAfter: W2.wins, milestones: W2.milestones,
       boostsUsed: used, gemsGain: gemsGain,
+      stats: { goals: goals || 0, shots: st.shots || 0, passes: st.passes || 0, skills: st.skills || 0, tackles: st.tackles || 0, poss: st.poss != null ? st.poss : null },
       pass: { before: pv.before, after: pv.after, into: ps.into, need: ps.need, ready: ps.ready },
       missions: mAfter.map(function (m, i) { return Object.assign({}, m, { was: mBefore[i] ? mBefore[i].have : 0 }); })
     };
