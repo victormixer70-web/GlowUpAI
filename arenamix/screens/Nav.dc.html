@@ -108,7 +108,15 @@ class Component extends DCLogic {
       const st = JSON.parse(localStorage.getItem('arenamix.stats.v2') || 'null');
       pm = st && st.futbol ? st.futbol.pm || 0 : 36;
     } catch (e) {}
-    const badge = [pend.missions + ach, 0, pend.week + pend.pass, pm > 0 ? '!' : 0];
+    // new clothes you got (season pass, weekly prizes, ranks) that you have not seen in the Taquilla yet
+    let newGear = 0;
+    try {
+      const L = JSON.parse(localStorage.getItem('arenamix.locker.v1') || 'null'), seen = JSON.parse(localStorage.getItem('arenamix.taqseen.v1') || 'null');
+      const b = (L && L.bought) || [];
+      newGear = seen ? b.filter((id) => seen.indexOf(id) < 0).length : 0;
+      if (!seen) localStorage.setItem('arenamix.taqseen.v1', JSON.stringify(b));
+    } catch (e) {}
+    const badge = [pend.missions + ach, newGear, pend.week + pend.pass, pm > 0 ? '!' : 0];
     badge.forEach((n, i) => { v['b' + i + 'on'] = !!n; v['b' + i] = String(n); });
     // the active icon turns dark on its coloured tile; the others keep their colour
     v.c0 = COL[0]; v.c1 = COL[1]; v.c2 = COL[2];

@@ -53,6 +53,8 @@ input::placeholder{color:#8686A6}
 .tq-leg{background:linear-gradient(110deg,#FBBF24,#FFF3B0 45%,#F59E0B 60%,#FBBF24)!important;background-size:250% 100%!important;animation:tqLeg 2.2s linear infinite}
 @keyframes tqLeg{from{background-position:120% 0}to{background-position:-130% 0}}
 .tq-shirt3d{position:absolute;left:-14px;top:-18px;width:92px;height:96px;object-fit:contain;filter:drop-shadow(0 4px 5px #000a);pointer-events:none}
+.tq-new{position:absolute;left:50%;bottom:-7px;z-index:3;translate:-50% 0;padding:1px 7px;border-radius:7px;background:#FF3B5C;color:#fff;font:800 8px Exo2,sans-serif;letter-spacing:1px;box-shadow:0 0 10px #FF3B5C;animation:tqNew 1.2s ease-in-out infinite}
+@keyframes tqNew{0%,100%{scale:1}50%{scale:1.12}}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #251358 0%, #150925 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -154,6 +156,7 @@ input::placeholder{color:#8686A6}
         <button type="button" class="tq-item" onClick="{{it.pick}}" style="{{it.style}}">
           <sc-if value="{{it.isOn}}" hint-placeholder-val="{{ false }}"><span class="tq-badge" style="background: #22D3EE"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#150925" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg></span></sc-if>
           <sc-if value="{{it.isLocked}}" hint-placeholder-val="{{ false }}"><span class="tq-badge" style="background: #251443; box-shadow: 0 0 0 2px #150925, inset 0 0 0 1.5px {{it.lockC}}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="{{it.lockC}}" stroke-width="3" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></sc-if>
+          <sc-if value="{{it.isNew}}" hint-placeholder-val="{{ false }}"><span class="tq-new">¡NUEVO!</span></sc-if>
           <sc-if value="{{it.hasRar}}" hint-placeholder-val="{{ false }}"><span class="{{it.rarCls}}" style="{{it.rarStyle}}">{{it.rar}}</span></sc-if>
           <svg width="26" height="12" viewBox="0 0 26 12" style="position: absolute; top: -9px; left: 50%; margin-left: -13px"><path d="M13 10V5a2.5 2.5 0 1 1 2.5-2.5M2 11L13 6l11 5" fill="none" stroke="#A3A3C2" stroke-width="1.6" stroke-linecap="round"/></svg>
           <sc-if value="{{it.isKit}}" hint-placeholder-val="{{ true }}">
@@ -200,6 +203,8 @@ const Taq_RAR = [['COMÚN', '#94A3B8', '#0F172A'], ['RARO', '#38BDF8', '#062033'
 class Component extends DCLogic {
   constructor(props) {
     super(props);
+    try { const k = JSON.parse(localStorage.getItem('arenamix.locker.v1') || 'null'), seen = JSON.parse(localStorage.getItem('arenamix.taqseen.v1') || '[]'); this.newIds = ((k && k.bought) || []).filter((id) => seen.indexOf(id) < 0); } catch (e) { this.newIds = []; }
+    this.markSeen();
     this.state = {
       sport: 'futbol',
       cat: 'equipos',
@@ -297,6 +302,8 @@ class Component extends DCLogic {
   }
   /* saves the locker, plus the resolved outfit per sport that the games dress your character in
      (arenamix.outfit.v1: { futbol: { primary, secondary, pattern, shorts, socks, shoe, name } ... }) */
+  // everything in the locker counts as seen once you open the Taquilla (clears the red badge in the menu)
+  markSeen() { try { const k = JSON.parse(localStorage.getItem('arenamix.locker.v1') || 'null'); localStorage.setItem('arenamix.taqseen.v1', JSON.stringify((k && k.bought) || [])); } catch (e) {} }
   saveLocker(equip, bought) {
     try {
       const L = this.leagues(), X = this.extras(), out = {};
@@ -640,6 +647,7 @@ class Component extends DCLogic {
       return {
         name: it.name, label, color: it.color || '#2F4BA8', k,
         isKit: s.cat === 'equipos', is3d: s.cat !== 'equipos',
+        isNew: (this.newIds || []).indexOf(it.id) >= 0,
         hasRar: it.rar != null, rar: it.rar != null ? Taq_RAR[it.rar][0] : '', rarCls: it.rar === 3 ? 'tq-rar tq-leg' : 'tq-rar',
         rarStyle: it.rar != null ? 'background: ' + Taq_RAR[it.rar][1] + '; color: ' + Taq_RAR[it.rar][2] + ';' : '',
         thumb: s.cat !== 'equipos' && window.AMGear ? window.AMGear.thumb(s.cat, it) : '',
