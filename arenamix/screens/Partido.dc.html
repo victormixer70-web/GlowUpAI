@@ -858,6 +858,9 @@ class Component extends DCLogic {
     this.autoGfx(now);
     this.crowdT = (this.crowdT || 0) - dt;
     if (this.crowdT <= 0) { this.crowdT = 0.25; this.sfx('crowd', this.crowdLevel()); }
+    // the stands break into a chant now and then during play
+    this.chantT = (this.chantT ?? 12 + Math.random() * 10) - dt;
+    if (this.chantT <= 0) { this.chantT = 26 + Math.random() * 20; if (this.g && this.g.phase === 'play') this.sfx('chant'); }
     this.draw3D(dt);
     this.forceUpdate();
     const g = this.g;
@@ -3217,7 +3220,8 @@ class Component extends DCLogic {
   /* ---------- goal replay: the last seconds before a goal, again, slowly, from a TV camera ---------- */
   recordFrame() {
     const g = this.g;
-    if (g.phase !== 'play') return;
+    // the first moments after a goal are kept too: the replay ends on the scorer's celebration
+    if (g.phase !== 'play' && !(g.phase === 'goal' && g.pt < 1.3)) return;
     const b = g.ball, buf = this.rbuf || (this.rbuf = []);
     buf.push({
       ps: g.ps.map((p) => [p.x, p.y, p.face, p.run, p.turn || 0, p.vx, p.vy, p.act ? { type: p.act.type, t: p.act.t, dur: p.act.dur, loft: p.act.loft, s: p.act.s, h: p.act.h, face: p.act.face, from: p.act.from, lock: p.act.lock } : null, p.touchAnim || 0]),
@@ -3229,7 +3233,7 @@ class Component extends DCLogic {
     const buf = this.rbuf || [];
     // from about 2.8 s before the goal
     let tsum = 0, i = buf.length - 1;
-    while (i > 0 && tsum < 2.8) { tsum += buf[i].dt; i--; }
+    while (i > 0 && tsum < 4.1) { tsum += buf[i].dt; i--; }
     const frames = buf.slice(i);
     if (frames.length < 20) { this.rpDone = true; return; }
     let acc = 0; frames.forEach((f) => { f.at = acc; acc += f.dt; });

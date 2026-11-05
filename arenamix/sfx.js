@@ -101,6 +101,20 @@
     },
     ooh: function () { if (!ready()) return; var t = now(); var h = hiss(t, 1.1, 0.45, 'bandpass', 800, 1.2); h.f.frequency.setValueAtTime(600, t); h.f.frequency.linearRampToValueAtTime(950, t + 0.3); h.f.frequency.linearRampToValueAtTime(500, t + 1.1); },
     /* interface */
+    /* a terrace chant: claps on the beat and a sung "o-le, o-le" line from thousands of voices (detuned
+       saws through a vowel filter), a few seconds long */
+    chant: function () {
+      if (!ready()) return; var t = now() + 0.05, beat = 0.42;
+      for (var k = 0; k < 12; k++) { var c = hiss(t + k * beat, 0.09, 0.22, 'bandpass', 1500 + Math.random() * 400, 1.4); }
+      var mel = [392, 440, 392, 330, 392, 440, 494, 440], vow = [700, 1100, 700, 1100, 700, 1100, 800, 1200];
+      mel.forEach(function (f, i) {
+        var st = t + i * beat * 1.5, dur = beat * 1.35;
+        var bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = vow[i]; bp.Q.value = 2.5;
+        var g = ctx.createGain(); env(g, st, 0.08, 0.05, dur);
+        bp.connect(g); g.connect(out);
+        [-14, -6, 0, 7, 13].forEach(function (d) { var o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f * Math.pow(2, d / 1200); o.connect(bp); o.start(st); o.stop(st + dur + 0.1); });
+      });
+    },
     tick: function () { if (!ready()) return; tone('square', 1400, 1800, now(), 0.04, 0.04); },
     coin: function () { if (!ready()) return; var t = now(); tone('square', 1320, 0, t, 0.07, 0.05); tone('square', 1760, 0, t + 0.07, 0.16, 0.05); },
     levelUp: function () { if (!ready()) return; var t = now(); [523, 659, 784, 1047].forEach(function (f, i) { tone('triangle', f, 0, t + i * 0.09, 0.25, 0.18); }); },
