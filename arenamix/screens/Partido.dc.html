@@ -2259,9 +2259,9 @@ class Component extends DCLogic {
       let r = Math.random();
       if (key) { let h = 7; for (let k = 0; k < key.length; k++) h = (h * 31 + key.charCodeAt(k)) | 0; r = ((h >>> 0) % 1000) / 1000; }
       const one = this.size() === 1 && !P0.practice;
-      this.wx = window.__amWx ? window.__amWx : P0.tutorial ? 'dia' : one ? (r < 0.6 ? 'noche' : r < 0.85 ? 'lluvia' : 'nieve') : (r < 0.45 ? 'dia' : r < 0.7 ? 'noche' : r < 0.88 ? 'lluvia' : 'nieve');
+      this.wx = window.__amWx ? window.__amWx : P0.tutorial ? 'dia' : one ? (r < 0.45 ? 'noche' : r < 0.65 ? 'atardecer' : r < 0.85 ? 'lluvia' : 'nieve') : (r < 0.32 ? 'dia' : r < 0.5 ? 'atardecer' : r < 0.72 ? 'noche' : r < 0.88 ? 'lluvia' : 'nieve');
     }
-    const night = this.wx === 'noche', grey = this.wx === 'lluvia' || this.wx === 'nieve';
+    const night = this.wx === 'noche', grey = this.wx === 'lluvia' || this.wx === 'nieve', dusk = this.wx === 'atardecer';
     // real stadium HDRI: daylight sky behind the stands and image-based light on players and pitch
     const SKY = window.AMSky;
     if (SKY) {
@@ -2273,6 +2273,8 @@ class Component extends DCLogic {
     if (night) { hemi.color.setHex(0x6f84c0); hemi.groundColor.setHex(0x08160e); hemi.intensity = 0.16; this.R.toneMappingExposure = 1.0; }
     if (grey) { S.background = new T.Color(this.wx === 'nieve' ? 0xb9c2cf : 0x5d6675); S.fog = new T.Fog(S.background, 70, 230); }
     sun.position.set(-18, 34, 22);
+    // sunset: a low warm sun, a pink-violet sky light
+    if (dusk) { sun.color.setHex(0xffa25a); sun.intensity = 1.25; sun.position.set(-46, 15, 14); hemi.color.setHex(0xffb3c8); hemi.groundColor.setHex(0x3a1a2a); this.R.toneMappingExposure = 1.05; S.background = new T.Color(0x5a2a5a); S.fog = new T.Fog(0x7a3a5a, 120, 300); }
     sun.castShadow = true;
     sun.shadow.mapSize.set(this.gfxNow === 'alta' ? 2048 : 1024, this.gfxNow === 'alta' ? 2048 : 1024);
     Object.assign(sun.shadow.camera, { left: -40, right: 40, top: 30, bottom: -30, near: 5, far: 110 });
@@ -2654,8 +2656,8 @@ class Component extends DCLogic {
       ban.position.set(sx * 35.4, 1.05, 0); ban.rotation.y = sx * Math.PI / 2; S.add(ban);
     });
     // sky: open roof, night gradient with stars
-    const skyTex = this.canvasTex(16, 256, (c, w, h) => { const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#05060f'); gr.addColorStop(0.55, '#0d1840'); gr.addColorStop(1, '#2a2f6a'); c.fillStyle = gr; c.fillRect(0, 0, w, h); });
-    const useHdr = SKY && !night;
+    const skyTex = this.canvasTex(16, 256, (c, w, h) => { const gr = c.createLinearGradient(0, 0, 0, h); if (dusk) { gr.addColorStop(0, '#22125a'); gr.addColorStop(0.28, '#8a2f8a'); gr.addColorStop(0.45, '#ff5a5a'); gr.addColorStop(0.58, '#ff9a3d'); gr.addColorStop(1, '#ffd08a'); } else { gr.addColorStop(0, '#05060f'); gr.addColorStop(0.55, '#0d1840'); gr.addColorStop(1, '#2a2f6a'); } c.fillStyle = gr; c.fillRect(0, 0, w, h); });
+    const useHdr = SKY && !night && !dusk;
     const sky = new T.Mesh(new T.SphereGeometry(320, 32, 16), new T.MeshBasicMaterial({ map: useHdr ? SKY.bg() : skyTex, side: T.BackSide, fog: false, toneMapped: !useHdr }));
     sky.scale.x = useHdr ? -1 : 1;
     if (grey) { sky.material.color = new T.Color(this.wx === 'nieve' ? 0xd8dee8 : 0x8a93a3); }
@@ -3930,7 +3932,7 @@ class Component extends DCLogic {
         st: 'animation-delay: ' + (0.25 + i * 0.08) + 's;' + (g.ps.indexOf(q) === g.ctl ? ' border-color: ' + col + '; box-shadow: 0 0 12px ' + col + '55;' : '')
       }));
       const TIPS = ['Mantén CHUT para cargar el disparo: cuanto más lleno, más fuerte.', 'Con SPRINT y PASE juntos mandas el balón al hueco.', 'REGATE justo antes de la entrada rival lo deja sentado.', 'Si un compañero tiene el balón, pídela con PASE.', 'Los últimos 30 segundos el gol vale doble: ¡balón dorado!', 'Presiona sin balón para robar más rápido.', 'Con mando: X pasa, ○ chuta, □ entrada y R2 esprinta.', 'Cambia de cámara en Ajustes: TV, cerca o lejos.'];
-      const wx = { noche: 'PARTIDO NOCTURNO · FOCOS ENCENDIDOS', lluvia: 'BAJO LA LLUVIA · BALÓN RÁPIDO', nieve: 'PARTIDO CON NIEVE', dia: 'A PLENO SOL' }[this.wx] || '';
+      const wx = { noche: 'PARTIDO NOCTURNO · FOCOS ENCENDIDOS', lluvia: 'BAJO LA LLUVIA · BALÓN RÁPIDO', nieve: 'PARTIDO CON NIEVE', dia: 'A PLENO SOL', atardecer: 'AL ATARDECER · CIELO DE FUEGO' }[this.wx] || '';
       const dur = Number(P.duration ?? 90);
       return {
         ldOn: true, ldCls: 'ld-root' + (L.out ? ' out' : ''), ldVars: '--ha: ' + hc + '; --aa: ' + ac + ';',
@@ -4004,7 +4006,8 @@ class Component extends DCLogic {
       wxOverlay: 'position: absolute; inset: 0; pointer-events: none; ' + ({
         noche: 'background: linear-gradient(180deg, #01030Fe6 0%, #02061Ab3 22%, #02061A33 46%, transparent 62%), radial-gradient(120% 95% at 50% 60%, transparent 55%, #000818b0 100%);',
         lluvia: 'background: linear-gradient(180deg, #1A2230cc 0%, #1A223080 26%, #1A223040 50%, #1A223033 100%);',
-        nieve: 'background: linear-gradient(180deg, #DCE4EEd0 0%, #DCE4EE70 24%, #DCE4EE26 48%, #FFFFFF14 100%);'
+        nieve: 'background: linear-gradient(180deg, #DCE4EEd0 0%, #DCE4EE70 24%, #DCE4EE26 48%, #FFFFFF14 100%);',
+        atardecer: 'background: linear-gradient(180deg, #3B1A5A80 0%, #E0567A33 30%, transparent 55%), radial-gradient(120% 90% at 10% 40%, #FF8A3D22, transparent 60%);'
       }[this.wx] || 'display: none;'),
       homeC: hc, awayC: ac, isGolden: this.golden() && g.phase !== 'winners',
       hasNar: !!g.nar && (g.phase === 'play' || g.phase === 'goal' || g.phase === 'winners'), narKey: g.nar ? 'nar' + g.nar.id : 'nar', narText: g.nar ? g.nar.text : '',
@@ -4066,7 +4069,7 @@ class Component extends DCLogic {
         const k = g.phase === 'intro' ? this.introShot() : 0, hn = (Partido_me(P.homeName) ?? 'Tu equipo').toUpperCase(), an = (P.awayName ?? 'Rival').toUpperCase();
         const col = k === 0 ? hc : k === 1 ? ac : '#FFC53D';
         return {
-          introKicker: k === 0 ? 'AFICIÓN LOCAL' : k === 1 ? 'AFICIÓN VISITANTE' : (this.wx === 'noche' ? 'PARTIDO NOCTURNO' : this.wx === 'lluvia' ? 'BAJO LA LLUVIA' : this.wx === 'nieve' ? 'PARTIDO CON NIEVE' : 'ARENA MIX') + ' · ' + n + ' VS ' + n,
+          introKicker: k === 0 ? 'AFICIÓN LOCAL' : k === 1 ? 'AFICIÓN VISITANTE' : (this.wx === 'noche' ? 'PARTIDO NOCTURNO' : this.wx === 'lluvia' ? 'BAJO LA LLUVIA' : this.wx === 'nieve' ? 'PARTIDO CON NIEVE' : this.wx === 'atardecer' ? 'AL ATARDECER' : 'ARENA MIX') + ' · ' + n + ' VS ' + n,
           introTitle: k === 0 ? hn : k === 1 ? an : hn + '  VS  ' + an,
           introColor: col,
           introTitleStyle: 'font-size: ' + (k === 2 ? 40 : 52) + 'px; background: linear-gradient(90deg, transparent, #0B0B14E6 12%, #0B0B14E6 88%, transparent); color: #F4F4FA; text-shadow: 0 4px 0 #05050A, 0 0 26px ' + col + '; box-shadow: inset 0 -4px 0 ' + col + ';'
