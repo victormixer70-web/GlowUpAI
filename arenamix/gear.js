@@ -253,23 +253,24 @@
   function stage() {
     if (R) return true;
     try {
-      var cv = document.createElement('canvas'); cv.width = cv.height = 192;
+      var cv = document.createElement('canvas'); cv.width = cv.height = 256;
       R = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true });
       R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.0;
-      R.setClearColor(0, 0); R.setSize(192, 192, false);
+      R.setClearColor(0, 0); R.setSize(256, 256, false);
     } catch (e) { R = null; return false; }
     S = new T.Scene();
-    S.add(new T.HemisphereLight(0xe8eeff, 0x302848, 1.0));
+    S.add(new T.HemisphereLight(0xe8eeff, 0x302848, 0.8));
     var k = new T.DirectionalLight(0xffffff, 1.4); k.position.set(2, 4, 3); S.add(k);
-    var r = new T.DirectionalLight(0x22d3ee, 0.9); r.position.set(-3, 1, -2); S.add(r);
+    var r = new T.DirectionalLight(0x22d3ee, 1.0); r.position.set(-3, 1, -2); S.add(r);
+    var r2 = new T.DirectionalLight(0xf472b6, 0.8); r2.position.set(3, 0.5, -2); S.add(r2);
     cam = new T.PerspectiveCamera(30, 1, 0.1, 50);
     return true;
   }
   // a matte mannequin head, so hats and glasses read at a glance
   function mannequin() {
-    var g = new T.Group(), m = std('#3A3A66', { r: 0.6 });
+    var g = new T.Group(), m = std('#7E72C8', { r: 0.45 });
     var h = mesh(new T.SphereGeometry(1, 32, 24), m, 0, -0.35, 0); h.scale.set(1, 1.18, 1.05); g.add(h);
-    g.add(mesh(new T.CylinderGeometry(0.45, 0.5, 0.8, 20), m, 0, -1.5, -0.1));
+    g.add(mesh(new T.CylinderGeometry(0.42, 0.48, 0.45, 20), m, 0, -1.35, -0.1));
     var n = mesh(new T.ConeGeometry(0.13, 0.32, 12), m, 0, -0.6, 1.08); n.rotation.x = Math.PI / 2; g.add(n);
     [-1, 1].forEach(function (s) { var e = mesh(new T.SphereGeometry(0.2, 12, 10), m, s * 1.0, -0.5, 0); e.scale.set(0.5, 1, 0.8); g.add(e); });
     return g;
@@ -295,7 +296,7 @@
     if (cache[key]) return cache[key];
     if (!stage()) return '';
     var g = new T.Group();
-    if (cat === 'calzado') { var b = boot(it.color); b.rotation.y = 0.45; b.rotation.z = 0.08; g.add(b); }
+    if (cat === 'calzado') { var b = boot(it.color); b.rotation.y = 0.45; b.rotation.z = 0.08; g.add(b); var b2 = boot(it.color); b2.rotation.y = 0.2; b2.position.set(-0.7, 0, -0.55); g.add(b2); }
     else {
       var head = mannequin(); g.add(head);
       if (cat === 'cabeza') { var h = hat(it.kind, it.color); if (h) { h.position.y = 0.08; g.add(h); } }
@@ -304,7 +305,7 @@
       g.rotation.y = -0.25;
     }
     g.userData.low = cat === 'calzado';
-    cache[key] = snap(g, cat === 'calzado' ? 0.95 : 0.85);
+    cache[key] = snap(g, cat === 'calzado' ? 0.98 : 0.95);
     return cache[key];
   }
 

@@ -43,6 +43,9 @@ input::placeholder{color:#8686A6}
 .tq-num{position:absolute;right:26%;top:30%;font:800 italic 11px/1 'Barlow Condensed',sans-serif;opacity:.9}
 .tq-collar{position:absolute;left:50%;top:0;width:30%;height:16%;margin-left:-15%;border-radius:0 0 50% 50%;pointer-events:none}
 .tq-item:hover .tq-jw{transform:scale(1.08) rotate(-3deg);transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.tq-aw{position:relative;display:block;width:64px;height:64px;margin:-6px 0 -4px}
+.tq-aw::before{content:"";position:absolute;inset:-4px;border-radius:50%;background:radial-gradient(closest-side,var(--ac),transparent);opacity:.8}
+.tq-aw::after{content:"";position:absolute;left:14%;right:14%;bottom:2px;height:8px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.45),transparent)}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #251358 0%, #150925 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -142,7 +145,7 @@ input::placeholder{color:#8686A6}
             <span class="tq-jw" style="{{it.jwStyle}}"><span style="{{it.jerseyStyle}}"><i class="tq-shade"></i><i class="tq-cuff l" style="{{it.cuffStyle}}"></i><i class="tq-cuff r" style="{{it.cuffStyle}}"></i><b class="tq-num" style="{{it.numStyle}}">10</b><span style="{{it.crestStyle}}">{{it.crest}}</span></span><i class="tq-collar" style="{{it.collarStyle}}"></i></span>
           </sc-if>
           <sc-if value="{{it.is3d}}" hint-placeholder-val="{{ false }}">
-            <img src="{{it.thumb}}" alt="" draggable="false" class="tq-3d" style="display: block; width: 50px; height: 50px; margin: -4px 0 -2px 0; object-fit: contain; filter: drop-shadow(0 4px 4px #0009); pointer-events: none">
+            <span class="tq-aw" style="{{it.awStyle}}"><img src="{{it.thumb}}" alt="" draggable="false" class="tq-3d" style="position: relative; display: block; width: 64px; height: 64px; object-fit: contain; filter: drop-shadow(0 4px 5px #000a); pointer-events: none"></span>
           </sc-if>
           <span style="max-width: 100%; font-size: 10px; font-weight: 700; line-height: 1.15; color: #F4F4FA; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{it.name}}</span>
           <span style="{{it.labelStyle}}">
@@ -613,6 +616,7 @@ class Component extends DCLogic {
         thumb: s.cat !== 'equipos' && window.AMGear ? window.AMGear.thumb(s.cat, it) : '',
         crest: it.crest || '',
         crestStyle: s.cat === 'equipos' ? 'position: absolute; left: 24%; top: 26%; width: 14px; height: 14px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.6); ' + ({ shield: 'border-radius: 2px 2px 7px 7px;', circle: 'border-radius: 50%;', diamond: 'clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);' })[it.crestShape] + ' background: ' + it.secondary + '; color: ' + it.primary + '; font: 800 6px Exo2, sans-serif; display: flex; align-items: center; justify-content: center; letter-spacing: -.3px;' : '',
+        awStyle: '--ac: ' + (it.color || ({ cabeza: '#F472B6', cara: '#FACC15', calzado: '#4ADE80' })[s.cat] || '#A855F7') + 'AA;',
         jwStyle: '--jc: ' + (it.primary || '#7C3AED') + ';',
         cuffStyle: 'background: ' + (it.secondary || '#150925') + ';',
         numStyle: 'color: ' + (it.secondary || '#150925') + ';',
