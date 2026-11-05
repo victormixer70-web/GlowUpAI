@@ -12,7 +12,14 @@
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
-.md-card{position:absolute;left:50%;top:10px;width:170px;height:244px;margin-left:-85px;padding:0;border:0;background:none;cursor:pointer;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.25,1.2,.4,1),opacity .35s,filter .35s;-webkit-tap-highlight-color:transparent}
+.md-card{position:absolute;padding:0;border:0;background:none;cursor:pointer;transition:transform .25s cubic-bezier(.3,1.6,.5,1),filter .3s;-webkit-tap-highlight-color:transparent;animation:mdIn .4s cubic-bezier(.2,1.3,.4,1) both}
+.md-card:hover{transform:translateY(-3px)}
+.md-card:active{transform:scale(.96)}
+@keyframes mdIn{from{opacity:0;transform:translateY(14px) scale(.92)}to{opacity:1;transform:none}}
+.md-card .md-pic{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:18px;pointer-events:none;transition:opacity .5s,transform .5s}
+.md-card:hover .md-pic{transform:scale(1.04)}
+.md-card .md-fade{position:absolute;left:0;right:0;bottom:0;height:62%;border-radius:0 0 18px 18px;background:linear-gradient(180deg,transparent,#0F061EEE 75%);pointer-events:none}
+.md-card .md-clip{position:absolute;inset:0;border-radius:18px;overflow:hidden}
 .md-bg{position:absolute;left:80px;right:0;top:0;bottom:0;z-index:0;pointer-events:none;overflow:hidden;contain:layout paint}
 .md-stands{position:absolute;left:-40px;right:-40px;top:58px;height:170px;border-radius:50% 50% 0 0/30% 30% 0 0;background:radial-gradient(circle,color-mix(in srgb,var(--c) 50%,transparent) 1.1px,transparent 1.7px) 4px 3px/13px 11px,radial-gradient(circle,#FFFFFF22 1.1px,transparent 1.7px) 0 0/9px 8px,repeating-linear-gradient(180deg,transparent 0 20px,#00000055 20px 23px),linear-gradient(180deg,#2E1A53,#190C30 75%);-webkit-mask-image:linear-gradient(180deg,#000 45%,transparent);mask-image:linear-gradient(180deg,#000 45%,transparent);opacity:.6}
 .md-roof{position:absolute;left:-40px;right:-40px;top:44px;height:30px;border-radius:50% 50% 0 0/100% 100% 0 0;background:#0F061E;box-shadow:0 3px 0 color-mix(in srgb,var(--c) 45%,transparent),0 8px 26px color-mix(in srgb,var(--c) 22%,transparent)}
@@ -81,24 +88,19 @@ input::placeholder{color:#8686A6}
     </div>
   </div>
 
-  <!-- the modes as big cards in a carousel: swipe or tap the ones at the sides -->
-  <div key="{{listKey}}" onPointerDown="{{swDown}}" onPointerUp="{{swUp}}" onPointerCancel="{{swUp}}" style="position: absolute; left: 80px; right: 0; top: 52px; height: 270px; perspective: 900px; touch-action: pan-y; z-index: 1">
-    <span aria-hidden="true" style="{{spot}}"></span>
-    <sc-for list="{{cards}}" as="m" hint-placeholder-count="5">
+  <!-- every mode at once, in a grid of cards: tap one to choose it -->
+  <div key="{{listKey}}" style="position: absolute; left: 96px; right: 14px; top: 58px; height: 256px; z-index: 1">
+    <sc-for list="{{cards}}" as="m" hint-placeholder-count="6">
       <button type="button" onClick="{{m.pick}}" aria-label="{{m.aria}}" aria-pressed="{{m.on}}" class="md-card" style="{{m.style}}">
         <span style="{{m.bg}}"></span>
-        <img src="{{m.img}}" alt="" draggable="false" style="{{m.imgStyle}}">
-        <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 110px; background: linear-gradient(180deg, transparent, #0F061EEE 70%); pointer-events: none"></span>
+        <span class="md-clip"><img class="md-pic" src="{{m.img}}" alt="" draggable="false" style="{{m.imgStyle}}"><span class="md-fade"></span></span>
         <span style="{{m.tagStyle}}">{{m.tag}}</span>
         <sc-if value="{{m.hasRib}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; inset: 0; border-radius: 18px; overflow: hidden; pointer-events: none"><span class="md-rib" style="background: {{m.ribC}}">{{m.rib}}</span></span></sc-if>
         <sc-if value="{{m.isOn}}" hint-placeholder-val="{{ false }}"><span class="md-sweep"></span></sc-if>
-        <span style="position: absolute; left: 12px; right: 10px; bottom: 30px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: {{m.size}}px; line-height: .92; letter-spacing: -.5px; text-align: left; color: #F4F4FA; text-shadow: 0 3px 0 #0F061E, 0 0 18px {{m.glow}}">{{m.title}}</span>
-        <span style="position: absolute; left: 13px; bottom: 12px; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: {{m.sub}}">{{m.kicker}}</span>
+        <span style="{{m.titleStyle}}">{{m.title}}</span>
+        <span style="{{m.kickStyle}}">{{m.kicker}}</span>
       </button>
     </sc-for>
-    <sc-if value="{{canPrev}}" hint-placeholder-val="{{ false }}"><button type="button" class="md-arrow" aria-label="Modo anterior" onClick="{{prev}}" style="left: 236px; --ac: {{accent}}; --nx: -3px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7l7 7"/></svg></button></sc-if>
-    <sc-if value="{{canNext}}" hint-placeholder-val="{{ true }}"><button type="button" class="md-arrow" aria-label="Modo siguiente" onClick="{{next}}" style="left: 490px; --ac: {{accent}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7l-7 7"/></svg></button></sc-if>
-    <div class="md-dots2" aria-hidden="true"><sc-for list="{{pager}}" as="d" hint-placeholder-count="5"><i style="{{d}}"></i></sc-for></div>
   </div>
 
   <!-- what you picked, in one line, and the big button -->
@@ -261,21 +263,24 @@ class Component extends DCLogic {
       const mmr = comp ? this.mmrOf(s.sport, m.id) : 0, R = this.rankOf(mmr);
       const tag = comp ? (placingOf(m) ? 'CLASIF. ' + this.placeOf(S, s.sport + ':' + m.id).g + '/5' : R.label.toUpperCase()) : s.cat === 'casual' ? (m.kind === 'private' ? 'CON AMIGOS' : 'SIN RANGO') : s.cat === 'tour' ? 'CONTRA LA IA' : 'LIBRE';
       const img = P ? P.get(this.posterKey(m), () => this.forceUpdate()) : '';
-      // the carousel: the chosen card in the middle, the others fanned out and turned away
-      const tx = off === 0 ? 0 : Math.sign(off) * (a === 1 ? 182 : a === 2 ? 318 : 420);
-      const sc = a === 0 ? 1.06 : a === 1 ? 0.84 : 0.7;
+      // the grid: up to 4 per row, the cards filling the space
+      const cols = list.length <= 3 ? list.length : list.length <= 4 ? 2 : 4, rows = Math.ceil(list.length / cols);
+      const GW = 734, GH = 256, gap = 10, cw = (GW - (cols - 1) * gap) / cols, ch = (GH - (rows - 1) * gap) / rows;
+      const cx = (i % cols) * (cw + gap), cy = Math.floor(i / cols) * (ch + gap);
+      const big = rows === 1;
       const kicker = m.kind === 'team' ? 'PARTIDO · ' + m.n + ' CONTRA ' + m.n : m.kind === 'duel' ? 'DUELO · CARA A CARA' : m.kind === 'private' ? 'ONLINE · CÓDIGO DE SALA' : m.kind === 'tour' ? (m.id === 'retos' ? 'DESAFÍOS · CADA DÍA' : 'TORNEO · UN JUGADOR') : 'PRÁCTICA';
       const title = m.kind === 'team' ? m.n + ' VS ' + m.n : m.title;
       return {
         title, tag, kicker, img, on: on ? 'true' : 'false', isOn: on,
         hasRib: !!RIB[m.id], rib: (RIB[m.id] || [])[0] || '', ribC: (RIB[m.id] || [])[1] || '', aria: title + '. ' + m.desc,
-        size: title.length > 12 ? 30 : title.length > 7 ? 36 : 54,
         glow: on ? CAT[0] + '88' : 'transparent', sub: on ? CAT[0] : '#A3A3C2',
-        style: 'transform: translateX(' + tx + 'px) translateZ(' + (-a * 60) + 'px) rotateY(' + (-Math.sign(off) * Math.min(2, a) * 16) + 'deg) scale(' + sc + '); z-index: ' + (10 - a) + '; opacity: ' + (a > 2 ? 0 : a === 2 ? 0.55 : 1) + '; pointer-events: ' + (a > 2 ? 'none' : 'auto') + '; filter: ' + (on ? 'none' : 'brightness(.62) saturate(.8)') + ';' + (on ? ' animation: mdFloat 3.2s ease-in-out infinite;' : ''),
-        bg: 'position: absolute; inset: 0; border-radius: 18px; overflow: hidden; background: radial-gradient(120% 80% at 50% 25%, ' + CAT[1] + ' 0%, #1C0E43 60%, #0F061E 100%); --mc: ' + CAT[0] + '; ' + (on ? 'animation: mdGlow 2.4s ease-in-out infinite;' : 'box-shadow: 0 0 0 1px #2E2E58, 0 14px 24px #000a;'),
-        imgStyle: 'position: absolute; left: 0; top: 0; width: 170px; height: 215px; object-fit: cover; border-radius: 18px 18px 0 0; opacity: ' + (img ? 1 : 0) + '; transition: opacity .5s; pointer-events: none;',
-        tagStyle: 'position: absolute; left: 10px; top: 10px; padding: 3px 9px; transform: skewX(0deg); background: ' + (on ? CAT[0] : '#251443CC') + '; color: ' + (on ? '#150925' : '#CACAE0') + '; font: 800 9.5px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap;',
-        pick: () => { if (on || performance.now() - (this.swiped || 0) < 350) return; this.setState({ id: m.id }); }
+        style: 'left: ' + cx.toFixed(1) + 'px; top: ' + cy.toFixed(1) + 'px; width: ' + cw.toFixed(1) + 'px; height: ' + ch.toFixed(1) + 'px; z-index: ' + (on ? 2 : 1) + '; animation-delay: ' + (i * 0.04).toFixed(2) + 's; filter: ' + (on ? 'none' : 'brightness(.78) saturate(.9)') + ';',
+        bg: 'position: absolute; inset: 0; border-radius: 18px; overflow: hidden; background: radial-gradient(120% 80% at 50% 25%, ' + CAT[1] + ' 0%, #1C0E43 60%, #0F061E 100%); --mc: ' + CAT[0] + '; ' + (on ? 'animation: mdGlow 2.4s ease-in-out infinite;' : 'box-shadow: 0 0 0 1px #7C5CFF66, 0 10px 20px #000a;'),
+        imgStyle: 'opacity: ' + (img ? 1 : 0) + ';',
+        tagStyle: 'position: absolute; left: 10px; top: 10px; padding: 3px 9px; border-radius: 9px; background: ' + (on ? CAT[0] : '#251443CC') + '; color: ' + (on ? '#150925' : '#CACAE0') + '; font: 800 9.5px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap;',
+        titleStyle: 'position: absolute; left: 12px; right: 10px; bottom: ' + (big ? 34 : 24) + 'px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + (big ? (title.length > 12 ? 34 : title.length > 7 ? 42 : 60) : (title.length > 12 ? 19 : title.length > 7 ? 23 : 34)) + 'px; line-height: .92; letter-spacing: -.5px; text-align: left; color: #F4F4FA; text-shadow: 0 3px 0 #0F061E, 0 0 18px ' + (on ? CAT[0] + '88' : 'transparent') + ';',
+        kickStyle: 'position: absolute; left: 13px; right: 8px; bottom: ' + (big ? 14 : 9) + 'px; font-size: ' + (big ? 10 : 8.5) + 'px; font-weight: 800; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; color: ' + (on ? CAT[0] : '#A3A3C2') + ';',
+        pick: () => { if (!on) this.setState({ id: m.id }); }
       };
     });
     const mmr = cur && comp ? this.mmrOf(s.sport, cur.id) : 0, R = this.rankOf(mmr);
