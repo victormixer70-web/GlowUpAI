@@ -227,24 +227,77 @@
   function hat(kind, color) { var f = HATS[kind]; return f ? f(color) : null; }
   function face(kind) { var f = FACES[kind]; return f ? f() : null; }
 
-  // a football boot, for the shop: sole with studs, a shaped upper in the colour, white laces and swoosh
+  /* a football boot, for the shop: a shoe last lofted from cross-sections (rounded heel, tapering toe, a low
+     vamp and a high collar), painted with a contrast heel counter, a stripe along the side and the sole edge;
+     a sole plate with studs underneath, laces over the tongue and a dark collar opening */
   function boot(color) {
-    var g = new T.Group(), c = std(color || '#F2F5FA', { r: 0.4 }), sole = std('#F4F4FA', { r: 0.5 }), dk = std('#17172A', { r: 0.5 });
-    var s = new T.Shape();
-    s.moveTo(-1.0, 0); s.lineTo(1.05, 0); s.quadraticCurveTo(1.4, 0.05, 1.3, 0.3); s.quadraticCurveTo(1.0, 0.55, 0.4, 0.6);
-    s.lineTo(-0.35, 0.95); s.quadraticCurveTo(-0.85, 1.05, -1.0, 0.85); s.quadraticCurveTo(-1.15, 0.4, -1.0, 0);
-    var up = new T.ExtrudeGeometry(s, { depth: 0.62, bevelEnabled: true, bevelThickness: 0.14, bevelSize: 0.12, bevelSegments: 4, curveSegments: 20 });
-    up.translate(0, 0, -0.31);
-    g.add(mesh(up, c, 0, 0.12, 0));
-    var so = mesh(new T.BoxGeometry(2.45, 0.12, 0.86), dk, 0.08, 0.06, 0); g.add(so);
-    // the ankle opening and a contrast heel counter
-    var col = mesh(new T.CylinderGeometry(0.34, 0.34, 0.06, 24), dk, -0.62, 1.08, 0); col.scale.z = 1.1; col.rotation.z = 0.15; g.add(col);
-    var heel = mesh(new T.BoxGeometry(0.3, 0.55, 0.9), sole, -1.02, 0.42, 0); g.add(heel);
-    [[-0.75, 0.25], [-0.75, -0.25], [0.35, 0.28], [0.35, -0.28], [0.8, 0.25], [0.8, -0.25], [1.1, 0]].forEach(function (p) {
-      g.add(mesh(new T.CylinderGeometry(0.06, 0.08, 0.14, 10), sole, p[0], -0.04, p[1]));
+    var g = new T.Group(), base0 = new T.Color(color || '#F2F5FA'), base = base0.clone().convertSRGBToLinear();
+    var lum = 0.3 * base0.r + 0.59 * base0.g + 0.11 * base0.b;
+    var acc = new T.Color(lum > 0.62 ? '#1E1B3A' : '#FFFFFF').convertSRGBToLinear(), soleC = new T.Color(lum > 0.62 ? '#2A2850' : '#F4F4FA').convertSRGBToLinear();
+    var XH = -1.1, XT = 1.3, X0 = -0.35, N = 44, M = 36;
+    var halfW = function (x) {
+      var t = x < X0 ? (X0 - x) / (X0 - XH) : (x - X0) / (XT - X0), p = x < X0 ? 3 : 2.2;
+      var env = Math.pow(Math.max(0, 1 - Math.pow(Math.min(1, t), p)), 1 / p);
+      return (x < X0 ? 0.38 : 0.38 + 0.06 * Math.sin(Math.min(1, t) * Math.PI)) * env;
+    };
+    var topH = function (x) {
+      // collar at the heel, dropping to the tongue, the vamp, then down to the toe
+      if (x < -0.55) return 0.98 - 0.25 * Math.pow((x + 0.55) / (XH + 0.55), 2);
+      if (x < 0.15) return 0.98 - (x + 0.55) / 0.7 * 0.36;
+      return 0.62 - 0.36 * Math.pow((x - 0.15) / (XT - 0.15), 1.4);
+    };
+    var P = [], C = [], I = [];
+    for (var i = 0; i <= N; i++) {
+      var u = i / N, x = XH + (XT - XH) * (1 - Math.cos(u * Math.PI)) / 2, w = halfW(x), H = Math.max(0.02, topH(x)), h0 = H * 0.42;
+      for (var j = 0; j < M; j++) {
+        var th = j / M * Math.PI * 2, cz = Math.cos(th), sy = Math.sin(th);
+        var z = w * (cz < 0 ? -1 : 1) * Math.pow(Math.abs(cz), 0.55);
+        var y = sy >= 0 ? h0 + (H - h0) * Math.pow(sy, 0.85) : h0 * (1 - Math.pow(-sy, 2.6));
+        P.push(x, y + 0.06, z);
+        var col = base.clone();
+        var side = Math.abs(z) > w * 0.55;
+        var band = y - (0.62 - 0.32 * (x + 0.85) / 1.7);
+        if (x < -0.72 && y > 0.12) col.copy(acc);                                   // heel counter
+        else if (side && x > -0.85 && x < 0.75 && Math.abs(band) < 0.055) col.copy(acc); // the stripe
+        else if (y < 0.075) col.copy(soleC);                                         // sole edge
+        else if (x > 1.0) col.multiplyScalar(0.9);                                   // toe cap, a shade darker
+        C.push(col.r, col.g, col.b);
+      }
+    }
+    for (var i2 = 0; i2 < N; i2++) for (var j2 = 0; j2 < M; j2++) {
+      var a0 = i2 * M + j2, a1 = i2 * M + (j2 + 1) % M, b0 = a0 + M, b1 = a1 + M;
+      I.push(a0, b0, a1, a1, b0, b1);
+    }
+    var geo = new T.BufferGeometry();
+    geo.setAttribute('position', new T.Float32BufferAttribute(P, 3));
+    geo.setAttribute('color', new T.Float32BufferAttribute(C, 3));
+    geo.setIndex(I); geo.computeVertexNormals();
+    var upper = new T.Mesh(geo, new T.MeshStandardMaterial({ vertexColors: true, roughness: 0.38, metalness: 0.05, side: T.DoubleSide }));
+    upper.castShadow = true; g.add(upper);
+    // sole plate from the outline seen from above, a little wider than the upper
+    var o = new T.Shape(), K = 40;
+    for (var k = 0; k <= K; k++) { var xx = XH + (XT - XH) * k / K; var ww = halfW(xx) * 1.06 + 0.015; if (k === 0) o.moveTo(xx, ww); else o.lineTo(xx, ww); }
+    for (var k2 = K; k2 >= 0; k2--) { var xx2 = XH + (XT - XH) * k2 / K; o.lineTo(xx2, -(halfW(xx2) * 1.06 + 0.015)); }
+    var sg = new T.ExtrudeGeometry(o, { depth: 0.07, bevelEnabled: false });
+    sg.rotateX(Math.PI / 2); sg.translate(0, 0.07, 0);
+    var soleM = new T.MeshStandardMaterial({ color: soleC.clone(), roughness: 0.5 });
+    g.add(mesh(sg, soleM, 0, 0, 0));
+    // studs
+    [[-0.85, 0.2], [-0.85, -0.2], [-0.55, 0], [0.3, 0.27], [0.3, -0.27], [0.7, 0.3], [0.7, -0.3], [1.02, 0.12], [1.02, -0.12]].forEach(function (q) {
+      g.add(mesh(new T.CylinderGeometry(0.045, 0.075, 0.13, 10), soleM, q[0], -0.035, q[1]));
     });
-    for (var i = 0; i < 4; i++) { var l = mesh(new T.BoxGeometry(0.06, 0.04, 0.36), std('#FFFFFF'), 0.28 - i * 0.17, 0.78 + i * 0.07, 0); l.rotation.z = 0.35; g.add(l); }
-    var sw = mesh(new T.TorusGeometry(0.45, 0.04, 6, 24, Math.PI * 0.7), dk, 0.15, 0.45, 0.47); sw.rotation.z = Math.PI * 1.08; g.add(sw);
+    // the collar opening, a padded rim and the tongue
+    var dk = std('#120E24', { r: 0.7 });
+    var hole = mesh(new T.CircleGeometry(1, 28), dk, -0.78, 0.985, 0); hole.scale.set(0.3, 0.27, 1); hole.rotation.x = -Math.PI / 2; hole.rotation.y = 0; g.add(hole);
+    hole.rotateOnWorldAxis(new T.Vector3(0, 0, 1), 0.18);
+    var rim = mesh(new T.TorusGeometry(1, 0.09, 8, 28), new T.MeshStandardMaterial({ color: acc.clone(), roughness: 0.6 }), -0.78, 0.98, 0); rim.scale.set(0.3, 0.27, 0.5); rim.rotation.x = -Math.PI / 2; rim.rotateOnWorldAxis(new T.Vector3(0, 0, 1), 0.18); g.add(rim);
+    // laces across the tongue, following the top of the upper
+    var lace = std('#FFFFFF', { r: 0.6 });
+    for (var l = 0; l < 5; l++) {
+      var lx = -0.42 + l * 0.15, ly = topH(lx) + 0.06 + 0.012, lw = halfW(lx) * 0.75;
+      var bar = mesh(new T.CylinderGeometry(0.024, 0.024, lw * 2, 8), lace, lx, ly, 0);
+      bar.rotation.x = Math.PI / 2; bar.rotation.z = 0.12; g.add(bar);
+    }
     return g;
   }
 
@@ -278,7 +331,7 @@
   function frame(obj, fill) {
     var box = new T.Box3().setFromObject(obj), sz = box.getSize(new T.Vector3()), c = box.getCenter(new T.Vector3());
     var r = Math.max(sz.x, sz.y, sz.z) * 0.5 / (fill || 0.8), d = r / Math.tan(cam.fov * Math.PI / 360);
-    var lift = obj.userData.low ? 0.6 : 0.3;
+    var lift = obj.userData.low ? 0.45 : 0.3;
     cam.position.set(c.x + d * 0.45, c.y + d * lift, c.z + d * 0.84);
     cam.lookAt(c);
   }
