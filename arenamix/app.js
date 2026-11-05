@@ -298,6 +298,8 @@
     var Comp = registry[this.state.screen];
     // the screen's name on the stage, so each one can wear its own colours (ui-fx.js)
     var st = document.getElementById('stage'); if (st) st.setAttribute('data-screen', this.state.screen);
+    // colour theme: the logo's blues unless you switched back to the classic violet ('arenamix.theme.v1' = 'classic')
+    if (st) { var th = 'logo'; try { th = localStorage.getItem('arenamix.theme.v1') || 'logo'; } catch (e) {} if (th === 'classic') st.removeAttribute('data-theme'); else st.setAttribute('data-theme', 'logo'); }
     return h(Comp, { key: this.state.screen });
   };
 
