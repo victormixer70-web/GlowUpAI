@@ -577,7 +577,7 @@
       if (Array.isArray(mt) || mt.transparent || !mt.map) return;
       var geo = m.geometry, pos = geo.attributes.position, si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight, uv = geo.attributes.uv;
       if (!si || !sw) return;
-      var n = pos.count, kit = new Float32Array(n * 3), arm = new Float32Array(n), names = m.skeleton.bones.map(function (b) { return b.name; });
+      var n = pos.count, kit = new Float32Array(n * 3), arm = new Float32Array(n), names = m.skeleton.bones.map(function (b) { return b.name; }), isShirt = /shirt|tops/i.test(m.name);
       // where each bone sits at rest, for the sleeve coordinate (0 shoulder .. 1 elbow .. 2 wrist)
       var bwp = {}; m.skeleton.bones.forEach(function (b) { bwp[b.name] = new T.Vector3().setFromMatrixPosition(b.matrixWorld); });
       var armAt = function (bn, p) {
@@ -601,6 +601,8 @@
         var best = 0, bw = -1;
         for (var k = 0; k < 4; k++) { var w = sw.array[i * 4 + k]; if (w > bw) { bw = w; best = si.array[i * 4 + k]; } }
         var z = zoneOf(names[best] || '');
+        // a shirt is all shirt, down to its hem (the hip bones move the hem, but it is not the shorts)
+        if (z === 2 && isShirt) z = 1;
         v.fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld);
         kit[i * 3] = z; kit[i * 3 + 1] = (v.x - cx) / H; kit[i * 3 + 2] = (v.y - box.min.y) / H;
         arm[i] = z === 1 ? armAt(names[best] || '', v) : -1;

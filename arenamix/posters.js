@@ -240,8 +240,8 @@
         cx.fill(); cx.stroke();
         cx.fillStyle = kit.primary || '#FFFFFF'; cx.font = '800 22px Arial'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText((kit.crest || '').slice(0, 2), 32, 33);
         var ct = new T.CanvasTexture(cc); ct.encoding = T.sRGBEncoding;
-        var crest = new T.Mesh(new T.PlaneGeometry(0.105, 0.105), new T.MeshStandardMaterial({ map: ct, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -2 }));
-        crest.position.set(0.1, cn.y + sz.y * 0.2, 0.165); S.add(crest);
+        var crest = new T.Mesh(new T.PlaneGeometry(0.125, 0.125), new T.MeshStandardMaterial({ map: ct, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -2 }));
+        crest.position.set(0.095, cn.y + sz.y * 0.2 + 0.014, 0.17); S.add(crest);
         // (the box is the bind pose, arms out: frame on the torso's height, centred on the body)
         cn.x = 0; var d = (sz.y / 2) / 0.6 / Math.tan(16 * Math.PI / 180);
         look = { pos: [cn.x + d * 0.18, cn.y + d * 0.06, cn.z + d], at: [cn.x, cn.y, cn.z] };
