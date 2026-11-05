@@ -68,6 +68,11 @@ input::placeholder{color:#8686A6}
 .md-card[aria-pressed="true"] .md-cn.c{transform:translate(-2px,2px)}.md-card[aria-pressed="true"] .md-cn.d{transform:translate(2px,2px)}
 .md-card .md-bar{position:absolute;left:22%;right:22%;bottom:-1px;height:3px;border-radius:3px;z-index:4;background:linear-gradient(90deg,transparent,var(--mc),#FFFFFF,var(--mc),transparent);opacity:.6;pointer-events:none}
 .md-card[aria-pressed="true"] .md-bar{opacity:1;box-shadow:0 0 10px var(--mc)}
+
+/* inside the cards: turning light rays, a halftone of dots, and a gloss across the top */
+.md-card .md-rays2{position:absolute;left:-50%;top:-60%;width:200%;height:200%;-webkit-mask-image:radial-gradient(closest-side,#000 20%,transparent 75%);mask-image:radial-gradient(closest-side,#000 20%,transparent 75%);animation:mdSpin 40s linear infinite;pointer-events:none}
+.md-card .md-dotsx{position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.16) 1.2px,transparent 1.8px) 0 0/10px 10px;-webkit-mask-image:linear-gradient(200deg,#000 0%,transparent 55%);mask-image:linear-gradient(200deg,#000 0%,transparent 55%);pointer-events:none}
+.md-card .md-glint{position:absolute;left:0;right:0;top:0;height:42%;border-radius:18px 18px 0 0;background:linear-gradient(180deg,rgba(255,255,255,.16),transparent);pointer-events:none}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -109,7 +114,7 @@ input::placeholder{color:#8686A6}
     <sc-for list="{{cards}}" as="m" hint-placeholder-count="6">
       <button type="button" onClick="{{m.pick}}" aria-label="{{m.aria}}" aria-pressed="{{m.on}}" class="md-card" style="{{m.style}}">
         <span style="{{m.bg}}"></span>
-        <span class="md-clip"><img class="md-pic" src="{{m.img}}" alt="" draggable="false" style="{{m.imgStyle}}"><span class="md-fade"></span></span>
+        <span class="md-clip"><span class="md-rays2" style="{{m.rayStyle}}"></span><span class="md-dotsx"></span><img class="md-pic" src="{{m.img}}" alt="" draggable="false" style="{{m.imgStyle}}"><span class="md-fade" style="{{m.fadeStyle}}"></span><span class="md-glint"></span></span>
         <span style="{{m.tagStyle}}">{{m.tag}}</span>
         <sc-if value="{{m.hasRib}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; inset: 0; border-radius: 18px; overflow: hidden; pointer-events: none"><span class="md-rib" style="background: {{m.ribC}}">{{m.rib}}</span></span></sc-if>
         <sc-if value="{{m.isOn}}" hint-placeholder-val="{{ false }}"><span class="md-sweep"></span></sc-if>
@@ -285,14 +290,22 @@ class Component extends DCLogic {
       const GW = 734, GH = 256, gap = 10, cw = (GW - (cols - 1) * gap) / cols, ch = (GH - (rows - 1) * gap) / rows;
       const cx = (i % cols) * (cw + gap), cy = Math.floor(i / cols) * (ch + gap);
       const big = rows === 1;
+      // every mode its own colours: [glow, accent, top, bottom]
+      const PAL = { m1: ['#22D3EE', '#3B82F6', '#1E3A8A', '#0B1030'], m2: ['#4ADE80', '#14B8A6', '#065F46', '#04201A'], m3: ['#FB923C', '#EF4444', '#7C2D12', '#250A06'], m4: ['#F472B6', '#A855F7', '#701A75', '#22062A'],
+        pens: ['#A3E635', '#22C55E', '#14532D', '#06200E'], fk: ['#FDE047', '#F97316', '#78350F', '#241004'], private: ['#38BDF8', '#8B5CF6', '#312E81', '#0E0B30'],
+        copa: ['#FDE047', '#F59E0B', '#7C2D12', '#2A0E04'], liga: ['#A78BFA', '#3B82F6', '#3730A3', '#0E0B36'], retos: ['#F472B6', '#F43F5E', '#831843', '#2A0618'],
+        libre: ['#4ADE80', '#22D3EE', '#065F46', '#04201A'], train: ['#FB923C', '#FDE047', '#7C2D12', '#250A06'], tut: ['#22D3EE', '#A855F7', '#1E3A8A', '#0B1030'] };
+      const pal = PAL[m.id] || [CAT[0], '#A855F7', '#2A1B6E', '#0F061E'];
       const kicker = m.kind === 'team' ? 'PARTIDO · ' + m.n + ' CONTRA ' + m.n : m.kind === 'duel' ? 'DUELO · CARA A CARA' : m.kind === 'private' ? 'ONLINE · CÓDIGO DE SALA' : m.kind === 'tour' ? (m.id === 'retos' ? 'DESAFÍOS · CADA DÍA' : 'TORNEO · UN JUGADOR') : 'PRÁCTICA';
       const title = m.kind === 'team' ? m.n + ' VS ' + m.n : m.title;
       return {
         title, tag, kicker, img, on: on ? 'true' : 'false', isOn: on,
         hasRib: !!RIB[m.id], rib: (RIB[m.id] || [])[0] || '', ribC: (RIB[m.id] || [])[1] || '', aria: title + '. ' + m.desc,
         glow: on ? CAT[0] + '88' : 'transparent', sub: on ? CAT[0] : '#A3A3C2',
-        style: '--mc: ' + CAT[0] + '; left: ' + cx.toFixed(1) + 'px; top: ' + cy.toFixed(1) + 'px; width: ' + cw.toFixed(1) + 'px; height: ' + ch.toFixed(1) + 'px; z-index: ' + (on ? 2 : 1) + '; animation-delay: ' + (i * 0.04).toFixed(2) + 's; filter: ' + (on ? 'none' : 'brightness(.78) saturate(.9)') + ';',
-        bg: 'position: absolute; inset: 0; border-radius: 18px; overflow: hidden; background: radial-gradient(120% 80% at 50% 25%, ' + CAT[1] + ' 0%, #1C0E43 60%, #0F061E 100%); --mc: ' + CAT[0] + '; ' + (on ? 'animation: mdGlow 2.4s ease-in-out infinite;' : 'box-shadow: 0 0 0 1px #7C5CFF66, 0 10px 20px #000a;'),
+        style: '--mc: ' + CAT[0] + '; left: ' + cx.toFixed(1) + 'px; top: ' + cy.toFixed(1) + 'px; width: ' + cw.toFixed(1) + 'px; height: ' + ch.toFixed(1) + 'px; z-index: ' + (on ? 2 : 1) + '; animation-delay: ' + (i * 0.04).toFixed(2) + 's; filter: ' + (on ? 'none' : 'brightness(.86)') + ';',
+        bg: 'position: absolute; inset: 0; border-radius: 18px; overflow: hidden; background: radial-gradient(70% 55% at 50% 38%, ' + pal[0] + 'CC 0%, transparent 70%), radial-gradient(60% 50% at 100% 0%, ' + pal[1] + 'AA 0%, transparent 70%), radial-gradient(60% 50% at 0% 100%, ' + pal[1] + '88 0%, transparent 70%), linear-gradient(165deg, ' + pal[2] + ' 0%, ' + pal[3] + ' 100%); --mc: ' + CAT[0] + '; ' + (on ? 'animation: mdGlow 2.4s ease-in-out infinite;' : 'box-shadow: 0 0 0 1px #7C5CFF66, 0 10px 20px #000a;'),
+        fadeStyle: 'background: linear-gradient(180deg, transparent, ' + pal[3] + 'F0 78%);',
+        rayStyle: 'background: repeating-conic-gradient(from 0deg at 50% 40%, ' + pal[0] + '40 0 7deg, transparent 7deg 18deg);',
         imgStyle: 'opacity: ' + (img ? 1 : 0) + ';',
         tagStyle: 'position: absolute; left: 10px; top: 10px; padding: 3px 9px; border-radius: 9px; background: ' + (on ? CAT[0] : '#251443CC') + '; color: ' + (on ? '#150925' : '#CACAE0') + '; font: 800 9.5px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap;',
         titleStyle: 'position: absolute; left: 12px; right: 10px; bottom: ' + (big ? 34 : 24) + 'px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + (big ? (title.length > 12 ? 34 : title.length > 7 ? 42 : 60) : (title.length > 12 ? 19 : title.length > 7 ? 23 : 34)) + 'px; line-height: .92; letter-spacing: -.5px; text-align: left; color: #F4F4FA; text-shadow: 0 3px 0 #0F061E, 0 0 18px ' + (on ? CAT[0] + '88' : 'transparent') + ';',

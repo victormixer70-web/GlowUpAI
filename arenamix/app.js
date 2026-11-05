@@ -296,6 +296,8 @@
   };
   App.prototype.render = function () {
     var Comp = registry[this.state.screen];
+    // the screen's name on the stage, so each one can wear its own colours (ui-fx.js)
+    var st = document.getElementById('stage'); if (st) st.setAttribute('data-screen', this.state.screen);
     return h(Comp, { key: this.state.screen });
   };
 
