@@ -46,6 +46,11 @@ input::placeholder{color:#8686A6}
 .tq-aw{position:relative;display:block;width:64px;height:64px;margin:-6px 0 -4px}
 .tq-aw::before{content:"";position:absolute;inset:-4px;border-radius:50%;background:radial-gradient(closest-side,var(--ac),transparent);opacity:.8}
 .tq-aw::after{content:"";position:absolute;left:14%;right:14%;bottom:2px;height:8px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.45),transparent)}
+
+/* rarity: a chip on the card, the card's frame in its colour; legendary ones shimmer */
+.tq-rar{position:absolute;left:4px;top:4px;z-index:2;padding:1px 5px;border-radius:6px;font:800 7.5px Exo2,sans-serif;letter-spacing:.6px;box-shadow:0 1px 3px #0008}
+.tq-leg{background:linear-gradient(110deg,#FBBF24,#FFF3B0 45%,#F59E0B 60%,#FBBF24)!important;background-size:250% 100%!important;animation:tqLeg 2.2s linear infinite}
+@keyframes tqLeg{from{background-position:120% 0}to{background-position:-130% 0}}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #251358 0%, #150925 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -140,6 +145,7 @@ input::placeholder{color:#8686A6}
         <button type="button" class="tq-item" onClick="{{it.pick}}" style="{{it.style}}">
           <sc-if value="{{it.isOn}}" hint-placeholder-val="{{ false }}"><span class="tq-badge" style="background: #22D3EE"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#150925" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg></span></sc-if>
           <sc-if value="{{it.isLocked}}" hint-placeholder-val="{{ false }}"><span class="tq-badge" style="background: #251443; box-shadow: 0 0 0 2px #150925, inset 0 0 0 1.5px {{it.lockC}}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="{{it.lockC}}" stroke-width="3" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></sc-if>
+          <sc-if value="{{it.hasRar}}" hint-placeholder-val="{{ false }}"><span class="{{it.rarCls}}" style="{{it.rarStyle}}">{{it.rar}}</span></sc-if>
           <svg width="26" height="12" viewBox="0 0 26 12" style="position: absolute; top: -9px; left: 50%; margin-left: -13px"><path d="M13 10V5a2.5 2.5 0 1 1 2.5-2.5M2 11L13 6l11 5" fill="none" stroke="#A3A3C2" stroke-width="1.6" stroke-linecap="round"/></svg>
           <sc-if value="{{it.isKit}}" hint-placeholder-val="{{ true }}">
             <span class="tq-jw" style="{{it.jwStyle}}"><span style="{{it.jerseyStyle}}"><i class="tq-shade"></i><i class="tq-cuff l" style="{{it.cuffStyle}}"></i><i class="tq-cuff r" style="{{it.cuffStyle}}"></i><b class="tq-num" style="{{it.numStyle}}">10</b><span style="{{it.crestStyle}}">{{it.crest}}</span></span><i class="tq-collar" style="{{it.collarStyle}}"></i></span>
@@ -158,7 +164,7 @@ input::placeholder{color:#8686A6}
     </div>
     <div style="flex: none; display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 6px 8px 6px 12px; border-radius: 14px; background: linear-gradient(100deg, #7C3AEDCC, #DB2777B3 60%, #F97316A6); border: 1px solid #F0ABFCAA; box-shadow: inset 0 1px 0 #ffffff33, 0 0 16px #DB277766">
       <div style="flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0">
-        <span style="font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{selName}}</span>
+        <span style="font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{selName}}<sc-if value="{{hasSelRar}}" hint-placeholder-val="{{ false }}"><span style="{{selRarStyle}}">{{selRar}}</span></sc-if></span>
         <span style="font-size: 11px; color: #FDE7F3">{{selHint}}</span>
       </div>
       <sc-if value="{{showEquip}}" hint-placeholder-val="{{ true }}">
@@ -181,6 +187,7 @@ input::placeholder{color:#8686A6}
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+const Taq_RAR = [['COMÚN', '#94A3B8', '#0F172A'], ['RARO', '#38BDF8', '#062033'], ['ÉPICO', '#C084FC', '#2A0A4A'], ['LEGENDARIO', '#FBBF24', '#3A2000']];
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -464,36 +471,36 @@ class Component extends DCLogic {
     return {
       cabeza: [
         { id: 'h0', name: 'Ninguno', kind: 'none', st: 'owned' },
-        { id: 'h9', name: 'Cinta Volt', kind: 'band', color: '#C8F031', st: 'owned' },
-        { id: 'h1', name: 'Gorra', kind: 'cap', color: '#2F4BA8', st: 'owned' },
-        { id: 'h2', name: 'Sombrero de copa', kind: 'top', st: 'coins', price: 900 },
-        { id: 'h3', name: 'Gorro de chef', kind: 'chef', st: 'coins', price: 700 },
-        { id: 'h4', name: 'Casco vikingo', kind: 'viking', st: 'reward', req: 'Oro 1', how: 'rank' },
-        { id: 'h5', name: 'Gorro hélice', kind: 'prop', st: 'coins', price: 600 },
-        { id: 'h6', name: 'Corona', kind: 'crown', st: 'reward', req: 'Premium nv. 25', how: 'pass' },
-        { id: 'h7', name: 'Brote', kind: 'sprout', st: 'reward', req: '10 victorias', how: 'wins' },
-        { id: 'h8', name: 'Auriculares', kind: 'phones', st: 'coins', price: 800 },
-        { id: 'h10', name: 'Gorra Temporada', kind: 'cap', color: '#FF8A3D', st: 'reward', req: 'Premium nv. 1', how: 'pass' },
-        { id: 'h11', name: 'Cinta Dorada', kind: 'band', color: '#FFC53D', st: 'reward', req: 'Pase nv. 5', how: 'pass' }
+        { id: 'h9', rar: 0, name: 'Cinta Volt', kind: 'band', color: '#C8F031', st: 'owned' },
+        { id: 'h1', rar: 0, name: 'Gorra', kind: 'cap', color: '#2F4BA8', st: 'owned' },
+        { id: 'h2', rar: 2, name: 'Sombrero de copa', kind: 'top', st: 'coins', price: 900 },
+        { id: 'h3', rar: 1, name: 'Gorro de chef', kind: 'chef', st: 'coins', price: 700 },
+        { id: 'h4', rar: 2, name: 'Casco vikingo', kind: 'viking', st: 'reward', req: 'Oro 1', how: 'rank' },
+        { id: 'h5', rar: 1, name: 'Gorro hélice', kind: 'prop', st: 'coins', price: 600 },
+        { id: 'h6', rar: 3, name: 'Corona', kind: 'crown', st: 'reward', req: 'Premium nv. 25', how: 'pass' },
+        { id: 'h7', rar: 1, name: 'Brote', kind: 'sprout', st: 'reward', req: '10 victorias', how: 'wins' },
+        { id: 'h8', rar: 1, name: 'Auriculares', kind: 'phones', st: 'coins', price: 800 },
+        { id: 'h10', rar: 2, name: 'Gorra Temporada', kind: 'cap', color: '#FF8A3D', st: 'reward', req: 'Premium nv. 1', how: 'pass' },
+        { id: 'h11', rar: 3, name: 'Cinta Dorada', kind: 'band', color: '#FFC53D', st: 'reward', req: 'Pase nv. 5', how: 'pass' }
       ],
       cara: [
         { id: 'f0', name: 'Ninguno', kind: 'none', st: 'owned' },
-        { id: 'f1', name: 'Gafas de sol', kind: 'sun', st: 'owned' },
-        { id: 'f2', name: 'Gafas redondas', kind: 'round', st: 'coins', price: 500 },
-        { id: 'f3', name: 'Gafas estrella', kind: 'star', st: 'coins', price: 650 },
-        { id: 'f4', name: 'Gafas 3D', kind: 'd3', st: 'reward', req: 'Plata 1', how: 'rank' },
-        { id: 'f5', name: 'Máscara de esquí', kind: 'ski', st: 'coins', price: 750 },
-        { id: 'f6', name: 'Bigote', kind: 'stache', st: 'reward', req: 'Premium nv. 4', how: 'pass' }
+        { id: 'f1', rar: 0, name: 'Gafas de sol', kind: 'sun', st: 'owned' },
+        { id: 'f2', rar: 1, name: 'Gafas redondas', kind: 'round', st: 'coins', price: 500 },
+        { id: 'f3', rar: 2, name: 'Gafas estrella', kind: 'star', st: 'coins', price: 650 },
+        { id: 'f4', rar: 1, name: 'Gafas 3D', kind: 'd3', st: 'reward', req: 'Plata 1', how: 'rank' },
+        { id: 'f5', rar: 1, name: 'Máscara de esquí', kind: 'ski', st: 'coins', price: 750 },
+        { id: 'f6', rar: 3, name: 'Bigote', kind: 'stache', st: 'reward', req: 'Premium nv. 4', how: 'pass' }
       ],
       calzado: [
-        { id: 's1', name: 'Volt', color: '#C8F031', st: 'owned' },
-        { id: 's2', name: 'Blanco', color: '#F2F5FA', st: 'owned' },
-        { id: 's3', name: 'Naranja', color: '#FF8A3D', st: 'coins', price: 900 },
-        { id: 's4', name: 'Carmesí', color: '#E5484D', st: 'reward', req: '10 victorias', how: 'wins' },
-        { id: 's5', name: 'Celeste', color: '#3EA6FF', st: 'coins', price: 700 },
-        { id: 's6', name: 'Oro', color: '#FFC53D', st: 'reward', req: 'Premium nv. 18', how: 'pass' },
-        { id: 's7', name: 'Galaxia', color: '#9B6BFF', st: 'reward', req: 'Premium nv. 9', how: 'pass' },
-        { id: 's8', name: 'Lava', color: '#FF5A1F', st: 'reward', req: 'Pase nv. 10', how: 'pass' }
+        { id: 's1', rar: 0, name: 'Volt', color: '#C8F031', st: 'owned' },
+        { id: 's2', rar: 0, name: 'Blanco', color: '#F2F5FA', st: 'owned' },
+        { id: 's3', rar: 1, name: 'Naranja', color: '#FF8A3D', st: 'coins', price: 900 },
+        { id: 's4', rar: 2, name: 'Carmesí', color: '#E5484D', st: 'reward', req: '10 victorias', how: 'wins' },
+        { id: 's5', rar: 1, name: 'Celeste', color: '#3EA6FF', st: 'coins', price: 700 },
+        { id: 's6', rar: 3, name: 'Oro', color: '#FFC53D', st: 'reward', req: 'Premium nv. 18', how: 'pass' },
+        { id: 's7', rar: 3, name: 'Galaxia', color: '#9B6BFF', st: 'reward', req: 'Premium nv. 9', how: 'pass' },
+        { id: 's8', rar: 2, name: 'Lava', color: '#FF5A1F', st: 'reward', req: 'Pase nv. 10', how: 'pass' }
       ]
     };
   }
@@ -613,6 +620,8 @@ class Component extends DCLogic {
       return {
         name: it.name, label, color: it.color || '#2F4BA8', k,
         isKit: s.cat === 'equipos', is3d: s.cat !== 'equipos',
+        hasRar: it.rar != null, rar: it.rar != null ? Taq_RAR[it.rar][0] : '', rarCls: it.rar === 3 ? 'tq-rar tq-leg' : 'tq-rar',
+        rarStyle: it.rar != null ? 'background: ' + Taq_RAR[it.rar][1] + '; color: ' + Taq_RAR[it.rar][2] + ';' : '',
         thumb: s.cat !== 'equipos' && window.AMGear ? window.AMGear.thumb(s.cat, it) : '',
         crest: it.crest || '',
         crestStyle: s.cat === 'equipos' ? 'position: absolute; left: 24%; top: 26%; width: 14px; height: 14px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.6); ' + ({ shield: 'border-radius: 2px 2px 7px 7px;', circle: 'border-radius: 50%;', diamond: 'clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);' })[it.crestShape] + ' background: ' + it.secondary + '; color: ' + it.primary + '; font: 800 6px Exo2, sans-serif; display: flex; align-items: center; justify-content: center; letter-spacing: -.3px;' : '',
@@ -624,13 +633,14 @@ class Component extends DCLogic {
         jerseyStyle: s.cat === 'equipos' ? 'position: relative; display: block; width: 64px; height: 58px; overflow: hidden; background: ' + this.jerseyBg(it.primary, it.secondary, it.pattern) + '; clip-path: polygon(32% 0, 68% 0, 100% 18%, 88% 42%, 78% 36%, 78% 100%, 22% 100%, 22% 36%, 12% 42%, 0 18%); filter: drop-shadow(0 2px 0 #00000055);' : '',
         isCoins: !own && it.st === 'coins', isOn: equipped, isLocked: !own, lockC: it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D',
         isReward: !own && it.st === 'reward',
-        style: (() => { const rc = equipped ? '#22D3EE' : own ? '#8A93C8' : it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D'; return 'position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 110px; margin-top: 8px; padding: 8px 3px 5px 3px; box-sizing: border-box; border-radius: 12px; font-family: Exo2, sans-serif; cursor: pointer; min-width: 0; background: radial-gradient(90% 60% at 50% 25%, ' + rc + '55, transparent 75%), linear-gradient(180deg, #5B2BB0, #2E1270 70%); border: ' + (sel ? '2px solid ' + rc : '1px solid ' + rc + '55') + '; border-top: 3px solid ' + rc + '; box-shadow: ' + (sel ? '0 0 14px ' + rc + '88, 0 6px 12px #0008' : '0 6px 12px #0006') + ';'; })(),
+        style: (() => { const rc = it.rar != null ? Taq_RAR[it.rar][1] : equipped ? '#22D3EE' : own ? '#8A93C8' : it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D'; return 'position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 110px; margin-top: 8px; padding: 8px 3px 5px 3px; box-sizing: border-box; border-radius: 12px; font-family: Exo2, sans-serif; cursor: pointer; min-width: 0; background: radial-gradient(90% 60% at 50% 25%, ' + rc + '55, transparent 75%), linear-gradient(180deg, #5B2BB0, #2E1270 70%); border: ' + (sel ? '2px solid ' + rc : '1px solid ' + rc + '55') + '; border-top: 3px solid ' + rc + '; box-shadow: ' + (sel ? '0 0 14px ' + rc + '88, 0 6px 12px #0008' : '0 6px 12px #0006') + ';'; })(),
         labelStyle: 'display: flex; align-items: center; gap: 3px; max-width: 100%; white-space: nowrap; overflow: hidden; font-size: 10.5px; font-weight: 800; color: ' + color + ';',
         pick: () => this.setState({ preview: { cat: s.cat, id: it.id } })
       };
     });
 
     const selItem = findItem(s.cat, selId);
+
     const selOwned = owned(selItem);
     const selEquipped = eq[s.cat] === selItem.id;
     const canAfford = selItem.st === 'coins' && s.coins >= selItem.price;
@@ -702,7 +712,7 @@ class Component extends DCLogic {
       hatColor: headItem.color || '#22D3EE',
       face: faceMap[faceItem.kind] || 'none',
       isPreviewing: !!s.preview && s.preview.id !== eq[s.preview.cat],
-      selName: selItem.name,
+      selName: selItem.name, selRar: selItem.rar != null ? Taq_RAR[selItem.rar][0] : '', hasSelRar: selItem.rar != null, selRarStyle: selItem.rar != null ? 'margin-left: 6px; padding: 1px 7px; border-radius: 8px; font-size: 9.5px; font-weight: 800; letter-spacing: 1px; vertical-align: 2px; background: ' + Taq_RAR[selItem.rar][1] + '; color: ' + Taq_RAR[selItem.rar][2] + ';' : '',
       selHint,
       selPrice: selItem.st === 'coins' ? this.fmt(selItem.price) + ' VCD' : '',
       showEquipped: selEquipped,
