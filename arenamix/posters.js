@@ -221,6 +221,31 @@
       add(ball(0.15, 1.3));
       add(player({ char: you ? me : 'ty', kit: homeKit(), you: true, x: 0.9, z: 1.9, face: Math.PI - 0.35, t: 0.4 }));
       look = { pos: [0.6, 2.4, 9.4], at: [-0.1, 1.0, -0.8] };
+    } else if (kind === 'shirt') {
+      // a shirt on its own, in 3D: the game's real kit painted in the team's colours, laid out with the arms open
+      var kit = JSON.parse(key.slice(6));
+      var m = A && A.ready() ? A.make({ char: 'dani', kit: { primary: kit.primary, secondary: kit.secondary, pattern: kit.pattern, shorts: kit.primary, socks: kit.primary, shoe: '#F2F5FA' }, noRing: true, noGear: true, fit: { sleeve: 'short', size: 'M' } }) : null;
+      if (m) {
+        m.traverse(function (o) { if (o.isMesh && !/Shirt/i.test(o.name)) o.visible = false; });
+        S.add(m); m.updateMatrixWorld(true);
+        var bx = new T.Box3(); m.traverse(function (o) { if (o.isMesh && o.visible) bx.expandByObject(o); });
+        var cn = bx.getCenter(new T.Vector3()), sz = bx.getSize(new T.Vector3());
+        // the crest on the left of the chest
+        var cc = document.createElement('canvas'); cc.width = cc.height = 64;
+        var cx = cc.getContext('2d'); cx.fillStyle = kit.secondary || '#150925'; cx.strokeStyle = '#FFFFFF'; cx.lineWidth = 4;
+        cx.beginPath();
+        if (kit.crestShape === 'circle') cx.arc(32, 32, 26, 0, Math.PI * 2);
+        else if (kit.crestShape === 'diamond') { cx.moveTo(32, 4); cx.lineTo(60, 32); cx.lineTo(32, 60); cx.lineTo(4, 32); cx.closePath(); }
+        else { cx.moveTo(8, 6); cx.lineTo(56, 6); cx.lineTo(56, 30); cx.quadraticCurveTo(54, 50, 32, 60); cx.quadraticCurveTo(10, 50, 8, 30); cx.closePath(); }
+        cx.fill(); cx.stroke();
+        cx.fillStyle = kit.primary || '#FFFFFF'; cx.font = '800 22px Arial'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText((kit.crest || '').slice(0, 2), 32, 33);
+        var ct = new T.CanvasTexture(cc); ct.encoding = T.sRGBEncoding;
+        var crest = new T.Mesh(new T.PlaneGeometry(0.105, 0.105), new T.MeshStandardMaterial({ map: ct, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -2 }));
+        crest.position.set(0.1, cn.y + sz.y * 0.2, 0.165); S.add(crest);
+        // (the box is the bind pose, arms out: frame on the torso's height, centred on the body)
+        cn.x = 0; var d = (sz.y / 2) / 0.6 / Math.tan(16 * Math.PI / 180);
+        look = { pos: [cn.x + d * 0.18, cn.y + d * 0.06, cn.z + d], at: [cn.x, cn.y, cn.z] };
+      }
     } else if (kind === 'tut') {
       add(patch(3.2));
       add(cone(-1.5, -0.6)); add(cone(1.5, -0.6));

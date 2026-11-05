@@ -36,6 +36,7 @@ input::placeholder{color:#8686A6}
 
 /* the shirts on the rail: bigger, with folds and light, a collar, cuffs, a number and their colour glowing behind */
 .tq-jw{position:relative;display:block;width:64px;height:58px;margin:-2px 0 -1px}
+.tq-jw:has(.tq-shirt3d) .tq-collar{display:none}
 .tq-jw::before{content:"";position:absolute;left:50%;top:50%;width:70px;height:70px;margin:-35px 0 0 -35px;border-radius:50%;background:radial-gradient(closest-side,var(--jc),transparent);opacity:.75;pointer-events:none}
 .tq-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.28),transparent 22%,rgba(255,255,255,.22) 42%,transparent 58%,rgba(0,0,0,.18) 80%,rgba(0,0,0,.35)),linear-gradient(180deg,rgba(255,255,255,.18),transparent 30%,transparent 80%,rgba(0,0,0,.25));pointer-events:none}
 .tq-cuff{position:absolute;top:30%;width:15%;height:7%;transform-origin:50% 50%}
@@ -51,6 +52,7 @@ input::placeholder{color:#8686A6}
 .tq-rar{position:absolute;left:4px;top:4px;z-index:2;padding:1px 5px;border-radius:6px;font:800 7.5px Exo2,sans-serif;letter-spacing:.6px;box-shadow:0 1px 3px #0008}
 .tq-leg{background:linear-gradient(110deg,#FBBF24,#FFF3B0 45%,#F59E0B 60%,#FBBF24)!important;background-size:250% 100%!important;animation:tqLeg 2.2s linear infinite}
 @keyframes tqLeg{from{background-position:120% 0}to{background-position:-130% 0}}
+.tq-shirt3d{position:absolute;left:-14px;top:-18px;width:92px;height:96px;object-fit:contain;filter:drop-shadow(0 4px 5px #000a);pointer-events:none}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #251358 0%, #150925 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -148,7 +150,7 @@ input::placeholder{color:#8686A6}
           <sc-if value="{{it.hasRar}}" hint-placeholder-val="{{ false }}"><span class="{{it.rarCls}}" style="{{it.rarStyle}}">{{it.rar}}</span></sc-if>
           <svg width="26" height="12" viewBox="0 0 26 12" style="position: absolute; top: -9px; left: 50%; margin-left: -13px"><path d="M13 10V5a2.5 2.5 0 1 1 2.5-2.5M2 11L13 6l11 5" fill="none" stroke="#A3A3C2" stroke-width="1.6" stroke-linecap="round"/></svg>
           <sc-if value="{{it.isKit}}" hint-placeholder-val="{{ true }}">
-            <span class="tq-jw" style="{{it.jwStyle}}"><span style="{{it.jerseyStyle}}"><i class="tq-shade"></i><i class="tq-cuff l" style="{{it.cuffStyle}}"></i><i class="tq-cuff r" style="{{it.cuffStyle}}"></i><b class="tq-num" style="{{it.numStyle}}">10</b><span style="{{it.crestStyle}}">{{it.crest}}</span></span><i class="tq-collar" style="{{it.collarStyle}}"></i></span>
+            <span class="tq-jw" style="{{it.jwStyle}}"><sc-if value="{{it.has3dShirt}}" hint-placeholder-val="{{ false }}"><img class="tq-shirt3d" src="{{it.shirtImg}}" alt="" draggable="false"></sc-if><span style="{{it.jerseyStyle}}"><i class="tq-shade"></i><i class="tq-cuff l" style="{{it.cuffStyle}}"></i><i class="tq-cuff r" style="{{it.cuffStyle}}"></i><b class="tq-num" style="{{it.numStyle}}">10</b><span style="{{it.crestStyle}}">{{it.crest}}</span></span><i class="tq-collar" style="{{it.collarStyle}}"></i></span>
           </sc-if>
           <sc-if value="{{it.is3d}}" hint-placeholder-val="{{ false }}">
             <span class="tq-aw" style="{{it.awStyle}}"><img src="{{it.thumb}}" alt="" draggable="false" class="tq-3d" style="position: relative; display: block; width: 64px; height: 64px; object-fit: contain; filter: drop-shadow(0 4px 5px #000a); pointer-events: none"></span>
@@ -504,6 +506,12 @@ class Component extends DCLogic {
       ]
     };
   }
+  // the shirt drawn in 3D (posters.js renders one at a time; until it is ready the flat one shows)
+  shirtPic(it) {
+    const P = window.AMPosters; if (!P) return '';
+    const key = 'shirt:' + JSON.stringify({ primary: it.primary, secondary: it.secondary, pattern: it.pattern, crest: it.crest || '', crestShape: it.crestShape || 'shield' });
+    return P.get(key, () => { clearTimeout(this.spT); this.spT = setTimeout(() => this.forceUpdate(), 60); }) || '';
+  }
   initials(n) {
     return n.split(' ').filter((w) => w.length > 2 || /^[A-ZÁÉÍÓÚ]/.test(w)).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
   }
@@ -626,11 +634,12 @@ class Component extends DCLogic {
         crest: it.crest || '',
         crestStyle: s.cat === 'equipos' ? 'position: absolute; left: 24%; top: 26%; width: 14px; height: 14px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.6); ' + ({ shield: 'border-radius: 2px 2px 7px 7px;', circle: 'border-radius: 50%;', diamond: 'clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);' })[it.crestShape] + ' background: ' + it.secondary + '; color: ' + it.primary + '; font: 800 6px Exo2, sans-serif; display: flex; align-items: center; justify-content: center; letter-spacing: -.3px;' : '',
         awStyle: '--ac: ' + (it.color || ({ cabeza: '#F472B6', cara: '#FACC15', calzado: '#4ADE80' })[s.cat] || '#A855F7') + 'AA;',
+        shirtImg: s.cat === 'equipos' ? this.shirtPic(it) : '', has3dShirt: s.cat === 'equipos' && !!this.shirtPic(it),
         jwStyle: '--jc: ' + (it.primary || '#7C3AED') + ';',
         cuffStyle: 'background: ' + (it.secondary || '#150925') + ';',
         numStyle: 'color: ' + (it.secondary || '#150925') + ';',
         collarStyle: 'background: ' + (it.secondary || '#150925') + '; box-shadow: inset 0 -3px 0 ' + (it.primary || '#fff') + ';',
-        jerseyStyle: s.cat === 'equipos' ? 'position: relative; display: block; width: 64px; height: 58px; overflow: hidden; background: ' + this.jerseyBg(it.primary, it.secondary, it.pattern) + '; clip-path: polygon(32% 0, 68% 0, 100% 18%, 88% 42%, 78% 36%, 78% 100%, 22% 100%, 22% 36%, 12% 42%, 0 18%); filter: drop-shadow(0 2px 0 #00000055);' : '',
+        jerseyStyle: s.cat === 'equipos' ? 'position: relative; display: ' + (this.shirtPic(it) ? 'none' : 'block') + '; width: 64px; height: 58px; overflow: hidden; background: ' + this.jerseyBg(it.primary, it.secondary, it.pattern) + '; clip-path: polygon(32% 0, 68% 0, 100% 18%, 88% 42%, 78% 36%, 78% 100%, 22% 100%, 22% 36%, 12% 42%, 0 18%); filter: drop-shadow(0 2px 0 #00000055);' : '',
         isCoins: !own && it.st === 'coins', isOn: equipped, isLocked: !own, lockC: it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D',
         isReward: !own && it.st === 'reward',
         style: (() => { const rc = it.rar != null ? Taq_RAR[it.rar][1] : equipped ? '#22D3EE' : own ? '#8A93C8' : it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D'; return 'position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 110px; margin-top: 8px; padding: 8px 3px 5px 3px; box-sizing: border-box; border-radius: 12px; font-family: Exo2, sans-serif; cursor: pointer; min-width: 0; background: ' + (it.rar != null ? 'radial-gradient(90% 60% at 50% 28%, ' + rc + 'CC, transparent 75%), radial-gradient(80% 50% at 50% 100%, ' + rc + '66, transparent 70%), linear-gradient(180deg, color-mix(in srgb, ' + rc + ' 62%, #2A1070), color-mix(in srgb, ' + rc + ' 30%, #1A0B40) 75%)' : 'radial-gradient(90% 60% at 50% 25%, ' + rc + '55, transparent 75%), linear-gradient(180deg, #5B2BB0, #2E1270 70%)') + '; border: ' + (sel ? '2px solid ' + rc : '1px solid ' + rc + '55') + '; border-top: 3px solid ' + rc + '; box-shadow: ' + (sel ? '0 0 14px ' + rc + '88, 0 6px 12px #0008' : '0 6px 12px #0006') + ';'; })(),
