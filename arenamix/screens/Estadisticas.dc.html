@@ -162,19 +162,19 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 
   <!-- top bar: sport, points, help and reset -->
   <div style="position: absolute; left: 318px; right: 12px; top: 10px; display: flex; align-items: center; gap: 10px">
-    <div role="tablist" aria-label="Deporte" style="position: relative; display: flex; width: 130px; height: 40px; background: #251443CC; box-shadow: inset 0 0 0 1px #2E2E52; padding: 3px; box-sizing: border-box; transform: skewX(0deg)">
+    <div role="tablist" aria-label="Deporte" style="position: relative; display: flex; width: 130px; height: 40px; background: linear-gradient(135deg, #0EA5E9, #7C3AED); box-shadow: inset 0 0 0 1px #A5F3FC; padding: 3px; box-sizing: border-box; transform: skewX(0deg)">
       <span style="{{thumb}}"></span>
       <sc-for list="{{sports}}" as="sp" hint-placeholder-count="2">
         <button type="button" role="tab" aria-selected="{{sp.sel}}" onClick="{{sp.pick}}" style="{{sp.style}}"><span style="display: flex; align-items: center; gap: 6px; transform: skewX(0deg)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{sp.path}}"/></svg>{{sp.label}}</span></button>
       </sc-for>
     </div>
-    <span class="{{pmClass}} bc-para" style="display: flex; align-items: center; gap: 7px; height: 38px; padding: 0 16px; background: linear-gradient(135deg, #1A316E, #1E0F43); box-shadow: inset 0 0 0 1px #22D3EE; font-weight: 800; font-size: 14px">
+    <span class="{{pmClass}} bc-para" style="display: flex; align-items: center; gap: 7px; height: 38px; padding: 0 16px; background: linear-gradient(135deg, #2563EB, #7C3AED 55%, #DB2777); box-shadow: inset 0 0 0 1px #F0ABFC, 0 0 14px #7C3AED88; font-weight: 800; font-size: 14px">
       <span style="width: 22px; height: 22px; border-radius: 11px; background: radial-gradient(circle at 35% 30%, #7EF0FF, #22D3EE 60%, #0E8FA3); display: flex; align-items: center; justify-content: center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#150925" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7l7 7"/></svg></span>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 24px; line-height: 1">{{pmLabel}}</span><span style="font-size: 11px; color: #7EF0FF; letter-spacing: 1px">PM</span>
     </span>
     <span style="flex: 1"></span>
-    <button type="button" aria-label="Cómo conseguir PM" aria-expanded="{{helpOpen}}" onClick="{{toggleHelp}}" class="bc-para" style="width: 40px; height: 36px; border: 0; background: #251443CC; box-shadow: inset 0 0 0 1px #2E2E52; color: #F4F4FA; font: 800 16px Exo2, sans-serif; cursor: pointer">?</button>
-    <button type="button" onClick="{{reset}}" aria-label="Restablecer puntos" class="bc-para" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border: 0; background: #251443CC; box-shadow: inset 0 0 0 1px #2E2E52; color: #CACAE0; font: 800 12px Exo2, sans-serif; cursor: pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg>Reiniciar</button>
+    <button type="button" aria-label="Cómo conseguir PM" aria-expanded="{{helpOpen}}" onClick="{{toggleHelp}}" class="bc-para" style="width: 40px; height: 36px; border: 0; background: linear-gradient(135deg, #F59E0B, #EC4899); box-shadow: inset 0 0 0 1px #FDE68A; color: #F4F4FA; font: 800 16px Exo2, sans-serif; cursor: pointer">?</button>
+    <button type="button" onClick="{{reset}}" aria-label="Restablecer puntos" class="bc-para" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border: 0; background: linear-gradient(135deg, #7C3AED, #4338CA); box-shadow: inset 0 0 0 1px #C4B5FD; color: #CACAE0; font: 800 12px Exo2, sans-serif; cursor: pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg>Reiniciar</button>
   </div>
 
   <!-- radar -->
@@ -184,15 +184,15 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <div class="st-sweep" style="background: conic-gradient(from 0deg, {{tierColor}}66, {{tierColor}}00 70deg, transparent 360deg)"></div>
       <svg width="212" height="228" viewBox="-110 -118 220 236" role="img" aria-label="{{radarAria}}" style="overflow: visible">
         <defs>
-          <radialGradient id="st-rad" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="{{tierColor}}" stop-opacity=".85"/><stop offset="1" stop-color="#7C5CFF" stop-opacity=".35"/></radialGradient>
-          <radialGradient id="st-bgr" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#2E1A60"/><stop offset="1" stop-color="#1C0E38"/></radialGradient>
+          <radialGradient id="st-rad" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#22D3EE" stop-opacity=".9"/><stop offset=".6" stop-color="#EC4899" stop-opacity=".6"/><stop offset="1" stop-color="#FACC15" stop-opacity=".5"/></radialGradient>
+          <radialGradient id="st-bgr" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#5B21B6"/><stop offset="1" stop-color="#2E1065"/></radialGradient>
         </defs>
         <circle r="104" fill="none" stroke="{{tierColor}}" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="3 7" class="st-orbit"/>
-        <polygon points="{{grid3}}" fill="url(#st-bgr)" stroke="#34345E" stroke-width="1.5"/>
+        <polygon points="{{grid3}}" fill="url(#st-bgr)" stroke="#C4B5FD" stroke-opacity=".6" stroke-width="1.5"/>
         <polygon points="{{grid2}}" fill="none" stroke="#2A2A50" stroke-width="1"/>
         <polygon points="{{grid1}}" fill="none" stroke="#2A2A50" stroke-width="1"/>
-        <sc-for list="{{axes}}" as="x" hint-placeholder-count="6"><line x1="0" y1="0" x2="{{x.x}}" y2="{{x.y}}" stroke="#2A2A50" stroke-width="1"/><g transform="translate({{x.lx}} {{x.ly}})"><rect x="-25" y="-10" width="50" height="20" rx="3" fill="#150925" stroke="{{x.c}}" stroke-opacity=".7"/><text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="13" fill="#E6E6F4">{{x.k}}</text></g></sc-for>
-        <polygon points="{{radar}}" fill="url(#st-rad)" stroke="{{tierColor}}" stroke-width="2.5" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px {{tierColor}})"/>
+        <sc-for list="{{axes}}" as="x" hint-placeholder-count="6"><line x1="0" y1="0" x2="{{x.x}}" y2="{{x.y}}" stroke="{{x.c}}" stroke-opacity=".6" stroke-width="1.5"/><g transform="translate({{x.lx}} {{x.ly}})"><rect x="-25" y="-10" width="50" height="20" rx="3" fill="{{x.c}}" stroke="#FFFFFF" stroke-opacity=".8"/><text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="13" fill="#150925">{{x.k}}</text></g></sc-for>
+        <polygon points="{{radar}}" fill="url(#st-rad)" stroke="#FFFFFF" stroke-width="2.5" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px {{tierColor}})"/>
         <sc-for list="{{dots}}" as="d" hint-placeholder-count="6"><circle class="st-dotp" cx="{{d.x}}" cy="{{d.y}}" r="4.5" fill="#FFC53D" stroke="#150925" stroke-width="1.5" style="{{d.delay}}"/></sc-for>
       </svg>
       <!-- the rating in a hexagon at the centre -->
@@ -201,8 +201,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <span style="position: relative; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 28px; color: {{cardInk}}">{{overall}}</span>
       </div>
     </div>
-    <div class="bc-para" style="display: flex; align-items: center; gap: 10px; padding: 5px 16px; background: #150925CC; box-shadow: inset 0 0 0 1px {{tierColor}}66">
-      <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">MEDIA {{sportUpper}}</span>
+    <div class="bc-para" style="display: flex; align-items: center; gap: 10px; padding: 5px 16px; background: linear-gradient(135deg, #4C1D95, #9D174D); box-shadow: inset 0 0 0 1px #F0ABFC, 0 0 14px #9D174D88">
+      <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 1.5px; color: #FDE7F3">MEDIA {{sportUpper}}</span>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; line-height: 1; color: {{tierColor}}; text-shadow: 0 0 14px {{tierColor}}88">{{overall}}<span style="font-size: 14px; color: #8686A6"> / 150</span></span>
     </div>
     <div style="width: 180px; margin-top: 8px; display: flex; flex-direction: column; gap: 3px">
@@ -223,7 +223,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
             <span class="{{r.bumpClass}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 21px; line-height: 1; color: {{r.color}}; text-shadow: 0 0 10px {{r.color}}66">{{r.value}}</span>
           </div>
           <div style="display: flex; gap: 2px; height: 7px; transform: skewX(0deg)"><sc-for list="{{r.segs}}" as="g" hint-placeholder-count="15"><span style="{{g.style}}"></span></sc-for></div>
-          <span style="font-size: 10px; color: #A3A3C2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.effect}}</span>
+          <span style="font-size: 10px; color: #F3E8FF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.effect}}</span>
         </div>
         <button type="button" onClick="{{r.up}}" aria-label="{{r.aria}}" class="{{r.btnCls}}" style="{{r.btn}}">
           <span style="display: flex; flex-direction: column; align-items: center; transform: skewX(0deg)"><span style="font-size: 20px; line-height: .9; font-weight: 800">{{r.plus}}</span><span style="font-size: 9px; font-weight: 800">{{r.cost}}</span></span>
@@ -340,16 +340,17 @@ class Component extends DCLogic {
     const put = (next, flash) => { const data = { ...this.state.data, [sp]: next }; this.save(data); this.setState({ data, flash }); };
     const rows = def.stats.map((d, i) => {
       const v = stats[d.id], c = this.cost(v), max = v >= 150, can = !max && pm >= c, sv = shown(d.id);
-      const col = this.tierOf(v)[2];
+      // every stat its own colour
+      const col = { vel: '#FACC15', pot: '#F97316', pre: '#22D3EE', con: '#4ADE80', res: '#F43F5E', ref: '#A855F7' }[d.id] || this.tierOf(v)[2];
       const segs = [];
       for (let k = 0; k < 15; k++) {
         const fill = Math.max(0, Math.min(1, (sv - k * 10) / 10));
-        segs.push({ style: 'flex: 1; border-radius: 2px; background: ' + (fill > 0 ? 'linear-gradient(90deg, ' + col + ' ' + (fill * 100).toFixed(0) + '%, #39206E ' + (fill * 100).toFixed(0) + '%)' : '#39206E') + ';' + (fill > 0 ? ' box-shadow: 0 0 6px ' + col + '55;' : '') });
+        segs.push({ style: 'flex: 1; border-radius: 2px; background: ' + (fill > 0 ? 'linear-gradient(90deg, ' + col + ' ' + (fill * 100).toFixed(0) + '%, #FFFFFF22 ' + (fill * 100).toFixed(0) + '%)' : '#FFFFFF22') + ';' + (fill > 0 ? ' box-shadow: 0 0 6px ' + col + '55;' : '') });
       }
       return {
-        rowStyle: 'position: relative; flex: 1; min-height: 0; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 12px; clip-path: inset(0 round 12px); background: linear-gradient(90deg, ' + col + '1f, #221245EE 38%, #1D0E3BEE); box-shadow: inset 3px 0 0 ' + col + '; animation-delay: ' + (0.08 + i * 0.06).toFixed(2) + 's; --dx: ' + (this.dir || 1) * 50 + 'px;',
+        rowStyle: 'position: relative; flex: 1; min-height: 0; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 12px; clip-path: inset(0 round 12px); background: radial-gradient(60% 120% at 0% 50%, ' + col + '88, transparent 70%), linear-gradient(90deg, color-mix(in srgb, ' + col + ' 45%, #3B1A8A), color-mix(in srgb, ' + col + ' 20%, #24105A) 55%, #2A1266EE); box-shadow: inset 4px 0 0 ' + col + ', inset 0 0 0 1px color-mix(in srgb, ' + col + ' 55%, transparent), inset 0 1px 0 #ffffff33; animation-delay: ' + (0.08 + i * 0.06).toFixed(2) + 's; --dx: ' + (this.dir || 1) * 50 + 'px;',
         name: d.name, value: String(Math.round(sv)), effect: d.effect(v), color: col, segs, path: Est_ICON[d.icon],
-        iconBox: 'flex: none; width: 28px; height: 28px; margin: 0 2px; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; color: ' + col + '; background: ' + col + '22; box-shadow: inset 0 0 0 1.5px ' + col + '88, 0 0 10px ' + col + '33;',
+        iconBox: 'flex: none; width: 28px; height: 28px; margin: 0 2px; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; color: #FFFFFF; background: linear-gradient(135deg, ' + col + ', color-mix(in srgb, ' + col + ' 55%, #000)); box-shadow: inset 0 0 0 1.5px #ffffff88, 0 0 12px ' + col + 'AA;',
         plus: max ? '★' : '+', cost: max ? 'MÁX' : c + ' PM', isMax: max, btnCls: can ? 'st-can' : '',
         aria: max ? d.name + ' al máximo' : 'Mejorar ' + d.name + ' por ' + c + ' PM',
         flash: !!(this.state.flash && this.state.flash.id === d.id), bumpClass: this.state.flash && this.state.flash.id === d.id ? 'st-bump' : '',
@@ -458,7 +459,7 @@ class Component extends DCLogic {
       mini: def.stats.map((d) => ({ k: d.k, v: String(Math.round(shown(d.id))), bar: 'display: block; height: 100%; border-radius: 2px; background: ' + ink + '; width: ' + Math.max(4, (shown(d.id) - 10) / 140 * 100).toFixed(0) + '%' })),
       kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#150925', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#251443', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE',
       grid1: ring(1 / 3), grid2: ring(2 / 3), grid3: ring(1),
-      axes: def.stats.map((d, k) => ({ x: (Math.cos(ang(k)) * R).toFixed(1), y: (Math.sin(ang(k)) * R).toFixed(1), lx: (Math.cos(ang(k)) * (R + 22)).toFixed(1), ly: (Math.sin(ang(k)) * (R + 18)).toFixed(1), k: d.k + ' ' + Math.round(shown(d.id)), c: this.tierOf(stats[d.id])[2] })),
+      axes: def.stats.map((d, k) => ({ x: (Math.cos(ang(k)) * R).toFixed(1), y: (Math.sin(ang(k)) * R).toFixed(1), lx: (Math.cos(ang(k)) * (R + 22)).toFixed(1), ly: (Math.sin(ang(k)) * (R + 18)).toFixed(1), k: d.k + ' ' + Math.round(shown(d.id)), c: { vel: '#FACC15', pot: '#F97316', pre: '#22D3EE', con: '#4ADE80', res: '#F43F5E', ref: '#A855F7' }[d.id] || this.tierOf(stats[d.id])[2] })),
       radar: pts.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '),
       dots: pts.map((p, k) => ({ x: p[0].toFixed(1), y: p[1].toFixed(1), delay: 'animation-delay: ' + (-k * 0.3).toFixed(1) + 's' })),
       radarAria: 'Estadísticas: ' + def.stats.map((d) => d.name + ' ' + stats[d.id]).join(', '),
