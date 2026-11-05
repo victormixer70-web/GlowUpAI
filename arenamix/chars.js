@@ -13,7 +13,7 @@
     { id: 'nico', name: 'Nico', file: 'assets/chars/nico.glb' },
     { id: 'dani', name: 'Dani', file: 'assets/chars/dani.glb' }
   ];
-  var KEY = 'arenamix.char.v1', HEIGHT = 1.86, NECK_H = 1.55;
+  var KEY = 'arenamix.char.v1', HEIGHT = 1.86, NECK_H = 1.55, HEAD_K = 0.78;
   var tpl = {}, loading = null, waiters = [], ANIM = null;
 
   function pref() {
@@ -169,6 +169,20 @@
     var w0 = torsoW('dani');
     LIST.forEach(function (c) { var t = tpl[c.id], w = torsoW(c.id); if (t && w0 && w) t.wx = Math.max(0.85, Math.min(1.15, w0 / w)); });
     LIST.forEach(function (c) { prepMuscle(c.id); });
+    // heads sat a little high on the athletic build: bring every head down onto the neck (the head bone's
+    // offset from the neck is shortened; the measured head boxes move with it, so hats and glasses still fit)
+    LIST.forEach(function (c) {
+      var t = tpl[c.id]; if (!t) return;
+      var hb = null; t.root.traverse(function (b) { if (b.isBone && b.name === 'mixamorigHead' && !hb) hb = b; });
+      if (!hb) return;
+      t.root.updateMatrixWorld(true);
+      var p0 = new T.Vector3().setFromMatrixPosition(hb.matrixWorld);
+      hb.position.multiplyScalar(HEAD_K);
+      t.root.updateMatrixWorld(true);
+      var d = new T.Vector3().setFromMatrixPosition(hb.matrixWorld).sub(p0);
+      ['skull', 'all', 'eyes'].forEach(function (k) { var b = t.head && t.head[k]; if (b && !b.isEmpty()) b.translate(d); });
+      if (t.head && t.head.front != null) t.head.front += d.z;
+    });
   }
   // width of the torso (hips to chest) at rest, in units of the neck height
   function torsoW(id) {
@@ -435,8 +449,8 @@
      x for the upper body (chest, shoulders, arms, neck), y for the legs and hips. The same push goes on skin
      and clothes alike, so the shirt still covers the chest it covers now. BUILD scales it per character. */
   var MUS = {
-    Spine2: [0.030, 0], Spine1: [0.015, 0], Spine: [0.006, 0], Neck: [0.016, 0],
-    LeftShoulder: [0.030, 0], RightShoulder: [0.030, 0], LeftArm: [0.028, 0], RightArm: [0.028, 0],
+    Spine2: [0.026, 0], Spine1: [0.015, 0], Spine: [0.006, 0], Neck: [0, 0],
+    LeftShoulder: [0.02, 0], RightShoulder: [0.02, 0], LeftArm: [0.028, 0], RightArm: [0.028, 0],
     LeftForeArm: [0.016, 0], RightForeArm: [0.016, 0],
     Hips: [0, 0.008], LeftUpLeg: [0, 0.014], RightUpLeg: [0, 0.014]
   };
