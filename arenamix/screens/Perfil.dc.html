@@ -108,7 +108,7 @@ class Component extends DCLogic {
       tile('EMPATES', r.drawn, null, '#94A3B8'), tile('% VICTORIAS', pct(r.won) + '%', '#22D3EE'), tile('MEJOR RACHA', r.best, '#FFC53D'),
       tile('GOLES MARCADOS', goals ? r.gf : '—', null, '#F97316'), tile('GOLES ENCAJADOS', goals ? r.ga : '—', null, '#E11D48'), tile('PORTERÍAS A CERO', goals ? r.clean : '—', null, '#A855F7')
     ];
-    const labels = { all: 'Todos', futbol: 'Fútbol', baloncesto: 'Basket' };
+    const labels = { all: 'Todos', futbol: 'Fútbol' };
     const keys = Object.keys(labels), ti = Math.max(0, keys.indexOf(s.sport));
     const tabs = keys.map((k) => ({ label: labels[k], sel: k === s.sport ? 'true' : 'false', pick: () => this.setState({ sport: k }), style: 'position: relative; z-index: 1; flex: 1; height: 34px; border: 0; border-radius: 12px; font: 800 13px Exo2, sans-serif; cursor: pointer; background: transparent; transition: color .3s; color: ' + (k === s.sport ? '#150925;' : '#FFFFFF;') }));
     const cl = this.claimed(), ready = this.achievements().filter((a) => a.cur >= a.goal && !cl[a.id]).length;
@@ -118,7 +118,7 @@ class Component extends DCLogic {
     const w = (a, c) => 'width: ' + pct(a) + '%; background: ' + c + ';';
     return {
       tiles, tabs, sportKey: s.sport,
-      thumb: 'position: absolute; top: 4px; bottom: 4px; left: calc(4px + ' + ti + ' * (100% - 8px) / 3); width: calc((100% - 8px) / 3); border-radius: 12px; background: linear-gradient(135deg, #FFFFFF, #7EF0FF 40%, #22D3EE); box-shadow: 0 0 14px #22D3EE; transition: left .4s cubic-bezier(.3,1.5,.5,1);', coins: this.fmt(this.coins()), bestRank: best,
+      thumb: 'position: absolute; top: 4px; bottom: 4px; left: calc(4px + ' + ti + ' * (100% - 8px) / 2); width: calc((100% - 8px) / 2); border-radius: 12px; background: linear-gradient(135deg, #FFFFFF, #7EF0FF 40%, #22D3EE); box-shadow: 0 0 14px #22D3EE; transition: left .4s cubic-bezier(.3,1.5,.5,1);', coins: this.fmt(this.coins()), bestRank: best,
       hasBadge: ready > 0, badge: String(ready),
       totalLabel: r.played + ' partidos',
       barW: w(r.won, '#53D88E'), barD: w(r.drawn, '#8C8CB0'), barL: w(r.lost, '#FF5C5C')
