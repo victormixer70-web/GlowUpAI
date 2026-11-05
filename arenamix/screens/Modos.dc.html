@@ -14,9 +14,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
 .md-card{position:absolute;left:50%;top:10px;width:170px;height:244px;margin-left:-85px;padding:0;border:0;background:none;cursor:pointer;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.25,1.2,.4,1),opacity .35s,filter .35s;-webkit-tap-highlight-color:transparent}
 .md-bg{position:absolute;left:80px;right:0;top:0;bottom:0;z-index:0;pointer-events:none;overflow:hidden;contain:layout paint}
-.md-stands{position:absolute;left:-40px;right:-40px;top:58px;height:170px;border-radius:50% 50% 0 0/30% 30% 0 0;background:radial-gradient(circle,color-mix(in srgb,var(--c) 50%,transparent) 1.1px,transparent 1.7px) 4px 3px/13px 11px,radial-gradient(circle,#FFFFFF22 1.1px,transparent 1.7px) 0 0/9px 8px,repeating-linear-gradient(180deg,transparent 0 20px,#00000055 20px 23px),linear-gradient(180deg,#1E1E36,#0E0E1C 75%);-webkit-mask-image:linear-gradient(180deg,#000 45%,transparent);mask-image:linear-gradient(180deg,#000 45%,transparent);opacity:.6}
-.md-roof{position:absolute;left:-40px;right:-40px;top:44px;height:30px;border-radius:50% 50% 0 0/100% 100% 0 0;background:#07070F;box-shadow:0 3px 0 color-mix(in srgb,var(--c) 45%,transparent),0 8px 26px color-mix(in srgb,var(--c) 22%,transparent)}
-.md-tower{position:absolute;top:58px;width:46px;height:20px;border-radius:3px;background:radial-gradient(circle,#FFFFFF 2px,#FFF6C8aa 3px,transparent 4px) 0 0/11.5px 10px,#1A1A2A;box-shadow:0 0 26px 6px #FFF6C844}
+.md-stands{position:absolute;left:-40px;right:-40px;top:58px;height:170px;border-radius:50% 50% 0 0/30% 30% 0 0;background:radial-gradient(circle,color-mix(in srgb,var(--c) 50%,transparent) 1.1px,transparent 1.7px) 4px 3px/13px 11px,radial-gradient(circle,#FFFFFF22 1.1px,transparent 1.7px) 0 0/9px 8px,repeating-linear-gradient(180deg,transparent 0 20px,#00000055 20px 23px),linear-gradient(180deg,#2E1A53,#190C30 75%);-webkit-mask-image:linear-gradient(180deg,#000 45%,transparent);mask-image:linear-gradient(180deg,#000 45%,transparent);opacity:.6}
+.md-roof{position:absolute;left:-40px;right:-40px;top:44px;height:30px;border-radius:50% 50% 0 0/100% 100% 0 0;background:#0F061E;box-shadow:0 3px 0 color-mix(in srgb,var(--c) 45%,transparent),0 8px 26px color-mix(in srgb,var(--c) 22%,transparent)}
+.md-tower{position:absolute;top:58px;width:46px;height:20px;border-radius:3px;background:radial-gradient(circle,#FFFFFF 2px,#FFF6C8aa 3px,transparent 4px) 0 0/11.5px 10px,#291643;box-shadow:0 0 26px 6px #FFF6C844}
 .md-word{position:absolute;left:0;top:118px;white-space:nowrap;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-style:italic;font-size:120px;line-height:1;color:transparent;-webkit-text-stroke:1.5px color-mix(in srgb,var(--c) 26%,transparent);will-change:transform;animation:mdWord 26s linear infinite}
 @keyframes mdWord{to{transform:translateX(-50%)}}
 .md-pitchw{position:absolute;left:0;right:0;bottom:0;height:250px;overflow:hidden;-webkit-mask-image:linear-gradient(0deg,#000 15%,transparent 62%);mask-image:linear-gradient(0deg,#000 15%,transparent 62%)}
@@ -37,8 +37,8 @@ input::placeholder{color:#8686A6}
 .md-sweep{position:absolute;inset:0;border-radius:18px;overflow:hidden;pointer-events:none}
 .md-sweep::after{content:"";position:absolute;top:-20%;bottom:-20%;left:-70%;width:45%;background:linear-gradient(100deg,transparent,#FFFFFF30,transparent);transform:skewX(-14deg);animation:mdSweep 4.5s ease-in-out infinite}
 @keyframes mdSweep{0%,65%{left:-70%}100%{left:140%}}
-.md-rib{position:absolute;top:14px;right:-30px;width:110px;padding:3px 0;transform:rotate(40deg);text-align:center;font:800 9px Exo2,sans-serif;letter-spacing:1px;color:#0B0B14;box-shadow:0 2px 6px #0008}
-.md-arrow{position:absolute;top:110px;width:38px;height:38px;border-radius:50%;border:0;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;background:#0B0B14CC;box-shadow:inset 0 0 0 2px var(--ac),0 0 14px var(--ac);color:var(--ac);transition:transform .2s cubic-bezier(.3,1.8,.5,1)}
+.md-rib{position:absolute;top:14px;right:-30px;width:110px;padding:3px 0;transform:rotate(40deg);text-align:center;font:800 9px Exo2,sans-serif;letter-spacing:1px;color:#150925;box-shadow:0 2px 6px #0008}
+.md-arrow{position:absolute;top:110px;width:38px;height:38px;border-radius:50%;border:0;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;background:#150925CC;box-shadow:inset 0 0 0 2px var(--ac),0 0 14px var(--ac);color:var(--ac);transition:transform .2s cubic-bezier(.3,1.8,.5,1)}
 .md-arrow:active{transform:scale(.88)}
 .md-arrow svg{animation:mdNudge 1.6s ease-in-out infinite}
 @keyframes mdNudge{0%,100%{translate:0 0}50%{translate:var(--nx,3px) 0}}
@@ -70,10 +70,10 @@ input::placeholder{color:#8686A6}
   <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; height: 390px; z-index: 3"><dc-import name="Nav" active="jugar" hint-size="80px,390px"></dc-import></div>
   <!-- header: back, title, the three kinds of play -->
   <div style="position: absolute; left: 96px; right: 12px; top: 10px; height: 40px; display: flex; align-items: center; gap: 10px; z-index: 4">
-    <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 44px; height: 36px; display: flex; align-items: center; justify-content: center; background: #17172A; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+    <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 44px; height: 36px; display: flex; align-items: center; justify-content: center; background: #251443; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
     <h1 class="bc-title" style="font-size: 23px; white-space: nowrap">¿A QUÉ JUGAMOS?</h1>
     <span style="flex: 1"></span>
-    <div role="tablist" aria-label="Tipo de partida" style="position: relative; display: flex; gap: 0; padding: 3px; border-radius: 14px; background: #0B0B14CC; border: 1px solid #2E2E58">
+    <div role="tablist" aria-label="Tipo de partida" style="position: relative; display: flex; gap: 0; padding: 3px; border-radius: 14px; background: #150925CC; border: 1px solid #2E2E58">
       <span aria-hidden="true" style="{{thumbStyle}}"></span>
       <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
         <button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" style="{{t.style}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{t.icon}}"/></svg>{{t.label}}</button>
@@ -88,11 +88,11 @@ input::placeholder{color:#8686A6}
       <button type="button" onClick="{{m.pick}}" aria-label="{{m.aria}}" aria-pressed="{{m.on}}" class="md-card" style="{{m.style}}">
         <span style="{{m.bg}}"></span>
         <img src="{{m.img}}" alt="" draggable="false" style="{{m.imgStyle}}">
-        <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 110px; background: linear-gradient(180deg, transparent, #07070FEE 70%); pointer-events: none"></span>
+        <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 110px; background: linear-gradient(180deg, transparent, #0F061EEE 70%); pointer-events: none"></span>
         <span style="{{m.tagStyle}}">{{m.tag}}</span>
         <sc-if value="{{m.hasRib}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; inset: 0; border-radius: 18px; overflow: hidden; pointer-events: none"><span class="md-rib" style="background: {{m.ribC}}">{{m.rib}}</span></span></sc-if>
         <sc-if value="{{m.isOn}}" hint-placeholder-val="{{ false }}"><span class="md-sweep"></span></sc-if>
-        <span style="position: absolute; left: 12px; right: 10px; bottom: 30px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: {{m.size}}px; line-height: .92; letter-spacing: -.5px; text-align: left; color: #F4F4FA; text-shadow: 0 3px 0 #07070F, 0 0 18px {{m.glow}}">{{m.title}}</span>
+        <span style="position: absolute; left: 12px; right: 10px; bottom: 30px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: {{m.size}}px; line-height: .92; letter-spacing: -.5px; text-align: left; color: #F4F4FA; text-shadow: 0 3px 0 #0F061E, 0 0 18px {{m.glow}}">{{m.title}}</span>
         <span style="position: absolute; left: 13px; bottom: 12px; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: {{m.sub}}">{{m.kicker}}</span>
       </button>
     </sc-for>
@@ -108,7 +108,7 @@ input::placeholder{color:#8686A6}
       <sc-if value="{{showRank}}" hint-placeholder-val="{{ true }}">
         <a href="Rangos.dc.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #F4F4FA">
           <span style="font-size: 11px; font-weight: 800; color: {{rankColor}}; white-space: nowrap">{{rankLabel}}</span>
-          <span class="bc-para" style="flex: 0 1 160px; height: 6px; background: #26264A"><span class="am-bar-shine" style="display: block; {{rankBar}}"></span></span>
+          <span class="bc-para" style="flex: 0 1 160px; height: 6px; background: #39206E"><span class="am-bar-shine" style="display: block; {{rankBar}}"></span></span>
           <span style="font-size: 10px; font-weight: 700; color: #A3A3C2; white-space: nowrap">{{mmrLabel}} · {{seasonLabel}}</span>
         </a>
       </sc-if>
@@ -121,7 +121,7 @@ input::placeholder{color:#8686A6}
         </div>
       </sc-if>
     </div>
-    <a href="{{playHref}}" onClick="{{saveSel}}" class="bc-btn am-shine" style="flex: none; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 30px 0 24px; text-decoration: none; font-size: 26px; white-space: nowrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="#0B0B14"><path d="M6 3l15 9l-15 9z"/></svg>{{playLabel}}</a>
+    <a href="{{playHref}}" onClick="{{saveSel}}" class="bc-btn am-shine" style="flex: none; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 30px 0 24px; text-decoration: none; font-size: 26px; white-space: nowrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="#150925"><path d="M6 3l15 9l-15 9z"/></svg>{{playLabel}}</a>
   </div>
 </div>
 </x-dc>
@@ -252,7 +252,7 @@ class Component extends DCLogic {
     const cur = list[ci];
     const comp = s.cat === 'comp', S = this.season();
     const placingOf = (m) => this.placeOf(S, s.sport + ':' + m.id).g < 5;
-    const CAT = { comp: ['#FFC53D', '#3A2A0A'], casual: ['#22D3EE', '#0A2A33'], train: ['#53D88E', '#0A2A1A'], tour: ['#A78BFA', '#1E1240'] }[s.cat];
+    const CAT = { comp: ['#FFC53D', '#3A2A0A'], casual: ['#22D3EE', '#14244F'], train: ['#53D88E', '#0A2A1A'], tour: ['#A78BFA', '#2E0F60'] }[s.cat];
     const P = window.AMPosters;
     // a corner ribbon on the modes worth pointing out
     const RIB = { m1: ['POPULAR', '#FF5C8A'], libre: ['NUEVO', '#53D88E'], private: ['AMIGOS', '#22D3EE'], m4: ['CAOS', '#FF8A3D'], copa: ['TROFEO', '#FFC53D'], retos: ['DIARIO', '#FF5CC8'] };
@@ -272,9 +272,9 @@ class Component extends DCLogic {
         size: title.length > 12 ? 30 : title.length > 7 ? 36 : 54,
         glow: on ? CAT[0] + '88' : 'transparent', sub: on ? CAT[0] : '#A3A3C2',
         style: 'transform: translateX(' + tx + 'px) translateZ(' + (-a * 60) + 'px) rotateY(' + (-Math.sign(off) * Math.min(2, a) * 16) + 'deg) scale(' + sc + '); z-index: ' + (10 - a) + '; opacity: ' + (a > 2 ? 0 : a === 2 ? 0.55 : 1) + '; pointer-events: ' + (a > 2 ? 'none' : 'auto') + '; filter: ' + (on ? 'none' : 'brightness(.62) saturate(.8)') + ';' + (on ? ' animation: mdFloat 3.2s ease-in-out infinite;' : ''),
-        bg: 'position: absolute; inset: 0; border-radius: 18px; overflow: hidden; background: radial-gradient(120% 80% at 50% 25%, ' + CAT[1] + ' 0%, #10102A 60%, #07070F 100%); --mc: ' + CAT[0] + '; ' + (on ? 'animation: mdGlow 2.4s ease-in-out infinite;' : 'box-shadow: 0 0 0 1px #2E2E58, 0 14px 24px #000a;'),
+        bg: 'position: absolute; inset: 0; border-radius: 18px; overflow: hidden; background: radial-gradient(120% 80% at 50% 25%, ' + CAT[1] + ' 0%, #1C0E43 60%, #0F061E 100%); --mc: ' + CAT[0] + '; ' + (on ? 'animation: mdGlow 2.4s ease-in-out infinite;' : 'box-shadow: 0 0 0 1px #2E2E58, 0 14px 24px #000a;'),
         imgStyle: 'position: absolute; left: 0; top: 0; width: 170px; height: 215px; object-fit: cover; border-radius: 18px 18px 0 0; opacity: ' + (img ? 1 : 0) + '; transition: opacity .5s; pointer-events: none;',
-        tagStyle: 'position: absolute; left: 10px; top: 10px; padding: 3px 9px; transform: skewX(0deg); background: ' + (on ? CAT[0] : '#17172ACC') + '; color: ' + (on ? '#0B0B14' : '#CACAE0') + '; font: 800 9.5px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap;',
+        tagStyle: 'position: absolute; left: 10px; top: 10px; padding: 3px 9px; transform: skewX(0deg); background: ' + (on ? CAT[0] : '#251443CC') + '; color: ' + (on ? '#150925' : '#CACAE0') + '; font: 800 9.5px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap;',
         pick: () => { if (on || performance.now() - (this.swiped || 0) < 350) return; this.setState({ id: m.id }); }
       };
     });
@@ -297,7 +297,7 @@ class Component extends DCLogic {
       ...nav,
       tabs: TABS.map((t, i) => ({
         label: t.label, icon: t.icon, sel: i === ti ? 'true' : 'false',
-        style: 'position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; height: 32px; width: 108px; justify-content: center; border: 0; background: none; font: 800 11.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (i === ti ? '#0B0B14' : t.color) + ';',
+        style: 'position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; height: 32px; width: 108px; justify-content: center; border: 0; background: none; font: 800 11.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (i === ti ? '#150925' : t.color) + ';',
         pick: () => { if (i !== ti) this.setState({ cat: t.id, id: null }); }
       })),
       thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 108) + 'px; width: 108px; height: 32px; border-radius: 11px; background: ' + TABS[ti].color + '; box-shadow: 0 0 16px ' + TABS[ti].color + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s, box-shadow .3s;',
@@ -323,7 +323,7 @@ class Component extends DCLogic {
         return [['facil', 'FÁCIL', '#53D88E'], ['normal', 'NORMAL', '#22D3EE'], ['dificil', 'DIFÍCIL', '#FF5C5C']].map(([id, label, c]) => ({
           label, on: id === now ? 'true' : 'false',
           pick: () => { if (A && A.setAiPref) { A.setAiPref(id); this.forceUpdate(); } },
-          style: 'height: 22px; padding: 0 10px; border: 0; transform: skewX(0deg); font: 800 10.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; ' + (id === now ? 'background: ' + c + '; color: #0B0B14; box-shadow: 0 0 10px ' + c + '88;' : 'background: #17172ACC; color: ' + c + '; box-shadow: inset 0 0 0 1px ' + c + '55;')
+          style: 'height: 22px; padding: 0 10px; border: 0; transform: skewX(0deg); font: 800 10.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; ' + (id === now ? 'background: ' + c + '; color: #150925; box-shadow: 0 0 10px ' + c + '88;' : 'background: #251443CC; color: ' + c + '; box-shadow: inset 0 0 0 1px ' + c + '55;')
         }));
       })(),
       rankLabel: curPlacing ? 'Sin clasificar' : R.label, rankColor: curPlacing ? '#A3A3C2' : R.text,

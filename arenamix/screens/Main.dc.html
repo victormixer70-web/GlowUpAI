@@ -20,17 +20,17 @@ input::placeholder{color:#6E6E92}
 .lg-shirt{animation:lgShirt 3.2s ease-in-out infinite;transform-origin:50% 0}@keyframes lgShirt{0%,100%{rotate:-2deg}50%{rotate:2deg}}
 .lg-dice:active svg{rotate:200deg;transition:rotate .3s}
 .lg-nm .lg-field{height:44px}
-.nm-wall{position:relative;flex:none;width:236px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(120% 80% at 50% 0%,#2A2363,#120F33 60%,#0A0A1E);overflow:hidden;border-right:1px solid #2E2E58}
+.nm-wall{position:relative;flex:none;width:236px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(120% 80% at 50% 0%,#2A2363,#1E0D4F 60%,#140832);overflow:hidden;border-right:1px solid #2E2E58}
 .nm-logos{position:absolute;left:-60px;top:-40px;width:380px;display:flex;flex-wrap:wrap;gap:14px 18px;rotate:-14deg;opacity:.07;font:800 italic 15px 'Barlow Condensed',sans-serif;letter-spacing:1px;color:#fff;pointer-events:none}
 .nm-flash{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff;opacity:0;box-shadow:0 0 18px 10px #ffffffcc,0 0 50px 24px #9fe8ff55;animation:nmFlash 4s ease-out infinite;pointer-events:none}
 @keyframes nmFlash{0%,86%,100%{opacity:0;transform:scale(.4)}88%{opacity:1;transform:scale(1.2)}93%{opacity:.2;transform:scale(1)}}
 .nm-spot{position:absolute;left:50%;top:-20px;width:240px;height:300px;margin-left:-120px;background:conic-gradient(from 180deg at 50% 0%,transparent 160deg,#FFF3C422 172deg,#FFF3C433 180deg,#FFF3C422 188deg,transparent 200deg);pointer-events:none;animation:nmSpot 5s ease-in-out infinite;transform-origin:50% 0}
 @keyframes nmSpot{0%,100%{rotate:-3deg}50%{rotate:3deg}}
 .nm-new{position:relative;font:800 italic 13px 'Barlow Condensed',sans-serif;letter-spacing:2px;color:#1A1204;background:linear-gradient(135deg,#FFE38A,#FFC53D);padding:2px 10px;border-radius:4px;transform:skewX(-10deg);box-shadow:0 3px 0 #B7791F}
-.nm-d{width:32px;height:30px;border-radius:8px;border:1px solid #3A3A6E;background:#0B0B18CC;color:#A3A3C2;font:800 italic 16px 'Barlow Condensed',sans-serif;cursor:pointer;padding:0;transition:transform .15s,background .15s}
+.nm-d{width:32px;height:30px;border-radius:8px;border:1px solid #3A3A6E;background:#15092ACC;color:#A3A3C2;font:800 italic 16px 'Barlow Condensed',sans-serif;cursor:pointer;padding:0;transition:transform .15s,background .15s}
 .nm-d.on{background:linear-gradient(135deg,#FFE38A,#FFC53D);color:#1A1204;border-color:#FFE38A;transform:translateY(-3px);box-shadow:0 3px 0 #B7791F,0 0 14px #FFC53D66}
 .nm-num{animation:nmNum .35s cubic-bezier(.2,1.6,.4,1)}@keyframes nmNum{from{opacity:0}}
-.nm-led{display:flex;align-items:center;gap:8px;height:30px;padding:0 10px;border-radius:8px;background:#05050C;border:1px solid #2A2A4A;box-shadow:inset 0 0 12px #000}
+.nm-led{display:flex;align-items:center;gap:8px;height:30px;padding:0 10px;border-radius:8px;background:#0D041A;border:1px solid #3F246E;box-shadow:inset 0 0 12px #000}
 .nm-led-in{position:relative;flex:1;min-width:0;height:100%;overflow:hidden;display:flex;align-items:center;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
 .nm-led-in span{white-space:nowrap;font:800 13px 'Barlow Condensed',sans-serif;letter-spacing:2px;color:#FFC53D;text-shadow:0 0 6px #FFC53DAA;background-image:radial-gradient(#0005 35%,transparent 36%);background-size:3px 3px}
 .nm-led-in span.idle{color:#6E6E92;text-shadow:none;animation:lgLive 1.6s ease-in-out infinite}
@@ -43,7 +43,7 @@ input::placeholder{color:#6E6E92}
 .nm-idea{height:24px;padding:0 9px;border-radius:12px;border:1px solid #3A3A6E;background:#7C5CFF1F;color:#C9C2FF;font:700 11px Exo2,sans-serif;cursor:pointer;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;transition:background .15s,transform .15s}
 .nm-idea:active{transform:scale(.94);background:#7C5CFF44}
 .nm-stamp{position:absolute;left:50%;top:44%;z-index:4;pointer-events:none;translate:-50% -50%;animation:nmStamp .4s cubic-bezier(.3,1.6,.5,1) both}
-.nm-stamp span{display:block;padding:6px 18px;border:4px solid #FF4D5E;border-radius:10px;color:#FF4D5E;font:800 italic 48px 'Barlow Condensed',sans-serif;letter-spacing:2px;rotate:-12deg;background:#0E0F26CC;box-shadow:0 0 0 3px #FF4D5E33,0 10px 30px #000a;text-shadow:0 0 12px #FF4D5E77}
+.nm-stamp span{display:block;padding:6px 18px;border:4px solid #FF4D5E;border-radius:10px;color:#FF4D5E;font:800 italic 48px 'Barlow Condensed',sans-serif;letter-spacing:2px;rotate:-12deg;background:#190D3DCC;box-shadow:0 0 0 3px #FF4D5E33,0 10px 30px #000a;text-shadow:0 0 12px #FF4D5E77}
 @keyframes nmStamp{from{opacity:0;scale:2.6}to{opacity:1;scale:1}}
 .nm-boom{position:absolute;inset:0;z-index:5;pointer-events:none;background:#fff;animation:nmBoom .5s .1s ease-out both}
 @keyframes nmBoom{0%{opacity:0}15%{opacity:.75}100%{opacity:0}}
@@ -56,24 +56,24 @@ input::placeholder{color:#6E6E92}
 @keyframes lgMainFlash{0%{filter:brightness(1)}40%{filter:brightness(1.8)}100%{filter:brightness(1)}}
 .lg-card{position:absolute;left:514px;top:44px;width:304px;height:330px;transform-origin:50% -46px;animation:lgIn .6s cubic-bezier(.2,1.4,.4,1) both,lgSwing 6s 0.6s ease-in-out infinite}
 .lg-card:focus-within{animation-play-state:running,paused}
-.lg-field{display:flex;align-items:center;gap:8px;height:36px;padding:0 10px;border-radius:9px;border:1px solid #2E2E58;background:#07070FCC;transition:border-color .2s,box-shadow .2s}
+.lg-field{display:flex;align-items:center;gap:8px;height:36px;padding:0 10px;border-radius:9px;border:1px solid #2E2E58;background:#0F061ECC;transition:border-color .2s,box-shadow .2s}
 .lg-field:focus-within{border-color:#22D3EE;box-shadow:0 0 0 3px #22D3EE33}
 .lg-field input{flex:1;min-width:0;height:100%;border:0;outline:0;background:transparent;color:#F4F4FA;font:700 13px Exo2,sans-serif}
 .lg-ticket{position:absolute;left:266px;bottom:30px;width:238px;height:70px;display:flex;border:0;padding:0;background:none;cursor:pointer;animation:lgTicketIn .5s .25s cubic-bezier(.2,1.3,.4,1) both;filter:drop-shadow(0 10px 18px #000c)}
 .lg-ticket .main{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 14px;background:linear-gradient(120deg,#FFE38A,#FFC53D 45%,#F59E0B);border-radius:10px 0 0 10px;color:#1A1206;text-align:left;-webkit-mask:radial-gradient(circle 7px at 100% 50%,#0000 98%,#000);mask:radial-gradient(circle 7px at 100% 50%,#0000 98%,#000);animation:lgPulse 2s 1s ease-in-out infinite}
-.lg-ticket .stub{position:relative;width:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:linear-gradient(120deg,#22D3EE,#0EA5C0);border-radius:0 10px 10px 0;color:#0B0B14;border-left:2px dashed #0B0B1466;-webkit-mask:radial-gradient(circle 7px at 0 50%,#0000 98%,#000);mask:radial-gradient(circle 7px at 0 50%,#0000 98%,#000)}
+.lg-ticket .stub{position:relative;width:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:linear-gradient(120deg,#22D3EE,#0EA5C0);border-radius:0 10px 10px 0;color:#150925;border-left:2px dashed #15092566;-webkit-mask:radial-gradient(circle 7px at 0 50%,#0000 98%,#000);mask:radial-gradient(circle 7px at 0 50%,#0000 98%,#000)}
 .lg-ticket.torn .stub{animation:lgStubFly .38s cubic-bezier(.5,0,.8,.5) forwards}
 .lg-ticket.torn .main{animation:lgMainFlash .3s ease-out}
 .lg-ticket:active .main{translate:0 2px}
-.lg-social{flex:none;width:40px;height:36px;border-radius:9px;border:1px solid #2E2E58;background:#07070FCC;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.lg-social{flex:none;width:40px;height:36px;border-radius:9px;border:1px solid #2E2E58;background:#0F061ECC;display:flex;align-items:center;justify-content:center;cursor:pointer}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 90% at 30% 10%, #14215A 0%, #0A0E2C 42%, #04040A 100%); color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none">
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(120% 90% at 30% 10%, #14215A 0%, #140C45 42%, #0B0318 100%); color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none">
   <canvas ref="{{crowdRef}}" aria-hidden="true" style="position: absolute; inset: 0; width: 844px; height: 390px; display: block"></canvas>
   <span aria-hidden="true" style="position: absolute; left: 6px; top: 64px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 150px; line-height: .8; white-space: nowrap; color: transparent; -webkit-text-stroke: 2px #22D3EE33; animation: lgTitleIn 1s cubic-bezier(.2,.8,.2,1) both; pointer-events: none">ARENA<br>MIX</span>
   <sc-if value="{{show3d}}" hint-placeholder-val="{{ false }}">
     <canvas ref="{{canvasRef}}" role="img" aria-label="Tu jugador. Tócalo para que chute." onPointerDown="{{kick}}" style="position: absolute; left: 0; top: 0; width: 500px; height: 390px; display: block; cursor: pointer; touch-action: manipulation"></canvas>
-    <span style="position: absolute; left: 92px; top: 300px; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC; border: 1px solid #2E2E58; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #CACAE0; pointer-events: none; animation: lgHint 1.8s ease-in-out infinite; opacity: {{hintOp}}; transition: opacity .4s">
+    <span style="position: absolute; left: 92px; top: 300px; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; background: #150925CC; border: 1px solid #2E2E58; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #CACAE0; pointer-events: none; animation: lgHint 1.8s ease-in-out infinite; opacity: {{hintOp}}; transition: opacity .4s">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2.5" stroke-linecap="round"><path d="M9 11V5a2 2 0 0 1 4 0v6M13 9a2 2 0 0 1 4 0v3M17 11a2 2 0 0 1 4 0v4a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3l-3-5a2 2 0 0 1 3-2l2 2"/></svg>TÓCALO Y CHUTA</span>
   </sc-if>
   <sc-if value="{{show2d}}" hint-placeholder-val="{{ true }}">
@@ -83,7 +83,7 @@ input::placeholder{color:#6E6E92}
   </sc-if>
 
   <div style="position: absolute; left: 18px; top: 14px; display: flex; align-items: center; gap: 10px; animation: lgIn .5s both">
-    <svg width="46" height="46" viewBox="0 0 512 512" role="img" aria-label="ARENA MIX" style="display: block; flex: none; filter: drop-shadow(0 0 12px #22D3EE66)"><rect width="512" height="512" rx="112" fill="#0B0B14" stroke="#22D3EE" stroke-width="12"/><text x="256" y="350" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="270" letter-spacing="-6"><tspan fill="#F4F4FA">A</tspan><tspan fill="#22D3EE" dx="90">M</tspan></text><path d="M262 120L222 238h38l-26 104l80-140h-42l30-82z" fill="#FFC53D" stroke="#0B0B14" stroke-width="10" stroke-linejoin="round"/></svg>
+    <svg width="46" height="46" viewBox="0 0 512 512" role="img" aria-label="ARENA MIX" style="display: block; flex: none; filter: drop-shadow(0 0 12px #22D3EE66)"><rect width="512" height="512" rx="112" fill="#150925" stroke="#22D3EE" stroke-width="12"/><text x="256" y="350" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="270" letter-spacing="-6"><tspan fill="#F4F4FA">A</tspan><tspan fill="#22D3EE" dx="90">M</tspan></text><path d="M262 120L222 238h38l-26 104l80-140h-42l30-82z" fill="#FFC53D" stroke="#150925" stroke-width="10" stroke-linejoin="round"/></svg>
     <div style="display: flex; flex-direction: column; gap: 3px">
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; line-height: .9; letter-spacing: .5px">ARENA <span style="color: #22D3EE">MIX</span></span>
       <span style="display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 800; letter-spacing: 1.5px; color: #FF8A8E"><span style="width: 7px; height: 7px; border-radius: 4px; background: #FF5C5C; box-shadow: 0 0 8px #FF5C5C; animation: lgLive 1.2s infinite"></span>NOCHE DE PARTIDO · {{fans}} EN LA GRADA</span>
@@ -96,40 +96,40 @@ input::placeholder{color:#6E6E92}
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 23px; line-height: 1; letter-spacing: .3px; white-space: nowrap">JUGAR COMO INVITADO</span>
     </span>
     <span class="stub">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="#0B0B14"><path d="M7 4l13 8l-13 8z"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#150925"><path d="M7 4l13 8l-13 8z"/></svg>
       <span style="font-size: 9px; font-weight: 800; letter-spacing: 1px">YA</span>
     </span>
   </button>
   <span style="position: absolute; left: 270px; bottom: 12px; font-size: 10px; color: #8686A6">Tu progreso se guarda en este móvil</span>
 
-  <a href="Idioma.dc.html" aria-label="Cambiar idioma" style="position: absolute; right: 12px; top: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 14px; background: #0B0B14CC; border: 1px solid #2E2E58; color: #F4F4FA; text-decoration: none; font-weight: 700; font-size: 11px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>{{langCode}}</a>
+  <a href="Idioma.dc.html" aria-label="Cambiar idioma" style="position: absolute; right: 12px; top: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 14px; background: #150925CC; border: 1px solid #2E2E58; color: #F4F4FA; text-decoration: none; font-weight: 700; font-size: 11px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>{{langCode}}</a>
 
   <!-- the lanyard -->
-  <svg aria-hidden="true" width="844" height="390" style="position: absolute; inset: 0; pointer-events: none"><path d="M610 -6L656 40M720 -6L676 40" stroke="#22D3EE" stroke-width="9" stroke-linecap="round"/><path d="M610 -6L656 40M720 -6L676 40" stroke="#0B0B14" stroke-opacity=".35" stroke-width="2" stroke-dasharray="3 6"/><rect x="652" y="34" width="28" height="16" rx="4" fill="#A3A3C2" stroke="#4C4C78" stroke-width="2"/></svg>
+  <svg aria-hidden="true" width="844" height="390" style="position: absolute; inset: 0; pointer-events: none"><path d="M610 -6L656 40M720 -6L676 40" stroke="#22D3EE" stroke-width="9" stroke-linecap="round"/><path d="M610 -6L656 40M720 -6L676 40" stroke="#150925" stroke-opacity=".35" stroke-width="2" stroke-dasharray="3 6"/><rect x="652" y="34" width="28" height="16" rx="4" fill="#A3A3C2" stroke="#4C4C78" stroke-width="2"/></svg>
 
   <div class="lg-card">
-    <div style="position: absolute; inset: 0; border-radius: 16px; background: linear-gradient(165deg, #1B1D44 0%, #10112A 55%, #0B0B18 100%); border: 1px solid #3A3A6E; box-shadow: 0 20px 40px #000c, inset 0 1px 0 #ffffff1a; overflow: hidden">
-      <div style="height: 44px; background: linear-gradient(100deg, #22D3EE, #7C5CFF, #FF5C8A, #FFC53D, #22D3EE) 0 0 / 200% 100%; animation: lgHolo 6s linear infinite; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 14px 6px 14px; box-sizing: border-box; color: #0B0B14">
+    <div style="position: absolute; inset: 0; border-radius: 16px; background: linear-gradient(165deg, #2A1966 0%, #1C0E43 55%, #15092A 100%); border: 1px solid #3A3A6E; box-shadow: 0 20px 40px #000c, inset 0 1px 0 #ffffff1a; overflow: hidden">
+      <div style="height: 44px; background: linear-gradient(100deg, #22D3EE, #7C5CFF, #FF5C8A, #FFC53D, #22D3EE) 0 0 / 200% 100%; animation: lgHolo 6s linear infinite; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 14px 6px 14px; box-sizing: border-box; color: #150925">
         <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 17px; letter-spacing: 1px">ACREDITACIÓN</span>
         <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px">TEMPORADA 1</span>
       </div>
-      <div style="position: absolute; left: 50%; top: 8px; width: 34px; height: 8px; margin-left: -17px; border-radius: 4px; background: #0B0B14"></div>
+      <div style="position: absolute; left: 50%; top: 8px; width: 34px; height: 8px; margin-left: -17px; border-radius: 4px; background: #150925"></div>
       <div style="padding: 10px 14px 0 14px; display: flex; flex-direction: column; gap: 7px">
         <div style="display: flex; align-items: center; gap: 10px">
-          <span style="flex: none; width: 52px; height: 52px; border-radius: 10px; overflow: hidden; border: 2px solid #22D3EE; background: radial-gradient(circle at 50% 30%, #2A3A7A, #10112A); box-shadow: 0 0 12px #22D3EE55"><img src="{{photo}}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: {{photoDisp}}"></span>
+          <span style="flex: none; width: 52px; height: 52px; border-radius: 10px; overflow: hidden; border: 2px solid #22D3EE; background: radial-gradient(circle at 50% 30%, #2A3A7A, #1C0E43); box-shadow: 0 0 12px #22D3EE55"><img src="{{photo}}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: {{photoDisp}}"></span>
           <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
             <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #8686A6">JUGADOR</span>
             <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{name}}</span>
             <span style="font-size: 10px; font-weight: 800; color: #22D3EE">ACCESO: CAMPO · VESTUARIO</span>
           </div>
-          <svg width="34" height="34" viewBox="0 0 7 7" aria-hidden="true" style="flex: none; border-radius: 4px; background: #F4F4FA; padding: 3px; box-sizing: border-box"><path d="M0 0h3v3H0zM4 0h3v3H4zM0 4h3v3H0zM1 1h1v1H1zM5 1h1v1H5zM1 5h1v1H1zM4 4h1v1H4zM6 4h1v1H6zM5 5h1v1H5zM4 6h1v1H4zM6 6h1v1H6z" fill="#0B0B14" fill-rule="evenodd"/></svg>
+          <svg width="34" height="34" viewBox="0 0 7 7" aria-hidden="true" style="flex: none; border-radius: 4px; background: #F4F4FA; padding: 3px; box-sizing: border-box"><path d="M0 0h3v3H0zM4 0h3v3H4zM0 4h3v3H0zM1 1h1v1H1zM5 1h1v1H5zM1 5h1v1H1zM4 4h1v1H4zM6 4h1v1H6zM5 5h1v1H5zM4 6h1v1H4zM6 6h1v1H6z" fill="#150925" fill-rule="evenodd"/></svg>
         </div>
         <span style="display: flex; align-items: center; gap: 8px; font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #8686A6">INICIA SESIÓN<span style="flex: 1; height: 1px; background: #2E2E58"></span></span>
         <form style="display: flex; flex-direction: column; gap: 6px" onSubmit="{{submit}}">
           <label class="lg-field"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8686A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6l9-6"/></svg><input type="email" autocomplete="email" aria-label="Correo electrónico" placeholder="Correo electrónico"></label>
           <label class="lg-field"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8686A6" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><input type="password" autocomplete="current-password" aria-label="Contraseña" placeholder="Contraseña"></label>
           <div style="display: flex; gap: 6px">
-            <button type="submit" style="flex: 1; height: 38px; border: 0; padding: 0; transform: skewX(0deg); background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #0B0B14; cursor: pointer; box-shadow: 0 4px 0 #0E8FA3"><span style="display: inline-block; transform: skewX(0deg); font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 19px; letter-spacing: 1.5px">ENTRAR</span></button>
+            <button type="submit" style="flex: 1; height: 38px; border: 0; padding: 0; transform: skewX(0deg); background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #150925; cursor: pointer; box-shadow: 0 4px 0 #0E8FA3"><span style="display: inline-block; transform: skewX(0deg); font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 19px; letter-spacing: 1.5px">ENTRAR</span></button>
             <button type="button" class="lg-social" aria-label="Entrar con Google" onClick="{{soon}}"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z" fill="#4285F4"/><path d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z" fill="#34A853"/><path d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2z" fill="#FBBC05"/><path d="M12 6c1.5 0 2.8.5 3.8 1.5l2.8-2.8A10 10 0 0 0 3.1 7.4L6.4 10C7.2 7.8 9.4 6 12 6z" fill="#EA4335"/></svg></button>
             <button type="button" class="lg-social" aria-label="Entrar con Apple" onClick="{{soon}}"><svg width="14" height="16" viewBox="0 0 16 18" fill="#F4F4FA"><path d="M13 9.5c0-2 1.6-3 1.7-3c-1-1.4-2.4-1.6-2.9-1.6c-1.2-.1-2.4.7-3 .7s-1.6-.7-2.6-.7C4.8 5 3.4 5.8 2.7 7.1c-1.5 2.6-.4 6.4 1 8.5c.7 1 1.5 2.1 2.6 2.1c1-.1 1.4-.7 2.6-.7s1.6.7 2.6.7c1.1 0 1.8-1 2.5-2c.8-1.1 1.1-2.2 1.1-2.3c0 0-2.1-.8-2.1-3.9zM11 3.3c.6-.7 1-1.6.9-2.6c-.8 0-1.9.6-2.5 1.3c-.6.6-1 1.6-.9 2.5c.9.1 1.9-.5 2.5-1.2z"/></svg></button>
           </div>
@@ -146,8 +146,8 @@ input::placeholder{color:#6E6E92}
   </div>
   <!-- the first time in: your presentation as the club's new signing. Pick a shirt number, sign the contract with your player name -->
   <sc-if value="{{nameOpen}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; inset: 0; z-index: 8; background: #05050AE6; display: flex; align-items: center; justify-content: center; animation: lgFade .25s both">
-      <form onSubmit="{{nameSubmit}}" class="lg-nm" style="position: relative; width: 640px; height: 340px; box-sizing: border-box; display: flex; border-radius: 18px; background: #0E0F26; border: 1px solid #3A3A6E; box-shadow: 0 24px 50px #000d, 0 0 50px #7C5CFF2A; overflow: hidden">
+    <div style="position: absolute; inset: 0; z-index: 8; background: #0D0418E6; display: flex; align-items: center; justify-content: center; animation: lgFade .25s both">
+      <form onSubmit="{{nameSubmit}}" class="lg-nm" style="position: relative; width: 640px; height: 340px; box-sizing: border-box; display: flex; border-radius: 18px; background: #190D3D; border: 1px solid #3A3A6E; box-shadow: 0 24px 50px #000d, 0 0 50px #7C5CFF2A; overflow: hidden">
         <div style="position: absolute; left: 0; right: 0; top: 0; height: 5px; z-index: 3; background: linear-gradient(100deg, #22D3EE, #7C5CFF, #FF5C8A, #FFC53D, #22D3EE) 0 0 / 200% 100%; animation: lgHolo 6s linear infinite"></div>
         <!-- press wall: the sponsor backdrop, camera flashes, a spotlight on your new shirt -->
         <div class="nm-wall">
@@ -161,11 +161,11 @@ input::placeholder{color:#6E6E92}
               <defs><linearGradient id="lg-sh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".25"/><stop offset=".6" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient></defs>
               <!-- hanger -->
               <path d="M50 -12 Q55 -12 55 -7 Q55 -3 50 -1 L50 4 M50 4 L22 14 M50 4 L78 14" fill="none" stroke="#C9CAE0" stroke-width="2" stroke-linecap="round"/>
-              <path d="M34 6 Q50 12 66 6 L90 16 L99 42 L84 48 L80 40 L80 102 L20 102 L20 40 L16 48 L1 42 L10 16 Z" fill="{{shirtP}}" stroke="#0B0B14" stroke-width="1.6" stroke-linejoin="round"/>
+              <path d="M34 6 Q50 12 66 6 L90 16 L99 42 L84 48 L80 40 L80 102 L20 102 L20 40 L16 48 L1 42 L10 16 Z" fill="{{shirtP}}" stroke="#150925" stroke-width="1.6" stroke-linejoin="round"/>
               <path d="M34 6 Q50 12 66 6 L90 16 L99 42 L84 48 L80 40 L80 102 L20 102 L20 40 L16 48 L1 42 L10 16 Z" fill="url(#lg-sh)"/>
               <path d="M34 6 Q50 12 66 6" fill="none" stroke="{{shirtS}}" stroke-width="3"/>
               <text x="50" y="34" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="{{shirtFs}}" letter-spacing=".5" fill="{{shirtS}}" translate="no">{{shirtName}}</text>
-              <text class="nm-num" x="50" y="86" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="48" fill="{{shirtS}}" stroke="#0B0B14" stroke-opacity=".25" stroke-width=".8">{{dorsal}}</text>
+              <text class="nm-num" x="50" y="86" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="48" fill="{{shirtS}}" stroke="#150925" stroke-opacity=".25" stroke-width=".8">{{dorsal}}</text>
             </svg>
           </div>
           <span style="position: relative; font-size: 9px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2; margin-top: 4px">ELIGE TU DORSAL</span>
@@ -176,7 +176,7 @@ input::placeholder{color:#6E6E92}
           </div>
         </div>
         <!-- the contract -->
-        <div style="position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 20px 22px 18px 20px; background: repeating-linear-gradient(0deg, #ffffff05 0 1px, transparent 1px 22px), linear-gradient(170deg, #1B1D44, #0F1029 70%)">
+        <div style="position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 20px 22px 18px 20px; background: repeating-linear-gradient(0deg, #ffffff05 0 1px, transparent 1px 22px), linear-gradient(170deg, #2A1966, #1A0E41 70%)">
           <div style="display: flex; align-items: center; justify-content: space-between">
             <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #22D3EE">CONTRATO DE FICHAJE</span>
             <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #8686A6; border: 1px solid #2E2E58; border-radius: 5px; padding: 2px 6px">TEMPORADA 1</span>
@@ -186,7 +186,7 @@ input::placeholder{color:#6E6E92}
           <div class="nm-led"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M3 10v4h4l6 5V5L7 10z"/><path d="M17 8a5 5 0 0 1 0 8"/></svg><div class="nm-led-in" translate="no"><span class="{{ledCls}}">{{ledText}}</span></div></div>
           <div style="display: flex; gap: 8px; align-items: flex-end; margin-top: 2px">
             <label class="nm-sign" style="{{nameField}}"><span class="nm-sign-lb">FIRMA AQUÍ</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><input type="text" maxLength="16" autocomplete="nickname" autocapitalize="off" spellcheck="false" aria-label="Nombre de jugador" placeholder="Tu nombre" value="{{nameDraft}}" onInput="{{nameInput}}" translate="no"></label>
-            <button type="button" onClick="{{nameDice}}" aria-label="Sugerir un nombre" class="lg-dice" style="flex: none; width: 46px; height: 46px; border-radius: 11px; border: 1px solid #2E2E58; background: #07070FCC; color: #FFC53D; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg></button>
+            <button type="button" onClick="{{nameDice}}" aria-label="Sugerir un nombre" class="lg-dice" style="flex: none; width: 46px; height: 46px; border-radius: 11px; border: 1px solid #2E2E58; background: #0F061ECC; color: #FFC53D; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg></button>
           </div>
           <div style="display: flex; gap: 6px; align-items: center; min-height: 24px">
             <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 1px; color: #6E6E92; flex: none">IDEAS:</span>
@@ -207,7 +207,7 @@ input::placeholder{color:#6E6E92}
     </div>
   </sc-if>
   <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
-    <span role="status" style="position: absolute; left: 514px; width: 304px; top: 196px; z-index: 5; padding: 8px 12px; box-sizing: border-box; border-radius: 10px; background: #F4F4FA; color: #0B0B14; font-size: 12px; font-weight: 800; text-align: center">{{toast}}</span>
+    <span role="status" style="position: absolute; left: 514px; width: 304px; top: 196px; z-index: 5; padding: 8px 12px; box-sizing: border-box; border-radius: 10px; background: #F4F4FA; color: #150925; font-size: 12px; font-weight: 800; text-align: center">{{toast}}</span>
   </sc-if>
 </div>
 </x-dc>
@@ -257,7 +257,7 @@ class Component extends DCLogic {
     // floodlight towers
     this.lights = [[318, 40], [452, 26], [596, 14]];
     this.lights.forEach(([lx, ly]) => {
-      s.fillStyle = '#0B0B18'; s.fillRect(lx - 1.5, ly, 3, 130);
+      s.fillStyle = '#15092A'; s.fillRect(lx - 1.5, ly, 3, 130);
       s.fillStyle = '#E8F6FF'; for (let i = 0; i < 4; i++) for (let j = 0; j < 2; j++) s.fillRect(lx - 14 + i * 7, ly - 8 + j * 6, 5, 4);
     });
     this.flashes = Array.from({ length: 36 }, () => ({ x: Math.random() * 844, y: 70 + Math.random() * 160, t: Math.random() * 3 }));
@@ -326,7 +326,7 @@ class Component extends DCLogic {
   }
   buildModel() {
     const A = window.AMChars, o = A.outfit('futbol') || {};
-    const kit = { primary: o.primary || '#FF8A3D', secondary: o.secondary || '#0B0B14', pattern: o.pattern || 'solid', shorts: o.shorts || '#17172A', socks: o.socks || '#F4F4FA', shoe: o.shoe || '#C8F031', hat: o.hat, hatColor: o.hatColor, face: o.face };
+    const kit = { primary: o.primary || '#FF8A3D', secondary: o.secondary || '#150925', pattern: o.pattern || 'solid', shorts: o.shorts || '#251443', socks: o.socks || '#F4F4FA', shoe: o.shoe || '#C8F031', hat: o.hat, hatColor: o.hatColor, face: o.face };
     const m = A.make({ char: A.pref(), kit, noRing: true, gear: true });
     if (!m) return;
     m.rotation.y = 0.45; this.S.add(m); this.model = m;
@@ -381,7 +381,7 @@ class Component extends DCLogic {
     return {
       langCode: (window.AMI18n ? window.AMI18n.lang() : 'es').toUpperCase(),
       crowdRef: this.crowdRef, canvasRef: this.canvasRef, show3d, show2d: !show3d,
-      kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#0B0B14', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#17172A', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE',
+      kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#150925', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#251443', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE',
       fans: this.fans.toLocaleString('es-ES'), serial: this.serial, name: name.toUpperCase(),
       photo: show3d ? 'assets/chars/' + pref + '.png' : '', photoDisp: show3d ? 'block' : 'none',
       hintOp: s.kicks ? '0' : '1',
@@ -412,9 +412,9 @@ class Component extends DCLogic {
       nameMsg: !s.nameDraft ? '3 a 16 caracteres: letras, números, _ . -' : nmErr || '¡Buen nombre!',
       nameMsgStyle: 'font-size: 11px; font-weight: 800; min-height: 14px; color: ' + (!s.nameDraft ? '#8686A6' : nmErr ? '#FF8A8E' : '#53D88E'),
       nameField: s.nameDraft && nmErr ? 'border-bottom-color: #FF5C5C' : s.nameDraft ? 'border-bottom-color: #53D88E' : '',
-      nameBtn: 'height: 44px; border: 0; padding: 0; transform: skewX(0deg); cursor: ' + (nmErr ? 'default' : 'pointer') + '; ' + (nmErr ? 'background: #26264A; color: #6E6E92;' : 'background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #F59E0B); color: #1A1204; box-shadow: 0 4px 0 #B7791F, 0 0 18px #FFC53D66;'),
+      nameBtn: 'height: 44px; border: 0; padding: 0; transform: skewX(0deg); cursor: ' + (nmErr ? 'default' : 'pointer') + '; ' + (nmErr ? 'background: #39206E; color: #6E6E92;' : 'background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #F59E0B); color: #1A1204; box-shadow: 0 4px 0 #B7791F, 0 0 18px #FFC53D66;'),
       shirtName: (s.nameDraft || 'TU NOMBRE').toUpperCase(), shirtFs: String(Math.max(7, Math.min(13, 130 / Math.max(6, (s.nameDraft || 'TU NOMBRE').length)))),
-      shirtP: kit.primary || '#FF8A3D', shirtS: kit.secondary || '#0B0B14',
+      shirtP: kit.primary || '#FF8A3D', shirtS: kit.secondary || '#150925',
       nameSubmit: (e) => {
         e.preventDefault();
         if (nmErr || !O) return;

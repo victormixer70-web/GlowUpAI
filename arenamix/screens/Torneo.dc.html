@@ -14,27 +14,27 @@ body{margin:0}
 @keyframes tnGlow{0%,100%{filter:drop-shadow(0 0 10px #FFC53D88)}50%{filter:drop-shadow(0 0 26px #FFC53D)}}
 @keyframes tnFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
 @keyframes tnRay{to{transform:rotate(360deg)}}
-@keyframes tnPulse{0%,100%{box-shadow:0 0 0 0 var(--tc),0 5px 0 #05050A}50%{box-shadow:0 0 0 7px transparent,0 5px 0 #05050A}}
+@keyframes tnPulse{0%,100%{box-shadow:0 0 0 0 var(--tc),0 5px 0 #0D0418}50%{box-shadow:0 0 0 7px transparent,0 5px 0 #0D0418}}
 @keyframes tnShine{0%,60%{transform:translateX(-160%) rotate(14deg)}100%{transform:translateX(360%) rotate(14deg)}}
 @keyframes tnLine{to{stroke-dashoffset:-20}}
-.tn-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(90% 80% at 70% 0%,#2C1C5E 0%,#130E30 55%,#07061A 100%)}
+.tn-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(90% 80% at 70% 0%,#2C1C5E 0%,#200C4B 55%,#0F052D 100%)}
 .tn-bg i{position:absolute;left:50%;top:-260px;width:1100px;height:1100px;margin-left:-550px;background:repeating-conic-gradient(from 0deg,#A78BFA10 0 6deg,transparent 6deg 18deg);animation:tnRay 90s linear infinite;-webkit-mask-image:radial-gradient(closest-side,#000 20%,transparent 70%);mask-image:radial-gradient(closest-side,#000 20%,transparent 70%)}
 .tn-bg b{position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(0deg,#0E3A22aa,transparent);-webkit-mask-image:repeating-linear-gradient(90deg,#000 0 60px,#0008 60px 120px);mask-image:repeating-linear-gradient(90deg,#000 0 60px,#0008 60px 120px)}
 .tn-tab{position:relative;z-index:1;display:flex;align-items:center;gap:6px;height:32px;width:122px;justify-content:center;border:0;background:none;font:800 11.5px Exo2,sans-serif;letter-spacing:.5px;cursor:pointer;transition:color .3s}
 .tn-panel{position:absolute;left:16px;right:16px;top:62px;bottom:12px;animation:tnIn .4s cubic-bezier(.2,1.3,.4,1) both}
-.tn-card{position:relative;border-radius:20px;background:linear-gradient(170deg,#1E1A48F2,#100D2AF2);box-shadow:inset 0 0 0 1px #3A3270,inset 0 2px 0 #ffffff14,0 14px 30px #0009;overflow:hidden}
+.tn-card{position:relative;border-radius:20px;background:linear-gradient(170deg,#2E166BF2,#1C0B43F2);box-shadow:inset 0 0 0 1px #3A3270,inset 0 2px 0 #ffffff14,0 14px 30px #0009;overflow:hidden}
 .tn-go{position:relative;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 24px;border:0;border-radius:14px;background:linear-gradient(135deg,#FFE38A,#FFC53D 55%,#F59E0B);color:#1A1204;font:800 italic 21px 'Barlow Condensed',sans-serif;letter-spacing:1px;cursor:pointer;overflow:hidden;--tc:#FFC53D88;animation:tnPulse 2s infinite}
 .tn-go::after{content:'';position:absolute;top:-30%;bottom:-30%;left:0;width:26%;background:linear-gradient(90deg,transparent,#ffffffaa,transparent);animation:tnShine 3.2s ease-in-out infinite}
 .tn-go:active{transform:translateY(2px)}
-.tn-ghost{height:34px;padding:0 14px;border-radius:11px;border:1px solid #4A4180;background:#0B0B18CC;color:#C9C2FF;font:800 11.5px Exo2,sans-serif;cursor:pointer}
-.tn-size{width:58px;height:34px;border-radius:10px;border:1px solid #3A3270;background:#0B0B18CC;color:#A3A3C2;font:800 italic 16px 'Barlow Condensed',sans-serif;cursor:pointer;transition:transform .15s}
-.tn-size.on{background:#A78BFA;border-color:#C4B5FD;color:#0B0B14;transform:translateY(-2px);box-shadow:0 3px 0 #5B3FB0,0 0 14px #A78BFA88}
+.tn-ghost{height:34px;padding:0 14px;border-radius:11px;border:1px solid #4A4180;background:#15092ACC;color:#C9C2FF;font:800 11.5px Exo2,sans-serif;cursor:pointer}
+.tn-size{width:58px;height:34px;border-radius:10px;border:1px solid #3A3270;background:#15092ACC;color:#A3A3C2;font:800 italic 16px 'Barlow Condensed',sans-serif;cursor:pointer;transition:transform .15s}
+.tn-size.on{background:#A78BFA;border-color:#C4B5FD;color:#150925;transform:translateY(-2px);box-shadow:0 3px 0 #5B3FB0,0 0 14px #A78BFA88}
 .tn-trophy{animation:tnFloat 4s ease-in-out infinite,tnGlow 3s ease-in-out infinite}
-.tn-m{position:absolute;width:168px;border-radius:9px;background:#0B0B18E6;box-shadow:inset 0 0 0 1px #2E2E58;overflow:hidden}
+.tn-m{position:absolute;width:168px;border-radius:9px;background:#15092AE6;box-shadow:inset 0 0 0 1px #2E2E58;overflow:hidden}
 .tn-m.me{box-shadow:inset 0 0 0 1.5px #22D3EE,0 0 14px #22D3EE55}
 .tn-m.next{animation:tnPulse 1.8s infinite;--tc:#22D3EE66}
 .tn-row{display:flex;align-items:center;gap:6px;height:24px;padding:0 8px;font:700 11px Exo2,sans-serif;color:#CACAE0;white-space:nowrap}
-.tn-row+.tn-row{border-top:1px solid #20204A}
+.tn-row+.tn-row{border-top:1px solid #311B6E}
 .tn-row.w{color:#F4F4FA;font-weight:800}.tn-row.l{opacity:.5}
 .tn-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .tn-row .sc{font:800 13px 'Barlow Condensed',sans-serif;min-width:12px;text-align:right}
@@ -48,9 +48,9 @@ body{margin:0}
 .tn-reto{position:relative;display:flex;flex-direction:column;gap:8px;padding:16px 16px 14px;box-sizing:border-box;width:258px;height:300px;border-radius:22px;animation:tnIn .45s cubic-bezier(.2,1.3,.4,1) both}
 .tn-reto h3{margin:0;font:800 italic 27px/1 'Barlow Condensed',sans-serif;letter-spacing:.5px}
 .tn-reto p{margin:0;font-size:12px;font-weight:700;line-height:1.4;color:#DADAF0}
-.tn-chip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:8px;background:#0B0B18CC;font:800 10.5px Exo2,sans-serif;letter-spacing:.5px;white-space:nowrap}
-.tn-done{position:absolute;right:14px;top:14px;rotate:12deg;padding:3px 10px;border:3px solid #53D88E;border-radius:8px;color:#53D88E;font:800 italic 18px 'Barlow Condensed',sans-serif;letter-spacing:1px;background:#0B0B18CC}
-.tn-banner{position:absolute;left:50%;top:50%;z-index:9;translate:-50% -50%;width:520px;padding:20px 24px;box-sizing:border-box;border-radius:22px;text-align:center;background:linear-gradient(170deg,#2A1E5E,#120D2C);box-shadow:0 0 0 3px #FFC53D,0 20px 60px #000c,0 0 60px #FFC53D55;animation:tnIn .5s cubic-bezier(.2,1.5,.4,1) both}
+.tn-chip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:8px;background:#15092ACC;font:800 10.5px Exo2,sans-serif;letter-spacing:.5px;white-space:nowrap}
+.tn-done{position:absolute;right:14px;top:14px;rotate:12deg;padding:3px 10px;border:3px solid #53D88E;border-radius:8px;color:#53D88E;font:800 italic 18px 'Barlow Condensed',sans-serif;letter-spacing:1px;background:#15092ACC}
+.tn-banner{position:absolute;left:50%;top:50%;z-index:9;translate:-50% -50%;width:520px;padding:20px 24px;box-sizing:border-box;border-radius:22px;text-align:center;background:linear-gradient(170deg,#2A1E5E,#1E0B45);box-shadow:0 0 0 3px #FFC53D,0 20px 60px #000c,0 0 60px #FFC53D55;animation:tnIn .5s cubic-bezier(.2,1.5,.4,1) both}
 .tn-dash{stroke-dasharray:4 6;animation:tnLine 1s linear infinite}
 </style>
 </helmet>
@@ -59,11 +59,11 @@ body{margin:0}
     <div class="tn-bg" aria-hidden="true"><i></i><b></b></div>
     <!-- header: back, title, the three competitions -->
     <div style="position: absolute; left: 16px; right: 16px; top: 12px; height: 40px; display: flex; align-items: center; gap: 12px">
-      <a href="Modos.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 46px; height: 38px; display: flex; align-items: center; justify-content: center; background: #17172A; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+      <a href="Modos.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 46px; height: 38px; display: flex; align-items: center; justify-content: center; background: #251443; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
       <h1 class="bc-title" style="font-size: 28px">TORNEOS</h1>
-      <span style="display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 10px; background: #0B0B18CC; font: 800 12px Exo2, sans-serif; color: #FFC53D"><svg width="15" height="15" viewBox="0 0 24 24" fill="#FFC53D"><path d="M7 3h10v6a5 5 0 0 1-10 0zM5 4H2v2a4 4 0 0 0 5 4M19 4h3v2a4 4 0 0 1-5 4M10 15h4v3h3v3H7v-3h3z"/></svg>{{trophyCount}}</span>
+      <span style="display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 10px; background: #15092ACC; font: 800 12px Exo2, sans-serif; color: #FFC53D"><svg width="15" height="15" viewBox="0 0 24 24" fill="#FFC53D"><path d="M7 3h10v6a5 5 0 0 1-10 0zM5 4H2v2a4 4 0 0 0 5 4M19 4h3v2a4 4 0 0 1-5 4M10 15h4v3h3v3H7v-3h3z"/></svg>{{trophyCount}}</span>
       <span style="flex: 1"></span>
-      <div role="tablist" aria-label="Competición" style="position: relative; display: flex; padding: 3px; border-radius: 14px; background: #0B0B14CC; border: 1px solid #2E2E58">
+      <div role="tablist" aria-label="Competición" style="position: relative; display: flex; padding: 3px; border-radius: 14px; background: #150925CC; border: 1px solid #2E2E58">
         <span aria-hidden="true" style="{{thumbStyle}}"></span>
         <sc-for list="{{tabs}}" as="t" key="id">
           <button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" class="tn-tab" style="{{t.style}}">{{t.label}}</button>
@@ -85,7 +85,7 @@ body{margin:0}
             <path d="M60 24l4 8l9 1l-7 6l2 9l-8-5l-8 5l2-9l-7-6l9-1z" fill="#FFF8D6" opacity=".85"/>
             <path d="M42 18q4 20 0 34" stroke="#fff" stroke-width="3" fill="none" opacity=".45" stroke-linecap="round"/>
           </svg>
-          <span style="font: 800 italic 34px/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; color: #FFE38A; text-shadow: 0 3px 0 #05050A, 0 0 18px #FFC53D88">COPA ARENA</span>
+          <span style="font: 800 italic 34px/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; color: #FFE38A; text-shadow: 0 3px 0 #0D0418, 0 0 18px #FFC53D88">COPA ARENA</span>
           <span style="font-size: 11.5px; font-weight: 700; color: #C9C2FF; text-align: center; padding: 0 26px; line-height: 1.4">8 equipos, eliminación directa. Si hay empate, tanda de penaltis. Cada ronda, un rival más duro.</span>
         </div>
         <div class="tn-card" style="flex: 1; padding: 18px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
@@ -137,12 +137,12 @@ body{margin:0}
         <div class="tn-card" style="flex: none; width: 330px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
           <svg class="tn-trophy" width="140" height="140" viewBox="0 0 120 120">
             <defs><linearGradient id="tn-s" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F4F4FA"/><stop offset=".5" stop-color="#A9B4D6"/><stop offset="1" stop-color="#5B6690"/></linearGradient></defs>
-            <circle cx="60" cy="52" r="38" fill="url(#tn-s)" stroke="#1E2440" stroke-width="3"/>
-            <circle cx="60" cy="52" r="28" fill="none" stroke="#1E2440" stroke-width="2" stroke-dasharray="3 5"/>
-            <path d="M60 32l6 12l13 2l-9 9l2 13l-12-6l-12 6l2-13l-9-9l13-2z" fill="#22D3EE" stroke="#1E2440" stroke-width="2"/>
-            <path d="M40 88l-8 24l14-6l8 10l6-24M80 88l8 24l-14-6l-8 10l-6-24" fill="#A78BFA" stroke="#1E2440" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="60" cy="52" r="38" fill="url(#tn-s)" stroke="#2E1F60" stroke-width="3"/>
+            <circle cx="60" cy="52" r="28" fill="none" stroke="#2E1F60" stroke-width="2" stroke-dasharray="3 5"/>
+            <path d="M60 32l6 12l13 2l-9 9l2 13l-12-6l-12 6l2-13l-9-9l13-2z" fill="#22D3EE" stroke="#2E1F60" stroke-width="2"/>
+            <path d="M40 88l-8 24l14-6l8 10l6-24M80 88l8 24l-14-6l-8 10l-6-24" fill="#A78BFA" stroke="#2E1F60" stroke-width="2.5" stroke-linejoin="round"/>
           </svg>
-          <span style="font: 800 italic 34px/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; color: #E6EBFF; text-shadow: 0 3px 0 #05050A, 0 0 18px #A78BFA88">LIGA ARENA</span>
+          <span style="font: 800 italic 34px/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; color: #E6EBFF; text-shadow: 0 3px 0 #0D0418, 0 0 18px #A78BFA88">LIGA ARENA</span>
           <span style="font-size: 11.5px; font-weight: 700; color: #C9C2FF; text-align: center; padding: 0 26px; line-height: 1.4">6 equipos, todos contra todos. 5 jornadas: 3 puntos por victoria, 1 por empate. ¡Acaba arriba!</span>
         </div>
         <div class="tn-card" style="flex: 1; padding: 18px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
@@ -177,7 +177,7 @@ body{margin:0}
           <span style="font: 800 italic 24px/1.05 'Barlow Condensed', sans-serif; letter-spacing: .5px" translate="no">{{lgHeadline}}</span>
           <span style="font-size: 11px; font-weight: 700; color: #A3A3C2; line-height: 1.4">{{lgSub}}</span>
           <sc-if value="{{lgHasLast}}" hint-placeholder-val="{{ false }}">
-            <div style="width: 100%; display: flex; flex-direction: column; gap: 3px; padding: 8px 10px; box-sizing: border-box; border-radius: 12px; background: #0B0B18AA; text-align: left">
+            <div style="width: 100%; display: flex; flex-direction: column; gap: 3px; padding: 8px 10px; box-sizing: border-box; border-radius: 12px; background: #15092AAA; text-align: left">
               <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #8686A6">{{lgLastHead}}</span>
               <sc-for list="{{lgLast}}" as="x" key="k"><span style="{{x.style}}" translate="no">{{x.t}}</span></sc-for>
             </div>
@@ -215,10 +215,10 @@ body{margin:0}
     </sc-if>
 
     <sc-if value="{{hasBanner}}" hint-placeholder-val="{{ false }}">
-      <div style="position: absolute; inset: 0; z-index: 8; background: #05050ACC" onClick="{{closeBanner}}"></div>
+      <div style="position: absolute; inset: 0; z-index: 8; background: #0D0418CC" onClick="{{closeBanner}}"></div>
       <div class="tn-banner">
         <div style="font-size: 11px; font-weight: 800; letter-spacing: 3px; color: #A78BFA">{{bannerKicker}}</div>
-        <div style="font: 800 italic 40px/1.05 'Barlow Condensed', sans-serif; letter-spacing: 1px; color: #FFE38A; text-shadow: 0 3px 0 #05050A; margin: 6px 0">{{bannerTitle}}</div>
+        <div style="font: 800 italic 40px/1.05 'Barlow Condensed', sans-serif; letter-spacing: 1px; color: #FFE38A; text-shadow: 0 3px 0 #0D0418; margin: 6px 0">{{bannerTitle}}</div>
         <div style="font-size: 13px; font-weight: 700; color: #DADAF0">{{bannerSub}}</div>
         <button type="button" class="tn-go" style="margin: 14px auto 0" onClick="{{closeBanner}}">¡GENIAL!</button>
       </div>
@@ -238,9 +238,9 @@ body{margin:0}
 const TN_CLUBS = [
   ['Villaduna Blanco', '#F4F4F6', '#C9A227'], ['Puerto Brisa Azulgrana', '#A50044', '#1A3E8C'], ['Montealto Rojiblanco', '#CB3524', '#F4F4F6'],
   ['Campoverde Verdiblanco', '#0BB363', '#F4F4F6'], ['Valdeoro Amarillo', '#FFE135', '#005187'], ['Altamar Celeste', '#8AC3EE', '#F4F4F6'],
-  ['Northwick Rojo', '#EF0107', '#F4F4F6'], ['Ashvale Granate', '#670E36', '#95BFE5'], ['Harbour Bay Rojinegro', '#DA291C', '#141B2D'],
-  ['Brightmoor Albiazul', '#0057B8', '#F4F4F6'], ['Valloro Nerazzurro', '#0068A8', '#141B2D'], ['Bergheim Rojo', '#DC052D', '#F4F4F6'],
-  ['Montclair Azul', '#004170', '#DA291C'], ['Isla Coral Bermellón', '#E20613', '#141B2D'], ['Faro Norte Blanquiazul', '#007FC8', '#F4F4F6'],
+  ['Northwick Rojo', '#EF0107', '#F4F4F6'], ['Ashvale Granate', '#670E36', '#95BFE5'], ['Harbour Bay Rojinegro', '#DA291C', '#211747'],
+  ['Brightmoor Albiazul', '#0057B8', '#F4F4F6'], ['Valloro Nerazzurro', '#0068A8', '#211747'], ['Bergheim Rojo', '#DC052D', '#F4F4F6'],
+  ['Montclair Azul', '#004170', '#DA291C'], ['Isla Coral Bermellón', '#E20613', '#211747'], ['Faro Norte Blanquiazul', '#007FC8', '#F4F4F6'],
   ['Pinar Azul', '#0050A0', '#F4F4F6'], ['Sierra Clara Azul', '#005999', '#F4F4F6'], ['Robledo Rojo', '#D91A21', '#0A346F']
 ];
 const TN_NAMES = ['Kai_Striker', 'LunaGol_09', 'ToroVeloz', 'Mika10', 'Zeta_FC', 'Nico_Volea', 'Sara_Crack', 'Dani_Muro', 'Bruno7', 'Iker_Rayo', 'Vega_22', 'Leo_Tiki', 'Noa_Golazo', 'Rafa_Pared', 'Alba_Top', 'Hugo_Chut', 'Eva_Regate', 'Tomi_9'];
@@ -271,7 +271,7 @@ class Component extends DCLogic {
     return null;
   }
   me() { return window.AMOnline && window.AMOnline.myName ? window.AMOnline.myName() : 'Tú'; }
-  myClub() { return [this.me() + ' FC', '#22D3EE', '#0B0B14']; }
+  myClub() { return [this.me() + ' FC', '#22D3EE', '#150925']; }
   shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   names(n, avoid) {
     const out = [], pool = this.shuffle(TN_NAMES).filter((x) => !(avoid || []).includes(x));
@@ -449,12 +449,12 @@ class Component extends DCLogic {
   }
   renderVals() {
     const s = this.state, tab = s.tab, C = this.cup(), L = this.league(), TR = this.trophies();
-    const kit = (c) => 'background: linear-gradient(135deg, ' + c[1] + ' 55%, ' + c[2] + ' 55%); box-shadow: 0 0 0 1px #05050A';
+    const kit = (c) => 'background: linear-gradient(135deg, ' + c[1] + ' 55%, ' + c[2] + ' 55%); box-shadow: 0 0 0 1px #0D0418';
     const TABS = [['copa', 'COPA', '#FFC53D'], ['liga', 'LIGA', '#22D3EE'], ['retos', 'RETOS DEL DÍA', '#FF5CC8']], ti = TABS.findIndex((t) => t[0] === tab);
     const out = {
       isHub: s.phase === 'hub', isMatch: s.phase === 'match', isShootout: s.phase === 'shootout',
       trophyCount: String((TR.copa || 0) + (TR.liga || 0)),
-      tabs: TABS.map(([id, label, c], i) => ({ id, label, sel: i === ti ? 'true' : 'false', style: 'color: ' + (i === ti ? '#0B0B14' : c), pick: () => { this.setState({ tab: id }); try { const S = this.store('arenamix.sel') || {}; this.store('arenamix.sel', { ...S, cat: 'tour', id }); } catch (e) {} } })),
+      tabs: TABS.map(([id, label, c], i) => ({ id, label, sel: i === ti ? 'true' : 'false', style: 'color: ' + (i === ti ? '#150925' : c), pick: () => { this.setState({ tab: id }); try { const S = this.store('arenamix.sel') || {}; this.store('arenamix.sel', { ...S, cat: 'tour', id }); } catch (e) {} } })),
       thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 122) + 'px; width: 122px; height: 32px; border-radius: 11px; background: ' + TABS[ti][2] + '; box-shadow: 0 0 16px ' + TABS[ti][2] + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s',
       sizes: [1, 2, 3, 4].map((n) => ({ n: String(n), label: n + ' VS ' + n, cls: 'tn-size' + (n === s.size ? ' on' : ''), pick: () => this.setState({ size: n }) })),
       cupPrizes: [['Campeón', '1.000 VCD + trofeo', '#FFC53D'], ['Subcampeón', '350 VCD', '#C9CAE0'], ['Semifinal', '150 VCD', '#CD7F32'], ['Cuartos', '60 VCD', '#6E6E92']].map(([k, v, c]) => ({ k, v, dot: 'width: 10px; height: 10px; border-radius: 3px; background: ' + c })),
@@ -523,7 +523,7 @@ class Component extends DCLogic {
       const PC = ['#FFC53D', '#C9CAE0', '#CD7F32'];
       const last = L.res.length ? L.res[L.res.length - 1] : null, lastDay = L.days[L.res.length - 1];
       Object.assign(out, {
-        table: T.map((x, k) => ({ k: String(x.k), pos: String(k + 1), name: L.teams[x.k].c[0], kit: kit(L.teams[x.k].c), pj: String(x.pj), g: String(x.g), e: String(x.e), p: String(x.p), gl: x.gf + ':' + x.gc, pts: String(x.pts), cls: 'tn-tr' + (L.teams[x.k].me ? ' me' : ''), posStyle: k < 3 ? 'background: ' + PC[k] + '; color: #0B0B14' : 'background: #17172A; color: #A3A3C2' })),
+        table: T.map((x, k) => ({ k: String(x.k), pos: String(k + 1), name: L.teams[x.k].c[0], kit: kit(L.teams[x.k].c), pj: String(x.pj), g: String(x.g), e: String(x.e), p: String(x.p), gl: x.gf + ':' + x.gc, pts: String(x.pts), cls: 'tn-tr' + (L.teams[x.k].me ? ' me' : ''), posStyle: k < 3 ? 'background: ' + PC[k] + '; color: #150925' : 'background: #251443; color: #A3A3C2' })),
         lgStage: L.done ? 'LIGA TERMINADA' : 'JORNADA ' + (L.day + 1) + ' DE 5 · ' + L.n + ' VS ' + L.n,
         lgDays: L.days.map((_, k) => 'width: 26px; height: 6px; border-radius: 3px; background: ' + (k < L.day ? '#22D3EE' : k === L.day && !L.done ? '#FFC53D' : '#2E2E58')),
         lgHeadline: L.done ? (pos === 0 ? '¡CAMPEÓN!' : pos + 1 + '.º PUESTO') : 'vs ' + opp.c[0],
@@ -548,10 +548,10 @@ class Component extends DCLogic {
       const ok = done.includes(R.id);
       return {
         id: R.id, num: String(k + 1), title: R.title, desc: R.desc, setup: R.setup, reward: String(R.reward), icon: R.icon, c: R.c, done: ok,
-        style: 'background: linear-gradient(170deg, color-mix(in srgb, ' + R.c + ' 22%, #1B1840), #0F0D28 70%); box-shadow: inset 0 0 0 1px color-mix(in srgb, ' + R.c + ' 45%, transparent), 0 14px 30px #0009; animation-delay: ' + (k * 0.08).toFixed(2) + 's;' + (ok ? ' filter: saturate(.6);' : ''),
-        badge: 'display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 11px; background: ' + R.c + '; color: #0B0B14; box-shadow: 0 0 14px ' + R.c + '88',
+        style: 'background: linear-gradient(170deg, color-mix(in srgb, ' + R.c + ' 22%, #2A1460), #1A0B40 70%); box-shadow: inset 0 0 0 1px color-mix(in srgb, ' + R.c + ' 45%, transparent), 0 14px 30px #0009; animation-delay: ' + (k * 0.08).toFixed(2) + 's;' + (ok ? ' filter: saturate(.6);' : ''),
+        badge: 'display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 11px; background: ' + R.c + '; color: #150925; box-shadow: 0 0 14px ' + R.c + '88',
         label: ok ? 'JUGAR OTRA VEZ' : '¡ACEPTO!',
-        btn: ok ? 'background: #26264A; color: #C9C2FF; animation: none' : '',
+        btn: ok ? 'background: #39206E; color: #C9C2FF; animation: none' : '',
         play: () => this.play({ kind: 'reto', reto: R.id, n: R.n, ai: R.ai, dur: R.dur, start: R.start || null, away: TN_CLUBS[(k * 5 + 3) % TN_CLUBS.length][0], color: TN_CLUBS[(k * 5 + 3) % TN_CLUBS.length][1], trim: TN_CLUBS[(k * 5 + 3) % TN_CLUBS.length][2], label: 'RETO · ' + R.title })
       };
     });

@@ -13,17 +13,17 @@ body{margin:0}
 @keyframes mjIn{from{opacity:0;transform:translateY(24px) scale(.92)}}
 @keyframes mjSpin{to{transform:rotate(360deg)}}
 @keyframes mjBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@keyframes mjPulse{0%,100%{box-shadow:0 0 0 2px #05050A,0 5px 0 #05050A,0 0 0 0 var(--mc)}50%{box-shadow:0 0 0 2px #05050A,0 5px 0 #05050A,0 0 0 8px transparent}}
+@keyframes mjPulse{0%,100%{box-shadow:0 0 0 2px #0D0418,0 5px 0 #0D0418,0 0 0 0 var(--mc)}50%{box-shadow:0 0 0 2px #0D0418,0 5px 0 #0D0418,0 0 0 8px transparent}}
 @keyframes mjMsg{from{opacity:0;transform:scale(.3) rotate(-10deg)}60%{transform:scale(1.15) rotate(3deg)}to{opacity:1;transform:scale(1) rotate(-3deg)}}
 @keyframes mjZone{0%,100%{opacity:.35}50%{opacity:.75}}
 .mj-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;width:236px;height:228px;padding:14px 12px 12px;box-sizing:border-box;border:0;border-radius:24px;cursor:pointer;color:#F4F4FA;font-family:Exo2,sans-serif;text-align:center;overflow:hidden;animation:mjIn .5s cubic-bezier(.2,1.4,.4,1) both;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
 .mj-card:hover{transform:translateY(-5px) rotate(-1deg)}
 .mj-card .art{position:relative;width:150px;height:118px;display:flex;align-items:center;justify-content:center}
-.mj-card h3{margin:0;font:800 italic 26px/1 'Barlow Condensed',sans-serif;letter-spacing:.5px;text-shadow:0 3px 0 #05050A}
+.mj-card h3{margin:0;font:800 italic 26px/1 'Barlow Condensed',sans-serif;letter-spacing:.5px;text-shadow:0 3px 0 #0D0418}
 .mj-card p{margin:0;font-size:11.5px;font-weight:700;line-height:1.35;color:#DADAF0;flex:1}
 .mj-go{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:40px;border-radius:14px;font:800 italic 19px 'Barlow Condensed',sans-serif;letter-spacing:1px}
-.mj-sign{position:relative;display:flex;align-items:center;gap:2px;padding:4px 18px 2px;border-radius:14px;background:linear-gradient(180deg,#2A1650,#120A26);box-shadow:0 0 0 3px #05050A,0 0 0 6px #FF5CC8,0 0 22px #FF5CC8AA,inset 0 0 18px #FF5CC855}
-.mj-sign b{font:800 italic 30px/1 'Barlow Condensed',sans-serif;letter-spacing:1px;color:#FFE38A;text-shadow:0 0 6px #FFC53D,0 0 16px #FF8A3D,0 3px 0 #05050A;animation:mjNeon 3.4s infinite}
+.mj-sign{position:relative;display:flex;align-items:center;gap:2px;padding:4px 18px 2px;border-radius:14px;background:linear-gradient(180deg,#2A1650,#1E083D);box-shadow:0 0 0 3px #0D0418,0 0 0 6px #FF5CC8,0 0 22px #FF5CC8AA,inset 0 0 18px #FF5CC855}
+.mj-sign b{font:800 italic 30px/1 'Barlow Condensed',sans-serif;letter-spacing:1px;color:#FFE38A;text-shadow:0 0 6px #FFC53D,0 0 16px #FF8A3D,0 3px 0 #0D0418;animation:mjNeon 3.4s infinite}
 .mj-sign b:nth-child(3n){animation-delay:-1.1s}.mj-sign b:nth-child(4n){animation-delay:-2.3s}.mj-sign b.sp{width:10px}
 @keyframes mjNeon{0%,17%,19%,60%,62%,100%{opacity:1}18%,61%{opacity:.35}}
 .mj-sign .bul{position:absolute;inset:-9px;pointer-events:none}
@@ -35,7 +35,7 @@ body{margin:0}
 .mj-card .rib{position:absolute;right:-30px;top:16px;width:120px;padding:3px 0;rotate:38deg;text-align:center;font:800 10px Exo2,sans-serif;letter-spacing:1px;box-shadow:0 3px 0 #0006}
 .mj-card .spk i{position:absolute;bottom:0;width:4px;height:4px;border-radius:50%;background:var(--mc);box-shadow:0 0 8px var(--mc);opacity:0;animation:mjSpk 3.2s linear infinite}
 @keyframes mjSpk{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-200px);opacity:0}}
-.mj-streak{position:absolute;left:24px;right:24px;bottom:12px;height:62px;display:flex;align-items:center;gap:12px;padding:0 14px;border-radius:20px;background:linear-gradient(180deg,#1E1F45E6,#0E0E22E6);box-shadow:inset 0 2px 0 #ffffff18,inset 0 -3px 0 #0008,0 0 0 2px #05050A,0 0 0 3.5px #FF8A3D66}
+.mj-streak{position:absolute;left:24px;right:24px;bottom:12px;height:62px;display:flex;align-items:center;gap:12px;padding:0 14px;border-radius:20px;background:linear-gradient(180deg,#2E1A67E6,#190C38E6);box-shadow:inset 0 2px 0 #ffffff18,inset 0 -3px 0 #0008,0 0 0 2px #0D0418,0 0 0 3.5px #FF8A3D66}
 .mj-flame{animation:mjFlame .9s ease-in-out infinite alternate;transform-origin:50% 90%}
 @keyframes mjFlame{from{transform:scale(1,1) rotate(-3deg)}to{transform:scale(1.08,.94) rotate(3deg)}}
 .mj-day{position:relative;flex:1;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:12px;font:800 9px Exo2,sans-serif;letter-spacing:.5px}
@@ -45,7 +45,7 @@ body{margin:0}
 @keyframes mjRipple{0%{transform:scale(1)}30%{transform:scale(1.06,1.1) translateY(-4px)}60%{transform:scale(.98)}100%{transform:scale(1)}}
 @keyframes mjJump{0%,100%{transform:translateY(0)}40%{transform:translateY(-26px)}}
 /* the arcade hall: a neon grid floor rolling towards you, tokens floating up, side neons */
-.mj-hall{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:radial-gradient(70% 60% at 50% 30%,#3A1A6A 0%,#170C34 55%,#07051A 100%)}
+.mj-hall{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:radial-gradient(70% 60% at 50% 30%,#3A1A6A 0%,#250A50 55%,#0F042D 100%)}
 .mj-floor{position:absolute;left:-50%;right:-50%;bottom:-40px;height:260px;transform:perspective(380px) rotateX(62deg);transform-origin:50% 100%;overflow:hidden;-webkit-mask-image:linear-gradient(0deg,#000 30%,transparent 95%);mask-image:linear-gradient(0deg,#000 30%,transparent 95%)}
 .mj-floor i{position:absolute;left:0;right:0;top:-60px;bottom:0;background:linear-gradient(90deg,#FF5CC855 2px,transparent 2px) 0 0/60px 60px,linear-gradient(0deg,#22D3EE55 2px,transparent 2px) 0 0/60px 60px;animation:mjRoll 2.4s linear infinite;will-change:transform}
 @keyframes mjRoll{to{transform:translateY(60px)}}
@@ -53,7 +53,7 @@ body{margin:0}
 .mj-tok{position:absolute;bottom:-30px;opacity:0;animation:mjTok var(--d,9s) linear infinite;will-change:transform,opacity}
 @keyframes mjTok{0%{opacity:0;transform:translateY(0) rotate(0)}12%{opacity:.75}100%{opacity:0;transform:translateY(-420px) rotate(var(--r,200deg))}}
 .mj-side{position:absolute;top:96px;font:800 italic 40px/1 'Barlow Condensed',sans-serif;letter-spacing:2px;color:transparent;-webkit-text-stroke:2px var(--nc);text-shadow:0 0 14px var(--nc);opacity:.32;writing-mode:vertical-rl;animation:mjNeon 4.2s infinite}
-.mj-screen{position:absolute;inset:-4px -8px;border-radius:14px;background:#05050A;box-shadow:inset 0 0 0 2px var(--mc),inset 0 0 18px color-mix(in srgb,var(--mc) 40%,transparent);overflow:hidden}
+.mj-screen{position:absolute;inset:-4px -8px;border-radius:14px;background:#0D0418;box-shadow:inset 0 0 0 2px var(--mc),inset 0 0 18px color-mix(in srgb,var(--mc) 40%,transparent);overflow:hidden}
 .mj-screen::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,#ffffff0a 0 1px,transparent 1px 3px);pointer-events:none}
 .mj-card .art>svg{position:relative;max-height:90px;width:auto}
 .mj-zone{position:absolute;border:0;padding:0;cursor:pointer;border-radius:10px;background:radial-gradient(closest-side,#22D3EE55,transparent);box-shadow:inset 0 0 0 2px #22D3EE88;animation:mjZone 1.4s ease-in-out infinite}
@@ -68,27 +68,27 @@ body{margin:0}
       <div class="mj-sun"></div>
       <div class="mj-floor"><i></i></div>
       <span class="mj-side" style="left: 14px; --nc: #22D3EE">PLAY</span><span class="mj-side" style="right: 14px; --nc: #FF5CC8; animation-delay: -2s">WIN</span>
-      <sc-for list="{{tokens}}" as="t" hint-placeholder-count="0"><svg class="mj-tok" width="{{t.s}}" height="{{t.s}}" viewBox="0 0 24 24" style="{{t.style}}"><path d="{{t.d}}" fill="{{t.c}}" stroke="#05050A" stroke-width="1.5"/></svg></sc-for>
+      <sc-for list="{{tokens}}" as="t" hint-placeholder-count="0"><svg class="mj-tok" width="{{t.s}}" height="{{t.s}}" viewBox="0 0 24 24" style="{{t.style}}"><path d="{{t.d}}" fill="{{t.c}}" stroke="#0D0418" stroke-width="1.5"/></svg></sc-for>
     </div>
     <div style="position: absolute; left: 16px; right: 16px; top: 12px; display: flex; align-items: center; gap: 10px">
-      <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 46px; height: 38px; background: #17172A; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+      <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 46px; height: 38px; background: #251443; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
       <div class="mj-sign" role="heading" aria-level="1" aria-label="Minijuegos diarios"><span class="bul"><sc-for list="{{bulbs}}" as="u" hint-placeholder-count="0"><i style="{{u}}"></i></sc-for></span><sc-for list="{{signLetters}}" as="l" hint-placeholder-count="17"><b class="{{l.cls}}">{{l.ch}}</b></sc-for></div>
       <span style="flex: 1"></span>
-      <span class="bc-para" style="display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; background: #17172AE6; font-size: 12px; font-weight: 800; color: #CACAE0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>Nuevos en {{reset}}</span>
+      <span class="bc-para" style="display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; background: #251443E6; font-size: 12px; font-weight: 800; color: #CACAE0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>Nuevos en {{reset}}</span>
     </div>
     <div style="position: absolute; left: 0; right: 0; top: 70px; display: flex; justify-content: center; gap: 18px">
       <sc-for list="{{cards}}" as="c" hint-placeholder-count="3">
         <button type="button" class="mj-card" onClick="{{c.open}}" aria-label="{{c.title}}" style="{{c.style}}">
           <span class="art"><span class="mj-screen"></span>
             <sc-if value="{{c.isWheel}}" hint-placeholder-val="{{ false }}">
-              <svg width="112" height="112" viewBox="0 0 54 54" style="animation: mjSpin 7s linear infinite; filter: drop-shadow(0 6px 8px #000a)"><circle cx="27" cy="27" r="25" fill="#FFC53D" stroke="#05050A" stroke-width="2.5"/><g transform="translate(27 27)"><path d="M0 0L0 -21A21 21 0 0 1 14.8 -14.8Z" fill="#22D3EE"/><path d="M0 0L14.8 -14.8A21 21 0 0 1 21 0Z" fill="#FF5CC8"/><path d="M0 0L21 0A21 21 0 0 1 14.8 14.8Z" fill="#53D88E"/><path d="M0 0L14.8 14.8A21 21 0 0 1 0 21Z" fill="#A78BFA"/><path d="M0 0L0 21A21 21 0 0 1 -14.8 14.8Z" fill="#FF8A3D"/><path d="M0 0L-14.8 14.8A21 21 0 0 1 -21 0Z" fill="#6FB6FF"/><path d="M0 0L-21 0A21 21 0 0 1 -14.8 -14.8Z" fill="#FF5C5C"/><path d="M0 0L-14.8 -14.8A21 21 0 0 1 0 -21Z" fill="#FFE38A"/><circle r="6" fill="#FFF2B0" stroke="#05050A" stroke-width="1.5"/></g></svg>
-              <svg width="20" height="24" viewBox="0 0 34 42" style="position: absolute; left: 65px; top: -2px"><path d="M17 40L3 12a14 14 0 1 1 28 0z" fill="#FF3B5C" stroke="#05050A" stroke-width="3"/></svg>
+              <svg width="112" height="112" viewBox="0 0 54 54" style="animation: mjSpin 7s linear infinite; filter: drop-shadow(0 6px 8px #000a)"><circle cx="27" cy="27" r="25" fill="#FFC53D" stroke="#0D0418" stroke-width="2.5"/><g transform="translate(27 27)"><path d="M0 0L0 -21A21 21 0 0 1 14.8 -14.8Z" fill="#22D3EE"/><path d="M0 0L14.8 -14.8A21 21 0 0 1 21 0Z" fill="#FF5CC8"/><path d="M0 0L21 0A21 21 0 0 1 14.8 14.8Z" fill="#53D88E"/><path d="M0 0L14.8 14.8A21 21 0 0 1 0 21Z" fill="#A78BFA"/><path d="M0 0L0 21A21 21 0 0 1 -14.8 14.8Z" fill="#FF8A3D"/><path d="M0 0L-14.8 14.8A21 21 0 0 1 -21 0Z" fill="#6FB6FF"/><path d="M0 0L-21 0A21 21 0 0 1 -14.8 -14.8Z" fill="#FF5C5C"/><path d="M0 0L-14.8 -14.8A21 21 0 0 1 0 -21Z" fill="#FFE38A"/><circle r="6" fill="#FFF2B0" stroke="#0D0418" stroke-width="1.5"/></g></svg>
+              <svg width="20" height="24" viewBox="0 0 34 42" style="position: absolute; left: 65px; top: -2px"><path d="M17 40L3 12a14 14 0 1 1 28 0z" fill="#FF3B5C" stroke="#0D0418" stroke-width="3"/></svg>
             </sc-if>
             <sc-if value="{{c.isPens}}" hint-placeholder-val="{{ false }}">
-              <svg width="150" height="110" viewBox="0 0 150 110"><rect x="12" y="10" width="126" height="64" fill="none" stroke="#FFFFFF" stroke-width="5"/><path d="M12 10l10 10h106l10-10M22 20v54M128 20v54" stroke="#ffffff55" stroke-width="2" fill="none"/><path d="M24 22h102v50H24z" fill="url(#mjNet)" opacity=".5"/><defs><pattern id="mjNet" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 0L8 8M8 0L0 8" stroke="#fff" stroke-width=".8"/></pattern></defs><g><path d="M60 72h8v-16l6-6M74 50l6 6v16h8" stroke="#FFC53D" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"><animateTransform attributeName="transform" type="translate" values="0 0;0 0;34 -16;34 -16;0 0" keyTimes="0;.35;.55;.9;1" dur="2.4s" repeatCount="indefinite"/></path><circle cx="74" cy="44" r="5" fill="#FFC53D"><animateTransform attributeName="transform" type="translate" values="0 0;0 0;34 -16;34 -16;0 0" keyTimes="0;.35;.55;.9;1" dur="2.4s" repeatCount="indefinite"/></circle></g><path d="M75 100 Q 92 70 112 32" stroke="#FFFFFF55" stroke-width="2" stroke-dasharray="4 5" fill="none"/><g><circle r="8" fill="#fff" stroke="#05050A" stroke-width="2.2"/><path d="M0 -4l4 3-1.5 4.5h-5L-4 -1z" fill="#17172A"/><animateMotion dur="2.4s" repeatCount="indefinite" path="M75 100 Q 92 70 112 32" keyPoints="0;0;1;1" keyTimes="0;.3;.55;1" calcMode="linear"/><animate attributeName="opacity" values="1;1;1;0;1" keyTimes="0;.55;.85;.95;1" dur="2.4s" repeatCount="indefinite"/></g><text x="75" y="22" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="20" fill="#FFE38A" stroke="#05050A" stroke-width="1" opacity="0">¡GOL!<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;.55;.6;.85;1" dur="2.4s" repeatCount="indefinite"/></text></svg>
+              <svg width="150" height="110" viewBox="0 0 150 110"><rect x="12" y="10" width="126" height="64" fill="none" stroke="#FFFFFF" stroke-width="5"/><path d="M12 10l10 10h106l10-10M22 20v54M128 20v54" stroke="#ffffff55" stroke-width="2" fill="none"/><path d="M24 22h102v50H24z" fill="url(#mjNet)" opacity=".5"/><defs><pattern id="mjNet" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 0L8 8M8 0L0 8" stroke="#fff" stroke-width=".8"/></pattern></defs><g><path d="M60 72h8v-16l6-6M74 50l6 6v16h8" stroke="#FFC53D" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"><animateTransform attributeName="transform" type="translate" values="0 0;0 0;34 -16;34 -16;0 0" keyTimes="0;.35;.55;.9;1" dur="2.4s" repeatCount="indefinite"/></path><circle cx="74" cy="44" r="5" fill="#FFC53D"><animateTransform attributeName="transform" type="translate" values="0 0;0 0;34 -16;34 -16;0 0" keyTimes="0;.35;.55;.9;1" dur="2.4s" repeatCount="indefinite"/></circle></g><path d="M75 100 Q 92 70 112 32" stroke="#FFFFFF55" stroke-width="2" stroke-dasharray="4 5" fill="none"/><g><circle r="8" fill="#fff" stroke="#0D0418" stroke-width="2.2"/><path d="M0 -4l4 3-1.5 4.5h-5L-4 -1z" fill="#251443"/><animateMotion dur="2.4s" repeatCount="indefinite" path="M75 100 Q 92 70 112 32" keyPoints="0;0;1;1" keyTimes="0;.3;.55;1" calcMode="linear"/><animate attributeName="opacity" values="1;1;1;0;1" keyTimes="0;.55;.85;.95;1" dur="2.4s" repeatCount="indefinite"/></g><text x="75" y="22" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="20" fill="#FFE38A" stroke="#0D0418" stroke-width="1" opacity="0">¡GOL!<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;.55;.6;.85;1" dur="2.4s" repeatCount="indefinite"/></text></svg>
             </sc-if>
             <sc-if value="{{c.isFk}}" hint-placeholder-val="{{ false }}">
-              <svg width="150" height="110" viewBox="0 0 150 110"><rect x="12" y="8" width="126" height="60" fill="none" stroke="#FFFFFF" stroke-width="5"/><path d="M24 20h102v46H24z" fill="url(#mjNet2)" opacity=".45"/><defs><pattern id="mjNet2" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 0L8 8M8 0L0 8" stroke="#fff" stroke-width=".8"/></pattern></defs><g fill="#1D2A6B" stroke="#05050A" stroke-width="2"><rect x="50" y="52" width="12" height="30" rx="5"/><rect x="64" y="50" width="12" height="32" rx="5"/><rect x="78" y="52" width="12" height="30" rx="5"/><circle cx="56" cy="47" r="5"/><circle cx="70" cy="45" r="5"/><circle cx="84" cy="47" r="5"/></g><path d="M40 104 Q 20 40 116 22" stroke="#FFFFFF55" stroke-width="2" stroke-dasharray="4 5" fill="none"/><g><circle r="7.5" fill="#fff" stroke="#05050A" stroke-width="2.2"/><path d="M0 -3.5l3.5 2.6-1.3 4h-4.4l-1.3-4z" fill="#17172A"/><animateMotion dur="2.6s" repeatCount="indefinite" path="M40 104 Q 20 40 116 22" keyPoints="0;0;1;1" keyTimes="0;.25;.6;1" calcMode="linear" rotate="auto"/><animate attributeName="opacity" values="1;1;1;0;1" keyTimes="0;.6;.85;.95;1" dur="2.6s" repeatCount="indefinite"/></g><g><animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 -7;0 0;0 0" keyTimes="0;.3;.4;.5;1" dur="2.6s" repeatCount="indefinite"/></g><text x="75" y="96" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="18" fill="#FFE38A" stroke="#05050A" stroke-width="1" opacity="0">¡ESCUADRA!<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;.6;.65;.88;1" dur="2.6s" repeatCount="indefinite"/></text></svg>
+              <svg width="150" height="110" viewBox="0 0 150 110"><rect x="12" y="8" width="126" height="60" fill="none" stroke="#FFFFFF" stroke-width="5"/><path d="M24 20h102v46H24z" fill="url(#mjNet2)" opacity=".45"/><defs><pattern id="mjNet2" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 0L8 8M8 0L0 8" stroke="#fff" stroke-width=".8"/></pattern></defs><g fill="#1D2A6B" stroke="#0D0418" stroke-width="2"><rect x="50" y="52" width="12" height="30" rx="5"/><rect x="64" y="50" width="12" height="32" rx="5"/><rect x="78" y="52" width="12" height="30" rx="5"/><circle cx="56" cy="47" r="5"/><circle cx="70" cy="45" r="5"/><circle cx="84" cy="47" r="5"/></g><path d="M40 104 Q 20 40 116 22" stroke="#FFFFFF55" stroke-width="2" stroke-dasharray="4 5" fill="none"/><g><circle r="7.5" fill="#fff" stroke="#0D0418" stroke-width="2.2"/><path d="M0 -3.5l3.5 2.6-1.3 4h-4.4l-1.3-4z" fill="#251443"/><animateMotion dur="2.6s" repeatCount="indefinite" path="M40 104 Q 20 40 116 22" keyPoints="0;0;1;1" keyTimes="0;.25;.6;1" calcMode="linear" rotate="auto"/><animate attributeName="opacity" values="1;1;1;0;1" keyTimes="0;.6;.85;.95;1" dur="2.6s" repeatCount="indefinite"/></g><g><animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 -7;0 0;0 0" keyTimes="0;.3;.4;.5;1" dur="2.6s" repeatCount="indefinite"/></g><text x="75" y="96" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-style="italic" font-size="18" fill="#FFE38A" stroke="#0D0418" stroke-width="1" opacity="0">¡ESCUADRA!<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;.6;.65;.88;1" dur="2.6s" repeatCount="indefinite"/></text></svg>
             </sc-if>
           </span>
           <span class="spk" aria-hidden="true"><i style="left: 20%"></i><i style="left: 45%; animation-delay: -1.2s"></i><i style="left: 70%; animation-delay: -2.1s"></i><i style="left: 88%; animation-delay: -.6s"></i></span>
@@ -100,7 +100,7 @@ body{margin:0}
       </sc-for>
     </div>
     <div class="mj-streak">
-      <svg class="mj-flame" width="34" height="40" viewBox="0 0 34 40"><path d="M17 2c3 8 12 12 12 23a12 12 0 0 1-24 0c0-6 3-9 5-12 1 4 3 6 5 6-3-6 0-12 2-17z" fill="#FF8A3D" stroke="#05050A" stroke-width="2.5"/><path d="M17 20c2 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 3 3 3-1-3 0-5 0-7z" fill="#FFE38A"/></svg>
+      <svg class="mj-flame" width="34" height="40" viewBox="0 0 34 40"><path d="M17 2c3 8 12 12 12 23a12 12 0 0 1-24 0c0-6 3-9 5-12 1 4 3 6 5 6-3-6 0-12 2-17z" fill="#FF8A3D" stroke="#0D0418" stroke-width="2.5"/><path d="M17 20c2 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 3 3 3-1-3 0-5 0-7z" fill="#FFE38A"/></svg>
       <div style="display: flex; flex-direction: column; width: 128px; line-height: 1.1">
         <b style="font: 800 italic 20px 'Barlow Condensed', sans-serif; color: #FF8A3D">RACHA · {{streakN}} {{streakDays}}</b>
         <span style="font-size: 10px; font-weight: 700; color: #CACAE0">{{streakHint}}</span>
@@ -117,13 +117,13 @@ body{margin:0}
       <dc-import name="Duelo" mode="daily" kind="{{duelKind}}" on-end="{{onDuel}}" hint-size="844px,390px"></dc-import>
     </div>
     <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
-      <div style="position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: radial-gradient(60% 70% at 50% 45%, #2A1C5ECC, #05050AEE)">
+      <div style="position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: radial-gradient(60% 70% at 50% 45%, #2A1C5ECC, #0D0418EE)">
         <div style="position: absolute; left: 50%; top: 45%; width: 700px; height: 700px; margin: -350px 0 0 -350px; background: repeating-conic-gradient(#FFC53D18 0 7deg, transparent 9deg 20deg); -webkit-mask-image: radial-gradient(closest-side, #000, transparent); mask-image: radial-gradient(closest-side, #000, transparent); animation: mjSpin 30s linear infinite; pointer-events: none"></div>
         <span style="position: relative; font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">{{gameTitle}}</span>
-        <span style="position: relative; font: 800 italic 54px/1 'Barlow Condensed', sans-serif; color: #FFC53D; text-shadow: 0 5px 0 #05050A, 0 0 26px #FFC53D66; animation: mjMsg .5s both">{{doneTitle}}</span>
+        <span style="position: relative; font: 800 italic 54px/1 'Barlow Condensed', sans-serif; color: #FFC53D; text-shadow: 0 5px 0 #0D0418, 0 0 26px #FFC53D66; animation: mjMsg .5s both">{{doneTitle}}</span>
         <div style="position: relative; display: flex; gap: 10px"><sc-for list="{{dots}}" as="d" hint-placeholder-count="3"><span style="{{d}}"></span></sc-for></div>
         <span style="position: relative; font: 800 22px 'Barlow Condensed', sans-serif; color: #F4F4FA">{{doneScore}}</span>
-        <span style="position: relative; padding: 6px 16px; border-radius: 14px; background: #17172A; box-shadow: 0 0 0 2px #FFC53D; font-size: 15px; font-weight: 800; color: #FFE38A">Premio: {{prizeLabel}}</span>
+        <span style="position: relative; padding: 6px 16px; border-radius: 14px; background: #251443; box-shadow: 0 0 0 2px #FFC53D; font-size: 15px; font-weight: 800; color: #FFE38A">Premio: {{prizeLabel}}</span>
         <button type="button" onClick="{{claim}}" class="bc-btn-gold" style="position: relative; margin-top: 6px; height: 52px; padding: 0 34px; font-size: 24px; cursor: pointer">RECOGER</button>
       </div>
     </sc-if>
@@ -192,11 +192,11 @@ class Component extends DCLogic {
       const ok = D.ready(id);
       return {
         title, desc: desc + ' ' + prize, isWheel: id === 'wheel', isPens: id === 'pens', isFk: id === 'fk',
-        style: '--mc: ' + col + '; background: radial-gradient(120% 70% at 50% 20%, ' + col2 + ', #11112A 70%); box-shadow: inset 0 2px 0 #ffffff22, inset 0 -4px 0 #0008, inset 0 0 0 2px ' + col + (ok ? '' : '44') + ', 0 10px 24px #0008' + (ok ? ', 0 0 22px ' + col + '55' : '') + ';' + (ok ? '' : ' filter: saturate(.55) brightness(.85);'),
+        style: '--mc: ' + col + '; background: radial-gradient(120% 70% at 50% 20%, ' + col2 + ', #1D0E43 70%); box-shadow: inset 0 2px 0 #ffffff22, inset 0 -4px 0 #0008, inset 0 0 0 2px ' + col + (ok ? '' : '44') + ', 0 10px 24px #0008' + (ok ? ', 0 0 22px ' + col + '55' : '') + ';' + (ok ? '' : ' filter: saturate(.55) brightness(.85);'),
         titleStyle: 'color: ' + col + ';' + (title.length > 12 ? ' font-size: 22px; white-space: nowrap;' : ''),
-        rib: ok ? 'NUEVO HOY' : 'JUGADO ✓', ribStyle: ok ? 'background: ' + col + '; color: #0B0B14;' : 'background: #26264A; color: #8A8AAE;',
+        rib: ok ? 'NUEVO HOY' : 'JUGADO ✓', ribStyle: ok ? 'background: ' + col + '; color: #150925;' : 'background: #39206E; color: #8A8AAE;',
         btn: ok ? '¡JUGAR GRATIS!' : 'MAÑANA',
-        btnStyle: ok ? 'background: linear-gradient(180deg, ' + col + ', color-mix(in srgb, ' + col + ' 70%, #000)); color: #0B0B14; box-shadow: inset 0 2px 0 #fff8, 0 0 0 2px #05050A, 0 4px 0 #05050A; animation: mjPulse 1.6s ease-in-out infinite;' : 'background: #26264A; color: #8686A6; box-shadow: 0 0 0 2px #05050A;',
+        btnStyle: ok ? 'background: linear-gradient(180deg, ' + col + ', color-mix(in srgb, ' + col + ' 70%, #000)); color: #150925; box-shadow: inset 0 2px 0 #fff8, 0 0 0 2px #0D0418, 0 4px 0 #0D0418; animation: mjPulse 1.6s ease-in-out infinite;' : 'background: #39206E; color: #8686A6; box-shadow: 0 0 0 2px #0D0418;',
         open: () => {
           if (id === 'wheel') { if (window.AMJuice) window.AMJuice.wheel.open(); return; }
           if (!ok) return;
@@ -223,7 +223,7 @@ class Component extends DCLogic {
       days: R.map((r, i) => {
         const n = i + 1, done = n <= st.n, next = n === st.n + 1 && !st.today;
         const label = r.t === 'vcd' ? r.n + ' VCD' : r.t === 'bob' ? r.n + ' BOB' + (r.chest ? '+🎁' : '') : 'COFRE';
-        return { n: String(n), label, style: done ? 'background: linear-gradient(180deg, #FF8A3D, #C2410C); color: #2A0E02; box-shadow: inset 0 2px 0 #fff6;' : next ? 'background: #2A1A10; color: #FFC53D; animation: mjToday 1.4s infinite;' : r.t === 'bob' ? 'background: #2A0F24; color: #FF9AD8; box-shadow: inset 0 0 0 1.5px #FF5CC866;' : 'background: #16162E; color: #8A8AAE; box-shadow: inset 0 0 0 1px #2E2E52;' };
+        return { n: String(n), label, style: done ? 'background: linear-gradient(180deg, #FF8A3D, #C2410C); color: #2A0E02; box-shadow: inset 0 2px 0 #fff6;' : next ? 'background: #2A1A10; color: #FFC53D; animation: mjToday 1.4s infinite;' : r.t === 'bob' ? 'background: #3F0D3B; color: #FF9AD8; box-shadow: inset 0 0 0 1.5px #FF5CC866;' : 'background: #241348; color: #8A8AAE; box-shadow: inset 0 0 0 1px #2E2E52;' };
       }),
       crowd: g ? Array.from({ length: 70 }, (_, k) => ({ x: (rnd(k) * 844).toFixed(0), y: (40 + rnd(k + 99) * 34).toFixed(0), r: (4 + rnd(k + 7) * 3).toFixed(1), c: ['#22D3EE', '#FFC53D', '#FF5CC8', '#F4F4FA', '#53D88E'][k % 5] })) : [],
       netStyle: scored ? 'transform-origin: 422px 238px; animation: mjRipple .6s ease-out;' : '',
@@ -239,7 +239,7 @@ class Component extends DCLogic {
         card('fk', 'FALTAS', '3 faltas con barrera: chuta en el momento justo.', '#FF5CC8', '#4A0F38', 'Pleno: 250 VCD + 3 BOB.')
       ],
       gameTitle: g === 'fk' ? 'FALTAS DE LA SUERTE' : 'PENALTIS DE LA SUERTE',
-      dots: [0, 1, 2].map((i) => 'width: 22px; height: 22px; border-radius: 11px; box-sizing: border-box; ' + (i < s.shots.length ? (s.shots[i] ? 'background: #53D88E; box-shadow: 0 0 10px #53D88E;' : 'background: #FF5C5C;') : 'border: 2px solid #4C4C78; background: #0B0B14CC;')),
+      dots: [0, 1, 2].map((i) => 'width: 22px; height: 22px; border-radius: 11px; box-sizing: border-box; ' + (i < s.shots.length ? (s.shots[i] ? 'background: #53D88E; box-shadow: 0 0 10px #53D88E;' : 'background: #FF5C5C;') : 'border: 2px solid #4C4C78; background: #150925CC;')),
       zones: [0, 1, 2, 3, 4, 5].map((z) => ({
         aria: 'Chutar ' + ['arriba', 'abajo'][Math.floor(z / 3)] + ' ' + ['a la izquierda', 'al centro', 'a la derecha'][z % 3],
         style: 'left: ' + (272 + (z % 3) * 102) + 'px; top: ' + (88 + Math.floor(z / 3) * 74) + 'px; width: 96px; height: 68px;' + (s.phase !== 'aim' ? ' display: none;' : ''),
@@ -251,7 +251,7 @@ class Component extends DCLogic {
       canShoot: g === 'fk' && s.phase === 'aim',
       shootFk: () => this.shootFk(),
       hasMsg: !!s.msg, msg: s.msg, msgKey: 'm' + s.msgN,
-      msgStyle: 'font: 800 italic 58px/1 \'Barlow Condensed\', sans-serif; letter-spacing: 1px; color: ' + (/GOL|ESCUADRA/.test(s.msg) ? '#53D88E' : '#FF5C5C') + '; text-shadow: 0 5px 0 #05050A, 0 0 24px currentColor; animation: mjMsg .45s cubic-bezier(.2,1.6,.4,1) both;',
+      msgStyle: 'font: 800 italic 58px/1 \'Barlow Condensed\', sans-serif; letter-spacing: 1px; color: ' + (/GOL|ESCUADRA/.test(s.msg) ? '#53D88E' : '#FF5C5C') + '; text-shadow: 0 5px 0 #0D0418, 0 0 24px currentColor; animation: mjMsg .45s cubic-bezier(.2,1.6,.4,1) both;',
       isDone: s.phase === 'done',
       doneTitle: pr.g === 3 ? '¡PLENO!' : pr.g === 2 ? '¡MUY BIEN!' : pr.g === 1 ? '¡NO ESTÁ MAL!' : '¡OTRA VEZ SERÁ!',
       doneScore: pr.g + ' de 3 goles',

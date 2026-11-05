@@ -12,7 +12,7 @@
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
-.lg-room{position:absolute;inset:0;pointer-events:none;overflow:hidden;background:radial-gradient(60% 80% at 18% 30%,#3A2A0A55,transparent 70%),linear-gradient(180deg,#0B0A1A,#120E26 60%,#0A0816)}
+.lg-room{position:absolute;inset:0;pointer-events:none;overflow:hidden;background:radial-gradient(60% 80% at 18% 30%,#3A2A0A55,transparent 70%),linear-gradient(180deg,#15082D,#1E0C3D 60%,#140728)}
 .lg-room::before{content:"";position:absolute;left:-40px;top:-60px;width:340px;height:470px;background:conic-gradient(from 160deg at 50% 0%,transparent 0deg,#FFE9A814 12deg,#FFE9A824 20deg,#FFE9A814 28deg,transparent 40deg);animation:lgSpot 6s ease-in-out infinite alternate;transform-origin:50% 0}
 @keyframes lgSpot{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
 .lg-dust{position:absolute;width:3px;height:3px;border-radius:50%;background:#FFE38A;box-shadow:0 0 6px #FFC53D;opacity:0;animation:lgDust var(--d,7s) linear infinite}
@@ -26,7 +26,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 @keyframes lgReady{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.06)}}
 .lg-rays{z-index:0;position:absolute;left:50%;top:38px;width:120px;height:120px;margin:-60px;border-radius:50%;background:repeating-conic-gradient(#FFE38A55 0 8deg,transparent 11deg 24deg);-webkit-mask-image:radial-gradient(closest-side,#000 30%,transparent);mask-image:radial-gradient(closest-side,#000 30%,transparent);animation:lgSpin 8s linear infinite;pointer-events:none;will-change:transform}
 @keyframes lgSpin{to{transform:rotate(360deg)}}
-.lg-shelf{grid-column:1/-1;height:10px;margin:-6px 6px 4px;border-radius:3px;background:linear-gradient(180deg,#3A2E5E,#1A1430);box-shadow:0 6px 12px #0009,0 -1px 0 #6E5CB0 inset;position:relative}
+.lg-shelf{grid-column:1/-1;height:10px;margin:-6px 6px 4px;border-radius:3px;background:linear-gradient(180deg,#3A2E5E,#29114B);box-shadow:0 6px 12px #0009,0 -1px 0 #6E5CB0 inset;position:relative}
 .lg-shelf::after{content:"";position:absolute;left:10%;right:10%;top:-14px;height:14px;background:radial-gradient(50% 100% at 50% 100%,#FFC53D22,transparent)}
 .lg-burst{animation:lgBurst 1.2s cubic-bezier(.2,1.6,.4,1)}
 @keyframes lgBurst{0%{transform:scale(.6) rotate(-20deg);filter:brightness(2.5)}40%{transform:scale(1.25) rotate(8deg)}100%{transform:scale(1) rotate(0);filter:brightness(1)}}
@@ -40,16 +40,16 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <!-- left: the collection and the selected medal -->
   <div style="position: absolute; left: 14px; top: 12px; width: 252px; bottom: 12px; display: flex; flex-direction: column; gap: 10px">
     <div style="display: flex; align-items: center; gap: 10px">
-      <a href="Perfil.dc.html" aria-label="Volver al perfil" style="display: flex; align-items: center; justify-content: center; width: 42px; height: 38px; border-radius: 12px; background: #17172A; box-shadow: inset 0 0 0 1px #2E2E52; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+      <a href="Perfil.dc.html" aria-label="Volver al perfil" style="display: flex; align-items: center; justify-content: center; width: 42px; height: 38px; border-radius: 12px; background: #251443; box-shadow: inset 0 0 0 1px #2E2E52; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
       <div style="display: flex; flex-direction: column; line-height: 1">
         <span style="font-size: 10px; font-weight: 800; letter-spacing: 3px; color: #FFC53D">SALA DE</span>
         <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 1px; text-shadow: 0 0 18px #FFC53D66">TROFEOS</h1>
       </div>
     </div>
     <!-- the collection: a trophy inside a ring that fills as you complete it -->
-    <div style="position: relative; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 18px; background: linear-gradient(135deg, #3A2A0ACC, #17142ACC); box-shadow: inset 0 0 0 1.5px #FFC53D66, 0 8px 18px #0008">
+    <div style="position: relative; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 18px; background: linear-gradient(135deg, #3A2A0ACC, #251143CC); box-shadow: inset 0 0 0 1.5px #FFC53D66, 0 8px 18px #0008">
       <div style="position: relative; flex: none; width: 78px; height: 78px">
-        <svg width="78" height="78" viewBox="0 0 78 78" style="position: absolute; inset: 0; transform: rotate(-90deg)"><circle cx="39" cy="39" r="34" fill="#0B0B14" stroke="#2E2E52" stroke-width="6"/><circle cx="39" cy="39" r="34" fill="none" stroke="url(#lg-ring)" stroke-width="6" stroke-linecap="round" stroke-dasharray="{{ringDash}}"/><defs><linearGradient id="lg-ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF3B0"/><stop offset="1" stop-color="#FFB020"/></linearGradient></defs></svg>
+        <svg width="78" height="78" viewBox="0 0 78 78" style="position: absolute; inset: 0; transform: rotate(-90deg)"><circle cx="39" cy="39" r="34" fill="#150925" stroke="#2E2E52" stroke-width="6"/><circle cx="39" cy="39" r="34" fill="none" stroke="url(#lg-ring)" stroke-width="6" stroke-linecap="round" stroke-dasharray="{{ringDash}}"/><defs><linearGradient id="lg-ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF3B0"/><stop offset="1" stop-color="#FFB020"/></linearGradient></defs></svg>
         <svg class="lg-trophy" width="40" height="40" viewBox="0 0 24 24" style="position: absolute; left: 19px; top: 17px"><path d="M7 3h10v3h3v2a5 5 0 0 1-5 5h-.3A5 5 0 0 1 13 15v2h3v3H8v-3h3v-2a5 5 0 0 1-1.7-2H9a5 5 0 0 1-5-5V6h3zM6 8a3 3 0 0 0 1.5 2.6A7 7 0 0 1 7 8zm12 0h-1a7 7 0 0 1-.5 2.6A3 3 0 0 0 18 8z" fill="#FFC53D"/><path d="M9 4h2v6a3 3 0 0 1-2-2z" fill="#FFF3B0" opacity=".7"/></svg>
       </div>
       <div style="min-width: 0; display: flex; flex-direction: column; gap: 3px">
@@ -60,7 +60,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       </div>
     </div>
     <!-- the selected medal, up close -->
-    <div style="position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 12px 14px 12px; border-radius: 18px; background: linear-gradient(180deg, #1C1B3ACC, #0F0F20E6); box-shadow: inset 0 0 0 1px {{selC}}66, 0 8px 18px #0008; overflow: hidden">
+    <div style="position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 12px 14px 12px; border-radius: 18px; background: linear-gradient(180deg, #2C1758CC, #1A0D35E6); box-shadow: inset 0 0 0 1px {{selC}}66, 0 8px 18px #0008; overflow: hidden">
       <div style="position: absolute; left: 50%; top: 10px; width: 160px; height: 120px; margin-left: -80px; background: radial-gradient(closest-side, {{selC}}44, transparent); pointer-events: none"></div>
       <div style="display: flex; align-items: center; gap: 12px; align-self: stretch">
         <svg width="58" height="66" viewBox="-30 -36 60 68" style="flex: none; overflow: visible"><path d="M-14-34h10l6 18h-10zM14-34H4l-6 18h10z" fill="{{selRib}}"/><circle r="24" cy="6" fill="{{selRim}}"/><circle r="18" cy="6" fill="{{selFace}}"/><g transform="translate(-11 -5) scale(.92)"><path d="{{selIcon}}" fill="{{selInk}}"/></g></svg>
@@ -71,7 +71,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         </div>
       </div>
       <div style="align-self: stretch; display: flex; align-items: center; gap: 8px; margin-top: 4px">
-        <div style="flex: 1; height: 10px; border-radius: 5px; background: #26264A; box-shadow: inset 0 1px 2px #0008; overflow: hidden"><div class="am-bar-shine" style="{{selBar}}"></div></div>
+        <div style="flex: 1; height: 10px; border-radius: 5px; background: #39206E; box-shadow: inset 0 1px 2px #0008; overflow: hidden"><div class="am-bar-shine" style="{{selBar}}"></div></div>
         <span style="font-size: 12px; font-weight: 800; color: #CACAE0">{{selProg}}</span>
       </div>
       <span style="flex: 1"></span>
@@ -99,14 +99,14 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
           <sc-if value="{{c.ready}}" hint-placeholder-val="{{ false }}"><i class="lg-rays"></i></sc-if>
           <svg class="lg-disc {{c.burst}}" width="72" height="80" viewBox="-36 -42 72 80" style="overflow: visible; position: relative; z-index: 1">
             <path d="M-17-40h12l7 22h-12zM17-40H5l-7 22h12z" fill="{{c.rib}}"/>
-            <circle r="31" cy="6" fill="none" stroke="#26264A" stroke-width="4"/>
+            <circle r="31" cy="6" fill="none" stroke="#39206E" stroke-width="4"/>
             <circle r="31" cy="6" fill="none" stroke="{{c.ringC}}" stroke-width="4" stroke-linecap="round" stroke-dasharray="{{c.dash}}" transform="rotate(-90 0 6)"/>
             <circle r="25" cy="6" fill="{{c.rim}}"/>
             <circle r="19" cy="6" fill="{{c.face}}"/>
             <path d="M-12 -6a19 19 0 0 1 24 -6" stroke="#FFFFFF" stroke-opacity="{{c.gloss}}" stroke-width="3" fill="none" stroke-linecap="round"/>
             <g transform="translate(-11 -5) scale(.92)"><path d="{{c.icon}}" fill="{{c.ink}}"/></g>
-            <sc-if value="{{c.got}}" hint-placeholder-val="{{ false }}"><g transform="translate(20 24)"><circle r="8" fill="#53D88E" stroke="#0B0B14" stroke-width="2"/><path d="M-3.5 0l2.5 2.5l4.5-5" stroke="#0B0B14" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></sc-if>
-            <sc-if value="{{c.locked}}" hint-placeholder-val="{{ true }}"><g transform="translate(20 24)"><circle r="8" fill="#17172A" stroke="#3A3A64" stroke-width="1.5"/><text y="3.5" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="9" fill="#CACAE0">{{c.pct}}</text></g></sc-if>
+            <sc-if value="{{c.got}}" hint-placeholder-val="{{ false }}"><g transform="translate(20 24)"><circle r="8" fill="#53D88E" stroke="#150925" stroke-width="2"/><path d="M-3.5 0l2.5 2.5l4.5-5" stroke="#150925" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></sc-if>
+            <sc-if value="{{c.locked}}" hint-placeholder-val="{{ true }}"><g transform="translate(20 24)"><circle r="8" fill="#251443" stroke="#3A3A64" stroke-width="1.5"/><text y="3.5" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="9" fill="#CACAE0">{{c.pct}}</text></g></sc-if>
           </svg>
           <span style="{{c.titleStyle}}">{{c.title}}</span>
         </button>
@@ -116,7 +116,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </div>
 
   <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; pointer-events: none; z-index: 5"><span class="am-bob" style="padding: 12px 22px; border-radius: 16px; background: linear-gradient(135deg, #FFE38A, #FFC53D); color: #0B0B14; font-weight: 800; font-size: 14px; box-shadow: 0 0 30px #FFC53DAA, 0 8px 20px #000A">{{toastText}}</span></div>
+    <div style="position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; pointer-events: none; z-index: 5"><span class="am-bob" style="padding: 12px 22px; border-radius: 16px; background: linear-gradient(135deg, #FFE38A, #FFC53D); color: #150925; font-weight: 800; font-size: 14px; box-shadow: 0 0 30px #FFC53DAA, 0 8px 20px #000A">{{toastText}}</span></div>
   </sc-if>
 </div>
 </x-dc>
@@ -147,7 +147,7 @@ class Component extends DCLogic {
     if (!document.getElementById('lgm-defs')) {
       const d = document.createElement('div'); d.id = 'lgm-defs'; d.setAttribute('aria-hidden', 'true'); d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
       const g = (id, a, b, c) => '<linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + a + '"/><stop offset=".5" stop-color="' + b + '"/><stop offset="1" stop-color="' + c + '"/></linearGradient>';
-      d.innerHTML = '<svg><defs>' + g('lgm-b', '#FFD7B0', '#E6A672', '#8A4A22') + g('lgm-s', '#FFFFFF', '#C9D3E0', '#6B7689') + g('lgm-g', '#FFF3B0', '#FFC53D', '#B7791F') + g('lgm-d', '#E6FCFF', '#7FE3FF', '#1B6FA8') + g('lgm-l', '#3A3A5C', '#26264A', '#17172A') + '</defs></svg>';
+      d.innerHTML = '<svg><defs>' + g('lgm-b', '#FFD7B0', '#E6A672', '#8A4A22') + g('lgm-s', '#FFFFFF', '#C9D3E0', '#6B7689') + g('lgm-g', '#FFF3B0', '#FFC53D', '#B7791F') + g('lgm-d', '#E6FCFF', '#7FE3FF', '#1B6FA8') + g('lgm-l', '#3A3A5C', '#39206E', '#251443') + '</defs></svg>';
       document.body.appendChild(d);
     }
     this.onDown = (e) => { const st = document.getElementById('stage'), r = st && st.getBoundingClientRect(); if (r) this.lastXY = { x: (e.clientX - r.left) / (r.width / 844), y: (e.clientY - r.top) / (r.width / 844) }; };
@@ -225,7 +225,7 @@ class Component extends DCLogic {
         burst: this.burst === a.id ? 'lg-burst' : '',
         aria: a.title + ': ' + (s === 'got' ? 'conseguido' : s === 'ready' ? 'listo para reclamar' : a.cur + ' de ' + a.goal),
         pick: () => { this.setState({ sel: a.id }); if (s === 'ready') this.claim(a); },
-        rib: on ? t.rib : '#2A2A48', rim: on ? t.rim : 'url(#lgm-l)', face: on ? t.face : '#121224', ink: on ? t.ink : '#4A4A72', gloss: on ? '.55' : '.08',
+        rib: on ? t.rib : '#3F246B', rim: on ? t.rim : 'url(#lgm-l)', face: on ? t.face : '#1E0F3B', ink: on ? t.ink : '#4A4A72', gloss: on ? '.55' : '.08',
         icon: Lg_ICON[a.icon] || Lg_ICON.rank,
         ringC: s === 'ready' ? '#FFC53D' : s === 'got' ? '#53D88E' : '#22D3EE',
         dash: (C * (s === 'locked' ? f : 1)).toFixed(1) + ' ' + C.toFixed(1),
@@ -243,7 +243,7 @@ class Component extends DCLogic {
     const tabs = Lg_TABS.map(([id, label]) => {
       const inCat = list.filter((a) => id === 'all' || this.catOf(a) === id), r = inCat.filter((a) => state(a) === 'ready').length, on = id === tab;
       return { label, sel: on ? 'true' : 'false', count: inCat.filter((a) => cl[a.id]).length + '/' + inCat.length, ready: String(r), hasReady: r > 0,
-        style: on ? 'background: linear-gradient(135deg, #FFE38A, #FFC53D); color: #2A1C02; box-shadow: 0 3px 0 #9A6A0A, 0 0 14px #FFC53D66;' : 'background: #17172ACC; color: #CACAE0; box-shadow: inset 0 0 0 1px #2E2E52;',
+        style: on ? 'background: linear-gradient(135deg, #FFE38A, #FFC53D); color: #2A1C02; box-shadow: 0 3px 0 #9A6A0A, 0 0 14px #FFC53D66;' : 'background: #251443CC; color: #CACAE0; box-shadow: inset 0 0 0 1px #2E2E52;',
         pick: () => this.setState({ tab: id, sel: null }) };
     });
     return {
@@ -252,7 +252,7 @@ class Component extends DCLogic {
       doneLabel: got + ' de ' + list.length + ' logros' + (ready ? ' · ' + ready + ' por reclamar' : ''),
       ringDash: (RC * frac).toFixed(1) + ' ' + RC.toFixed(1), collTier: coll[0], collColor: coll[1],
       selC: son ? st.c : '#22D3EE', selTier: 'MEDALLA DE ' + st.name, selTitle: sel ? sel.title : '', selDesc: sel ? sel.desc : '',
-      selRib: son ? st.rib : '#2A2A48', selRim: son ? st.rim : 'url(#lgm-l)', selFace: son ? st.face : '#121224', selInk: son ? st.ink : '#4A4A72', selIcon: sel ? Lg_ICON[sel.icon] || Lg_ICON.rank : '',
+      selRib: son ? st.rib : '#3F246B', selRim: son ? st.rim : 'url(#lgm-l)', selFace: son ? st.face : '#1E0F3B', selInk: son ? st.ink : '#4A4A72', selIcon: sel ? Lg_ICON[sel.icon] || Lg_ICON.rank : '',
       selBar: sel ? 'height: 10px; border-radius: 5px; width: ' + Math.round(sel.cur / sel.goal * 100) + '%; background: ' + (son ? 'linear-gradient(90deg, #53D88E, #9DF5C0)' : 'linear-gradient(90deg, #22D3EE, #7EF0FF)') + ';' : '',
       selProg: sel ? sel.cur + '/' + sel.goal : '', selReward: sel ? String(sel.reward) : '0',
       selCan: ss === 'ready', selGot: ss === 'got', selLeft: ss === 'locked', selLeftText: sel ? 'Te faltan ' + (sel.goal - sel.cur) : '',

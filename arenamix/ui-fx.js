@@ -188,7 +188,22 @@
     '.fx-ball b::after{content:"";position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4.5px;background:#17172A;clip-path:polygon(50% 0,100% 38%,82% 100%,18% 100%,0 38%)}',
     '@keyframes fxBallX{0%{translate:0 0;opacity:1}75%{opacity:1}100%{translate:var(--bx) 0;opacity:0}}',
     '@keyframes fxBallY{0%{translate:0 0}18%{translate:0 -70px;animation-timing-function:ease-in}36%{translate:0 0;animation-timing-function:ease-out}52%{translate:0 -34px;animation-timing-function:ease-in}66%{translate:0 0}76%{translate:0 -12px}86%,100%{translate:0 0}}',
-    '@keyframes fxBallR{to{rotate:var(--br)}}'
+    '@keyframes fxBallR{to{rotate:var(--br)}}',
+    // ---- colour pass: the menus in richer purples, magentas and blues instead of near-black navy ----
+    '#stage{background:#140C34!important}',
+    '.bc-stage{background:radial-gradient(70% 90% at 15% 0%,#5B2BB8 0%,transparent 60%),radial-gradient(60% 80% at 95% 100%,#C0267A 0%,transparent 60%),radial-gradient(90% 120% at 50% 40%,#23207A 0%,#140E46 55%,#0B0822 100%)!important}',
+    '.am-bg::before{background:radial-gradient(32% 42% at 18% 28%,#22D3EE55,transparent 70%),radial-gradient(30% 40% at 82% 72%,#EC489955,transparent 70%),radial-gradient(26% 34% at 70% 12%,#FFC53D38,transparent 70%),radial-gradient(30% 40% at 40% 90%,#8B5CF655,transparent 70%)!important}',
+    '.am-arena{background:radial-gradient(60% 70% at 20% 10%,#6D28D9 0%,transparent 60%),radial-gradient(50% 60% at 90% 90%,#BE185D 0%,transparent 60%),radial-gradient(70% 60% at 50% 42%,#2B2A8A 0%,#151050 55%,#0A0824 100%)!important}',
+    '.am-card{background:linear-gradient(160deg,#3A2380,#1E1650 55%,#160F3C)!important;border-color:#7C5CFF88!important;box-shadow:0 8px 22px #0007,inset 0 1px 0 #ffffff24,0 0 18px #7C5CFF33!important}',
+    '.bc-glass{background:linear-gradient(160deg,#36217AF2,#1A1248F2 60%,#140E3AF2)!important;box-shadow:inset 0 0 0 1px #A78BFA55}',
+    '.bc-tile{background:linear-gradient(110deg,color-mix(in srgb,var(--bc-c,#7C5CFF) 38%,#2A1B6E),#1A1448 72%)!important}',
+    '.bc-tile.on{background:linear-gradient(110deg,color-mix(in srgb,var(--bc-c,#22D3EE) 60%,#1A1448),#1E1A58 72%)!important}',
+    '.bc-title{background:linear-gradient(135deg,#7C3AED,#C026D3 55%,#DB2777)!important;box-shadow:inset 0 2px 0 #ffffff40,inset 0 -3px 0 #00000055,0 0 0 2px #1A0B33,0 0 18px #C026D366!important}',
+    // the dark inline panels and chips the screens use, recoloured where they are
+    '[style*="background: #17172A"]{background:linear-gradient(160deg,#35207A,#211858)!important}',
+    '[style*="background: #26264A"]{background:linear-gradient(160deg,#4A2D9A,#2E2276)!important}',
+    '[style*="background: #0E0E1C"],[style*="background: #121226"],[style*="background: #141428"]{background:#1C1450!important}',
+    '[style*="border: 1px solid #2E2E52"],[style*="border: 2px solid #2E2E52"]{border-color:#7C5CFF99!important}'
   ].join('\n');
   document.head.appendChild(css);
   if (reduce) return;

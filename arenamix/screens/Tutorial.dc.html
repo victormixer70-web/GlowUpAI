@@ -15,9 +15,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .tu-chalk{position:absolute;left:0;top:0;width:430px;height:390px;pointer-events:none;opacity:.22}
 .tu-chalk path,.tu-chalk circle{stroke-dasharray:7 7;animation:tuChalk 1.6s linear infinite}
 @keyframes tuChalk{to{stroke-dashoffset:-28}}
-.tu-step{position:relative;display:flex;align-items:center;gap:12px;padding:8px 12px 8px 8px;border-radius:14px;background:linear-gradient(90deg,color-mix(in srgb,var(--sc) 22%,#17172A),#141428 70%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sc) 40%,transparent),0 4px 0 #05050A;animation:tuIn .5s cubic-bezier(.2,1.4,.4,1) both}
+.tu-step{position:relative;display:flex;align-items:center;gap:12px;padding:8px 12px 8px 8px;border-radius:14px;background:linear-gradient(90deg,color-mix(in srgb,var(--sc) 22%,#251443),#211140 70%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sc) 40%,transparent),0 4px 0 #0D0418;animation:tuIn .5s cubic-bezier(.2,1.4,.4,1) both}
 @keyframes tuIn{from{opacity:0;transform:translateX(30px)}}
-.tu-ic{flex:none;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:var(--sc);color:#0B0B14;box-shadow:0 0 12px color-mix(in srgb,var(--sc) 60%,transparent)}
+.tu-ic{flex:none;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:var(--sc);color:#150925;box-shadow:0 0 12px color-mix(in srgb,var(--sc) 60%,transparent)}
 .tu-ic svg{animation:tuBob 1.8s ease-in-out infinite}
 @keyframes tuBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px) scale(1.08)}}
 .tu-n{margin-left:auto;font:800 italic 22px/1 'Barlow Condensed',sans-serif;color:color-mix(in srgb,var(--sc) 70%,#fff);opacity:.5}
@@ -42,7 +42,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 52px; line-height: .95">TUTORIAL</span>
         <span style="font-size: 14px; line-height: 1.5; color: #CACAE0">{{introText}}</span>
         <div style="display: flex; gap: 10px; margin-top: 6px">
-          <button type="button" onClick="{{play}}" class="bc-btn am-shine tu-go" style="height: 54px; padding: 0 28px 0 18px; border: 0; border-radius: 14px; background: linear-gradient(180deg, #9AF5FF, #22D3EE 60%, #0EA5C0); color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; cursor: pointer; box-shadow: inset 0 2px 0 #FFFFFFAA, 0 5px 0 #0E8FA3, 0 0 20px #22D3EE66"><span class="rg"></span><span class="rg" style="animation-delay: -1.1s"></span><svg class="tu-ball" width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#FFFFFF" stroke="#0B0B14" stroke-width="1.6"/><path d="M12 7l3.4 2.5l-1.3 4h-4.2l-1.3-4z" fill="#0B0B14"/><path d="M12 7V3M15.4 9.5l3.8-1.2M14.1 13.5l2.3 3.3M9.9 13.5l-2.3 3.3M8.6 9.5L4.8 8.3" stroke="#0B0B14" stroke-width="1.3"/></svg>EMPEZAR</button>
+          <button type="button" onClick="{{play}}" class="bc-btn am-shine tu-go" style="height: 54px; padding: 0 28px 0 18px; border: 0; border-radius: 14px; background: linear-gradient(180deg, #9AF5FF, #22D3EE 60%, #0EA5C0); color: #150925; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; letter-spacing: 2px; cursor: pointer; box-shadow: inset 0 2px 0 #FFFFFFAA, 0 5px 0 #0E8FA3, 0 0 20px #22D3EE66"><span class="rg"></span><span class="rg" style="animation-delay: -1.1s"></span><svg class="tu-ball" width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#FFFFFF" stroke="#150925" stroke-width="1.6"/><path d="M12 7l3.4 2.5l-1.3 4h-4.2l-1.3-4z" fill="#150925"/><path d="M12 7V3M15.4 9.5l3.8-1.2M14.1 13.5l2.3 3.3M9.9 13.5l-2.3 3.3M8.6 9.5L4.8 8.3" stroke="#150925" stroke-width="1.3"/></svg>EMPEZAR</button>
           <a href="Modos.dc.html" onClick="{{skip}}" style="display: flex; align-items: center; height: 54px; padding: 0 18px; border-radius: 14px; border: 1.5px solid #4C4C78; color: #CACAE0; text-decoration: none; font-weight: 700; font-size: 14px">Saltar</a>
         </div>
       </div>
@@ -59,17 +59,17 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </sc-if>
   <sc-if value="{{isFoot}}" hint-placeholder-val="{{ false }}">
-    <dc-import name="Partido" tutorial="{{ true }}" mode="quick" team-size="2" duration="600" autostart="{{ true }}" home-name="Invitado_4821" mates="{{mates}}" rivals="{{rivals}}" away-name="Entrenador" away-color="#3EA6FF" away-trim="#0B0B14" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
+    <dc-import name="Partido" tutorial="{{ true }}" mode="quick" team-size="2" duration="600" autostart="{{ true }}" home-name="Invitado_4821" mates="{{mates}}" rivals="{{rivals}}" away-name="Entrenador" away-color="#3EA6FF" away-trim="#150925" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isBasket}}" hint-placeholder-val="{{ false }}"><dc-import name="Baloncesto" mode="three" locked="{{ true }}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import></sc-if>
   <sc-if value="{{isTenis}}" hint-placeholder-val="{{ false }}"><dc-import name="Tenis" mode="serve" locked="{{ true }}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import></sc-if>
   <sc-if value="{{isVoley}}" hint-placeholder-val="{{ false }}"><dc-import name="Voley" mode="serve" locked="{{ true }}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import></sc-if>
   <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: radial-gradient(circle at 50% 40%, #12304A, #0B0B14 70%)">
+    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: radial-gradient(circle at 50% 40%, #1E296E, #150925 70%)">
       <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">TUTORIAL DE {{sportName}}</span>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 56px; line-height: 1; color: #22D3EE">{{doneTitle}}</span>
       <span style="font-size: 14px; color: #CACAE0; text-align: center; max-width: 420px">{{doneText}}</span>
-      <a href="Modos.dc.html" class="bc-btn am-shine" style="margin-top: 8px; display: flex; align-items: center; height: 52px; padding: 0 34px; border-radius: 14px; background: #22D3EE; color: #0B0B14; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 22px; letter-spacing: 2px; box-shadow: 0 5px 0 #0E8FA3">IR A LOS MODOS</a>
+      <a href="Modos.dc.html" class="bc-btn am-shine" style="margin-top: 8px; display: flex; align-items: center; height: 52px; padding: 0 34px; border-radius: 14px; background: #22D3EE; color: #150925; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 22px; letter-spacing: 2px; box-shadow: 0 5px 0 #0E8FA3">IR A LOS MODOS</a>
     </div>
   </sc-if>
 </div>
@@ -103,7 +103,7 @@ class Component extends DCLogic {
     const play = s.phase === 'play';
     return {
       sportName: I.name, introText: I.text,
-      introBg: 'position: absolute; inset: 0; background: linear-gradient(120deg, ' + I.bg + ' 0%, #0B0B14 60%);',
+      introBg: 'position: absolute; inset: 0; background: linear-gradient(120deg, ' + I.bg + ' 0%, #150925 60%);',
       // each step with its own colour and a little icon: move, sprint, pass, dribble, shoot
       steps: I.steps.map((t, k) => ({ n: String(k + 1), text: t, d: (0.1 + k * 0.08).toFixed(2),
         c: ['#22D3EE', '#FFC53D', '#A78BFA', '#53D88E', '#FF8A3D'][k % 5],
