@@ -2939,11 +2939,17 @@ class Component extends DCLogic {
     const fit = (txt, px, maxW) => { let k = px; c.font = font(k); while (c.measureText(txt).width > maxW && k > 12) { k -= 2; c.font = font(k); } };
     const glow = (col, b) => { c.shadowColor = col; c.shadowBlur = b; };
     c.textAlign = 'center'; c.textBaseline = 'middle';
-    // background: deep navy with a soft light in the middle and a sweeping diagonal shine
-    const bg = c.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, '#0A1238'); bg.addColorStop(1, '#03050F');
+    // background: a vivid broadcast gradient (violet into magenta), each team's colour washing in from its side
+    const bg = c.createLinearGradient(0, 0, w, h); bg.addColorStop(0, '#2A0E6E'); bg.addColorStop(0.5, '#4C1395'); bg.addColorStop(1, '#8A0F5C');
     c.fillStyle = bg; c.fillRect(0, 0, w, h);
-    const rg = c.createRadialGradient(w / 2, h * 0.45, 10, w / 2, h * 0.45, w * 0.55); rg.addColorStop(0, 'rgba(34,211,238,0.16)'); rg.addColorStop(1, 'rgba(34,211,238,0)');
+    const side = (x0, col) => { const sg = c.createRadialGradient(x0, h * 0.45, 4, x0, h * 0.45, w * 0.42); sg.addColorStop(0, col); sg.addColorStop(1, 'rgba(0,0,0,0)'); c.globalAlpha = 0.55; c.fillStyle = sg; c.fillRect(0, 0, w, h); c.globalAlpha = 1; };
+    if (!goal) { side(40, hc); side(w - 40, ac); }
+    const rg = c.createRadialGradient(w / 2, h * 0.45, 10, w / 2, h * 0.45, w * 0.4); rg.addColorStop(0, 'rgba(255,214,102,0.22)'); rg.addColorStop(1, 'rgba(255,214,102,0)');
     c.fillStyle = rg; c.fillRect(0, 0, w, h);
+    // light rays turning slowly behind everything
+    for (let k = 0; k < 12; k++) { const ra = k / 12 * Math.PI * 2 + now * 0.15; c.fillStyle = 'rgba(255,255,255,0.045)'; c.beginPath(); c.moveTo(w / 2, h * 0.45); c.arc(w / 2, h * 0.45, w, ra, ra + 0.14); c.closePath(); c.fill(); }
+    const rainbow = (x, y, ww, hh) => { const rb = c.createLinearGradient(x, 0, x + ww, 0); rb.addColorStop(0, '#22D3EE'); rb.addColorStop(0.35, '#A855F7'); rb.addColorStop(0.65, '#EC4899'); rb.addColorStop(1, '#FFC53D'); c.fillStyle = rb; c.fillRect(x, y, ww, hh); };
+    const rrect = (x, y, ww, hh, r) => { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + ww, y, x + ww, y + hh, r); c.arcTo(x + ww, y + hh, x, y + hh, r); c.arcTo(x, y + hh, x, y, r); c.arcTo(x, y, x + ww, y, r); c.closePath(); };
     const crest = (x, y, r, col, letter) => {
       c.save(); glow(col, 14);
       c.beginPath(); c.moveTo(x - r, y - r * 0.95); c.lineTo(x + r, y - r * 0.95); c.lineTo(x + r, y + r * 0.15); c.quadraticCurveTo(x + r * 0.95, y + r * 0.85, x, y + r * 1.15); c.quadraticCurveTo(x - r * 0.95, y + r * 0.85, x - r, y + r * 0.15); c.closePath();
@@ -2953,20 +2959,22 @@ class Component extends DCLogic {
       c.restore();
     };
     const ticker = () => {
-      c.fillStyle = '#060A1E'; c.fillRect(0, h - 30, w, 30);
-      c.fillStyle = '#22D3EE'; c.fillRect(0, h - 30, w, 2);
+      const tg = c.createLinearGradient(0, 0, w, 0); tg.addColorStop(0, '#1E0B4F'); tg.addColorStop(0.5, '#3B0E6B'); tg.addColorStop(1, '#5A0B45');
+      c.fillStyle = tg; c.fillRect(0, h - 30, w, 30); rainbow(0, h - 30, w, 3);
       const msg = '  ARENA MIX  ·  ¡VAMOS, ' + hn + '!  ·  MINIJUEGOS · TORNEOS · PASE DE TEMPORADA  ·  SIGUE AL EQUIPO  ·';
       c.font = font(20); c.textAlign = 'left';
       const tw = c.measureText(msg).width, off = V.hi ? (now * 60) % tw : 0;
-      c.fillStyle = '#DCE6FF'; for (let x = -off; x < w; x += tw) c.fillText(msg, x, h - 14);
+      c.fillStyle = '#FFF3C4'; for (let x = -off; x < w; x += tw) c.fillText(msg, x, h - 14);
       c.textAlign = 'center';
     };
     if (goal) {
       // GOAL: the scoring team's colours flashing, the word huge, the scorer underneath
       const tm = 1 - (g.concede ?? 0), col = tm === 0 ? hc : ac, flash = (anim % 4) < 2;
-      const gg = c.createLinearGradient(0, 0, w, h); gg.addColorStop(0, col); gg.addColorStop(1, '#05060F');
+      const gg = c.createLinearGradient(0, 0, w, h); gg.addColorStop(0, col); gg.addColorStop(0.55, '#7C3AED'); gg.addColorStop(1, '#DB2777');
       c.globalAlpha = flash ? 0.95 : 0.7; c.fillStyle = gg; c.fillRect(0, 0, w, h); c.globalAlpha = 1;
       for (let k = 0; k < 14; k++) { const a = k / 14 * Math.PI * 2 + now * 0.8; c.fillStyle = 'rgba(255,255,255,0.06)'; c.beginPath(); c.moveTo(w / 2, h * 0.42); c.arc(w / 2, h * 0.42, w, a, a + 0.12); c.closePath(); c.fill(); }
+      const CONF = ['#22D3EE', '#FFC53D', '#EC4899', '#A855F7', '#4ADE80', '#FFFFFF'];
+      for (let k = 0; k < 46; k++) { const fx = (k * 97.3 % w), fy = ((k * 53.7 + now * (60 + k % 5 * 18)) % (h + 20)) - 10; c.save(); c.translate(fx, fy); c.rotate(now * 3 + k); c.fillStyle = CONF[k % CONF.length]; c.fillRect(-4, -2, 8, 4); c.restore(); }
       c.save(); glow('#FFFFFF', 22); fit('¡GOOOL!', 128, w - 30); c.fillStyle = '#FFFFFF'; c.fillText('¡GOOOL!', w / 2, h * 0.4); c.restore();
       const by = (g.scorer || '').toUpperCase();
       if (by) { fit(by, 34, w - 50); c.fillStyle = '#FFE38A'; c.fillText(by, w / 2, h * 0.72); }
@@ -2981,32 +2989,39 @@ class Component extends DCLogic {
       c.fillStyle = '#9FB2D8'; c.font = font(22); c.fillText('SALTAN AL CAMPO', 190, 172);
       c.textAlign = 'center'; ticker();
     } else {
-      // top bar: LIVE tag and the competition
-      c.fillStyle = 'rgba(255,255,255,0.06)'; c.fillRect(0, 0, w, 36);
+      // top bar: LIVE tag and the competition, on a glossy strip
+      const tb = c.createLinearGradient(0, 0, 0, 36); tb.addColorStop(0, 'rgba(255,255,255,0.16)'); tb.addColorStop(1, 'rgba(255,255,255,0.04)');
+      c.fillStyle = tb; c.fillRect(0, 0, w, 36); rainbow(0, 36, w, 2);
       const live = (anim % 8) < 6;
-      c.fillStyle = '#E11D48'; c.fillRect(14, 8, 92, 20);
+      const lg = c.createLinearGradient(14, 0, 106, 0); lg.addColorStop(0, '#FF2D55'); lg.addColorStop(1, '#FF7A1A');
+      c.fillStyle = lg; rrect(14, 8, 92, 20, 10); c.fill();
       c.fillStyle = live ? '#FFFFFF' : '#FFB4C4'; c.beginPath(); c.arc(26, 18, 5, 0, Math.PI * 2); c.fill();
       c.font = font(17); c.fillStyle = '#FFFFFF'; c.fillText('EN DIRECTO', 66, 19);
-      c.font = font(22); c.fillStyle = this.golden() ? '#FFC53D' : '#22D3EE';
-      c.fillText(g.phase === 'intro' ? 'ARENA MIX · PREVIA' : this.golden() ? '★ BALÓN DORADO ★' : 'ARENA MIX · LIGA', w / 2 + 40, 19);
-      // crests and names
-      crest(66, 104, 38, hc, hn[0] || 'A'); crest(w - 66, 104, 38, ac, an[0] || 'B');
-      fit(hn, 26, 120); c.fillStyle = '#FFFFFF'; c.fillText(hn, 66, 166);
-      fit(an, 26, 120); c.fillText(an, w - 66, 166);
-      // the score: two lit panels
-      const sc = (x, v) => {
-        c.fillStyle = '#050816'; c.fillRect(x - 52, 60, 104, 104);
-        c.strokeStyle = 'rgba(34,211,238,0.5)'; c.lineWidth = 2; c.strokeRect(x - 52, 60, 104, 104);
-        c.save(); glow(this.golden() ? '#FFC53D' : '#7EF0FF', 16); c.font = font(96); c.fillStyle = this.golden() ? '#FFE38A' : '#FFFFFF'; c.fillText(String(v), x, 114); c.restore();
+      c.save(); glow(this.golden() ? '#FFC53D' : '#F0ABFC', 10); c.font = font(22); c.fillStyle = this.golden() ? '#FFE38A' : '#FFFFFF';
+      c.fillText(g.phase === 'intro' ? 'ARENA MIX · PREVIA' : this.golden() ? '★ BALÓN DORADO ★' : 'ARENA MIX · LIGA', w / 2 + 40, 19); c.restore();
+      // crests and names on pills in each team's colour
+      crest(66, 100, 38, hc, hn[0] || 'A'); crest(w - 66, 100, 38, ac, an[0] || 'B');
+      const pill = (x, col, nm) => { c.save(); c.globalAlpha = 0.9; c.fillStyle = col; rrect(x - 60, 152, 120, 26, 13); c.fill(); c.globalAlpha = 1; c.lineWidth = 2; c.strokeStyle = 'rgba(255,255,255,0.7)'; c.stroke(); fit(nm, 22, 108); c.lineWidth = 4; c.strokeStyle = 'rgba(10,5,30,0.7)'; c.strokeText(nm, x, 166); c.fillStyle = '#FFFFFF'; c.fillText(nm, x, 166); c.restore(); };
+      pill(66, hc, hn); pill(w - 66, ac, an);
+      // the score: two glowing panels, each framed in its team's colour
+      const sc = (x, v, col) => {
+        const pg = c.createLinearGradient(0, 58, 0, 164); pg.addColorStop(0, '#2B1270'); pg.addColorStop(1, '#12082F');
+        c.save(); glow(col, 18); c.fillStyle = pg; rrect(x - 52, 58, 104, 106, 16); c.fill(); c.restore();
+        c.lineWidth = 4; c.strokeStyle = col; rrect(x - 52, 58, 104, 106, 16); c.stroke();
+        c.fillStyle = 'rgba(255,255,255,0.10)'; rrect(x - 48, 62, 96, 44, 12); c.fill();
+        c.save(); glow(this.golden() ? '#FFC53D' : '#FFFFFF', 18); c.font = font(96);
+        const dg = c.createLinearGradient(0, 70, 0, 160); dg.addColorStop(0, '#FFFFFF'); dg.addColorStop(1, this.golden() ? '#FFC53D' : '#FDE68A');
+        c.fillStyle = dg; c.fillText(String(v), x, 114); c.restore();
       };
-      sc(w / 2 - 62, g.score[0]); sc(w / 2 + 62, g.score[1]);
-      c.font = font(40); c.fillStyle = '#7EF0FF'; c.fillText(':', w / 2, 110);
-      // clock and a bar for the time left
-      c.fillStyle = '#0B1434'; c.fillRect(w / 2 - 70, 174, 140, 34);
-      c.font = font(30); c.fillStyle = '#FFFFFF'; c.fillText(this.fmtClock(g.t), w / 2, 192);
+      sc(w / 2 - 62, g.score[0], hc); sc(w / 2 + 62, g.score[1], ac);
+      c.save(); glow('#F472B6', 12); c.font = font(40); c.fillStyle = '#FFFFFF'; c.fillText(':', w / 2, 110); c.restore();
+      // clock on a gradient pill and a rainbow bar for the time left
+      const cg = c.createLinearGradient(w / 2 - 70, 0, w / 2 + 70, 0); cg.addColorStop(0, '#7C3AED'); cg.addColorStop(1, '#DB2777');
+      c.fillStyle = cg; rrect(w / 2 - 70, 172, 140, 36, 18); c.fill(); c.lineWidth = 2; c.strokeStyle = 'rgba(255,255,255,0.6)'; c.stroke();
+      c.font = font(30); c.fillStyle = '#FFFFFF'; c.fillText(this.fmtClock(g.t), w / 2, 191);
       const dur = Math.max(1, g.dur || 90), u = Math.max(0, Math.min(1, 1 - g.t / dur));
-      c.fillStyle = 'rgba(255,255,255,0.12)'; c.fillRect(w / 2 - 110, 214, 220, 5);
-      c.fillStyle = '#22D3EE'; c.fillRect(w / 2 - 110, 214, 220 * u, 5);
+      c.fillStyle = 'rgba(255,255,255,0.16)'; rrect(w / 2 - 110, 213, 220, 6, 3); c.fill();
+      c.save(); c.beginPath(); rrect(w / 2 - 110, 213, 220 * u, 6, 3); c.clip(); rainbow(w / 2 - 110, 213, 220, 6); c.restore();
       ticker();
     }
     // LED wall: a fine pixel grid and scanlines over everything, and a moving shine
@@ -3016,6 +3031,10 @@ class Component extends DCLogic {
     const sx = ((now * 0.25) % 1.6 - 0.3) * w, sh = c.createLinearGradient(sx - 60, 0, sx + 60, 0);
     sh.addColorStop(0, 'rgba(255,255,255,0)'); sh.addColorStop(0.5, 'rgba(255,255,255,0.07)'); sh.addColorStop(1, 'rgba(255,255,255,0)');
     c.fillStyle = sh; c.fillRect(0, 0, w, h);
+    // a glowing frame of light running round the edge of the screen
+    const fo = (now * 0.4) % 1, fr = c.createLinearGradient(0, 0, w, h);
+    ['#22D3EE', '#A855F7', '#EC4899', '#FFC53D', '#22D3EE'].forEach((col, i) => fr.addColorStop((i / 4 + fo) % 1, col));
+    c.lineWidth = 6; c.strokeStyle = fr; c.strokeRect(3, 3, w - 6, h - 6);
     c.setTransform(1, 0, 0, 1, 0, 0);
     V.tex.needsUpdate = true;
   }
