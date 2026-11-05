@@ -278,7 +278,7 @@
   function frame(obj, fill) {
     var box = new T.Box3().setFromObject(obj), sz = box.getSize(new T.Vector3()), c = box.getCenter(new T.Vector3());
     var r = Math.max(sz.x, sz.y, sz.z) * 0.5 / (fill || 0.8), d = r / Math.tan(cam.fov * Math.PI / 360);
-    var lift = obj.userData.low ? 0.12 : 0.3;
+    var lift = obj.userData.low ? 0.6 : 0.3;
     cam.position.set(c.x + d * 0.45, c.y + d * lift, c.z + d * 0.84);
     cam.lookAt(c);
   }
@@ -296,7 +296,7 @@
     if (cache[key]) return cache[key];
     if (!stage()) return '';
     var g = new T.Group();
-    if (cat === 'calzado') { var b = boot(it.color); b.rotation.y = 0.45; b.rotation.z = 0.08; g.add(b); var b2 = boot(it.color); b2.rotation.y = 0.2; b2.position.set(-0.7, 0, -0.55); g.add(b2); }
+    if (cat === 'calzado') { var b = boot(it.color); b.rotation.y = 0.45; b.rotation.z = 0.08; g.add(b); b.position.set(0.7, 0, 0.7); var b2 = boot(it.color); b2.rotation.y = 0.3; b2.position.set(-0.9, 0.0, -1.1); g.add(b2); }
     else {
       var head = mannequin(); g.add(head);
       if (cat === 'cabeza') { var h = hat(it.kind, it.color); if (h) { h.position.y = 0.08; g.add(h); } }
@@ -305,7 +305,7 @@
       g.rotation.y = -0.25;
     }
     g.userData.low = cat === 'calzado';
-    cache[key] = snap(g, cat === 'calzado' ? 0.98 : 0.95);
+    cache[key] = snap(g, cat === 'calzado' ? 0.92 : 0.95);
     return cache[key];
   }
 
