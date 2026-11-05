@@ -77,12 +77,12 @@
      from Dani's bones to the same bones of the other skeleton, scaled to the model's height. */
   var KIT_SRC = 'dani', KIT_MESH = /(Shorts|Shirt|Socks|Shoes|Body)$/;
   // models with no legs under their trousers borrow Dani's (thigh to ankle), tinted to their skin
-  var LEGS = { leo: '#F2E2D8', nico: '#8A6450', remy: '#D9B497' };
+  var LEGS = { leo: '#F2E2D8', nico: '#8A6450', remy: '#FFE6D8' };
   // per model fit: offsets from each bone scaled a bit (borrowed legs sit just inside the model's own skin)
   var FIT = { remy: { Shorts: 1.1, Shirt: 1.04, Body: 0.94 } };
   var WEAR = { leo: /Ch23_(Suit|Belt|Shirt|Pants|Shoes)$/, nico: /Ch28_(Sneakers|Pants|Hoody)$/, remy: /^(Shoes|Tops|Bottoms)$/ };
   var DROP = { ty: /Scarf/ };
-  var TRIM = { remy: /(Spine|Spine1|Spine2|Shoulder)$/ };
+  var TRIM = { remy: /(Spine|Spine1|Spine2|Shoulder|Neck)$/ };
   function footballers() {
     var src = tpl[KIT_SRC];
     Object.keys(DROP).forEach(function (id) {
@@ -163,7 +163,8 @@
       prepKit(root, t.box);
     });
     ['dani', 'leo', 'nico'].forEach(addArms);
-    Object.keys(HEADS).forEach(headOnBody);
+    ['leo', 'nico', 'remy'].forEach(function (id) { addNeck(id); });
+    Object.keys(HEADS).forEach(function (id) { headOnBody(id); if (tpl[id] && HEADS[id].face !== KIT_SRC) addNeck(id, 1.25, FACE_ARM[HEADS[id].face]); });
     // the same build for everyone: torsos as wide as Dani's (measured, so close models barely change)
     var w0 = torsoW('dani');
     LIST.forEach(function (c) { var t = tpl[c.id], w = torsoW(c.id); if (t && w0 && w) t.wx = Math.max(0.85, Math.min(1.15, w0 / w)); });
@@ -192,13 +193,13 @@
      glasses...), fitted over the real skull. Everyone has the same height and build. */
   var HEADS = {
     // the face model's own hair, recoloured (it fits the real skull); the rest comes from the Taquilla gear
-    ty: { face: 'remy', hair: '#D8A846', noLash: true },
-    vegas: { face: 'leo', hair: '#121216', fix: { fz: 0.07 } },
+    ty: { face: 'remy', hair: '#D8A846', noLash: true, dy: 0.012 },
+    vegas: { face: 'leo', hair: '#121216', dy: 0.005, fix: { fz: 0.07 } },
     granny: { face: 'dani', hair: '#E4E4EA', fix: { fz: 0.11, hatY: -0.05 } }
   };
   // Dani's skin tinted to each face's (multiplier on his texture), and the colour of the bare arms
   var SIGNATURE = { vegas: { face: 'sun' }, granny: { hat: 'cap', hatColor: '#2BB3C0', face: 'round' } };
-  var FACE_TINT = { dani: '#FFFFFF', leo: '#F2E2D8', remy: '#D9B497' };
+  var FACE_TINT = { dani: '#FFFFFF', leo: '#F2E2D8', remy: '#FFE6D8' };
   var FACE_ARM = { dani: '#C99A7E', leo: '#D9AE93', remy: '#D2A88A' };
   // the bones the head bone carries
   function headSet(root) {
@@ -301,11 +302,13 @@
     holder.matrix.copy(hB.matrixWorld).invert();
     hB.add(holder);
     var pD = new T.Vector3().setFromMatrixPosition(hB.matrixWorld);
+    // a face model whose chin hangs lower under its head bone is lifted, so the neck shows under the jaw
+    if (cfg.dy) pD.y += cfg.dy * (base.neck || 1);
     // the real face: the head of the face model, moved from its head bone to Dani's, at Dani's scale
     var real = { min: base.head.skull.min.clone(), max: base.head.skull.max.clone(), eyes: base.head.eyes, front: base.head.front };
     if (!ownFace) {
       var pF = new T.Vector3().setFromMatrixPosition(fh.bone.matrixWorld), kf = (base.neck || 1) / (face.neck || 1);
-      var fp = headPieces(face, function (m) { return !/Shirt|Tops|Hoody|Suit|Scarf/i.test(m.name) && !(cfg.noLash && /Lash/i.test(m.name)); }, function () { return true; });
+      var fp = headPieces(face, function (m) { return !/Shirt|Tops|Hoody|Suit|Scarf|Neck_Body/i.test(m.name) && !m.userData.neckFill && !(cfg.noLash && /Lash/i.test(m.name)); }, function () { return true; });
       var fb = new T.Box3(), fbh = new T.Box3();
       placePieces(fp, holder, function (v) { v.sub(pF).multiplyScalar(kf).add(pD); }, fb, fbh);
       holder.children.forEach(function (mh) { if (/Hair/i.test(mh.name)) mh.material = hairTint(mh.material, cfg.hair); });
@@ -372,6 +375,60 @@
   var SKIN = { ty: '#F6CBAA', vegas: '#F0C29C', granny: '#BFD3C6', dani: '#C99A7E', leo: '#D9AE93', nico: '#5E3E2E', remy: '#D2A88A' };
   /* models with nothing under the shirt get arms: a tube along the arm bones, as thick as the sleeve
      around it, skinned to the shoulder, elbow and wrist */
+  /* a neck that reaches down into the collar: the transplanted shirt is cut lower than each model's own,
+     so without it a gap (or a hard edge of skin) shows between the head and the shirt */
+  function addNeck(id, top, col) {
+    var t = tpl[id]; if (!t) return;
+    var shirt = null, body = []; t.root.traverse(function (m) { if (!m.isSkinnedMesh) return; if (/Shirt$/.test(m.name)) shirt = m; else if (/Body$|Head$/.test(m.name) && !m.userData.bareArms && m.name !== 'Legs_Body') body.push(m); });
+    if (!shirt) return;
+    t.root.updateMatrixWorld(true);
+    var by = {}; t.root.traverse(function (b) { if (b.isBone && !by[b.name]) by[b.name] = b; });
+    var bS = by.mixamorigSpine2, bN = by.mixamorigNeck, bH = by.mixamorigHead; if (!bS || !bN || !bH) return;
+    var pS = new T.Vector3().setFromMatrixPosition(bS.matrixWorld), pN = new T.Vector3().setFromMatrixPosition(bN.matrixWorld), pH = new T.Vector3().setFromMatrixPosition(bH.matrixWorld);
+    // the radius of the model's own neck, from its skin between the neck and head bones
+    var ds = [], v = new T.Vector3(), ax = pH.clone().sub(pN), L2 = ax.lengthSq();
+    body.forEach(function (m) {
+      var pos = m.geometry.attributes.position;
+      for (var i = 0; i < pos.count; i += 2) {
+        v.fromBufferAttribute(pos, i); m.boneTransform(i, v); v.applyMatrix4(m.matrixWorld);
+        var tt = v.clone().sub(pN).dot(ax) / L2; if (tt < 0.15 || tt > 0.7) continue;
+        ds.push(v.distanceTo(pN.clone().addScaledVector(ax, tt)));
+      }
+    });
+    var H = t.box.max.y - t.box.min.y, R = H * 0.034;
+    if (ds.length > 20) { ds.sort(function (a, b) { return a - b; }); R = Math.min(R * 1.4, ds[Math.floor(ds.length * 0.3)] * 0.93); }
+    var mat = new T.MeshStandardMaterial({ color: new T.Color(col || NECK[id] || SKIN[id] || '#D9AE93').convertSRGBToLinear(), roughness: 0.62, metalness: 0 });
+    mat.skinning = true;
+    var inv = new T.Matrix4().copy(shirt.matrixWorld).invert(), RING = 16, P = [], SI = [], SW = [], IDX = [], ST = 8;
+    // from the top of the chest (inside the shirt) to just under the jaw, a little forward like a real neck
+    var y0 = pS.clone().lerp(pN, 0.8), y1 = pN.clone().lerp(pH, top || 0.75);
+    for (var k = 0; k <= ST; k++) {
+      // at the bottom it widens towards the shoulders and the back (the inside of the collar never shows)
+      var u = k / ST, c = y0.clone().lerp(y1, u), r = R * (1.0 - 0.06 * u), fl = Math.max(0, 1 - u / 0.45);
+      for (var j = 0; j < RING; j++) {
+        var a = j / RING * Math.PI * 2, sz = Math.sin(a), p = new T.Vector3(c.x + Math.cos(a) * r * (1 + 0.45 * fl), c.y, c.z - R * 0.2 * fl + sz * r * (sz < 0 ? 0.95 + 0.35 * fl : 0.95)).applyMatrix4(inv);
+        P.push(p.x, p.y, p.z);
+        var wH = Math.max(0, (u - 0.6) / 0.4), wS = Math.max(0, 1 - u / 0.45);
+        SI.push(0, 1, 2, 0); SW.push(wS, 1 - wS - wH, wH, 0);
+      }
+    }
+    for (var k2 = 0; k2 < ST; k2++) for (var j2 = 0; j2 < RING; j2++) {
+      var a0 = k2 * RING + j2, a1 = k2 * RING + (j2 + 1) % RING;
+      IDX.push(a0, a1, a0 + RING, a1, a1 + RING, a0 + RING);
+    }
+    var geo = new T.BufferGeometry();
+    geo.setAttribute('position', new T.Float32BufferAttribute(P, 3));
+    geo.setAttribute('skinIndex', new T.Uint16BufferAttribute(SI, 4));
+    geo.setAttribute('skinWeight', new T.Float32BufferAttribute(SW, 4));
+    geo.setIndex(IDX); geo.computeVertexNormals();
+    mat.side = T.DoubleSide;
+    var mesh = new T.SkinnedMesh(geo, mat);
+    mesh.name = 'Neck_Body'; mesh.castShadow = true; mesh.frustumCulled = false; mesh.userData.neckFill = true;
+    mesh.position.copy(shirt.position); mesh.quaternion.copy(shirt.quaternion); mesh.scale.copy(shirt.scale);
+    shirt.parent.add(mesh); mesh.updateMatrixWorld(true);
+    mesh.bind(new T.Skeleton([bS, bN, bH]), mesh.matrixWorld.clone());
+  }
+  var NECK = { leo: '#E8BFA8', nico: '#5E3C2C', remy: '#EBC6B4' };
   function addArms(id) {
     var t = tpl[id]; if (!t) return;
     var shirt = null; t.root.traverse(function (m) { if (m.isSkinnedMesh && /Shirt$/.test(m.name)) shirt = m; });
