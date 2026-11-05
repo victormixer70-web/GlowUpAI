@@ -66,6 +66,7 @@
 .ld-tip b{color:#FFC53D;font-weight:800;letter-spacing:1px}
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
+@keyframes qcIn{from{opacity:0;transform:translateY(10px) scale(.8)}}
 </style>
 </helmet>
 <section data-am-game="1" tabIndex="0" aria-label="Partido. Muévete con WASD o flechas, Espacio chuta o hace entrada, E pasa o cambia de jugador, F regatea o presiona, Mayúsculas esprinta" onKeyDown="{{onKeyDown}}" onKeyUp="{{onKeyUp}}" style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0D0D1A; color: #F4F4FA; font-family: Exo2, sans-serif; outline: none; user-select: none; -webkit-user-select: none">
@@ -158,6 +159,14 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <button type="button" aria-label="{{skillAria}}" onPointerDown="{{skillDown}}" onPointerUp="{{skillUp}}" onPointerCancel="{{skillUp}}" style="{{skillBtnStyle}}">{{skillLabel}}</button>
   <button type="button" aria-label="Sprint: mantén pulsado para correr más rápido" onPointerDown="{{sprintDown}}" onPointerUp="{{sprintUp}}" onPointerCancel="{{sprintUp}}" style="{{sprintBtnStyle}}">SPRINT</button>
 
+  <!-- online: quick chat with set phrases -->
+  <sc-if value="{{hasQC}}" hint-placeholder-val="{{ false }}">
+    <button type="button" aria-label="Chat rápido" onPointerDown="{{qcToggle}}" style="position: absolute; right: 12px; top: 56px; z-index: 6; width: 40px; height: 40px; border-radius: 20px; border: 1.5px solid #ffffffaa; background: linear-gradient(135deg, #22D3EE, #8B5CF6); color: #fff; font: 800 18px Exo2, sans-serif; cursor: pointer; box-shadow: 0 4px 12px #0008">💬</button>
+    <sc-if value="{{qcOpen}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; right: 58px; top: 50px; z-index: 6; display: flex; flex-direction: column; gap: 4px">
+      <sc-for list="{{qcList}}" as="q" hint-placeholder-count="6"><button type="button" onPointerDown="{{q.send}}" style="height: 30px; padding: 0 12px; border-radius: 15px; border: 1px solid #ffffff55; background: #1A0B44E6; color: #fff; font: 800 12px Exo2, sans-serif; cursor: pointer; white-space: nowrap; text-align: left">{{q.t}}</button></sc-for>
+    </div></sc-if>
+  </sc-if>
+  <sc-for list="{{qcBubbles}}" as="qb" hint-placeholder-count="0"><span style="{{qb.style}}">{{qb.t}}</span></sc-for>
   <sc-if value="{{hasMates}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; left: 0; right: 0; bottom: 8px; display: flex; justify-content: center; align-items: center; gap: 6px; pointer-events: none">
       <span style="font-size: 9px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">ÓRDENES</span>
@@ -471,6 +480,7 @@ class Component extends DCLogic {
         else if (m.t === 'ev') h.q.push(m);
       } else if (m.t === 's') { N.snap = this.netUnpack(m); N.snapAt = performance.now(); }
       else if (m.t === 'f') this.flashMsg(m.x, m.d);
+      if (m.t === 'qc') { this.qcShow(m.n, m.x); if (N.host) N.room.send(m); }
     });
   }
   // host → everyone, 20 times a second: where everything is
@@ -860,6 +870,9 @@ class Component extends DCLogic {
   }
   clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+  // quick chat: a phrase floats up on everyone's screen with the sender's name
+  qcShow(name, text) { this.qcB = (this.qcB || []).filter((b) => performance.now() - b.at < 3200).concat([{ n: String(name || '').slice(0, 14), t: String(text || '').slice(0, 40), at: performance.now() }]).slice(-3); this.forceUpdate(); setTimeout(() => this.forceUpdate(), 3300); }
+  qcSend(text) { const N = this.net, me = window.AMOnline ? window.AMOnline.myName() : 'Tú'; this.qcOpen = false; this.qcShow(me, text); if (N && N.room) N.room.send({ t: 'qc', n: me, x: text }); }
   flashMsg(text, t) {
     // a message about a remote player's action goes to that player's phone
     if (this.ctxH) { if (this.net) this.net.room.sendTo(this.ctxH.id, { t: 'f', x: text, d: t || 1 }); return; }
@@ -3988,6 +4001,9 @@ class Component extends DCLogic {
     const sprintOn = g.sprint && h.stam > 0.04;
     return {
       ...ldV,
+      hasQC: !!this.net, qcOpen: !!this.qcOpen, qcToggle: (e) => { if (e && e.stopPropagation) e.stopPropagation(); this.qcOpen = !this.qcOpen; this.forceUpdate(); },
+      qcList: ['¡Buen pase!', '¡Qué golazo!', '¡Vamos!', '¡Pásala!', 'Uff, casi…', '¡Revancha!'].map((t) => ({ t, send: (e) => { if (e && e.stopPropagation) e.stopPropagation(); this.qcSend(t); } })),
+      qcBubbles: (this.qcB || []).filter((b) => performance.now() - b.at < 3200).map((b, i) => ({ t: b.n + ': ' + b.t, style: 'position: absolute; left: 50%; top: ' + (64 + i * 30) + 'px; z-index: 7; translate: -50% 0; padding: 5px 14px; border-radius: 14px; background: linear-gradient(135deg, #22D3EEE6, #8B5CF6E6); color: #fff; font: 800 12.5px Exo2, sans-serif; white-space: nowrap; box-shadow: 0 4px 14px #0008; pointer-events: none; animation: qcIn .3s cubic-bezier(.2,1.5,.4,1) both;' })),
       tags, hasMates: n > 1, hasPing: online, pingLabel: (this.net ? (this.net.host ? Math.max(0, ...Object.values(this.net.room.pings || {})) : this.net.room.ping) || '–' : P.ping ?? '') + ' ms',
       ordPass: (e) => { e.preventDefault(); if (g.phase === 'play') this.order('pass'); },
       ordShoot: (e) => { e.preventDefault(); if (g.phase === 'play') this.order('shoot'); },
