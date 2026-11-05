@@ -191,7 +191,7 @@ input::placeholder{color:#8686A6}
             <img class="am-float" src="{{p.img}}" alt="" style="width: 92px; height: 82px; object-fit: contain; filter: drop-shadow(0 8px 10px #000a)">
             <sc-for list="{{p.twk}}" as="t" hint-placeholder-count="3"><svg class="td-twk" width="12" height="12" viewBox="-6 -6 12 12" style="{{t}}"><path d="M0-6C.6-1.4 1.4-.6 6 0C1.4.6.6 1.4 0 6C-.6 1.4-1.4.6-6 0C-1.4-.6-.6-1.4 0-6z" fill="#FFFFFF"/></svg></sc-for>
             <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 21px; line-height: 1">{{p.amount}}</span>
-            <span style="font-size: 12px; font-weight: 700; color: #22D3EE">{{p.bonus}}</span>
+            <span style="font-size: 12px; font-weight: 800; color: #FDE68A">{{p.bonus}}</span>
             <span class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 36px; margin-top: auto; background: linear-gradient(135deg, #FFFFFF, #D6DEE9); color: #150925; font-weight: 800; font-size: 13px; letter-spacing: 1px">PRONTO</span>
           </button>
         </sc-for>
@@ -217,7 +217,8 @@ class Component extends DCLogic {
   party(c) { const t = this.tap || { x: 460, y: 220 }; if (window.AMJuice && window.AMJuice.confetti) window.AMJuice.confetti(t.x, t.y, c); }
   renderVals() {
     const t = this.state.tab;
-    const tabStyle = (on) => 'position: relative; display: flex; align-items: center; white-space: nowrap; height: 34px; padding: 0 9px; border: 0; border-radius: 12px; font: 800 10.5px Exo2, sans-serif; letter-spacing: 0; cursor: pointer; ' + (on ? 'background: linear-gradient(180deg, #9AF5FF, #22D3EE); color: #150925; box-shadow: 0 3px 0 #0A6F80, 0 0 16px #22D3EE88;' : 'background: #251443CC; color: #CACAE0; box-shadow: inset 0 0 0 1px #2E2E52, 0 3px 0 #150925;');
+    const TABC = { rewards: '#22D3EE', boosts: '#FACC15', celebs: '#F472B6', shop: '#4ADE80' };
+    const tabStyle = (on, id) => { const c = TABC[id]; return 'position: relative; display: flex; align-items: center; white-space: nowrap; height: 34px; padding: 0 9px; border: 0; border-radius: 12px; font: 800 10.5px Exo2, sans-serif; letter-spacing: 0; cursor: pointer; ' + (on ? 'background: linear-gradient(180deg, #FFFFFF, ' + c + ' 55%); color: #150925; box-shadow: 0 3px 0 color-mix(in srgb, ' + c + ' 55%, #000), 0 0 16px ' + c + '88;' : 'background: ' + c + '2E; color: ' + c + '; box-shadow: inset 0 0 0 1px ' + c + '88, 0 3px 0 #150925;'); };
     const G = window.AMGear, P = (k) => (G ? G.prize(k) : '');
     const PR = window.AMProgress, W = PR ? PR.weekly() : { wins: 0, milestones: [], daysLeft: 7 };
     // the bar runs through the milestones, which sit at 0, 25, 50, 75 and 100 %
@@ -227,7 +228,7 @@ class Component extends DCLogic {
     const PACK = ['gems:1', 'gems:2', 'gems:3', 'chest:legend:open'];
     const wReadyN = W.milestones.filter((m) => m.reached && !m.claimed).length;
     const nextI = W.milestones.findIndex((m) => !m.reached);
-    const pk = (amount, bonus, k) => ({ amount, bonus, hot: k === 2, twk: [[18, 22], [80, 14], [70, 70]].slice(0, 1 + k % 3 + (k === 3 ? 1 : 0)).map((q, j) => 'left: ' + q[0] + '%; top: ' + q[1] + 'px; animation-delay: ' + (-(k + j) * 0.7).toFixed(1) + 's'), img: P(PACK[k]), style: 'position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 200px; padding: 16px 10px 12px 10px; box-sizing: border-box; clip-path: inset(0 round 16px); color: #F4F4FA; font-family: Exo2, sans-serif; cursor: pointer; background: linear-gradient(160deg, ' + ['#2C1858', '#2D246E', '#3F1A6E', '#3A2A0A'][k] + ', #1E0F3D 75%); border: 1px solid ' + ['#2E2E58', '#22D3EE88', '#9B6BFF', '#FFC53D'][k] + '; box-shadow: 0 0 ' + (6 + k * 5) + 'px ' + ['#0000', '#22D3EE44', '#9B6BFF55', '#FFC53D66'][k] + ', 0 8px 18px #0007;' });
+    const pk = (amount, bonus, k) => ({ amount, bonus, hot: k === 2, twk: [[18, 22], [80, 14], [70, 70]].slice(0, 1 + k % 3 + (k === 3 ? 1 : 0)).map((q, j) => 'left: ' + q[0] + '%; top: ' + q[1] + 'px; animation-delay: ' + (-(k + j) * 0.7).toFixed(1) + 's'), img: P(PACK[k]), style: 'position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 200px; padding: 16px 10px 12px 10px; box-sizing: border-box; clip-path: inset(0 round 16px); color: #F4F4FA; font-family: Exo2, sans-serif; cursor: pointer; background: radial-gradient(90% 55% at 50% 28%, ' + ['#F472B6', '#E879F9', '#C084FC', '#FACC15'][k] + '88, transparent 72%), linear-gradient(160deg, ' + ['#7C2D82', '#6D28D9', '#7E22CE', '#92400E'][k] + ', ' + ['#3B0F4A', '#2E1065', '#3B0764', '#3A1206'][k] + ' 80%); border: 1px solid ' + ['#2E2E58', '#22D3EE88', '#9B6BFF', '#FFC53D'][k] + '; box-shadow: 0 0 ' + (6 + k * 5) + 'px ' + ['#0000', '#22D3EE44', '#9B6BFF55', '#FFC53D66'][k] + ', 0 8px 18px #0007;' });
     const GEM = 'M7 3h10l4 6l-9 12L3 9z', COIN = 'M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20z', STAR = 'M12 2l2.9 6.3l6.9.8l-5.1 4.7l1.4 6.8L12 17.2l-6.1 3.4l1.4-6.8L2.2 9.1l6.9-.8z';
     const FL = [[120, 300, 22, GEM, '#FF5CC8'], [300, 340, 16, COIN, '#FFC53D'], [470, 320, 20, STAR, '#22D3EE'], [610, 350, 18, GEM, '#9B6BFF'], [760, 300, 24, COIN, '#FFC53D'], [700, 120, 14, STAR, '#FF8A3D'], [200, 150, 12, COIN, '#FFC53D']];
     const BC = ['#FFC53D', '#FF5C8A', '#22D3EE', '#53D88E', '#9B6BFF'];
@@ -247,7 +248,7 @@ class Component extends DCLogic {
           icCls: ready ? 'td-wiggle' : (m.prize === 'chest' && !m.reached ? 'td-snore' : ''),
           cardCls: ready ? 'am-float td-card' : i === nextI ? 'td-card td-next' : 'td-card', isNext: i === nextI,
           pos: 'position: absolute; left: calc(' + (i * 25) + '% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px',
-          card: 'position: relative; width: 120px; height: 150px; box-sizing: border-box; padding: 12px 8px 10px; border-radius: 14px; overflow: hidden; --sd: ' + (-i * 1.1).toFixed(1) + 's; background: linear-gradient(160deg, ' + (m.claimed ? '#202958, #1E0F3D' : ready ? '#3A2A0A, #1E1A10' : '#2C1858, #211140') + '); border: 1px solid ' + rc + (m.claimed ? '66' : '') + '; ' + (ready ? 'box-shadow: 0 0 18px #FFC53D55;' : '') + (m.claimed ? ' opacity: .85;' : '') + ' display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center',
+          card: 'position: relative; width: 120px; height: 150px; box-sizing: border-box; padding: 12px 8px 10px; border-radius: 14px; overflow: hidden; --sd: ' + (-i * 1.1).toFixed(1) + 's; background: ' + (m.claimed ? 'linear-gradient(160deg, #202958, #1E0F3D)' : ready ? 'radial-gradient(90% 60% at 50% 30%, #FFC53D88, transparent 72%), linear-gradient(160deg, #7A4A0A, #3A1A06)' : 'radial-gradient(90% 60% at 50% 30%, ' + ['#22D3EE', '#F59E0B', '#38BDF8', '#FACC15', '#F43F5E'][i % 5] + '77, transparent 72%), linear-gradient(160deg, color-mix(in srgb, ' + ['#22D3EE', '#F59E0B', '#38BDF8', '#FACC15', '#F43F5E'][i % 5] + ' 35%, #3B1A8A), #24104E)') + '; border: 1px solid ' + rc + (m.claimed ? '66' : '') + '; ' + (ready ? 'box-shadow: 0 0 18px #FFC53D55;' : '') + (m.claimed ? ' opacity: .85;' : '') + ' display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center',
           dot: 'width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 18px; ' + (m.claimed ? 'background: #22D3EE; color: #150925; box-shadow: 0 0 12px #22D3EE;' : ready ? 'background: #FFC53D; color: #2A1C02; box-shadow: 0 0 16px #FFC53D;' : 'background: #331C58; color: #A3A3C2; border: 2px solid #3A3A66;'),
           claim: () => {
             const r = PR.claim(m.id);
@@ -265,8 +266,8 @@ class Component extends DCLogic {
       isShop: t === 'shop',
       thumb: 'position: absolute; top: 4px; bottom: 4px; width: calc(50% - 4px); left: ' + (t === 'rewards' ? '4px' : '50%') + '; border-radius: 12px; background: linear-gradient(135deg, #7EF0FF, #22D3EE); box-shadow: 0 0 14px #22D3EE88; transition: left .4s cubic-bezier(.3,1.5,.5,1);',
       rSel: t === 'rewards' ? 'true' : 'false', sSel: t === 'shop' ? 'true' : 'false', bSel: t === 'boosts' ? 'true' : 'false',
-      isBoosts: t === 'boosts', boostsTab: tabStyle(t === 'boosts'), showBoosts: () => this.setState({ tab: 'boosts' }),
-      isCelebs: t === 'celebs', celebsTab: tabStyle(t === 'celebs'), showCelebs: () => this.setState({ tab: 'celebs' }), cSel: t === 'celebs' ? 'true' : 'false',
+      isBoosts: t === 'boosts', boostsTab: tabStyle(t === 'boosts', 'boosts'), showBoosts: () => this.setState({ tab: 'boosts' }),
+      isCelebs: t === 'celebs', celebsTab: tabStyle(t === 'celebs', 'celebs'), showCelebs: () => this.setState({ tab: 'celebs' }), cSel: t === 'celebs' ? 'true' : 'false',
       celebCards: (PR && PR.celebList ? PR.celebList : []).concat((PR && PR.trailList ? PR.trailList : []).map((t) => Object.assign({ trail: true }, t))).map((c) => {
         if (c.trail) {
           // a shot trail: a ball with its streak
@@ -274,7 +275,7 @@ class Component extends DCLogic {
           return {
             pose: 'td-pose td-pose-trail', name: c.name, desc: c.desc, color: c.color, on, hx: '44', hy: '30', d: 'M4 30h28M10 22h20M10 38h20', fx: 'M2 26h6M2 34h6',
             showGem: !own, label: on ? 'QUITAR' : own ? 'EQUIPAR' : String(c.price),
-            card: 'position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 5px; padding: 10px 9px 9px; box-sizing: border-box; border-radius: 16px; background: linear-gradient(165deg, ' + c.color + '26, #211140 55%, #190C32); box-shadow: inset 0 0 0 1px ' + c.color + (on ? '' : '55') + (on ? ', 0 0 18px ' + c.color + '55' : '') + ';',
+            card: 'position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 5px; padding: 10px 9px 9px; box-sizing: border-box; border-radius: 16px; background: radial-gradient(90% 55% at 50% 22%, ' + c.color + '77, transparent 72%), radial-gradient(70% 50% at 100% 100%, ' + c.color + '40, transparent 70%), linear-gradient(170deg, color-mix(in srgb, ' + c.color + ' 38%, #3B1A8A), color-mix(in srgb, ' + c.color + ' 16%, #1E0E4A) 70%); box-shadow: inset 0 0 0 1px ' + c.color + (on ? '' : '55') + (on ? ', 0 0 18px ' + c.color + '55' : '') + ';',
             glow: 'position: absolute; left: 50%; top: 8px; width: 110px; height: 90px; margin-left: -55px; border-radius: 50%; background: radial-gradient(closest-side, ' + c.color + '44, transparent); pointer-events: none',
             btn: 'position: relative; height: 32px; border: 0; transform: skewX(0deg); display: flex; align-items: center; justify-content: center; font: 800 15px \'Barlow Condensed\', sans-serif; cursor: pointer; ' + (on ? 'background: #39206E; color: ' + c.color + '; box-shadow: inset 0 0 0 1px ' + c.color + ';' : own ? 'background: ' + c.color + '; color: #150925; box-shadow: 0 3px 0 #0006;' : can ? 'background: linear-gradient(135deg, #FFC2EC, #FF5CC8); color: #2A0A20; box-shadow: 0 3px 0 #0006;' : 'background: #39206E; color: #8686A6;'),
             act: () => {
@@ -303,7 +304,7 @@ class Component extends DCLogic {
           pose: 'td-pose td-pose-' + c.id, name: c.name, desc: c.desc, color: c.color, on, hx: String(PIC[0]), hy: String(PIC[1]), d: PIC[2], fx: PIC[3],
           showGem: !own && c.price > 0,
           label: on ? 'EN USO' : own ? 'EQUIPAR' : c.price > 0 ? String(c.price) : 'GRATIS',
-          card: 'position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 5px; padding: 10px 9px 9px; box-sizing: border-box; border-radius: 16px; background: linear-gradient(165deg, ' + c.color + '26, #211140 55%, #190C32); box-shadow: inset 0 0 0 1px ' + c.color + (on ? '' : '55') + (on ? ', 0 0 18px ' + c.color + '55' : '') + ';',
+          card: 'position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 5px; padding: 10px 9px 9px; box-sizing: border-box; border-radius: 16px; background: radial-gradient(90% 55% at 50% 22%, ' + c.color + '77, transparent 72%), radial-gradient(70% 50% at 100% 100%, ' + c.color + '40, transparent 70%), linear-gradient(170deg, color-mix(in srgb, ' + c.color + ' 38%, #3B1A8A), color-mix(in srgb, ' + c.color + ' 16%, #1E0E4A) 70%); box-shadow: inset 0 0 0 1px ' + c.color + (on ? '' : '55') + (on ? ', 0 0 18px ' + c.color + '55' : '') + ';',
           glow: 'position: absolute; left: 50%; top: 8px; width: 110px; height: 90px; margin-left: -55px; border-radius: 50%; background: radial-gradient(closest-side, ' + c.color + '44, transparent); pointer-events: none',
           btn: 'position: relative; height: 32px; border: 0; transform: skewX(0deg); display: flex; align-items: center; justify-content: center; font: 800 15px \'Barlow Condensed\', sans-serif; cursor: pointer; ' + (on ? 'background: #39206E; color: ' + c.color + '; box-shadow: inset 0 0 0 1px ' + c.color + ';' : own ? 'background: ' + c.color + '; color: #150925; box-shadow: 0 3px 0 #0006;' : can ? 'background: linear-gradient(135deg, #FF8AD8, #FF5CC8 55%, #C2338F); color: #2A0620; box-shadow: 0 3px 0 #7A1050;' : 'background: #39206E; color: #8686A6;'),
           act: () => {
@@ -323,7 +324,7 @@ class Component extends DCLogic {
         return {
           name: b.name, desc: b.desc, price: String(b.price), color: b.color, img, left: String(left), active: left > 0,
           hasTag: b.id !== 'chest' && b.id !== 'shield', tag: b.id === 'xp2' ? 'XP x2' : 'x2',
-          card: 'position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 6px; padding: 12px 10px 10px; box-sizing: border-box; border-radius: 16px; --sd: ' + (-PR.boostList.indexOf(b) * 1.3).toFixed(1) + 's; background: linear-gradient(165deg, ' + b.color + '33, #211140 55%, #190C32); box-shadow: inset 0 0 0 1.5px ' + b.color + (left > 0 ? '' : '66') + ', inset 0 4px 0 ' + b.color + (left > 0 ? ', 0 0 20px ' + b.color + '66' : '') + ';',
+          card: 'position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 6px; padding: 12px 10px 10px; box-sizing: border-box; border-radius: 16px; --sd: ' + (-PR.boostList.indexOf(b) * 1.3).toFixed(1) + 's; background: radial-gradient(90% 55% at 50% 22%, ' + b.color + '88, transparent 72%), radial-gradient(70% 50% at 100% 100%, ' + b.color + '44, transparent 70%), linear-gradient(170deg, color-mix(in srgb, ' + b.color + ' 42%, #3B1A8A), color-mix(in srgb, ' + b.color + ' 18%, #1E0E4A) 70%); box-shadow: inset 0 0 0 1.5px ' + b.color + (left > 0 ? '' : '66') + ', inset 0 4px 0 ' + b.color + (left > 0 ? ', 0 0 20px ' + b.color + '66' : '') + ';',
           glow: 'position: absolute; left: 50%; top: 10px; width: 120px; height: 90px; margin-left: -60px; border-radius: 50%; background: radial-gradient(closest-side, ' + b.color + '44, transparent); pointer-events: none',
           btn: 'position: relative; height: 34px; border: 0; transform: skewX(0deg); display: flex; align-items: center; justify-content: center; font: 800 16px \'Barlow Condensed\', sans-serif; cursor: pointer; ' + (can ? 'background: linear-gradient(135deg, #FF8AD8, #FF5CC8 55%, #C2338F); color: #2A0620; box-shadow: 0 3px 0 #7A1050;' : 'background: #39206E; color: #8686A6;'),
           buy: () => {
@@ -339,8 +340,8 @@ class Component extends DCLogic {
         };
       }),
       hasToast: !!this.state.toast, toastText: this.state.toast || '',
-      rewardsTab: tabStyle(t === 'rewards'),
-      shopTab: tabStyle(t === 'shop'),
+      rewardsTab: tabStyle(t === 'rewards', 'rewards'),
+      shopTab: tabStyle(t === 'shop', 'shop'),
       showRewards: () => this.setState({ tab: 'rewards' }),
       showShop: () => this.setState({ tab: 'shop' }),
       packs: [pk('100 BOB', 'Básico', 0), pk('250 BOB', '+10% extra', 1), pk('600 BOB', '+20% extra', 2), pk('1.500 BOB', '+30% extra', 3)]
