@@ -55,6 +55,8 @@ input::placeholder{color:#8686A6}
 .tq-shirt3d{position:absolute;left:-14px;top:-18px;width:92px;height:96px;object-fit:contain;filter:drop-shadow(0 4px 5px #000a);pointer-events:none}
 .tq-new{position:absolute;left:50%;bottom:-7px;z-index:3;translate:-50% 0;padding:1px 7px;border-radius:7px;background:#FF3B5C;color:#fff;font:800 8px Exo2,sans-serif;letter-spacing:1px;box-shadow:0 0 10px #FF3B5C;animation:tqNew 1.2s ease-in-out infinite}
 @keyframes tqNew{0%,100%{scale:1}50%{scale:1.12}}
+.tq-ed{margin-top:10px;padding:10px;border-radius:14px;background:linear-gradient(160deg,#FBBF2433,#7C3AED33);box-shadow:inset 0 0 0 1px #FBBF2488;display:flex;flex-direction:column;gap:7px}
+.tq-er{display:flex;align-items:center;gap:8px}.tq-er>span{flex:none;width:54px;font:800 9px Exo2,sans-serif;letter-spacing:1px;color:#FDE68A}.tq-er>div{display:flex;flex-wrap:wrap;gap:3px}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #251358 0%, #150925 65%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -173,6 +175,13 @@ input::placeholder{color:#8686A6}
         </button>
       </sc-for>
       </div>
+      <sc-if value="{{isMine}}" hint-placeholder-val="{{ false }}">
+        <div class="tq-ed">
+          <sc-for list="{{edRows}}" as="er" hint-placeholder-count="4">
+            <div class="tq-er"><span>{{er.label}}</span><div><sc-for list="{{er.opts}}" as="eo" hint-placeholder-count="8"><button type="button" aria-label="{{eo.aria}}" aria-pressed="{{eo.on}}" onClick="{{eo.pick}}" style="{{eo.style}}">{{eo.txt}}</button></sc-for></div></div>
+          </sc-for>
+        </div>
+      </sc-if>
     </div>
     <div style="flex: none; display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 6px 8px 6px 12px; border-radius: 14px; background: linear-gradient(100deg, #7C3AEDCC, #DB2777B3 60%, #F97316A6); border: 1px solid #F0ABFCAA; box-shadow: inset 0 1px 0 #ffffff33, 0 0 16px #DB277766">
       <div style="flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0">
@@ -379,7 +388,9 @@ class Component extends DCLogic {
         // the season pass's kits (progress.js gives them out: futbol-5-n)
         { name: 'Pase de temporada', country: 'Temporada', pass: [30, 6, 14, 15], teams: [
           ['Temporada Oro', '#211125', '#FFC53D', 'stripes', '#211125', '#FFC53D'], ['Temporada Neón', '#150925', '#22D3EE', 'diag', '#150925', '#22D3EE'],
-          ['Temporada Lava', '#FF5A1F', '#2A0A0A', 'halves', '#2A0A0A', '#FF5A1F'], ['Temporada Hielo', '#E8F7FF', '#3EA6FF', 'pin', '#3EA6FF', '#E8F7FF']] }
+          ['Temporada Lava', '#FF5A1F', '#2A0A0A', 'halves', '#2A0A0A', '#FF5A1F'], ['Temporada Hielo', '#E8F7FF', '#3EA6FF', 'pin', '#3EA6FF', '#E8F7FF']] },
+        // your own kit, designed in the editor below the rail (arenamix.mykit.v1)
+        { name: '★ Mi equipo', country: 'Tuyo', custom: true, teams: [(() => { const k = this.myKit(); return [k.name, k.primary, k.secondary, k.pattern, k.shorts, k.socks]; })()] }
       ],
       basket: [
         { name: 'Liga Norteamérica', country: 'EE. UU. y Canadá', teams: [
@@ -550,8 +561,14 @@ class Component extends DCLogic {
     this._cv = out;
     return out;
   }
+  myKit() {
+    let k = null; try { k = JSON.parse(localStorage.getItem('arenamix.mykit.v1') || 'null'); } catch (e) {}
+    return Object.assign({ name: 'Mi Equipo', primary: '#2563EB', secondary: '#FFFFFF', pattern: 'stripes', shorts: '#0B1D48', socks: '#2563EB', crestShape: 'shield' }, k || {});
+  }
+  setMyKit(ch) { const k = Object.assign(this.myKit(), ch); try { localStorage.setItem('arenamix.mykit.v1', JSON.stringify(k)); } catch (e) {} this.saveLocker(this.state.equip, this.state.bought); this.forceUpdate(); }
   teamItem(sport, li, ti, L) {
     const t = L[sport][li].teams[ti];
+    if (L[sport][li].custom) { const k = this.myKit(); return { id: sport + '-' + li + '-' + ti, crest: (window.AMOnline ? window.AMOnline.myName() : 'TU').slice(0, 2).toUpperCase(), crestShape: k.crestShape, crestMark: 'star', name: k.name, primary: k.primary, secondary: k.secondary, pattern: k.pattern, shorts: k.shorts, socks: k.socks, st: 'owned', rar: 3 }; }
     const rules = [
       { st: 'owned' }, { st: 'coins', price: 1500 }, { st: 'coins', price: 1500 },
       { st: 'reward', req: 'Plata 1', how: 'rank' }, { st: 'coins', price: 1200 }, { st: 'premium' }
@@ -732,6 +749,15 @@ class Component extends DCLogic {
       lockers: Array.from({ length: 8 }, (_, k) => ({ n: k === 4 ? (window.AMOnline ? window.AMOnline.myName() : 'TÚ').toUpperCase().slice(0, 10) : String([3, 7, 11, 5, 10, 8, 14, 21][k]), cls: 'tq-locker' + (k === 4 ? ' tq-mine' : ''), style: 'left: ' + (k * 49 + 1) + 'px; width: 46px; --lc: ' + ['#22D3EE', '#A855F7', '#EC4899', '#F97316', '#3B82F6', '#FACC15', '#22C55E', '#F43F5E'][k] + '; --kc: ' + kitItem.primary + '88;' + (k === 4 ? ' z-index: 0;' : '') })),
       kitGlow: kitItem.primary + '66',
       dust: Array.from({ length: 7 }, (_, k) => 'left: ' + (150 + k * 13) + 'px; top: ' + (120 + (k * 37) % 150) + 'px; --dx: ' + ((k % 3) - 1) * 12 + 'px; --d: ' + (5 + k % 4) + 's; animation-delay: ' + (-k * 0.8).toFixed(1) + 's'),
+      isMine: s.cat === 'equipos' && !!(L[sport][li] && L[sport][li].custom),
+      edRows: (() => {
+        const k = this.myKit(), C = ['#FFFFFF', '#0B0B14', '#DC2626', '#F97316', '#FACC15', '#16A34A', '#22D3EE', '#2563EB', '#7C3AED', '#EC4899', '#94A3B8', '#7A1C2C'];
+        const sw = (key) => C.map((c) => ({ aria: key + ' ' + c, txt: '', on: k[key] === c ? 'true' : 'false', pick: () => this.setMyKit({ [key]: c, ...(key === 'primary' ? { socks: c } : {}) }), style: 'width: 16px; height: 16px; padding: 0; border-radius: 5px; cursor: pointer; background: ' + c + '; border: ' + (k[key] === c ? '2px solid #FFFFFF; box-shadow: 0 0 8px #FFFFFF' : '1px solid #ffffff44') + ';' }));
+        const ch = (key, list) => list.map(([v, t]) => ({ aria: t, txt: t, on: k[key] === v ? 'true' : 'false', pick: () => this.setMyKit({ [key]: v }), style: 'height: 22px; padding: 0 8px; border-radius: 8px; cursor: pointer; font: 800 9.5px Exo2, sans-serif; ' + (k[key] === v ? 'background: #FBBF24; color: #1A1206; border: 0;' : 'background: #ffffff14; color: #fff; border: 1px solid #ffffff33;') }));
+        return [{ label: 'COLOR 1', opts: sw('primary') }, { label: 'COLOR 2', opts: sw('secondary') }, { label: 'PANTALÓN', opts: sw('shorts') },
+          { label: 'DISEÑO', opts: ch('pattern', [['solid', 'Liso'], ['stripes', 'Rayas'], ['hoops', 'Aros'], ['sash', 'Banda'], ['halves', 'Mitades'], ['pin', 'Finas']]) },
+          { label: 'ESCUDO', opts: ch('crestShape', [['shield', 'Escudo'], ['circle', 'Círculo'], ['diamond', 'Rombo']]) }];
+      })(),
       isTeams: s.cat === 'equipos', notTeams: s.cat !== 'equipos',
       rarChips: [[null, 'TODAS', '#E9D5FF']].concat(Taq_RAR.map((r, i) => [i, r[0], r[1]])).map(([v, label, c]) => {
         const on = (s.rarF ?? null) === v;
