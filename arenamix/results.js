@@ -80,7 +80,25 @@
     '#am-res .cf{position:absolute;inset:0;pointer-events:none;overflow:hidden}#am-res .cf i{position:absolute;top:-16px;width:8px;height:14px;border-radius:2px;animation:amResCf linear infinite}',
     '@keyframes amResCf{to{transform:translateY(430px) rotate(720deg)}}',
     '#am-res .rn{position:absolute;inset:0;pointer-events:none;overflow:hidden}#am-res .rn i{position:absolute;top:-30px;width:1.5px;height:22px;background:linear-gradient(180deg,transparent,#BFD7FF88);animation:amResRn linear infinite}',
-    '@keyframes amResRn{to{transform:translate(-40px,440px)}}'
+    '@keyframes amResRn{to{transform:translate(-40px,440px)}}',
+    // ===== v3: letters that bounce in one by one, stars, a shower of coins, shine on every panel =====
+    '#am-res .t{animation:none!important;transform:rotate(-3deg);background:none!important;color:#fff!important}',
+    '#am-res .t .lt{background:linear-gradient(180deg,#FFFFFF 25%,color-mix(in srgb,var(--rc) 55%,#fff) 60%,var(--rc));-webkit-background-clip:text;background-clip:text;color:transparent;padding:0 1px}',
+    '#am-res .t .lt{display:inline-block;animation:amResLt .5s cubic-bezier(.2,2,.4,1) both,amResLtW 2.4s ease-in-out infinite}',
+    '@keyframes amResLt{from{opacity:0;transform:translateY(-70px) scale(2) rotate(-25deg)}}',
+    '@keyframes amResLtW{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}',
+    '#am-res.lost .t .lt{animation:amResLtL .6s cubic-bezier(.5,0,.6,1.6) both}@keyframes amResLtL{from{opacity:0;transform:translateY(-40px) rotate(18deg)}}',
+    '#am-res .stars i{position:absolute;background:#FFE38A;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);filter:drop-shadow(0 0 8px #FFC53D);animation:amResStar .5s cubic-bezier(.2,2,.4,1) both,amResTw 1.4s ease-in-out infinite}',
+    '@keyframes amResStar{from{opacity:0;transform:scale(0) rotate(-90deg)}}@keyframes amResTw{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.35) rotate(25deg)}}',
+    '#am-res .coinr{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3}#am-res .coinr img{position:absolute;top:-40px;filter:drop-shadow(0 4px 4px #0008);animation:amResCoin ease-in both}',
+    '@keyframes amResCoin{0%{transform:translateY(0) rotate(0);opacity:1}85%{opacity:1}100%{transform:translateY(440px) rotate(540deg);opacity:0}}',
+    '#am-res .pn::after,#am-res .mvp::after,#am-res .mst::after{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:26%;background:linear-gradient(100deg,transparent,#ffffff2e,transparent);transform:translateX(-220%) skewX(-18deg);animation:amResShine 4.5s ease-in-out infinite;pointer-events:none}',
+    '#am-res .pn:nth-child(2)::after{animation-delay:-1.5s}#am-res .pn:nth-child(3)::after{animation-delay:-3s}#am-res .mst::after{animation-delay:-2.2s}',
+    '@keyframes amResShine{0%,70%{transform:translateX(-220%) skewX(-18deg)}100%{transform:translateX(560%) skewX(-18deg)}}',
+    '#am-res .pn,#am-res .mvp,#am-res .mst{overflow:hidden}',
+    '#am-res .mvp .nt{animation:amResNt 1.6s 1.2s ease-in-out infinite}@keyframes amResNt{0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 #FBBF24)}50%{transform:scale(1.1);filter:drop-shadow(0 0 14px #FBBF24)}}',
+    '#am-res .cn b{animation:amResPopN .5s .9s cubic-bezier(.2,2,.4,1) both}@keyframes amResPopN{from{transform:scale(.3);opacity:0}}',
+    '#am-res .sc{animation:amResPopN .5s .7s cubic-bezier(.2,2,.4,1) both}'
   ].join('\n');
   document.head.appendChild(css);
 
@@ -105,7 +123,9 @@
       (S.lost ? '<div class="rn">' + Array.from({ length: 40 }, function (_, k) { return '<i style="left:' + ((k * 29) % 110) + '%;animation-duration:' + (0.7 + (k % 5) * 0.12).toFixed(2) + 's;animation-delay:' + (-(k % 8) * 0.13).toFixed(2) + 's"></i>'; }).join('') + '</div>' : '') +
       '<div class="band"></div>' +
       '<div class="k">FINAL DEL PARTIDO</div>' +
-      '<div class="t">' + (S.won ? '¡VICTORIA!' : S.lost ? 'DERROTA' : 'EMPATE') + '</div>' +
+      '<div class="t">' + (S.won ? '¡VICTORIA!' : S.lost ? 'DERROTA' : 'EMPATE').split('').map(function (ch, k) { return '<span class="lt" style="animation-delay:' + (0.15 + k * 0.05).toFixed(2) + 's,' + (1.2 + k * 0.08).toFixed(2) + 's">' + ch + '</span>'; }).join('') + '</div>' +
+      (S.won ? '<div class="stars">' + [[-250, 30, 26], [-210, 70, 16], [235, 26, 24], [205, 72, 15], [-150, 10, 12], [160, 8, 13]].map(function (q, k) { return '<i style="left:calc(50% + ' + q[0] + 'px);top:' + q[1] + 'px;width:' + q[2] + 'px;height:' + q[2] + 'px;animation-delay:' + (0.5 + k * 0.12).toFixed(2) + 's,' + (-k * 0.4).toFixed(2) + 's"></i>'; }).join('') + '</div>' : '') +
+      (S.won ? '<div class="coinr">' + Array.from({ length: 14 }, function (_, k) { return '<img src="' + P('coins:6') + '" alt="" style="left:' + ((k * 43 + 5) % 96) + '%;width:' + (22 + (k % 3) * 8) + 'px;animation-delay:' + (0.6 + (k % 7) * 0.22).toFixed(2) + 's;animation-duration:' + (1.6 + (k % 4) * 0.3).toFixed(2) + 's">'; }).join('') + '</div>' : '') +
       '<div class="sc">' + S.home + ' – ' + S.away + (S.pen ? ' <small style="font-size:.45em;opacity:.8">(' + S.pen[0] + '–' + S.pen[1] + ' pen.)</small>' : '') + '</div>' +
       (function () {
         var st = S.stats || {}, g = st.goals || 0;

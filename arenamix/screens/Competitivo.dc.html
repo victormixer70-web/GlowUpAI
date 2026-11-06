@@ -210,6 +210,38 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .vs-pos{display:flex;gap:3px;padding:3px;border-radius:11px;background:#02040CCC;box-shadow:inset 0 0 0 1px #1E8BFF66}
 .vs-go{flex:1;height:56px;border:0;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:12px;font:800 italic 26px 'Barlow Condensed',sans-serif;letter-spacing:2px;cursor:pointer;position:relative}
 
+/* ===== versus: the show ===== */
+.vs-split{position:absolute;inset:0;pointer-events:none;z-index:0}
+.vs-split .a{position:absolute;inset:0;background:linear-gradient(100deg,#0A3DCC66 0%,#0A3DCC22 38%,transparent 52%);animation:vsInL .8s both}
+.vs-split .b{position:absolute;inset:0;background:linear-gradient(280deg,#C0103A66 0%,#C0103A22 38%,transparent 52%);animation:vsInR .8s both}
+.vs-split .cut{position:absolute;left:50%;top:-40px;bottom:-40px;width:4px;margin-left:-2px;transform:skewX(-14deg);background:linear-gradient(180deg,transparent,#FFFFFF 30%,#FFC53D 50%,#FFFFFF 70%,transparent);box-shadow:0 0 18px #FFC53D,0 0 40px #FFFFFF88;opacity:.55;animation:vsCut 2.4s ease-in-out infinite}
+@keyframes vsCut{0%,100%{opacity:.25}50%{opacity:.75}}
+.vs-aura{position:absolute;left:40px;right:40px;bottom:46px;height:220px;pointer-events:none}
+.vs-aura i{position:absolute;bottom:0;width:4px;height:4px;border-radius:50%;background:var(--pc);box-shadow:0 0 8px var(--pc),0 0 2px #fff;opacity:0;animation:vsAura linear infinite}
+@keyframes vsAura{0%{transform:translateY(0) scale(.5);opacity:0}20%{opacity:1}100%{transform:translateY(-200px) scale(1.4);opacity:0}}
+.vs-wave{position:absolute;width:80px;height:80px;border-radius:50%;border:3px solid #FFC53D;opacity:0;animation:vsWave 2s ease-out infinite}
+@keyframes vsWave{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.6);opacity:0}}
+.vs-spk{position:absolute;left:50%;top:50%;width:3px;height:14px;border-radius:2px;background:linear-gradient(180deg,#FFFFFF,#FFC53D);transform-origin:50% 0;opacity:0;animation:vsSpk 1.4s ease-out infinite}
+@keyframes vsSpk{0%{opacity:0;translate:0 0}15%{opacity:1}100%{opacity:0;translate:var(--dx) var(--dy)}}
+.vs-q{text-shadow:2px 0 #22D3EE,-2px 0 #FF3B5C,0 0 22px #FF3B5C,0 4px 0 #000!important;animation:vsQ 1.6s ease-in-out infinite,vsGlitch 2.6s steps(1) infinite!important}
+@keyframes vsGlitch{0%,88%,100%{clip-path:none;translate:0 0}90%{clip-path:inset(20% 0 45% 0);translate:-6px 0}92%{clip-path:inset(55% 0 10% 0);translate:6px 0}94%{clip-path:none;translate:0 0}}
+.vs-sil{animation:vsSil 2.2s ease-in-out infinite,vsSilG 3.2s steps(1) infinite}
+@keyframes vsSilG{0%,90%,100%{filter:brightness(0) drop-shadow(0 0 2px #FF5C8A) drop-shadow(0 0 14px #FF3B5C)}92%{filter:brightness(0) drop-shadow(4px 0 0 #22D3EE) drop-shadow(-4px 0 0 #FF3B5C)}}
+.vs-tag{overflow:hidden}.vs-tag::after{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:30%;background:linear-gradient(100deg,transparent,#ffffff44,transparent);transform:translateX(-200%) skewX(-18deg);animation:vsShine 4s ease-in-out infinite;pointer-events:none}
+.vs-tag.r::after{animation-delay:-2s}
+@keyframes vsShine{0%,70%{transform:translateX(-200%) skewX(-18deg)}100%{transform:translateX(500%) skewX(-18deg)}}
+.vs-tk{z-index:2}
+.vs-tile{position:relative;overflow:hidden;transition:transform .2s}
+.vs-tile svg{flex:none;width:28px;height:28px;padding:5px;box-sizing:border-box;border-radius:9px;background:color-mix(in srgb,var(--tc) 30%,transparent);box-shadow:0 0 10px color-mix(in srgb,var(--tc) 50%,transparent)}
+.vs-tile::after{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:30%;background:linear-gradient(100deg,transparent,#ffffff33,transparent);transform:translateX(-200%) skewX(-18deg);animation:vsShine 5s ease-in-out infinite;pointer-events:none}
+.vs-tile:nth-child(2)::after{animation-delay:-1.2s}.vs-tile:nth-child(3)::after{animation-delay:-2.4s}.vs-tile:nth-child(4)::after{animation-delay:-3.6s}
+.vs-tile:hover{transform:translateY(-3px)}
+.vs-chev{display:flex;gap:2px;margin-left:4px}.vs-chev i{width:10px;height:16px;background:#FFFFFF;clip-path:polygon(0 0,45% 0,100% 50%,45% 100%,0 100%,55% 50%);opacity:.25;animation:vsChev 1.2s ease-in-out infinite}
+.vs-chev i:nth-child(2){animation-delay:.15s}.vs-chev i:nth-child(3){animation-delay:.3s}
+@keyframes vsChev{0%,100%{opacity:.2;translate:0 0}50%{opacity:1;translate:3px 0}}
+.vs-mt{animation:vsTitle .6s .2s cubic-bezier(.2,1.6,.4,1) both,vsTitleG 3s 1s ease-in-out infinite}
+@keyframes vsTitleG{0%,100%{filter:drop-shadow(0 3px 0 #000) drop-shadow(0 0 14px #1E8BFF88)}50%{filter:drop-shadow(0 3px 0 #000) drop-shadow(0 0 26px #3DA9FF)}}
+
 .cp-promo{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:radial-gradient(60% 70% at 50% 45%,color-mix(in srgb,var(--pc) 55%,#000) 0%,#05030FEE 70%);pointer-events:none}
 .cp-promo .r{position:absolute;left:50%;top:45%;width:900px;height:900px;margin:-450px 0 0 -450px;background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--pc) 45%,transparent) 0 7deg,transparent 9deg 20deg);animation:mmBeam 8s linear infinite;-webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent)}
 .cp-promo .em{position:relative;filter:drop-shadow(0 0 30px var(--pc));animation:cpEm .7s cubic-bezier(.2,1.8,.4,1) both}
@@ -235,11 +267,14 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 
   <sc-if value="{{isLobby}}" hint-placeholder-val="{{ true }}">
     <div class="cp-fx" aria-hidden="true"><sc-for list="{{confetti}}" as="c" hint-placeholder-count="0"><i style="{{c}}"></i></sc-for></div>
+    <!-- versus split: blue for you, red for them, a glowing diagonal between -->
+    <div class="vs-split" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="cut"></i></div>
     <div class="vs-floor" aria-hidden="true"></div>
     <div class="vs-arena" style="--lc: {{glow}}">
       <!-- you -->
       <div class="vs-side l">
         <div class="vs-plat" style="--pc: #1E8BFF"></div>
+        <div class="vs-aura" style="--pc: #3DA9FF"><sc-for list="{{auraL}}" as="a" hint-placeholder-count="0"><i style="{{a}}"></i></sc-for></div>
         <sc-for list="{{mateSil}}" as="m" hint-placeholder-count="0"><img class="vs-mate" src="{{m.src}}" alt="" style="{{m.style}}"></sc-for>
         <sc-if value="{{hero3d}}" hint-placeholder-val="{{ false }}"><div class="vs-me3d" ref="{{heroRef}}" onClick="{{heroTap}}"></div></sc-if>
         <sc-if value="{{hero2d}}" hint-placeholder-val="{{ true }}"><img class="vs-me" src="{{meImg}}" alt=""></sc-if>
@@ -250,7 +285,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <span class="vs-mk">{{plKicker}}</span>
         <span class="vs-mt">{{plTitle}}</span>
         <div class="vs-core">
+          <i class="vs-wave"></i><i class="vs-wave" style="animation-delay: -1s"></i>
           <i class="vs-ring"></i><i class="vs-ring b"></i>
+          <sc-for list="{{vsSparks}}" as="p" hint-placeholder-count="0"><i class="vs-spk" style="{{p}}"></i></sc-for>
           <svg class="vs-bolt" width="190" height="120" viewBox="0 0 190 120" aria-hidden="true"><path d="M0 60 L40 48 L62 70 L92 40 L118 72 L146 46 L190 60" fill="none" stroke="#7CC4FF" stroke-width="3" stroke-linejoin="round"/><path d="M0 60 L34 70 L66 44 L96 76 L124 42 L150 68 L190 60" fill="none" stroke="#FF5C8A" stroke-width="2.4" stroke-linejoin="round" class="b2"/></svg>
           <b class="vs-vs">VS</b>
         </div>
@@ -259,8 +296,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <!-- the rival: unknown until the search finds one -->
       <div class="vs-side r">
         <div class="vs-plat" style="--pc: #FF3B5C"></div>
+        <div class="vs-aura" style="--pc: #FF5C8A"><sc-for list="{{auraR}}" as="a" hint-placeholder-count="0"><i style="{{a}}"></i></sc-for></div>
         <sc-for list="{{rivalSil}}" as="m" hint-placeholder-count="1"><img class="vs-sil" src="{{m.src}}" alt="" style="{{m.style}}"></sc-for>
-        <b class="vs-q">?</b>
+        <b class="vs-q" data-t="?">?</b>
         <div class="vs-tag r"><span class="vs-tk">RIVAL</span><b>{{rivalLine}}</b><span class="vs-rk" style="--rc: #FF5C8A"><i></i>{{rivalSub}}</span></div>
       </div>
     </div>
@@ -268,7 +306,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <div class="vs-bottom">
       <div class="vs-tiles"><sc-for list="{{tiles}}" as="t" hint-placeholder-count="4"><div class="vs-tile" style="{{t.style}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{t.ic}}"/></svg><div><b>{{t.v}}</b><span>{{t.l}}</span></div></div></sc-for></div>
       <sc-if value="{{canKeep}}" hint-placeholder-val="{{ false }}"><div class="vs-pos"><button type="button" onClick="{{setField}}" style="{{fieldStyle}}">CAMPO</button><button type="button" onClick="{{setKeeper}}" style="{{keeperStyle}}">PORTERO</button></div></sc-if>
-      <button type="button" onClick="{{search}}" class="bc-btn am-shine lb-go am-logo-btn vs-go"><span class="rg"></span><span class="rg" style="animation-delay: -1.1s"></span><svg class="lb-ball" width="30" height="30" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#FFFFFF" stroke="#150925" stroke-width="1.6"/><path d="M12 7l3.4 2.5l-1.3 4h-4.2l-1.3-4z" fill="#150925"/><path d="M12 7V3M15.4 9.5l3.8-1.2M14.1 13.5l2.3 3.3M9.9 13.5l-2.3 3.3M8.6 9.5L4.8 8.3" stroke="#150925" stroke-width="1.3"/></svg>BUSCAR PARTIDA</button>
+      <button type="button" onClick="{{search}}" class="bc-btn am-shine lb-go am-logo-btn vs-go"><span class="rg"></span><span class="rg" style="animation-delay: -1.1s"></span><svg class="lb-ball" width="30" height="30" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#FFFFFF" stroke="#150925" stroke-width="1.6"/><path d="M12 7l3.4 2.5l-1.3 4h-4.2l-1.3-4z" fill="#150925"/><path d="M12 7V3M15.4 9.5l3.8-1.2M14.1 13.5l2.3 3.3M9.9 13.5l-2.3 3.3M8.6 9.5L4.8 8.3" stroke="#150925" stroke-width="1.3"/></svg>BUSCAR PARTIDA<span class="vs-chev" aria-hidden="true"><i></i><i></i><i></i></span></button>
     </div>
     <sc-if value="{{showNotice}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; left: 50%; top: 64px; z-index: 6; translate: -50% 0; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px; background: #2A2410; border: 1px solid #FFC53D"><span style="font-size: 12px; font-weight: 700; color: #FFE38A">{{noticeText}}</span><button type="button" onClick="{{closeNotice}}" style="border: 0; background: transparent; color: #FFE38A; font-weight: 800; font-size: 13px; cursor: pointer">OK</button></div></sc-if>
   </sc-if>
@@ -941,6 +979,9 @@ class Component extends DCLogic {
           plKicker: (casual ? 'INFORMAL' : 'COMPETITIVO') + ' · ' + (pl.kind === 'team' ? 'PARTIDO' : 'DUELO'),
           mateSil: Array.from({ length: nTeam - 1 }, (_, k) => ({ src: pick(k + 2), style: 'left: ' + (k % 2 ? 150 : -6) + 'px; bottom: ' + (64 + Math.floor(k / 2) * 14) + 'px; z-index: 0' })),
           rivalSil: Array.from({ length: nTeam }, (_, k) => { const main = k === 0, w = main ? 160 : 104; return { src: pick(k + 5), style: 'width: ' + w + 'px; height: ' + w + 'px; left: ' + (main ? 45 : k % 2 ? 146 : 0) + 'px; ' + (main ? 'z-index: 2;' : 'bottom: 66px; opacity: .7;') + ' animation-delay: ' + (-k * 0.4) + 's' }; }),
+          auraL: Array.from({ length: 14 }, (_, k) => 'left: ' + ((k * 41) % 100) + '%; animation-duration: ' + (1.6 + (k % 5) * 0.35).toFixed(2) + 's; animation-delay: ' + (-k * 0.27).toFixed(2) + 's'),
+          auraR: Array.from({ length: 14 }, (_, k) => 'left: ' + ((k * 53) % 100) + '%; animation-duration: ' + (1.6 + (k % 5) * 0.35).toFixed(2) + 's; animation-delay: ' + (-k * 0.31).toFixed(2) + 's'),
+          vsSparks: Array.from({ length: 12 }, (_, k) => { const a = k / 12 * Math.PI * 2, d = 70 + (k % 3) * 18; return '--dx: ' + (Math.cos(a) * d).toFixed(0) + 'px; --dy: ' + (Math.sin(a) * d).toFixed(0) + 'px; rotate: ' + (a * 180 / Math.PI - 90).toFixed(0) + 'deg; animation-delay: ' + (-(k % 4) * 0.35).toFixed(2) + 's'; }),
           rivalLine: nTeam > 1 ? 'EQUIPO RIVAL' : '¿QUIÉN SERÁ?', rivalSub: casual ? 'ONLINE O IA' : 'DE TU NIVEL',
           tiles: [tl('clock', dur, 'DURACIÓN', '#7CC4FF', 0), tl('users', nTeam + ' VS ' + nTeam, pl.kind === 'team' ? '+ PORTEROS' : 'CARA A CARA', '#53D88E', 1),
             tl('trophy', casual ? 'LIBRE' : placing ? (Math.min(5, pc.g + 1)) + ' / 5' : '+25 MMR', casual ? 'SIN RANGO' : placing ? 'CLASIFICATORIA' : 'SI GANAS', '#FFC53D', 2), tl('coin', '+60', 'VCD AL GANAR', '#FF8A3D', 3)]
