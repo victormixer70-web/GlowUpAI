@@ -263,14 +263,14 @@ const TN_CLUBS = [
 const TN_NAMES = ['Kai_Striker', 'LunaGol_09', 'ToroVeloz', 'Mika10', 'Zeta_FC', 'Nico_Volea', 'Sara_Crack', 'Dani_Muro', 'Bruno7', 'Iker_Rayo', 'Vega_22', 'Leo_Tiki', 'Noa_Golazo', 'Rafa_Pared', 'Alba_Top', 'Hugo_Chut', 'Eva_Regate', 'Tomi_9'];
 // the challenges of the day: a match with a twist, and what you must do in it
 const TN_RETOS = [
-  { id: 'remontada', title: 'LA REMONTADA', icon: 'M3 17l6-6l4 4l8-8M14 7h7v7', c: '#FF8A3D', desc: 'Empiezas perdiendo 0-2. Dale la vuelta y gana el partido.', n: 3, dur: 120, ai: 0.45, start: [0, 2], setup: '3 VS 3 · 0-2', reward: 300, ok: (r) => r.home > r.away },
-  { id: 'muro', title: 'EL MURO', icon: 'M12 3l8 3v6c0 5-4 8-8 9c-4-1-8-4-8-9V6z', c: '#22D3EE', desc: 'Gana sin encajar ni un solo gol.', n: 2, dur: 90, ai: 0.5, setup: '2 VS 2', reward: 200, ok: (r) => r.home > r.away && r.away === 0 },
-  { id: 'pichichi', title: 'PICHICHI', icon: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18M12 7l4 3l-1.5 5h-5L8 10z', c: '#FFC53D', desc: 'Marca tú mismo 3 goles en un 1 contra 1.', n: 1, dur: 120, ai: 0.4, setup: '1 VS 1', reward: 250, ok: (r) => (r.stats && r.stats.goals || 0) >= 3 },
-  { id: 'gigante', title: 'TUMBA AL GIGANTE', icon: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z', c: '#FF5C5C', desc: 'Gana a la IA en su nivel más difícil.', n: 1, dur: 90, ai: 0.95, setup: '1 VS 1 · DIFÍCIL', reward: 250, ok: (r) => r.home > r.away },
-  { id: 'agonia', title: 'AL LÍMITE', icon: 'M12 7v5l3 2M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18', c: '#A78BFA', desc: '45 segundos, empate a 1. Marca el gol de la victoria.', n: 2, dur: 45, ai: 0.5, start: [1, 1], setup: '2 VS 2 · 45 S', reward: 200, ok: (r) => r.home > r.away },
-  { id: 'paliza', title: 'EXHIBICIÓN', icon: 'M13 2L4 14h7l-1 8l9-12h-7z', c: '#53D88E', desc: 'Gana por 3 goles o más de diferencia.', n: 3, dur: 120, ai: 0.4, setup: '3 VS 3', reward: 250, ok: (r) => r.home - r.away >= 3 },
-  { id: 'tikitaka', title: 'TIKI-TAKA', icon: 'M5 12h14M13 6l6 6l-6 6', c: '#22D3EE', desc: 'Da 8 pases y gana el partido.', n: 4, dur: 120, ai: 0.45, setup: '4 VS 4', reward: 200, ok: (r) => r.home > r.away && (r.stats && r.stats.passes || 0) >= 8 },
-  { id: 'artista', title: 'EL ARTISTA', icon: 'M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z', c: '#FF5CC8', desc: 'Haz 3 filigranas y no pierdas.', n: 2, dur: 90, ai: 0.4, setup: '2 VS 2', reward: 200, ok: (r) => r.home >= r.away && (r.stats && r.stats.skills || 0) >= 3 }
+  { id: 'remontada', title: 'LA REMONTADA', icon: 'M3 17l6-6l4 4l8-8M14 7h7v7', c: '#FF8A3D', desc: 'Empiezas perdiendo 0-2. Dale la vuelta y gana el partido.', n: 3, dur: 120, ai: 0.45, start: [0, 2], setup: '3 VS 3 · 0-2', reward: 180, ok: (r) => r.home > r.away },
+  { id: 'muro', title: 'EL MURO', icon: 'M12 3l8 3v6c0 5-4 8-8 9c-4-1-8-4-8-9V6z', c: '#22D3EE', desc: 'Gana sin encajar ni un solo gol.', n: 2, dur: 90, ai: 0.5, setup: '2 VS 2', reward: 120, ok: (r) => r.home > r.away && r.away === 0 },
+  { id: 'pichichi', title: 'PICHICHI', icon: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18M12 7l4 3l-1.5 5h-5L8 10z', c: '#FFC53D', desc: 'Marca tú mismo 3 goles en un 1 contra 1.', n: 1, dur: 120, ai: 0.4, setup: '1 VS 1', reward: 150, ok: (r) => (r.stats && r.stats.goals || 0) >= 3 },
+  { id: 'gigante', title: 'TUMBA AL GIGANTE', icon: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z', c: '#FF5C5C', desc: 'Gana a la IA en su nivel más difícil.', n: 1, dur: 90, ai: 0.95, setup: '1 VS 1 · DIFÍCIL', reward: 150, ok: (r) => r.home > r.away },
+  { id: 'agonia', title: 'AL LÍMITE', icon: 'M12 7v5l3 2M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18', c: '#A78BFA', desc: '45 segundos, empate a 1. Marca el gol de la victoria.', n: 2, dur: 45, ai: 0.5, start: [1, 1], setup: '2 VS 2 · 45 S', reward: 120, ok: (r) => r.home > r.away },
+  { id: 'paliza', title: 'EXHIBICIÓN', icon: 'M13 2L4 14h7l-1 8l9-12h-7z', c: '#53D88E', desc: 'Gana por 3 goles o más de diferencia.', n: 3, dur: 120, ai: 0.4, setup: '3 VS 3', reward: 150, ok: (r) => r.home - r.away >= 3 },
+  { id: 'tikitaka', title: 'TIKI-TAKA', icon: 'M5 12h14M13 6l6 6l-6 6', c: '#22D3EE', desc: 'Da 8 pases y gana el partido.', n: 4, dur: 120, ai: 0.45, setup: '4 VS 4', reward: 120, ok: (r) => r.home > r.away && (r.stats && r.stats.passes || 0) >= 8 },
+  { id: 'artista', title: 'EL ARTISTA', icon: 'M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z', c: '#FF5CC8', desc: 'Haz 3 filigranas y no pierdas.', n: 2, dur: 90, ai: 0.4, setup: '2 VS 2', reward: 120, ok: (r) => r.home >= r.away && (r.stats && r.stats.skills || 0) >= 3 }
 ];
 const TN_ROUND = ['CUARTOS', 'SEMIFINAL', 'FINAL'];
 class Component extends DCLogic {
@@ -340,7 +340,7 @@ class Component extends DCLogic {
     const me = this.myIdx(C);
     let wins = 0;
     C.rounds.forEach((R, k) => R.forEach((p, i) => { const m = C.res[k] && C.res[k][i]; if (m && (p[0] === me || p[1] === me) && p[this.winnerOf(m)] === me) wins++; }));
-    return [[60, 'Eliminado en cuartos'], [150, 'Eliminado en semifinales'], [350, 'Subcampeón'], [1000, '¡CAMPEÓN DE LA COPA!']][Math.min(3, wins)];
+    return [[50, 'Eliminado en cuartos'], [120, 'Eliminado en semifinales'], [250, 'Subcampeón'], [600, '¡CAMPEÓN DE LA COPA!']][Math.min(3, wins)];
   }
 
   /* ---------- liga ---------- */
@@ -385,7 +385,7 @@ class Component extends DCLogic {
     L.res.push(res); L.day++;
     if (L.day >= L.days.length) L.done = true;
   }
-  lgPrize(pos) { return [[800, '¡CAMPEÓN DE LIGA!'], [400, 'Subcampeón'], [200, 'Tercer puesto'], [100, 'Cuarto puesto'], [60, 'Quinto puesto'], [40, 'Sexto puesto']][pos]; }
+  lgPrize(pos) { return [[500, '¡CAMPEÓN DE LIGA!'], [250, 'Subcampeón'], [150, 'Tercer puesto'], [80, 'Cuarto puesto'], [50, 'Quinto puesto'], [30, 'Sexto puesto']][pos]; }
 
   /* ---------- retos ---------- */
   today() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
@@ -475,8 +475,8 @@ class Component extends DCLogic {
       thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 122) + 'px; width: 122px; height: 32px; border-radius: 11px; background: ' + TABS[ti][2] + '; box-shadow: 0 0 16px ' + TABS[ti][2] + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s',
       sizes: [1, 2, 3, 4].map((n) => ({ n: String(n), label: n + ' VS ' + n, cls: 'tn-size' + (n === s.size ? ' on' : ''), pick: () => this.setState({ size: n }) })),
       copaImg: window.AMPosters ? window.AMPosters.get('copa', () => this.forceUpdate()) : '', ligaImg: window.AMPosters ? window.AMPosters.get('liga', () => this.forceUpdate()) : '', retosImg: window.AMPosters ? window.AMPosters.get('retos', () => this.forceUpdate()) : '',
-      cupPrizes: [['Campeón', '1.000 VCD + trofeo', '#FFC53D'], ['Subcampeón', '350 VCD', '#C9CAE0'], ['Semifinal', '150 VCD', '#CD7F32'], ['Cuartos', '60 VCD', '#6E6E92']].map(([k, v, c], i) => ({ k, v, n: String(i + 1), dot: '', tile: 'background: linear-gradient(135deg, ' + c + '55, ' + c + '18); border: 1px solid ' + c + 'AA; --pc: ' + c + ';' })),
-      lgPrizes: [['1.º', '800 VCD + trofeo', '#FFC53D'], ['2.º', '400 VCD', '#C9CAE0'], ['3.º', '200 VCD', '#CD7F32'], ['4.º a 6.º', '40-100 VCD', '#6E6E92']].map(([k, v, c], i) => ({ k, v, n: String(i + 1), dot: '', tile: 'background: linear-gradient(135deg, ' + c + '55, ' + c + '18); border: 1px solid ' + c + 'AA; --pc: ' + c + ';' })),
+      cupPrizes: [['Campeón', '600 VCD + trofeo', '#FFC53D'], ['Subcampeón', '250 VCD', '#C9CAE0'], ['Semifinal', '120 VCD', '#CD7F32'], ['Cuartos', '50 VCD', '#6E6E92']].map(([k, v, c], i) => ({ k, v, n: String(i + 1), dot: '', tile: 'background: linear-gradient(135deg, ' + c + '55, ' + c + '18); border: 1px solid ' + c + 'AA; --pc: ' + c + ';' })),
+      lgPrizes: [['1.º', '500 VCD + trofeo', '#FFC53D'], ['2.º', '250 VCD', '#C9CAE0'], ['3.º', '150 VCD', '#CD7F32'], ['4.º a 6.º', '30-80 VCD', '#6E6E92']].map(([k, v, c], i) => ({ k, v, n: String(i + 1), dot: '', tile: 'background: linear-gradient(135deg, ' + c + '55, ' + c + '18); border: 1px solid ' + c + 'AA; --pc: ' + c + ';' })),
       newCup: () => this.newCup(), newLeague: () => this.newLeague(),
       cupIntro: tab === 'copa' && !C, cupOn: tab === 'copa' && !!C,
       lgIntro: tab === 'liga' && !L, lgOn: tab === 'liga' && !!L, isRetos: tab === 'retos',

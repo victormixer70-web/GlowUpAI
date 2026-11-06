@@ -333,13 +333,13 @@
     if (useBoost('pass2')) { passGain *= 2; used.push('Pase turbo'); }
     var x0 = xp(), before = levelOf(x0), after = levelOf(addXp(gain)), pv = addPassXp(passGain), ps = pass();
     // coins
-    var coinsGain = won ? 40 : lost ? 10 : 20, levelBonus = 0;
+    var coinsGain = won ? 60 : lost ? 20 : 30, levelBonus = 0;
     // win streak bonus: +10 VCD per win in a row (up to +50)
     var Cs = get('arenamix.career.v1', { streak: 0 }), streakNow = won ? (Cs.streak || 0) + 1 : 0, streakBonus = won && streakNow >= 2 ? Math.min(5, streakNow) * 10 : 0;
     coinsGain += streakBonus;
     if (useBoost('vcd2')) { coinsGain *= 2; used.push('Doble VCD'); }
     for (var lv = before.level + 1; lv <= after.level; lv++) levelBonus += 100;
-    var gemsGain = 2 * (after.level - before.level);
+    var gemsGain = 3 * (after.level - before.level);
     if (gemsGain) addGems(gemsGain);
     var c0 = coins(); addCoins(coinsGain + levelBonus);
     // the weekly track
