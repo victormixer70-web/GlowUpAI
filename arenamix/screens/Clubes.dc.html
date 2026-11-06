@@ -82,6 +82,14 @@ body{margin:0}
         <button type="button" class="cl-sm" style="background: #ffffff1a; color: #FCA5A5; box-shadow: inset 0 0 0 1px #FCA5A588" onClick="{{leave}}">{{leaveLabel}}</button>
       </div>
       <div class="cl-card" style="flex: 1; padding: 12px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; gap: 6px"><sc-for list="{{views}}" as="v" hint-placeholder-count="2"><button type="button" class="cl-sm" style="{{v.style}}" onClick="{{v.pick}}">{{v.label}}</button></sc-for></div>
+        <sc-if value="{{isTor}}" hint-placeholder-val="{{ false }}">
+          <span style="font-size: 10.5px; font-weight: 700; color: #C4B5FD">Cada victoria de un miembro suma para el club. Termina en {{torLeft}} · premio para todos según el puesto.</span>
+          <div style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px">
+            <sc-for list="{{tor}}" as="t" hint-placeholder-count="6"><div style="{{t.style}}"><span style="{{t.posStyle}}">{{t.pos}}</span><b translate="no" style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{t.name}}</b><span style="font-size: 10px; font-weight: 800; color: #FDE68A">{{t.prize}}</span><span style="width: 44px; text-align: right; font: 800 16px 'Barlow Condensed', sans-serif">{{t.wins}}</span></div></sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{isMem}}" hint-placeholder-val="{{ true }}">
         <span class="cl-h">MIEMBROS · {{memN}}/20<i></i></span>
         <div style="flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 5px">
           <sc-for list="{{members}}" as="m" hint-placeholder-count="4"><div class="cl-mem"><img src="{{m.pic}}" alt=""><b translate="no">{{m.name}}</b><span style="{{m.roleStyle}}">{{m.role}}</span><span style="font: 800 12px 'Barlow Condensed', sans-serif; color: #FDE68A">{{m.wins}} 🏆</span><span class="dot" style="{{m.dot}}"></span></div></sc-for>
@@ -91,6 +99,7 @@ body{margin:0}
           <div style="display: flex; flex-wrap: wrap; gap: 5px"><sc-for list="{{invitable}}" as="f" hint-placeholder-count="2"><button type="button" class="cl-sm" style="{{f.style}}" onClick="{{f.inv}}">+ {{f.name}}</button></sc-for></div>
         </sc-if>
         <sc-if value="{{noFriends}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10.5px; font-weight: 700; color: #C4B5FD">Añade amigos en Social para invitarles al club.</span></sc-if>
+        </sc-if>
       </div>
       <div class="cl-card" style="flex: none; width: 230px; padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px">
         <span class="cl-h" style="color: #93C5FD">MURO DEL CLUB<i style="background: linear-gradient(90deg, #93C5FD, transparent)"></i></span>
@@ -106,10 +115,13 @@ body{margin:0}
 const Cl_SHAPES = { shield: 'M32 2L60 12V34C60 52 47 63 32 68C17 63 4 52 4 34V12Z', circle: 'M32 4A30 30 0 1 1 31.9 4Z', diamond: 'M32 2L62 35L32 68L2 35Z' };
 const Cl_COLORS = ['#2563EB', '#DC2626', '#16A34A', '#F59E0B', '#7C3AED', '#EC4899', '#0EA5E9', '#111827'];
 const Cl_PICS = ['ty', 'vegas', 'granny', 'remy', 'leo', 'nico', 'dani'];
+// the other clubs of the weekly club tournament
+const Cl_RIVALS = ['Los Galácticos', 'Furia Roja FC', 'Tiburones CF', 'Leones del Sur', 'Rayo Nocturno', 'Club Dragón', 'Atlético Neón', 'Los Invencibles', 'Halcones FC', 'Mareas Azules', 'Titanes 10', 'Fénix United'];
+const Cl_PRIZE = [[300, 10], [200, 6], [120, 3], [60, 0], [40, 0], [30, 0]];
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { name: '', tag: '', motto: '', color: '#2563EB', shape: 'shield', draft: '' };
+    this.state = { name: '', tag: '', motto: '', color: '#2563EB', shape: 'shield', draft: '', view: 'mem' };
     this.wallRef = (el) => { if (el) { this.wallEl = el; el.scrollTop = el.scrollHeight; } };
   }
   componentDidMount() {
@@ -138,7 +150,36 @@ class Component extends DCLogic {
     const owner = club.owner === me, wins = (club.members || []).reduce((a, m) => a + (m.wins || 0), 0), lv = 1 + Math.floor(wins / 10);
     const inClub = (n) => (club.members || []).some((m) => m.name.toLowerCase() === n.toLowerCase());
     const inv = st.friends.filter((f) => !inClub(f.name));
-    return { ...base, noClub: false, hasClub: true,
+    // ---- the weekly club tournament: your club against 5 others, on the wins of the week ----
+    const PR = window.AMProgress, W = PR && PR.weekly ? PR.weekly() : { week: 0, daysLeft: 7 };
+    const torOf = (week, prog) => {
+      let h = 7; for (const ch of String(club.id || club.name) + ':' + week) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+      const rnd = () => { h = (h * 1103515245 + 12345) >>> 0; return h / 4294967296; };
+      const n = (club.members || []).length, names = Cl_RIVALS.slice();
+      const rows = [{ name: club.name, wins, me: true }];
+      for (let k = 0; k < 5; k++) { const nm = names.splice(Math.floor(rnd() * names.length), 1)[0], target = Math.round((3 + n * 5) * (0.35 + rnd() * 1.1)); rows.push({ name: nm, wins: Math.round(target * prog) }); }
+      return rows.sort((a, b) => b.wins - a.wins || (a.me ? -1 : b.me ? 1 : 0));
+    };
+    const prog = Math.max(0.06, Math.min(1, (7 - W.daysLeft + 0.5) / 7)), rows = torOf(W.week, prog), myPos = rows.findIndex((x) => x.me);
+    // a new week: last week's prize, paid once
+    try {
+      const T = JSON.parse(localStorage.getItem('arenamix.clubcup.v1') || 'null');
+      if (T && T.week !== W.week && !T.paid && T.club === club.id) {
+        const [vc, bob] = Cl_PRIZE[T.pos] || [30, 0];
+        if (PR) { PR.addCoins(vc); if (bob) PR.addGems(bob); }
+        if (C && C.say) setTimeout(() => C.say('🏆 Torneo de clubes: ' + (T.pos + 1) + '.º puesto la semana pasada (+' + vc + ' VCD' + (bob ? ' +' + bob + ' BOB' : '') + ')'), 300);
+      }
+      if (!T || T.week !== W.week || T.pos !== myPos) localStorage.setItem('arenamix.clubcup.v1', JSON.stringify({ week: W.week, pos: myPos, club: club.id, paid: false }));
+    } catch (e) {}
+    const PC = ['#FFC53D', '#C9CAE0', '#CD7F32'];
+    const torVals = {
+      isTor: s.view === 'tor', isMem: s.view !== 'tor', torLeft: W.daysLeft + (W.daysLeft === 1 ? ' día' : ' días'),
+      views: [['mem', 'MIEMBROS'], ['tor', '🏆 TORNEO SEMANAL · ' + (myPos + 1) + '.º']].map(([v, label]) => ({ label, pick: () => this.setState({ view: v }), style: 'height: 26px; padding: 0 10px; font-size: 10.5px; ' + ((s.view || 'mem') === v ? 'background: linear-gradient(135deg, #FDE68A, #F59E0B); color: #2A1400;' : 'background: #ffffff1a; color: #fff;') })),
+      tor: rows.map((x, k) => ({ pos: String(k + 1), name: x.name + (x.me ? ' (tu club)' : ''), wins: String(x.wins), prize: Cl_PRIZE[k][0] + ' VCD' + (Cl_PRIZE[k][1] ? ' · ' + Cl_PRIZE[k][1] + ' BOB' : ''),
+        style: 'display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 10px; border-radius: 10px; font-size: 12px; ' + (x.me ? 'background: linear-gradient(90deg, ' + club.color + 'CC, ' + club.color + '44); box-shadow: inset 0 0 0 1.5px #ffffffaa;' : 'background: #00000033;'),
+        posStyle: 'flex: none; width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font: 800 11px Exo2, sans-serif; ' + (k < 3 ? 'background: ' + PC[k] + '; color: #150925;' : 'background: #ffffff22; color: #fff;') }))
+    };
+    return { ...base, ...torVals, noClub: false, hasClub: true,
       cName: club.name, cTag: club.tag || club.name.slice(0, 2).toUpperCase(), cMotto: club.motto ? '«' + club.motto + '»' : '', cColor: club.color, cShape: Cl_SHAPES[club.shape] || Cl_SHAPES.shield,
       crestCard: 'flex: none; width: 210px; padding: 14px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 6px; background: radial-gradient(80% 50% at 50% 20%, ' + club.color + 'AA, transparent 70%), linear-gradient(165deg, color-mix(in srgb, ' + club.color + ' 35%, #3B1A8A), #1A0B44) !important; box-shadow: inset 0 0 0 1.5px ' + club.color + ', 0 0 24px ' + club.color + '55, 0 14px 30px #0009 !important;',
       cLv: String(lv), cWins: String(wins), cBar: 'height: 100%; width: ' + ((wins % 10) * 10) + '%; background: linear-gradient(90deg, #FDE68A, #F97316); box-shadow: 0 0 8px #FBBF24;',
