@@ -709,7 +709,7 @@ class Component extends DCLogic {
       localStorage.setItem('arenamix.record.v1', JSON.stringify(R));
       // experience, coins, the weekly track and the daily missions, then the results screen plays it back
       if (window.AMProgress) {
-        const sum = window.AMProgress.recordMatch({ home: r.home || 0, away: r.away || 0, pen: r.pen, kind, stats: r.stats });
+        const sum = window.AMProgress.recordMatch({ home: r.home || 0, away: r.away || 0, pen: r.pen, kind, stats: r.stats, comp: !this.props.casual || !!(this.state.online || this.state.room) });
         if (window.AMResults && !r.tutorial) setTimeout(() => window.AMResults.show(sum), 60);
       }
     } catch (e) {}

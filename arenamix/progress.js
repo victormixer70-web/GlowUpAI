@@ -21,10 +21,16 @@
 
 
   /* ---------- AI difficulty (Informal and Entrenar; Competitivo follows your MMR) ---------- */
-  var AI = { facil: 0.15, normal: 0.5, dificil: 0.85 };
-  function aiPref() { var v = get('arenamix.ai.v1', 'normal'); return AI[v] != null ? v : 'normal'; }
+  var AI = { facil: 0.15, normal: 0.5, dificil: 0.85, auto: 0.45 };
+  function aiPref() { var v = get('arenamix.ai.v1', 'auto'); return AI[v] != null ? v : 'auto'; }
   function setAiPref(v) { if (AI[v] != null) put('arenamix.ai.v1', v); }
-  function aiLevel(mmr) { return mmr == null ? AI[aiPref()] : Math.max(0.3, Math.min(1, 0.4 + mmr / 3000)); }
+  // Adaptativa: the rivals get a little better each time you beat them well, and easier when you lose
+  function aiAuto() { var a = get('arenamix.aiauto.v1', null); return a && typeof a.l === 'number' ? a.l : 0.45; }
+  function aiAdapt(gf, ga) {
+    var d = gf - ga, l = aiAuto(), step = d > 0 ? Math.min(0.1, 0.03 + 0.02 * d) : d < 0 ? -Math.min(0.12, 0.04 + 0.025 * -d) : 0.01;
+    l = Math.max(0.1, Math.min(0.95, l + step)); put('arenamix.aiauto.v1', { l: l }); return l;
+  }
+  function aiLevel(mmr) { if (mmr != null) return Math.max(0.3, Math.min(1, 0.4 + mmr / 3000)); var p = aiPref(); return p === 'auto' ? aiAuto() : AI[p]; }
 
   /* ---------- goal celebrations, bought with BOB: your player does the one you equip after scoring ---------- */
   var CELEBS = [
@@ -347,6 +353,7 @@
     if (won) { W.wins++; saveWeekly(W); }
     var W2 = weekly();
     // the career tally on the back of the player card (Perfil)
+    if (kind === 'team' && !info.comp && aiPref() === 'auto') aiAdapt(info.home || 0, info.away || 0);
     var C = get('arenamix.career.v1', { played: 0, won: 0, goals: 0, streak: 0, best: 0 });
     C.played++; C.goals += goals || 0;
     C.passes = (C.passes || 0) + (st.passes || 0); C.skills = (C.skills || 0) + (st.skills || 0); C.tackles = (C.tackles || 0) + (st.tackles || 0);
@@ -383,7 +390,7 @@
     streak: function () { return get('arenamix.career.v1', { streak: 0 }).streak || 0; },
     coins: coins, addCoins: addCoins, gems: gems, addGems: addGems, spendGems: spendGems,
     boostList: BOOSTS, boostLeft: boostLeft, buyBoost: buyBoost, useBoost: useBoost,
-    aiPref: aiPref, setAiPref: setAiPref, aiLevel: aiLevel,
+    aiPref: aiPref, setAiPref: setAiPref, aiLevel: aiLevel, aiAuto: aiAuto,
     celebList: CELEBS, celebs: celebState, buyCeleb: buyCeleb, equipCeleb: equipCeleb, rollChest: rollChest,
     trailList: TRAILS, trails: trailState, buyTrail: buyTrail, equipTrail: equipTrail, trailOn: trailOn,
     // everything waiting to be collected, by section (for the badges on the menu)

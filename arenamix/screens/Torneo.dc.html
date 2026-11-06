@@ -417,7 +417,7 @@ class Component extends DCLogic {
       });
       this.store('arenamix.record.v1', R);
       if (window.AMProgress) {
-        const sum = window.AMProgress.recordMatch({ home: r.home || 0, away: r.away || 0, pen: r.pen, kind: 'team', stats: r.stats });
+        const sum = window.AMProgress.recordMatch({ home: r.home || 0, away: r.away || 0, pen: r.pen, kind: 'team', stats: r.stats, comp: true });
         if (window.AMResults) setTimeout(() => window.AMResults.show(sum), 60);
       }
     } catch (e) {}

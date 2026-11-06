@@ -320,7 +320,7 @@ class Component extends DCLogic {
     this.tick = this.tick.bind(this);
     this.joyReset();
     // the loading screen shows first; the stadium is built a moment later, under it
-    this.ld = { on: true, t0: performance.now(), p: 0.06, out: false, step: 'PREPARANDO EL ESTADIO', tip: Math.floor(Math.random() * 8) };
+    this.ld = { on: true, t0: performance.now(), p: 0.06, out: false, step: 'PREPARANDO EL ESTADIO', tip: Math.floor(Math.random() * 10) };
     this.canvasRef = (el) => {
       if (el && el !== this.cv) {
         this.cv = el;
@@ -1026,7 +1026,7 @@ class Component extends DCLogic {
     p.act = { type: 'pass', t: 0, dur: 0.3 };
     return true;
   }
-  doSkill(p, side) {
+  doSkill(p, side, pick) {
     const g = this.g, b = g.ball, i = g.ps.indexOf(p);
     if (g.tut && i === g.ctl && g.own === i) g.tut.skilled = true;
     if (g.own !== i || p.skillCd > 0 || (p.act && p.act.lock)) return false;
@@ -1041,7 +1041,8 @@ class Component extends DCLogic {
     });
     const perfect = !!near && nd > 1.15 && nd < 2.4;
     const TR = ['ruleta', 'cano', 'sombrero', 'elastica'];
-    const trick = near ? TR[(p.trickN = ((p.trickN ?? -1) + 1) % TR.length)] : 'bici';
+    // you choose it with the stick (back: roulette, forward: nutmeg / with sprint: flick over, sideways: elastico)
+    const trick = pick && (pick === 'bici' || near) ? pick : near ? TR[(p.trickN = ((p.trickN ?? -1) + 1) % TR.length)] : 'bici';
     p.act = { type: 'skill', t: 0, dur: trick === 'ruleta' ? 0.5 : 0.42, side, trick };
     p.inv = 0.7; p.skillCd = 1.3;
     const lat = trick === 'elastica' ? 6 : trick === 'cano' || trick === 'sombrero' ? 2 : 4.2;
@@ -1304,11 +1305,17 @@ class Component extends DCLogic {
     if (this.netEv('skill')) return;
     if (g.own !== g.ctl) { this.flashMsg('Necesitas el balón para regatear', 0.8); return; }
     if (p.skillCd > 0) return;
+    // tricks cost energy: with the tank empty you can't do them
+    if (p.stam < 0.15) { this.flashMsg('Sin energía para regatear', 0.8); return; }
     const [ix, iy] = this.inp || [0, 0];
-    let side = (p.lastSide || 1) * -1;
-    if (Math.hypot(ix, iy) > 0.3) { const c = Math.cos(p.face) * iy - Math.sin(p.face) * ix; if (Math.abs(c) > 0.2) side = c > 0 ? 1 : -1; }
+    let side = (p.lastSide || 1) * -1, pick = null;
+    if (Math.hypot(ix, iy) > 0.3) {
+      const c = Math.cos(p.face) * iy - Math.sin(p.face) * ix, fw = Math.cos(p.face) * ix + Math.sin(p.face) * iy;
+      if (Math.abs(c) > 0.2) side = c > 0 ? 1 : -1;
+      pick = fw < -0.45 ? 'ruleta' : fw > 0.6 ? (g.sprint ? 'sombrero' : 'cano') : Math.abs(c) > 0.6 ? 'elastica' : null;
+    }
     p.lastSide = side;
-    this.doSkill(p, side);
+    if (this.doSkill(p, side, pick) !== false) p.stam = Math.max(0, p.stam - 0.14);
     this.stat('skills');
   }
   humanSlide() {
@@ -4041,7 +4048,7 @@ class Component extends DCLogic {
         tag: g.ps.indexOf(q) === g.ctl ? 'TÚ' : q.role === 'ai' ? (this.net ? 'ONLINE' : 'IA') : q.role === 'mate' ? 'EQUIPO' : '',
         st: 'animation-delay: ' + (0.25 + i * 0.08) + 's;' + (g.ps.indexOf(q) === g.ctl ? ' border-color: ' + col + '; box-shadow: 0 0 12px ' + col + '55;' : '')
       }));
-      const TIPS = ['Mantén CHUT para cargar el disparo: cuanto más lleno, más fuerte.', 'Con SPRINT y PASE juntos mandas el balón al hueco.', 'REGATE justo antes de la entrada rival lo deja sentado.', 'Si un compañero tiene el balón, pídela con PASE.', 'Los últimos 30 segundos el gol vale doble: ¡balón dorado!', 'Presiona sin balón para robar más rápido.', 'Con mando: X pasa, ○ chuta, □ entrada y R2 esprinta.', 'Cambia de cámara en Ajustes: TV, cerca o lejos.'];
+      const TIPS = ['Mantén CHUT para cargar el disparo: cuanto más lleno, más fuerte.', 'Con SPRINT y PASE juntos mandas el balón al hueco.', 'REGATE justo antes de la entrada rival lo deja sentado.', 'REGATE con el joystick atrás hace una ruleta, adelante un caño (con SPRINT, sombrero) y de lado una elástica.', 'Cuidado con las entradas por detrás: falta, tarjeta y en el área ¡penalti!', 'Si un compañero tiene el balón, pídela con PASE.', 'Los últimos 30 segundos el gol vale doble: ¡balón dorado!', 'Presiona sin balón para robar más rápido.', 'Con mando: X pasa, ○ chuta, □ entrada y R2 esprinta.', 'Cambia de cámara en Ajustes: TV, cerca o lejos.'];
       const wx = { noche: 'PARTIDO NOCTURNO · FOCOS ENCENDIDOS', lluvia: 'BAJO LA LLUVIA · BALÓN RÁPIDO', nieve: 'PARTIDO CON NIEVE', dia: 'A PLENO SOL', atardecer: 'AL ATARDECER · CIELO DE FUEGO' }[this.wx] || '';
       const dur = Number(P.duration ?? 90);
       return {
