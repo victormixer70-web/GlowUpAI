@@ -19,7 +19,7 @@
 .pd-nar-t{padding:6px 12px;background:linear-gradient(90deg,#0B0B14F2,#17172AE6);color:#F4F4FA;font:800 italic 14px 'Barlow Condensed',sans-serif;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @keyframes pdNarIn{from{opacity:0;translate:-50% 14px}}
 @keyframes pdGold{0%,100%{box-shadow:0 0 10px #FFC53D88}50%{box-shadow:0 0 22px #FFC53D}}
-.sb{position:relative;display:flex;align-items:flex-start;gap:0;filter:drop-shadow(0 6px 10px #0009)}
+.sb{position:relative;display:flex;align-items:flex-start;gap:0}
 .sb-team{position:relative;display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;min-width:150px;box-sizing:border-box;font:800 italic 15px 'Barlow Condensed',sans-serif;letter-spacing:.8px;color:#fff;text-shadow:0 2px 0 #0008;white-space:nowrap;overflow:hidden}
 .sb-team.h{justify-content:flex-end;border-radius:16px 0 0 16px;background:linear-gradient(90deg,#0B0B1400,#0B0B14E6 30%,color-mix(in srgb,var(--tc) 55%,#0B0B14));box-shadow:inset 0 2px 0 #ffffff22,inset 0 -2px 0 color-mix(in srgb,var(--tc) 80%,#fff)}
 .sb-team.a{justify-content:flex-start;border-radius:0 16px 16px 0;background:linear-gradient(270deg,#0B0B1400,#0B0B14E6 30%,color-mix(in srgb,var(--tc) 55%,#0B0B14));box-shadow:inset 0 2px 0 #ffffff22,inset 0 -2px 0 color-mix(in srgb,var(--tc) 80%,#fff)}
@@ -426,18 +426,20 @@ class Component extends DCLogic {
       F.good = 0;
       // first less sharp, then (at normal sharpness) without shadows, then less sharp again
       if (pr > 1) { pr = Math.max(1, pr - 0.25); changed = true; }
-      else if (this.R.shadowMap.enabled) { this.R.shadowMap.enabled = false; this.gfxNow = 'baja'; changed = true; this.S && this.S.traverse((o) => { if (o.material) [].concat(o.material).forEach((m) => { m.needsUpdate = true; }); }); }
+      else if (this.R.shadowMap.enabled) { this.R.shadowMap.enabled = false; this.gfxNow = 'baja'; changed = true; this.uiEvery = 2; this.S && this.S.traverse((o) => { if (o.material) [].concat(o.material).forEach((m) => { m.needsUpdate = true; }); }); }
       else if (pr > 0.75) { pr = Math.max(0.75, pr - 0.125); changed = true; }
       else if (!this.lite) {
         // last step: drop the extras (half the rain or snow, no flares between goals)
-        this.lite = true;
+        this.lite = true; this.uiEvery = 3;
+        if (this.shells) this.shells.visible = false;
         const W = this.weather; if (W) { W.N = Math.floor(W.N / 2); W.obj.geometry.setDrawRange(0, W.N * (W.snow ? 1 : 2)); }
         if (this.amb) this.amb.list.forEach((f) => { f.at = null; f.sp.visible = false; f.smoke.visible = false; });
       }
+      else if (pr > 0.6) { pr = Math.max(0.6, pr - 0.15); changed = true; }
     } else if (fps > 57 && ++F.good >= 3 && pr < this.prCap) { pr = Math.min(this.prCap, pr + 0.25); F.good = 0; changed = true; }
     if (!changed) return;
     if (pr !== this.pr) { this.pr = pr; this.R.setPixelRatio(pr); this.R.setSize(844, 390, false); }
-    try { localStorage.setItem('arenamix.gfxdyn.v1', JSON.stringify({ pr: this.pr, shadows: this.R.shadowMap.enabled })); } catch (e) {}
+    try { localStorage.setItem('arenamix.gfxdyn.v1', JSON.stringify({ pr: this.pr, shadows: this.R.shadowMap.enabled, lite: !!this.lite })); } catch (e) {}
   }
   sfx(n, a) { const S = window.AMSfx; if (S && S[n] && !this.props.tutorialMute) try { S[n](a); } catch (e) {} }
   // the crowd follows the play: louder and brighter as the ball gets near a goal, roaring at a goal
@@ -898,7 +900,10 @@ class Component extends DCLogic {
     this.chantT = (this.chantT ?? 12 + Math.random() * 10) - dt;
     if (this.chantT <= 0) { this.chantT = 26 + Math.random() * 20; if (this.g && this.g.phase === 'play') this.sfx('chant'); }
     this.draw3D(dt);
-    this.forceUpdate();
+    // the HUD (DOM) is redrawn every frame on fast phones; on slow ones every 2nd or 3rd frame (the 3D stays at full rate)
+    const ph0 = this.g.phase;
+    this.uiN = ((this.uiN || 0) + 1) % (this.uiEvery || 1);
+    if (this.uiN === 0 || ph0 !== this.uiPh || this.rp) { this.uiPh = ph0; this.forceUpdate(); }
     const g = this.g;
     this.raf = (g.phase === 'play' || g.phase === 'goal' || g.phase === 'intro' || g.phase === 'winners' || (N && !N.host && g.phase !== 'end')) ? requestAnimationFrame(this.tick) : null;
   }
@@ -2399,10 +2404,14 @@ class Component extends DCLogic {
     if (this.gfxAuto) {
       let A = null;
       try { A = JSON.parse(localStorage.getItem('arenamix.gfxdyn.v1') || 'null'); } catch (e) {}
-      pr = Math.min(dpr, A && A.pr ? A.pr : 1.25); shadows = A ? !!A.shadows : true;
+      // a first match on a modest phone (few cores or little memory) starts light; then it adapts and remembers
+      const weak = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 3;
+      pr = Math.min(dpr, A && A.pr ? A.pr : weak ? 0.9 : 1.25); shadows = A ? !!A.shadows : !weak;
       gfx = shadows ? 'media' : 'baja';
+      if (A && A.lite) { this.lite = true; this.uiEvery = 3; } else if (!shadows) this.uiEvery = 2;
     }
     this.gfxNow = gfx; this.pr = pr; this.prCap = Math.min(2, dpr);
+    if (gfx === 'baja' && !this.gfxAuto) this.uiEvery = 2;
     try { R = new T.WebGLRenderer({ canvas: this.cv, antialias: pr < 1.5, powerPreference: 'high-performance' }); } catch (e) { this.no3d = true; return; }
     R.setPixelRatio(pr);
     R.setSize(844, 390, false);
@@ -2551,7 +2560,7 @@ class Component extends DCLogic {
     if (this.wx === 'lluvia' && pitch.material.roughness != null) pitch.material.roughness = Math.min(pitch.material.roughness, 0.55);
     pitch.rotation.x = -Math.PI / 2; pitch.receiveShadow = true; S.add(pitch);
     // blades of grass with real depth near the camera (more layers on better graphics; none on low)
-    { const nL = this.gfxNow === 'alta' ? 6 : this.gfxNow === 'media' ? 3 : 0; if (nL && window.AMGrass && window.AMGrass.shells && this.wx !== 'nieve' && !bare) S.add(window.AMGrass.shells(tex, PW, PH, nL)); }
+    { const nL = this.gfxNow === 'alta' ? 6 : this.gfxNow === 'media' ? 3 : 0; if (nL && window.AMGrass && window.AMGrass.shells && this.wx !== 'nieve' && !bare && !this.lite) { this.shells = window.AMGrass.shells(tex, PW, PH, nL); S.add(this.shells); } }
     const apron = new T.Mesh(new T.PlaneGeometry(500, 500), this.mat(this.stad === 'playa' ? 0xc49a5c : this.stad === 'calle' ? 0x26262e : this.stad === 'nevado' ? 0xdfe8f2 : 0x0a3a0c, { roughness: 1 }));
     apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; S.add(apron);
     // ---------- big open-air stadium: two tiers on three sides, ultras behind each goal ----------
