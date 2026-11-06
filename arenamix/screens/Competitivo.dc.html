@@ -137,6 +137,32 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .cp-info .lb-go svg{filter:drop-shadow(0 2px 0 #0006)}
 .cp-info>span:last-child{font-size:10.5px!important;color:#E9D5FF!important;opacity:.8}
 
+/* ===== lobby v3: entrances, the mode's artwork, sparkles, shine ===== */
+.cp-lobby .cp-rank{animation:cpInL .6s cubic-bezier(.2,1.3,.4,1) both}
+.cp-lobby .cp-info{animation:cpInR .6s .08s cubic-bezier(.2,1.3,.4,1) both;overflow:hidden}
+@keyframes cpInL{from{opacity:0;transform:translateX(-60px) scale(.94)}}@keyframes cpInR{from{opacity:0;transform:translateX(60px) scale(.96)}}
+.cp-hero{position:absolute;right:-10px;top:0;bottom:0;width:58%;object-fit:cover;object-position:center;opacity:.62;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 45%);mask-image:linear-gradient(90deg,transparent,#000 45%);animation:cpKen 14s ease-in-out infinite alternate}
+@keyframes cpKen{from{transform:scale(1.04) translateX(0)}to{transform:scale(1.14) translateX(-14px)}}
+.cp-info>*{position:relative;z-index:1}.cp-info>.cp-hero{position:absolute;z-index:0}
+.cp-info::before{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(90deg,#1A0B44EE 0%,#1A0B44AA 38%,transparent 75%);pointer-events:none;border-radius:inherit}
+.cp-info::after{content:"";position:absolute;top:-40%;bottom:-40%;left:0;width:22%;z-index:2;background:linear-gradient(100deg,transparent,#ffffff26,transparent);transform:translateX(-200%) skewX(-18deg);animation:cpSweep 7s ease-in-out 1s infinite;pointer-events:none}
+@keyframes cpSweep{0%,75%{transform:translateX(-200%) skewX(-18deg)}100%{transform:translateX(700%) skewX(-18deg)}}
+.cp-info>span:first-child{animation:cpTitle .7s .25s cubic-bezier(.2,1.5,.4,1) both;background-size:200% 100%!important}
+@keyframes cpTitle{from{opacity:0;transform:translateY(16px) scale(.9)}}
+.cp-chip{animation:cpChip .45s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes cpChip{from{opacity:0;transform:translateY(10px) scale(.7)}}
+.cp-spark{position:absolute;bottom:-10px;width:5px;height:5px;border-radius:50%;background:var(--lc);box-shadow:0 0 8px var(--lc),0 0 2px #fff;opacity:0;animation:cpRise linear infinite;pointer-events:none;z-index:1}
+@keyframes cpRise{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:1}100%{transform:translateY(-300px) scale(1.2);opacity:0}}
+.cp-rank .lb-float{animation:lbFloat 3s ease-in-out infinite,cpGlow 2.4s ease-in-out infinite}
+@keyframes cpGlow{0%,100%{filter:drop-shadow(0 8px 12px #000a) drop-shadow(0 0 6px var(--lc))}50%{filter:drop-shadow(0 8px 12px #000a) drop-shadow(0 0 26px var(--lc))}}
+.cp-rank>*{position:relative;z-index:2}.cp-rank>.lb-rays,.cp-rank>.lb-ped,.cp-rank>.cp-spark{position:absolute;z-index:0}
+.cp-rank .lb-rays{animation:lbSpin 18s linear infinite;opacity:.55}
+.cp-fx{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.cp-fx i{position:absolute;top:-12px;width:7px;height:12px;border-radius:2px;opacity:.75;animation:cpFall linear infinite}
+@keyframes cpFall{from{transform:translateY(0) rotate(0)}to{transform:translateY(420px) rotate(540deg)}}
+.cp-info .lb-go{animation:cpGo 4s ease-in-out infinite alternate,cpBreath 2s ease-in-out infinite!important}
+@keyframes cpBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+
 .cp-promo{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:radial-gradient(60% 70% at 50% 45%,color-mix(in srgb,var(--pc) 55%,#000) 0%,#05030FEE 70%);pointer-events:none}
 .cp-promo .r{position:absolute;left:50%;top:45%;width:900px;height:900px;margin:-450px 0 0 -450px;background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--pc) 45%,transparent) 0 7deg,transparent 9deg 20deg);animation:mmBeam 8s linear infinite;-webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent)}
 .cp-promo .em{position:relative;filter:drop-shadow(0 0 30px var(--pc));animation:cpEm .7s cubic-bezier(.2,1.8,.4,1) both}
@@ -161,9 +187,10 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 
   <sc-if value="{{isLobby}}" hint-placeholder-val="{{ true }}">
+    <div class="cp-fx" aria-hidden="true"><sc-for list="{{confetti}}" as="c" hint-placeholder-count="0"><i style="{{c}}"></i></sc-for></div>
     <div class="cp-lobby" style="position: absolute; inset: 70px 24px 18px 24px; display: flex; align-items: stretch; gap: 16px">
       <div class="lb-col cp-rank" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: 270px; --lc: {{glow}}">
-        <i class="lb-rays"></i><i class="lb-ped"></i>
+        <i class="lb-rays"></i><i class="lb-ped"></i><sc-for list="{{sparks}}" as="sp" hint-placeholder-count="0"><i class="cp-spark" style="{{sp}}"></i></sc-for>
         <sc-if value="{{ranked}}" hint-placeholder-val="{{ true }}">
           <svg class="lb-float" width="140" height="148" viewBox="-6 -10 76 80" style="position: relative; filter: drop-shadow(0 8px 12px #000a)"><circle cx="32" cy="32" r="34" fill="{{myC1}}" opacity=".15"/><sc-if value="{{myWings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{myC1}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{myC1}}"/></sc-if><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{myC1}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{myC2}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53Z" fill="#000000" opacity=".18"/><path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{myC1}}"/><rect x="20" y="62" width="7" height="5" rx="1.5" fill="{{pip1}}"/><rect x="29" y="62" width="7" height="5" rx="1.5" fill="{{pip2}}"/><rect x="38" y="62" width="7" height="5" rx="1.5" fill="{{pip3}}"/></svg>
           <span class="bc-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 34px; line-height: 1; color: {{myText}}">{{myRank}}</span>
@@ -186,6 +213,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       </div>
       <div class="cp-info" style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 10px; --lc: {{glow}}">
         <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 40px; line-height: 1; text-shadow: 0 3px 0 #0D0418, 0 0 18px {{glow}}66">{{plTitle}}</span>
+        <img class="cp-hero" src="{{heroImg}}" alt="" aria-hidden="true">
         <div class="lb-line" aria-hidden="true"><sc-for list="{{lineHome}}" as="h" hint-placeholder-count="2"><i style="{{h}}"></i></sc-for><span class="lb-vs">VS</span><sc-for list="{{lineAway}}" as="h" hint-placeholder-count="2"><i style="{{h}}"></i></sc-for></div>
         <span style="font-size: 13px; color: #BABAD6">{{plDesc}}</span>
         <div style="display: flex; flex-wrap: wrap; gap: 8px">
@@ -780,7 +808,8 @@ class Component extends DCLogic {
     this.promoOn = s.phase === 'result' && !casual && up && !s.justPlaced;
     const promoT = this.promoOn ? this.t - 1.9 : -1, showPromo = promoT > 0 && promoT < 3.6;
     // modern chips: glass pills tinted by their meaning (green good, red risk, violet info)
-    const chip = (text, tone) => { const c = tone === 'g' ? '#4ADE80' : tone === 'r' ? '#FB7185' : '#A78BFA'; return { text, style: 'display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px 7px 10px; border-radius: 12px; font-size: 12px; font-weight: 800; color: #FFFFFF; background: linear-gradient(135deg, ' + c + '40, ' + c + '14); border: 1px solid ' + c + '99; box-shadow: inset 0 1px 0 #ffffff26; --cc: ' + c + ';' }; };
+    let chipN = 0;
+    const chip = (text, tone) => { const c = tone === 'g' ? '#4ADE80' : tone === 'r' ? '#FB7185' : '#A78BFA'; return { text, style: 'animation-delay: ' + (0.35 + 0.07 * chipN++).toFixed(2) + 's; display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px 7px 10px; border-radius: 12px; font-size: 12px; font-weight: 800; color: #FFFFFF; background: linear-gradient(135deg, ' + c + '40, ' + c + '14); border: 1px solid ' + c + '99; box-shadow: inset 0 1px 0 #ffffff26; --cc: ' + c + ';' }; };
     const chips = [];
     if (pl.kind === 'team') chips.push(chip(pl.n + ' vs ' + pl.n + ' + porteros · ' + (casual ? '1:30' : '2:00')));
     if (pl.kind === 'duel') chips.push(chip(pl.duel === 'pen' ? '5 penaltis cada uno' : 'Escenario distinto en cada ronda'));
@@ -838,7 +867,10 @@ class Component extends DCLogic {
       noticeText: 'TEMPORADA ' + S.num + ': los rangos se han reiniciado. Juega 5 clasificatorias para conseguir tu rango inicial.',
       closeNotice: () => { const S2 = this.store('arenamix.season.v1'); if (S2) { S2.notice = false; this.store('arenamix.season.v1', S2); } this.setState({ notice: false }); },
       glow: casual ? '#22D3EE' : R.c1,
-      headLabel: (casual ? 'INFORMAL' : 'COMPETITIVO') + ' · ' + this.C.name + ' · ' + pl.title,
+      headLabel: (casual ? 'INFORMAL' : 'COMPETITIVO') + ' · ' + pl.title,
+      heroImg: window.AMPosters ? window.AMPosters.get(pl.kind === 'team' ? 'team:' + pl.n : pl.duel === 'pen' ? 'pen' : pl.duel === 'free' ? 'free' : 'train', () => this.forceUpdate()) : '',
+      sparks: Array.from({ length: 12 }, (_, k) => 'left: ' + (8 + ((k * 37) % 84)) + '%; animation-duration: ' + (2.6 + (k % 5) * 0.55).toFixed(2) + 's; animation-delay: ' + (-k * 0.47).toFixed(2) + 's; width: ' + (3 + (k % 3) * 2) + 'px; height: ' + (3 + (k % 3) * 2) + 'px'),
+      confetti: Array.from({ length: 16 }, (_, k) => 'left: ' + ((k * 53) % 100) + '%; background: ' + ['#22D3EE', '#FFC53D', '#FF5CC8', '#A78BFA', '#53D88E'][k % 5] + '; animation-duration: ' + (6 + (k % 6) * 1.3).toFixed(1) + 's; animation-delay: ' + (-k * 0.9).toFixed(1) + 's; opacity: .45'),
       headColor: casual ? '#22D3EE' : R.text,
       isLobby: s.phase === 'lobby', isSearch: s.phase === 'search', isFound: s.phase === 'found', isResult: s.phase === 'result',
       isTeamMatch: s.phase === 'match' && pl.kind === 'team' && !OL, isOnlineMatch: s.phase === 'match' && pl.kind === 'team' && !!OL, online: OL, isDuelMatch: s.phase === 'match' && pl.kind === 'duel',
