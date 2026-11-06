@@ -349,7 +349,7 @@ class Component extends DCLogic {
     this.tick = this.tick.bind(this);
     this.joyReset();
     // the loading screen shows first; the stadium is built a moment later, under it
-    this.ld = { on: true, t0: performance.now(), p: 0.06, out: false, step: 'PREPARANDO EL ESTADIO', tip: Math.floor(Math.random() * 10) };
+    this.ld = { on: true, t0: performance.now(), p: 0.06, out: false, step: 'PREPARANDO EL ESTADIO', tip: Math.floor(Math.random() * 13) };
     this.canvasRef = (el) => {
       if (el && el !== this.cv) {
         this.cv = el;
@@ -1253,7 +1253,11 @@ class Component extends DCLogic {
     const charge = g.charge, i = g.ctl;
     g.charging = false; g.charge = 0;
     const fire = (g.superM || 0) >= 1 && !this.ctxH && !this.props.tutorial;
-    if (this.dist(p, g.ball) > (g.own === i ? 1.7 : 1.5) || g.ball.z > 1.4) { this.flashMsg('Demasiado lejos del balón', 0.8); return; }
+    if (this.dist(p, g.ball) > (g.own === i ? 1.7 : 1.5) || g.ball.z > 1.4) {
+      // the ball is on its way to you: the shot waits for it and goes first time
+      if (this.incoming(i)) { g.buf = { k: 'kick', charge, t: 0.5 }; return; }
+      this.flashMsg('Demasiado lejos del balón', 0.8); return;
+    }
     this.stat('shots');
     if (Math.random() < 0.55) this.narrate('shot', this.nameOf(i));
     // a real strike: from the backswing the body turns to the target and the leg swings through; the ball
@@ -1271,6 +1275,23 @@ class Component extends DCLogic {
       else { this.applyShot(plan); this.vib(Math.round(12 + 26 * power)); }
     } };
   }
+  // a loose ball heading your way (a pass to you, or close and rolling at you): presses are kept for it
+  incoming(i) {
+    const g = this.g, b = g.ball, p = g.ps[i];
+    if (this.net || g.own >= 0 || g.hold >= 0 || !p) return false;
+    if (g.recv && g.recv.i === i) return true;
+    const d = Math.hypot(b.x - p.x, b.y - p.y);
+    return d < 4.5 && ((p.x - b.x) * b.vx + (p.y - b.y) * b.vy) > 0;
+  }
+  // first time: the buffered pass or shot goes the moment the ball arrives
+  firstTime() {
+    const g = this.g, B = g.buf;
+    g.buf = null;
+    if (!B || g.phase !== 'play') return;
+    if (B.k === 'kick') { g.charge = B.charge; g.charging = false; this.doKick(); }
+    else this.humanPass(B.kind);
+    if (g.own !== g.ctl) this.flashMsg('¡De primeras!', 0.7);
+  }
   humanPass(kind) {
     const g = this.g, p = g.ps[g.ctl], b = g.ball;
     if (g.phase !== 'play' || this.netEv('pass', kind)) return;
@@ -1282,7 +1303,10 @@ class Component extends DCLogic {
       this.passBall(p, q); b.vz = 2.2; p.cd = 0.8;
       return;
     }
-    if (this.dist(p, b) > (g.own === g.ctl ? 1.7 : 1.5) || b.z > 1.4) { this.flashMsg('Demasiado lejos del balón', 0.8); return; }
+    if (this.dist(p, b) > (g.own === g.ctl ? 1.7 : 1.5) || b.z > 1.4) {
+      if (this.incoming(g.ctl)) { g.buf = { k: 'pass', kind, t: 0.5 }; return; }
+      this.flashMsg('Demasiado lejos del balón', 0.8); return;
+    }
     const [ix, iy] = this.inp || [0, 0];
     const aimed = Math.hypot(ix, iy) > 0.2, dir = aimed ? Math.atan2(iy, ix) : p.face;
     const q = this.pickPassTarget(p, dir, !aimed);
@@ -1397,6 +1421,7 @@ class Component extends DCLogic {
     if (!g.extra && !g.lastMin && g.dur >= 60 && g.t <= 15 && !this.props.practice) { g.lastMin = true; this.narrate(g.score[0] === g.score[1] ? 'lastTie' : 'last', '', null, true); }
     if (g.charging) g.charge = Math.min(1, g.charge + dt * 1.15);
     if (g.recv) { g.recv.t -= dt; if (g.recv.t <= 0) g.recv = null; }
+    if (g.buf) { g.buf.t -= dt; if (g.buf.t <= 0) g.buf = null; }
     if (this.net) this.net.humans.forEach((h) => {
       if (h.charging) h.charge = Math.min(1, h.charge + dt * 1.15);
       while (h.q.length) { const ev = h.q.shift(); this.withHuman(h, () => this.runEv(ev)); }
@@ -2246,6 +2271,7 @@ class Component extends DCLogic {
       b.vx = p.vx + (b.vx - p.vx) * keep; b.vy = p.vy + (b.vy - p.vy) * keep; b.vz = Math.min(b.vz, 0);
       p.touchT = 0.12;
       if (g.recv && g.recv.i === best) g.recv = null;
+      if (best === g.ctl && g.buf && g.buf.t > 0) { this.firstTime(); return; }
       if (p.team === 0 && best !== g.ctl && this.props.coach) { g.ctl = best; g.charging = false; }
     }
   }
@@ -2285,20 +2311,52 @@ class Component extends DCLogic {
     // his feet, so in a turn it is dragged round him (never through him) and at a sprint it is pushed a
     // little ahead with each touch and caught up again, but never runs off on its own
     const moving = sp > 0.9;
+    // the nearest rival: shielding, heavy touches under pressure, room to run into
+    let foe = null, fd = 99, ahead = 99;
+    for (const q of g.ps) {
+      if (q.team === p.team || q.out) continue;
+      const qd = Math.hypot(q.x - p.x, q.y - p.y);
+      if (qd < fd) { fd = qd; foe = q; }
+      if (((q.x - p.x) * fx + (q.y - p.y) * fy) > 0 && qd < ahead) ahead = qd;
+    }
+    const human = oi === g.ctl && !this.autoplay, soft = human && il > 0.2 && il < 0.62 && !p.sprinting;
+    p.knockT = Math.max(0, (p.knockT || 0) - dt);
     if (moving && p.touchT <= 0) {
       const cyc = 1 / (0.9 + 0.09 * sp);
-      p.touchT = cyc * (p.sprinting ? 0.6 : 0.4); p.touchP = p.touchT;
+      p.touchT = cyc * (p.sprinting ? 0.6 : soft ? 0.32 : 0.4); p.touchP = p.touchT;
       p.kickFoot = Math.cos(p.run) > 0 ? 1 : 0; p.touchAnim = 0.22;
+      // flat out with open grass ahead: a longer touch into space, then run onto it (anyone can nip in)
+      if (p.sprinting && sp > 6.3 && ahead > 4.2 && p.knockT <= 0 && b.z < 0.2 && p.role !== 'gk') {
+        const push = 1.07 + 0.05 * (1 - ctrl);
+        b.vx = p.vx * push + fx * 0.8; b.vy = p.vy * push + fy * 0.8; b.vz = 0.2;
+        g.own = -1; g.last = oi; p.cd = 0.1; p.knockT = 1.1; g.recv = { i: oi, t: 0.9 };
+        return;
+      }
+      // a heavy touch: sprinting into a man with poor control, the ball gets away from you
+      if (p.sprinting && fd < 1.8 && Math.random() < 0.3 * (1 - ctrl) && p.role !== 'gk') {
+        b.vx = p.vx * 1.15 + fx * 2.4; b.vy = p.vy * 1.15 + fy * 2.4; b.vz = 0.15;
+        g.own = -1; g.last = oi; p.cd = 0.18;
+        if (human) this.flashMsg('Toque largo', 0.6);
+        return;
+      }
     }
     const ph = moving && p.touchP ? this.clamp(1 - p.touchT / p.touchP, 0, 1) : 1;   // 0 at the touch, 1 when the feet catch up
-    const amp = moving ? (p.sprinting ? 0.32 + 0.16 * (1 - ctrl) : 0.16) : 0;
-    const want = Math.atan2(fy, fx), cur = d > 0.05 ? Math.atan2(ry, rx) : want;
-    const da = this.ang(want - cur), om = (9 + 5 * ctrl) * dt;
+    const amp = moving && !soft ? (p.sprinting ? 0.32 + 0.16 * (1 - ctrl) : 0.16) : 0;
+    // standing still with a rival close: shield it, body between him and the ball
+    const shield = !moving && foe && fd < 2.3 && !(human && il > 0.2);
+    let want = Math.atan2(fy, fx);
+    if (shield) want = Math.atan2(p.y - foe.y, p.x - foe.x);
+    const cur = d > 0.05 ? Math.atan2(ry, rx) : want;
+    const da = this.ang(want - cur), om = (9 + 5 * ctrl) * (soft ? 1.45 : 1) * dt;
     const a = cur + this.clamp(da, -om, om);
-    // the ball tucks in under the sole while it is being dragged round behind him
-    const R = Math.abs(da) > 1.4 ? 0.4 : 0.5 + (moving ? 0.08 : 0) + amp * Math.sin(Math.PI * ph);
+    // the ball tucks in under the sole while it is being dragged round behind him; walking it is kept tight
+    const R = shield ? 0.46 : Math.abs(da) > 1.4 ? 0.4 : soft ? 0.42 : 0.5 + (moving ? 0.08 : 0) + amp * Math.sin(Math.PI * ph);
+    // a sharp cut at speed costs pace: plant, drag it round, go again
+    if (moving && sp > 4.5 && Math.abs(da) > 1.1) { const k = Math.exp(-3.2 * dt); p.vx *= k; p.vy *= k; }
     const tx = p.x + Math.cos(a) * R + p.vx * dt, ty = p.y + Math.sin(a) * R + p.vy * dt;
-    let cx = (tx - b.x) * 14, cy = (ty - b.y) * 14; const cl = Math.hypot(cx, cy), cap = 7 + 0.5 * sp;
+    // between touches the ball rolls on its own (soft pull); at the touch the foot puts it back where it wants it
+    const gain = moving && !soft && ph > 0.25 && Math.abs(da) < 0.9 ? 7 : 14;
+    let cx = (tx - b.x) * gain, cy = (ty - b.y) * gain; const cl = Math.hypot(cx, cy), cap = 7 + 0.5 * sp;
     if (cl > cap) { cx *= cap / cl; cy *= cap / cl; }
     b.vx = p.vx + cx; b.vy = p.vy + cy; b.vz = 0; b.spin = 0; b.dip = 0; b.kn = 0;
     // poke-away chances for a defender close to the ball (the body bounce handles direct contact)
@@ -4146,7 +4204,7 @@ class Component extends DCLogic {
         tag: g.ps.indexOf(q) === g.ctl ? 'TÚ' : q.role === 'ai' ? (this.net ? 'ONLINE' : 'IA') : q.role === 'mate' ? 'EQUIPO' : '',
         st: 'animation-delay: ' + (0.25 + i * 0.08) + 's;' + (g.ps.indexOf(q) === g.ctl ? ' border-color: ' + col + '; box-shadow: 0 0 12px ' + col + '55;' : '')
       }));
-      const TIPS = ['Mantén CHUT para cargar el disparo: cuanto más lleno, más fuerte.', 'Con SPRINT y PASE juntos mandas el balón al hueco.', 'REGATE justo antes de la entrada rival lo deja sentado.', 'REGATE con el joystick atrás hace una ruleta, adelante un caño (con SPRINT, sombrero) y de lado una elástica.', 'Cuidado con las entradas por detrás: falta, tarjeta y en el área ¡penalti!', 'Si un compañero tiene el balón, pídela con PASE.', 'Los últimos 30 segundos el gol vale doble: ¡balón dorado!', 'Presiona sin balón para robar más rápido.', 'Con mando: X pasa, ○ chuta, □ entrada y R2 esprinta.', 'Cambia de cámara en Ajustes: TV, cerca o lejos.'];
+      const TIPS = ['Mantén CHUT para cargar el disparo: cuanto más lleno, más fuerte.', 'Con SPRINT y PASE juntos mandas el balón al hueco.', 'REGATE justo antes de la entrada rival lo deja sentado.', 'REGATE con el joystick atrás hace una ruleta, adelante un caño (con SPRINT, sombrero) y de lado una elástica.', 'Cuidado con las entradas por detrás: falta, tarjeta y en el área ¡penalti!', 'Pulsa PASE o CHUT justo antes de que te llegue el balón y lo jugarás de primeras.', 'Con el joystick a medio recorrido conduces pegado al pie; a fondo con SPRINT te la adelantas en carrera.', 'Quieto con un rival encima, tu jugador protege el balón con el cuerpo.', 'Si un compañero tiene el balón, pídela con PASE.', 'Los últimos 30 segundos el gol vale doble: ¡balón dorado!', 'Presiona sin balón para robar más rápido.', 'Con mando: X pasa, ○ chuta, □ entrada y R2 esprinta.', 'Cambia de cámara en Ajustes: TV, cerca o lejos.'];
       const wx = { noche: 'PARTIDO NOCTURNO · FOCOS ENCENDIDOS', lluvia: 'BAJO LA LLUVIA · BALÓN RÁPIDO', nieve: 'PARTIDO CON NIEVE', dia: 'A PLENO SOL', atardecer: 'AL ATARDECER · CIELO DE FUEGO' }[this.wx] || '';
       const dur = Number(P.duration ?? 90);
       return {
