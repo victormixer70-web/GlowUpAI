@@ -1975,9 +1975,9 @@ class Component extends DCLogic {
           p.react += dt;
           // a shot on its way: he plants his feet (a small set step, no shuffling across the goal) and,
           // once he has read it, throws himself at it; only a ball straight at him is taken standing up
-          const gap = Math.abs(iy - p.y), standCatch = gap < 0.5 && iz > 0.7 && iz < 1.9;
+          const gap = Math.abs(iy - p.y), standCatch = gap < 0.62 && iz > 0.3 && iz < 2.0;
           ty = p.setY + this.clamp(iy - p.setY, -0.45, 0.45); maxV = 1.6; acc = 10;
-          if (p.react > D.react * 0.85 && !this.noAutoDive && !p.act && t < 0.85 && !standCatch && (gap > 0.32 || iz > 2.0)) this.dive(p, iy, t, D, iz);
+          if (p.react > D.react * 0.85 && !this.noAutoDive && !p.act && t < 0.85 && !standCatch && (gap > 0.62 || iz > 2.0 || iz < 0.3)) this.dive(p, iy, t, D, iz);
         }
       } else p.react = 0;
     } else p.react = 0;
@@ -2241,10 +2241,16 @@ class Component extends DCLogic {
         if (Math.random() > saveP * ((b.fire || 0) > 0 ? 0.3 : 1)) { p.cd = 0.35; continue; }
         if ((b.fire || 0) > 0) { b.fire = 0; if (p.team === 1) this.callout('¡PARA EL FUEGO!', 'Qué reflejos', '#FF7A2E'); }
         b.dip = 0; b.kn = 0;
-        if (sp < D.catchV && Math.random() < 0.85) {
+        // blocking it: a shot at his body is held even when hit hard; at full stretch only the softer ones stick
+        const atBody = !diving && edge < 0.62 && b.z < 2.0;
+        const catchP = atBody ? (sp < D.catchV + 9 ? 0.94 : 0.75) : diving ? (sp < D.catchV ? 0.72 : sp < D.catchV + 4 ? 0.3 : 0.08) : (sp < D.catchV ? 0.88 : 0.3);
+        if (Math.random() < catchP) {
           g.hold = i; g.holdT = 0.9; g.last = i;
+          // the block: arms round it, pulled into the chest (a short stagger if it was a rocket)
+          if (!diving) { p.act = { type: 'block', t: 0, dur: 0.45, lock: true, hard: sp > 15 }; p.vx *= 0.2; p.vy *= 0.2; }
+          if (atBody && sp > 9 && sp <= 15) this.flashMsg('¡Blocaje!', 1);
           if (this.props.practice && p.team === 1) { g.score[1]++; g.resetT = 1.1; g.holdT = 9; }
-          if (sp > 15) this.callout('¡QUÉ PARADA!', '', p.team === 0 ? '#22D3EE' : '#FF5C5C'); else this.flashMsg(sp > 12 ? '¡PARADÓN!' : 'Atrapa el portero', 1.2);
+          if (sp > 15) this.callout(atBody ? '¡BLOCAJE!' : '¡QUÉ PARADA!', atBody ? 'Ni se mueve' : '', p.team === 0 ? '#22D3EE' : '#FF5C5C'); else if (!(atBody && sp > 9)) this.flashMsg(sp > 12 ? '¡PARADÓN!' : 'Atrapa el portero', 1.2);
           if (sp > 11) this.narrate(p.team === 0 ? 'save' : 'saveAgainst', '', null, sp > 15);
         } else {
           const out = p.team === 0 ? 1 : -1, side = diving ? p.act.s : b.y >= p.y ? 1 : -1;
@@ -4005,6 +4011,7 @@ class Component extends DCLogic {
       else if (a.type === 'pass') act = { id: 'pass', t: 0.28 + 0.22 * k, key: a };
       else if (a.type === 'throw') act = { id: 'gkThrow', t: 1.3 + 0.6 * k, key: a };
       else if (a.type === 'slide') act = { id: 'slide', t: 0.2 + 0.75 * k, key: a };
+      else if (a.type === 'block') act = { id: 'catch', t: 0.35 + 0.45 * k, key: a };
       else if (a.type === 'dive') act = { id: a.dl > 0 ? 'diveL' : 'diveR', t: a.smother ? 1.25 + 0.6 * k : 0.95 + 0.95 * Math.min(1, a.t / ((a.flight || 0.5) + 0.45)), key: a };
     } else if (gk && g.hold === i) act = { id: 'catch', t: 0.8, key: 'hold' };
     // poses only the procedural rig has (skills, stumbles, celebrations): clips fade out
@@ -4175,6 +4182,11 @@ class Component extends DCLogic {
       u.body.rotation.x = 0.45 * f; u.body.position.y = -0.08 * f;
       A0.sho.rotation.z = -(0.4 + 0.9 * f); A1.sho.rotation.z = 0.4 + 0.9 * f;
       Lg.knee.rotation.x += 0.5 * f; Rg.knee.rotation.x += 0.5 * f;
+    } else if (a.type === 'block') {
+      // arms wrapped round the ball, pulled into the chest; a hard one knocks him back a touch
+      const f = Math.sin(Math.PI * Math.min(1, k * 1.4));
+      A0.sho.rotation.set(-1.3, 0, 0.35); A1.sho.rotation.set(-1.3, 0, -0.35); A0.elb.rotation.x = -1.2; A1.elb.rotation.x = -1.2;
+      u.body.rotation.x = (a.hard ? -0.25 : 0.2) * f; Lg.knee.rotation.x = 0.35 * f; Rg.knee.rotation.x = 0.35 * f;
     } else if (a.type === 'dive') {
       // stretched out flat in the air (more for a high one), lying on the grass, then back up
       const fl = a.flight || 0.5, e = Math.min(1, a.t / 0.16), up = a.t > fl + 0.45 ? Math.min(1, (a.t - fl - 0.45) / 0.3) : 0;
