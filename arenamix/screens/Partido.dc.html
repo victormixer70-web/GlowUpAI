@@ -25,7 +25,7 @@
 /* ===== match loading screen ===== */
 .ld-root{position:absolute;inset:0;z-index:60;overflow:hidden;background:#050816;transition:opacity .55s ease,transform .55s ease}
 .ld-root.out{opacity:0;transform:scale(1.04);pointer-events:none}
-.ld-bg{position:absolute;inset:-20px;background:url(assets/lobby_bg.jpg?v=8) center/cover;filter:blur(6px) brightness(.45) saturate(1.2);animation:ldZoom 14s ease-in-out infinite alternate}
+.ld-bg{position:absolute;inset:-20px;background:url(assets/lobby_bg.jpg?v=9) center/cover;filter:blur(6px) brightness(.45) saturate(1.2);animation:ldZoom 14s ease-in-out infinite alternate}
 @keyframes ldZoom{to{transform:scale(1.08)}}
 .ld-tint{position:absolute;inset:0;background:linear-gradient(100deg,color-mix(in srgb,var(--ha) 45%,transparent) 0%,transparent 42%,transparent 58%,color-mix(in srgb,var(--aa) 45%,transparent) 100%),radial-gradient(60% 80% at 50% 45%,transparent,#050816E6)}
 .ld-sweep{position:absolute;top:-20%;bottom:-20%;width:26%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.07),transparent);transform:skewX(-18deg);animation:ldSweep 3.6s ease-in-out infinite}
@@ -2328,7 +2328,7 @@ class Component extends DCLogic {
     if (this.wx === 'lluvia' && pitch.material.roughness != null) pitch.material.roughness = Math.min(pitch.material.roughness, 0.55);
     pitch.rotation.x = -Math.PI / 2; pitch.receiveShadow = true; S.add(pitch);
     // blades of grass with real depth near the camera (more layers on better graphics; none on low)
-    { const nL = this.gfxNow === 'alta' ? 8 : this.gfxNow === 'media' ? 5 : 0; if (nL && window.AMGrass && window.AMGrass.shells && this.wx !== 'nieve') S.add(window.AMGrass.shells(tex, PW, PH, nL)); }
+    { const nL = this.gfxNow === 'alta' ? 6 : this.gfxNow === 'media' ? 3 : 0; if (nL && window.AMGrass && window.AMGrass.shells && this.wx !== 'nieve') S.add(window.AMGrass.shells(tex, PW, PH, nL)); }
     const apron = new T.Mesh(new T.PlaneGeometry(500, 500), this.mat(0x0a3a0c, { roughness: 1 }));
     apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; S.add(apron);
     // ---------- big open-air stadium: two tiers on three sides, ultras behind each goal ----------
@@ -2373,7 +2373,8 @@ class Component extends DCLogic {
        shirt (instance colour), skin, hair, the team's second colour (scarf, beanie) and fixed colours
        (trousers, shoes). The level of detail follows the graphics setting. */
     const LQ = this.gfxNow === 'alta' ? 2 : this.gfxNow === 'media' ? 1 : 0;
-    const SEG = [4, 6, 8][LQ], HSEG = [5, 7, 10][LQ];
+    // far-away people: few sides are enough (they are a few pixels tall)
+    const SEG = [4, 5, 6][LQ], HSEG = [5, 6, 7][LQ];
     const PART = { shirt: 0, skin: 1, alt: 2, hair: 3, raw: 4 };
     const fanPart = (geo, part, shade) => {
       const gg = geo.index ? geo.toNonIndexed() : geo, n = gg.attributes.position.count;
@@ -2635,7 +2636,10 @@ class Component extends DCLogic {
         // the scarf / beanie in the team colour the shirt isn't
         const alt = col.equals(cA) ? cB : cA; ga.aAlt.setXYZ(j, alt.r, alt.g, alt.b);
       });
-      bodies.forEach((bm, k) => { bm.count = counts[k]; if (counts[k]) grp.add(bm); });
+      // each block is culled as a whole when it is off screen (the bounds cover all its fans)
+      const bb = new T.Box3(); sec.items.forEach((it) => bb.expandByPoint(pos.set(it.wx, it.wy, it.wz)));
+      const bs = bb.isEmpty() ? null : bb.getBoundingSphere(new T.Sphere()); if (bs) bs.radius += 2.5;
+      bodies.forEach((bm, k) => { bm.count = counts[k]; if (bs) { bm.geometry.boundingSphere = bs.clone(); bm.frustumCulled = true; } if (counts[k]) grp.add(bm); });
       S.add(grp);
       const mid = sec.items[Math.floor(n / 2)];
       // a few fans of this block who can hold up a flare

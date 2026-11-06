@@ -46,6 +46,8 @@
     if (!T || !T.GLTFLoader || !T.SkeletonUtils) return (loading = Promise.resolve(false));
     var loader = new T.GLTFLoader();
     loading = Promise.all([loadAnims()].concat(LIST.map(function (c) {
+      // characters rebuilt from Dani's body and another model's face: their own files are not needed
+      if (HEADS[c.id]) { if (onStep) onStep(); return Promise.resolve(true); }
       return new Promise(function (res) {
         loader.load(c.file, function (gl) {
           var root = gl.scene;
@@ -289,12 +291,12 @@
     });
   }
   function headOnBody(id) {
-    var src = tpl[id], base = tpl[KIT_SRC], cfg = HEADS[id], face = tpl[cfg && cfg.face];
-    if (!src || !base || !cfg || !face) return;
+    var base = tpl[KIT_SRC], cfg = HEADS[id], face = tpl[cfg && cfg.face];
+    if (!base || !cfg || !face) return;
     var root = T.SkeletonUtils.clone(base.root);
     root.updateMatrixWorld(true);
-    var dh = headSet(root), hB = dh.bone, fh = headSet(face.root), sh = headSet(src.root);
-    if (!hB || !fh.bone || !sh.bone) return;
+    var dh = headSet(root), hB = dh.bone, fh = headSet(face.root);
+    if (!hB || !fh.bone) return;
     var ownFace = cfg.face === KIT_SRC, tint = new T.Color(FACE_TINT[cfg.face] || '#FFFFFF');
     var drop = [];
     root.traverse(function (m) {
