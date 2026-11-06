@@ -992,7 +992,7 @@ class Component extends DCLogic {
     return !this.props.tutorial && g.dur >= 60 && g.t <= 30 && (g.phase === 'play' || g.phase === 'goal');
   }
   // a keeper's punt, throw or goal kick from the hands can't be blocked: rivals let it through until it lands or a teammate takes it
-  gkFree(k) { this.g.gkSafe = { team: k.team, t: 1.6 }; }
+  gkFree(k) { this.g.gkSafe = { team: k.team, t: 2.2 }; }
   release(p) {
     const g = this.g, i = g.ps.indexOf(p);
     if (g.own === i) g.own = -1;
@@ -2128,6 +2128,17 @@ class Component extends DCLogic {
     if (g.hold >= 0) {
       const k = g.ps[g.hold];
       b.x = k.x + Math.cos(k.face) * 0.35; b.y = k.y + Math.sin(k.face) * 0.35; b.z = 0.9; b.vx = b.vy = b.vz = 0;
+      // ball in the keeper's hands: no rival may stand on top of him or in his way; they back off to 8 m
+      // (outside his half-circle) and can't get close until the ball has been played
+      for (const q of g.ps) {
+        if (q.team === k.team || q.role === 'gk' || q.out) continue;
+        const dx = q.x - k.x, dy = q.y - k.y, d = Math.hypot(dx, dy) || 0.01, R = 8;
+        if (d < R) {
+          const push = Math.min(R - d, dt * 9);
+          q.x = this.clamp(q.x + dx / d * push, 0.5, 59.5); q.y = this.clamp(q.y + dy / d * push, 0.5, 29.5);
+          const vin = (q.vx * dx + q.vy * dy) / d; if (vin < 0) { q.vx -= dx / d * vin; q.vy -= dy / d * vin; }
+        }
+      }
       g.holdT -= g.hold === g.ctl && this.keeperMode() ? dt / 6 : dt;
       if (g.holdT <= 0 && !(k.act && k.act.lock)) {
         g.hold = -1; this.gkFree(k);
