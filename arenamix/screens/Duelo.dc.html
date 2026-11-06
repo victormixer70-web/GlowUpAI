@@ -830,7 +830,7 @@ class Component extends DCLogic {
   }
   /* Same open-air stadium as the match (two tiers, low-poly fans, seats, aisles, LED ribbon).
      stands: [name, x, z, length, rotY, fanLimit(worldPos), ultraZone(worldPos)] */
-  buildStadium(S, stands, teamCols, teamOf) {
+  buildStadium(S, stands, teamCols, teamOf, seatItems) {
     const T = THREE;
     const standMat = this.mat(0x2a3044, { roughness: 0.92 });
     const seatMat = this.mat(0x1b2236, { roughness: 0.9 });
@@ -945,7 +945,8 @@ class Component extends DCLogic {
       for (let r = 1; r < LOW; r++) row(lowZ(r) + 0.35, lowY(r), 0.06, r);
       for (let r = 0; r < UP; r++) row(upZ(r) + 0.35, upY(r), 0.14, r);
     };
-    stands.forEach((st) => (st[0] === 'corner' ? addCorner(st[1], st[2], st[3], st[4]) : addStand.apply(null, st)));
+    if (seatItems) seatItems.forEach((it, k) => { const team = teamOf(it), ultra = !!it.ultra; put('m:' + it.sec + ':' + (ultra ? 'u' : 'n'), team, ultra, it.x, it.y, it.z, it.rotY, fanColor(team, ultra, it.row)); });
+    else stands.forEach((st) => (st[0] === 'corner' ? addCorner(st[1], st[2], st[3], st[4]) : addStand.apply(null, st)));
     // crowd: one group per section so whole blocks can bounce cheaply
     const fanGroups = [];
     const m4 = new T.Matrix4(), q = new T.Quaternion(), sc = new T.Vector3(1, 1, 1), pos = new T.Vector3(), col = new T.Color(), up = new T.Vector3(0, 1, 0);
@@ -971,7 +972,7 @@ class Component extends DCLogic {
       grp.userData = { team: sec.team, ultra: sec.ultra, ph: Math.random() * 6.28, w: sec.ultra ? 6.5 + Math.random() : 1.5 + Math.random() };
       fanGroups.push(grp);
     });
-    {
+    if (!seatItems) {
       const seats = new T.InstancedMesh(seatGeo, this.mat(0xffffff, { roughness: 0.6 }), seatSpots.length);
       const steps = new T.InstancedMesh(new T.BoxGeometry(0.62, 0.05, 0.8), this.mat(0x8a90a3, { roughness: 0.9 }), stepSpots.length);
       const seatCols = [new T.Color('#24304f'), new T.Color('#2b3a5e')].map((c) => c.convertSRGBToLinear());
@@ -984,6 +985,57 @@ class Component extends DCLogic {
       S.add(seats); S.add(steps);
     }
     return fanGroups;
+  }
+  // the match's stadium model, scaled from its small pitch to a real one: long axis along z with the goal end
+  // behind this goal, closed on every side with a mirror image of its far half (clipped where they meet)
+  buildOurStadium(E, STAD, teamCols) {
+    const T = THREE, D = this.D, GX = this.GX, KL = 1.9, KY = 1.45, KW = 2.25;
+    const place = (m, mirror) => {
+      m.scale.set(KL, KY, mirror ? -KW : KW);
+      m.rotation.y = -Math.PI / 2;
+      m.position.set(GX, -0.03, D - 30 * KL);
+      return m;
+    };
+    this.R.localClippingEnabled = true;
+    const planes = [new T.Plane(new T.Vector3(1, 0, 0), -GX), new T.Plane(new T.Vector3(-1, 0, 0), GX)];
+    this.stadPlanes = planes;
+    const clip = (m, pl) => m.traverse((o) => {
+      if (!o.isMesh) return;
+      const ms = [].concat(o.material).map((mt) => { const c2 = mt.clone(); c2.clippingPlanes = [pl]; return c2; });
+      o.material = ms.length === 1 ? ms[0] : ms;
+    });
+    // the model's open side (+z, the TV side) becomes -x here: keep the far half (+x) and mirror it
+    const a = place(STAD.model(), false); clip(a, planes[0]); E.add(a);
+    const b = place(STAD.model(), true); clip(b, planes[1]); E.add(b);
+    // the two big video screens of the stadium: the ARENA MIX board with what is being played
+    {
+      const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 512;
+      const c = cv.getContext('2d'), w = 1024, h = 512;
+      const gr = c.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#1A0B44'); gr.addColorStop(0.55, '#3B1A8A'); gr.addColorStop(1, '#0B1F5C');
+      c.fillStyle = gr; c.fillRect(0, 0, w, h);
+      c.fillStyle = 'rgba(255,255,255,0.05)'; for (let x = 0; x < w; x += 8) c.fillRect(x, 0, 3, h);
+      c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.font = 'italic 800 170px Barlow Condensed, Arial'; c.fillStyle = '#22D3EE'; c.shadowColor = '#22D3EE'; c.shadowBlur = 30; c.fillText('ARENA MIX', w / 2, 200);
+      c.shadowBlur = 0; c.font = 'italic 800 84px Barlow Condensed, Arial'; c.fillStyle = '#FFC53D';
+      c.fillText(this.kind === 'pen' ? (this.props.shootout ? 'TANDA DE PENALTIS' : 'PENALTIS') : 'TIROS LIBRES', w / 2, 360);
+      const tex = new T.CanvasTexture(cv); tex.encoding = T.sRGBEncoding;
+      const mat = new T.MeshBasicMaterial({ map: tex, toneMapped: false });
+      [-1, 1].forEach((sx) => { const m = new T.Mesh(new T.PlaneGeometry(12.4, 6.1), mat); m.position.set(sx * 40.9, 9.1, -0.2); m.rotation.y = sx > 0 ? -Math.PI / 2 : Math.PI / 2; a.add(m); });
+    }
+    a.updateMatrix(); b.updateMatrix();
+    const v = new T.Vector3(), cx = GX, cz = D - 30 * KL, items = [];
+    const low = this.gfx === 'baja';
+    STAD.seats().forEach(([x, y, z]) => {
+      if (z >= 0) return;
+      [a, b].forEach((m) => {
+        if (Math.random() < (low ? 0.6 : 0.12)) return;
+        v.set(x, y, z).applyMatrix4(m.matrix);
+        const tx = cx + Math.max(-14, Math.min(14, v.x - cx)), rotY = Math.atan2(tx - v.x, cz - v.z);
+        const ultra = Math.abs(x) > 31;
+        items.push({ x: v.x, y: v.y, z: v.z, rotY, ultra, row: Math.round(y / 0.5), sec: Math.round(x / 12) + ':' + (m === a ? 'a' : 'b') });
+      });
+    });
+    return this.buildStadium(E, [], teamCols, (w) => (w.x < GX ? 0 : 1), items);
   }
   buildScene() {
     const T = THREE, D = this.D, GX = this.GX;
@@ -1041,9 +1093,15 @@ class Component extends DCLogic {
     const apron = new T.Mesh(new T.PlaneGeometry(400, 400), this.mat(0x0a3a0c, { roughness: 1 }));
     apron.rotation.x = -Math.PI / 2; apron.position.y = -0.01; E.add(apron);
 
+    // our stadium (the match's 3D model) at full size round this pitch; the generic bowl only if it isn't loaded
+    const teamCols = [['#FF8A3D', '#0B0B14'], ['#3EA6FF', '#F4F4FA']];
+    const STAD = window.AMStadium && window.AMStadium.ready() ? window.AMStadium : null;
+    this.usingModel = !!STAD;
+    if (STAD) this.fans = this.buildOurStadium(E, STAD, teamCols);
+    else {
+    if (window.AMStadium && window.AMStadium.load) { const pr = window.AMStadium.load(); if (pr && pr.then) pr.then(() => { if (this.R && !this.usingModel && window.AMStadium.ready() && this.phase !== 'flight') { this.buildScene(); this.camSnap = true; } }); }
     // stadium: a full bowl. Stand behind the goal (ultras in the middle), both touchline stands, and the
     // stand at the far end, behind the penalty taker (it fills the background when you play in goal)
-    const teamCols = [['#FF8A3D', '#0B0B14'], ['#3EA6FF', '#F4F4FA']];
     const far = D - 61;
     this.fans = this.buildStadium(E, [
       ['goal', 0, D + 9, 81, 0, () => true, (w) => Math.abs(w.x) < 15],
@@ -1078,6 +1136,7 @@ class Component extends DCLogic {
       sp.scale.set(30, 30, 1); sp.position.set(x, 36, z); E.add(sp);
     });
 
+    }
     // goal: a real 11-a-side goal (white frame, box net, padded poles behind); the back of the net gives
     const GOALm = window.AMNet.goal(7.32, 2.44, 2);
     GOALm.group.position.set(GX, 0, D); E.add(GOALm.group);
@@ -1148,6 +1207,7 @@ class Component extends DCLogic {
   relayout() {
     if (!this.env) { this.buildScene(); return; }
     this.env.position.set(this.GX - this.envGX, 0, this.D - this.envD);
+    if (this.stadPlanes) { this.stadPlanes[0].constant = -this.GX; this.stadPlanes[1].constant = this.GX; }
     this.placeWallAndTargets();
     this.camSnap = true;
   }
