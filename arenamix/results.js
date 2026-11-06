@@ -56,7 +56,31 @@
     '#am-res .mst .r{display:flex;justify-content:space-between;font-size:10.5px;font-weight:800;color:#E0F2FE}#am-res .mst .r b{color:#FFFFFF}',
     '#am-res .mst .pz{display:flex;height:7px;border-radius:4px;overflow:hidden;margin:1px 0 2px;background:#0B1030}#am-res .mst .pz i{display:block;height:100%;background:linear-gradient(90deg,#22D3EE,#7EF0FF);transition:width 1.2s cubic-bezier(.3,1,.4,1)}#am-res .mst .pz u{flex:1;background:#F472B6}',
     '#am-res .spark{position:absolute;width:8px;height:8px;border-radius:2px;pointer-events:none;animation:amResSpark 1.3s ease-out forwards}',
-    '@keyframes amResSpark{from{transform:translate(0,0) rotate(0);opacity:1}to{transform:translate(var(--dx),var(--dy)) rotate(540deg);opacity:0}}'
+    '@keyframes amResSpark{from{transform:translate(0,0) rotate(0);opacity:1}to{transform:translate(var(--dx),var(--dy)) rotate(540deg);opacity:0}}',
+    // ===== v2: our stadium behind it, the result in big letters on a colour band, glass panels, confetti or rain =====
+    '#am-res .photo{position:absolute;inset:-14px;background:url(assets/bg_estadio.jpg) center 35%/cover no-repeat;animation:amResKen 16s ease-in-out infinite alternate}',
+    '@keyframes amResKen{from{transform:scale(1.05)}to{transform:scale(1.14) translateY(-8px)}}',
+    '#am-res .bg{background:radial-gradient(70% 60% at 50% 8%,color-mix(in srgb,var(--rc) 55%,transparent) 0%,transparent 70%),linear-gradient(180deg,#05040FCC 0%,#05040F66 30%,#05040FE6 100%)!important}',
+    '#am-res.lost .photo{filter:grayscale(.55) brightness(.7)}#am-res.won .photo{filter:saturate(1.25)}',
+    '#am-res .band{position:absolute;left:-40px;right:-40px;top:22px;height:64px;transform:skewY(-3deg);background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--rc) 70%,#000) 18%,var(--rc) 50%,color-mix(in srgb,var(--rc) 70%,#000) 82%,transparent);opacity:.55;animation:amResBand .6s .1s cubic-bezier(.2,1.2,.4,1) both;box-shadow:0 0 40px var(--rc)}',
+    '@keyframes amResBand{from{transform:skewY(-3deg) scaleX(0)}}',
+    '#am-res .t{font-size:66px!important;top:16px!important;background:linear-gradient(180deg,#FFFFFF 25%,color-mix(in srgb,var(--rc) 55%,#fff) 60%,var(--rc));-webkit-background-clip:text;background-clip:text;color:transparent!important;text-shadow:none!important;filter:drop-shadow(0 4px 0 #000) drop-shadow(0 0 22px var(--rc));animation:amResSlam .6s .15s cubic-bezier(.2,2,.4,1) both!important}',
+    '@keyframes amResSlam{from{opacity:0;transform:scale(3) rotate(-8deg)}to{opacity:1;transform:scale(1) rotate(-3deg)}}',
+    '#am-res.won{animation:amResIn .35s ease-out both,amResShake .4s .45s ease-out}@keyframes amResShake{20%{translate:6px -3px}40%{translate:-5px 2px}60%{translate:3px 1px}80%{translate:-2px 0}}',
+    '#am-res .k{top:4px!important;z-index:2;color:#FFFFFF!important;text-shadow:0 0 10px var(--rc)}',
+    '#am-res .sc{top:86px!important;font-size:30px!important;color:#FFFFFF!important;text-shadow:0 2px 0 #000,0 0 14px var(--rc)}',
+    '#am-res .pn{clip-path:none!important;border-radius:18px;background:linear-gradient(160deg,color-mix(in srgb,var(--pc) 26%,#0B0820E6),#08061AEE 70%)!important;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--pc) 75%,transparent),inset 0 1px 0 #ffffff33,0 10px 26px #000A,0 0 22px color-mix(in srgb,var(--pc) 30%,transparent)!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}',
+    '#am-res .h{display:inline-block;padding:2px 9px;border-radius:8px;background:var(--pc);color:#0B0820!important;letter-spacing:1.5px!important}',
+    '#am-res .mvp{clip-path:none!important;border-radius:16px;box-shadow:inset 0 0 0 1.5px #F0ABFC,0 0 22px #C026D388!important;animation:amResUp .5s .2s cubic-bezier(.2,1.4,.4,1) both}',
+    '#am-res .mst{clip-path:none!important;border-radius:16px;box-shadow:inset 0 0 0 1.5px #7DD3FC,0 0 22px #0EA5E988!important;animation:amResUp .5s .3s cubic-bezier(.2,1.4,.4,1) both}',
+    '#am-res .mi{clip-path:none!important;border-radius:12px;background:linear-gradient(160deg,#0F2A1FEE,#08061AEE)!important;box-shadow:inset 0 0 0 1.5px #53D88E88!important}',
+    '#am-res .mi.done{box-shadow:inset 0 0 0 1.5px #53D88E,0 0 14px #53D88E66!important}',
+    '#am-res .go{border-radius:16px!important;background:linear-gradient(100deg,#3DA9FF 0%,#1E8BFF 30%,#0A3DCC 70%,#06102E 100%)!important;color:#FFFFFF!important;box-shadow:inset 0 2px 0 #BFE3FF88,0 0 0 2px #000,0 0 0 3.5px #1E8BFF,0 6px 0 #02040C,0 10px 24px #0A6CFF88!important;text-shadow:0 2px 0 #000A;animation:amResUp .5s 1s both,amResGo 1.6s 1.6s ease-in-out infinite}',
+    '@keyframes amResGo{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}',
+    '#am-res .cf{position:absolute;inset:0;pointer-events:none;overflow:hidden}#am-res .cf i{position:absolute;top:-16px;width:8px;height:14px;border-radius:2px;animation:amResCf linear infinite}',
+    '@keyframes amResCf{to{transform:translateY(430px) rotate(720deg)}}',
+    '#am-res .rn{position:absolute;inset:0;pointer-events:none;overflow:hidden}#am-res .rn i{position:absolute;top:-30px;width:1.5px;height:22px;background:linear-gradient(180deg,transparent,#BFD7FF88);animation:amResRn linear infinite}',
+    '@keyframes amResRn{to{transform:translate(-40px,440px)}}'
   ].join('\n');
   document.head.appendChild(css);
 
@@ -67,16 +91,19 @@
     var stage = document.getElementById('stage');
     if (!stage || !S) { if (onClose) onClose(); return; }
     var old = document.getElementById('am-res'); if (old) old.remove();
-    var col = S.won ? ['#22D3EE', '#0F3A4A', '#22D3EE22'] : S.lost ? ['#FF5C5C', '#3A1420', '#FF5C5C18'] : ['#F4F4FA', '#25254A', '#ffffff14'];
+    var col = S.won ? ['#FFC53D', '#3A2A08', '#FFC53D26'] : S.lost ? ['#FF3B5C', '#3A1420', '#FF5C5C18'] : ['#A78BFA', '#25254A', '#A78BFA22'];
     var G = window.AMGear, P = function (k) { return G ? G.prize(k) : ''; };
     var nextM = (S.milestones || []).find(function (m) { return !m.claimed; });
     var readyM = (S.milestones || []).filter(function (m) { return m.reached && !m.claimed; }).length;
     var weekText = readyM ? '¡Tienes ' + (readyM === 1 ? 'un premio' : readyM + ' premios') + ' en la Tienda!' : nextM ? 'Te ' + (nextM.at - S.weekAfter === 1 ? 'falta 1 victoria' : 'faltan ' + (nextM.at - S.weekAfter) + ' victorias') + ' para: ' + nextM.name : '¡Has completado la semana!';
-    var el = document.createElement('div'); el.id = 'am-res';
+    var el = document.createElement('div'); el.id = 'am-res'; el.className = S.won ? 'won' : S.lost ? 'lost' : 'drew';
     el.style.setProperty('--rc', col[0]); el.style.setProperty('--rc2', col[1]); el.style.setProperty('--rc3', col[2]);
     var dots = ''; for (var i = 1; i <= 10; i++) dots += '<i data-n="' + i + '" class="' + ((S.milestones || []).some(function (m) { return m.at === i; }) ? 'm' : '') + '"></i>';
     el.innerHTML =
-      '<div class="bg"></div><div class="rays"></div>' +
+      '<div class="photo"></div><div class="bg"></div><div class="rays"></div>' +
+      (S.won ? '<div class="cf">' + Array.from({ length: 34 }, function (_, k) { return '<i style="left:' + ((k * 37) % 100) + '%;background:' + ['#22D3EE', '#FFC53D', '#FF5C8A', '#53D88E', '#A78BFA', '#FFFFFF'][k % 6] + ';animation-duration:' + (2.6 + (k % 7) * 0.45).toFixed(2) + 's;animation-delay:' + (-(k % 9) * 0.37).toFixed(2) + 's"></i>'; }).join('') + '</div>' : '') +
+      (S.lost ? '<div class="rn">' + Array.from({ length: 40 }, function (_, k) { return '<i style="left:' + ((k * 29) % 110) + '%;animation-duration:' + (0.7 + (k % 5) * 0.12).toFixed(2) + 's;animation-delay:' + (-(k % 8) * 0.13).toFixed(2) + 's"></i>'; }).join('') + '</div>' : '') +
+      '<div class="band"></div>' +
       '<div class="k">FINAL DEL PARTIDO</div>' +
       '<div class="t">' + (S.won ? '¡VICTORIA!' : S.lost ? 'DERROTA' : 'EMPATE') + '</div>' +
       '<div class="sc">' + S.home + ' – ' + S.away + (S.pen ? ' <small style="font-size:.45em;opacity:.8">(' + S.pen[0] + '–' + S.pen[1] + ' pen.)</small>' : '') + '</div>' +

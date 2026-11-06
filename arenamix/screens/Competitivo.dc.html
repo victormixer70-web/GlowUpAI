@@ -163,6 +163,53 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .cp-info .lb-go{animation:cpGo 4s ease-in-out infinite alternate,cpBreath 2s ease-in-out infinite!important}
 @keyframes cpBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
 
+/* ===== lobby v4: a versus screen. You on a lit platform (your 3D player), the unknown rival opposite, a VS with lightning ===== */
+.vs-floor{position:absolute;left:-30%;right:-30%;bottom:-40px;height:250px;transform:perspective(380px) rotateX(64deg);transform-origin:50% 100%;background:linear-gradient(90deg,#1E8BFF22 1px,transparent 1px) 0 0/48px 48px,linear-gradient(0deg,#1E8BFF22 1px,transparent 1px) 0 0/48px 48px,radial-gradient(60% 80% at 50% 100%,#0A3DCC55,transparent 70%);animation:vsFloor 3s linear infinite;-webkit-mask-image:linear-gradient(0deg,#000 30%,transparent 95%);mask-image:linear-gradient(0deg,#000 30%,transparent 95%);pointer-events:none}
+@keyframes vsFloor{to{background-position:0 48px,0 48px,0 0}}
+.vs-arena{position:absolute;left:0;right:0;top:64px;height:246px}
+.vs-side{position:absolute;top:0;width:250px;height:250px}
+.vs-side.l{left:18px;animation:vsInL .7s cubic-bezier(.2,1.3,.4,1) both}.vs-side.r{right:18px;animation:vsInR .7s .1s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes vsInL{from{opacity:0;transform:translateX(-140px)}}@keyframes vsInR{from{opacity:0;transform:translateX(140px)}}
+.vs-plat{position:absolute;left:25px;right:25px;bottom:34px;height:46px;border-radius:50%;background:radial-gradient(closest-side,var(--pc),transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--pc) 70%,#fff) inset;opacity:.9;animation:vsPlat 2s ease-in-out infinite}
+.vs-plat::before{content:"";position:absolute;left:50%;bottom:50%;width:150px;height:240px;margin-left:-75px;background:linear-gradient(0deg,color-mix(in srgb,var(--pc) 45%,transparent),transparent);clip-path:polygon(20% 100%,80% 100%,100% 0,0 0);opacity:.55}
+@keyframes vsPlat{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.08);opacity:1}}
+.vs-me3d{position:absolute;left:35px;bottom:44px;width:180px;height:220px;cursor:pointer;filter:drop-shadow(0 0 14px #1E8BFF88)}
+.vs-me{position:absolute;left:45px;bottom:52px;width:160px;height:160px;object-fit:contain;filter:drop-shadow(0 0 16px #1E8BFF)}
+.vs-mate{position:absolute;bottom:62px;width:110px;height:110px;object-fit:contain;filter:brightness(.55) saturate(.7) drop-shadow(0 0 8px #1E8BFF88)}
+.vs-sil{position:absolute;bottom:52px;object-fit:contain;filter:brightness(0) drop-shadow(0 0 2px #FF5C8A) drop-shadow(0 0 14px #FF3B5C);animation:vsSil 2.2s ease-in-out infinite}
+@keyframes vsSil{0%,100%{opacity:.85}50%{opacity:1;transform:translateY(-4px)}}
+.vs-q{position:absolute;left:0;right:0;top:44px;text-align:center;font:800 italic 70px/1 'Barlow Condensed',sans-serif;color:#FF5C8A;text-shadow:0 0 22px #FF3B5C,0 4px 0 #000;animation:vsQ 1.6s ease-in-out infinite}
+@keyframes vsQ{0%,100%{transform:scale(1) rotate(-6deg)}50%{transform:scale(1.12) rotate(6deg)}}
+.vs-tag{position:absolute;bottom:0;left:10px;right:10px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 8px 6px;border-radius:12px;background:linear-gradient(160deg,#06102EEE,#02040CEE);box-shadow:inset 0 0 0 1.5px #1E8BFF,0 6px 16px #0008}
+.vs-tag.r{box-shadow:inset 0 0 0 1.5px #FF3B5C,0 6px 16px #0008;background:linear-gradient(160deg,#2E0614EE,#0C0206EE)}
+.vs-tag b{font:800 italic 18px/1.05 'Barlow Condensed',sans-serif;letter-spacing:.5px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vs-tk{position:absolute;top:-9px;left:50%;translate:-50% 0;padding:1px 9px;border-radius:7px;background:#1E8BFF;color:#fff;font:800 9px Exo2,sans-serif;letter-spacing:2px}
+.vs-tag.r .vs-tk{background:#FF3B5C}
+.vs-rk{display:flex;align-items:center;gap:5px;font:800 10px Exo2,sans-serif;letter-spacing:1px;color:#E2E8F0;white-space:nowrap}
+.vs-rk i{width:7px;height:7px;border-radius:50%;background:var(--rc);box-shadow:0 0 8px var(--rc)}
+.vs-mid{position:absolute;left:280px;right:280px;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center}
+.vs-mk{font:800 10px Exo2,sans-serif;letter-spacing:3px;color:#7CC4FF;animation:vsFade .5s .3s both}
+.vs-mt{font:800 italic 42px/1 'Barlow Condensed',sans-serif;letter-spacing:1px;background:linear-gradient(180deg,#FFFFFF 30%,#7CC4FF);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #000) drop-shadow(0 0 14px #1E8BFF88);animation:vsTitle .6s .2s cubic-bezier(.2,1.6,.4,1) both;white-space:nowrap}
+@keyframes vsTitle{from{opacity:0;transform:scale(.4)}}@keyframes vsFade{from{opacity:0}}
+.vs-core{position:relative;width:200px;height:120px;margin-top:4px;display:flex;align-items:center;justify-content:center}
+.vs-ring{position:absolute;width:112px;height:112px;border-radius:50%;border:3px dashed #1E8BFF;box-shadow:0 0 18px #1E8BFF88,inset 0 0 18px #1E8BFF55;animation:lbSpin 6s linear infinite}
+.vs-ring.b{width:90px;height:90px;border-color:#FF3B5C;box-shadow:0 0 18px #FF3B5C88,inset 0 0 14px #FF3B5C55;animation-direction:reverse;animation-duration:4s}
+.vs-bolt{position:absolute;inset:0;margin:auto;filter:drop-shadow(0 0 6px #7CC4FF)}
+.vs-bolt path{stroke-dasharray:260;animation:vsBolt .9s steps(6) infinite}.vs-bolt .b2{animation-delay:-.45s;filter:drop-shadow(0 0 6px #FF5C8A)}
+@keyframes vsBolt{0%{stroke-dashoffset:260;opacity:1}60%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+.vs-vs{position:relative;font:800 italic 64px/1 'Barlow Condensed',sans-serif;background:linear-gradient(180deg,#FFF6C4,#FFC53D 55%,#F97316);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #000) drop-shadow(0 0 20px #FFC53D);animation:vsSlam .55s .45s cubic-bezier(.2,2,.4,1) both,vsPulse 1.2s 1.1s ease-in-out infinite}
+@keyframes vsSlam{from{opacity:0;transform:scale(3.2) rotate(-20deg)}}@keyframes vsPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.vs-desc{margin-top:2px;font:700 11.5px/1.35 Exo2,sans-serif;color:#C7D7F5;max-width:260px;animation:vsFade .5s .5s both}
+.vs-bottom{position:absolute;left:18px;right:18px;bottom:12px;height:58px;display:flex;align-items:center;gap:10px;animation:vsUp .6s .35s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes vsUp{from{opacity:0;transform:translateY(40px)}}
+.vs-tiles{display:flex;gap:7px}
+.vs-tile{display:flex;align-items:center;gap:7px;height:50px;padding:0 11px 0 9px;border-radius:13px;background:linear-gradient(160deg,#ffffff1f,#ffffff08);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--tc) 70%,transparent),0 0 14px color-mix(in srgb,var(--tc) 30%,transparent);color:var(--tc);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:vsUp .5s cubic-bezier(.2,1.4,.4,1) both}
+.vs-tile div{display:flex;flex-direction:column}
+.vs-tile b{font:800 italic 19px/1 'Barlow Condensed',sans-serif;color:#fff;letter-spacing:.5px;white-space:nowrap}
+.vs-tile span{font:800 8.5px Exo2,sans-serif;letter-spacing:1px;color:color-mix(in srgb,var(--tc) 70%,#fff);white-space:nowrap}
+.vs-pos{display:flex;gap:3px;padding:3px;border-radius:11px;background:#02040CCC;box-shadow:inset 0 0 0 1px #1E8BFF66}
+.vs-go{flex:1;height:56px;border:0;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:12px;font:800 italic 26px 'Barlow Condensed',sans-serif;letter-spacing:2px;cursor:pointer;position:relative}
+
 .cp-promo{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:radial-gradient(60% 70% at 50% 45%,color-mix(in srgb,var(--pc) 55%,#000) 0%,#05030FEE 70%);pointer-events:none}
 .cp-promo .r{position:absolute;left:50%;top:45%;width:900px;height:900px;margin:-450px 0 0 -450px;background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--pc) 45%,transparent) 0 7deg,transparent 9deg 20deg);animation:mmBeam 8s linear infinite;-webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent)}
 .cp-promo .em{position:relative;filter:drop-shadow(0 0 30px var(--pc));animation:cpEm .7s cubic-bezier(.2,1.8,.4,1) both}
@@ -188,43 +235,42 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 
   <sc-if value="{{isLobby}}" hint-placeholder-val="{{ true }}">
     <div class="cp-fx" aria-hidden="true"><sc-for list="{{confetti}}" as="c" hint-placeholder-count="0"><i style="{{c}}"></i></sc-for></div>
-    <div class="cp-lobby" style="position: absolute; inset: 70px 24px 18px 24px; display: flex; align-items: stretch; gap: 16px">
-      <div class="lb-col cp-rank" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: 270px; --lc: {{glow}}">
-        <i class="lb-rays"></i><i class="lb-ped"></i><sc-for list="{{sparks}}" as="sp" hint-placeholder-count="0"><i class="cp-spark" style="{{sp}}"></i></sc-for>
-        <sc-if value="{{ranked}}" hint-placeholder-val="{{ true }}">
-          <svg class="lb-float" width="140" height="148" viewBox="-6 -10 76 80" style="position: relative; filter: drop-shadow(0 8px 12px #000a)"><circle cx="32" cy="32" r="34" fill="{{myC1}}" opacity=".15"/><sc-if value="{{myWings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{myC1}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{myC1}}"/></sc-if><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{myC1}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{myC2}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53Z" fill="#000000" opacity=".18"/><path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{myC1}}"/><rect x="20" y="62" width="7" height="5" rx="1.5" fill="{{pip1}}"/><rect x="29" y="62" width="7" height="5" rx="1.5" fill="{{pip2}}"/><rect x="38" y="62" width="7" height="5" rx="1.5" fill="{{pip3}}"/></svg>
-          <span class="bc-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 34px; line-height: 1; color: {{myText}}">{{myRank}}</span>
-          <span style="font-size: 14px; font-weight: 700">{{mmrLabel}} MMR</span>
-          <div style="width: 200px; height: 8px; border-radius: 4px; background: #39206E; margin-top: 4px"><div style="{{lobbyBar}}"></div></div>
-          <span style="font-size: 12px; color: #A3A3C2">{{nextLabel}}</span>
-        </sc-if>
-        <sc-if value="{{placing}}" hint-placeholder-val="{{ false }}">
-          <svg class="lb-float" width="130" height="138" viewBox="-6 -10 76 80" style="position: relative; filter: drop-shadow(0 8px 12px #000a)"><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="#3A3A5E"/><path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="#311B58"/><text x="32" y="40" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="26" fill="#8C8CB0">?</text></svg>
-          <span class="bc-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1">SIN CLASIFICAR</span>
-          <span style="font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #53D88E">{{placeTitle}}</span>
-          <div style="display: flex; gap: 6px; margin-top: 2px"><sc-for list="{{placeDots}}" as="dt" hint-placeholder-count="5"><span style="{{dt.style}}"></span></sc-for></div>
-          <span style="font-size: 11px; color: #A3A3C2; text-align: center; margin-top: 2px">{{placeNote}}</span>
-        </sc-if>
-        <sc-if value="{{casual}}" hint-placeholder-val="{{ false }}">
-          <svg class="lb-float" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="position: relative; filter: drop-shadow(0 0 12px #22D3EE)"><path d="M13 2L4 14h7l-1 8l9-12h-7z" fill="#22D3EE33"/></svg>
-          <span class="bc-title" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: 1">SIN RANGO</span>
-          <span style="font-size: 12px; color: #A3A3C2; text-align: center">Juega tranquilo: no ganas ni pierdes MMR.</span>
-        </sc-if>
+    <div class="vs-floor" aria-hidden="true"></div>
+    <div class="vs-arena" style="--lc: {{glow}}">
+      <!-- you -->
+      <div class="vs-side l">
+        <div class="vs-plat" style="--pc: #1E8BFF"></div>
+        <sc-for list="{{mateSil}}" as="m" hint-placeholder-count="0"><img class="vs-mate" src="{{m.src}}" alt="" style="{{m.style}}"></sc-for>
+        <sc-if value="{{hero3d}}" hint-placeholder-val="{{ false }}"><div class="vs-me3d" ref="{{heroRef}}" onClick="{{heroTap}}"></div></sc-if>
+        <sc-if value="{{hero2d}}" hint-placeholder-val="{{ true }}"><img class="vs-me" src="{{meImg}}" alt=""></sc-if>
+        <div class="vs-tag l"><span class="vs-tk">TÚ</span><b translate="no">{{meName}}</b><span class="vs-rk" style="--rc: {{glow}}"><i></i>{{rankLine}}</span></div>
       </div>
-      <div class="cp-info" style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 10px; --lc: {{glow}}">
-        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 40px; line-height: 1; text-shadow: 0 3px 0 #0D0418, 0 0 18px {{glow}}66">{{plTitle}}</span>
-        <img class="cp-hero" src="{{heroImg}}" alt="" aria-hidden="true">
-        <div class="lb-line" aria-hidden="true"><sc-for list="{{lineHome}}" as="h" hint-placeholder-count="2"><i style="{{h}}"></i></sc-for><span class="lb-vs">VS</span><sc-for list="{{lineAway}}" as="h" hint-placeholder-count="2"><i style="{{h}}"></i></sc-for></div>
-        <span style="font-size: 13px; color: #BABAD6">{{plDesc}}</span>
-        <div style="display: flex; flex-wrap: wrap; gap: 8px">
-          <sc-for list="{{chips}}" as="c" hint-placeholder-count="3"><span class="cp-chip" style="{{c.style}}">{{c.text}}</span></sc-for>
+      <!-- the clash -->
+      <div class="vs-mid">
+        <span class="vs-mk">{{plKicker}}</span>
+        <span class="vs-mt">{{plTitle}}</span>
+        <div class="vs-core">
+          <i class="vs-ring"></i><i class="vs-ring b"></i>
+          <svg class="vs-bolt" width="190" height="120" viewBox="0 0 190 120" aria-hidden="true"><path d="M0 60 L40 48 L62 70 L92 40 L118 72 L146 46 L190 60" fill="none" stroke="#7CC4FF" stroke-width="3" stroke-linejoin="round"/><path d="M0 60 L34 70 L66 44 L96 76 L124 42 L150 68 L190 60" fill="none" stroke="#FF5C8A" stroke-width="2.4" stroke-linejoin="round" class="b2"/></svg>
+          <b class="vs-vs">VS</b>
         </div>
-        <sc-if value="{{canKeep}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">TU POSICIÓN</span><div style="display: flex; gap: 3px; padding: 3px; border-radius: 11px; background: #251443"><button type="button" onClick="{{setField}}" style="{{fieldStyle}}">CAMPO</button><button type="button" onClick="{{setKeeper}}" style="{{keeperStyle}}">PORTERO</button></div></div></sc-if>
-        <button type="button" onClick="{{search}}" class="bc-btn am-shine lb-go am-logo-btn" style="margin-top: 4px; height: 56px; border: 0; border-radius: 16px; background: linear-gradient(180deg, #9AF5FF, #22D3EE 60%, #0EA5C0); color: #150925; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; cursor: pointer; box-shadow: inset 0 2px 0 #FFFFFFAA, 0 6px 0 #0E8FA3, 0 0 22px #22D3EE66"><span class="rg"></span><span class="rg" style="animation-delay: -1.1s"></span><svg class="lb-ball" width="30" height="30" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#FFFFFF" stroke="#150925" stroke-width="1.6"/><path d="M12 7l3.4 2.5l-1.3 4h-4.2l-1.3-4z" fill="#150925"/><path d="M12 7V3M15.4 9.5l3.8-1.2M14.1 13.5l2.3 3.3M9.9 13.5l-2.3 3.3M8.6 9.5L4.8 8.3" stroke="#150925" stroke-width="1.3"/></svg>BUSCAR PARTIDA</button>
-        <sc-if value="{{showNotice}}" hint-placeholder-val="{{ false }}"><div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: #2A2410; border: 1px solid #FFC53D"><span style="flex: 1; font-size: 12px; font-weight: 700; color: #FFE38A">{{noticeText}}</span><button type="button" onClick="{{closeNotice}}" style="border: 0; background: transparent; color: #FFE38A; font-weight: 800; font-size: 13px; cursor: pointer">OK</button></div></sc-if>
-        <span style="font-size: 11px; color: #8686A6">Partidos por equipos: buscamos jugadores reales online; si no hay nadie buscando, juegas con la IA.</span>
+        <span class="vs-desc">{{plDesc}}</span>
+      </div>
+      <!-- the rival: unknown until the search finds one -->
+      <div class="vs-side r">
+        <div class="vs-plat" style="--pc: #FF3B5C"></div>
+        <sc-for list="{{rivalSil}}" as="m" hint-placeholder-count="1"><img class="vs-sil" src="{{m.src}}" alt="" style="{{m.style}}"></sc-for>
+        <b class="vs-q">?</b>
+        <div class="vs-tag r"><span class="vs-tk">RIVAL</span><b>{{rivalLine}}</b><span class="vs-rk" style="--rc: #FF5C8A"><i></i>{{rivalSub}}</span></div>
       </div>
     </div>
+    <!-- what is at stake, then go -->
+    <div class="vs-bottom">
+      <div class="vs-tiles"><sc-for list="{{tiles}}" as="t" hint-placeholder-count="4"><div class="vs-tile" style="{{t.style}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{t.ic}}"/></svg><div><b>{{t.v}}</b><span>{{t.l}}</span></div></div></sc-for></div>
+      <sc-if value="{{canKeep}}" hint-placeholder-val="{{ false }}"><div class="vs-pos"><button type="button" onClick="{{setField}}" style="{{fieldStyle}}">CAMPO</button><button type="button" onClick="{{setKeeper}}" style="{{keeperStyle}}">PORTERO</button></div></sc-if>
+      <button type="button" onClick="{{search}}" class="bc-btn am-shine lb-go am-logo-btn vs-go"><span class="rg"></span><span class="rg" style="animation-delay: -1.1s"></span><svg class="lb-ball" width="30" height="30" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#FFFFFF" stroke="#150925" stroke-width="1.6"/><path d="M12 7l3.4 2.5l-1.3 4h-4.2l-1.3-4z" fill="#150925"/><path d="M12 7V3M15.4 9.5l3.8-1.2M14.1 13.5l2.3 3.3M9.9 13.5l-2.3 3.3M8.6 9.5L4.8 8.3" stroke="#150925" stroke-width="1.3"/></svg>BUSCAR PARTIDA</button>
+    </div>
+    <sc-if value="{{showNotice}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; left: 50%; top: 64px; z-index: 6; translate: -50% 0; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px; background: #2A2410; border: 1px solid #FFC53D"><span style="font-size: 12px; font-weight: 700; color: #FFE38A">{{noticeText}}</span><button type="button" onClick="{{closeNotice}}" style="border: 0; background: transparent; color: #FFE38A; font-weight: 800; font-size: 13px; cursor: pointer">OK</button></div></sc-if>
   </sc-if>
 
   <sc-if value="{{isSearch}}" hint-placeholder-val="{{ false }}">
@@ -447,6 +493,10 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 class Component extends DCLogic {
   constructor(props) {
     super(props);
+    this.heroRef = (el) => {
+      if (el && el !== this.heroEl) { if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = el; if (window.AMHero) window.AMHero.attach(el); }
+      else if (!el && this.heroEl) { if (window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; }
+    };
     const sel = this.store('arenamix.sel') || {};
     this.sport = sel.sport || 'futbol';
     const C = this.catalog(this.sport);
@@ -473,7 +523,7 @@ class Component extends DCLogic {
       this.setState({ phase: 'search', online: null }); this.startOnline(n); this.anim();
     }, 300);
   }
-  componentWillUnmount() { if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; if (this.mm && this.mm.isHost && this.mm.party && !this.mm.started && window.AMSocial) window.AMSocial.partySend({ t: 'mmStop' }); this.endOnline(); }
+  componentWillUnmount() { if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; if (this.mm && this.mm.isHost && this.mm.party && !this.mm.started && window.AMSocial) window.AMSocial.partySend({ t: 'mmStop' }); this.endOnline(); }
   endOnline() { if (this.mm) { this.mm.cancel(); this.mm = null; } }
   // look for real players for a team match (same mode, same size), with the AI as the back-up
   startOnline(n) {
@@ -876,6 +926,26 @@ class Component extends DCLogic {
       isTeamMatch: s.phase === 'match' && pl.kind === 'team' && !OL, isOnlineMatch: s.phase === 'match' && pl.kind === 'team' && !!OL, online: OL, isDuelMatch: s.phase === 'match' && pl.kind === 'duel',
       isBasket: s.phase === 'match' && mg && pl.comp === 'Baloncesto', isTenis: s.phase === 'match' && mg && pl.comp === 'Tenis', isVoley: s.phase === 'match' && mg && pl.comp === 'Voley',
       plTitle: pl.title, plDesc: pl.desc, chips,
+      // the versus screen
+      ...(() => {
+        const A = window.AMChars, pref = A ? A.pref() : 'clasico', hero3d = !!(window.AMHero && window.THREE && A && pref !== 'clasico');
+        const PICS = ['dani', 'leo', 'nico', 'remy', 'ty', 'vegas', 'granny'], mine = pref !== 'clasico' ? pref : 'dani';
+        const nTeam = pl.kind === 'team' ? pl.n : 1, pick = (k) => 'assets/chars/' + PICS[(k * 3 + 1) % PICS.length] + '.png';
+        const IC = { clock: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18M12 7v5l3 2', users: 'M9 11a4 4 0 1 0 0-8a4 4 0 0 0 0 8M2 21v-1a6 6 0 0 1 12 0v1M17 11a3 3 0 1 0 0-6M18 15a5 5 0 0 1 4 5v1', trophy: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4', coin: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18M9 9h4.5a1.5 1.5 0 0 1 0 3H10.5a1.5 1.5 0 0 0 0 3H15M12 7v2M12 15v2' };
+        const tl = (ic, v, l, c, k) => ({ ic: IC[ic], v, l, style: '--tc: ' + c + '; animation-delay: ' + (0.4 + k * 0.08).toFixed(2) + 's' });
+        const dur = pl.kind === 'team' ? (casual ? '1:30' : '2:00') : pl.duel === 'pen' ? '5 TIROS' : pl.kind === 'duel' ? '5 RONDAS' : 'RÉCORD';
+        return {
+          hero3d, hero2d: !hero3d, heroRef: this.heroRef, heroTap: () => { if (window.AMHero && window.AMHero.play) window.AMHero.play(); },
+          meImg: 'assets/chars/' + mine + '.png', meName: window.AMOnline ? window.AMOnline.myName() : 'Tú',
+          rankLine: casual ? 'SIN RANGO · PARTIDA LIBRE' : placing ? 'SIN CLASIFICAR · ' + Math.min(5, pc.g + 1) + '/5' : R.label.toUpperCase() + ' · ' + s.mmr + ' MMR',
+          plKicker: (casual ? 'INFORMAL' : 'COMPETITIVO') + ' · ' + (pl.kind === 'team' ? 'PARTIDO' : 'DUELO'),
+          mateSil: Array.from({ length: nTeam - 1 }, (_, k) => ({ src: pick(k + 2), style: 'left: ' + (k % 2 ? 150 : -6) + 'px; bottom: ' + (64 + Math.floor(k / 2) * 14) + 'px; z-index: 0' })),
+          rivalSil: Array.from({ length: nTeam }, (_, k) => { const main = k === 0, w = main ? 160 : 104; return { src: pick(k + 5), style: 'width: ' + w + 'px; height: ' + w + 'px; left: ' + (main ? 45 : k % 2 ? 146 : 0) + 'px; ' + (main ? 'z-index: 2;' : 'bottom: 66px; opacity: .7;') + ' animation-delay: ' + (-k * 0.4) + 's' }; }),
+          rivalLine: nTeam > 1 ? 'EQUIPO RIVAL' : '¿QUIÉN SERÁ?', rivalSub: casual ? 'ONLINE O IA' : 'DE TU NIVEL',
+          tiles: [tl('clock', dur, 'DURACIÓN', '#7CC4FF', 0), tl('users', nTeam + ' VS ' + nTeam, pl.kind === 'team' ? '+ PORTEROS' : 'CARA A CARA', '#53D88E', 1),
+            tl('trophy', casual ? 'LIBRE' : placing ? (Math.min(5, pc.g + 1)) + ' / 5' : '+25 MMR', casual ? 'SIN RANGO' : placing ? 'CLASIFICATORIA' : 'SI GANAS', '#FFC53D', 2), tl('coin', '+60', 'VCD AL GANAR', '#FF8A3D', 3)]
+        };
+      })(),
       // the line-up at a glance: you and your mates against the rivals (a duel is one against one)
       lineHome: Array.from({ length: pl.kind === 'team' ? pl.n : 1 }, (_, k) => 'background: ' + (k ? '#FF8A3D' : '#22D3EE') + '; animation-delay: ' + (-k * 0.2).toFixed(1) + 's'),
       lineAway: Array.from({ length: pl.kind === 'team' ? pl.n : 1 }, (_, k) => 'background: #3EA6FF; animation-delay: ' + (-(k + 2) * 0.2).toFixed(1) + 's'),
