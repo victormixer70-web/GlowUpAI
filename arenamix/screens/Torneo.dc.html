@@ -20,7 +20,7 @@ body{margin:0}
 .tn-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(90% 80% at 70% 0%,#2C1C5E 0%,#200C4B 55%,#0F052D 100%)}
 .tn-bg i{position:absolute;left:50%;top:-260px;width:1100px;height:1100px;margin-left:-550px;background:repeating-conic-gradient(from 0deg,#A78BFA10 0 6deg,transparent 6deg 18deg);animation:tnRay 90s linear infinite;-webkit-mask-image:radial-gradient(closest-side,#000 20%,transparent 70%);mask-image:radial-gradient(closest-side,#000 20%,transparent 70%)}
 .tn-bg b{position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(0deg,#0E3A22aa,transparent);-webkit-mask-image:repeating-linear-gradient(90deg,#000 0 60px,#0008 60px 120px);mask-image:repeating-linear-gradient(90deg,#000 0 60px,#0008 60px 120px)}
-.tn-tab{position:relative;z-index:1;display:flex;align-items:center;gap:6px;height:32px;width:122px;justify-content:center;border:0;background:none;font:800 11.5px Exo2,sans-serif;letter-spacing:.5px;cursor:pointer;transition:color .3s}
+.tn-tab{position:relative;z-index:1;display:flex;align-items:center;gap:6px;height:32px;width:100px;justify-content:center;border:0;background:none;font:800 11.5px Exo2,sans-serif;letter-spacing:.5px;cursor:pointer;transition:color .3s}
 .tn-panel{position:absolute;left:16px;right:16px;top:62px;bottom:12px;animation:tnIn .4s cubic-bezier(.2,1.3,.4,1) both}
 .tn-card{position:relative;border-radius:20px;background:linear-gradient(170deg,#2E166BF2,#1C0B43F2);box-shadow:inset 0 0 0 1px #3A3270,inset 0 2px 0 #ffffff14,0 14px 30px #0009;overflow:hidden}
 .tn-go{position:relative;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 24px;border:0;border-radius:14px;background:linear-gradient(135deg,#FFE38A,#FFC53D 55%,#F59E0B);color:#1A1204;font:800 italic 21px 'Barlow Condensed',sans-serif;letter-spacing:1px;cursor:pointer;overflow:hidden;--tc:#FFC53D88;animation:tnPulse 2s infinite}
@@ -207,6 +207,70 @@ body{margin:0}
       </div>
     </sc-if>
 
+    <!-- ===== CARRERA ===== -->
+    <sc-if value="{{crIntro}}" hint-placeholder-val="{{ false }}">
+      <div class="tn-panel" style="display: flex; gap: 14px">
+        <div class="tn-card tn-hero" style="flex: none; width: 330px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; padding-bottom: 16px; text-align: center; --tc: #53D88E; background: radial-gradient(80% 60% at 50% 20%, #53D88E88, transparent 70%), linear-gradient(170deg, #0E6B47, #0B2A2A)"><img class="tn-heroimg" src="{{ligaImg}}" alt=""><i class="tn-herofade"></i><span class="tn-tag">MODO CARRERA</span>
+          <span class="tn-big" style="font-size: 32px">DEL BARRIO A LA ÉLITE</span><div class="tn-feats"><span>5 divisiones</span><span>Temporadas de 5 jornadas</span><span>Ofertas de fichaje</span></div>
+        </div>
+        <div class="tn-card tn-side" style="flex: 1; padding: 18px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px">
+          <span class="tn-sec">CÓMO FUNCIONA<i></i></span>
+          <p class="tn-lead" style="margin: 0; font-size: 12px; line-height: 1.5; color: #DADAF0">Empiezas en un club modesto de Tercera. Cada partido sube tu media: goles, victorias y buen juego. Al final de cada temporada, los clubes de la división de arriba te mandan ofertas. ¿Llegarás a la Élite?</p>
+          <span class="tn-sec">TAMAÑO DE LOS EQUIPOS<i></i></span>
+          <div style="display: flex; gap: 8px">
+            <sc-for list="{{sizes}}" as="z" key="n"><button type="button" class="{{z.cls}}" onClick="{{z.pick}}">{{z.label}}</button></sc-for>
+          </div>
+          <span style="flex: 1"></span>
+          <button type="button" class="tn-go" onClick="{{newCareer}}">EMPEZAR CARRERA</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{crOn}}" hint-placeholder-val="{{ false }}">
+      <div class="tn-panel" style="display: flex; gap: 14px">
+        <div class="tn-card" style="flex: 1; padding: 8px 12px 0">
+          <div class="tn-tr tn-th"><span>#</span><span class="t">{{crDiv}}</span><span>PJ</span><span>G</span><span>E</span><span>P</span><span>GOLES</span><span>PTS</span></div>
+          <sc-for list="{{crTable}}" as="r" key="k">
+            <div class="{{r.cls}}"><span><span class="tn-pos" style="{{r.posStyle}}">{{r.pos}}</span></span><span class="t"><span class="tn-kit" style="{{r.kit}}"></span><span translate="no" style="overflow: hidden; text-overflow: ellipsis">{{r.name}}</span></span><span>{{r.pj}}</span><span>{{r.g}}</span><span>{{r.e}}</span><span>{{r.p}}</span><span>{{r.gl}}</span><span class="pts">{{r.pts}}</span></div>
+          </sc-for>
+        </div>
+        <div class="tn-card" style="flex: none; width: 236px; padding: 14px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 7px; text-align: center">
+          <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #53D88E">{{crStage}}</span>
+          <div style="display: flex; align-items: center; gap: 10px">
+            <div style="width: 52px; height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px 10px 18px 18px; background: linear-gradient(170deg, #FDE68A, #B7791F); color: #2A1400; box-shadow: 0 0 14px #FBBF2477"><b style="font: 800 italic 26px/1 'Barlow Condensed', sans-serif">{{crOvr}}</b><span style="font-size: 8px; font-weight: 800; letter-spacing: 1px">MEDIA</span></div>
+            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; min-width: 0"><span style="font: 800 italic 19px/1.05 'Barlow Condensed', sans-serif" translate="no">{{crClub}}</span><span style="font-size: 10.5px; font-weight: 700; color: #A3A3C2">{{crSeason}}</span></div>
+          </div>
+          <span style="font-size: 11px; font-weight: 700; color: #DADAF0; line-height: 1.4">{{crSub}}</span>
+          <span style="flex: 1"></span>
+          <sc-if value="{{crCanPlay}}" hint-placeholder-val="{{ true }}"><button type="button" class="tn-go" style="width: 100%; font-size: 19px; padding: 0 10px" onClick="{{playCareer}}">{{crPlayLabel}}</button></sc-if>
+          <sc-for list="{{crOffers}}" as="o" key="k"><button type="button" class="tn-go" style="{{o.style}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for>
+          <button type="button" class="tn-ghost" onClick="{{quitCareer}}">Retirarse y empezar de cero</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===== EVENTO DE FIN DE SEMANA ===== -->
+    <sc-if value="{{isEvento}}" hint-placeholder-val="{{ false }}">
+      <div class="tn-panel" style="display: flex; gap: 14px">
+        <div class="tn-card tn-hero" style="{{evHero}}"><img class="tn-heroimg" src="{{copaImg}}" alt=""><i class="tn-herofade"></i><span class="tn-tag">{{evTag}}</span>
+          <span class="tn-big" style="font-size: 32px; line-height: 1.02">{{evTitle}}</span><div class="tn-feats"><sc-for list="{{evFeats}}" as="f" key="f"><span>{{f}}</span></sc-for></div>
+        </div>
+        <div class="tn-card tn-side" style="flex: 1; padding: 18px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px">
+          <span class="tn-sec">LAS REGLAS<i></i></span>
+          <p class="tn-lead" style="margin: 0; font-size: 12px; line-height: 1.5; color: #DADAF0">{{evDesc}}</p>
+          <span class="tn-sec">PREMIO EXCLUSIVO · GANA 3 PARTIDOS<i></i></span>
+          <div style="display: flex; align-items: center; gap: 10px">
+            <sc-for list="{{evPips}}" as="d" key="k"><span style="{{d}}"></span></sc-for>
+            <span style="font-size: 12px; font-weight: 800; color: #FFC53D">{{evPrize}}</span>
+          </div>
+          <span style="font-size: 11px; font-weight: 700; color: #A3A3C2">{{evWhen}}</span>
+          <span style="flex: 1"></span>
+          <sc-if value="{{evCanClaim}}" hint-placeholder-val="{{ false }}"><button type="button" class="tn-go" onClick="{{evClaim}}">¡RECOGER PREMIO!</button></sc-if>
+          <sc-if value="{{evCanPlay}}" hint-placeholder-val="{{ false }}"><button type="button" class="tn-go" onClick="{{evPlay}}">JUGAR EVENTO</button></sc-if>
+          <sc-if value="{{evClosed}}" hint-placeholder-val="{{ true }}"><button type="button" class="tn-go" style="background: #39206E; color: #C9C2FF; animation: none; cursor: default">ABRE EL VIERNES</button></sc-if>
+        </div>
+      </div>
+    </sc-if>
+
     <!-- ===== RETOS DEL DÍA ===== -->
     <sc-if value="{{isRetos}}" hint-placeholder-val="{{ false }}">
       <div class="tn-panel" style="display: flex; gap: 14px; justify-content: center">
@@ -243,7 +307,7 @@ body{margin:0}
   </sc-if>
 
   <sc-if value="{{isMatch}}" hint-placeholder-val="{{ false }}">
-    <dc-import name="Partido" ai-level="{{m_ai}}" label="{{m_label}}" mode="comp" duration="{{m_dur}}" team-size="{{m_n}}" autostart="{{ true }}" home-name="{{m_home}}" mates="{{m_mates}}" rivals="{{m_rivals}}" away-name="{{m_away}}" away-color="{{m_color}}" away-trim="{{m_trim}}" start-score="{{m_start}}" on-end="{{onMatchEnd}}" hint-size="844px,390px"></dc-import>
+    <dc-import name="Partido" ai-level="{{m_ai}}" label="{{m_label}}" mode="comp" duration="{{m_dur}}" team-size="{{m_n}}" autostart="{{ true }}" home-name="{{m_home}}" mates="{{m_mates}}" rivals="{{m_rivals}}" away-name="{{m_away}}" away-color="{{m_color}}" away-trim="{{m_trim}}" start-score="{{m_start}}" rules="{{m_rules}}" on-end="{{onMatchEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isShootout}}" hint-placeholder-val="{{ false }}">
     <dc-import name="Duelo" ai-level="{{m_ai}}" kind="pen" shootout="{{ true }}" rival-name="{{m_away}}" on-end="{{onPens}}" hint-size="844px,390px"></dc-import>
@@ -273,11 +337,26 @@ const TN_RETOS = [
   { id: 'artista', title: 'EL ARTISTA', icon: 'M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z', c: '#FF5CC8', desc: 'Haz 3 filigranas y no pierdas.', n: 2, dur: 90, ai: 0.4, setup: '2 VS 2', reward: 120, ok: (r) => r.home >= r.away && (r.stats && r.stats.skills || 0) >= 3 }
 ];
 const TN_ROUND = ['CUARTOS', 'SEMIFINAL', 'FINAL'];
+// career: five divisions, from the neighbourhood to the elite; [name, shirt, trim]
+const CR_DIV = [
+  { name: 'TERCERA DIVISIÓN', ai: 0.18, pay: 120, clubs: [['CD Barrio Alto', '#2E7D32', '#F4F4F6'], ['Atlético Ribera', '#B91C1C', '#F4F4F6'], ['UD Los Pinos', '#166534', '#FDE68A'], ['CF Arrabal', '#1D4ED8', '#F4F4F6'], ['Racing Molino', '#7C2D12', '#FDE68A'], ['SD Fuente Vieja', '#0F766E', '#F4F4F6'], ['Peña Deportiva Sur', '#6B21A8', '#F4F4F6']] },
+  { name: 'SEGUNDA B', ai: 0.33, pay: 200, clubs: [['Real Ciudadela', '#4338CA', '#F4F4F6'], ['Unión Marina', '#0369A1', '#F4F4F6'], ['Deportivo Olivar', '#3F6212', '#FDE68A'], ['CF Mirador', '#BE123C', '#0B0B14'], ['Club Atlético Vega', '#C2410C', '#F4F4F6'], ['UD Puente Real', '#1E3A8A', '#FDE68A'], ['Sporting Bahía', '#0E7490', '#F4F4F6']] },
+  { name: 'SEGUNDA DIVISIÓN', ai: 0.48, pay: 320 },
+  { name: 'PRIMERA DIVISIÓN', ai: 0.64, pay: 480 },
+  { name: 'ÉLITE', ai: 0.8, pay: 700 }
+];
+// weekend events: a different twist every week, Friday to Sunday
+const EV_LIST = [
+  { id: 'fuego', title: 'FIN DE SEMANA DE FUEGO', c: '#FF7A2E', rules: 'fuego', n: 3, dur: 90, ai: 0.5, feats: ['3 VS 3', 'Cada chut es de fuego'], desc: 'Todos los disparos salen ardiendo: más rápidos y más difíciles de parar. Para los dos equipos.', prize: { gems: 25, coins: 300 } },
+  { id: 'turbo', title: 'TURBO', c: '#22D3EE', rules: 'turbo', n: 2, dur: 60, ai: 0.5, feats: ['2 VS 2', 'Todos un 25% más rápidos', '60 segundos'], desc: 'Partidos cortos y a toda velocidad: todos los jugadores corren un 25% más.', prize: { gems: 20, coins: 400 } },
+  { id: 'oro', title: 'GOL DE ORO', c: '#FFC53D', rules: 'oro', n: 4, dur: 120, ai: 0.55, feats: ['4 VS 4', 'El primer gol gana'], desc: 'El primer gol termina el partido. Un error y estás fuera: cada balón cuenta.', prize: { gems: 30, coins: 250 } },
+  { id: 'mano', title: 'MANO A MANO', c: '#FF5CC8', rules: '', n: 1, dur: 90, ai: 0.7, feats: ['1 VS 1', 'IA difícil'], desc: 'Tú contra un rival duro en un 1 contra 1. Gana tres veces y es tuyo.', prize: { gems: 25, coins: 350 } }
+];
 class Component extends DCLogic {
   constructor(props) {
     super(props);
     const sel = this.store('arenamix.sel') || {};
-    const tab = sel.cat === 'tour' && ['copa', 'liga', 'retos'].includes(sel.id) ? sel.id : 'copa';
+    const tab = sel.cat === 'tour' && ['copa', 'liga', 'retos', 'carrera', 'evento'].includes(sel.id) ? sel.id : 'copa';
     this.state = { tab, phase: 'hub', size: 3, banner: null, cfg: null };
   }
   store(key, val) {
@@ -387,6 +466,43 @@ class Component extends DCLogic {
   }
   lgPrize(pos) { return [[500, '¡CAMPEÓN DE LIGA!'], [250, 'Subcampeón'], [150, 'Tercer puesto'], [80, 'Cuarto puesto'], [50, 'Quinto puesto'], [30, 'Sexto puesto']][pos]; }
 
+  /* ---------- carrera ---------- */
+  career() { return this.store('arenamix.carrera.v1'); }
+  crClubs(tier) { return CR_DIV[tier].clubs || TN_CLUBS.slice((tier - 2) * 6, (tier - 2) * 6 + 6).concat([TN_CLUBS[(tier * 5) % 18]]); }
+  crSeason(K, tier, club) {
+    const pool = this.crClubs(tier).filter((c) => c[0] !== club[0]);
+    const clubs = this.shuffle(pool).slice(0, 5).map((c, k) => ({ c, str: 0.25 + k * 0.1 + Math.random() * 0.08 }));
+    const teams = [{ c: club, str: 0.5, me: true }].concat(this.shuffle(clubs)), ids = [0, 1, 2, 3, 4, 5], days = [];
+    for (let rd = 0; rd < 5; rd++) { const d = []; for (let k = 0; k < 3; k++) { const a = ids[k], b = ids[5 - k]; d.push(rd % 2 ? [b, a] : [a, b]); } days.push(d); ids.splice(1, 0, ids.pop()); }
+    Object.assign(K, { tier, club, teams, days, res: [], day: 0, done: false, offers: null, note: '' });
+  }
+  newCareer() {
+    const K = { n: this.state.size, season: 1, ovr: 60, titles: 0 };
+    this.crSeason(K, 0, this.shuffle(CR_DIV[0].clubs)[0]);
+    this.store('arenamix.carrera.v1', K); this.forceUpdate();
+  }
+  crEnd(K) {
+    // the season is over: prize money, then the offers (or relegation)
+    const pos = this.tableOf(K).findIndex((x) => K.teams[x.k].me), D = CR_DIV[K.tier];
+    const pay = [D.pay, Math.round(D.pay * 0.6), Math.round(D.pay * 0.4), Math.round(D.pay * 0.25), Math.round(D.pay * 0.2), Math.round(D.pay * 0.15)][pos];
+    this.pay(pay);
+    if (pos === 0) { K.titles = (K.titles || 0) + 1; this.addTrophy('liga'); }
+    const up = K.tier < 4 ? this.shuffle(this.crClubs(K.tier + 1)) : [];
+    const offers = [];
+    if (K.tier < 4 && (pos <= 1 || (pos <= 3 && K.ovr >= 66 + K.tier * 6))) offers.push({ tier: K.tier + 1, club: up[0] }, ...(pos === 0 ? [{ tier: K.tier + 1, club: up[1] }] : []));
+    if (pos === 5 && K.tier > 0) offers.push({ tier: K.tier - 1, club: this.shuffle(this.crClubs(K.tier - 1))[0], down: true });
+    else offers.push({ tier: K.tier, club: K.club, stay: true });
+    K.offers = offers;
+    K.note = (pos + 1) + '.º en ' + D.name.toLowerCase() + ' · +' + pay + ' VCD' + (pos === 0 ? ' · ¡CAMPEÓN!' : '');
+    return { k: 'MODO CARRERA · TEMPORADA ' + K.season, t: pos === 0 ? '¡CAMPEÓN DE ' + D.name + '!' : (pos + 1) + '.º PUESTO', s: '+' + pay + ' VCD · ' + (offers.some((o) => !o.stay && !o.down) ? 'Tienes ofertas de fichaje' : pos === 5 && K.tier > 0 ? 'Tu club baja de división' : 'Sigue sumando para recibir ofertas') };
+  }
+
+  /* ---------- evento de fin de semana ---------- */
+  evWeek() { const d = new Date(), t = new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 2) % 7)); return t.getFullYear() + '-' + (t.getMonth() + 1) + '-' + t.getDate(); }
+  evNow() { let h = 0; for (const ch of this.evWeek()) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return EV_LIST[h % EV_LIST.length]; }
+  evOpen() { const d = new Date().getDay(); return d === 5 || d === 6 || d === 0; }
+  evState() { const E = this.store('arenamix.evento.v1'); return E && E.week === this.evWeek() ? E : { week: this.evWeek(), wins: 0, claimed: false }; }
+
   /* ---------- retos ---------- */
   today() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
   todays() {
@@ -455,6 +571,18 @@ class Component extends DCLogic {
         }
         this.store('arenamix.league.v1', L);
       }
+    } else if (cfg.kind === 'carrera') {
+      const K = this.career();
+      if (K && !K.done) {
+        this.advanceLeague(K, { g: [r.home, r.away] });
+        const goals = (r.stats && r.stats.goals) || 0, w = r.home > r.away, l = r.home < r.away;
+        K.ovr = Math.max(50, Math.min(99, K.ovr + (w ? 1 : l ? -1 : 0) + Math.min(3, goals) + (r.away === 0 ? 1 : 0)));
+        if (K.done) banner = this.crEnd(K);
+        this.store('arenamix.carrera.v1', K);
+      }
+    } else if (cfg.kind === 'evento') {
+      const E = this.evState();
+      if (r.home > r.away && E.wins < 3) { E.wins++; this.store('arenamix.evento.v1', E); banner = { k: 'EVENTO DE FIN DE SEMANA', t: E.wins >= 3 ? '¡PREMIO DESBLOQUEADO!' : '¡VICTORIA ' + E.wins + ' DE 3!', s: E.wins >= 3 ? 'Recoge tu premio exclusivo en la pestaña Evento' : 'Te quedan ' + (3 - E.wins) + ' para el premio' }; }
     } else if (cfg.kind === 'reto') {
       const R = TN_RETOS.find((x) => x.id === cfg.reto), done = this.retosDone();
       if (R && !done.includes(R.id) && R.ok(r)) {
@@ -467,12 +595,12 @@ class Component extends DCLogic {
   renderVals() {
     const s = this.state, tab = s.tab, C = this.cup(), L = this.league(), TR = this.trophies();
     const kit = (c) => 'background: linear-gradient(135deg, ' + c[1] + ' 55%, ' + c[2] + ' 55%); box-shadow: 0 0 0 1px #0D0418';
-    const TABS = [['copa', 'COPA', '#FFC53D'], ['liga', 'LIGA', '#22D3EE'], ['retos', 'RETOS DEL DÍA', '#FF5CC8']], ti = TABS.findIndex((t) => t[0] === tab);
+    const TABS = [['carrera', 'CARRERA', '#53D88E'], ['copa', 'COPA', '#FFC53D'], ['liga', 'LIGA', '#22D3EE'], ['retos', 'RETOS', '#FF5CC8'], ['evento', 'EVENTO', '#FF7A2E']], ti = TABS.findIndex((t) => t[0] === tab);
     const out = {
       isHub: s.phase === 'hub', isMatch: s.phase === 'match', isShootout: s.phase === 'shootout',
       trophyCount: String((TR.copa || 0) + (TR.liga || 0)),
       tabs: TABS.map(([id, label, c], i) => ({ id, label, sel: i === ti ? 'true' : 'false', style: 'color: ' + (i === ti ? '#150925' : c), pick: () => { this.setState({ tab: id }); try { const S = this.store('arenamix.sel') || {}; this.store('arenamix.sel', { ...S, cat: 'tour', id }); } catch (e) {} } })),
-      thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 122) + 'px; width: 122px; height: 32px; border-radius: 11px; background: ' + TABS[ti][2] + '; box-shadow: 0 0 16px ' + TABS[ti][2] + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s',
+      thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 100) + 'px; width: 100px; height: 32px; border-radius: 11px; background: ' + TABS[ti][2] + '; box-shadow: 0 0 16px ' + TABS[ti][2] + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s',
       sizes: [1, 2, 3, 4].map((n) => ({ n: String(n), label: n + ' VS ' + n, cls: 'tn-size' + (n === s.size ? ' on' : ''), pick: () => this.setState({ size: n }) })),
       copaImg: window.AMPosters ? window.AMPosters.get('copa', () => this.forceUpdate()) : '', ligaImg: window.AMPosters ? window.AMPosters.get('liga', () => this.forceUpdate()) : '', retosImg: window.AMPosters ? window.AMPosters.get('retos', () => this.forceUpdate()) : '',
       cupPrizes: [['Campeón', '600 VCD + trofeo', '#FFC53D'], ['Subcampeón', '250 VCD', '#C9CAE0'], ['Semifinal', '120 VCD', '#CD7F32'], ['Cuartos', '50 VCD', '#6E6E92']].map(([k, v, c], i) => ({ k, v, n: String(i + 1), dot: '', tile: 'background: linear-gradient(135deg, ' + c + '55, ' + c + '18); border: 1px solid ' + c + 'AA; --pc: ' + c + ';' })),
@@ -489,7 +617,7 @@ class Component extends DCLogic {
     const cf = s.cfg || {};
     Object.assign(out, {
       m_ai: cf.ai ?? 0.5, m_label: cf.label || 'TORNEO', m_dur: cf.dur || 90, m_n: cf.n || 3, m_home: this.me(), m_mates: cf.mates || [], m_rivals: cf.rivals || [],
-      m_away: cf.away || 'Rival', m_color: cf.color || '#A78BFA', m_trim: cf.trim || '#F4F4FA', m_start: cf.start || null
+      m_away: cf.away || 'Rival', m_color: cf.color || '#A78BFA', m_trim: cf.trim || '#F4F4FA', m_start: cf.start || null, m_rules: cf.rules || ''
     });
     // ----- the cup bracket -----
     if (C) {
@@ -558,6 +686,47 @@ class Component extends DCLogic {
         quitLeague: () => { if (window.confirm && !window.confirm('¿Abandonar la liga?')) return; this.store('arenamix.league.v1', null); this.forceUpdate(); }
       });
     } else Object.assign(out, { table: [], lgStage: '', lgDays: [], lgHeadline: '', lgSub: '', lgHasLast: false, lgLastHead: '', lgLast: [], lgCanPlay: false, lgOver: false, lgPlayLabel: '', playLeague: () => {}, resetLeague: () => {}, quitLeague: () => {} });
+    // ----- career -----
+    const K = this.career();
+    out.newCareer = () => this.newCareer();
+    out.crIntro = tab === 'carrera' && !K; out.crOn = tab === 'carrera' && !!K;
+    out.quitCareer = () => { if (window.confirm && !window.confirm('¿Retirarte? Se borra tu carrera.')) return; this.store('arenamix.carrera.v1', null); this.forceUpdate(); };
+    if (K) {
+      const T = this.tableOf(K), mm = !K.done ? this.myLeagueMatch(K) : null, opp = mm ? K.teams[mm.pair[mm.home ? 1 : 0]] : null, D = CR_DIV[K.tier];
+      const pos = T.findIndex((x) => K.teams[x.k].me), PC = ['#53D88E', '#53D88E', '#C9CAE0'];
+      Object.assign(out, {
+        crDiv: D.name, crOvr: String(K.ovr), crClub: K.club[0], crSeason: 'Temporada ' + K.season + ' · ' + (K.titles || 0) + (K.titles === 1 ? ' título' : ' títulos'),
+        crTable: T.map((x, k) => ({ k: String(x.k), pos: String(k + 1), name: K.teams[x.k].c[0], kit: kit(K.teams[x.k].c), pj: String(x.pj), g: String(x.g), e: String(x.e), p: String(x.p), gl: x.gf + ':' + x.gc, pts: String(x.pts), cls: 'tn-tr' + (K.teams[x.k].me ? ' me' : ''), posStyle: k < 2 ? 'background: ' + PC[k] + '; color: #150925' : k === 5 ? 'background: #FF5C5C; color: #150925' : 'background: #251443; color: #A3A3C2' })),
+        crStage: K.done ? 'FIN DE TEMPORADA' : 'JORNADA ' + (K.day + 1) + ' DE 5 · ' + K.n + ' VS ' + K.n,
+        crSub: K.done ? K.note + '. Elige tu futuro:' : 'Vas ' + (pos + 1) + '.º. Los dos primeros reciben ofertas de ' + (K.tier < 4 ? CR_DIV[K.tier + 1].name.toLowerCase() : 'renovación') + '; el último desciende. Próximo rival: ' + opp.c[0] + '.',
+        crCanPlay: !!mm, crPlayLabel: mm ? 'JUGAR JORNADA ' + (K.day + 1) : '',
+        playCareer: () => {
+          if (!mm) return;
+          const ai = Math.max(0.1, Math.min(0.95, D.ai + (opp.str - 0.5) * 0.3 - (K.ovr - 60) * 0.004));
+          this.play({ kind: 'carrera', n: K.n, ai, dur: 90, away: opp.c[0], color: opp.c[1], trim: opp.c[2], label: 'CARRERA · ' + D.name });
+        },
+        crOffers: (K.done && K.offers ? K.offers : []).map((o, k) => ({
+          k: String(k), label: o.stay ? 'SEGUIR EN ' + o.club[0].toUpperCase() : o.down ? 'BAJAR CON ' + o.club[0].toUpperCase() : 'FICHAR POR ' + o.club[0].toUpperCase(),
+          style: 'width: 100%; height: 40px; font-size: 14px; padding: 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;' + (o.stay || o.down ? ' background: #39206E; color: #DDD6FE; animation: none;' : ''),
+          pick: () => { const K2 = this.career(); K2.season++; this.crSeason(K2, o.tier, o.club); this.store('arenamix.carrera.v1', K2); this.setState({ banner: o.stay || o.down ? null : { k: 'FICHAJE', t: '¡NUEVO CLUB!', s: o.club[0] + ' · ' + CR_DIV[o.tier].name } }); }
+        }))
+      });
+    } else Object.assign(out, { crDiv: '', crOvr: '', crClub: '', crSeason: '', crTable: [], crStage: '', crSub: '', crCanPlay: false, crPlayLabel: '', playCareer: () => {}, crOffers: [] });
+    // ----- weekend event -----
+    {
+      const EV = this.evNow(), E = this.evState(), open = this.evOpen();
+      const d = new Date(), toFri = (5 - d.getDay() + 7) % 7;
+      Object.assign(out, {
+        isEvento: tab === 'evento', evTitle: EV.title, evTag: open ? 'EVENTO · ¡ABIERTO!' : 'PRÓXIMO EVENTO', evFeats: EV.feats, evDesc: EV.desc,
+        evHero: '--tc: ' + EV.c + '; flex: none; width: 330px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; padding-bottom: 16px; text-align: center; background: radial-gradient(80% 60% at 50% 20%, ' + EV.c + '99, transparent 70%), linear-gradient(170deg, color-mix(in srgb, ' + EV.c + ' 45%, #2A1460), #160A36)',
+        evPips: [0, 1, 2].map((k) => 'width: 30px; height: 30px; border-radius: 50%; display: inline-block; background: ' + (k < E.wins ? EV.c : '#251443') + '; box-shadow: ' + (k < E.wins ? '0 0 12px ' + EV.c : 'inset 0 0 0 1.5px #3A3270')),
+        evPrize: EV.prize.gems + ' BOB + ' + EV.prize.coins + ' VCD' + (E.claimed ? ' · ¡recogido!' : ''),
+        evWhen: open ? 'Abierto hasta el domingo a medianoche.' : 'Abre en ' + toFri + (toFri === 1 ? ' día' : ' días') + ': de viernes a domingo.',
+        evCanPlay: open && !(E.wins >= 3 && !E.claimed), evClosed: !open, evCanClaim: E.wins >= 3 && !E.claimed,
+        evPlay: () => this.play({ kind: 'evento', n: EV.n, ai: EV.ai, dur: EV.dur, rules: EV.rules, away: TN_CLUBS[7][0], color: EV.c, trim: '#0B0B14', label: 'EVENTO · ' + EV.title }),
+        evClaim: () => { const E2 = this.evState(); if (E2.claimed || E2.wins < 3) return; E2.claimed = true; this.store('arenamix.evento.v1', E2); const PR = window.AMProgress; if (PR) { PR.addGems(EV.prize.gems); PR.addCoins(EV.prize.coins); } this.setState({ banner: { k: 'EVENTO DE FIN DE SEMANA', t: '¡PREMIO EXCLUSIVO!', s: '+' + EV.prize.gems + ' BOB · +' + EV.prize.coins + ' VCD' } }); }
+      });
+    }
     // ----- today's challenges -----
     const done = this.retosDone();
     const now = new Date(), mid = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1), hl = Math.max(0, mid - now), hh = Math.floor(hl / 36e5), mn = Math.floor((hl % 36e5) / 6e4);

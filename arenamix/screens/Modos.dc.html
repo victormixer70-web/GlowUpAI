@@ -174,9 +174,11 @@ class Component extends DCLogic {
       futbol: { name: 'FÚTBOL', c1: '#145A33', c2: '#22914F', modes: teams(false).concat([
         { id: 'pens', title: 'PENALTIS', kind: 'duel', duel: 'pen', desc: 'Tanda de 5 tiros y 5 paradas por turnos. Muerte súbita.' },
         { id: 'fk', title: 'TIROS LIBRES', kind: 'duel', duel: 'free', desc: '7 escenarios distintos, con barrera.' }]),
-        tour: [{ id: 'copa', title: 'COPA ARENA', href: 'Torneo.dc.html', kind: 'tour', desc: '8 equipos, eliminación directa contra la IA. Empate = penaltis. Gana el trofeo.' },
+        tour: [{ id: 'carrera', title: 'MODO CARRERA', href: 'Torneo.dc.html', kind: 'tour', desc: 'De un club de barrio a la Élite: temporadas, tu media y ofertas de fichaje.' },
+          { id: 'copa', title: 'COPA ARENA', href: 'Torneo.dc.html', kind: 'tour', desc: '8 equipos, eliminación directa contra la IA. Empate = penaltis. Gana el trofeo.' },
           { id: 'liga', title: 'LIGA ARENA', href: 'Torneo.dc.html', kind: 'tour', desc: '6 equipos, todos contra todos en 5 jornadas. Acaba primero en la tabla.' },
-          { id: 'retos', title: 'RETOS DEL DÍA', href: 'Torneo.dc.html', kind: 'tour', desc: '3 partidos con truco cada día: remontadas, goleadas, porterías a cero…' }],
+          { id: 'retos', title: 'RETOS DEL DÍA', href: 'Torneo.dc.html', kind: 'tour', desc: '3 partidos con truco cada día: remontadas, goleadas, porterías a cero…' },
+          { id: 'evento', title: 'EVENTO FINDE', href: 'Torneo.dc.html', kind: 'tour', desc: 'De viernes a domingo: reglas locas y un premio exclusivo por 3 victorias.' }],
         train: [{ id: 'libre', title: 'CAMPO LIBRE', href: 'EntrenoLibre.dc.html', desc: 'Tú contra el portero en el estadio de Competitivo: chuta desde donde quieras, sin reloj.' }, { id: 'train', title: 'PENALTIS Y FALTAS', href: 'Entrenamiento.dc.html', desc: 'Práctica libre con dianas y todos los escenarios.' }, { id: 'tut', title: 'TUTORIAL', href: 'Tutorial.dc.html', desc: 'Repasa los controles paso a paso.' }] },
       baloncesto: { name: 'BALONCESTO', c1: '#7A3B12', c2: '#C2652A', modes: teams(true).concat([
         { id: 'three', title: 'CONCURSO DE TRIPLES', kind: 'mg', comp: 'Baloncesto', mode: 'three', unit: 'puntos', rival: [6, 16], desc: '15 balones en 5 posiciones y 60 segundos; el último de cada posición vale doble.' },
@@ -264,7 +266,7 @@ class Component extends DCLogic {
     const all = this.store('arenamix.mmr.v1') || {};
     return all[sport + ':' + id] || 0;
   }
-  posterKey(m) { return m.kind === 'tour' ? m.id : m.kind === 'team' ? 'team:' + m.n : m.duel === 'pen' ? 'pen' : m.duel === 'free' ? 'free' : m.kind === 'private' ? 'private' : m.id === 'tut' ? 'tut' : m.id === 'libre' ? 'pen' : 'train'; }
+  posterKey(m) { return m.kind === 'tour' ? (m.id === 'carrera' ? 'liga' : m.id === 'evento' ? 'copa' : m.id) : m.kind === 'team' ? 'team:' + m.n : m.duel === 'pen' ? 'pen' : m.duel === 'free' ? 'free' : m.kind === 'private' ? 'private' : m.id === 'tut' ? 'tut' : m.id === 'libre' ? 'pen' : 'train'; }
   renderVals() {
     const s = this.state, C = this.catalog(s.sport);
     let list;
@@ -279,7 +281,7 @@ class Component extends DCLogic {
     const CAT = { comp: ['#FFC53D', '#3A2A0A'], casual: ['#22D3EE', '#14244F'], train: ['#53D88E', '#0A2A1A'], tour: ['#A78BFA', '#2E0F60'] }[s.cat];
     const P = window.AMPosters;
     // a corner ribbon on the modes worth pointing out
-    const RIB = { m1: ['POPULAR', '#FF5C8A'], libre: ['NUEVO', '#53D88E'], private: ['AMIGOS', '#22D3EE'], m4: ['CAOS', '#FF8A3D'], copa: ['TROFEO', '#FFC53D'], retos: ['DIARIO', '#FF5CC8'] };
+    const RIB = { m1: ['POPULAR', '#FF5C8A'], libre: ['NUEVO', '#53D88E'], private: ['AMIGOS', '#22D3EE'], m4: ['CAOS', '#FF8A3D'], copa: ['TROFEO', '#FFC53D'], retos: ['DIARIO', '#FF5CC8'], carrera: ['NUEVO', '#53D88E'], evento: ['FINDE', '#FF7A2E'] };
     const cards = list.map((m, i) => {
       const off = i - ci, a = Math.abs(off), on = off === 0;
       const mmr = comp ? this.mmrOf(s.sport, m.id) : 0, R = this.rankOf(mmr);
@@ -293,10 +295,10 @@ class Component extends DCLogic {
       // every mode its own colours: [glow, accent, top, bottom]
       const PAL = { m1: ['#22D3EE', '#3B82F6', '#1E3A8A', '#0B1030'], m2: ['#4ADE80', '#14B8A6', '#065F46', '#04201A'], m3: ['#FB923C', '#EF4444', '#7C2D12', '#250A06'], m4: ['#F472B6', '#A855F7', '#701A75', '#22062A'],
         pens: ['#A3E635', '#22C55E', '#14532D', '#06200E'], fk: ['#FDE047', '#F97316', '#78350F', '#241004'], private: ['#38BDF8', '#8B5CF6', '#312E81', '#0E0B30'],
-        copa: ['#FDE047', '#F59E0B', '#7C2D12', '#2A0E04'], liga: ['#A78BFA', '#3B82F6', '#3730A3', '#0E0B36'], retos: ['#F472B6', '#F43F5E', '#831843', '#2A0618'],
+        copa: ['#FDE047', '#F59E0B', '#7C2D12', '#2A0E04'], liga: ['#A78BFA', '#3B82F6', '#3730A3', '#0E0B36'], retos: ['#F472B6', '#F43F5E', '#831843', '#2A0618'], carrera: ['#4ADE80', '#10B981', '#065F46', '#04201A'], evento: ['#FB923C', '#EF4444', '#7C2D12', '#250A06'],
         libre: ['#4ADE80', '#22D3EE', '#065F46', '#04201A'], train: ['#FB923C', '#FDE047', '#7C2D12', '#250A06'], tut: ['#22D3EE', '#A855F7', '#1E3A8A', '#0B1030'] };
       const pal = PAL[m.id] || [CAT[0], '#A855F7', '#2A1B6E', '#0F061E'];
-      const kicker = m.kind === 'team' ? 'PARTIDO · ' + m.n + ' CONTRA ' + m.n : m.kind === 'duel' ? 'DUELO · CARA A CARA' : m.kind === 'private' ? 'ONLINE · CÓDIGO DE SALA' : m.kind === 'tour' ? (m.id === 'retos' ? 'DESAFÍOS · CADA DÍA' : 'TORNEO · UN JUGADOR') : 'PRÁCTICA';
+      const kicker = m.kind === 'team' ? 'PARTIDO · ' + m.n + ' CONTRA ' + m.n : m.kind === 'duel' ? 'DUELO · CARA A CARA' : m.kind === 'private' ? 'ONLINE · CÓDIGO DE SALA' : m.kind === 'tour' ? (m.id === 'retos' ? 'DESAFÍOS · CADA DÍA' : m.id === 'carrera' ? 'CARRERA · TEMPORADAS' : m.id === 'evento' ? 'EVENTO · FIN DE SEMANA' : 'TORNEO · UN JUGADOR') : 'PRÁCTICA';
       const title = m.kind === 'team' ? m.n + ' VS ' + m.n : m.title;
       return {
         title, tag, kicker, img, on: on ? 'true' : 'false', isOn: on,

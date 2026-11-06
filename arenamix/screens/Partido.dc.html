@@ -276,7 +276,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 </section>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"keeper":{"editor":"bool","default":false},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3,4],"default":3},"mates":{"editor":null},"label":{"editor":null},"tutorial":{"editor":"bool","default":false},"rivals":{"editor":null},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"online":{"editor":null},"aiLevel":{"editor":null},"practice":{"editor":"bool","default":false},"startScore":{"editor":null},"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["quick","comp","test"],"default":"test"},"duration":{"editor":"int","default":90,"min":20,"max":300},"homeName":{"editor":null},"awayName":{"editor":null},"homeColor":{"editor":null},"homeTrim":{"editor":null},"awayColor":{"editor":null},"awayTrim":{"editor":null},"autostart":{"editor":null},"keeper":{"editor":"bool","default":false},"onEnd":{"editor":null},"teamSize":{"editor":"enum","options":[1,2,3,4],"default":3},"mates":{"editor":null},"label":{"editor":null},"tutorial":{"editor":"bool","default":false},"rivals":{"editor":null},"mateName":{"editor":null},"mate2Name":{"editor":null},"away2Name":{"editor":null},"away3Name":{"editor":null},"ping":{"editor":null},"online":{"editor":null},"aiLevel":{"editor":null},"practice":{"editor":"bool","default":false},"startScore":{"editor":null},"rules":{"editor":null},"$preview":{"width":844,"height":390}}'>
 // ball radius in the match (metres): a little bigger than a real one so it reads on a phone
 // the commentator's lines: [Spanish, English]. {n} = a player's name, {s} = a number or the score
 const AMNAR = {
@@ -1365,6 +1365,7 @@ class Component extends DCLogic {
         this.narrate('extra', '', add, true); this.sfx('whistle', 1);
       } else { g.t = 0; g.charging = false; this.setupWinners(); return; }
     }
+    if (this.props.rules === 'fuego') g.superM = 1;
     if (!g.extra && !g.lastMin && g.dur >= 60 && g.t <= 15 && !this.props.practice) { g.lastMin = true; this.narrate(g.score[0] === g.score[1] ? 'lastTie' : 'last', '', null, true); }
     if (g.charging) g.charge = Math.min(1, g.charge + dt * 1.15);
     if (g.recv) { g.recv.t -= dt; if (g.recv.t <= 0) g.recv = null; }
@@ -1433,6 +1434,7 @@ class Component extends DCLogic {
     });
     if (g.pt > 1.4 && !this.rp && !this.rpDone && !this.props.tutorial && !this.props.practice) this.startReplay();
     if (this.props.practice && g.pt > 1.8) { g.phase = 'play'; g.pt = 0; this.practiceReset(); return; }
+    if (g.pt > 3 && !this.rp && this.props.rules === 'oro') { this.rpDone = false; g.t = 0; g.charging = false; this.setupWinners(); return; }
     if (g.pt > 3 && !this.rp) { this.rpDone = false; if (this.props.tutorial) { this.tutSetup(6); g.phase = 'play'; g.pt = 0; return; } this.kickoff(g.concede); g.phase = 'play'; g.pt = 0; this.sfx('whistle', 1); }
   }
   // after a goal the ball flies on into the goal: the side nets and the roof stop it, and the back of the
@@ -1583,6 +1585,7 @@ class Component extends DCLogic {
     if (sp > 0.25) p.run += 2 * Math.PI * (0.9 + 0.09 * sp) * dt;
   }
   locomote(p, i, tvx, tvy, maxV, dt) {
+    if (this.props.rules === 'turbo') maxV *= 1.25;
     // a body with momentum: it speeds up quickly then tops out, brakes harder than it accelerates,
     // and can only turn so sharply at speed (a curve, or brake-and-plant for a reversal)
     const g = this.g, human = i === g.ctl && !this.autoplay, ball = g.own === i;

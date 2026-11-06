@@ -424,7 +424,7 @@ class Component extends DCLogic {
     const sel = this.store('arenamix.sel', {}) || {};
     const CAT = { comp: ['COMPETITIVO', '#FFC53D'], casual: ['INFORMAL', '#22D3EE'], tour: ['TORNEOS', '#A78BFA'], train: ['ENTRENAR', '#53D88E'] };
     const cat = sel.sport === 'futbol' && CAT[sel.cat] ? sel.cat : 'comp', id = sel.sport === 'futbol' ? sel.id || '' : '';
-    const T = { m1: '1 VS 1', m2: '2 VS 2', m3: '3 VS 3', m4: '4 VS 4', pens: 'PENALTIS', fk: 'TIROS LIBRES', private: 'PARTIDA PRIVADA', copa: 'COPA ARENA', liga: 'LIGA ARENA', retos: 'RETOS DEL DÍA', libre: 'CAMPO LIBRE', train: 'PENALTIS Y FALTAS', tut: 'TUTORIAL' };
+    const T = { m1: '1 VS 1', m2: '2 VS 2', m3: '3 VS 3', m4: '4 VS 4', pens: 'PENALTIS', fk: 'TIROS LIBRES', private: 'PARTIDA PRIVADA', copa: 'COPA ARENA', liga: 'LIGA ARENA', retos: 'RETOS DEL DÍA', carrera: 'MODO CARRERA', evento: 'EVENTO FINDE', libre: 'CAMPO LIBRE', train: 'PENALTIS Y FALTAS', tut: 'TUTORIAL' };
     const title = T[id] || (cat === 'tour' ? 'COPA ARENA' : cat === 'train' ? 'CAMPO LIBRE' : '1 VS 1');
     const TRAIN = { libre: 'EntrenoLibre.dc.html', train: 'Entrenamiento.dc.html', tut: 'Tutorial.dc.html' };
     const href = !done.futbol ? 'Tutorial.dc.html' : cat === 'train' ? TRAIN[id] || 'EntrenoLibre.dc.html' : cat === 'tour' ? 'Torneo.dc.html' : id === 'private' ? 'Privada.dc.html' : cat === 'comp' ? 'Competitivo.dc.html' : 'Rapida.dc.html';
