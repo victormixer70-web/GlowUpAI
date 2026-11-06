@@ -231,6 +231,10 @@
     '.bc-title.hd+span{margin-top:5px;display:block}',
     // the back buttons (the arrow next to every title) match it: black with an electric-blue edge
     '.bc-para,#stage a.bc-para{background:linear-gradient(150deg,#06102E 0%,#02040C 70%)!important;color:#7CC4FF!important;outline:2px solid #000000!important;box-shadow:inset 0 0 0 1.5px #1E8BFF,0 0 12px #0A6CFF66!important}',
+    // the big play buttons (BUSCAR PARTIDA / JUGAR) in the logo's electric blue
+    '.am-logo-btn,#stage .am-logo-btn{background:linear-gradient(100deg,#3DA9FF 0%,#1E8BFF 30%,#0A3DCC 70%,#06102E 100%)!important;background-size:200% 100%!important;animation:amLogoGo 4s ease-in-out infinite alternate!important;color:#FFFFFF!important;text-shadow:0 2px 0 #000A!important;box-shadow:inset 0 2px 0 #BFE3FF88,0 0 0 2px #000,0 0 0 3.5px #1E8BFF,0 6px 0 #02040C,0 10px 26px #0A6CFF88!important}',
+    '.am-logo-btn svg{fill:#FFFFFF!important;filter:drop-shadow(0 2px 0 #000A)}',
+    '@keyframes amLogoGo{from{background-position:0 0}to{background-position:100% 0}}',
     '.bc-para:hover,.bc-para:active{color:#FFFFFF!important;box-shadow:inset 0 0 0 1.5px #3DA9FF,0 0 18px #1E8BFFAA!important}',
     // header titles in the logo's colours: deep black into a strong electric blue, with a blue edge and glow
     '.bc-title.hd,#stage .bc-title.hd{background:linear-gradient(120deg,#02040C 0%,#06102E 32%,#0A3DCC 70%,#1E8BFF 100%)!important;box-shadow:inset 0 2px 0 #7CC4FF55,inset 0 -3px 0 #00000099,0 0 0 2px #000000,0 0 0 3.5px #1E8BFF,0 0 18px #0A6CFF99!important;text-shadow:0 2px 0 #000000CC,0 0 12px #3DA9FF88!important}',
