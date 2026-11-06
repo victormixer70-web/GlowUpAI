@@ -105,9 +105,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <span style="position: absolute; left: 12px; top: 2px; padding: 3px 10px; transform: skewX(0deg); background: {{modeColor}}; color: #0B0B14; font: 800 10px Exo2, sans-serif; letter-spacing: 1.5px; white-space: nowrap">{{modeLabel}}</span>
     <div style="display: flex; align-items: stretch; height: 30px; transform: skewX(0deg); border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 2px #05050A, 0 4px 0 #05050A, 0 8px 16px #0009">
       <span style="width: 7px; background: {{homeC}}"></span>
-      <span style="display: flex; align-items: center; justify-content: flex-end; min-width: 140px; padding: 0 12px; background: linear-gradient(90deg, #0B0B14D9, #17172AF2); font: 800 13px Exo2, sans-serif; white-space: nowrap">{{homeName}}</span>
+      <span style="display: flex; align-items: center; justify-content: flex-end; min-width: 140px; padding: 0 12px; background: linear-gradient(90deg, #0B0B14D9, #17172AF2); font: 800 13px Exo2, sans-serif; white-space: nowrap"><sc-for list="{{homeReds}}" item="x"><i style="display: inline-block; width: 8px; height: 11px; margin-right: 5px; border-radius: 1.5px; background: #FF3B3B; box-shadow: 0 0 6px #FF3B3B"></i></sc-for>{{homeName}}</span>
       <span style="{{scoreStyle}}"><span>{{s0}}</span><span style="opacity: .45">–</span><span>{{s1}}</span></span>
-      <span style="display: flex; align-items: center; min-width: 140px; padding: 0 12px; background: linear-gradient(270deg, #0B0B14D9, #17172AF2); font: 800 13px Exo2, sans-serif; white-space: nowrap">{{awayName}}</span>
+      <span style="display: flex; align-items: center; min-width: 140px; padding: 0 12px; background: linear-gradient(270deg, #0B0B14D9, #17172AF2); font: 800 13px Exo2, sans-serif; white-space: nowrap">{{awayName}}<sc-for list="{{awayReds}}" item="x"><i style="display: inline-block; width: 8px; height: 11px; margin-left: 5px; border-radius: 1.5px; background: #FF3B3B; box-shadow: 0 0 6px #FF3B3B"></i></sc-for></span>
       <span style="width: 7px; background: {{awayC}}"></span>
       <span style="{{clockStyle}}">{{clock}}</span>
     </div>
@@ -297,6 +297,11 @@ const AMNAR = {
   lateWinner: [['¡EN EL ÚLTIMO SUSPIRO! ¡{n}! ¡{n}!', 'AT THE VERY DEATH! {n}! {n}!'], ['¡INCREÍBLE! ¡{n} lo gana al final!', 'UNBELIEVABLE! {n} wins it at the end!']],
   lateEqualiser: [['¡AL FINAL! ¡{n} salva el empate!', 'LATE DRAMA! {n} rescues a draw!']],
   lateWinnerAgainst: [['¡No! ¡{n} lo gana en el último segundo!', 'No! {n} wins it in the final second!']],
+  foul: [['¡Falta de {n}! El árbitro lo ha visto', 'Foul by {n}! The referee saw it'], ['Entrada a destiempo de {n}. Falta', 'A late tackle from {n}. Free kick'], ['¡Se lo lleva por delante {n}! Falta', '{n} takes the man! Foul']],
+  yellow: [['Amarilla para {n}. Tendrá que tener cuidado', 'Yellow card for {n}. Careful now'], ['¡Tarjeta amarilla para {n}!', 'Yellow card for {n}!']],
+  red: [['¡ROJA! ¡{n} se va a la calle!', 'RED CARD! {n} is sent off!'], ['¡Expulsado {n}! Su equipo se queda con uno menos', '{n} is sent off! Down to one fewer']],
+  penalty: [['¡PENALTI! ¡El árbitro señala el punto!', 'PENALTY! The referee points to the spot!'], ['¡Penalti clarísimo!', 'A clear penalty!']],
+  freeKick: [['Falta en zona peligrosa… se coloca la barrera', 'A free kick in a dangerous area… the wall lines up'], ['Tiro libre al borde del área. ¡Ojo!', 'A free kick on the edge of the box. Watch this!']],
   golden: [['¡Balón dorado! Cada gol vale doble', 'Golden ball! Every goal counts double'], ['¡Últimos 30 segundos y los goles valen doble!', 'Last 30 seconds and goals count double!']],
   last: [['¡Último arreón! Se acaba el tiempo', 'One last push! Time is running out'], ['¡Quedan segundos! ¿Habrá más?', 'Seconds left! Is there more to come?']],
   lastTie: [['¡Empate y se acaba! ¿Quién se atreve?', 'All square and time is up! Who dares?']],
@@ -347,6 +352,7 @@ class Component extends DCLogic {
     setTimeout(() => this.ldWait(), 160);
   }
   componentDidMount() {
+    if (/[?&]debug\b/.test(location.search)) window.__pd = this;
     // the match starts when the loading screen goes (see ldWait)
     // inputs must never stay stuck: listen at window level for every way a finger can go away
     this.onWinUp = (e) => this.releasePtr(e.pointerId);
@@ -600,7 +606,7 @@ class Component extends DCLogic {
     let homeNames = keeper ? mates.concat(['Compañero 4', 'Compañero 5']) : [Partido_me(P.homeName) ?? 'Tú'].concat(mates), awayNames = rivals;
     // online: the room's players (the host's phone runs the match; a guest on the other team sees it
     // mirrored, so on every phone your own team plays left to right in your kit)
-    this.mstats = { goals: 0, shots: 0, passes: 0, skills: 0, tackles: 0 }; this.poss = [0, 0];
+    this.mstats = { goals: 0, shots: 0, passes: 0, skills: 0, tackles: 0, fouls: 0 }; this.poss = [0, 0];
     const O = P.online;
     this.net = O && O.room ? { room: O.room, host: !!O.isHost, me: O.me, mirror: !O.isHost && O.myTeam === 1, mySlot: O.mySlot || 0, humans: [], snapT: 0, inT: 0, snap: null } : null;
     if (this.net) {
@@ -700,7 +706,7 @@ class Component extends DCLogic {
       if (p.team === 1) { x = 60 - x; y = 30 - y; }
       Object.assign(p, { x, y });
     });
-    g.own = -1; g.hold = -1; g.gkSafe = null; g.recv = null; g.charging = false; g.charge = 0;
+    g.own = -1; g.hold = -1; g.gkSafe = null; g.foulT = null; g.ps.forEach((p) => { p.wallT = 0; }); g.recv = null; g.charging = false; g.charge = 0;
     g.ctl = this.keeperMode() ? g.ps.findIndex((p) => p.team === 0 && p.role === 'gk') : g.ps.findIndex((p) => p.team === 0 && p.slot === (this.net ? this.net.mySlot : 0));
     if (this.net) this.net.humans.forEach((h) => { h.i = h.home; h.charging = false; h.charge = 0; });
   }
@@ -1151,7 +1157,7 @@ class Component extends DCLogic {
     const g = this.g;
     let best = null, bs = -1e9;
     g.ps.forEach((q) => {
-      if (q === p || q.team !== p.team || q.role === 'gk') return;
+      if (q === p || q.team !== p.team || q.role === 'gk' || q.out) return;
       const a = Math.atan2(q.y - p.y, q.x - p.x), c = Math.cos(this.ang(a - dir)), d = this.dist(p, q);
       if ((c < 0.3 && !any) || d < 2) return;
       const s = c * 1.3 - d / 40;
@@ -1287,7 +1293,7 @@ class Component extends DCLogic {
     let best = -1, bd = 1e9;
     const tm = g.ps[g.ctl].team;
     g.ps.forEach((q, i) => {
-      if (q.team !== tm || q.role === 'gk' || i === g.ctl || this.netHuman(i)) return;
+      if (q.team !== tm || q.role === 'gk' || q.out || i === g.ctl || this.netHuman(i)) return;
       const d = this.dist(q, b);
       if (d < bd) { bd = d; best = i; }
     });
@@ -1362,6 +1368,11 @@ class Component extends DCLogic {
     // behind-the-goal camera: up on the stick is up the pitch
     // with the Pro camera too, the camera looks up the pitch
     this.inp = this.keeperMode() ? [-sm[1], sm[0]] : this.proCam() ? this.proMap(sm) : [sm[0], sm[1]];
+    if (g.foulT) {
+      g.foulT.t -= dt;
+      if (g.foulT.t <= 0) { const F = g.foulT; g.foulT = null; this.setPiece(F); }
+      else { g.ps.forEach((p) => { if (!p.out) { p.x += p.vx * dt; p.y += p.vy * dt; } p.vx *= 0.85; p.vy *= 0.85; }); return; }
+    }
     const chasers = this.pickChasers();
     g.ps.forEach((p, i) => { const h = this.netHuman(i); if (h) this.withHuman(h, () => this.movePlayer(p, i, dt, chasers)); else this.movePlayer(p, i, dt, chasers); });
     for (let i = 0; i < g.ps.length; i++) for (let j = i + 1; j < g.ps.length; j++) {
@@ -1459,7 +1470,7 @@ class Component extends DCLogic {
     const ownTeam = g.own >= 0 ? g.ps[g.own].team : (g.hold >= 0 ? g.ps[g.hold].team : -1);
     [0, 1].forEach((tm) => {
       if (tm === ownTeam) return;
-      const outs = g.ps.filter((q, i) => q.team === tm && q.role !== 'gk' && (i !== g.ctl || this.autoplay) && !this.netHuman(i) && !(q.act && q.act.lock));
+      const outs = g.ps.filter((q, i) => q.team === tm && q.role !== 'gk' && !q.out && (i !== g.ctl || this.autoplay) && !this.netHuman(i) && !(q.act && q.act.lock));
       if (!outs.length) return;
       const d = (q) => Math.hypot(b.x + b.vx * 0.3 - q.x, b.y + b.vy * 0.3 - q.y);
       outs.sort((u, v) => d(u) - d(v));
@@ -1474,6 +1485,10 @@ class Component extends DCLogic {
   }
   movePlayer(p, i, dt, chasers) {
     const g = this.g, b = g.ball;
+    // sent off: stands on the touchline, out of play
+    if (p.out) { p.x = p.benchX; p.y = -1.1; p.vx = p.vy = 0; p.face = Math.PI / 2; p.act = null; p.cd = 99; p.ghost = 99; return; }
+    // in the wall: stand still until the free kick is taken
+    if (p.wallT > 0) { p.wallT -= dt; if (g.gkSafe && g.gkSafe.go) p.wallT = Math.min(p.wallT, 0.35); p.vx = p.vy = 0; p.face = Math.atan2(b.y - p.y, b.x - p.x); return; }
     const lock = p.act && p.act.lock;
     let maxV = 6, acc = 8;
     if (lock) {
@@ -1597,7 +1612,7 @@ class Component extends DCLogic {
   seekS(p, tx, ty, slow, dt) {
     // keep a sensible distance from team-mates so two players never chase the same spot
     this.g.ps.forEach((q) => {
-      if (q === p || q.team !== p.team || q.role === 'gk') return;
+      if (q === p || q.team !== p.team || q.role === 'gk' || q.out) return;
       const ex = tx - q.x, ey = ty - q.y, e = Math.hypot(ex, ey);
       if (e < 4) { const push = (4 - e) * 0.6 / (e || 1); tx += ex * push; ty += ey * push; }
     });
@@ -1674,7 +1689,7 @@ class Component extends DCLogic {
     const mine = (own && own.team === p.team) || (g.hold >= 0 && g.ps[g.hold].team === p.team);
     if (mine) {
       const ref = own || g.ps[g.hold];
-      const defs = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk');
+      const defs = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk' && !q.out);
       // the last defender line: runners attack the space just past it
       const line = defs.length ? defs.reduce((m, q) => (sg > 0 ? Math.max(m, q.x) : Math.min(m, q.x)), sg > 0 ? -99 : 99) : gx - sg * 8;
       const run = ((p.runT = (p.runT || 0) + dt) % 6) < 3.2;
@@ -1699,7 +1714,7 @@ class Component extends DCLogic {
     } else if (own || p.defend > 0) {
       const foes = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk' && q !== own)
         .sort((u, v) => Math.abs(u.x - ownX) - Math.abs(v.x - ownX));
-      const mates = g.ps.filter((q, k) => q.team === p.team && q.role !== 'gk' && !chasers.has(q) && (k !== g.ctl || this.autoplay))
+      const mates = g.ps.filter((q, k) => q.team === p.team && q.role !== 'gk' && !q.out && !chasers.has(q) && (k !== g.ctl || this.autoplay))
         .sort((u, v) => u.slot - v.slot);
       const foe = foes[mates.indexOf(p)];
       if (foe && own) {
@@ -1734,7 +1749,7 @@ class Component extends DCLogic {
   }
   aiCarry(p, i, dt, D) {
     const g = this.g, sg = p.team === 0 ? 1 : -1, gx = p.team === 0 ? 60 : 0;
-    const foes = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk');
+    const foes = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk' && !q.out);
     p.think -= dt;
     const pressure = foes.reduce((m, q) => Math.min(m, this.dist(p, q)), 99);
     if (pressure < 3 && p.think > 0.12) p.think = 0.12;
@@ -1778,7 +1793,7 @@ class Component extends DCLogic {
     const tx = gx, ex = tx - p.x, ey = ty - p.y, L2 = ex * ex + ey * ey || 1;
     let block = 0;
     g.ps.forEach((o) => {
-      if (o.team === p.team || o.role === 'gk') return;
+      if (o.team === p.team || o.role === 'gk' || o.out) return;
       const t = ((o.x - p.x) * ex + (o.y - p.y) * ey) / L2;
       if (t < 0 || t > 1) return;
       const dl = Math.hypot(p.x + ex * t - o.x, p.y + ey * t - o.y);
@@ -1792,7 +1807,7 @@ class Component extends DCLogic {
   }
   aiDecide(p) {
     const g = this.g, D = this.diff(p.team), sg = p.team === 0 ? 1 : -1;
-    const foes = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk');
+    const foes = g.ps.filter((q) => q.team !== p.team && q.role !== 'gk' && !q.out);
     const pressure = foes.reduce((m, q) => Math.min(m, this.dist(p, q)), 99);
     const caller = g.ps[g.ctl];
     // you are in the box and your teammate is out wide: a cross for you to finish with a header or a bicycle kick
@@ -1808,7 +1823,7 @@ class Component extends DCLogic {
     // otherwise look for a pass that improves things
     let best = null, bs = -1e9;
     g.ps.forEach((q) => {
-      if (q === p || q.team !== p.team || q.role === 'gk') return;
+      if (q === p || q.team !== p.team || q.role === 'gk' || q.out) return;
       const prog = (q.x - p.x) * sg, mark = foes.reduce((m, o) => Math.min(m, this.dist(o, q)), 99);
       if (!this.laneOpen(p, q) || mark < 1.6 || this.dist(p, q) < 3.5) return;
       const qs = this.shotQuality(q);
@@ -1940,16 +1955,86 @@ class Component extends DCLogic {
     else if (T.i === 6 && g.own >= 0 && g.ps[g.own].team === 0) next();
     else if (T.i === 6 && g.own < 0 && T.t > 0.3 && this.dist(h, b) < 1.3) next();
   }
+  // a foul: the referee stops play, maybe a card, then a free kick (or a penalty in the box)
+  foul(off, vic, behind) {
+    const g = this.g, P = this.props;
+    if (this.net || P.tutorial || P.practice || this.autoplay || g.phase !== 'play' || vic.role === 'gk') return false;
+    const vi = g.ps.indexOf(vic), oi = g.ps.indexOf(off), gx = vic.team === 0 ? 60 : 0;
+    const inBox = Math.abs(gx - vic.x) < 9 && vic.y > 6 && vic.y < 24, near = Math.hypot(gx - vic.x, 15 - vic.y) < 20;
+    this.stumble(vic, 0.7);
+    this.sfx('whistle', 1); this.vib(40);
+    g.fouls = g.fouls || [0, 0]; g.fouls[off.team]++;
+    // the card: from behind or stopping a chance near goal
+    let card = '';
+    const pY = (behind ? 0.45 : 0.15) + (near ? 0.2 : 0) + (inBox ? 0.1 : 0);
+    if (Math.random() < pY || (behind && Math.random() < 0.04)) card = off.yel ? 'red' : 'yellow';
+    const mates = g.ps.filter((q) => q.team === off.team && q.role !== 'gk' && !q.out);
+    if (card === 'red' && mates.length < 2) card = 'yellow';
+    const nm = this.nameOf(oi);
+    if (card === 'yellow') { off.yel = (off.yel || 0) + 1; this.callout('TARJETA AMARILLA', nm, '#FFC53D'); this.narrate('yellow', nm, null, true); }
+    else if (card === 'red') {
+      off.out = true; g.reds = g.reds || [0, 0];
+      off.benchX = 30 + (off.team ? 4 : -4) + (g.reds[off.team]++) * (off.team ? 1.2 : -1.2);
+      this.callout('¡TARJETA ROJA!', nm + (off.yel ? ' · segunda amarilla' : ''), '#FF3B3B'); this.narrate('red', nm, null, true);
+      if (oi === g.ctl) { const k = g.ps.findIndex((q) => q.team === off.team && q.role !== 'gk' && !q.out); if (k >= 0) g.ctl = k; }
+    } else { this.flashMsg(inBox ? '¡PENALTI!' : '¡FALTA!', 1.4); this.narrate(inBox ? 'penalty' : 'foul', nm, null, true); }
+    if (card && inBox) this.flashMsg('¡PENALTI!', 1.6);
+    if (oi === g.ctl) this.stat('fouls');
+    // the restart a moment later, once the referee has blown
+    g.foulT = { t: 0.9, vi, x: vic.x, y: vic.y, pen: inBox };
+    g.own = -1; Object.assign(g.ball, { vx: 0, vy: 0, vz: 0 });
+    return true;
+  }
+  setPiece(F) {
+    const g = this.g, b = g.ball, vic = g.ps[F.vi], sg = vic.team === 0 ? 1 : -1, gx = vic.team === 0 ? 60 : 0, pen = F.pen;
+    let x = this.clamp(F.x, 1.5, 58.5), y = this.clamp(F.y, 1.5, 28.5);
+    if (pen) { x = gx - sg * 7; y = 15; }
+    const dir = Math.atan2(15 - y, gx - x), dGoal = Math.hypot(gx - x, 15 - y);
+    Object.assign(b, { x, y, z: 0, vx: 0, vy: 0, vz: 0, spin: 0, dip: 0, kn: 0, fire: 0 });
+    Object.assign(vic, { x: x - Math.cos(dir) * 0.55, y: y - Math.sin(dir) * 0.55, vx: 0, vy: 0, face: dir, act: null, cd: 0 });
+    const others = g.ps.filter((q) => q !== vic && q.role !== 'gk' && !q.out);
+    const foes = others.filter((q) => q.team !== vic.team).sort((u, v) => this.dist(u, b) - this.dist(v, b));
+    const wallN = pen ? 0 : dGoal < 25 ? Math.min(2, foes.length) : 0;
+    let w = 0;
+    others.forEach((q) => {
+      Object.assign(q, { act: null, vx: 0, vy: 0 });
+      if (q.team !== vic.team) q.cd = 1.2;
+      if (q.team !== vic.team && w < wallN) {
+        const o = (w - (wallN - 1) / 2) * 0.8;
+        Object.assign(q, { x: x + Math.cos(dir) * 5 - Math.sin(dir) * o, y: y + Math.sin(dir) * 5 + Math.cos(dir) * o, wallT: 2.6 }); w++;
+        return;
+      }
+      if (pen) { if (Math.abs(gx - q.x) < 10 && q.y > 5 && q.y < 25) q.x = gx - sg * (10.5 + Math.random() * 2); return; }
+      const d = this.dist(q, b);
+      if (q.team !== vic.team && d < 5.5) { const ux = (q.x - x) / (d || 1), uy = (q.y - y) / (d || 1); q.x = this.clamp(x + ux * 5.5, 0.5, 59.5); q.y = this.clamp(y + uy * 5.5, 0.5, 29.5); }
+    });
+    const gk = g.ps.find((q) => q.team !== vic.team && q.role === 'gk');
+    if (gk && (pen || dGoal < 25)) Object.assign(gk, { x: gx - sg * 0.8, y: 15, vx: 0, vy: 0, act: null });
+    g.own = F.vi; g.hold = -1; g.recv = null; g.cross = null; g.last = F.vi; g.charging = false; g.charge = 0;
+    g.gkSafe = { team: vic.team, t: 3, fk: true, i: F.vi };
+    if (vic.team === 0 && !this.keeperMode() && !this.netHuman(F.vi)) g.ctl = F.vi;
+    if (pen) this.callout('PENALTI', vic.team === 0 ? 'Tira desde el punto' : 'Para el penalti', '#FF5C2E');
+    else if (wallN) { this.callout('TIRO LIBRE', 'Barrera a 5 metros', '#22D3EE'); this.narrate('freeKick', '', null, true); }
+    // an AI taker shoots a dangerous one straight away
+    if (vic.team === 1 || F.vi !== g.ctl) vic.think = 0;
+  }
   slideHits() {
     const g = this.g, b = g.ball;
     g.ps.forEach((p, i) => {
       const a = p.act;
       if (!a || a.type !== 'slide' || a.hit || a.t < 0.03 || a.t > 0.5 || b.z > 0.6 || g.hold >= 0) return;
       const fx = p.x + Math.cos(p.face) * 0.95, fy = p.y + Math.sin(p.face) * 0.95;
-      if (Math.hypot(b.x - fx, b.y - fy) > 0.85) return;
+      const owner = g.own >= 0 ? g.ps[g.own] : null, rival = owner && owner.team !== p.team;
+      // from behind: the slider comes in at the carrier's back
+      const behind = rival && Math.cos(this.ang(p.face - owner.face)) > 0.45 && ((owner.x - p.x) * Math.cos(owner.face) + (owner.y - p.y) * Math.sin(owner.face)) > 0;
+      if (Math.hypot(b.x - fx, b.y - fy) > 0.85) {
+        // the ball wasn't there but the man was: a foul
+        if (rival && Math.hypot(owner.x - fx, owner.y - fy) < 0.8) { a.hit = true; this.foul(p, owner, behind); }
+        return;
+      }
       a.hit = true;
-      const owner = g.own >= 0 ? g.ps[g.own] : null;
       if (owner && owner.team === p.team) return;
+      if (behind && Math.random() < 0.55 && this.foul(p, owner, true)) return;
       if (owner) { this.stumble(owner, 0.6); g.own = -1; if (g.ps.indexOf(owner) === g.ctl) this.flashMsg('¡Te han robado!', 0.9); }
       const side = (Math.random() - 0.5) * 3;
       b.vx = Math.cos(p.face) * 5.5 - Math.sin(p.face) * side; b.vy = Math.sin(p.face) * 5.5 + Math.cos(p.face) * side; b.vz = 0.8;
@@ -1965,8 +2050,8 @@ class Component extends DCLogic {
       g.holdT -= g.hold === g.ctl && this.keeperMode() ? dt / 6 : dt;
       if (g.holdT <= 0 && !(k.act && k.act.lock)) {
         g.hold = -1; this.gkFree(k);
-        const foes = g.ps.filter((q) => q.team !== k.team && q.role !== 'gk');
-        const mates = g.ps.filter((q) => q.team === k.team && q.role !== 'gk')
+        const foes = g.ps.filter((q) => q.team !== k.team && q.role !== 'gk' && !q.out);
+        const mates = g.ps.filter((q) => q.team === k.team && q.role !== 'gk' && !q.out)
           .sort((u, v) => foes.reduce((m, o) => Math.min(m, this.dist(o, v)), 99) - foes.reduce((m, o) => Math.min(m, this.dist(o, u)), 99));
         if (mates.length) { this.passBall(k, mates[0]); b.vz = 2.2; }
         else { const dir = (k.team === 0 ? 0 : Math.PI) + (Math.random() - 0.5) * 0.8; b.vx = Math.cos(dir) * 17; b.vy = Math.sin(dir) * 17; b.vz = 6.5; this.release(k); }
@@ -1975,7 +2060,7 @@ class Component extends DCLogic {
       return;
     }
     const gs = g.gkSafe;
-    if (gs) { gs.t -= dt; if (gs.t <= 0 || (g.own >= 0 && g.ps[g.own].team === gs.team)) g.gkSafe = null; }
+    if (gs) { gs.t -= dt; if (gs.fk) { if (g.own !== gs.i && !gs.go) { gs.go = true; gs.t = Math.min(gs.t, 0.7); } } else if (g.own >= 0 && g.ps[g.own].team === gs.team) gs.t = 0; if (gs.t <= 0) g.gkSafe = null; }
     if (b.fire > 0) { b.fire -= dt; if (g.own >= 0 || Math.hypot(b.vx, b.vy) < 9) b.fire = 0; }
     // ---- free ball physics: gravity, air drag, bounce, rolling resistance, curl ----
     if (b.z > 0 || b.vz > 0) {
@@ -2065,7 +2150,7 @@ class Component extends DCLogic {
     const BR = 0.48;
     for (let i = 0; i < g.ps.length; i++) {
       const p = g.ps[i];
-      if (p === owner || b.z > 1.8 || (owner && p.team === owner.team) || p.ghost > 0 || (g.gkSafe && p.team !== g.gkSafe.team)) continue;
+      if (p === owner || b.z > 1.8 || (owner && p.team === owner.team) || p.ghost > 0 || (g.gkSafe && p.team !== g.gkSafe.team && !(p.wallT > 0))) continue;
       p.contestT = Math.max(0, (p.contestT || 0) - dt);
       const sliding = p.act && (p.act.type === 'slide' || p.act.type === 'dive');
       const r = sliding ? 0.6 : BR;
@@ -4026,6 +4111,7 @@ class Component extends DCLogic {
       hasPassMark: !!passQ && g.phase === 'play' && (!this.play || this.play.passMark !== false),
       passMarkStyle: 'position: absolute; left: 0; top: 0; pointer-events: none; transform: translate(' + (pm.x - 9).toFixed(1) + 'px, ' + (pm.y - 34).toFixed(1) + 'px);',
       homeName: Partido_me(P.homeName) ?? 'Tú', awayName: P.awayName ?? 'Rival',
+      homeReds: Array.from({ length: (g.reds || [0, 0])[0] }, (_, k) => k), awayReds: Array.from({ length: (g.reds || [0, 0])[1] }, (_, k) => k),
       homeChip: chip(hc, ht), awayChip: chip(ac, at),
       s0: String(g.score[0]), s1: String(g.score[1]),
       clock: P.practice ? '∞' : (g.extra ? '+' : '') + this.fmtClock(g.t),
@@ -4209,7 +4295,7 @@ class Component extends DCLogic {
     if (g.phase !== 'play' || this.size() < 2) return;
     if (g.own !== g.ctl && (this.dist(p, b) > 1.5 || b.z > 1.2)) { this.flashMsg('Necesitas el balón para centrar', 0.8); return; }
     const sg = p.team === 0 ? 1 : -1, gx = p.team === 0 ? 60 : 0, spotX = gx - sg * 8;
-    const mates = g.ps.filter((q) => q.team === p.team && q.role !== 'gk' && q !== p);
+    const mates = g.ps.filter((q) => q.team === p.team && q.role !== 'gk' && !q.out && q !== p);
     if (!mates.length) return;
     const q = mates.sort((u, v) => Math.hypot(u.x - spotX, u.y - 15) - Math.hypot(v.x - spotX, v.y - 15))[0];
     this.crossFrom(p, q, Math.random() < 0.6 ? 'header' : 'bicycle');
@@ -4298,7 +4384,7 @@ class Component extends DCLogic {
   order(kind) {
     const g = this.g, h = g.ps[g.ctl];
     if (this.netEv('order', kind)) return;
-    const mates = g.ps.filter((q, k) => q.team === h.team && q.role !== 'gk' && k !== g.ctl);
+    const mates = g.ps.filter((q, k) => q.team === h.team && q.role !== 'gk' && !q.out && k !== g.ctl);
     if (!mates.length) return;
     if (kind === 'pass') { this.callForBall(); return; }
     const texts = { shoot: ['¡Chuta!', '¡Vale!'], back: ['¡Atrás!', '¡Defiendo!'], press: ['¡Presiona!', '¡Voy!'] }[kind];
