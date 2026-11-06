@@ -19,6 +19,26 @@
 .pd-nar-t{padding:6px 12px;background:linear-gradient(90deg,#0B0B14F2,#17172AE6);color:#F4F4FA;font:800 italic 14px 'Barlow Condensed',sans-serif;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @keyframes pdNarIn{from{opacity:0;translate:-50% 14px}}
 @keyframes pdGold{0%,100%{box-shadow:0 0 10px #FFC53D88}50%{box-shadow:0 0 22px #FFC53D}}
+.sb{position:relative;display:flex;align-items:flex-start;gap:0;filter:drop-shadow(0 6px 10px #0009)}
+.sb-team{position:relative;display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;min-width:150px;box-sizing:border-box;font:800 italic 15px 'Barlow Condensed',sans-serif;letter-spacing:.8px;color:#fff;text-shadow:0 2px 0 #0008;white-space:nowrap;overflow:hidden}
+.sb-team.h{justify-content:flex-end;border-radius:16px 0 0 16px;background:linear-gradient(90deg,#0B0B1400,#0B0B14E6 30%,color-mix(in srgb,var(--tc) 55%,#0B0B14));box-shadow:inset 0 2px 0 #ffffff22,inset 0 -2px 0 color-mix(in srgb,var(--tc) 80%,#fff)}
+.sb-team.a{justify-content:flex-start;border-radius:0 16px 16px 0;background:linear-gradient(270deg,#0B0B1400,#0B0B14E6 30%,color-mix(in srgb,var(--tc) 55%,#0B0B14));box-shadow:inset 0 2px 0 #ffffff22,inset 0 -2px 0 color-mix(in srgb,var(--tc) 80%,#fff)}
+.sb-name{max-width:120px;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
+.sb-crest{flex:none;width:24px;height:27px;display:flex;align-items:center;justify-content:center;clip-path:path('M12 0L24 4V14C24 21 18 25 12 27C6 25 0 21 0 14V4Z');background:linear-gradient(160deg,var(--tc) 55%,var(--tt) 55%);font:800 11px Exo2,sans-serif;font-style:normal;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
+.sb-red{display:inline-block;width:8px;height:11px;border-radius:1.5px;background:#FF3B3B;box-shadow:0 0 6px #FF3B3B}
+.sb-mid{display:flex;flex-direction:column;align-items:center;margin-top:-3px}
+.sb-score{position:relative;display:flex;align-items:center;gap:6px;height:40px;padding:0 12px;border-radius:13px;background:linear-gradient(180deg,#9B5CFF,#6D28D9 55%,#4C1D95);box-shadow:inset 0 2px 0 #ffffff66,inset 0 -3px 0 #2E1065,0 0 0 2px #0B0B14,0 0 18px #8B5CF688;overflow:hidden}
+.sb-score::after{content:'';position:absolute;top:-20%;bottom:-20%;width:30%;left:0;background:linear-gradient(100deg,transparent,#ffffff55,transparent);transform:translateX(-200%) skewX(-18deg);animation:sbShine 6s ease-in-out infinite}
+@keyframes sbShine{0%,80%{transform:translateX(-200%) skewX(-18deg)}100%{transform:translateX(450%) skewX(-18deg)}}
+.sb-n{min-width:26px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#0B0B14CC;box-shadow:inset 0 -2px 0 #ffffff1a;font:800 28px/1 'Barlow Condensed',sans-serif;color:#fff;text-shadow:0 0 10px #C4B5FD;animation:sbPop .6s cubic-bezier(.2,1.8,.4,1) both}
+@keyframes sbPop{0%{transform:scale(1.9);color:#FDE68A;text-shadow:0 0 22px #FBBF24}100%{transform:scale(1)}}
+.sb-dash{width:8px;height:3px;border-radius:2px;background:#E9D5FF}
+.sb-clock{position:relative;display:flex;align-items:center;gap:4px;margin-top:-3px;padding:2px 12px 3px;border-radius:0 0 10px 10px;background:#0B0B14F2;box-shadow:0 0 0 1.5px #0B0B14;font:800 15px/1 'Barlow Condensed',sans-serif;letter-spacing:1px;color:#F4F4FA;overflow:hidden}
+.sb-clock em{font-style:normal;padding:0 4px;border-radius:4px;background:#22C55E;color:#052E16;font-size:12px}
+.sb-clock i{position:absolute;left:0;bottom:0;height:2px;background:linear-gradient(90deg,#22D3EE,#A78BFA)}
+.sb-clock.late{color:#FF6B6B;animation:sbLate 1s steps(2) infinite}@keyframes sbLate{50%{color:#fff}}
+.sb.gold .sb-score{background:linear-gradient(180deg,#FFE08A,#FFC53D 55%,#C98A12);box-shadow:inset 0 2px 0 #ffffff88,inset 0 -3px 0 #7C4A03,0 0 0 2px #0B0B14,0 0 22px #FFC53DAA}
+.sb.gold .sb-n{text-shadow:0 0 10px #FDE68A}.sb.gold .sb-clock{color:#FFC53D}
 .pd-co-t{display:inline-block;padding:4px 18px 2px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-style:italic;font-size:34px;line-height:1;letter-spacing:1px;text-shadow:0 4px 0 #05050A;animation:pdCo .5s cubic-bezier(.2,1.4,.4,1) both}
 .pd-co-s{margin-top:4px;padding:2px 10px;background:#0B0B14D9;font:800 11px Exo2,sans-serif;letter-spacing:1px;color:#F4F4FA;animation:pdCoS .7s both}
 
@@ -101,15 +121,23 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 
   <sc-if value="{{hud}}" hint-placeholder-val="{{ true }}">
   <!-- broadcast scoreboard -->
-  <div style="position: absolute; left: 0; right: 0; top: 6px; height: 32px; display: flex; align-items: center; justify-content: center; pointer-events: none">
+  <div style="position: absolute; left: 0; right: 0; top: 7px; height: 34px; display: flex; align-items: flex-start; justify-content: center; pointer-events: none">
     <span style="position: absolute; left: 12px; top: 2px; padding: 3px 10px; transform: skewX(0deg); background: {{modeColor}}; color: #0B0B14; font: 800 10px Exo2, sans-serif; letter-spacing: 1.5px; white-space: nowrap">{{modeLabel}}</span>
-    <div style="display: flex; align-items: stretch; height: 30px; transform: skewX(0deg); border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 2px #05050A, 0 4px 0 #05050A, 0 8px 16px #0009">
-      <span style="width: 7px; background: {{homeC}}"></span>
-      <span style="display: flex; align-items: center; justify-content: flex-end; min-width: 140px; padding: 0 12px; background: linear-gradient(90deg, #0B0B14D9, #17172AF2); font: 800 13px Exo2, sans-serif; white-space: nowrap"><sc-for list="{{homeReds}}" item="x"><i style="display: inline-block; width: 8px; height: 11px; margin-right: 5px; border-radius: 1.5px; background: #FF3B3B; box-shadow: 0 0 6px #FF3B3B"></i></sc-for>{{homeName}}</span>
-      <span style="{{scoreStyle}}"><span>{{s0}}</span><span style="opacity: .45">–</span><span>{{s1}}</span></span>
-      <span style="display: flex; align-items: center; min-width: 140px; padding: 0 12px; background: linear-gradient(270deg, #0B0B14D9, #17172AF2); font: 800 13px Exo2, sans-serif; white-space: nowrap">{{awayName}}<sc-for list="{{awayReds}}" item="x"><i style="display: inline-block; width: 8px; height: 11px; margin-left: 5px; border-radius: 1.5px; background: #FF3B3B; box-shadow: 0 0 6px #FF3B3B"></i></sc-for></span>
-      <span style="width: 7px; background: {{awayC}}"></span>
-      <span style="{{clockStyle}}">{{clock}}</span>
+    <div class="{{sbCls}}">
+      <div class="sb-team h" style="--tc: {{homeC}}; --tt: {{homeT}}">
+        <span class="sb-name" translate="no"><sc-for list="{{homeReds}}" item="x"><i class="sb-red"></i></sc-for>{{homeName}}</span>
+        <span class="sb-crest"><b>{{homeIni}}</b></span>
+      </div>
+      <div class="sb-mid">
+        <div class="sb-score">
+          <span key="{{s0Key}}" class="sb-n">{{s0}}</span><span class="sb-dash"></span><span key="{{s1Key}}" class="sb-n">{{s1}}</span>
+        </div>
+        <div class="{{clockCls}}"><span>{{clock}}</span><sc-if value="{{hasExtra}}" hint-placeholder-val="{{ false }}"><em>+{{extraN}}</em></sc-if><i style="{{progStyle}}"></i></div>
+      </div>
+      <div class="sb-team a" style="--tc: {{awayC}}; --tt: {{awayT}}">
+        <span class="sb-crest"><b>{{awayIni}}</b></span>
+        <span class="sb-name" translate="no">{{awayName}}<sc-for list="{{awayReds}}" item="x"><i class="sb-red"></i></sc-for></span>
+      </div>
     </div>
     <sc-if value="{{isGolden}}" hint-placeholder-val="{{ false }}"><span style="margin-left: 10px; padding: 3px 9px; transform: skewX(0deg); background: linear-gradient(135deg, #FFE08A, #FFC53D 55%, #C98A12); color: #0B0B14; font: 800 11px Exo2, sans-serif; letter-spacing: 1px; animation: pdGold 1s infinite">GOLES x2</span></sc-if>
     <sc-if value="{{hasPing}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 14px; top: 24px; display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; color: #53D88E"><svg width="12" height="10" viewBox="0 0 12 10" fill="#53D88E"><rect x="0" y="7" width="2.5" height="3"/><rect x="3.2" y="5" width="2.5" height="5"/><rect x="6.4" y="2.5" width="2.5" height="7.5"/><rect x="9.6" y="0" width="2.4" height="10"/></svg>{{pingLabel}}</span></sc-if>
@@ -4193,6 +4221,11 @@ class Component extends DCLogic {
       s0: String(g.score[0]), s1: String(g.score[1]),
       clock: P.practice ? '∞' : (g.extra ? '+' : '') + this.fmtClock(g.t),
       clockStyle: 'display: flex; align-items: center; margin-left: 6px; padding: 0 10px; background: ' + (g.extra ? '#0E3A22' : this.golden() ? '#3A2A08' : '#0B0B14E6') + '; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 20px; color: ' + (g.t <= 10 && g.phase === 'play' ? '#FF5C5C' : this.golden() ? '#FFC53D' : '#F4F4FA') + ';',
+      sbCls: 'sb' + (this.golden() && g.phase !== 'winners' ? ' gold' : ''), homeT: ht, awayT: at,
+      homeIni: (Partido_me(P.homeName) ?? 'Tú').replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ0-9]/g, '').slice(0, 2).toUpperCase() || 'TU', awayIni: (P.awayName ?? 'Rival').replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ0-9]/g, '').slice(0, 2).toUpperCase() || 'RV',
+      s0Key: 'h' + g.score[0], s1Key: 'a' + g.score[1], hasExtra: !!g.extra, extraN: String(g.extra || ''),
+      clockCls: 'sb-clock' + (g.t <= 10 && g.phase === 'play' && !P.practice ? ' late' : ''),
+      progStyle: 'width: ' + (P.practice ? 0 : Math.max(0, Math.min(1, g.extra ? 1 : 1 - g.t / (g.dur || 1))) * 100).toFixed(1) + '%',
       scoreStyle: 'display: flex; align-items: center; gap: 8px; padding: 0 14px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 26px; line-height: 1; ' + (this.golden() ? 'background: linear-gradient(135deg, #FFE08A, #FFC53D 55%, #C98A12); color: #0B0B14;' : 'background: #F4F4FA; color: #0B0B14;'),
       wxOverlay: 'position: absolute; inset: 0; pointer-events: none; ' + ({
         noche: 'background: linear-gradient(180deg, #01030Fe6 0%, #02061Ab3 22%, #02061A33 46%, transparent 62%), radial-gradient(120% 95% at 50% 60%, transparent 55%, #000818b0 100%);',
