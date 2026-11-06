@@ -244,7 +244,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
       <div class="am-arena" aria-hidden="true"><i class="aa-pitch"></i><i class="aa-beam" style="left: 18%"></i><i class="aa-beam r" style="left: 82%"></i><i class="aa-flash" style="left: 12%; top: 22%"></i><i class="aa-flash" style="left: 31%; top: 30%; animation-delay: -1.1s"></i><i class="aa-flash" style="left: 58%; top: 18%; animation-delay: -2.3s"></i><i class="aa-flash" style="left: 77%; top: 27%; animation-delay: -0.6s"></i><i class="aa-flash" style="left: 90%; top: 20%; animation-delay: -1.8s"></i></div>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 40px; letter-spacing: 1px">{{readyTitle}}</span>
-      <span style="font-size: 13px; color: #CACAE0; text-align: center; max-width: 520px; line-height: 1.5">Con balón: CHUT (mantén para potencia), PASE al compañero que señala la flecha, REGATE para dejar atrás al rival y SPRINT. Sin balón: ENTRADA y PRESIÓN; si lo tiene un compañero, PÍDELA.</span>
+      <span style="font-size: 13px; color: #CACAE0; text-align: center; max-width: 520px; line-height: 1.5">Teclado: WASD o flechas para moverte, Espacio chuta, E pasa, F regatea, Mayús esprinta, Q centra, C cambia de jugador, Intro empieza. Con balón: CHUT (mantén para potencia), PASE al compañero que señala la flecha, REGATE para dejar atrás al rival y SPRINT. Sin balón: ENTRADA y PRESIÓN; si lo tiene un compañero, PÍDELA.</span>
       <button type="button" onClick="{{start}}" style="height: 54px; padding: 0 40px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 6px 0 #0E8FA3">SAQUE INICIAL</button>
     </div>
   </sc-if>
@@ -395,9 +395,13 @@ class Component extends DCLogic {
     window.addEventListener('touchcancel', this.onTouchEnd, true);
     window.addEventListener('blur', this.onHide);
     document.addEventListener('visibilitychange', this.onHide);
+    // the keyboard works wherever the focus is (after tapping a button too), not only on the pitch
+    this.onKeyD = (e) => this.keyDown(e); this.onKeyU = (e) => this.keyUp(e);
+    window.addEventListener('keydown', this.onKeyD, true); window.addEventListener('keyup', this.onKeyU, true);
   }
   componentWillUnmount() {
     this.recStop();
+    window.removeEventListener('keydown', this.onKeyD, true); window.removeEventListener('keyup', this.onKeyU, true);
     window.removeEventListener('pointerup', this.onWinUp, true);
     window.removeEventListener('pointercancel', this.onWinUp, true);
     window.removeEventListener('pointermove', this.onWinMove, true);
@@ -4447,26 +4451,43 @@ class Component extends DCLogic {
       skillUp: (e) => this.releasePtr(e.pointerId),
       sprintDown: (e) => { this.hold(e, 'sprint'); g.sprint = true; },
       sprintUp: (e) => this.releasePtr(e.pointerId),
-      onKeyDown: (e) => {
-        const k = e.key.toLowerCase();
-        const map = { arrowleft: 'l', a: 'l', arrowright: 'r', d: 'r', arrowup: 'u', w: 'u', arrowdown: 'd', s: 'd' };
-        if (map[k]) { g.keys[map[k]] = true; e.preventDefault(); }
-        if (e.repeat) return;
-        if (k === ' ' || k === 'spacebar') { e.preventDefault(); this.mainPress(); }
-        if (k === 'e') this.passPress();
-        if (k === 'f') this.skillPress();
-        if (k === 'shift') g.sprint = true;
-      },
-      onKeyUp: (e) => {
-        const k = e.key.toLowerCase();
-        const map = { arrowleft: 'l', a: 'l', arrowright: 'r', d: 'r', arrowup: 'u', w: 'u', arrowdown: 'd', s: 'd' };
-        if (map[k]) g.keys[map[k]] = false;
-        if ((k === ' ' || k === 'spacebar') && g.charging) this.doKick();
-        if (k === 'e') this.passRelease();
-        if (k === 'f' || k === 'e') g.press = false;
-        if (k === 'shift') g.sprint = false;
-      }
+      onKeyDown: () => {}, onKeyUp: () => {}
     };
+  }
+  // keyboard: WASD / arrows move, Space / J shoot (hold for power) or tackle, E / K pass (hold for a lofted one),
+  // F / L skill or press, Shift sprint, Q cross, C / Tab switch player, R call for the ball, Enter kick off
+  keyMap(e) {
+    const t = e.target, tag = t && t.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || (t && t.isContentEditable)) return null;
+    const c = e.code || '', k = (e.key || '').toLowerCase();
+    const M = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', ArrowUp: 'u', KeyW: 'u', ArrowDown: 'd', KeyS: 'd',
+      Space: 'shoot', KeyJ: 'shoot', KeyE: 'pass', KeyK: 'pass', KeyF: 'skill', KeyL: 'skill', ShiftLeft: 'sprint', ShiftRight: 'sprint',
+      KeyQ: 'cross', KeyC: 'switch', Tab: 'switch', KeyR: 'call', Enter: 'start', NumpadEnter: 'start' };
+    return M[c] || ({ arrowleft: 'l', arrowright: 'r', arrowup: 'u', arrowdown: 'd', ' ': 'shoot', shift: 'sprint', enter: 'start' })[k] || null;
+  }
+  keyDown(e) {
+    const a = this.keyMap(e), g = this.g;
+    if (!a || !g) return;
+    e.preventDefault();
+    if ('lrud'.indexOf(a) >= 0) { g.keys[a] = true; return; }
+    if (a === 'sprint') { g.sprint = true; return; }
+    if (e.repeat) return;
+    if (a === 'shoot') this.mainPress();
+    else if (a === 'pass') this.passPress();
+    else if (a === 'skill') this.skillPress();
+    else if (a === 'cross') { if (g.phase === 'play') this.humanCross(); }
+    else if (a === 'switch') { if (g.phase === 'play') this.switchPlayer(); }
+    else if (a === 'call') { if (g.phase === 'play') this.callForBall(); }
+    else if (a === 'start' && g.phase === 'ready') this.start();
+  }
+  keyUp(e) {
+    const a = this.keyMap(e), g = this.g;
+    if (!a || !g) return;
+    if ('lrud'.indexOf(a) >= 0) { g.keys[a] = false; return; }
+    if (a === 'sprint') g.sprint = false;
+    if (a === 'shoot' && g.charging) this.doKick();
+    if (a === 'pass') this.passRelease();
+    if (a === 'skill' || a === 'pass') g.press = false;
   }
   mainPress() {
     const g = this.g;
@@ -4626,7 +4647,7 @@ class Component extends DCLogic {
   releaseAll() {
     Object.keys(this.held || {}).forEach((id) => this.releasePtr(Number(id)));
     const g = this.g;
-    this.joyReset(); g.jx = 0; g.jy = 0; g.sprint = false; g.press = false;
+    this.joyReset(); g.jx = 0; g.jy = 0; g.sprint = false; g.press = false; g.keys = {};
     if (g.charging) { g.charging = false; g.charge = 0; }
     this.forceUpdate();
   }
