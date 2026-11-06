@@ -237,6 +237,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </sc-for>
     <div style="position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; gap: 12px">
       <sc-if value="{{hasHL}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{replayHL}}" style="height: 50px; padding: 0 20px; border: 1.5px solid #FFC53D; border-radius: 14px; background: #0B0B14CC; color: #FFC53D; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 19px; letter-spacing: 1.5px; cursor: pointer; display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8L6 20z"/></svg>RESUMEN</button></sc-if>
+      <sc-if value="{{hasVid}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{saveVid}}" style="height: 50px; padding: 0 20px; border: 1.5px solid #53D88E; border-radius: 14px; background: #0B0B14CC; color: #53D88E; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 19px; letter-spacing: 1.5px; cursor: pointer; display: flex; align-items: center; gap: 8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4l-4 4M12 2v13"/></svg>GUARDAR GOL</button></sc-if>
       <button type="button" onClick="{{finish}}" style="height: 50px; padding: 0 40px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">{{finishLabel}}</button>
     </div>
   </sc-if>
@@ -368,6 +369,7 @@ class Component extends DCLogic {
     document.addEventListener('visibilitychange', this.onHide);
   }
   componentWillUnmount() {
+    this.recStop();
     window.removeEventListener('pointerup', this.onWinUp, true);
     window.removeEventListener('pointercancel', this.onWinUp, true);
     window.removeEventListener('pointermove', this.onWinMove, true);
@@ -3379,6 +3381,35 @@ class Component extends DCLogic {
     const g = this.g, played = g.dur - g.t + (g.extra ? g.dur : 0);
     (this.clips || (this.clips = [])).push({ frames, len: acc, side: g.concede, label: g.scorer || 'Gol', score: g.score[0] + '-' + g.score[1], min: Math.max(1, Math.round(Math.min(g.dur, played) / g.dur * 90)) });
     if (this.clips.length > 8) this.clips.shift();
+    // your goals are filmed while the replay plays, to keep or share at the end
+    if (g.concede === 1 && !this.net && !this.autoplay) this.recStart(this.clips[this.clips.length - 1]);
+  }
+  recStart(clip) {
+    try {
+      if (!window.MediaRecorder || !this.cv || !this.cv.captureStream) return;
+      const types = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+      const mime = types.find((t) => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t));
+      if (!mime) return;
+      const rec = new MediaRecorder(this.cv.captureStream(30), { mimeType: mime, videoBitsPerSecond: 2500000 }), parts = [];
+      rec.ondataavailable = (e) => { if (e.data && e.data.size) parts.push(e.data); };
+      rec.onstop = () => { if (parts.length) { clip.video = new Blob(parts, { type: mime.split(';')[0] }); this.vids = (this.vids || 0) + 1; } };
+      rec.start(250);
+      this.rec = rec;
+    } catch (e) { this.rec = null; }
+  }
+  recStop() { const r = this.rec; this.rec = null; try { if (r && r.state !== 'inactive') r.stop(); } catch (e) {} }
+  // GUARDAR GOL: your last goal as a video, shared (WhatsApp, Instagram…) or downloaded
+  async saveGoal() {
+    const c = (this.clips || []).filter((x) => x.video).pop();
+    if (!c) return;
+    const ext = c.video.type.indexOf('mp4') >= 0 ? 'mp4' : 'webm', name = 'arenamix-gol-' + c.score + '.' + ext;
+    try {
+      const f = new File([c.video], name, { type: c.video.type });
+      if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: 'Mi gol en ARENA MIX', text: c.label + ' · ARENA MIX' }); return; }
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(c.video); a.download = name;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+    this.flashMsg('Vídeo guardado', 1.4);
   }
   // the highlights: every goal of the match again, one after another, before the final line-up
   playHL() {
@@ -3399,7 +3430,7 @@ class Component extends DCLogic {
     const rp = this.rp, g = this.g;
     rp.t += dt * (rp.hl ? 0.6 : this.rpSlow ? 0.28 : 0.42);
     if (rp.t >= rp.len) this.rpSlow = false;
-    if (rp.t >= rp.len) { this.rp = null; if (rp.hl) { this.nextHL(); if (!this.rp) return null; return this.replayFrame(0); } this.rpDone = true; return null; }
+    if (rp.t >= rp.len) { this.recStop(); this.rp = null; if (rp.hl) { this.nextHL(); if (!this.rp) return null; return this.replayFrame(0); } this.rpDone = true; return null; }
     const F = rp.frames;
     let k = 0; while (k < F.length - 2 && F[k + 1].at < rp.t) k++;
     const A = F[k], B = F[k + 1] || A, u = B.at > A.at ? Math.min(1, (rp.t - A.at) / (B.at - A.at)) : 0;
@@ -4206,6 +4237,7 @@ class Component extends DCLogic {
       replayTag: this.hl ? 'MEJORES MOMENTOS' : 'REPETICIÓN', hlOn: !!this.hl,
       hlLine: this.hl && this.hl.list[this.hl.i] ? (this.hl.i + 1) + '/' + this.hl.list.length + ' · MIN ' + this.hl.list[this.hl.i].min + '\' · ' + this.hl.list[this.hl.i].label + ' · ' + this.hl.list[this.hl.i].score : '',
       hasHL: g.phase === 'winners' && !this.hl && (this.clips || []).length > 0,
+      hasVid: g.phase === 'winners' && !this.hl && (this.clips || []).some((x) => x.video), saveVid: () => this.saveGoal(),
       replayHL: () => this.playHL(),
       isTut: !!(P.tutorial && g.tut && g.tut.i < 7),
       tutKicker: g.tut ? 'TUTORIAL · PASO ' + Math.min(7, g.tut.i + 1) + ' DE 7' : '',
