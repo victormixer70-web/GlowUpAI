@@ -21,6 +21,12 @@ body{margin:0}
 .me-sw{width:24px;height:24px;padding:0;border-radius:8px;cursor:pointer;transition:transform .15s}
 .me-sw:active{transform:scale(.9)}
 .me-chip{height:26px;padding:0 10px;border:0;border-radius:9px;font:800 10.5px Exo2,sans-serif;cursor:pointer;white-space:nowrap}
+.me-pad{position:absolute;right:8px;bottom:8px;width:96px;height:96px}
+.me-ar{position:absolute;width:30px;height:30px;padding:0;border:0;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#150925CC;color:#fff;box-shadow:inset 0 0 0 1.5px #ffffff44,0 3px 0 #0008;cursor:pointer;font:800 18px Exo2,sans-serif;touch-action:none;-webkit-tap-highlight-color:transparent}
+.me-ar:active{background:linear-gradient(135deg,#FDE68A,#F59E0B);color:#2A1400;transform:translateY(1px)}
+.me-pad .u{left:33px;top:0}.me-pad .d{left:33px;bottom:0}.me-pad .l{left:0;top:33px}.me-pad .r{right:0;top:33px}.me-pad .c{left:33px;top:33px;background:#3B1A8ACC}
+.me-zoom{position:absolute;left:8px;bottom:8px;display:flex;flex-direction:column;gap:4px}.me-zoom .me-ar{position:static}
+.me-hint{position:absolute;left:50%;top:8px;translate:-50% 0;padding:3px 10px;border-radius:9px;background:#150925BB;font:800 10px Exo2,sans-serif;letter-spacing:.5px;color:#E9D5FF;pointer-events:none;transition:opacity .5s;white-space:nowrap}
 .me-led{animation:meLed 6s linear infinite}
 .me-light{animation:meFlash 2.4s ease-in-out infinite}
 </style>
@@ -39,39 +45,23 @@ body{margin:0}
   <div style="position: absolute; left: 96px; right: 16px; top: 62px; bottom: 12px; display: flex; gap: 12px">
     <!-- live preview -->
     <div class="me-card" style="flex: none; width: 420px; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px">
-      <svg width="400" height="268" viewBox="0 0 460 300" style="border-radius: 14px; display: block">
-        <defs>
-          <linearGradient id="me-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{{sky1}}"/><stop offset="1" stop-color="{{sky2}}"/></linearGradient>
-          <linearGradient id="me-st" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{{c1d}}"/><stop offset="1" stop-color="{{c1}}"/></linearGradient>
-          <clipPath id="me-pc"><polygon points="70,128 390,128 450,262 10,262"/></clipPath>
-          <clipPath id="me-led"><rect x="20" y="112" width="420" height="16"/></clipPath>
-        </defs>
-        <rect width="460" height="300" fill="url(#me-sky)"/>
-        <sc-for list="{{lights}}" as="l" hint-placeholder-count="4"><g class="me-light" style="{{l.st}}"><rect x="{{l.x}}" y="6" width="34" height="12" rx="3" fill="#FFFBEA"/><circle cx="{{l.cx}}" cy="12" r="26" fill="#FFFBEA" opacity=".25"/></g></sc-for>
-        <!-- main stand with its rows of seats -->
-        <polygon points="30,40 430,40 450,112 10,112" fill="url(#me-st)"/>
-        <sc-for list="{{rows}}" as="r" hint-placeholder-count="6"><line x1="{{r.x1}}" y1="{{r.y}}" x2="{{r.x2}}" y2="{{r.y}}" stroke="{{c2}}" stroke-opacity=".28" stroke-width="1.5"/></sc-for>
-        <sc-for list="{{fans}}" as="f" hint-placeholder-count="20"><circle cx="{{f.x}}" cy="{{f.y}}" r="2.4" fill="{{f.c}}"/></sc-for>
-        <rect x="190" y="26" width="80" height="22" rx="3" fill="#0B0B14" stroke="{{c1}}" stroke-width="2"/>
-        <text x="230" y="41" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-style="italic" font-weight="800" font-size="11" fill="{{c2}}">{{shortName}}</text>
-        <!-- LED boards -->
-        <rect x="20" y="112" width="420" height="16" fill="#0B0B14"/>
-        <g clip-path="url(#me-led)"><g class="me-led"><sc-for list="{{ledTxt}}" as="t" hint-placeholder-count="4"><text x="{{t.x}}" y="124" font-family="Barlow Condensed, sans-serif" font-style="italic" font-weight="800" font-size="12" fill="{{c2}}">{{ledName}}</text></sc-for></g></g>
-        <!-- the pitch, in perspective, with its cut -->
-        <polygon points="70,128 390,128 450,262 10,262" fill="{{g1}}"/>
-        <g clip-path="url(#me-pc)">
-          <sc-for list="{{cuts}}" as="c" hint-placeholder-count="6"><polygon points="{{c.p}}" fill="{{g2}}"/></sc-for>
-          <sc-for list="{{rings}}" as="c" hint-placeholder-count="0"><ellipse cx="230" cy="195" rx="{{c.rx}}" ry="{{c.ry}}" fill="{{c.f}}"/></sc-for>
-        </g>
-        <polygon points="70,128 390,128 450,262 10,262" fill="none" stroke="#ffffff" stroke-width="2"/>
-        <line x1="230" y1="128" x2="230" y2="262" stroke="#ffffff" stroke-width="2"/>
-        <ellipse cx="230" cy="190" rx="38" ry="18" fill="none" stroke="#ffffff" stroke-width="2"/>
-        <polygon points="58,152 108,152 100,222 34,222" fill="none" stroke="#ffffff" stroke-width="2"/>
-        <polygon points="352,152 402,152 426,222 360,222" fill="none" stroke="#ffffff" stroke-width="2"/>
-        <!-- near stand -->
-        <polygon points="0,270 460,270 460,300 0,300" fill="{{c1d}}"/>
-        <rect x="0" y="262" width="460" height="9" fill="#0B0B14"/>
-      </svg>
+      <div style="position: relative; width: 400px; height: 268px; border-radius: 14px; overflow: hidden; background: {{skyCss}}">
+        <canvas ref="{{cvRef}}" aria-label="Tu estadio en 3D. Arrastra para girarlo." onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" onPointerLeave="{{pUp}}" onWheel="{{wheel}}" style="position: absolute; inset: 0; width: 400px; height: 268px; display: block; touch-action: none; cursor: grab"></canvas>
+        <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 800 italic 18px 'Barlow Condensed', sans-serif; letter-spacing: 1px; color: #C4B5FD">CARGANDO TU ESTADIO…</span></sc-if>
+        <span class="me-hint" style="{{hintStyle}}">Arrastra para girarlo · usa las flechas</span>
+        <!-- camera pad: rotate, tilt, zoom, reset -->
+        <div class="me-pad" aria-label="Mover la cámara">
+          <button type="button" class="me-ar u" aria-label="Inclinar arriba" onPointerDown="{{hU}}" onPointerUp="{{hOff}}" onPointerLeave="{{hOff}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6l6 6"/></svg></button>
+          <button type="button" class="me-ar l" aria-label="Girar a la izquierda" onPointerDown="{{hL}}" onPointerUp="{{hOff}}" onPointerLeave="{{hOff}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></button>
+          <button type="button" class="me-ar c" aria-label="Vista inicial" onClick="{{reset}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/></svg></button>
+          <button type="button" class="me-ar r" aria-label="Girar a la derecha" onPointerDown="{{hR}}" onPointerUp="{{hOff}}" onPointerLeave="{{hOff}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></button>
+          <button type="button" class="me-ar d" aria-label="Inclinar abajo" onPointerDown="{{hD}}" onPointerUp="{{hOff}}" onPointerLeave="{{hOff}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6-6"/></svg></button>
+        </div>
+        <div class="me-zoom">
+          <button type="button" class="me-ar" aria-label="Acercar" onPointerDown="{{hIn}}" onPointerUp="{{hOff}}" onPointerLeave="{{hOff}}">+</button>
+          <button type="button" class="me-ar" aria-label="Alejar" onPointerDown="{{hOut}}" onPointerUp="{{hOff}}" onPointerLeave="{{hOff}}">−</button>
+        </div>
+      </div>
       <div style="display: flex; align-items: center; gap: 8px">
         <span style="flex: none; width: 34px; height: 38px; display: flex; align-items: center; justify-content: center; clip-path: path('M17 0L34 6V20C34 30 26 35 17 38C8 35 0 30 0 20V6Z'); background: linear-gradient(160deg, {{c1}} 55%, {{c2}} 55%)"><b style="font: 800 12px Exo2, sans-serif; color: #fff; text-shadow: 0 1px 2px #000">{{ini}}</b></span>
         <div style="display: flex; flex-direction: column; min-width: 0"><b translate="no" style="font: 800 italic 20px/1.05 'Barlow Condensed', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{name}}</b><span style="font-size: 10.5px; font-weight: 700; color: #C4B5FD">{{summary}}</span></div>
@@ -102,14 +92,119 @@ class Component extends DCLogic {
   constructor(props) {
     super(props);
     this.state = { cfg: window.AMStad ? window.AMStad.get() : null, saved: 0 };
+    this.orb = { th: 0.35, ph: 1.12, r: 40, vth: 0, vph: 0, vr: 0 };
+    this.cvRef = (el) => { if (el && el !== this.cv) { this.cv = el; setTimeout(() => this.init3D(), 30); } };
   }
+  /* ---------- the real stadium in 3D: the match's model, your colours, your grass, your name on the boards ---------- */
+  init3D() {
+    const T = window.THREE, ST = window.AMStadium;
+    if (!T || !this.cv || this.R) return;
+    if (!ST || !ST.ready()) { this.loading = true; this.forceUpdate(); if (ST && ST.load) { const pr = ST.load(); if (pr && pr.then) pr.then(() => { this.loading = false; this.init3D(); this.forceUpdate(); }); } return; }
+    this.loading = false;
+    if (/[?&]debug\b/.test(location.search)) window.__me = this;
+    let R;
+    try { R = new T.WebGLRenderer({ canvas: this.cv, antialias: true, alpha: true }); } catch (e) { return; }
+    R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); R.setSize(400, 268, false);
+    R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.05;
+    R.localClippingEnabled = true;
+    this.R = R;
+    const S = this.S = new T.Scene();
+    this.cam = new T.PerspectiveCamera(40, 400 / 268, 0.5, 700);
+    this.hemi = new T.HemisphereLight(0xcfe0ff, 0x1d5a33, 0.9); S.add(this.hemi);
+    this.sun = new T.DirectionalLight(0xfff4e0, 1.3); this.sun.position.set(-30, 60, 25); S.add(this.sun);
+    // the pitch (its texture is redrawn when the cut or the tone changes)
+    this.pcv = document.createElement('canvas'); this.pcv.width = 1024; this.pcv.height = 544;
+    this.ptex = new T.CanvasTexture(this.pcv); this.ptex.encoding = T.sRGBEncoding; this.ptex.anisotropy = 4;
+    const pitch = new T.Mesh(new T.PlaneGeometry(68, 36), new T.MeshLambertMaterial({ map: this.ptex }));
+    pitch.rotation.x = -Math.PI / 2; S.add(pitch);
+    const apron = new T.Mesh(new T.PlaneGeometry(400, 400), new T.MeshLambertMaterial({ color: 0x0a3a0c })); apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; S.add(apron);
+    // the stadium model, closed on every side with its mirror image (each half clipped at the halfway plane)
+    const clipTo = (m, nz) => m.traverse((o) => {
+      if (!o.isMesh) return;
+      const ms = [].concat(o.material).map((mt) => { const c2 = mt.clone(); c2.side = T.FrontSide; c2.clippingPlanes = [new T.Plane(new T.Vector3(0, 0, nz), 0)]; c2.userData.base = c2.color ? c2.color.clone() : null; return c2; });
+      o.material = ms.length === 1 ? ms[0] : ms;
+    });
+    const a = ST.model(); a.scale.set(0.9, 1, 0.9); a.position.y = -0.03; clipTo(a, -1); S.add(a);
+    const b = ST.model(); b.scale.set(0.9, 1, -0.9); b.position.y = -0.03; clipTo(b, 1); S.add(b);
+    this.stadMats = []; [a, b].forEach((m) => m.traverse((o) => { if (o.isMesh) [].concat(o.material).forEach((mt) => this.stadMats.push(mt)); }));
+    // goals
+    if (window.AMNet && window.AMNet.goal) [-1, 1].forEach((sx) => { const G = window.AMNet.goal(6, 2.44, 1.9); G.group.position.set(30 * sx, 0, 0); G.group.rotation.y = sx * Math.PI / 2; S.add(G.group); });
+    // LED boards round the pitch with the stadium's name
+    this.lcv = document.createElement('canvas'); this.lcv.width = 1024; this.lcv.height = 32;
+    this.ltex = new T.CanvasTexture(this.lcv); this.ltex.encoding = T.sRGBEncoding; this.ltex.wrapS = T.RepeatWrapping;
+    const lm = new T.MeshBasicMaterial({ map: this.ltex, toneMapped: false });
+    [[0, -16.6, 64, 0], [0, 16.6, 64, Math.PI], [-32.6, 0, 33, Math.PI / 2], [32.6, 0, 33, -Math.PI / 2]].forEach(([x, z, len, ry]) => {
+      const t = this.ltex.clone(); t.needsUpdate = true; t.repeat.set(len / 16, 1);
+      const m = new T.Mesh(new T.BoxGeometry(len, 0.9, 0.15), new T.MeshBasicMaterial({ map: t, toneMapped: false }));
+      m.position.set(x, 0.45, z); m.rotation.y = ry; S.add(m); (this.ledTex = this.ledTex || []).push(t);
+    });
+    this.apply3D(this.state.cfg || window.AMStad.get());
+    let last = performance.now();
+    const loop = (now) => {
+      this.raf = requestAnimationFrame(loop);
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      const O = this.orb, H = this.hold;
+      if (H) { O.th += H.th * dt * 1.4; O.ph += H.ph * dt * 0.9; O.r *= Math.exp(H.r * dt * 1.2); }
+      else if (!this.drag && !this.touched) O.th += dt * 0.18;
+      if (!this.drag) { O.th += O.vth * dt; O.vth *= Math.exp(-dt * 3); }
+      O.ph = Math.max(0.28, Math.min(1.42, O.ph)); O.r = Math.max(14, Math.min(60, O.r));
+      // the camera stays over the pitch, inside the bowl (an ellipse: long towards the goals, short towards the sides)
+      { const ct = Math.cos(O.th) / 34, st = Math.sin(O.th) / 15.5, Hmax = 1 / Math.sqrt(ct * ct + st * st), rHi = Hmax / Math.max(0.2, Math.sin(O.ph)); this.rCam = Math.min(O.r, rHi); }
+      const C = this.cam;
+      const rc = this.rCam || O.r; C.position.set(Math.sin(O.ph) * Math.cos(O.th) * rc, Math.cos(O.ph) * rc + 1.5, Math.sin(O.ph) * Math.sin(O.th) * rc);
+      // it looks across the pitch at the stand opposite (the stadium, not just the grass)
+      C.lookAt(-Math.cos(O.th) * 14, 4 + 4 * (1 - Math.sin(O.ph)), -Math.sin(O.th) * 7);
+      this.R.render(this.S, C);
+    };
+    this.raf = requestAnimationFrame(loop);
+  }
+  // colours, grass, name and time of day onto the 3D stadium
+  apply3D(c) {
+    const T = window.THREE;
+    if (!this.R || !c) return;
+    // stadium tint
+    const tint = new T.Color(0xffffff).lerp(new T.Color(c.c1), 0.42);
+    (this.stadMats || []).forEach((m) => { if (m.color && m.userData.base) m.color.copy(m.userData.base).multiply(tint); });
+    // pitch
+    const x = this.pcv.getContext('2d'), w = 1024, h = 544, ppm = w / 68, X = (u) => (u + 4) * ppm, Y = (v) => (v + 3) * ppm;
+    const GT = { verde: ['#0a5c06', '#12780b'], oscuro: ['#06420a', '#0b5610'], claro: ['#1a7a14', '#25921c'], azulado: ['#0a5a3e', '#10704e'] }[c.grass] || ['#0a5c06', '#12780b'];
+    x.fillStyle = GT[0]; x.fillRect(0, 0, w, h); x.fillStyle = GT[1];
+    if (c.pitch === 'rayas' || c.pitch === 'anchas') { const sw = c.pitch === 'rayas' ? 3.75 : 7.5; for (let u = -4, i = 0; u < 64; u += sw, i++) if (i % 2) x.fillRect(X(u), 0, sw * ppm, h); }
+    else if (c.pitch === 'cuadros') { for (let u = -4, i = 0; u < 64; u += 5, i++) for (let v = -3, j = 0; v < 33; v += 5, j++) if ((i + j) % 2) x.fillRect(X(u), Y(v), 5 * ppm, 5 * ppm); }
+    else if (c.pitch === 'diagonal') { x.save(); x.translate(X(30), Y(15)); x.rotate(Math.PI / 4); for (let k = -20; k < 20; k += 2) x.fillRect(k * 4 * ppm, -60 * ppm, 4 * ppm, 120 * ppm); x.restore(); }
+    else if (c.pitch === 'circulos') { for (let rr = 40; rr > 0; rr -= 4) { x.fillStyle = (rr / 4) % 2 ? GT[1] : GT[0]; x.beginPath(); x.arc(X(30), Y(15), rr * ppm, 0, Math.PI * 2); x.fill(); } }
+    x.strokeStyle = '#ffffff'; x.lineWidth = 0.17 * ppm;
+    x.strokeRect(X(0), Y(0), 60 * ppm, 30 * ppm);
+    x.beginPath(); x.moveTo(X(30), Y(0)); x.lineTo(X(30), Y(30)); x.stroke();
+    x.beginPath(); x.arc(X(30), Y(15), 5.2 * ppm, 0, Math.PI * 2); x.stroke();
+    x.strokeRect(X(0), Y(6), 9 * ppm, 18 * ppm); x.strokeRect(X(51), Y(6), 9 * ppm, 18 * ppm);
+    x.strokeRect(X(0), Y(11), 3 * ppm, 8 * ppm); x.strokeRect(X(57), Y(11), 3 * ppm, 8 * ppm);
+    this.ptex.needsUpdate = true;
+    // LED boards
+    const L = this.lcv.getContext('2d'), name = c.name.toUpperCase();
+    L.fillStyle = '#0B0B14'; L.fillRect(0, 0, 1024, 32);
+    L.font = 'italic 800 24px Barlow Condensed, Arial'; L.textBaseline = 'middle';
+    const step = Math.max(260, L.measureText(name + ' ·').width + 40);
+    for (let u = 12, i = 0; u < 1024; u += step, i++) { L.fillStyle = i % 2 ? c.c1 : c.c2; L.fillText(name + ' ·', u, 17); }
+    (this.ledTex || []).forEach((t) => { t.needsUpdate = true; });
+    // time of day
+    const night = c.time === 'noche', dusk = c.time === 'atardecer';
+    this.sun.intensity = night ? 0.75 : dusk ? 1.0 : 1.3; this.sun.color.setHex(dusk ? 0xffa25a : night ? 0xdfe8ff : 0xfff4e0);
+    this.hemi.intensity = night ? 0.45 : 0.9; this.hemi.color.setHex(dusk ? 0xffb3c8 : 0xcfe0ff);
+    this.R.toneMappingExposure = night ? 1.2 : 1.05;
+  }
+  hold3D(th, ph, rr) { this.hold = { th, ph, r: rr }; this.touched = true; this.forceUpdate(); }
   save(v) {
     if (!window.AMStad) return;
     const cfg = window.AMStad.set(v);
     this.setState({ cfg, saved: Date.now() });
+    this.apply3D(cfg);
     clearTimeout(this.svT); this.svT = setTimeout(() => this.forceUpdate(), 1300);
   }
-  componentWillUnmount() { clearTimeout(this.svT); }
+  componentWillUnmount() {
+    clearTimeout(this.svT); cancelAnimationFrame(this.raf);
+    if (this.R) { try { this.S.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); this.R.dispose(); this.R.forceContextLoss(); } catch (e) {} this.R = null; }
+  }
   renderVals() {
     const S = window.AMStad, c = this.state.cfg || (S ? S.get() : { name: 'Mi estadio', c1: '#22D3EE', c2: '#FFC53D', pitch: 'rayas', grass: 'verde', time: 'auto' });
     const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16), f = (v) => Math.round(Math.max(0, Math.min(255, v * k))).toString(16).padStart(2, '0'); return '#' + f(n >> 16) + f((n >> 8) & 255) + f(n & 255); };
@@ -130,8 +225,22 @@ class Component extends DCLogic {
     const opts = (list, key) => (list || []).map(([v, label]) => ({ label, pick: () => this.save({ [key]: v }), style: chip(c[key] === v) }));
     const name = c.name, up = name.toUpperCase();
     const hasHist = typeof history !== 'undefined' && history.length > 1;
+    const SKYC = { auto: 'linear-gradient(180deg, #1B1050, #7C3AED)', dia: 'linear-gradient(180deg, #5DB4F0, #CFE8FF)', atardecer: 'linear-gradient(180deg, #2A1660, #FF7A59)', noche: 'linear-gradient(180deg, #04060F, #1B2350)' };
+    const O = this.orb;
     return {
       backHref: 'Perfil.dc.html',
+      cvRef: this.cvRef, loading: !!this.loading, skyCss: SKYC[c.time] || SKYC.auto,
+      hintStyle: 'opacity: ' + (this.touched ? 0 : 1),
+      // drag to orbit; the wheel (or the +/− buttons) to zoom
+      pDown: (e) => { this.drag = { x: e.clientX, y: e.clientY, t: performance.now() }; this.touched = true; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (er) {} e.currentTarget.style.cursor = 'grabbing'; },
+      pMove: (e) => { const D = this.drag; if (!D) return; const dx = e.clientX - D.x, dy = e.clientY - D.y, now = performance.now(); O.th += dx * 0.012; O.ph -= dy * 0.008; O.vth = dx * 0.012 / Math.max(0.016, (now - D.t) / 1000); D.x = e.clientX; D.y = e.clientY; D.t = now; },
+      pUp: (e) => { if (this.drag) { this.drag = null; if (e.currentTarget) e.currentTarget.style.cursor = 'grab'; } },
+      wheel: (e) => { e.preventDefault(); O.r *= Math.exp(e.deltaY * 0.0012); this.touched = true; },
+      hL: (e) => { e.preventDefault(); this.hold3D(1, 0, 0); }, hR: (e) => { e.preventDefault(); this.hold3D(-1, 0, 0); },
+      hU: (e) => { e.preventDefault(); this.hold3D(0, -1, 0); }, hD: (e) => { e.preventDefault(); this.hold3D(0, 1, 0); },
+      hIn: (e) => { e.preventDefault(); this.hold3D(0, 0, -1); }, hOut: (e) => { e.preventDefault(); this.hold3D(0, 0, 1); },
+      hOff: () => { this.hold = null; },
+      reset: () => { Object.assign(O, { th: 0.35, ph: 1.12, r: 40, vth: 0 }); this.touched = false; this.forceUpdate(); },
       savedStyle: 'padding: 4px 10px; border-radius: 10px; background: #053B26; color: #4ADE80; font: 800 10.5px Exo2, sans-serif; letter-spacing: 1px; transition: opacity .3s; opacity: ' + (Date.now() - this.state.saved < 1200 ? 1 : 0),
       sky1: s1, sky2: s2, c1: c.c1, c1d: shade(c.c1, 0.55), c2: c.c2, g1, g2, cuts, rings, fans,
       rows: [0, 1, 2, 3, 4, 5].map((r) => { const y = 44 + r * 11; return { y: y + 6, x1: 30 - (y - 40) * 0.28, x2: 430 + (y - 40) * 0.28 }; }),
