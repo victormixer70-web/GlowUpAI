@@ -190,6 +190,7 @@ class Component extends DCLogic {
       { key: 'sfx', ac: '#FFC53D', icon: 'M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14', title: 'EFECTOS DE SONIDO', desc: 'El balón, el árbitro, el público y los menús.', choices: [[1, 'Alta'], [0.8, 'Media'], [0.4, 'Baja'], [0, 'No']] },
       { key: 'cam', ac: '#22D3EE', icon: 'M23 7l-7 5l7 5zM1 5h15v14H1z', title: 'CÁMARA DEL PARTIDO', desc: 'TV: desde la tribuna, como en la tele. Pro: detrás de tu jugador.', choices: [['cerca', 'Cerca'], ['normal', 'Normal'], ['lejos', 'Lejos'], ['tv', 'TV'], ['pro', 'Pro']] },
       { key: 'gfx', ac: '#9B6BFF', icon: 'M12 2l2.4 7.4H22l-6.2 4.5l2.4 7.4L12 16.8l-6.2 4.5l2.4-7.4L2 9.4h7.6z', title: 'CALIDAD GRÁFICA', desc: 'Auto: la baja sola si tu móvil va lento. Baja: menos nitidez, sin sombras.', choices: [['auto', 'Auto'], ['alta', 'Alta'], ['media', 'Media'], ['baja', 'Baja']] },
+      { key: 'stad', ac: '#FB923C', icon: 'M3 20h18M5 20V10l7-5l7 5v10M9 20v-5h6v5', title: 'ESTADIO', desc: 'Dónde juegas tus partidos contra la IA. Se desbloquean subiendo de nivel. Al azar: cada vez uno.', choices: [['auto', 'Azar'], ['arena', 'Arena'], ['playa', 'Playa', 3], ['calle', 'Calle', 6], ['nevado', 'Nieve', 10], ['tormenta', 'Lluvia', 14]] },
       { key: 'names', ac: '#53D88E', icon: 'M20 7H4v6h16zM12 13v8M8 21h8', title: 'NOMBRES SOBRE LOS JUGADORES', desc: 'Con No, solo ves el TÚ encima de tu jugador.', choices: [[true, 'Sí'], [false, 'No']] },
       { key: 'narr', ac: '#FFC53D', icon: 'M9 2h6v12H9zM5 10a7 7 0 0 0 14 0M12 17v4', title: 'NARRADOR', desc: 'Las frases del narrador durante el partido. Con Voz, además las lee en alto.', choices: [['voz', 'Voz'], [true, 'Texto'], [false, 'No']] },
       { key: 'sens', ac: '#38BDF8', icon: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18M12 8a4 4 0 1 0 0 8a4 4 0 0 0 0-8', title: 'SENSIBILIDAD DEL JOYSTICK', desc: 'Alta: con poco recorrido del dedo ya corres a tope.', choices: [['baja', 'Baja'], ['normal', 'Normal'], ['alta', 'Alta']] },
@@ -202,12 +203,12 @@ class Component extends DCLogic {
       return {
         title: o.title, desc: o.desc, ac: o.ac, icon: o.icon, hasEq: audio && lvl > 0,
         eq: [0.6, 1, 0.75, 0.9, 0.5].map((h, k) => 'height: ' + Math.round(16 * h * Math.max(0.35, lvl)) + 'px; animation-duration: ' + (0.45 + k * 0.13).toFixed(2) + 's; animation-delay: ' + (-k * 0.21).toFixed(2) + 's'),
-        choices: o.choices.map(([v, label]) => {
-          const on = pl[o.key] === v;
+        choices: o.choices.map(([v, label, need]) => {
+          const on = (pl[o.key] ?? (o.key === 'stad' ? 'auto' : undefined)) === v, myLv = window.AMProgress && window.AMProgress.level ? window.AMProgress.level().level : 1, locked = need && myLv < need;
           return {
-            label, on: on ? 'true' : 'false', cls: 'cf-pick' + (on ? ' cf-on' : ''),
-            pick: () => this.savePlay({ ...pl, [o.key]: v }),
-            style: 'flex: 1; height: 32px; border-radius: 10px; cursor: pointer; font: 800 12px Exo2, sans-serif; ' + (on ? 'background: linear-gradient(180deg, color-mix(in srgb, ' + o.ac + ' 70%, #fff), ' + o.ac + '); color: #150925; border: 0; box-shadow: inset 0 2px 0 #fff8, 0 3px 0 color-mix(in srgb, ' + o.ac + ' 45%, #000), 0 0 12px ' + o.ac + '66;' : 'background: #15092588; color: #CACAE0; border: 1px solid #2E2E52; box-shadow: 0 3px 0 #0D0418;')
+            label: locked ? '🔒 Nv ' + need : label, on: on ? 'true' : 'false', cls: 'cf-pick' + (on ? ' cf-on' : ''),
+            pick: () => { if (!locked) this.savePlay({ ...pl, [o.key]: v }); },
+            style: 'flex: 1; height: 32px; border-radius: 10px; cursor: pointer; font: 800 12px Exo2, sans-serif; ' + (on ? 'background: linear-gradient(180deg, color-mix(in srgb, ' + o.ac + ' 70%, #fff), ' + o.ac + '); color: #150925; border: 0; box-shadow: inset 0 2px 0 #fff8, 0 3px 0 color-mix(in srgb, ' + o.ac + ' 45%, #000), 0 0 12px ' + o.ac + '66;' : 'background: #15092588; color: #CACAE0; border: 1px solid #2E2E52; box-shadow: 0 3px 0 #0D0418;') + (locked ? ' opacity: .55; filter: grayscale(.6);' : '')
           };
         })
       };

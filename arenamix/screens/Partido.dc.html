@@ -904,7 +904,14 @@ class Component extends DCLogic {
     if (this.play && this.play.narr === 'voz' && window.speechSynthesis) {
       try {
         const u = new SpeechSynthesisUtterance(text.replace(/[¡!¿?…·]/g, ' '));
-        u.lang = en ? 'en-GB' : 'es-ES'; u.rate = 1.12; u.pitch = 1.05; u.volume = Math.min(1, (this.play.sfx ?? 0.8) + 0.2);
+        u.lang = en ? 'en-GB' : 'es-ES'; u.rate = force ? 1.18 : 1.1; u.pitch = force ? 1.12 : 1.02;
+        // the best voice the phone has: a natural Spanish (Spain) one first, then any Spanish, a male one if it can tell
+        const vs = window.speechSynthesis.getVoices(), want = en ? 'en' : 'es';
+        if (vs.length && (!this.voiceSel || this.voiceSel.lang.slice(0, 2) !== want)) {
+          const sc = (v) => (v.lang.slice(0, 2) === want ? 10 : -99) + (/es-ES|en-GB/.test(v.lang) ? 4 : 0) + (/natural|neural|enhanced|premium|google/i.test(v.name) ? 3 : 0) + (/jorge|pablo|alvaro|diego|enrique|daniel|male|hombre/i.test(v.name) ? 2 : 0);
+          this.voiceSel = vs.slice().sort((x, y) => sc(y) - sc(x))[0];
+        }
+        if (this.voiceSel && this.voiceSel.lang.slice(0, 2) === want) u.voice = this.voiceSel; u.volume = Math.min(1, (this.play.sfx ?? 0.8) + 0.2);
         if (force) window.speechSynthesis.cancel();
         if (!window.speechSynthesis.speaking || force) window.speechSynthesis.speak(u);
       } catch (e) {}
@@ -2371,7 +2378,14 @@ class Component extends DCLogic {
       let r = Math.random();
       if (key) { let h = 7; for (let k = 0; k < key.length; k++) h = (h * 31 + key.charCodeAt(k)) | 0; r = ((h >>> 0) % 1000) / 1000; }
       const one = this.size() === 1 && !P0.practice;
-      this.wx = window.__amWx ? window.__amWx : P0.tutorial ? 'dia' : one ? (r < 0.45 ? 'noche' : r < 0.65 ? 'atardecer' : r < 0.85 ? 'lluvia' : 'nieve') : (r < 0.32 ? 'dia' : r < 0.5 ? 'atardecer' : r < 0.72 ? 'noche' : r < 0.88 ? 'lluvia' : 'nieve');
+      // the stadium (Configuración): beach, street court, snow or storm set the surface and the weather; online and tutorial keep the arena
+      const pl = this.play || {}, lv = window.AMProgress && window.AMProgress.level ? window.AMProgress.level().level : 1;
+      const NEED = { playa: 3, calle: 6, nevado: 10, tormenta: 14 }, own = Object.keys(NEED).filter((k) => lv >= NEED[k]);
+      let st = pl.stad || 'auto';
+      if (st === 'auto') st = own.length && Math.random() < 0.5 ? own[Math.floor(Math.random() * own.length)] : 'arena';
+      if (NEED[st] && lv < NEED[st]) st = 'arena';
+      this.stad = rm || P0.tutorial || P0.practice ? 'arena' : window.__amStad || st;
+      this.wx = window.__amWx ? window.__amWx : this.stad === 'playa' ? (r < 0.7 ? 'dia' : 'atardecer') : this.stad === 'calle' ? 'noche' : this.stad === 'nevado' ? 'nieve' : this.stad === 'tormenta' ? 'lluvia' : P0.tutorial ? 'dia' : one ? (r < 0.45 ? 'noche' : r < 0.65 ? 'atardecer' : r < 0.85 ? 'lluvia' : 'nieve') : (r < 0.32 ? 'dia' : r < 0.5 ? 'atardecer' : r < 0.72 ? 'noche' : r < 0.88 ? 'lluvia' : 'nieve');
     }
     const night = this.wx === 'noche', grey = this.wx === 'lluvia' || this.wx === 'nieve', dusk = this.wx === 'atardecer';
     // real stadium HDRI: daylight sky behind the stands and image-based light on players and pitch
@@ -2401,10 +2415,31 @@ class Component extends DCLogic {
     const M = 7, ppm = 32, PW = 60 + 2 * M, PH = 30 + 2 * M;
     const tex = this.canvasTex(PW * ppm, PH * ppm, (c, w, h) => {
       const X = (x) => (x + M) * ppm, Y = (y) => (y + M) * ppm;
-      c.fillStyle = '#0a5c06'; c.fillRect(0, 0, w, h);
-      for (let x = -M, i = 0; x < 60 + M; x += 3.75, i++) if (i % 2) { c.fillStyle = '#12780b'; c.fillRect(X(x), 0, 3.75 * ppm, h); }
-      for (let i = 0; i < 12000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.035)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
-      c.strokeStyle = '#ffffff'; c.lineWidth = 0.17 * ppm;
+      const SD = this.stad;
+      if (SD === 'playa') {
+        // sand: warm, uneven, with footprints
+        c.fillStyle = '#b98a4e'; c.fillRect(0, 0, w, h);
+        for (let i = 0; i < 26000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,240,200,0.10)' : 'rgba(120,80,30,0.10)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
+        for (let i = 0; i < 260; i++) { c.fillStyle = 'rgba(110,75,30,0.16)'; c.beginPath(); c.ellipse(Math.random() * w, Math.random() * h, 7, 12, Math.random() * 3, 0, Math.PI * 2); c.fill(); }
+      } else if (SD === 'calle') {
+        // a street court: blue asphalt with an orange run-off
+        c.fillStyle = '#c2410c'; c.fillRect(0, 0, w, h);
+        c.fillStyle = '#1e3a8a'; c.fillRect(X(0), Y(0), 60 * ppm, 30 * ppm);
+        for (let i = 0; i < 30000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.12)'; c.fillRect(Math.random() * w, Math.random() * h, 2, 2); }
+        c.fillStyle = '#ea580c'; c.fillRect(X(0), Y(6), 9 * ppm, 18 * ppm); c.fillRect(X(51), Y(6), 9 * ppm, 18 * ppm);
+        c.beginPath(); c.arc(X(30), Y(15), 5.2 * ppm, 0, Math.PI * 2); c.fill();
+      } else if (SD === 'nevado') {
+        // packed snow with the grass peeking through where the players run
+        c.fillStyle = '#cfd9e6'; c.fillRect(0, 0, w, h);
+        for (let x = -M, i = 0; x < 60 + M; x += 3.75, i++) if (i % 2) { c.fillStyle = '#c3cfdd'; c.fillRect(X(x), 0, 3.75 * ppm, h); }
+        for (let i = 0; i < 420; i++) { c.fillStyle = 'rgba(40,110,40,0.22)'; c.beginPath(); c.ellipse(X(5 + Math.random() * 50), Y(3 + Math.random() * 24), 6 + Math.random() * 22, 4 + Math.random() * 12, Math.random() * 3, 0, Math.PI * 2); c.fill(); }
+        for (let i = 0; i < 20000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.25)' : 'rgba(90,110,140,0.08)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
+      } else {
+        c.fillStyle = '#0a5c06'; c.fillRect(0, 0, w, h);
+        for (let x = -M, i = 0; x < 60 + M; x += 3.75, i++) if (i % 2) { c.fillStyle = '#12780b'; c.fillRect(X(x), 0, 3.75 * ppm, h); }
+        for (let i = 0; i < 12000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.035)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
+      }
+      c.strokeStyle = SD === 'playa' ? '#1d4ed8' : SD === 'nevado' ? '#dc2626' : '#ffffff'; c.lineWidth = 0.17 * ppm;
       c.strokeRect(X(0), Y(0), 60 * ppm, 30 * ppm);
       c.beginPath(); c.moveTo(X(30), Y(0)); c.lineTo(X(30), Y(30)); c.stroke();
       c.beginPath(); c.arc(X(30), Y(15), 5.2 * ppm, 0, Math.PI * 2); c.stroke();
@@ -2415,17 +2450,18 @@ class Component extends DCLogic {
       c.beginPath(); c.arc(X(7), Y(15), 5.2 * ppm, -da, da); c.stroke();
       c.beginPath(); c.arc(X(53), Y(15), 5.2 * ppm, Math.PI - da, Math.PI + da); c.stroke();
       [[0, 0, 0], [60, 0, Math.PI / 2], [60, 30, Math.PI], [0, 30, -Math.PI / 2]].forEach(([x, y, a]) => { c.beginPath(); c.arc(X(x), Y(y), 0.8 * ppm, a, a + Math.PI / 2); c.stroke(); });
-      c.fillStyle = '#ffffff';
+      c.fillStyle = c.strokeStyle;
       [[30, 15, 0.25], [7, 15, 0.2], [53, 15, 0.2]].forEach(([x, y, r]) => { c.beginPath(); c.arc(X(x), Y(y), r * ppm, 0, Math.PI * 2); c.fill(); });
     });
     // real lawn texture tiled under the painted stripes and lines
-    const pitch = new T.Mesh(new T.PlaneGeometry(PW, PH), window.AMGrass ? window.AMGrass.material(tex, PW, PH) : new T.MeshStandardMaterial({ map: tex, roughness: 0.95 }));
-    if (this.wx === 'nieve' && pitch.material.color) pitch.material.color.lerp(new T.Color(0xffffff), 0.18);
+    const bare = this.stad === 'playa' || this.stad === 'calle' || this.stad === 'nevado';
+    const pitch = new T.Mesh(new T.PlaneGeometry(PW, PH), window.AMGrass && !bare ? window.AMGrass.material(tex, PW, PH) : new T.MeshStandardMaterial({ map: tex, roughness: this.stad === 'calle' ? 0.7 : 1 }));
+    if (this.wx === 'nieve' && pitch.material.color) pitch.material.color.lerp(new T.Color(0xffffff), this.stad === 'nevado' ? 0 : 0.18);
     if (this.wx === 'lluvia' && pitch.material.roughness != null) pitch.material.roughness = Math.min(pitch.material.roughness, 0.55);
     pitch.rotation.x = -Math.PI / 2; pitch.receiveShadow = true; S.add(pitch);
     // blades of grass with real depth near the camera (more layers on better graphics; none on low)
-    { const nL = this.gfxNow === 'alta' ? 6 : this.gfxNow === 'media' ? 3 : 0; if (nL && window.AMGrass && window.AMGrass.shells && this.wx !== 'nieve') S.add(window.AMGrass.shells(tex, PW, PH, nL)); }
-    const apron = new T.Mesh(new T.PlaneGeometry(500, 500), this.mat(0x0a3a0c, { roughness: 1 }));
+    { const nL = this.gfxNow === 'alta' ? 6 : this.gfxNow === 'media' ? 3 : 0; if (nL && window.AMGrass && window.AMGrass.shells && this.wx !== 'nieve' && !bare) S.add(window.AMGrass.shells(tex, PW, PH, nL)); }
+    const apron = new T.Mesh(new T.PlaneGeometry(500, 500), this.mat(this.stad === 'playa' ? 0xc49a5c : this.stad === 'calle' ? 0x26262e : this.stad === 'nevado' ? 0xdfe8f2 : 0x0a3a0c, { roughness: 1 }));
     apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; S.add(apron);
     // ---------- big open-air stadium: two tiers on three sides, ultras behind each goal ----------
     const P = this.props;
