@@ -13,6 +13,7 @@ body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#6E6E92}
 @keyframes lgSwing{0%,100%{rotate:-1.6deg}50%{rotate:1.6deg}}
+.lg-card>div:first-child{transform:perspective(700px) rotateY(calc(var(--mx,0) * 7deg)) rotateX(calc(var(--my,0) * -5deg));transition:transform .25s ease-out}
 @keyframes lgHolo{to{background-position:200% 0}}
 @keyframes lgPulse{0%,100%{box-shadow:0 0 0 0 #FFC53D77,0 8px 22px #000a}50%{box-shadow:0 0 0 8px #FFC53D00,0 8px 22px #000a}}
 @keyframes lgFade{from{opacity:0}}
@@ -54,6 +55,13 @@ input::placeholder{color:#6E6E92}
 @keyframes lgLive{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes lgStubFly{to{translate:90px 140px;rotate:38deg;opacity:0}}
 @keyframes lgMainFlash{0%{filter:brightness(1)}40%{filter:brightness(1.8)}100%{filter:brightness(1)}}
+.lg-photo{position:absolute;left:-30px;top:-20px;width:904px;height:430px;background:url(assets/bg_tribuna.jpg) center 30%/cover no-repeat;transform:translate(calc(var(--mx,0) * -14px),calc(var(--my,0) * -8px)) scale(1.04);transition:transform .25s ease-out;animation:lgKen 18s ease-in-out infinite alternate;pointer-events:none}
+@keyframes lgKen{from{background-position:center 30%}to{background-position:center 40%}}
+.lg-tint{position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 80% at 18% 50%,#4C1D9599 0%,transparent 70%),radial-gradient(45% 70% at 92% 60%,#DB277766 0%,transparent 70%),linear-gradient(180deg,#0E052A55 0%,#0E052A00 40%,#0A042088 100%)}
+.lg-beam{position:absolute;top:-40px;width:180px;height:520px;margin-left:-90px;transform-origin:50% 0;background:linear-gradient(180deg,#E8F6FF66,#E8F6FF00 80%);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);mix-blend-mode:screen;pointer-events:none;animation:lgBeam 7s ease-in-out infinite alternate}
+@keyframes lgBeam{from{rotate:-28deg}to{rotate:22deg}}
+.lg-tap{position:absolute;inset:0;cursor:crosshair}
+.lg-outline{transform:translate(calc(var(--mx,0) * 10px),calc(var(--my,0) * 6px));transition:transform .3s ease-out}
 .lg-card{position:absolute;left:514px;top:44px;width:304px;height:330px;transform-origin:50% -46px;animation:lgIn .6s cubic-bezier(.2,1.4,.4,1) both,lgSwing 6s 0.6s ease-in-out infinite}
 .lg-card:focus-within{animation-play-state:running,paused}
 .lg-field{display:flex;align-items:center;gap:8px;height:36px;padding:0 10px;border-radius:9px;border:1px solid #A78BFA99;background:#1E0B4ACC;transition:border-color .2s,box-shadow .2s}
@@ -68,9 +76,12 @@ input::placeholder{color:#6E6E92}
 .lg-social{flex:none;width:40px;height:36px;border-radius:9px;border:1px solid #A78BFA99;background:#1E0B4ACC;display:flex;align-items:center;justify-content:center;cursor:pointer}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(55% 70% at 15% 15%, #7C3AEDCC 0%, transparent 65%), radial-gradient(50% 70% at 95% 95%, #DB2777BB 0%, transparent 62%), radial-gradient(40% 55% at 60% 0%, #0EA5E9AA 0%, transparent 62%), linear-gradient(160deg, #2A1170 0%, #1A0B4A 55%, #2A0A3A 100%); color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none">
-  <canvas ref="{{crowdRef}}" aria-hidden="true" style="position: absolute; inset: 0; width: 844px; height: 390px; display: block"></canvas>
-  <span aria-hidden="true" style="position: absolute; left: 6px; top: 64px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 150px; line-height: .8; white-space: nowrap; color: transparent; -webkit-text-stroke: 2px #F0ABFC66; animation: lgTitleIn 1s cubic-bezier(.2,.8,.2,1) both; pointer-events: none">ARENA<br>MIX</span>
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(55% 70% at 15% 15%, #7C3AEDCC 0%, transparent 65%), radial-gradient(50% 70% at 95% 95%, #DB2777BB 0%, transparent 62%), radial-gradient(40% 55% at 60% 0%, #0EA5E9AA 0%, transparent 62%), linear-gradient(160deg, #2A1170 0%, #1A0B4A 55%, #2A0A3A 100%); color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none; {{rootVars}}" onPointerMove="{{onMove}}" onPointerDown="{{tapBg}}">
+  <div class="lg-photo" aria-hidden="true"></div>
+  <div class="lg-tint" aria-hidden="true"></div>
+  <i class="lg-beam" style="left: 96px; animation-delay: -2s"></i><i class="lg-beam" style="left: 760px; animation-direction: alternate-reverse"></i>
+  <canvas ref="{{crowdRef}}" aria-hidden="true" style="position: absolute; inset: 0; width: 844px; height: 390px; display: block; cursor: pointer"></canvas>
+  <span class="lg-outline" aria-hidden="true" style="position: absolute; left: 6px; top: 64px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 150px; line-height: .8; white-space: nowrap; color: transparent; -webkit-text-stroke: 2px #F0ABFC66; animation: lgTitleIn 1s cubic-bezier(.2,.8,.2,1) both; pointer-events: none">ARENA<br>MIX</span>
   <sc-if value="{{show3d}}" hint-placeholder-val="{{ false }}">
     <canvas ref="{{canvasRef}}" role="img" aria-label="Tu jugador. Tócalo para que chute." onPointerDown="{{kick}}" style="position: absolute; left: 0; top: 0; width: 500px; height: 390px; display: block; cursor: pointer; touch-action: manipulation"></canvas>
     <span style="position: absolute; left: 92px; top: 300px; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; background: #150925CC; border: 1px solid #2E2E58; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #CACAE0; pointer-events: none; animation: lgHint 1.8s ease-in-out infinite; opacity: {{hintOp}}; transition: opacity .4s">
@@ -268,7 +279,7 @@ class Component extends DCLogic {
     s.beginPath(); s.ellipse(250, 330, 150, 34, 0, 0, Math.PI * 2); s.stroke();
     s.beginPath(); s.moveTo(422, 236); s.lineTo(422, 390); s.stroke();
     // floodlight towers
-    this.lights = [[318, 40], [452, 26], [596, 14]];
+    this.lights = [[96, 52], [760, 52]];
     this.lights.forEach(([lx, ly]) => {
       s.fillStyle = '#15092A'; s.fillRect(lx - 1.5, ly, 3, 130);
       s.fillStyle = '#E8F6FF'; for (let i = 0; i < 4; i++) for (let j = 0; j < 2; j++) s.fillRect(lx - 14 + i * 7, ly - 8 + j * 6, 5, 4);
@@ -279,7 +290,7 @@ class Component extends DCLogic {
       this.craf = requestAnimationFrame(loop);
       if (now - last < 33) return;
       const dt = Math.min(0.1, (now - last) / 1000); last = now;
-      x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, cv.width, cv.height); x.drawImage(st, 0, 0);
+      x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, cv.width, cv.height);
       x.setTransform(dpr, 0, 0, dpr, 0, 0);
       // floodlight glare, breathing a little
       const tt = now / 1000;
@@ -295,16 +306,24 @@ class Component extends DCLogic {
         this.fw.push({ cx, cy, col, t: 0, n: 18 + Math.floor(Math.random() * 10) });
       }
       this.fw = this.fw.filter((f) => (f.t += dt) < 1.4);
+      this.fw.forEach((f) => { if (f.big && f.t < 0.12) { const fl = x.createRadialGradient(f.cx, f.cy, 0, f.cx, f.cy, 90); fl.addColorStop(0, 'rgba(255,255,255,.35)'); fl.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = fl; x.fillRect(f.cx - 90, f.cy - 90, 180, 180); } });
       this.fw.forEach((f) => {
         const k = f.t / 1.4, r = 8 + 46 * (1 - Math.pow(1 - k, 3));
         x.globalAlpha = Math.max(0, 1 - k); x.fillStyle = f.col;
-        for (let i = 0; i < f.n; i++) { const a = i / f.n * Math.PI * 2; x.beginPath(); x.arc(f.cx + Math.cos(a) * r, f.cy + Math.sin(a) * r + k * k * 14, 1.8, 0, Math.PI * 2); x.fill(); }
+        const R2 = r * (f.big ? 1.5 : 1);
+        for (let i = 0; i < f.n; i++) { const a = i / f.n * Math.PI * 2; x.beginPath(); x.arc(f.cx + Math.cos(a) * R2, f.cy + Math.sin(a) * R2 + k * k * 14, f.big ? 2.4 : 1.8, 0, Math.PI * 2); x.fill(); }
         x.globalAlpha = 1;
       });
+      // la ola: a band of light rolling round the stands
+      {
+        const wx = ((tt * 170) % 1200) - 180, gw = x.createLinearGradient(wx - 90, 0, wx + 90, 0);
+        gw.addColorStop(0, 'rgba(255,255,255,0)'); gw.addColorStop(0.5, 'rgba(255,240,200,0.16)'); gw.addColorStop(1, 'rgba(255,255,255,0)');
+        x.fillStyle = gw; x.fillRect(wx - 90, 120, 180, 110);
+      }
       // camera flashes popping all over the stands
       this.flashes.forEach((f) => {
         f.t -= dt;
-        if (f.t < 0) { f.t = 0.6 + Math.random() * 3; f.x = Math.random() * 844; f.y = 70 + Math.random() * 160; }
+        if (f.t < 0) { f.t = 0.6 + Math.random() * 3; f.x = Math.random() * 844; f.y = 120 + Math.random() * 100; }
         if (f.t < 0.12) {
           const k = f.t / 0.12, rr = 6 * k + 1;
           const gf = x.createRadialGradient(f.x, f.y, 0, f.x, f.y, rr * 3);
@@ -447,6 +466,26 @@ class Component extends DCLogic {
     return {
       langCode: (window.AMI18n ? window.AMI18n.lang() : 'es').toUpperCase(),
       crowdRef: this.crowdRef, canvasRef: this.canvasRef, show3d, show2d: !show3d,
+      rootVars: '--mx: ' + (this.mx || 0).toFixed(3) + '; --my: ' + (this.my || 0).toFixed(3) + ';',
+      // the stadium follows the finger (or the mouse) a little: depth between the photo, the title and the card
+      onMove: (e) => {
+        const r0 = e.currentTarget.getBoundingClientRect(), mx = ((e.clientX - r0.left) / r0.width - 0.5) * 2, my = ((e.clientY - r0.top) / r0.height - 0.5) * 2;
+        this.mx = Math.max(-1, Math.min(1, mx)); this.my = Math.max(-1, Math.min(1, my));
+        const now = performance.now(); if (now - (this.mvT || 0) > 50) { this.mvT = now; e.currentTarget.style.setProperty('--mx', this.mx.toFixed(3)); e.currentTarget.style.setProperty('--my', this.my.toFixed(3)); }
+      },
+      // a tap on the stadium: a firework right there, and the crowd roars
+      tapBg: (e) => {
+        // only on the stadium itself: the crowd canvas, or the sky above your player
+        const tg = e.target, r0 = e.currentTarget.getBoundingClientRect(), k = 844 / r0.width;
+        const cx = (e.clientX - r0.left) * k, cy0 = (e.clientY - r0.top) * k, cy = Math.min(200, cy0);
+        if (!tg || tg.tagName !== 'CANVAS' || (tg !== this.cc && cy0 > 120)) return;
+        this.fw = this.fw || [];
+        const cols = ['#22D3EE', '#F472B6', '#FACC15', '#A855F7', '#4ADE80', '#F97316'];
+        this.fw.push({ cx, cy, col: cols[Math.floor(Math.random() * 6)], t: 0, n: 30, big: true });
+        this.fw.push({ cx: cx + 40 - Math.random() * 80, cy: cy - 20, col: cols[Math.floor(Math.random() * 6)], t: -0.15, n: 20 });
+        try { if (window.AMSfx && window.AMSfx.roar) window.AMSfx.roar(true); else if (window.AMSfx && window.AMSfx.crowd) window.AMSfx.crowd(1); } catch (er) {}
+        if (navigator.vibrate) try { navigator.vibrate(15); } catch (er) {}
+      },
       kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#150925', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#251443', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE',
       fans: this.fans.toLocaleString('es-ES'), serial: this.serial, name: name.toUpperCase(),
       photo: show3d ? 'assets/chars/' + pref + '.png' : '', photoDisp: show3d ? 'block' : 'none',
