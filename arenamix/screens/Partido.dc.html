@@ -700,7 +700,7 @@ class Component extends DCLogic {
       if (p.team === 1) { x = 60 - x; y = 30 - y; }
       Object.assign(p, { x, y });
     });
-    g.own = -1; g.hold = -1; g.recv = null; g.charging = false; g.charge = 0;
+    g.own = -1; g.hold = -1; g.gkSafe = null; g.recv = null; g.charging = false; g.charge = 0;
     g.ctl = this.keeperMode() ? g.ps.findIndex((p) => p.team === 0 && p.role === 'gk') : g.ps.findIndex((p) => p.team === 0 && p.slot === (this.net ? this.net.mySlot : 0));
     if (this.net) this.net.humans.forEach((h) => { h.i = h.home; h.charging = false; h.charge = 0; });
   }
@@ -808,7 +808,7 @@ class Component extends DCLogic {
       q.act = { type: 'cheer', t: 0, dur: 9999 };
     });
     Object.assign(g.ball, { x: -40, y: -40, z: 0, vx: 0, vy: 0, vz: 0 });
-    g.own = -1; g.hold = -1;
+    g.own = -1; g.hold = -1; g.gkSafe = null;
     this.confetti = null;
     this.loop();
   }
@@ -939,6 +939,8 @@ class Component extends DCLogic {
     const g = this.g;
     return !this.props.tutorial && g.dur >= 60 && g.t <= 30 && (g.phase === 'play' || g.phase === 'goal');
   }
+  // a keeper's punt, throw or goal kick from the hands can't be blocked: rivals let it through until it lands or a teammate takes it
+  gkFree(k) { this.g.gkSafe = { team: k.team, t: 1.6 }; }
   release(p) {
     const g = this.g, i = g.ps.indexOf(p);
     if (g.own === i) g.own = -1;
@@ -1183,7 +1185,7 @@ class Component extends DCLogic {
     if (g.hold === g.ctl) {
       // a punt from the hands, aimed with the stick
       const [ix, iy] = this.inp || [0, 0], dir = Math.hypot(ix, iy) > 0.2 ? Math.atan2(iy, ix) : 0;
-      g.hold = -1; p.cd = 0; g.ball.z = 0.5;
+      g.hold = -1; p.cd = 0; g.ball.z = 0.5; this.gkFree(p);
       this.kick(p, 0.55 + g.charge * 0.45, this.clamp(dir, -1.2, 1.2), true, 1, 0);
       p.cd = 0.8; g.charging = false; g.charge = 0;
       return;
@@ -1232,7 +1234,7 @@ class Component extends DCLogic {
       const [ix, iy] = this.inp || [0, 0], aimed = Math.hypot(ix, iy) > 0.2;
       const q = this.pickPassTarget(p, aimed ? Math.atan2(iy, ix) : 0, !aimed);
       if (!q) return;
-      g.hold = -1; p.cd = 0;
+      g.hold = -1; p.cd = 0; this.gkFree(p);
       this.passBall(p, q); b.vz = 2.2; p.cd = 0.8;
       return;
     }
@@ -1962,7 +1964,7 @@ class Component extends DCLogic {
       b.x = k.x + Math.cos(k.face) * 0.35; b.y = k.y + Math.sin(k.face) * 0.35; b.z = 0.9; b.vx = b.vy = b.vz = 0;
       g.holdT -= g.hold === g.ctl && this.keeperMode() ? dt / 6 : dt;
       if (g.holdT <= 0 && !(k.act && k.act.lock)) {
-        g.hold = -1;
+        g.hold = -1; this.gkFree(k);
         const foes = g.ps.filter((q) => q.team !== k.team && q.role !== 'gk');
         const mates = g.ps.filter((q) => q.team === k.team && q.role !== 'gk')
           .sort((u, v) => foes.reduce((m, o) => Math.min(m, this.dist(o, v)), 99) - foes.reduce((m, o) => Math.min(m, this.dist(o, u)), 99));
@@ -1972,6 +1974,8 @@ class Component extends DCLogic {
       }
       return;
     }
+    const gs = g.gkSafe;
+    if (gs) { gs.t -= dt; if (gs.t <= 0 || (g.own >= 0 && g.ps[g.own].team === gs.team)) g.gkSafe = null; }
     if (b.fire > 0) { b.fire -= dt; if (g.own >= 0 || Math.hypot(b.vx, b.vy) < 9) b.fire = 0; }
     // ---- free ball physics: gravity, air drag, bounce, rolling resistance, curl ----
     if (b.z > 0 || b.vz > 0) {
@@ -2061,7 +2065,7 @@ class Component extends DCLogic {
     const BR = 0.48;
     for (let i = 0; i < g.ps.length; i++) {
       const p = g.ps[i];
-      if (p === owner || b.z > 1.8 || (owner && p.team === owner.team) || p.ghost > 0) continue;
+      if (p === owner || b.z > 1.8 || (owner && p.team === owner.team) || p.ghost > 0 || (g.gkSafe && p.team !== g.gkSafe.team)) continue;
       p.contestT = Math.max(0, (p.contestT || 0) - dt);
       const sliding = p.act && (p.act.type === 'slide' || p.act.type === 'dive');
       const r = sliding ? 0.6 : BR;
@@ -2095,7 +2099,7 @@ class Component extends DCLogic {
     let best = -1, bd = 1e9;
     for (let i = 0; i < g.ps.length; i++) {
       const p = g.ps[i];
-      if (p.role === 'gk' || p.cd > 0 || (p.act && p.act.lock)) continue;
+      if (p.role === 'gk' || p.cd > 0 || (p.act && p.act.lock) || (g.gkSafe && p.team !== g.gkSafe.team)) continue;
       const d = Math.hypot(b.x - p.x, b.y - p.y);
       if (d > 0.95 || b.z > 0.8) continue;
       const rs = Math.hypot(b.vx - p.vx, b.vy - p.vy), ctrl = i === g.ctl ? this.tt('con') : 0.3;
