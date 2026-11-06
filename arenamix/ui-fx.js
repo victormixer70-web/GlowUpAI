@@ -229,6 +229,8 @@
     '.bc-title.hd::after{content:"";position:absolute;top:-30%;bottom:-30%;left:0;width:28%;background:linear-gradient(100deg,transparent,#ffffff66,transparent);transform:translateX(-160%) skewX(-18deg);animation:bcTitleShine 5s ease-in-out infinite;pointer-events:none}',
     '@keyframes bcTitleShine{0%,70%{transform:translateX(-160%) skewX(-18deg)}100%{transform:translateX(520%) skewX(-18deg)}}',
     '.bc-title.hd+span{margin-top:5px;display:block}',
+    // header titles in the logo's colours: deep black into a strong electric blue, with a blue edge and glow
+    '.bc-title.hd,#stage .bc-title.hd{background:linear-gradient(120deg,#02040C 0%,#06102E 32%,#0A3DCC 70%,#1E8BFF 100%)!important;box-shadow:inset 0 2px 0 #7CC4FF55,inset 0 -3px 0 #00000099,0 0 0 2px #000000,0 0 0 3.5px #1E8BFF,0 0 18px #0A6CFF99!important;text-shadow:0 2px 0 #000000CC,0 0 12px #3DA9FF88!important}',
     '[style*="border: 1px solid rgb(46, 46, 82)"],[style*="border: 2px solid rgb(46, 46, 82)"]{border-color:#7C5CFF99!important}',
     '#stage[data-theme="logo"] [style*="linear-gradient(180deg, rgb(42, 17, 112), rgb(76, 29, 149) 60%, rgb(107, 31, 126))"]{background:radial-gradient(60% 60% at 50% 30%,#1E8BFF88,transparent 70%),linear-gradient(180deg,#040A1C,#071230 60%,#0A1A44)!important}',
     '#stage[data-theme="logo"] [style*="rgb(126, 42, 142), rgb(58, 18, 102) 55%, rgb(30, 10, 62)"]{background:radial-gradient(70% 90% at 50% 0%,#3DA9FF55,transparent 70%),linear-gradient(180deg,#0A1A44,#040A1C 55%,#050B1F)!important;border-top-color:#6CC3FF!important;box-shadow:0 -4px 18px #1E8BFF88!important}',
