@@ -480,7 +480,7 @@ class Component extends DCLogic {
     const O = window.AMOnline;
     if (!O || !O.available() || this.pl.kind !== 'team') return;
     const A = window.AMChars, o = A ? A.outfit('futbol') : null;
-    const look = { char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none' };
+    const look = { char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none', stad: window.AMStad ? window.AMStad.get() : null };
     this.endOnline();
     const SO = window.AMSocial, party = SO && SO.partyNames ? SO.partyNames() : null;
     const handlers = {

@@ -780,6 +780,11 @@ class Component extends DCLogic {
   }
   start() {
     if (this.g.phase === 'end') this.newGame();
+    if (this.myStad && !this.stadSaid) {
+      this.stadSaid = true;
+      const rival = this.props.awayName || 'tu rival';
+      setTimeout(() => this.callout(this.adName, this.stadHome ? 'Juegas en casa' : 'Juegas en el campo de ' + rival, this.myStad.c2), 900);
+    }
     // team matches open with the fans: the camera shows each end, flares lit, then kick-off
     if (this.size() >= 2 && !this.props.tutorial && !this.net && !this.introDone) {
       this.introDone = true;
@@ -2530,7 +2535,23 @@ class Component extends DCLogic {
       if (st === 'auto') st = own.length && Math.random() < 0.5 ? own[Math.floor(Math.random() * own.length)] : 'arena';
       if (NEED[st] && lv < NEED[st]) st = 'arena';
       this.stad = rm || P0.tutorial || P0.practice ? 'arena' : window.__amStad || st;
-      this.wx = window.__amWx ? window.__amWx : this.stad === 'playa' ? (r < 0.7 ? 'dia' : 'atardecer') : this.stad === 'calle' ? 'noche' : this.stad === 'nevado' ? 'nieve' : this.stad === 'tormenta' ? 'lluvia' : P0.tutorial ? 'dia' : one ? (r < 0.45 ? 'noche' : r < 0.65 ? 'atardecer' : r < 0.85 ? 'lluvia' : 'nieve') : (r < 0.32 ? 'dia' : r < 0.5 ? 'atardecer' : r < 0.72 ? 'noche' : r < 0.88 ? 'lluvia' : 'nieve');
+      // 1 VS 1: a coin toss decides whose stadium it is (yours or your rival's, as each of you set it up in Mi estadio)
+      this.myStad = null;
+      const SD = window.AMStad;
+      if (SD && this.size() === 1 && !P0.tutorial && !P0.practice) {
+        let mine = SD.get(), theirs = SD.ai(P0.awayName || 'Rival'), meHome = r < 0.5;
+        if (rm && P0.online.roster) {
+          const R0 = P0.online.roster, host = R0.find((x) => x.host) || R0[0], guest = R0.find((x) => x !== host);
+          const hs = host && host.look && host.look.stad ? SD.clean(host.look.stad) : SD.ai(host ? host.name : 'A'), gs = guest && guest.look && guest.look.stad ? SD.clean(guest.look.stad) : SD.ai(guest ? guest.name : 'B');
+          const atHost = r < 0.5, iAmHost = host && host.id === P0.online.me;
+          mine = iAmHost ? hs : gs; theirs = iAmHost ? gs : hs; meHome = atHost === !!iAmHost;
+        }
+        this.myStad = meHome ? mine : theirs; this.stadHome = meHome;
+        this.stad = 'arena';
+      }
+      this.adName = this.myStad ? this.myStad.name.toUpperCase() : 'ARENA MIX';
+      this.adC = this.myStad ? [this.myStad.c2, this.myStad.c1] : ['#22D3EE', '#FFC53D'];
+      this.wx = window.__amWx ? window.__amWx : this.myStad && this.myStad.time !== 'auto' ? this.myStad.time : this.stad === 'playa' ? (r < 0.7 ? 'dia' : 'atardecer') : this.stad === 'calle' ? 'noche' : this.stad === 'nevado' ? 'nieve' : this.stad === 'tormenta' ? 'lluvia' : P0.tutorial ? 'dia' : one ? (r < 0.45 ? 'noche' : r < 0.65 ? 'atardecer' : r < 0.85 ? 'lluvia' : 'nieve') : (r < 0.32 ? 'dia' : r < 0.5 ? 'atardecer' : r < 0.72 ? 'noche' : r < 0.88 ? 'lluvia' : 'nieve');
     }
     const night = this.wx === 'noche', grey = this.wx === 'lluvia' || this.wx === 'nieve', dusk = this.wx === 'atardecer';
     // real stadium HDRI: daylight sky behind the stands and image-based light on players and pitch
@@ -2579,6 +2600,16 @@ class Component extends DCLogic {
         for (let x = -M, i = 0; x < 60 + M; x += 3.75, i++) if (i % 2) { c.fillStyle = '#c3cfdd'; c.fillRect(X(x), 0, 3.75 * ppm, h); }
         for (let i = 0; i < 420; i++) { c.fillStyle = 'rgba(40,110,40,0.22)'; c.beginPath(); c.ellipse(X(5 + Math.random() * 50), Y(3 + Math.random() * 24), 6 + Math.random() * 22, 4 + Math.random() * 12, Math.random() * 3, 0, Math.PI * 2); c.fill(); }
         for (let i = 0; i < 20000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.25)' : 'rgba(90,110,140,0.08)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
+      } else if (this.myStad) {
+        // your stadium: the grass tone and the way it is cut
+        const GT = { verde: ['#0a5c06', '#12780b'], oscuro: ['#06420a', '#0b5610'], claro: ['#1a7a14', '#25921c'], azulado: ['#0a5a3e', '#10704e'] }[this.myStad.grass] || ['#0a5c06', '#12780b'];
+        const pat = this.myStad.pitch;
+        c.fillStyle = GT[0]; c.fillRect(0, 0, w, h); c.fillStyle = GT[1];
+        if (pat === 'rayas' || pat === 'anchas') { const sw = pat === 'rayas' ? 3.75 : 7.5; for (let x = -M, i = 0; x < 60 + M; x += sw, i++) if (i % 2) c.fillRect(X(x), 0, sw * ppm, h); }
+        else if (pat === 'cuadros') { for (let x = -M, i = 0; x < 60 + M; x += 5, i++) for (let y = -M, j = 0; y < 30 + M; y += 5, j++) if ((i + j) % 2) c.fillRect(X(x), Y(y), 5 * ppm, 5 * ppm); }
+        else if (pat === 'diagonal') { c.save(); c.translate(X(30), Y(15)); c.rotate(Math.PI / 4); for (let k = -20; k < 20; k += 2) c.fillRect(k * 4 * ppm, -60 * ppm, 4 * ppm, 120 * ppm); c.restore(); }
+        else if (pat === 'circulos') { for (let rr = 40; rr > 0; rr -= 4) { c.fillStyle = (rr / 4) % 2 ? GT[1] : GT[0]; c.beginPath(); c.arc(X(30), Y(15), rr * ppm, 0, Math.PI * 2); c.fill(); } }
+        for (let i = 0; i < 12000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.035)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
       } else {
         c.fillStyle = '#0a5c06'; c.fillRect(0, 0, w, h);
         for (let x = -M, i = 0; x < 60 + M; x += 3.75, i++) if (i % 2) { c.fillStyle = '#12780b'; c.fillRect(X(x), 0, 3.75 * ppm, h); }
@@ -2629,7 +2660,8 @@ class Component extends DCLogic {
     const adTexBig = this.canvasTex(2048, 64, (c, w, h) => {
       c.fillStyle = '#0B0B14'; c.fillRect(0, 0, w, h);
       c.font = 'italic 800 46px Barlow Condensed, Arial'; c.textBaseline = 'middle';
-      for (let x = 20, i = 0; x < w; x += 340, i++) { c.fillStyle = i % 2 ? '#FFC53D' : '#22D3EE'; c.fillText(i % 2 ? 'ARENA MIX · ⚡' : 'ARENA MIX', x, h / 2 + 2); }
+      const AN = this.adName || 'ARENA MIX', AC = this.adC || ['#22D3EE', '#FFC53D'], step = Math.max(340, c.measureText(AN + ' · ⚡').width + 60);
+      for (let x = 20, i = 0; x < w; x += step, i++) { c.fillStyle = i % 2 ? AC[1] : AC[0]; c.fillText(i % 2 ? AN + ' · ⚡' : AN, x, h / 2 + 2); }
     });
     const ledMat = new T.MeshStandardMaterial({ map: adTexBig, emissive: 0xffffff, emissiveMap: adTexBig, emissiveIntensity: 0.85 });
     // crowd figures: low-poly people (legs, torso, shoulders, arms in three poses, head with hair).
@@ -2827,6 +2859,7 @@ class Component extends DCLogic {
     if (STAD) {
       const model = STAD.model();
       model.position.y = -0.03;
+      if (this.myStad) { const tint = new T.Color(0xffffff).lerp(new T.Color(this.myStad.c1), 0.38); model.traverse((o) => { if (o.isMesh && o.material) { const ms = [].concat(o.material).map((mt) => { const c2 = mt.clone(); if (c2.color) c2.color.multiply(tint); return c2; }); o.material = ms.length === 1 ? ms[0] : ms; } }); }
       // the stands brought in towards the pitch: the ends by 10 %, the far side too unless the near side
       // (the dugouts' side) is built as well
       const full = kv || this.proCam(), KX = 0.9, KZ = full ? 1 : 0.9;
@@ -2968,8 +3001,9 @@ class Component extends DCLogic {
     if (!SKY || night) S.add(new T.Points(sg, new T.PointsMaterial({ color: 0xffffff, size: 1.4, sizeAttenuation: false, fog: false, transparent: true, opacity: 0.8 })));
     const adTex = this.canvasTex(2048, 64, (c, w, h) => {
       c.fillStyle = '#0B0B14'; c.fillRect(0, 0, w, h);
-      c.fillStyle = '#22D3EE'; c.font = 'italic 800 44px Barlow Condensed, Arial'; c.textBaseline = 'middle';
-      for (let x = 20; x < w; x += 300) c.fillText('ARENA MIX', x, h / 2 + 2);
+      c.fillStyle = (this.adC || ['#22D3EE'])[0]; c.font = 'italic 800 44px Barlow Condensed, Arial'; c.textBaseline = 'middle';
+      const AN = this.adName || 'ARENA MIX', step = Math.max(300, c.measureText(AN).width + 60);
+      for (let x = 20; x < w; x += step) c.fillText(AN, x, h / 2 + 2);
     });
     const adMat = new T.MeshStandardMaterial({ map: adTex, emissive: 0xffffff, emissiveMap: adTex, emissiveIntensity: 0.9 });
     const b1 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); b1.position.set(0, 0.45, STAD && this.stadK && this.stadK[1] < 1 ? -16.6 : -17.5); S.add(b1);
@@ -3301,7 +3335,7 @@ class Component extends DCLogic {
       c.fillStyle = live ? '#FFFFFF' : '#FFB4C4'; c.beginPath(); c.arc(26, 18, 5, 0, Math.PI * 2); c.fill();
       c.font = font(17); c.fillStyle = '#FFFFFF'; c.fillText('EN DIRECTO', 66, 19);
       c.save(); glow(this.golden() ? '#FFC53D' : '#F0ABFC', 10); c.font = font(22); c.fillStyle = this.golden() ? '#FFE38A' : '#FFFFFF';
-      c.fillText(g.phase === 'intro' ? 'ARENA MIX · PREVIA' : this.golden() ? '★ BALÓN DORADO ★' : 'ARENA MIX · LIGA', w / 2 + 40, 19); c.restore();
+      c.fillText(g.phase === 'intro' ? (this.myStad ? this.adName : 'ARENA MIX') + ' · PREVIA' : this.golden() ? '★ BALÓN DORADO ★' : this.myStad ? this.adName : 'ARENA MIX · LIGA', w / 2 + 40, 19); c.restore();
       // crests and names on pills in each team's colour
       crest(66, 100, 38, hc, hn[0] || 'A'); crest(w - 66, 100, 38, ac, an[0] || 'B');
       const pill = (x, col, nm) => { c.save(); c.globalAlpha = 0.9; c.fillStyle = col; rrect(x - 60, 152, 120, 26, 13); c.fill(); c.globalAlpha = 1; c.lineWidth = 2; c.strokeStyle = 'rgba(255,255,255,0.7)'; c.stroke(); fit(nm, 22, 108); c.lineWidth = 4; c.strokeStyle = 'rgba(10,5,30,0.7)'; c.strokeText(nm, x, 166); c.fillStyle = '#FFFFFF'; c.fillText(nm, x, 166); c.restore(); };
