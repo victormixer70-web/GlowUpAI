@@ -426,7 +426,7 @@ class Component extends DCLogic {
       F.good = 0;
       // first less sharp, then (at normal sharpness) without shadows, then less sharp again
       if (pr > 1) { pr = Math.max(1, pr - 0.25); changed = true; }
-      else if (this.R.shadowMap.enabled) { this.R.shadowMap.enabled = false; this.gfxNow = 'baja'; changed = true; this.uiEvery = 2; this.S && this.S.traverse((o) => { if (o.material) [].concat(o.material).forEach((m) => { m.needsUpdate = true; }); }); }
+      else if (this.R.shadowMap.enabled) { this.R.shadowMap.enabled = false; this.gfxNow = 'baja'; changed = true; this.uiEvery = 2; this.cheap = true; this.S && this.S.traverse((o) => { if (o.material) [].concat(o.material).forEach((m) => { m.needsUpdate = true; }); }); }
       else if (pr > 0.75) { pr = Math.max(0.75, pr - 0.125); changed = true; }
       else if (!this.lite) {
         // last step: drop the extras (half the rain or snow, no flares between goals)
@@ -2412,6 +2412,7 @@ class Component extends DCLogic {
     }
     this.gfxNow = gfx; this.pr = pr; this.prCap = Math.min(2, dpr);
     if (gfx === 'baja' && !this.gfxAuto) this.uiEvery = 2;
+    this.cheap = !shadows;
     try { R = new T.WebGLRenderer({ canvas: this.cv, antialias: pr < 1.5, powerPreference: 'high-performance' }); } catch (e) { this.no3d = true; return; }
     R.setPixelRatio(pr);
     R.setSize(844, 390, false);
@@ -2470,7 +2471,7 @@ class Component extends DCLogic {
     S.background = new T.Color(0x0d1840);
     S.fog = new T.Fog(0x0d1840, 120, 260);
     this.S = S;
-    const hemi = new T.HemisphereLight(0xcfe0ff, 0x1d5a33, 0.75);
+    const hemi = new T.HemisphereLight(0xcfe0ff, 0x1d5a33, 0.75); this.hemi = hemi;
     S.add(hemi);
     // weather and time of day for this match: the same for everyone in an online room
     {
@@ -2745,7 +2746,7 @@ class Component extends DCLogic {
         if (!fanLimit(v)) return;
         if (xm < 0.75) { if (xm < 0.66) stepSpots.push({ x: v.x, y: v.y, z: v.z, rotY }); return; } // aisle with steps
         seatSpots.push({ x: v.x, y: v.y, z: v.z, rotY: rotY + Math.PI });
-        if (Math.random() < gap) return;
+        if (Math.random() < gap + (LQ === 0 && this.gfxNow === 'baja' ? (row < 0 ? 0 : 0.62) : 0)) return;
         v.set(x + (Math.random() - 0.5) * 0.12, y, z + 0.35).applyMatrix4(g.matrixWorld);
         const team = v.x < 0 ? 0 : 1, ultra = ultraZone(v);
         const band = Math.floor((x + len / 2) / 7);
@@ -2823,8 +2824,10 @@ class Component extends DCLogic {
       }
       this.endSeats = seatList;
       // fans in the model's seats, facing the pitch; ultras behind the goals
+      // low graphics: a thinner crowd (most of the triangles on screen are fans)
+      const skipK = this.gfxNow === 'baja' ? 0.55 : 0.04;
       seatList.forEach(([wx, wy, wz]) => {
-        if (Math.random() < 0.04) return;
+        if (Math.random() < skipK) return;
         const tx = Math.max(-26, Math.min(26, wx)), rotY = Math.atan2(tx - wx, -wz);
         const team = wx < 0 ? 0 : 1, ultra = Math.abs(wx) > 31, row = Math.round(wy / 0.5);
         const key = (wz < -18 ? 'far' : wz > 18 ? 'near' : Math.abs(wx) > 31 ? (wx < 0 ? 'west' : 'east') : 'side') + ':' + Math.floor((wx + 60) / 8) + ':' + (ultra ? 'u' : 'n');
@@ -3550,7 +3553,29 @@ class Component extends DCLogic {
     g.ps.forEach((p, i) => Object.assign(p, keep.ps[i]));
     Object.assign(g.ball, keep.b);
   }
+  // low graphics: every physically-based material becomes a plain diffuse one (several times cheaper per pixel on
+  // a phone GPU); materials with custom shader code (crowd, grass) are left alone
+  cheapen() {
+    const T = THREE, S = this.S;
+    if (!S) return;
+    if (!this.cheapOn) { this.cheapOn = true; if (this.hemi) this.hemi.intensity *= 1.35; }
+    const sw = (m) => {
+      if (!m || !m.isMeshStandardMaterial) return m;
+      if (m.__lam) return m.__lam;
+      const L = new T.MeshLambertMaterial({ skinning: !!m.skinning, morphTargets: !!m.morphTargets, color: m.color, map: m.map, emissive: m.emissive, emissiveMap: m.emissiveMap, emissiveIntensity: m.emissiveIntensity, transparent: m.transparent, opacity: m.opacity, alphaTest: m.alphaTest, side: m.side, vertexColors: m.vertexColors, depthWrite: m.depthWrite, depthTest: m.depthTest, alphaMap: m.alphaMap, aoMap: m.aoMap });
+      L.name = m.name; L.userData = m.userData; m.__lam = L;
+      // the custom shader code (kits, muscles, hair tint, crowd colours) only touches chunks the diffuse shader has too
+      if (Object.prototype.hasOwnProperty.call(m, 'onBeforeCompile')) {
+        L.onBeforeCompile = m.onBeforeCompile;
+        const key = m.customProgramCacheKey ? m.customProgramCacheKey() : m.uuid;
+        L.customProgramCacheKey = () => 'lam|' + key;
+      }
+      return L;
+    };
+    S.traverse((o) => { if (o.material && !o.isPoints && !o.isSprite) o.material = Array.isArray(o.material) ? o.material.map(sw) : sw(o.material); });
+  }
   draw3D(dt) {
+    if (this.cheap) { this.cheapT = (this.cheapT || 0) - dt; if (this.cheapT <= 0) { this.cheapT = 1.5; this.cheapen(); } }
     if (!this.R || !this.S) return;
     this.lastDt = dt || 0.016;
     if (this.rp && !this.inReplayDraw) {
