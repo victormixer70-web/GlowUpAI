@@ -19,6 +19,8 @@
     var key = new T.DirectionalLight(0xffffff, 1.1); key.position.set(2, 4, 4); S.add(key);
     var rim = new T.DirectionalLight(0x22d3ee, 0.6); rim.position.set(-3, 2.5, -3); S.add(rim);
     V = window.__amTaqV = { cv: cv, R: R, S: S, cam: new T.PerspectiveCamera(28, 1, 0.1, 50), model: null, modelKey: '', sz: '', owner: null };
+    // the browser may take this 3D context back when too many are open: the next screen that needs it gets a fresh one
+    cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); if (window.__amTaqV === V) window.__amTaqV = null; });
     if (window.AMSky) window.AMSky.env(R).then(function (e) { if (e) S.environment = e; });
     return V;
   }
@@ -129,6 +131,7 @@
     var V = viewer();
     if (!V || !el) return false;
     holder = el; token = 'hero' + Math.random(); V.owner = token; t0 = performance.now();
+    Array.prototype.slice.call(el.querySelectorAll('canvas[data-am-shared]')).forEach(function (c) { if (c !== V.cv) c.remove(); });
     el.appendChild(V.cv);
     cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
     return true;

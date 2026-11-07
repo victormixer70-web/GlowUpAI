@@ -9,7 +9,8 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var GAME = /^#\/(Partido|Duelo|Baloncesto|Tenis|Voley)\b/;
   // a game on screen, whichever screen holds it (ranked, casual, private, training...): no menu effects then
-  var inGame = function () { return GAME.test(location.hash) || !!(stage && stage.querySelector('[data-am-game]')); };
+  // (the frozen copy of the previous screen that a transition keeps for a moment does not count)
+  var inGame = function () { if (GAME.test(location.hash)) return true; if (!stage) return false; var L = stage.querySelectorAll('[data-am-game]'); for (var i = 0; i < L.length; i++) if (!L[i].closest('#fx-old')) return true; return false; };
 
   var css = document.createElement('style');
   css.textContent = [
@@ -289,8 +290,11 @@
   css.textContent = lines.filter(function (l) { return l.indexOf('[style*=') < 0; }).join('\n');
   document.head.appendChild(css); document.head.appendChild(cssAttr);
   var syncAttr = function () { var off = inGame(); if (cssAttr.disabled !== off) cssAttr.disabled = off; };
-  window.addEventListener('hashchange', function () { setTimeout(syncAttr, 50); });
-  setInterval(syncAttr, 700);
+  window.addEventListener('hashchange', function () { syncAttr(); setTimeout(syncAttr, 60); setTimeout(syncAttr, 450); });
+  // a match starting or ending inside a screen (the lobbies embed it): checked as the page changes, not on a timer
+  // (a mutation observer runs before the next paint, so the new screen is never drawn with the wrong colours)
+  try { new MutationObserver(syncAttr).observe(stage || document.body, { childList: true, subtree: false, attributes: true, attributeFilter: ['data-screen'] }); } catch (e) {}
+  setInterval(syncAttr, 1500);
   if (reduce) return;
 
   var layer = document.createElement('div'); layer.id = 'fx-layer';

@@ -219,7 +219,7 @@ class Component extends DCLogic {
     if (this.padOff) { this.padOff(); this.padOff = null; }
     if (this.raf) cancelAnimationFrame(this.raf);
     this.raf = null;
-    if (this.R) { this.R.dispose(); this.R = null; }
+    if (this.R) { this.R.dispose(); try { this.R.forceContextLoss(); } catch (e) {} this.R = null; }
   }
   loadStats() {
     try {

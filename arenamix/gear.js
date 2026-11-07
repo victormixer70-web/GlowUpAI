@@ -308,6 +308,8 @@
     try {
       var cv = document.createElement('canvas'); cv.width = cv.height = 256;
       R = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true });
+      // if the browser takes the 3D context back (too many open), make a new one next time instead of drawing nothing
+      cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); R = null; });
       R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.0;
       R.setClearColor(0, 0); R.setSize(256, 256, false);
     } catch (e) { R = null; return false; }

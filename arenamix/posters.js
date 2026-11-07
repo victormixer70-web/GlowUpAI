@@ -12,6 +12,7 @@
     try {
       var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
       R = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true });
+      cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); R = null; busy = false; });
       R.setPixelRatio(1); R.setSize(W, H, false);
       R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.15;
       R.setClearColor(0, 0);

@@ -78,7 +78,7 @@ class Component extends DCLogic {
   componentWillUnmount() {
     if (this.raf) cancelAnimationFrame(this.raf);
     this.raf = null;
-    if (this.R) { this.R.dispose(); this.R = null; }
+    if (this.R) { this.R.dispose(); try { this.R.forceContextLoss(); } catch (e) {} this.R = null; }
   }
   clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   // court: singles 8.23 x 23.77 m, net at z = 0 (0.914 m in the middle), my half is z > 0
