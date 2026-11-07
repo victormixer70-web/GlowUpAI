@@ -3676,8 +3676,9 @@ class Component extends DCLogic {
         const A = p.act, fl = A.flight || 0.5;
         // the dive clip already lifts the body off the ground: only a high dive gets a little extra height
         const clip = !!(window.AMChars && window.AMChars.clip && window.AMChars.clip('diveL'));
-        const lift = clip ? 0.55 * Math.max(0, (A.h || 0) - 0.25) : 0.12 + (A.h || 0) * 0.95;
-        if (A.t < fl) m.position.y += lift * Math.sin(Math.PI * A.t / fl);
+        const lift = clip ? 0.5 * Math.max(0, (A.h || 0) - 0.3) : 0.12 + (A.h || 0) * 0.95;
+        // up quickly, down with gravity: back to nothing exactly as he lands
+        if (A.t < fl) { const q = A.t / fl; m.position.y += lift * 4 * q * (1 - q) * (q < 0.5 ? 1 : 1 - (q - 0.5) * 0.6); }
       }
       m.rotation.order = 'YXZ'; m.rotation.x = 0;
       if (p.act && p.act.type === 'header') {
@@ -4055,7 +4056,13 @@ class Component extends DCLogic {
       else if (a.type === 'throw') act = { id: 'gkThrow', t: 1.3 + 0.6 * k, key: a };
       else if (a.type === 'slide') act = { id: 'slide', t: 0.2 + 0.75 * k, key: a };
       else if (a.type === 'block') act = { id: 'catch', t: 0.35 + 0.45 * k, key: a };
-      else if (a.type === 'dive') act = { id: a.dl > 0 ? 'diveL' : 'diveR', t: a.smother ? 1.25 + 0.6 * k : a.t < (a.flight || 0.5) ? 0.95 + 0.95 * a.t / (a.flight || 0.5) : Math.min(3.15, 1.9 + 1.25 * (a.t - (a.flight || 0.5)) / Math.max(0.3, a.dur - (a.flight || 0.5))), key: a };
+      else if (a.type === 'dive') {
+        // the clip (hips over time): up off the ground by 0.85 s, on the grass at 1.42 s, lying until 2.3 s, up again by 3.15 s.
+        // Its landing is put exactly at the end of the dive's flight, so he never lies flat in the air
+        const fl = a.flight || 0.5, rest = Math.max(0.3, a.dur - fl), u = a.t - fl;
+        const ct = a.smother ? 1.2 + 0.65 * k : a.t < fl ? 0.85 + 0.57 * (a.t / fl) : u < rest * 0.45 ? 1.42 + 0.88 * (u / (rest * 0.45)) : Math.min(3.15, 2.3 + 0.85 * (u - rest * 0.45) / (rest * 0.55));
+        act = { id: a.dl > 0 ? 'diveL' : 'diveR', t: ct, key: a };
+      }
     } else if (gk && g.hold === i) act = { id: 'catch', t: 0.8, key: 'hold' };
     // poses only the procedural rig has (skills, stumbles, celebrations): clips fade out
     const procOnly = a && !act && a.type !== 'windup';
