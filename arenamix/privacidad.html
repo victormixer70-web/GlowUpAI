@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Política de privacidad · ARENA MIX</title>
+<meta name="description" content="Qué datos usa ARENA MIX, para qué y cómo borrarlos.">
+<style>
+  :root { --bg: #02040C; --card: #0B1230; --line: #1E8BFF55; --text: #E6EEFF; --muted: #A9B8DA; --blue: #1E8BFF; --gold: #FFC53D; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: radial-gradient(80% 50% at 50% 0%, #0A3DCC55, transparent 70%), var(--bg); color: var(--text); font: 15px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 28px 18px 60px; }
+  header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  header img { width: 56px; height: 56px; border-radius: 14px; box-shadow: 0 0 18px #0A6CFF88; }
+  h1 { margin: 0; font-size: 26px; line-height: 1.15; }
+  .upd { color: var(--muted); font-size: 13px; }
+  section { background: linear-gradient(160deg, #0E1A44, var(--card)); border: 1px solid var(--line); border-radius: 16px; padding: 14px 18px; margin: 12px 0; }
+  h2 { margin: 2px 0 6px; font-size: 17px; color: #7CC4FF; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { margin: 4px 0; }
+  b { color: #fff; }
+  .note { border-left: 3px solid var(--gold); padding-left: 10px; color: var(--muted); }
+  .tag { display: inline-block; padding: 1px 8px; border-radius: 8px; background: #1E8BFF33; color: #BFE3FF; font-size: 12px; font-weight: 700; }
+  a { color: #7CC4FF; }
+  @media (max-width: 480px) { h1 { font-size: 22px; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="icons/logo-192.png?v=5" alt="ARENA MIX">
+    <div><h1>Política de privacidad</h1><div class="upd">ARENA MIX · Última actualización: 7 de noviembre de 2026</div></div>
+  </header>
+
+  <section>
+    <h2>Resumen</h2>
+    <ul>
+      <li>No pedimos registro: <b>no necesitas correo ni contraseña</b> para jugar.</li>
+      <li>Tu progreso se guarda <b>solo en tu dispositivo</b>, no en nuestros servidores.</li>
+      <li><b>No hay publicidad, ni análisis de uso, ni venta de datos</b>, y no compartimos nada con terceros con fines comerciales.</li>
+      <li>Al jugar online, otros jugadores ven tu <b>nombre de jugador</b>, tu aspecto y lo que haces en la partida.</li>
+      <li>El micrófono solo se usa si activas el <b>chat de voz</b>, y nunca se graba.</li>
+      <li>Puedes <b>borrar todos tus datos</b> desde el juego en cualquier momento.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>1. Quién es el responsable</h2>
+    <p>ARENA MIX es un juego de fútbol desarrollado por un equipo independiente. <span id="contact">Muy pronto añadiremos aquí un correo de contacto para cualquier consulta sobre privacidad.</span></p>
+  </section>
+
+  <section>
+    <h2>2. Datos que se guardan en tu dispositivo</h2>
+    <p>El juego guarda en el almacenamiento local de tu navegador o de la app (no en ningún servidor nuestro):</p>
+    <ul>
+      <li>Tu <b>nombre de jugador</b> (el que eliges; te recomendamos no usar tu nombre real completo).</li>
+      <li>Tu <b>progreso</b>: nivel, experiencia, monedas virtuales (VCD y BOB), rangos, trofeos, logros, misiones, pase de temporada, carrera, torneos y estadísticas de partidos.</li>
+      <li>Tu <b>personalización</b>: personaje, equipaciones, botas, celebraciones, tu estadio y tus ajustes (sonido, gráficos, controles, idioma).</li>
+      <li>Tu <b>lista de amigos y tu club</b>: los nombres de jugador de tus amigos y los mensajes del muro del club.</li>
+    </ul>
+    <p class="note">Estos datos no salen de tu dispositivo salvo lo que se explica en el punto 3 para jugar online. Si borras los datos del navegador o desinstalas la app, se pierden.</p>
+  </section>
+
+  <section>
+    <h2>3. Juego online, amigos y clubes</h2>
+    <p>Las partidas online, los amigos y los clubes conectan tu dispositivo directamente con el de los otros jugadores (conexión entre iguales, <i>peer to peer</i>). Para ello:</p>
+    <ul>
+      <li>A los <b>otros jugadores</b> de tu sala o de tu club les llega: tu nombre de jugador, el aspecto de tu personaje y de tu estadio, tus movimientos en la partida, tu rango, tus victorias semanales (en los clubes) y los mensajes que escribas en el chat.</li>
+      <li>Un <b>servidor de señalización</b> (PeerJS, <span class="tag">0.peerjs.com</span>) ayuda a que los dispositivos se encuentren. Ve un identificador aleatorio de conexión y tu dirección IP.</li>
+      <li>Si la conexión directa no es posible, el tráfico de la partida puede pasar por <b>servidores de enlace</b> (STUN de Google y el servicio TURN público de Open Relay, <span class="tag">openrelay.metered.ca</span>), que ven tu dirección IP mientras dura la conexión.</li>
+    </ul>
+    <p>Nosotros no guardamos las partidas, los chats ni las conexiones. Los mensajes del chat y del muro del club se guardan solo en los dispositivos de los jugadores que participan.</p>
+  </section>
+
+  <section>
+    <h2>4. Micrófono (chat de voz)</h2>
+    <p>Si activas el chat de voz en una partida online, el juego te pedirá permiso para usar el micrófono. Tu voz se envía en directo solo a tus compañeros de equipo de esa partida. No se graba ni se guarda en ningún sitio. Puedes apagar el micrófono en cualquier momento y retirar el permiso desde los ajustes de tu dispositivo.</p>
+  </section>
+
+  <section>
+    <h2>5. Vídeos de tus goles</h2>
+    <p>Las repeticiones de tus goles se graban en la memoria de tu dispositivo mientras juegas. Solo salen de él si tú pulsas «GUARDAR GOL» y eliges compartirlos o descargarlos. Al salir del partido se descartan.</p>
+  </section>
+
+  <section>
+    <h2>6. Alojamiento de la web</h2>
+    <p>El juego se descarga desde <b>GitHub Pages</b> (GitHub, Inc.). Como cualquier servidor web, puede registrar datos técnicos de la visita (dirección IP, navegador, fecha) para su funcionamiento y seguridad, según su propia política de privacidad. Nosotros no tenemos acceso a esos registros ni los usamos.</p>
+  </section>
+
+  <section>
+    <h2>7. Compras</h2>
+    <p>Las monedas del juego (VCD y BOB) son virtuales y se ganan jugando. Ahora mismo <b>no hay compras con dinero real</b>. Si en el futuro se añaden, se harán a través de la tienda de aplicaciones (Google Play o App Store), que gestiona el pago. Nosotros no veremos tus datos de pago, y actualizaremos esta política antes.</p>
+  </section>
+
+  <section>
+    <h2>8. Menores</h2>
+    <p>ARENA MIX está pensado para todas las edades, pero el juego online y los chats están dirigidos a mayores de 14 años. Los menores de esa edad deben jugar online con el permiso y la supervisión de sus padres o tutores. Recomendamos no escribir datos personales (nombre completo, dirección, teléfono, colegio) en el nombre de jugador ni en los chats.</p>
+  </section>
+
+  <section>
+    <h2>9. Tus derechos y cómo borrar tus datos</h2>
+    <ul>
+      <li><b>Borrar todo:</b> en el juego, ve a <b>Configuración → Privacidad → Borrar todos mis datos</b>. Se eliminan tu progreso, tus ajustes, tus amigos y tu club de este dispositivo.</li>
+      <li>También puedes borrarlos limpiando los datos del sitio en tu navegador o desinstalando la app.</li>
+      <li>Como no guardamos tus datos en servidores propios, no tenemos copias que consultar, corregir o entregar. Si tienes cualquier duda, podrás escribirnos al correo de contacto (punto 1). También puedes reclamar ante la Agencia Española de Protección de Datos (<a href="https://www.aepd.es" rel="noopener">aepd.es</a>).</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>10. Cambios en esta política</h2>
+    <p>Si cambiamos la forma en que el juego usa los datos (por ejemplo, al añadir cuentas, compras o nuevas funciones online), actualizaremos esta página y la fecha de arriba, y te lo avisaremos dentro del juego.</p>
+  </section>
+</main>
+<script>
+  // the contact e-mail, once there is one: set it here and it shows in point 1
+  var CONTACT = '';
+  if (CONTACT) document.getElementById('contact').innerHTML = 'Para cualquier consulta sobre privacidad o para ejercer tus derechos, escríbenos a <a href="mailto:' + CONTACT + '">' + CONTACT + '</a>.';
+  // inside the game the page sits in a frame: no outer margin there
+  if (window.parent !== window) document.querySelector('main').style.paddingTop = '10px';
+</script>
+</body>
+</html>

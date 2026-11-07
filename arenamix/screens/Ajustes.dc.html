@@ -53,6 +53,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <div role="tablist" style="display: flex; gap: 4px; padding: 4px; border-radius: 14px; background: #251443">
       <button type="button" role="tab" aria-selected="{{playSel}}" onClick="{{tabPlay}}" style="{{playTab}}">JUGABILIDAD</button>
       <button type="button" role="tab" aria-selected="{{ctrlSel}}" onClick="{{tabCtrl}}" style="{{ctrlTab}}">CONTROLES</button>
+      <button type="button" role="tab" aria-selected="{{privSel}}" onClick="{{tabPriv}}" style="{{privTab}}">PRIVACIDAD</button>
     </div>
   </div>
   <sc-if value="{{showPlay}}" hint-placeholder-val="{{ true }}">
@@ -130,10 +131,30 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       </div>
     </div>
   </sc-if>
+  <sc-if value="{{showPriv}}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; min-height: 0; display: flex; gap: 12px">
+      <iframe src="privacidad.html" title="Política de privacidad" style="flex: 1; min-width: 0; border: 1px solid #1E8BFF55; border-radius: 14px; background: #02040C; box-shadow: 0 0 0 2px #0A3DCC33, 0 10px 24px #0008"></iframe>
+      <div style="flex: none; width: 230px; display: flex; flex-direction: column; gap: 8px">
+        <div class="cf-tile" style="--ac: #1E8BFF; gap: 6px">
+          <span style="font-size: 12px; font-weight: 800; letter-spacing: 1px; padding-left: 4px">TUS DATOS</span>
+          <span style="font-size: 10.5px; line-height: 1.35; color: #CACAE0; padding-left: 4px">Sin cuentas, sin anuncios y sin análisis. Tu progreso solo vive en este dispositivo.</span>
+          <a href="privacidad.html" target="_blank" rel="noopener" style="display: flex; align-items: center; justify-content: center; height: 34px; border-radius: 11px; background: linear-gradient(180deg, #3DA9FF, #0A3DCC); color: #FFFFFF; text-decoration: none; font: 800 12px Exo2, sans-serif; box-shadow: inset 0 1px 0 #fff6, 0 3px 0 #06102E">Abrir en pantalla completa</a>
+        </div>
+        <div class="cf-tile" style="--ac: #FF5C5C; gap: 6px">
+          <span style="font-size: 12px; font-weight: 800; letter-spacing: 1px; padding-left: 4px">BORRAR MIS DATOS</span>
+          <span style="font-size: 10.5px; line-height: 1.35; color: #CACAE0; padding-left: 4px">{{wipeTxt}}</span>
+          <button type="button" onClick="{{wipe}}" style="{{wipeStyle}}">{{wipeBtn}}</button>
+          <sc-if value="{{wipeAsk}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{wipeNo}}" style="height: 30px; border-radius: 10px; border: 1px solid #2E2E52; background: transparent; color: #CACAE0; font: 800 12px Exo2, sans-serif; cursor: pointer">Cancelar</button></sc-if>
+        </div>
+        <span style="margin-top: auto; font-size: 10px; color: #6E6E8F">{{contactTxt}}</span>
+      </div>
+    </div>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
+  PRIVACY_CONTACT = '';
   constructor(props) {
     super(props);
     this.S = 500 / 844;
@@ -157,6 +178,16 @@ class Component extends DCLogic {
     if (window.AMSfx) { window.AMSfx.setVolume(); window.AMSfx.coin(); }
   }
   posOf(k) { const p = this.state.cfg.pos[k], d = this.DEF[k]; return p ? p.slice() : [d[0], d[1]]; }
+  // everything the game keeps on this device is under "arenamix." (and the friends' ids under "arenamix-")
+  wipeAll() {
+    try {
+      const ks = [];
+      for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && /^arenamix[.-]/.test(k)) ks.push(k); }
+      ks.forEach((k) => localStorage.removeItem(k));
+    } catch (e) {}
+    location.hash = '';
+    location.reload();
+  }
   renderVals() {
     const s = this.state, c = s.cfg, S = this.S;
     const btns = Object.keys(this.DEF).map((k) => {
@@ -216,12 +247,20 @@ class Component extends DCLogic {
     // a cog: 10 teeth round a ring
     const gearD = (() => { let d = ''; for (let k = 0; k < 20; k++) { const a = k / 20 * Math.PI * 2, r = k % 2 ? 36 : 46, a2 = (k + 1) / 20 * Math.PI * 2; d += (k ? 'L' : 'M') + (Math.cos(a) * r).toFixed(1) + ' ' + (Math.sin(a) * r).toFixed(1) + 'L' + (Math.cos(a2) * r).toFixed(1) + ' ' + (Math.sin(a2) * r).toFixed(1); } return d + 'ZM22 0A22 22 0 1 0 -22 0A22 22 0 1 0 22 0Z'; })();
     const tabSt = (on) => 'height: 32px; padding: 0 14px; border-radius: 10px; border: 0; cursor: pointer; font: 800 12px Exo2, sans-serif; letter-spacing: .5px; transition: background .25s; ' + (on ? 'background: linear-gradient(180deg, #9AF5FF, #22D3EE); color: #150925; box-shadow: 0 3px 0 #0A6F80, 0 0 14px #22D3EE88;' : 'background: transparent; color: #CACAE0;');
-    const play = s.tab === 'play';
+    const play = s.tab === 'play', priv = s.tab === 'priv', ask = !!s.wipeAsk;
     return {
       gearD, langLabel: (window.AMI18n ? window.AMI18n.lang() : 'es').toUpperCase(),
-      showPlay: play, showCtrl: !play, playSel: play ? 'true' : 'false', ctrlSel: play ? 'false' : 'true',
-      playTab: tabSt(play), ctrlTab: tabSt(!play),
-      tabPlay: () => this.setState({ tab: 'play' }), tabCtrl: () => this.setState({ tab: 'ctrl' }),
+      showPlay: play, showCtrl: s.tab === 'ctrl', showPriv: priv, playSel: play ? 'true' : 'false', ctrlSel: s.tab === 'ctrl' ? 'true' : 'false', privSel: priv ? 'true' : 'false',
+      playTab: tabSt(play), ctrlTab: tabSt(s.tab === 'ctrl'), privTab: tabSt(priv),
+      tabPlay: () => this.setState({ tab: 'play', wipeAsk: false }), tabCtrl: () => this.setState({ tab: 'ctrl', wipeAsk: false }), tabPriv: () => this.setState({ tab: 'priv' }),
+      // the privacy contact: there is no address yet. Set PRIVACY_CONTACT (and CONTACT in privacidad.html) when there is one
+      contactTxt: this.PRIVACY_CONTACT ? 'Dudas sobre privacidad: ' + this.PRIVACY_CONTACT : 'Pronto añadiremos un correo de contacto para dudas sobre privacidad.',
+      wipeAsk: ask,
+      wipeTxt: ask ? '¿Seguro? Se borra todo de este dispositivo: nivel, monedas, trofeos, amigos, club y ajustes. No se puede deshacer.' : 'Elimina todo lo que el juego guarda en este dispositivo y empieza de cero.',
+      wipeBtn: ask ? 'SÍ, BORRAR TODO' : 'Borrar todos mis datos',
+      wipeStyle: 'height: 34px; border-radius: 11px; cursor: pointer; font: 800 12px Exo2, sans-serif; ' + (ask ? 'border: 0; background: linear-gradient(180deg, #FF8A8E, #E11D48); color: #FFFFFF; box-shadow: 0 3px 0 #7F1D1D, 0 0 14px #FF5C5C88;' : 'border: 0; background: #2A1018; color: #FF8A8E; box-shadow: inset 0 0 0 1.5px #FF8A8E, 0 3px 0 #0D0418;'),
+      wipe: () => { if (!ask) return this.setState({ wipeAsk: true }); this.wipeAll(); },
+      wipeNo: () => this.setState({ wipeAsk: false }),
       opts, resetPlay: () => this.savePlay({ music: 0.6, sfx: 0.8, cam: 'normal', names: true, gfx: 'auto', passMark: true, narr: true, vib: true, sens: 'normal' }),
       backHref: 'Deportes.dc.html',
       btns, chars,
