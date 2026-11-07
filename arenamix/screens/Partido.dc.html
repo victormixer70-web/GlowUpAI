@@ -2864,6 +2864,8 @@ class Component extends DCLogic {
       const model = STAD.model();
       model.position.y = -0.03;
       if (this.myStad) { const tint = new T.Color(0xffffff).lerp(new T.Color(this.myStad.c1), 0.38); model.traverse((o) => { if (o.isMesh && o.material) { const ms = [].concat(o.material).map((mt) => { const c2 = mt.clone(); if (c2.color) c2.color.multiply(tint); return c2; }); o.material = ms.length === 1 ? ms[0] : ms; } }); }
+      // and the seats in the colour chosen for that stadium
+      if (this.myStad && window.AMStad && window.AMStad.paintSeats) window.AMStad.paintSeats(model, this.myStad);
       // the stands brought in towards the pitch: the ends by 10 %, the far side too unless the near side
       // (the dugouts' side) is built as well
       const full = kv || this.proCam(), KX = 0.9, KZ = full ? 1 : 0.9;

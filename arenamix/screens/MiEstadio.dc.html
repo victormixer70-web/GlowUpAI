@@ -71,7 +71,9 @@ body{margin:0}
     <div class="me-card" style="flex: 1; padding: 12px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; scrollbar-width: none">
       <span class="me-h">NOMBRE DEL ESTADIO<i></i></span>
       <input class="me-in" maxlength="22" value="{{draft}}" onInput="{{onName}}" aria-label="Nombre del estadio">
-      <span class="me-h">ASIENTOS Y GRADAS<i></i></span>
+      <span class="me-h">COLOR DE LOS ASIENTOS<i></i></span>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center"><sc-for list="{{seatOpts}}" as="c" hint-placeholder-count="2"><button type="button" class="me-chip" style="{{c.style}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for><sc-for list="{{swS}}" as="w" hint-placeholder-count="10"><button type="button" class="me-sw" aria-label="Color de los asientos" style="{{w.style}}" onClick="{{w.pick}}"></button></sc-for></div>
+      <span class="me-h">COLOR DE LAS GRADAS<i></i></span>
       <div style="display: flex; flex-wrap: wrap; gap: 6px"><sc-for list="{{sw1}}" as="w" hint-placeholder-count="10"><button type="button" class="me-sw" aria-label="Color de las gradas" style="{{w.style}}" onClick="{{w.pick}}"></button></sc-for></div>
       <span class="me-h">VALLAS LED Y DETALLES<i></i></span>
       <div style="display: flex; flex-wrap: wrap; gap: 6px"><sc-for list="{{sw2}}" as="w" hint-placeholder-count="10"><button type="button" class="me-sw" aria-label="Color de las vallas" style="{{w.style}}" onClick="{{w.pick}}"></button></sc-for></div>
@@ -127,6 +129,8 @@ class Component extends DCLogic {
     const a = ST.model(); a.scale.set(0.9, 1, 0.9); a.position.y = -0.03; clipTo(a, -1); S.add(a);
     const b = ST.model(); b.scale.set(0.9, 1, -0.9); b.position.y = -0.03; clipTo(b, 1); S.add(b);
     this.stadMats = []; [a, b].forEach((m) => m.traverse((o) => { if (o.isMesh) [].concat(o.material).forEach((mt) => this.stadMats.push(mt)); }));
+    // the seats in their own colour
+    if (window.AMStad.paintSeats) { const c0 = this.state.cfg || window.AMStad.get(); this.seatU = window.AMStad.paintSeats(a, c0); window.AMStad.paintSeats(b, c0, this.seatU); }
     // goals
     if (window.AMNet && window.AMNet.goal) [-1, 1].forEach((sx) => { const G = window.AMNet.goal(6, 2.44, 1.9); G.group.position.set(30 * sx, 0, 0); G.group.rotation.y = sx * Math.PI / 2; S.add(G.group); });
     // LED boards round the pitch with the stadium's name
@@ -165,6 +169,7 @@ class Component extends DCLogic {
     // stadium tint
     const tint = new T.Color(0xffffff).lerp(new T.Color(c.c1), 0.42);
     (this.stadMats || []).forEach((m) => { if (m.color && m.userData.base) m.color.copy(m.userData.base).multiply(tint); });
+    if (this.seatU && window.AMStad.setSeats) window.AMStad.setSeats(this.seatU, c);
     // pitch
     const x = this.pcv.getContext('2d'), w = 1024, h = 544, ppm = w / 68, X = (u) => (u + 4) * ppm, Y = (v) => (v + 3) * ppm;
     const GT = { verde: ['#0a5c06', '#12780b'], oscuro: ['#06420a', '#0b5610'], claro: ['#1a7a14', '#25921c'], azulado: ['#0a5a3e', '#10704e'] }[c.grass] || ['#0a5c06', '#12780b'];
@@ -250,7 +255,8 @@ class Component extends DCLogic {
       summary: lab(S ? S.PATTERNS : [], c.pitch) + ' · ' + lab(S ? S.GRASS : [], c.grass) + ' · ' + lab(S ? S.TIMES : [], c.time),
       draft: this.state.draft ?? name,
       onName: (e) => { const v = e.target.value; this.state.draft = v; if (v.trim()) this.save({ name: v }); else this.forceUpdate(); },
-      sw1: sw('c1', c.c1), sw2: sw('c2', c.c2),
+      sw1: sw('c1', c.c1), sw2: sw('c2', c.c2), swS: sw('seat', c.seat),
+      seatOpts: (S && S.SEATS ? S.SEATS : []).map(([v, label]) => ({ label, pick: () => this.save({ seat: v }), style: chip(c.seat === v) })),
       pats: opts(S && S.PATTERNS, 'pitch'), grs: opts(S && S.GRASS, 'grass'), tms: opts(S && S.TIMES, 'time')
     };
   }
