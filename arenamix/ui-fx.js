@@ -10,6 +10,9 @@
   var GAME = /^#\/(Partido|Duelo|Baloncesto|Tenis|Voley)\b/;
   // a game on screen, whichever screen holds it (ranked, casual, private, training...): no menu effects then
   // (the frozen copy of the previous screen that a transition keeps for a moment does not count)
+  // an element that already runs an animation of its own (a shine, a pulse, a float) does not get the pop-in:
+  // the pop-in would replace it, and when the pop-in class came off its own animation started over (a jump)
+  var ownAnim = function (el) { try { var n = getComputedStyle(el).animationName; return !!n && n !== 'none' && !el.classList.contains('fx-pop') && !el.classList.contains('fx-slide'); } catch (e) { return false; } };
   var inGame = function () { if (GAME.test(location.hash)) return true; if (!stage) return false; var L = stage.querySelectorAll('[data-am-game]'); for (var i = 0; i < L.length; i++) if (!L[i].closest('#fx-old')) return true; return false; };
 
   var css = document.createElement('style');
@@ -323,6 +326,10 @@
     var c = old.cloneNode(true);
     c.id = 'fx-old'; c.removeAttribute('class'); c.className = old.className.replace(/\bfx-\S+/g, '');
     c.setAttribute('aria-hidden', 'true'); c.inert = true;
+    // its backgrounds are set per screen (#stage[data-screen]): pin them on the copy, or while it leaves it would
+    // switch to the next screen's photo for a moment
+    var sel = '.bc-stage, .am-bg, .am-arena, .tn-bg, .lg-photo', oa = [old].concat([].slice.call(old.querySelectorAll(sel))), ca = [c].concat([].slice.call(c.querySelectorAll(sel)));
+    for (var j = 0; j < oa.length && j < ca.length; j++) { try { var cs = getComputedStyle(oa[j]); ca[j].style.setProperty('background', 'none'); ca[j].style.setProperty('background-color', cs.backgroundColor, 'important'); ca[j].style.setProperty('background-image', cs.backgroundImage, 'important'); ca[j].style.setProperty('background-size', cs.backgroundSize, 'important'); ca[j].style.setProperty('background-position', cs.backgroundPosition, 'important'); } catch (e) {} }
     var a = old.querySelectorAll('canvas'), b = c.querySelectorAll('canvas');
     for (var k = 0; k < a.length; k++) { try { b[k].getContext('2d').drawImage(a[k], 0, 0); } catch (e) {} }
     return c;
@@ -406,13 +413,16 @@
     var n = 0;
     for (var k = 0; k < items.length && n < 14; k++) {
       var el = items[k];
-      if (!el.offsetParent) continue;
+      if (!el.offsetParent || ownAnim(el)) continue;
       el.style.animationDelay = (lag + n * 0.014).toFixed(3) + 's'; el.classList.add('fx-pop');
       n++;
     }
     setTimeout(function () { for (var q = 0; q < items.length; q++) { items[q].classList.remove('fx-pop'); items[q].style.animationDelay = ''; } }, 900);
   };
   new MutationObserver(function () { var r = rootOf(); if (r) enter(r); }).observe(stage, { childList: true });
+
+  // the backgrounds, decoded once and kept: no blank frame while a big photo is decoded again on each screen change
+  window.__amBgs = ['assets/bg_estadio.jpg', 'assets/bg_tribuna.jpg', 'assets/bg_trofeos.jpg', 'assets/lobby_bg.jpg'].map(function (u) { var im = new Image(); im.src = u; if (im.decode) im.decode().catch(function () {}); return im; });
 
   // ---- presses: squash and spring back, a burst of light; new content after a press slides or pops in ----
   var pressable = 'button, a[href], [role="tab"], [role="button"], [role="option"], [role="menuitem"]';
@@ -461,7 +471,7 @@
       if (m.target === stage) return;   // whole screens are handled above
       for (var k = 0; k < m.addedNodes.length && n < 16; k++) {
         var el = m.addedNodes[k];
-        if (el.nodeType !== 1 || el.id === 'fx-layer' || el.closest('#fx-layer')) continue;
+        if (el.nodeType !== 1 || el.id === 'fx-layer' || el.closest('#fx-layer') || ownAnim(el)) continue;
         if (slideDir) { el.style.setProperty('--fx-dx', (slideDir * 34) + 'px'); el.classList.remove('fx-slide'); void el.offsetWidth; el.classList.add('fx-slide'); }
         else { el.style.animationDelay = (n * 0.03).toFixed(2) + 's'; el.classList.remove('fx-pop'); void el.offsetWidth; el.classList.add('fx-pop'); }
         n++;
