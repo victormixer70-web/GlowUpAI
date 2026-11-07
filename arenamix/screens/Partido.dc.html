@@ -51,10 +51,10 @@
 .ld-sweep{position:absolute;top:-20%;bottom:-20%;width:26%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.07),transparent);transform:skewX(-18deg);animation:ldSweep 3.6s ease-in-out infinite}
 @keyframes ldSweep{from{left:-30%}to{left:120%}}
 .ld-top{position:absolute;left:0;right:0;top:18px;display:flex;justify-content:center;gap:8px}
-.ld-chip{display:flex;align-items:center;gap:6px;height:26px;padding:0 12px;border-radius:9px;background:rgba(8,14,34,.6);border:1px solid rgba(186,230,253,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);font:700 10px Exo2,sans-serif;letter-spacing:1.8px;color:#DDF2FF;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.ld-chip{display:flex;align-items:center;gap:6px;height:26px;padding:0 12px;border-radius:9px;background:rgba(8,14,34,.6);border:1px solid rgba(186,230,253,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);font:700 10px Exo2,sans-serif;letter-spacing:1.8px;color:#DDF2FF;}
 .ld-chip i{width:7px;height:7px;border-radius:50%;background:#22D3EE;box-shadow:0 0 8px #22D3EE;animation:ldBlink 1.2s ease-in-out infinite}
 @keyframes ldBlink{50%{opacity:.25}}
-.ld-team{position:absolute;top:70px;width:276px;height:auto;min-height:120px;max-height:212px;box-sizing:border-box;padding:16px;border-radius:20px;background:linear-gradient(160deg,rgba(30,48,92,.55),rgba(8,14,34,.72));border:1px solid rgba(186,230,253,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 14px 34px rgba(0,0,0,.45);backdrop-filter:blur(12px) saturate(1.3);-webkit-backdrop-filter:blur(12px) saturate(1.3);display:flex;flex-direction:column;gap:10px}
+.ld-team{position:absolute;top:70px;width:276px;height:auto;min-height:120px;max-height:212px;box-sizing:border-box;padding:16px;border-radius:20px;background:linear-gradient(160deg,rgba(30,48,92,.55),rgba(8,14,34,.72));border:1px solid rgba(186,230,253,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 14px 34px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:10px}
 .ld-team.l{left:34px;animation:ldInL .6s cubic-bezier(.2,1.2,.4,1) both}.ld-team.r{right:34px;animation:ldInR .6s cubic-bezier(.2,1.2,.4,1) both}
 @keyframes ldInL{from{opacity:0;transform:translateX(-50px)}}@keyframes ldInR{from{opacity:0;transform:translateX(50px)}}
 .ld-team::before{content:'';position:absolute;left:16px;right:16px;top:0;height:3px;border-radius:0 0 3px 3px;background:var(--c);box-shadow:0 0 14px var(--c)}
@@ -420,14 +420,16 @@ class Component extends DCLogic {
   // automatic graphics: if the match runs slowly during the first seconds of play, step the quality down
   autoGfx(now) {
     if (!this.gfxAuto || !this.R || this.g.phase !== 'play') return;
-    const F = this.fpsS || (this.fpsS = { t0: now, n: 0, good: 0 });
+    const F = this.fpsS || (this.fpsS = { t0: now, n: 0, good: 0, bad: 0 });
     F.n++;
     if (now - F.t0 < 1500) return;
     const fps = F.n * 1000 / (now - F.t0);
     F.t0 = now; F.n = 0;
     let pr = this.pr, changed = false;
-    if (fps < 50) {
-      F.good = 0;
+    // only ever step down, and only after two slow readings in a row: going back up and down again made the
+    // picture pulse (each change of sharpness resizes the canvas, which blanks one frame)
+    if (fps < 48 && ++F.bad >= 2) {
+      F.bad = 0;
       // first less sharp, then (at normal sharpness) without shadows, then less sharp again
       if (pr > 1) { pr = Math.max(1, pr - 0.25); changed = true; }
       else if (this.R.shadowMap.enabled) { this.R.shadowMap.enabled = false; this.gfxNow = 'baja'; changed = true; this.uiEvery = 2; this.cheap = true; this.S && this.S.traverse((o) => { if (o.material) [].concat(o.material).forEach((m) => { m.needsUpdate = true; }); }); }
@@ -440,7 +442,7 @@ class Component extends DCLogic {
         if (this.amb) this.amb.list.forEach((f) => { f.at = null; f.sp.visible = false; f.smoke.visible = false; });
       }
       else if (pr > 0.6) { pr = Math.max(0.6, pr - 0.15); changed = true; }
-    } else if (fps > 57 && ++F.good >= 3 && pr < this.prCap) { pr = Math.min(this.prCap, pr + 0.25); F.good = 0; changed = true; }
+    } else if (fps >= 48) F.bad = 0;
     if (!changed) return;
     if (pr !== this.pr) { this.pr = pr; this.R.setPixelRatio(pr); this.R.setSize(844, 390, false); }
     try { localStorage.setItem('arenamix.gfxdyn.v1', JSON.stringify({ pr: this.pr, shadows: this.R.shadowMap.enabled, lite: !!this.lite })); } catch (e) {}
@@ -2379,14 +2381,15 @@ class Component extends DCLogic {
       p.touchT = cyc * (p.sprinting ? 0.6 : soft ? 0.32 : 0.4); p.touchP = p.touchT;
       p.kickFoot = Math.cos(p.run) > 0 ? 1 : 0; p.touchAnim = 0.22;
       // flat out with open grass ahead: a longer touch into space, then run onto it (anyone can nip in)
-      if (p.sprinting && sp > 6.3 && ahead > 4.2 && p.knockT <= 0 && b.z < 0.2 && p.role !== 'gk') {
+      // (only the AI does it: your own player keeps the ball at his feet when you sprint)
+      if (!human && p.sprinting && sp > 6.3 && ahead > 4.2 && p.knockT <= 0 && b.z < 0.2 && p.role !== 'gk') {
         const push = 1.07 + 0.05 * (1 - ctrl);
         b.vx = p.vx * push + fx * 0.8; b.vy = p.vy * push + fy * 0.8; b.vz = 0.2;
         g.own = -1; g.last = oi; p.cd = 0.1; p.knockT = 1.1; g.recv = { i: oi, t: 0.9 };
         return;
       }
       // a heavy touch: sprinting into a man with poor control, the ball gets away from you
-      if (p.sprinting && fd < 1.8 && Math.random() < 0.3 * (1 - ctrl) && p.role !== 'gk') {
+      if (!human && p.sprinting && fd < 1.8 && Math.random() < 0.3 * (1 - ctrl) && p.role !== 'gk') {
         b.vx = p.vx * 1.15 + fx * 2.4; b.vy = p.vy * 1.15 + fy * 2.4; b.vz = 0.15;
         g.own = -1; g.last = oi; p.cd = 0.18;
         if (human) this.flashMsg('Toque largo', 0.6);
@@ -2394,7 +2397,7 @@ class Component extends DCLogic {
       }
     }
     const ph = moving && p.touchP ? this.clamp(1 - p.touchT / p.touchP, 0, 1) : 1;   // 0 at the touch, 1 when the feet catch up
-    const amp = moving && !soft ? (p.sprinting ? 0.32 + 0.16 * (1 - ctrl) : 0.16) : 0;
+    const amp = moving && !soft ? (p.sprinting ? (human ? 0.2 : 0.32 + 0.16 * (1 - ctrl)) : 0.16) : 0;
     // standing still with a rival close: shield it, body between him and the ball
     const shield = !moving && foe && fd < 2.3 && !(human && il > 0.2);
     let want = Math.atan2(fy, fx);
@@ -2471,7 +2474,8 @@ class Component extends DCLogic {
     R.toneMapping = T.ACESFilmicToneMapping;
     R.toneMappingExposure = 1.1;
     this.R = R;
-    this.cam = new T.PerspectiveCamera(40, 844 / 390, 0.1, 700);
+    // near plane at 0.3 m, not 0.1: three times the depth precision, so far surfaces (stands, boards, lines) do not shimmer on phones
+    this.cam = new T.PerspectiveCamera(40, 844 / 390, 0.3, 700);
     this.camPos = new T.Vector3(0, 8, 16);
     this.camLook = new T.Vector3(0, 0, -2);
     this.buildScene();
