@@ -155,6 +155,26 @@ input::placeholder{color:#6E6E92}
       </div>
     </div>
   </div>
+  <!-- before going in: the privacy policy, to read and accept (once per version of the policy) -->
+  <sc-if value="{{privOpen}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; z-index: 9; background: #02040CE6; display: flex; align-items: center; justify-content: center; animation: lgFade .25s both">
+      <div style="position: relative; width: 700px; height: 352px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 18px; background: linear-gradient(160deg, #06102E, #02040C); border: 1px solid #3DA9FF; box-shadow: 0 24px 50px #000d, 0 0 40px #0A6CFF55">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3DA9FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.4 9.3-8 11c-4.6-1.7-8-6-8-11V5z"/><path d="M8.5 12l2.5 2.5l4.5-5"/></svg>
+          <span class="bc-title hd" style="font-size: 20px">TU PRIVACIDAD</span>
+          <span style="margin-left: auto; font-size: 11px; color: #A9B8DA">Léela y acéptala para jugar</span>
+        </div>
+        <iframe src="privacidad.html" title="Política de privacidad" style="flex: 1; min-height: 0; width: 100%; border: 1px solid #1E8BFF55; border-radius: 12px; background: #02040C"></iframe>
+        <div style="display: flex; align-items: center; gap: 10px">
+          <label style="flex: 1; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #E6EEFF; cursor: pointer">
+            <input type="checkbox" checked="{{privChk}}" onChange="{{privToggle}}" style="width: 20px; height: 20px; accent-color: #1E8BFF; cursor: pointer">He leído y acepto la política de privacidad
+          </label>
+          <button type="button" onClick="{{privNo}}" style="height: 38px; padding: 0 14px; border-radius: 11px; border: 1px solid #2E3A66; background: transparent; color: #A9B8DA; font: 800 12px Exo2, sans-serif; cursor: pointer">No acepto</button>
+          <button type="button" disabled="{{privOff}}" onClick="{{privYes}}" style="{{privBtn}}">ACEPTAR Y JUGAR</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
   <!-- the first time in: your presentation as the club's new signing. Pick a shirt number, sign the contract with your player name -->
   <sc-if value="{{nameOpen}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; inset: 0; z-index: 8; background: #0D0418E6; display: flex; align-items: center; justify-content: center; animation: lgFade .25s both">
@@ -455,6 +475,9 @@ class Component extends DCLogic {
     this.R.render(this.S, this.cam);
   }
   say(t) { this.setState({ toast: t }); clearTimeout(this.toastT); this.toastT = setTimeout(() => this.setState({ toast: '' }), 2600); }
+  // the version of the policy (its date): changing it asks everyone to accept again
+  PRIV_V = '2026-11-07';
+  privOk() { try { const v = JSON.parse(localStorage.getItem('arenamix.privacy.v1') || 'null'); return !!(v && v.v === this.PRIV_V); } catch (e) { return false; } }
   renderVals() {
     const s = this.state, A = window.AMChars, kit = (A && A.outfit('futbol')) || {};
     const pref = A ? A.pref() : 'clasico', show3d = !!(A && window.THREE && pref !== 'clasico');
@@ -462,7 +485,7 @@ class Component extends DCLogic {
     const name = s.nameOpen && s.nameDraft ? s.nameDraft : O && O.hasName && !O.hasName() ? 'NUEVO JUGADOR' : O ? O.myName() : 'Invitado';
     const nmErr = O ? O.checkName(s.nameDraft) : '';
     const T = (t) => (window.AMI18n ? window.AMI18n.t(t) : t);
-    { const ib = document.getElementById('install'); if (ib) ib.style.visibility = s.nameOpen ? 'hidden' : ''; }
+    { const ib = document.getElementById('install'); if (ib) ib.style.visibility = s.nameOpen || s.privOpen ? 'hidden' : ''; }
     return {
       langCode: (window.AMI18n ? window.AMI18n.lang() : 'es').toUpperCase(),
       crowdRef: this.crowdRef, canvasRef: this.canvasRef, show3d, show2d: !show3d,
@@ -500,10 +523,23 @@ class Component extends DCLogic {
       // tear off the stub and walk in
       guest: () => {
         if (s.torn) return;
+        // the privacy policy first: it has to be accepted (again whenever it changes) before playing
+        if (!this.privOk()) { this.setState({ privOpen: true, privChk: false }); return; }
         // no name yet: choose one first
         if (O && O.hasName && !O.hasName()) { this.setState({ nameOpen: true, nameDraft: '', ideas: O.suggestName ? [O.suggestName(), O.suggestName(), O.suggestName()] : [] }); return; }
         this.setState({ torn: true }); setTimeout(() => { location.hash = '#/Deportes'; }, 260);
       },
+      privOpen: !!s.privOpen, privChk: !!s.privChk, privOff: !s.privChk,
+      privToggle: (e) => this.setState({ privChk: e.target.checked }),
+      privNo: () => { this.setState({ privOpen: false }); this.say('Para jugar tienes que aceptar la política de privacidad.'); },
+      privYes: () => {
+        if (!s.privChk) return;
+        try { localStorage.setItem('arenamix.privacy.v1', JSON.stringify({ v: this.PRIV_V, at: new Date().toISOString() })); } catch (e) {}
+        this.setState({ privOpen: false });
+        // and on into the game, as if the ticket had been torn just now
+        setTimeout(() => { if (O && O.hasName && !O.hasName()) this.setState({ nameOpen: true, nameDraft: '', ideas: O.suggestName ? [O.suggestName(), O.suggestName(), O.suggestName()] : [] }); else { this.setState({ torn: true }); setTimeout(() => { location.hash = '#/Deportes'; }, 260); } }, 150);
+      },
+      privBtn: 'height: 38px; padding: 0 18px; border-radius: 11px; border: 0; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 18px; letter-spacing: 1px; cursor: ' + (s.privChk ? 'pointer; background: linear-gradient(180deg, #3DA9FF, #0A3DCC); color: #FFFFFF; box-shadow: inset 0 1px 0 #fff6, 0 4px 0 #06102E, 0 0 16px #1E8BFF88;' : 'default; background: #1A2244; color: #5A6890;'),
       nameOpen: s.nameOpen, nameDraft: s.nameDraft,
       nameInput: (e) => this.setState({ nameDraft: e.target.value.replace(/\s/g, '').slice(0, 16) }),
       nameDice: () => this.setState({ nameDraft: O ? O.suggestName() : 'Crack10' }),

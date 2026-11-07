@@ -519,7 +519,7 @@
   // ---- tap an empty spot: a ball hops away ----
   document.addEventListener('pointerdown', function (e) {
     if (inGame() || !stage.contains(e.target)) return;
-    if (e.target.closest(pressable + ', input, select, textarea, canvas, [onclick], #jc-layer')) return;
+    if (e.target.closest(pressable + ', input, select, textarea, label, iframe, canvas, [onclick], #jc-layer')) return;
     if (layer.querySelectorAll('.fx-ball').length > 3) return;
     mountFx();
     var p = stageXY(e), dir = p.x > 422 ? -1 : 1, d = (90 + Math.random() * 90) * dir;

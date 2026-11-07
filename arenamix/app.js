@@ -281,7 +281,10 @@
     var name = m && registry[m[1]] ? m[1] : 'Main';
     // nobody gets past the entrance without a player name
     var O = window.AMOnline;
-    if (name !== 'Main' && name !== 'Idioma' && O && O.hasName && !O.hasName()) { try { history.replaceState(null, '', '#/Main'); } catch (e) {} return 'Main'; }
+    // nor without having accepted the privacy policy (its current version: PRIV_V in Main)
+    var privOk = false;
+    try { var pv = JSON.parse(localStorage.getItem('arenamix.privacy.v1') || 'null'); privOk = !!(pv && pv.v === '2026-11-07'); } catch (e) {}
+    if (name !== 'Main' && name !== 'Idioma' && (!privOk || (O && O.hasName && !O.hasName()))) { try { history.replaceState(null, '', '#/Main'); } catch (e) {} return 'Main'; }
     return name;
   }
   function App() { PComponent.call(this); this.state = { screen: current() }; }
