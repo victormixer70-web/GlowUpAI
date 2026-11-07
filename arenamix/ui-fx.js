@@ -281,7 +281,10 @@
     '#stage[data-theme="logo"] .lb-social{background:linear-gradient(160deg,rgba(61,169,255,.5),rgba(0,87,255,.62))!important}',
     '#stage[data-theme="logo"] [style*="rgba(124, 58, 237, 0.8) 0%, transparent 65%"]{background:radial-gradient(55% 70% at 12% 8%,#0A6CFFB0 0%,transparent 62%),radial-gradient(50% 70% at 92% 95%,#0057FF99 0%,transparent 60%),radial-gradient(40% 55% at 75% 12%,#3DA9FF55 0%,transparent 60%),linear-gradient(160deg,#03060E 0%,#000000 100%)!important}',
     '#stage[data-theme="logo"] .tn-bg{background:radial-gradient(55% 70% at 12% 8%,#0A6CFFB0 0%,transparent 62%),radial-gradient(50% 70% at 92% 95%,#0057FF99 0%,transparent 60%),radial-gradient(40% 55% at 75% 12%,#3DA9FF55 0%,transparent 60%),linear-gradient(160deg,#03060E 0%,#000000 100%)!important}',
-    '#stage[data-theme="logo"] .cp-info .lb-go{background:linear-gradient(100deg,#3DA9FF,#0A6CFF 50%,#06154A)!important;box-shadow:inset 0 2px 0 #ffffff55,0 6px 0 #040A1C,0 10px 26px #0A6CFF77!important}'
+    '#stage[data-theme="logo"] .cp-info .lb-go{background:linear-gradient(100deg,#3DA9FF,#0A6CFF 50%,#06154A)!important;box-shadow:inset 0 2px 0 #ffffff55,0 6px 0 #040A1C,0 10px 26px #0A6CFF77!important}',
+    // ---- titles: Russo One, upright (no italic) ----
+    '.bc-title,.bc-title.hd,#stage .bc-title.hd,#stage .tn-big,#stage .ttl,#am-daily h2,#am-res .t,#am-res .t .lt,#am-res .lvup,.jc-wheel .side h2,.jc-wheel .won-card b{font-family:"Titulos",sans-serif!important;font-style:normal!important;font-weight:400!important}',
+    '.bc-title.hd,#stage .bc-title.hd{font-size:21px!important;letter-spacing:1px!important;padding:3px 18px 0!important}',
   ].join('\n');
   // the colour rules that match on inline styles ([style*=...]) are costly to re-check while a match updates its
   // HUD every frame: they live in their own sheet, switched off while a game is on screen

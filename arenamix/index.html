@@ -18,13 +18,16 @@
   /* the game's fonts, bundled so they look the same offline: Luckiest Guy for titles, buttons and numbers, Lilita One for
      everything else. The screens ask for 'Barlow Condensed' (titles) and 'Exo2' (text); both names point at the new
      faces, sized to fit the room the old ones had. */
-  @font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 100 900; font-display: swap; size-adjust: 84%; src: url(vendor/fonts/luckiestguy-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 100 900; font-display: swap; size-adjust: 80%; src: url(vendor/fonts/russoone-latin.woff2) format('woff2'); }
   @font-face { font-family: 'Exo2'; font-style: normal; font-weight: 100 900; font-display: swap; size-adjust: 96%; src: url(vendor/fonts/lilitaone-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Titulos'; font-display: swap; size-adjust: 92%; src: url(vendor/fonts/russoone-latin.woff2) format('woff2'); }
   @font-face { font-family: 'Luckiest Guy'; font-display: swap; src: url(vendor/fonts/luckiestguy-latin.woff2) format('woff2'); }
   @font-face { font-family: 'Lilita One'; font-display: swap; src: url(vendor/fonts/lilitaone-latin.woff2) format('woff2'); }
   @font-face { font-family: 'Rajdhani'; font-weight: 500; src: url(vendor/fonts/rajdhani-500.woff2) format('woff2'); font-display: swap; }
   @font-face { font-family: 'Rajdhani'; font-weight: 600; src: url(vendor/fonts/rajdhani-600.woff2) format('woff2'); font-display: swap; }
   @font-face { font-family: 'Rajdhani'; font-weight: 700; src: url(vendor/fonts/rajdhani-700.woff2) format('woff2'); font-display: swap; }
+  /* no slanted (fake italic) lettering anywhere */
+  html, body, #stage * { font-synthesis-style: none; }
   /* Luckiest Guy draws lowercase as small capitals: whatever uses the title face is shown in capitals */
   [style*="Barlow Condensed"], [font-family*="Barlow"], .bc-title, .bc-btn, .bc-btn-gold, .hm-pass-lv b, .st-plus1, #am-res .t, #am-res .sc, #am-res .lv, #am-res .lvup, #am-res .go, #am-res .cn b, #am-rw .it b, #am-rw .ok, #am-rw .tap { text-transform: uppercase; }
   html, body { margin: 0; height: 100%; background: #000000; overflow: hidden; overscroll-behavior: none; touch-action: none; -webkit-tap-highlight-color: transparent; }
@@ -88,7 +91,7 @@
 <script src="ball.js?v=48"></script>
 <script src="music.js?v=1"></script>
 <script src="app.js?v=79"></script>
-<script src="ui-fx.js?v=34"></script>
+<script src="ui-fx.js?v=36"></script>
 <script src="juice.js?v=5"></script>
 </body>
 </html>
