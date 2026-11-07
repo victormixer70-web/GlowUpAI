@@ -12,12 +12,12 @@
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#8686A6}
-.md-card{position:absolute;padding:0;border:0;background:none;cursor:pointer;transition:transform .25s cubic-bezier(.3,1.6,.5,1),filter .3s;-webkit-tap-highlight-color:transparent;animation:mdIn .4s cubic-bezier(.2,1.3,.4,1) both}
-.md-card:hover{transform:translateY(-3px)}
+.md-card{position:absolute;padding:0;border:0;background:none;cursor:pointer;transition:transform .25s cubic-bezier(.3,1.6,.5,1);-webkit-tap-highlight-color:transparent;animation:mdIn .4s cubic-bezier(.2,1.3,.4,1) both}
+@media (hover:hover){.md-card:hover{transform:translateY(-3px)}}
 .md-card:active{transform:scale(.96)}
 @keyframes mdIn{from{opacity:0;transform:translateY(14px) scale(.92)}to{opacity:1;transform:none}}
 .md-card .md-pic{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:18px;pointer-events:none;transition:opacity .5s,transform .5s}
-.md-card:hover .md-pic{transform:scale(1.04)}
+@media (hover:hover){.md-card:hover .md-pic{transform:scale(1.04)}}
 .md-card .md-fade{position:absolute;left:0;right:0;bottom:0;height:62%;border-radius:0 0 18px 18px;background:linear-gradient(180deg,transparent,#0F061EEE 75%);pointer-events:none}
 .md-card .md-clip{position:absolute;inset:0;border-radius:18px;overflow:hidden}
 .md-bg{position:absolute;left:80px;right:0;top:0;bottom:0;z-index:0;pointer-events:none;overflow:hidden;contain:layout paint}
@@ -42,8 +42,8 @@ input::placeholder{color:#8686A6}
 .md-cone{position:absolute;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:16px solid #FF8A3D;filter:drop-shadow(0 3px 2px #000a)}
 @keyframes mdGlow{0%,100%{box-shadow:0 0 0 2px var(--mc),0 0 22px var(--mc),0 18px 30px #000c}50%{box-shadow:0 0 0 2px var(--mc),0 0 38px var(--mc),0 18px 30px #000c}}
 .md-sweep{position:absolute;inset:0;border-radius:18px;overflow:hidden;pointer-events:none}
-.md-sweep::after{content:"";position:absolute;top:-20%;bottom:-20%;left:-70%;width:45%;background:linear-gradient(100deg,transparent,#FFFFFF30,transparent);transform:skewX(-14deg);animation:mdSweep 4.5s ease-in-out infinite}
-@keyframes mdSweep{0%,65%{left:-70%}100%{left:140%}}
+.md-sweep::after{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:45%;background:linear-gradient(100deg,transparent,#FFFFFF30,transparent);transform:translateX(-160%) skewX(-14deg);animation:mdSweep 4.5s ease-in-out infinite;will-change:transform}
+@keyframes mdSweep{0%,65%{transform:translateX(-160%) skewX(-14deg)}100%{transform:translateX(320%) skewX(-14deg)}}
 .md-rib{position:absolute;top:14px;right:-30px;width:110px;padding:3px 0;transform:rotate(40deg);text-align:center;font:800 9px Exo2,sans-serif;letter-spacing:1px;color:#150925;box-shadow:0 2px 6px #0008}
 .md-arrow{position:absolute;top:110px;width:38px;height:38px;border-radius:50%;border:0;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;background:#150925CC;box-shadow:inset 0 0 0 2px var(--ac),0 0 14px var(--ac);color:var(--ac);transition:transform .2s cubic-bezier(.3,1.8,.5,1)}
 .md-arrow:active{transform:scale(.88)}
@@ -57,6 +57,7 @@ input::placeholder{color:#8686A6}
 .md-card::before{content:"";position:absolute;inset:0;border-radius:18px;padding:3px;background:linear-gradient(140deg,var(--mc),#FFFFFF 22%,color-mix(in srgb,var(--mc) 60%,#A855F7) 50%,#EC4899 78%,var(--mc));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);opacity:.75;z-index:3;pointer-events:none;transition:opacity .3s}
 .md-card[aria-pressed="true"]::before{opacity:1;background-size:300% 300%;animation:mdFrame 3s linear infinite}
 @keyframes mdFrame{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+.md-card[aria-pressed="false"] .md-in{background:rgba(0,0,0,.15)}
 .md-card .md-in{position:absolute;inset:5px;border-radius:14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),inset 0 1px 0 rgba(255,255,255,.3);pointer-events:none;z-index:3}
 .md-card .md-cn{position:absolute;width:16px;height:16px;z-index:4;pointer-events:none;border:3px solid var(--mc);filter:drop-shadow(0 0 4px var(--mc));opacity:.7;transition:opacity .3s,transform .3s}
 .md-card .md-cn.a{left:-2px;top:-2px;border-right:0;border-bottom:0;border-radius:12px 0 0 0}
@@ -70,7 +71,7 @@ input::placeholder{color:#8686A6}
 .md-card[aria-pressed="true"] .md-bar{opacity:1;box-shadow:0 0 10px var(--mc)}
 
 /* inside the cards: turning light rays, a halftone of dots, and a gloss across the top */
-.md-card .md-rays2{position:absolute;left:-50%;top:-60%;width:200%;height:200%;-webkit-mask-image:radial-gradient(closest-side,#000 20%,transparent 75%);mask-image:radial-gradient(closest-side,#000 20%,transparent 75%);animation:mdSpin 40s linear infinite;pointer-events:none}
+.md-card .md-rays2{position:absolute;left:-50%;top:-60%;width:200%;height:200%;-webkit-mask-image:radial-gradient(closest-side,#000 20%,transparent 75%);mask-image:radial-gradient(closest-side,#000 20%,transparent 75%);pointer-events:none}
 .md-card .md-dotsx{position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.16) 1.2px,transparent 1.8px) 0 0/10px 10px;-webkit-mask-image:linear-gradient(200deg,#000 0%,transparent 55%);mask-image:linear-gradient(200deg,#000 0%,transparent 55%);pointer-events:none}
 .md-card .md-glint{position:absolute;left:0;right:0;top:0;height:42%;border-radius:18px 18px 0 0;background:linear-gradient(180deg,rgba(255,255,255,.16),transparent);pointer-events:none}
 </style>
@@ -304,7 +305,7 @@ class Component extends DCLogic {
         title, tag, kicker, img, on: on ? 'true' : 'false', isOn: on,
         hasRib: !!RIB[m.id], rib: (RIB[m.id] || [])[0] || '', ribC: (RIB[m.id] || [])[1] || '', aria: title + '. ' + m.desc,
         glow: on ? CAT[0] + '88' : 'transparent', sub: on ? CAT[0] : '#A3A3C2',
-        style: '--mc: ' + CAT[0] + '; left: ' + cx.toFixed(1) + 'px; top: ' + cy.toFixed(1) + 'px; width: ' + cw.toFixed(1) + 'px; height: ' + ch.toFixed(1) + 'px; z-index: ' + (on ? 2 : 1) + '; animation-delay: ' + (i * 0.04).toFixed(2) + 's; filter: ' + (on ? 'none' : 'brightness(.86)') + ';',
+        style: '--mc: ' + CAT[0] + '; left: ' + cx.toFixed(1) + 'px; top: ' + cy.toFixed(1) + 'px; width: ' + cw.toFixed(1) + 'px; height: ' + ch.toFixed(1) + 'px; z-index: ' + (on ? 2 : 1) + '; animation-delay: ' + (i * 0.04).toFixed(2) + 's;',
         bg: 'position: absolute; inset: 0; border-radius: 18px; overflow: hidden; background: radial-gradient(70% 55% at 50% 38%, ' + pal[0] + 'CC 0%, transparent 70%), radial-gradient(60% 50% at 100% 0%, ' + pal[1] + 'AA 0%, transparent 70%), radial-gradient(60% 50% at 0% 100%, ' + pal[1] + '88 0%, transparent 70%), linear-gradient(165deg, ' + pal[2] + ' 0%, ' + pal[3] + ' 100%); --mc: ' + CAT[0] + '; ' + (on ? 'animation: mdGlow 2.4s ease-in-out infinite;' : 'box-shadow: 0 0 0 1px #7C5CFF66, 0 10px 20px #000a;'),
         fadeStyle: 'background: linear-gradient(180deg, transparent, ' + pal[3] + 'F0 78%);',
         rayStyle: 'background: repeating-conic-gradient(from 0deg at 50% 40%, ' + pal[0] + '40 0 7deg, transparent 7deg 18deg);',

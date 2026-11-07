@@ -286,7 +286,7 @@
     var S = build(key);
     // twice: skinned models settle their pose on the first draw
     R.render(S, cam); R.render(S, cam);
-    var url = R.domElement.toDataURL('image/png');
+    var url = R.domElement.toDataURL('image/webp', 0.86); if (url.indexOf('data:image/webp') !== 0) url = R.domElement.toDataURL('image/png');
     S.traverse(function (o) { if (o.geometry && o.geometry !== undefined) o.geometry.dispose(); });
     return url;
   }
@@ -295,13 +295,24 @@
     busy = true;
     setTimeout(function () {
       var job = queue.shift();
-      try { if (!cache[job.key]) cache[job.key] = render(job.key); } catch (e) { cache[job.key] = ''; console.error(e); }
+      try { if (!cache[job.key]) { cache[job.key] = render(job.key); store(job.key, cache[job.key]); } } catch (e) { cache[job.key] = ''; console.error(e); }
       job.cbs.forEach(function (f) { try { f(cache[job.key]); } catch (e) {} });
       busy = false; pump();
     }, 30);
   }
+  // kept on the phone too, so the cards have their pictures straight away next time the app is opened
+  var PKEY = 'arenamix.poster.';
+  function stored(key) { try { return localStorage.getItem(PKEY + key); } catch (e) { return null; } }
+  function store(key, url) {
+    if (!url) return;
+    try { localStorage.setItem(PKEY + key, url); } catch (e) {
+      // full: forget the old pictures and try once more
+      try { for (var i = localStorage.length - 1; i >= 0; i--) { var k = localStorage.key(i); if (k && k.indexOf(PKEY) === 0) localStorage.removeItem(k); } localStorage.setItem(PKEY + key, url); } catch (e2) {}
+    }
+  }
   function get(key, onReady) {
     if (cache[key] != null) return cache[key];
+    var st = stored(key); if (st) { cache[key] = st; return st; }
     if (!stage() || !window.AMChars || !window.AMChars.ready()) return '';
     var job = queue.find(function (j) { return j.key === key; });
     if (job) { if (onReady) job.cbs.push(onReady); }
