@@ -234,7 +234,32 @@
     '#am-rw .it b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:22px;line-height:1;text-align:center}#am-rw .it span{font-size:10px;font-weight:800;letter-spacing:1.5px;color:#FFC53D}',
     '@keyframes amRwItem{from{opacity:0;transform:translateY(40px) scale(.5) rotate(-8deg)}to{opacity:1;transform:none}}',
     '#am-rw .ok{position:absolute;left:50%;bottom:12px;transform:translateX(-50%) skewX(0deg);display:none;height:48px;padding:0 34px;border:0;background:linear-gradient(135deg,#7EF0FF,#22D3EE 55%,#0EA5C0);box-shadow:0 5px 0 #0E8FA3;color:#0B0B14;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-style:italic;font-size:22px;letter-spacing:2px;cursor:pointer}',
-    '#am-rw.open .ok{display:block;animation:amResUp .4s .5s both}'
+    '#am-rw.open .ok{display:block;animation:amResUp .4s .5s both}',
+    // ---- the reveal, dressed up: the stadium at night behind, spotlights, a glow, a title, a gold card ----
+    '#am-rw{background:radial-gradient(42% 55% at 50% 46%,#FFC53D40 0%,transparent 70%),radial-gradient(70% 90% at 50% 40%,#06102ECC 0%,#02040CF2 75%),url(assets/bg_trofeos.jpg) center/cover}',
+    '#am-rw::before,#am-rw::after{content:"";position:absolute;top:-40px;width:180px;height:520px;pointer-events:none;background:linear-gradient(180deg,#9FD4FF55,transparent 80%);filter:blur(6px);transform-origin:50% 0;animation:amRwBeam 5s ease-in-out infinite alternate}',
+    '#am-rw::before{left:12%;transform:rotate(-24deg)}#am-rw::after{right:12%;transform:rotate(24deg);animation-delay:-2.5s}',
+    '@keyframes amRwBeam{from{opacity:.35}to{opacity:.85}}',
+    '#am-rw .rays{background:repeating-conic-gradient(from 0deg,#FFD86B33 0deg 5deg,transparent 7deg 16deg)}',
+    '#am-rw .glow{position:absolute;left:50%;top:46%;width:420px;height:420px;margin:-210px 0 0 -210px;border-radius:50%;background:radial-gradient(closest-side,#FFE38A88,#FFC53D33 45%,transparent 72%);animation:amRwPulse 2.2s ease-in-out infinite;pointer-events:none}',
+    '#am-rw.open .glow{top:30%}',
+    '@keyframes amRwPulse{0%,100%{transform:scale(.92);opacity:.75}50%{transform:scale(1.06);opacity:1}}',
+    '#am-rw .k{top:16px;font-family:"Barlow Condensed",sans-serif;font-size:30px;font-weight:800;letter-spacing:2px;color:#FFFFFF;text-shadow:0 3px 0 #000,0 0 18px #1E8BFF}',
+    '#am-rw .k small{display:block;margin-top:4px;font-family:Exo2,sans-serif;font-size:11px;letter-spacing:4px;color:#FFE38A;text-shadow:none}',
+    '#am-rw .ch{filter:drop-shadow(0 18px 22px #000d) drop-shadow(0 0 22px #FFC53D66)}',
+    '#am-rw .it{width:170px;padding:12px 10px 14px;clip-path:none;border-radius:16px;position:relative;overflow:hidden;background:radial-gradient(90% 70% at 50% 25%,#FFD86B44,transparent 70%),linear-gradient(160deg,#2B2410,#130F06);box-shadow:inset 0 0 0 2px #FFC53D,inset 0 0 0 4px #00000066,0 10px 26px #000a,0 0 26px #FFC53D55}',
+    '#am-rw .it::after{content:"";position:absolute;top:-30%;bottom:-30%;left:0;width:40%;background:linear-gradient(100deg,transparent,#FFFFFF40,transparent);transform:translateX(-200%) skewX(-16deg);animation:amRwShine 2.6s 1s ease-in-out infinite}',
+    '@keyframes amRwShine{0%,55%{transform:translateX(-200%) skewX(-16deg)}100%{transform:translateX(380%) skewX(-16deg)}}',
+    '#am-rw .it{width:160px;padding:10px 10px 12px}',
+    '#am-rw .it img{width:82px;height:82px}',
+    '#am-rw .it b{font-size:28px;text-shadow:0 2px 0 #000}',
+    // open: the chest (or the prize) sits under the title, the cards in front of its lower half, all clear of the button
+    '#am-rw.open .ch{width:150px;height:150px;margin-top:-129px;margin-left:-75px}',
+    '#am-rw .loot{top:174px}',
+    '#am-rw .ok{border-radius:14px;padding:0 46px;background:linear-gradient(180deg,#3DA9FF,#0A3DCC);box-shadow:inset 0 2px 0 #FFFFFF66,0 5px 0 #06102E,0 0 22px #1E8BFF99;color:#FFFFFF;font-style:normal;text-shadow:0 2px 0 #0008}',
+    '#am-rw .tap{font-style:normal;color:#FFE38A;text-shadow:0 2px 0 #000,0 0 14px #FFC53D}',
+    '#am-rw .twk{position:absolute;width:6px;height:6px;border-radius:50%;background:#FFF6C8;box-shadow:0 0 10px #FFE38A;opacity:0;pointer-events:none;animation:amRwTwk 2.4s ease-in-out infinite}',
+    '@keyframes amRwTwk{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1.3)}}'
   ].join('\n');
   document.head.appendChild(css2);
   function reward(r, onClose) {
@@ -246,7 +271,8 @@
     var loot = (r.items || []).map(function (it) { return '<div class="it"><img src="' + it.pic + '" alt=""><span>¡NUEVO!</span><b>' + esc(it.name) + '</b></div>'; });
     if (r.gems) loot.push('<div class="it" style="animation-delay:.18s"><img src="' + P('gems:' + (r.gems >= 30 ? 3 : r.gems >= 15 ? 2 : 1)) + '" alt=""><span>BOB</span><b>+' + r.gems + '</b></div>');
     if (r.coins) loot.push('<div class="it" style="animation-delay:.12s"><img src="' + P(r.coins >= 300 ? 'coins:14' : 'coins:6') + '" alt=""><span>VCD</span><b>+' + r.coins + '</b></div>');
-    el.innerHTML = '<div class="rays"></div><div class="k">' + esc((m.name || 'PREMIO').toUpperCase()) + '</div>' +
+    var twk = ''; for (var t = 0; t < 14; t++) twk += '<i class="twk" style="left:' + (8 + (t * 53) % 84) + '%;top:' + (12 + (t * 37) % 70) + '%;animation-delay:' + (-(t * 0.37) % 2.4).toFixed(2) + 's"></i>';
+    el.innerHTML = '<div class="rays"></div><div class="glow"></div>' + twk + '<div class="k">¡RECOMPENSA!<small>' + esc((m.name || 'PREMIO').toUpperCase()) + '</small></div>' +
       '<img class="ch" src="' + (isChest ? P('chest:' + m.chest) : (m.pic || P(m.icon))) + '" alt="">' +
       '<div class="fl"></div><div class="tap">' + (isChest ? '¡TOCA PARA ABRIR!' : '¡TOCA PARA RECOGER!') + '</div>' +
       '<div class="loot">' + loot.join('') + '</div><button type="button" class="ok">' + (r.items && r.items.length ? 'GENIAL' : 'RECOGER') + '</button>';

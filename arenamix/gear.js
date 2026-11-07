@@ -306,12 +306,13 @@
   function stage() {
     if (R) return true;
     try {
-      var cv = document.createElement('canvas'); cv.width = cv.height = 256;
+      // 512 px: the pictures are shown big on large screens and phones with sharp displays
+      var cv = document.createElement('canvas'); cv.width = cv.height = 512;
       R = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true });
       // if the browser takes the 3D context back (too many open), make a new one next time instead of drawing nothing
       cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); R = null; });
       R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.0;
-      R.setClearColor(0, 0); R.setSize(256, 256, false);
+      R.setClearColor(0, 0); R.setSize(512, 512, false);
     } catch (e) { R = null; return false; }
     S = new T.Scene();
     S.add(new T.HemisphereLight(0xe8eeff, 0x302848, 0.8));
