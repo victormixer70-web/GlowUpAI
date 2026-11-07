@@ -13,7 +13,7 @@
       var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
       R = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true });
       cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); R = null; busy = false; });
-      R.setPixelRatio(1); R.setSize(W, H, false);
+      R.setPixelRatio(1.6); R.setSize(W, H, false);   // sharper on big screens and sharp phone displays
       R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.15;
       R.setClearColor(0, 0);
     } catch (e) { R = null; return false; }
@@ -301,7 +301,9 @@
     }, 30);
   }
   // kept on the phone too, so the cards have their pictures straight away next time the app is opened
-  var PKEY = 'arenamix.poster.';
+  var PKEY = 'arenamix.poster2.';
+  // the pictures kept by an older version were smaller: let them go
+  try { for (var oi = localStorage.length - 1; oi >= 0; oi--) { var ok = localStorage.key(oi); if (ok && ok.indexOf('arenamix.poster.') === 0) localStorage.removeItem(ok); } } catch (e) {}
   function stored(key) { try { return localStorage.getItem(PKEY + key); } catch (e) { return null; } }
   function store(key, url) {
     if (!url) return;
