@@ -420,7 +420,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <dc-import name="Duelo" ai-level="{{aiLevel}}" kind="pen" shootout="{{ true }}" rival-name="{{oppName}}" on-end="{{onPens}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isDuelMatch}}" hint-placeholder-val="{{ false }}">
-    <dc-import name="Duelo" ai-level="{{aiLevel}}" kind="{{duelKind}}" rival-name="{{oppName}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
+    <dc-import name="Duelo" ai-level="{{aiLevel}}" kind="{{duelKind}}" online="{{duelOnline}}" rival-name="{{oppName}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isBasket}}" hint-placeholder-val="{{ false }}">
     <dc-import name="Baloncesto" mode="{{mgMode}}" locked="{{ true }}" on-end="{{onScore}}" hint-size="844px,390px"></dc-import>
@@ -564,9 +564,12 @@ class Component extends DCLogic {
   componentWillUnmount() { if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; if (this.raf) cancelAnimationFrame(this.raf); this.raf = null; if (this.mm && this.mm.isHost && this.mm.party && !this.mm.started && window.AMSocial) window.AMSocial.partySend({ t: 'mmStop' }); this.endOnline(); }
   endOnline() { if (this.mm) { this.mm.cancel(); this.mm = null; } }
   // look for real players for a team match (same mode, same size), with the AI as the back-up
+  // the modes played online against real people: the team matches and the football duels (penalties, free kicks)
+  netMode() { return this.pl.kind === 'team' || (this.pl.kind === 'duel' && this.sport === 'futbol'); }
   startOnline(n) {
     const O = window.AMOnline;
-    if (!O || !O.available() || this.pl.kind !== 'team') return;
+    if (!O || !O.available() || !this.netMode()) return;
+    const duel = this.pl.kind === 'duel';
     const A = window.AMChars, o = A ? A.outfit('futbol') : null;
     const look = { char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none', stad: window.AMStad ? window.AMStad.get() : null };
     this.endOnline();
@@ -585,6 +588,7 @@ class Component extends DCLogic {
       error: () => { this.endOnline(); }
     };
     if (this.autoParty === 'follow' && this.followCode && O.follow) { this.mm = O.follow(this.followCode, O.myName(), look, handlers); this.followCode = null; return; }
+    if (duel) { this.mm = O.matchmake((this.props.casual ? 'r' : 'c') + this.pl.id, 1, O.myName(), look, handlers, null); return; }
     this.mm = O.matchmake((this.props.casual ? 'r' : 'c') + this.pl.n, this.pl.n, O.myName(), look, handlers, party && party.length > 1 && party.length <= this.pl.n ? party : null);
   }
   catalog(sport) {
@@ -701,7 +705,7 @@ class Component extends DCLogic {
       if (M.isHost && M.party && !M.started && M.roster.length >= 2 * this.pl.n) M.start();
       // nobody else searching after a while: say so (and let the player choose what to do)
       if (this.t > this.findAt + 20 && M.roster.length <= 1 && !M.follower) { M.cancel(); this.mm = null; this.t = 0; this.setState({ phase: 'empty', emptyWhy: 'nobody' }); }
-    } else if (s.phase === 'search' && this.pl.kind === 'team') {
+    } else if (s.phase === 'search' && this.netMode()) {
       // online modes with no connection to the matchmaking service: nobody can be found
       if (this.t > 8) { this.endOnline(); this.t = 0; this.setState({ phase: 'empty', emptyWhy: 'offline' }); }
     } else if (s.phase === 'search' && this.t > this.findAt) { this.t = 0; this.setState({ phase: 'found', match: this.pre || this.makeMatch(), online: null }); }
@@ -1003,7 +1007,7 @@ class Component extends DCLogic {
         if (s.phase !== 'search') return { slotsA: [], slotsB: [] };
         const pre = this.pre || { mates: [], rivals: [], mateMmr: [], rivalMmr: [] };
         const live = M && !M.cancelled, others = live ? M.roster.filter((x) => x.id !== M.room.me) : [];
-        const have = live ? Math.min(total, 1 + others.length) : pl.kind === 'team' ? 1 : found;
+        const have = live ? Math.min(total, 1 + others.length) : this.netMode() ? 1 : found;
         this.foundNow = have;
         const POOL = ['Kai_Striker', 'LunaGol_09', 'ToroVeloz', 'Mika10', 'Zeta_FC', 'Nico_Volea', 'Sara_Crack', 'Dani_Muro', 'Bruno7', 'Iker_Rayo', 'Vega_22', 'Leo_Tiki', 'Noa_Golazo', 'Rafa_Pared', 'Alba_Top'];
         const FLAGS = ['ES', 'MX', 'AR', 'BR', 'FR', 'IT', 'DE', 'PT', 'CO', 'US', 'JP', 'GB'];
@@ -1026,7 +1030,7 @@ class Component extends DCLogic {
         };
         return { slotsA: Array.from({ length: n }, (_, k) => card(0, k)), slotsB: Array.from({ length: n }, (_, k) => card(1, k)) };
       })(),
-      searchSub: !(M && !M.cancelled) && pl.kind === 'team' ? 'Conectando con el servidor de partidas…' : M && !M.cancelled ? (humans > 1 ? humans + ' jugadores online en la sala' + (M.isHost ? ' · empieza en ' + Math.max(0, Math.ceil(10 - (Date.now() - M.firstJoin) / 1000)) + ' s' : ' · esperando al anfitrión') : 'Buscando jugadores online…') : n > 1 ? found + ' / ' + total + ' jugadores' : 'Rango de búsqueda: ' + Math.max(0, s.mmr - 50 - Math.floor(this.t / 1.5) * 25) + '–' + (s.mmr + 50 + Math.floor(this.t / 1.5) * 25) + ' MMR',
+      searchSub: !(M && !M.cancelled) && this.netMode() ? 'Conectando con el servidor de partidas…' : M && !M.cancelled ? (humans > 1 ? humans + ' jugadores online en la sala' + (M.isHost ? ' · empieza en ' + Math.max(0, Math.ceil(10 - (Date.now() - M.firstJoin) / 1000)) + ' s' : ' · esperando al anfitrión') : 'Buscando jugadores online…') : n > 1 ? found + ' / ' + total + ' jugadores' : 'Rango de búsqueda: ' + Math.max(0, s.mmr - 50 - Math.floor(this.t / 1.5) * 25) + '–' + (s.mmr + 50 + Math.floor(this.t / 1.5) * 25) + ' MMR',
       searchClock: '0:' + String(Math.floor(this.t)).padStart(2, '0'),
       teamA, teamB,
       koMode: (casual ? 'INFORMAL' : 'COMPETITIVO') + ' · ' + (pl.kind === 'team' ? pl.n + ' CONTRA ' + pl.n : pl.title || ''),
@@ -1044,7 +1048,7 @@ class Component extends DCLogic {
       })(),
       aiLevel: window.AMProgress && window.AMProgress.aiLevel ? window.AMProgress.aiLevel(casual ? null : s.mmr) : 0.5,
       matchLabel: casual ? 'INFORMAL' : 'COMPETITIVO', matchMode: casual ? 'quick' : 'comp', duration: casual ? 90 : 120, teamSize: n,
-      mates: m ? m.mates : [], rivals: m ? m.rivals : [], oppName: m ? m.rivals[0] : '',
+      mates: m ? m.mates : [], rivals: m ? m.rivals : [], oppName: OL && pl.kind === 'duel' ? ((OL.roster.find((x) => x.id !== OL.me) || {}).name || 'Rival') : m ? m.rivals[0] : '', duelOnline: pl.kind === 'duel' ? OL : null,
       oppColor: m ? m.color : '#A78BFA', oppTrim: m ? m.trim : '#F4F4FA',
       duelKind: pl.duel || 'pen', mgMode: pl.mode || '',
       resTitle: won ? '¡VICTORIA!' : lost ? 'DERROTA' : 'EMPATE',

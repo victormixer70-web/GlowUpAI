@@ -153,6 +153,12 @@ class Component extends DCLogic {
     this.practice = props.mode === 'practice' || this.daily;
     this.best = 0;
     this.kind = props.kind === 'free' ? 'free' : 'pen';
+    // online against another player: props.online = { room, isHost, me, roster }. The host shoots first; each
+    // shot is sent as it leaves the boot, the keeper's dive as it is made, and the keeper's side has the last
+    // word on what happened (it sends the result back)
+    this.ol = props.online && props.online.room ? props.online : null;
+    this.netShots = {}; this.netDives = {}; this.netRes = {};
+    if (/[?&]debug\b/.test(location.search)) window.__du = this;
     this.setup(true);
   }
   componentDidUpdate(prev) {
@@ -160,6 +166,32 @@ class Component extends DCLogic {
   }
   componentDidMount() {
     if (window.AMPad) this.padOff = window.AMPad.on((st, pv) => this.padIn(st, pv));
+    if (this.ol) this.netOff = this.ol.room.listen((kind, from, m) => {
+      if (kind === 'leave') { if (this.phase !== 'done') { this.oppLeft = true; this.winner = 'you'; this.phase = 'done'; this.forceUpdate(); } return; }
+      if (kind !== 'msg' || !m) return;
+      if (m.t === 'dshot') { this.netShots[m.n] = m.v; this.loop(); }
+      else if (m.t === 'ddive') { this.netDives[m.n] = m; this.applyNetDive(); }
+      else if (m.t === 'dres') { this.netRes[m.n] = m; this.fixRes(); this.forceUpdate(); }
+    });
+  }
+  // the other player's dive, on our side when we are the one shooting
+  applyNetDive() {
+    const n = this.shotN(), d = this.netDives[n];
+    if (!d || d.used || this.turn !== 'you' || this.result) return;
+    if (this.phase !== 'runup' && this.phase !== 'flight') return;   // kept for when the shot is taken
+    d.used = true;
+    this.aimKeeper(d.x, d.y);
+    if (this.phase === 'runup') { this.k.decided = false; this.pendingDive = true; }
+  }
+  sendDive(x, y) { if (this.ol && this.turn === 'rival') this.ol.room.send({ t: 'ddive', n: this.shotN(), x, y }); }
+  // what the keeper's phone saw is what counts
+  fixRes() {
+    if (!this.ol || this.turn !== 'you' || !this.result) return;
+    const n = this.shotN() - 1, r = this.netRes[n];
+    if (!r || r.kind === this.result.kind) return;
+    const goal = r.kind === 'gol' || r.kind === 'diana';
+    this.sh.you[this.sh.you.length - 1] = goal;
+    this.result = { kind: r.kind, sub: r.sub };
   }
   // a game controller: the stick aims (the cross-hair on the goal, or the free-kick target), A shoots / dives,
   // LB / RB the curve and X / Y the height of a free kick
@@ -208,7 +240,7 @@ class Component extends DCLogic {
       if (A) {
         this.tap = { x: pa.x, y: pa.y };
         if (this.phase === 'defend') { k.early = true; k.aimX = pa.x; }
-        this.aimKeeper(pa.x, pa.y);
+        this.aimKeeper(pa.x, pa.y); this.sendDive(pa.x, pa.y);
         if (this.phase === 'defend') { k.decided = false; this.pendingDive = true; }
         this.loop();
       }
@@ -217,6 +249,7 @@ class Component extends DCLogic {
   }
   componentWillUnmount() {
     if (this.padOff) { this.padOff(); this.padOff = null; }
+    if (this.netOff) { this.netOff(); this.netOff = null; }
     if (this.raf) cancelAnimationFrame(this.raf);
     this.raf = null;
     if (this.R) { this.R.dispose(); try { this.R.forceContextLoss(); } catch (e) {} this.R = null; }
@@ -232,13 +265,22 @@ class Component extends DCLogic {
     const s = this.st || {};
     return Math.max(0, Math.min(1, ((s[k] ?? 10) - 10) / 140));
   }
+  // the same random sequence on both phones (free-kick spots), from the room's code
+  rand() {
+    if (!this.ol) return Math.random();
+    let a = this.seed >>> 0; a = (a + 0x6D2B79F5) >>> 0; this.seed = a;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+  shotN() { return this.sh.you.length + this.sh.rival.length; }
   setup(init) {
+    if (this.ol) { let h = 7; const c = String(this.ol.room.code || 'duelo'); for (let i = 0; i < c.length; i++) h = (h * 31 + c.charCodeAt(i)) >>> 0; this.seed = h; }
     this.st = this.loadStats();
     if (this.kind === 'pen') { this.D = 11; this.GX = 0; this.WALL = []; }
-    else this.applyFK(this.practice && !this.daily ? (this.fk || 0) : Math.floor(Math.random() * this.FKS().length), false);
+    else this.applyFK(this.practice && !this.daily ? (this.fk || 0) : Math.floor(this.rand() * this.FKS().length), false);
     this.sh = { you: [], rival: [] };
     this.pts = 0;
-    this.turn = 'you'; this.winner = null;
+    this.turn = this.ol && !this.ol.isHost ? 'rival' : 'you'; this.winner = null;
     this.resetShot();
     if (!init) { if (this.R) this.buildScene(); this.camSnap = true; this.forceUpdate(); this.loop(); }
   }
@@ -366,8 +408,13 @@ class Component extends DCLogic {
     return { vx: (xt - 0.5 * aLat * T * T) / T, vy: (yt - 0.11 + 0.5 * 9.81 * T * T) / T + 0.0125 * speed * 0.5, vz: speed, curve, T };
   }
   queueShot(v, err) {
+    if (this.ol) {
+      v = Object.assign({}, v, { vx: v.vx + (Math.random() * 2 - 1) * err, vy: v.vy + (Math.random() * 2 - 1) * err * 0.6 }); err = 0;
+      this.ol.room.send({ t: 'dshot', n: this.shotN(), v });
+    }
     this.pendingShot = { v, err };
     this.phase = 'runup'; this.pt = 0;
+    if (this.ol) this.applyNetDive();
     this.loop();
   }
   launchPending() {
@@ -378,6 +425,7 @@ class Component extends DCLogic {
     this.phase = 'flight'; this.pt = 0; this.trail = [];
     if (window.AMSfx) try { window.AMSfx.kick(0.8); } catch (e) {}
     if (this.pendingDive) { this.k.decided = true; this.pendingDive = null; }
+    if (this.ol) this.applyNetDive();
   }
   rivalShot() {
     const GX = this.GX, pen = this.kind === 'pen';
@@ -433,6 +481,7 @@ class Component extends DCLogic {
   setResult(kind, sub) {
     if (this.result) return;
     this.result = { kind, sub };
+    if (this.ol && this.turn === 'rival') this.ol.room.send({ t: 'dres', n: this.shotN(), kind, sub });
     const goal = kind === 'gol' || kind === 'diana';
     this.sh[this.turn].push(goal);
     this.pts += kind === 'diana' ? 3 : kind === 'gol' ? 1 : 0;
@@ -462,11 +511,17 @@ class Component extends DCLogic {
     if (this.shake > 0) this.shake = Math.max(0, this.shake - dt);
     const b = this.b, k = this.k, D = this.D, GX = this.GX, kz = D - 0.4;
     if (this.bulgeT > 0) this.bulgeT -= dt;
-    if (this.phase === 'defend' && this.pt >= Duelo_RUN0 + Duelo_RUN) { this.rivalShot(); return; }
+    if (this.phase === 'defend' && this.ol) {
+      const ns = this.netShots[this.shotN()];
+      this.waiting = !ns;
+      if (!ns) this.pt = Math.min(this.pt, 0.2);
+      else if (this.pt < Duelo_RUN0) this.pt = Duelo_RUN0;
+      if (ns && this.pt >= Duelo_RUN0 + Duelo_RUN) { this.launchPendingDirect(ns, 0); return; }
+    } else if (this.phase === 'defend' && this.pt >= Duelo_RUN0 + Duelo_RUN) { this.rivalShot(); return; }
     if (this.phase === 'runup' && this.pt >= Duelo_RUN) { this.launchPending(); return; }
     if (this.phase === 'flight' || this.phase === 'result') {
       if (this.WALL.length) this.wallJ = this.pt < 1 && this.phase === 'flight' ? Math.max(0, Math.sin(Math.min(1, Math.max(0, (this.pt - 0.12) / 0.55)) * Math.PI)) * 0.3 : Math.max(0, this.wallJ - dt);
-      if (this.turn === 'you' && !k.decided && this.phase === 'flight' && this.pt > (this.kind === 'pen' ? 0.32 : 0.62)) {
+      if (this.turn === 'you' && !this.ol && !k.decided && this.phase === 'flight' && this.pt > (this.kind === 'pen' ? 0.32 : 0.62)) {
         const pr = this.predict();
         let px = pr.x;
         if (Math.random() < (this.kind === 'pen' ? 0.35 : 0.25) + (0.5 - this.aiLevel()) * 0.5) px = GX - (px - GX);
@@ -499,7 +554,7 @@ class Component extends DCLogic {
           const vx = bx - ax, vy = by - ay, t = Math.max(0, Math.min(1, ((c.x - ax) * vx + (c.y - ay) * vy) / (vx * vx + vy * vy)));
           let dist = Math.hypot(c.x - (ax + vx * t), c.y - (ay + vy * t));
           if (!k.up && Math.abs(c.y - (k.y + 1.25)) < 0.3) dist = Math.min(dist, Math.max(0, Math.abs(c.x - k.x) - 0.65));
-          if (dist < (this.turn === 'you' ? 0.24 + 0.18 * this.aiLevel() : 0.33)) {
+          if (dist < (this.turn === 'you' && !this.ol ? 0.24 + 0.18 * this.aiLevel() : 0.33)) {
             b.z = kz - 0.05; b.vz = -Math.abs(b.vz) * 0.35; b.vx = (c.x - k.x) * 3 + (Math.random() - 0.5) * 3; b.vy = 3; b.curve = 0; b.res = null;
             this.setResult('parada', this.turn === 'rival' ? '¡La has parado!' : 'El portero lo adivina');
           }
@@ -539,10 +594,16 @@ class Component extends DCLogic {
         this.resetShot();
         return;
       }
+      // online, shooting: wait (a few seconds at most) for the keeper's phone to say how it went
+      if (this.ol && this.turn === 'you') {
+        this.fixRes();
+        if (!this.netRes[this.shotN() - 1] && (this.waitRes = (this.waitRes || 0) + dt) < 5) return;
+        this.waitRes = 0;
+      }
       this.winner = this.checkWinner();
       if (this.winner) { this.phase = 'done'; return; }
       this.turn = this.turn === 'you' ? 'rival' : 'you';
-      if (this.kind === 'free' && this.sh.you.length === this.sh.rival.length) this.applyFK(this.fk + 1 + Math.floor(Math.random() * (this.FKS().length - 1)), true);
+      if (this.kind === 'free' && this.sh.you.length === this.sh.rival.length) this.applyFK(this.fk + 1 + Math.floor(this.rand() * (this.FKS().length - 1)), true);
       this.resetShot();
     }
   }
@@ -1313,7 +1374,7 @@ class Component extends DCLogic {
     // wall jump
     (this.wallMen || []).forEach((w) => { w.position.y = this.wallJ; });
     // the net wraps round the ball pressing into it, then springs back
-    if (this.net) {
+    if (this.ol) {
       const GX = this.GX ?? 0;
       // the goal's net: press(across, depth past the line, height, radius); older nets took push()
       if (b.z > D && Math.abs(b.x - GX) < 3.66) {
@@ -1593,8 +1654,8 @@ class Component extends DCLogic {
       turnLabel: youTurn ? 'TE TOCA TIRAR' : 'TE TOCA PARAR',
       turnStyle: 'padding: 6px 16px; border-radius: 10px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 22px; letter-spacing: 2px; ' + (youTurn ? 'background: #22D3EE; color: #0B0B14;' : 'background: #A78BFA; color: #0B0B14;'),
       showCount: this.phase === 'defend',
-      countLabel: cd > 0.8 ? String(Math.ceil(cd - 0.8)) : '¡CHUTA!',
-      countStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 60px; line-height: 1; color: #F4F4FA; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (1.3 - ((2.4 - cd) % 0.8) * 0.4).toFixed(2) + ');',
+      countLabel: this.ol && this.waiting ? 'EL RIVAL APUNTA…' : cd > 0.8 ? String(Math.ceil(cd - 0.8)) : '¡CHUTA!',
+      countStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + (this.ol && this.waiting ? 30 : 60) + 'px; line-height: 1; color: #F4F4FA; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (this.ol && this.waiting ? 1 : (1.3 - ((2.4 - cd) % 0.8) * 0.4)).toFixed(2) + ');',
       showHint: !this.replaying && ((this.phase === 'aim' && !this.swipe && !this.charge && !this.dragAim) || (this.phase === 'defend' && !this.tap) || (this.phase === 'flight' && !youTurn && !this.tap)),
       hintText: this.padOn ? (this.fkMode() ? 'Mando: stick = diana · L1/R1 = efecto · □/△ = altura · mantén ○ y suelta en la zona verde' : youTurn ? 'Mando: apunta con el stick · mantén ○ para la potencia y suelta para chutar' : 'Mando: mueve la mira con el stick y pulsa ○ para lanzarte') : this.fkMode() ? 'Arrastra la diana en la portería · ajusta efecto y altura · mantén CHUTAR y suelta en la zona verde' : youTurn ? 'Desliza desde el balón hacia la portería · más rápido = más potencia · curva el gesto para dar efecto' : 'Toca la portería donde quieras lanzarte · si te tiras antes del disparo, el rival puede leerte',
       zoneLabel: youTurn ? 'Zona de tiro: desliza desde el balón hacia la portería' : 'Portería: toca donde quieras que se lance el portero',
@@ -1605,12 +1666,12 @@ class Component extends DCLogic {
       resultStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 72px; line-height: 1; letter-spacing: 2px; color: ' + rm[1] + '; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (0.4 + rs * 0.6).toFixed(2) + ');',
       showDone: this.phase === 'done' && !this.daily,
       doneKicker: this.practice ? 'RONDA COMPLETADA' : this.kind === 'pen' ? 'TANDA DE PENALTIS' : 'DUELO DE TIROS LIBRES',
-      doneTitle: this.practice ? yg + ' GOLES · ' + this.pts + ' PUNTOS' : this.props.shootout ? (won ? '¡GANAS EN LOS PENALTIS!' : 'PIERDES EN LOS PENALTIS') : won ? '¡GANAS EL DUELO!' : 'PIERDES EL DUELO',
+      doneTitle: this.oppLeft ? 'EL RIVAL SE HA IDO' : this.practice ? yg + ' GOLES · ' + this.pts + ' PUNTOS' : this.props.shootout ? (won ? '¡GANAS EN LOS PENALTIS!' : 'PIERDES EN LOS PENALTIS') : won ? '¡GANAS EL DUELO!' : 'PIERDES EL DUELO',
       doneStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 44px; line-height: 1; letter-spacing: 2px; color: ' + (this.practice || won ? '#22D3EE' : '#FF5C5C') + ';',
       doneScore: this.practice ? 'Récord: ' + this.best : yg + ' – ' + rg,
       doneReward: this.practice ? (yg >= 3 ? '+1 PM de fútbol por 3 goles o más' : 'Marca 3 goles para ganar 1 PM') : this.props.shootout ? 'El partido acabó en empate: la tanda decide' : won ? '+30 VCD · +90 XP' : '+10 VCD · +40 XP',
       rematchLabel: this.props.onEnd && !this.practice ? 'CONTINUAR' : this.practice ? 'OTRA RONDA' : 'REVANCHA',
-      rematch: () => { if (this.props.onEnd && !this.practice) this.props.onEnd({ home: yg, away: rg }); else this.setup(false); },
+      rematch: () => { if (this.props.onEnd && !this.practice) this.props.onEnd(this.oppLeft && yg <= rg ? { home: rg + 1, away: rg, forfeitWin: true } : { home: yg, away: rg }); else this.setup(false); },
       isFree: this.kind === 'free',
       fkLabel: this.kind === 'free' ? this.FKS()[this.fk || 0].name : '',
       nextFK: () => { this.applyFK((this.fk || 0) + 1, true); this.resetShot(); this.forceUpdate(); },
@@ -1636,7 +1697,7 @@ class Component extends DCLogic {
           const gx = hit.x, gy = Math.max(0.2, Math.min(2.6, hit.y));
           this.tap = { x: gx, y: gy };
           if (this.phase === 'defend') { k.early = true; k.aimX = gx; }
-          this.aimKeeper(gx, gy);
+          this.aimKeeper(gx, gy); this.sendDive(gx, gy);
           if (this.phase === 'defend') { k.decided = false; this.pendingDive = true; }
           this.loop();
           this.forceUpdate();
