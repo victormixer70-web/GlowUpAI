@@ -17,6 +17,10 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 @keyframes mmShine{from{background-position:-160% 0}to{background-position:260% 0}}
 @keyframes mmBlink{0%,100%{opacity:1}50%{opacity:.25}}
 @keyframes mmVs{0%,100%{scale:1}50%{scale:1.12}}
+@keyframes mmPan{from{transform:scale(1.04) translateX(-10px)}to{transform:scale(1.09) translateX(10px)}}
+.mm-ring{position:absolute;left:-120px;top:-120px;width:240px;height:240px;border-radius:50%;box-shadow:inset 0 0 0 1.5px #3DA9FF66,0 0 18px #1E8BFF33;opacity:0;animation:mmRing 3s ease-out infinite}
+@keyframes mmRing{0%{transform:scale(.9);opacity:.8}100%{transform:scale(2.6);opacity:0}}
+.mm-grid{animation:mmGrid 2.4s linear infinite}@keyframes mmGrid{to{background-position:0 26px,0 0}}
 .mm-beam{animation:mmBeam 9s linear infinite}
 .mm-land{animation:mmLand .55s cubic-bezier(.2,1.4,.4,1) both}
 .mm-slot{background-image:linear-gradient(100deg,transparent 30%,#ffffff12 50%,transparent 70%)!important;background-size:60% 100%!important;background-repeat:no-repeat!important;animation:mmShine 1.6s linear infinite}
@@ -261,7 +265,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <rect width="844" height="390" fill="url(#cp-g)"/>
     </svg>
     <div class="lb-grass" aria-hidden="true"></div>
-    <a href="Modos.dc.html" aria-label="Volver a modos" style="position: absolute; left: 12px; top: 12px; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #251443; color: #F4F4FA">
+    <a href="Modos.dc.html" aria-label="Volver a modos" style="position: absolute; z-index: 5; left: 12px; top: 12px; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #251443; color: #F4F4FA">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
     </a>
     <span class="bc-title hd" style="position: absolute; left: 66px; top: 15px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; letter-spacing: 2px; color: {{headColor}}">{{headLabel}}</span>
@@ -315,6 +319,12 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 
   <sc-if value="{{isSearch}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; inset: 0; overflow: hidden">
+      <!-- its own backdrop: the stands at night, dimmed and cooled to the logo's blue, your side lit blue and theirs red,
+           a radar sweeping out from the globe and a fine grid on the pitch -->
+      <div style="position: absolute; inset: -12px; background: url(assets/bg_tribuna.jpg) center 35%/cover; filter: saturate(.5) brightness(.55) blur(1.5px); animation: mmPan 24s ease-in-out infinite alternate"></div>
+      <div style="position: absolute; inset: 0; background: radial-gradient(36% 52% at 50% 46%, #0A3DCC66 0%, transparent 70%), radial-gradient(45% 80% at 0% 50%, #1E8BFF33 0%, transparent 70%), radial-gradient(45% 80% at 100% 50%, #FF3B5C2E 0%, transparent 70%), linear-gradient(180deg, #02040CCC 0%, #06102E88 40%, #02040CE6 100%)"></div>
+      <div class="mm-grid" style="position: absolute; left: -10%; right: -10%; bottom: -40px; height: 210px; background: linear-gradient(#3DA9FF22 1px, transparent 1px) 0 0/100% 26px, linear-gradient(90deg, #3DA9FF22 1px, transparent 1px) 0 0/44px 100%; transform: perspective(380px) rotateX(58deg); transform-origin: 50% 100%; -webkit-mask-image: linear-gradient(0deg, #000 10%, transparent 90%); mask-image: linear-gradient(0deg, #000 10%, transparent 90%)"></div>
+      <div style="position: absolute; left: 422px; top: 177px; width: 0; height: 0"><i class="mm-ring"></i><i class="mm-ring" style="animation-delay: -1s"></i><i class="mm-ring" style="animation-delay: -2s"></i></div>
       <!-- stadium light sweeping behind the globe -->
       <div class="mm-beam" style="position: absolute; left: 50%; top: -120px; width: 900px; height: 900px; margin-left: -450px; background: conic-gradient(from 0deg, transparent 0deg, #22D3EE14 18deg, transparent 40deg, transparent 180deg, #A78BFA12 200deg, transparent 222deg); border-radius: 50%; pointer-events: none"></div>
       <canvas ref="{{globeRef}}" width="520" height="520" style="position: absolute; left: 307px; top: 62px; width: 230px; height: 230px"></canvas>
