@@ -49,10 +49,10 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .ko-wave{opacity:0;animation:koWave .7s .62s ease-out both}.ko-wave2{animation:koWave .9s 2.45s ease-out both}
 @keyframes koWave{from{transform:scale(.9);opacity:.9}to{transform:scale(2.6);opacity:0}}
 .ko-t1{animation:koT1 1.6s .7s both}@keyframes koT1{0%{opacity:0;letter-spacing:14px}25%,80%{opacity:1;letter-spacing:4px}100%{opacity:0}}
-.ko-t2{animation:koT2 .5s 2.35s cubic-bezier(.2,1.8,.4,1) both}@keyframes koT2{from{opacity:0;transform:scale(.3) rotate(-8deg)}to{opacity:1;transform:rotate(-3deg)}}
+.ko-t2{animation:koT2 .5s 2.35s cubic-bezier(.2,1.8,.4,1) both}@keyframes koT2{from{opacity:0;transform:scale(.3) rotate(-8deg)}to{opacity:1;transform:none}}
 .ko-sub{animation:koFade .4s .5s both}
 .ko-root{animation:koOut .45s 2.8s ease-in both}@keyframes koOut{to{transform:scale(1.35);filter:blur(4px)}}
-.ko-flash{opacity:0;animation:koFlash .5s 2.85s both}@keyframes koFlash{0%{opacity:0}60%{opacity:1}100%{opacity:1}}
+.ko-flash{opacity:0;animation:koFlash .5s 2.85s both}@keyframes koFlash{0%{opacity:0;background:#FFFFFF}35%{opacity:.85;background:#DCEBFF}100%{opacity:1;background:#06102E}}
 .em-rays{position:absolute;left:50%;top:50%;width:1400px;height:1400px;margin:-700px 0 0 -700px;background:repeating-conic-gradient(from 0deg,#FF5C8A14 0deg 8deg,transparent 10deg 22deg);animation:emRays 40s linear infinite;pointer-events:none;mask-image:radial-gradient(closest-side,#000,transparent);-webkit-mask-image:radial-gradient(closest-side,#000,transparent)}
 @keyframes emRays{to{rotate:360deg}}
 .em-blink{animation:emBlink 2.4s ease-in-out infinite}@keyframes emBlink{0%,100%{opacity:.2}50%{opacity:1}}
@@ -382,8 +382,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{isFound}}" hint-placeholder-val="{{ false }}">
     <div class="ko-root" style="position: absolute; inset: 0; z-index: 5; overflow: hidden; background: #0F061E">
       <!-- the two halves crash together along a diagonal -->
-      <div class="ko-a" style="position: absolute; inset: 0; clip-path: polygon(0 0, 57% 0, 43% 100%, 0 100%); background: radial-gradient(70% 90% at 15% 50%, #0F5566 0%, #141D4B 55%, #0F0E2D 100%)"><div class="ko-stripes"></div></div>
-      <div class="ko-b" style="position: absolute; inset: 0; clip-path: polygon(57% 0, 100% 0, 100% 100%, 43% 100%); background: radial-gradient(70% 90% at 85% 50%, #66202A 0%, #2E1018 55%, #14070C 100%)"><div class="ko-stripes"></div></div>
+      <div class="ko-a" style="position: absolute; inset: 0; clip-path: polygon(0 0, 57% 0, 43% 100%, 0 100%); background: radial-gradient(60% 80% at 18% 50%, #1E8BFF66 0%, transparent 70%), linear-gradient(90deg, #06102EE6 0%, #0A3DCC99 100%), url(assets/bg_tribuna.jpg) 30% 40%/cover"><div class="ko-stripes"></div></div>
+      <div class="ko-b" style="position: absolute; inset: 0; clip-path: polygon(57% 0, 100% 0, 100% 100%, 43% 100%); background: radial-gradient(60% 80% at 82% 50%, #FF3B5C66 0%, transparent 70%), linear-gradient(270deg, #1A0610E6 0%, #8A142899 100%), url(assets/bg_tribuna.jpg) 70% 40%/cover"><div class="ko-stripes"></div></div>
       <svg class="ko-bolt" width="844" height="390" viewBox="0 0 844 390" style="position: absolute; inset: 0; pointer-events: none"><path d="M481 -5 L452 120 L470 128 L430 262 L448 270 L362 395" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round" style="filter: drop-shadow(0 0 6px #7EF0FF) drop-shadow(0 0 14px #A78BFA)"/></svg>
       <!-- spotlights crossing -->
       <div class="ko-spot ko-spot-l"></div><div class="ko-spot ko-spot-r"></div>
@@ -407,7 +407,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       </div>
       <!-- the words under it -->
       <span class="ko-t1" style="position: absolute; left: 0; right: 0; top: 274px; text-align: center; font-size: 13px; font-weight: 800; letter-spacing: 4px; color: #F4F4FA">¡PARTIDA ENCONTRADA!</span>
-      <span class="ko-t2" style="position: absolute; left: 0; right: 0; top: 262px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 48px; line-height: 1; letter-spacing: 2px; color: #FFE38A; text-shadow: 0 4px 0 #0D0418, 0 0 24px #FFC53D">¡A JUGAR!</span>
+      <span class="ko-t2" style="position: absolute; left: 0; right: 0; top: 262px; text-align: center; font-family: 'Titulos', sans-serif; font-size: 50px; line-height: 1; letter-spacing: 2px; color: #FFE38A; text-shadow: 0 4px 0 #0D0418, 0 0 24px #FFC53D">¡A JUGAR!</span>
       <span class="ko-sub" style="position: absolute; left: 0; right: 0; top: 30px; text-align: center; font-size: 11px; font-weight: 800; letter-spacing: 3px; color: #A3A3C2">{{koMode}}</span>
       <div class="ko-flash" style="position: absolute; inset: 0; background: #0D0728; pointer-events: none"></div>
     </div>
@@ -1040,12 +1040,15 @@ class Component extends DCLogic {
       koMode: (casual ? 'INFORMAL' : 'COMPETITIVO') + ' · ' + (pl.kind === 'team' ? pl.n + ' CONTRA ' + pl.n : pl.title || ''),
       ...(() => {
         const face = (window.AMChars && window.AMChars.pref() !== 'clasico') ? 'assets/chars/' + window.AMChars.pref() + '.png' : '';
+        // everybody gets a face: yours, or one of the characters picked from the player's name
+        const PICS = ['dani', 'leo', 'nico', 'remy', 'ty', 'vegas'];
+        const picOf = (nm) => { let h = 7; for (const ch of String(nm)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return 'assets/chars/' + PICS[h % PICS.length] + '.png'; };
         const mk = (list, team) => list.map((p, i) => {
           const col = team ? '#FF8A8E' : '#22D3EE', mine = !!p.mine;
           return {
             name: p.name, tag: p.tag, ini: p.name.replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase() || '?', tagColor: mine ? '#53D88E' : col,
             style: 'position: relative; display: flex; align-items: center; gap: 10px; height: 54px; padding: 0 14px; box-sizing: border-box; animation-delay: ' + (0.15 + i * 0.12).toFixed(2) + 's; clip-path: inset(0 round 14px); ' + (team ? 'flex-direction: row-reverse; text-align: right; ' : '') + 'background: linear-gradient(' + (team ? '270' : '90') + 'deg, ' + col + (mine ? '55' : '33') + ', #150925CC); box-shadow: inset ' + (team ? '-4' : '4') + 'px 0 0 ' + col + (mine ? ', 0 0 18px ' + col + '66' : '') + ';',
-            av: 'flex: none; width: 38px; height: 38px; border-radius: 19px; display: flex; align-items: center; justify-content: center; font: 800 14px \'Barlow Condensed\', sans-serif; box-shadow: 0 0 0 2px #150925, 0 0 0 4px ' + col + '; ' + (mine && face ? 'background: #22D3EE url(' + face + ') center/cover; color: transparent;' : 'background: ' + col + '; color: #150925;')
+            av: 'flex: none; width: 38px; height: 38px; border-radius: 19px; display: flex; align-items: center; justify-content: center; font: 800 14px \'Barlow Condensed\', sans-serif; box-shadow: 0 0 0 2px #150925, 0 0 0 4px ' + col + '; ' + 'background: url(' + (mine && face ? face : picOf(p.name)) + ') center 20%/cover, ' + (team ? 'radial-gradient(circle at 50% 30%, #FF8A8E, #7A1E2C)' : 'radial-gradient(circle at 50% 30%, #7EF0FF, #0A3DCC)') + '; color: transparent;'
           };
         });
         return { koA: mk(teamA, 0), koB: mk(teamB, 1) };
