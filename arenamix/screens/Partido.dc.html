@@ -745,8 +745,51 @@ class Component extends DCLogic {
       Object.assign(p, { x, y });
     });
     g.own = -1; g.hold = -1; g.gkSafe = null; g.foulT = null; g.ps.forEach((p) => { p.wallT = 0; }); g.recv = null; g.charging = false; g.charge = 0;
+    // the kick-off: this team takes it; until the ball is played the others wait in their own half, outside the circle
+    g.ko = { team, t: 0, sec: -1 };
     g.ctl = this.keeperMode() ? g.ps.findIndex((p) => p.team === 0 && p.role === 'gk') : g.ps.findIndex((p) => p.team === 0 && p.slot === (this.net ? this.net.mySlot : 0));
     if (this.net) this.net.humans.forEach((h) => { h.i = h.home; h.charging = false; h.charge = 0; });
+  }
+  /* The kick-off. Until the team taking it plays the ball off the centre spot, the other team stays in its own
+     half and outside the centre circle, so nobody can take the ball off you before you have kicked off.
+     10 seconds at most: then it is taken for you (a pass back to a team-mate, or a little touch forward). */
+  koStep(dt) {
+    const g = this.g, K = g.ko, b = g.ball;
+    if (!K) return;
+    if (this.props.tutorial || this.props.practice) { g.ko = null; return; }
+    K.t += dt;
+    const off = Math.hypot(b.x - 30, b.y - 15);
+    if (off > 1.2 || b.z > 0.5) { g.ko = null; return; }
+    const R = 5.4;
+    for (const q of g.ps) {
+      if (q.team === K.team || q.role === 'gk' || q.out) continue;
+      if (q.team === 0 && q.x > 29.5) { q.x = 29.5; if (q.vx > 0) q.vx = 0; }
+      if (q.team === 1 && q.x < 30.5) { q.x = 30.5; if (q.vx < 0) q.vx = 0; }
+      const dx = q.x - 30, dy = q.y - 15, d = Math.hypot(dx, dy) || 0.01;
+      if (d < R) { q.x = 30 + dx / d * R; q.y = 15 + dy / d * R; const vin = (q.vx * dx + q.vy * dy) / d; if (vin < 0) { q.vx -= dx / d * vin; q.vy -= dy / d * vin; } }
+    }
+    // the countdown, for whoever is taking it
+    const me = g.ps[g.ctl], left = Math.ceil(10 - K.t);
+    if (me && me.team === K.team && left !== K.sec && left <= 7 && left > 0) { K.sec = left; this.flashMsg('Saca de centro · ' + left, 1.05); }
+    if (K.t >= 10) this.autoKickoff();
+  }
+  autoKickoff() {
+    const g = this.g, K = g.ko, b = g.ball;
+    if (!K) return;
+    const team = g.ps.map((p, i) => [p, i]).filter(([p]) => p.team === K.team && p.role !== 'gk' && !p.out);
+    if (!team.length) { g.ko = null; return; }
+    team.sort((a, c) => Math.hypot(a[0].x - b.x, a[0].y - b.y) - Math.hypot(c[0].x - b.x, c[0].y - b.y));
+    const [k, ki] = team[0], mate = team[1];
+    let tx, ty, sp;
+    if (mate) { tx = mate[0].x; ty = mate[0].y; sp = 10; }
+    else { tx = 30 + (K.team === 0 ? 4 : -4); ty = 15 + (Math.random() - 0.5) * 3; sp = 6; }
+    const dx = tx - b.x, dy = ty - b.y, d = Math.hypot(dx, dy) || 1;
+    Object.assign(b, { vx: dx / d * sp, vy: dy / d * sp, vz: 0, z: 0, spin: 0 });
+    g.own = -1; g.last = ki; g.hold = -1; k.face = Math.atan2(dy, dx); k.cd = 0.25;
+    if (mate) g.recv = { i: mate[1], t: 1.2 };
+    g.ko = null;
+    this.flashMsg('Saque automático', 1.1);
+    this.sfx('kick', 0.5);
   }
   keeperMode() {
     // 4vs4: you can play in goal, with a camera from behind your own goal
@@ -1468,6 +1511,7 @@ class Component extends DCLogic {
       if (d > 0 && d < 0.9) { const o = (0.9 - d) / 2, nx = dx / d, ny = dy / d; a.x -= nx * o; a.y -= ny * o; c.x += nx * o; c.y += ny * o; }
     }
     this.slideHits();
+    this.koStep(dt);
     if (this.props.tutorial) this.tutStep(dt);
     this.crossStep(dt);
     if (g.chilenaT > 0) g.chilenaT -= dt;
