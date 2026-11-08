@@ -276,6 +276,11 @@
       add(player({ char: you ? me : 'ty', kit: homeKit(), you: true, x: 0, z: 0, face: 0.28, t: 0.35 }));
       var spot = new T.PointLight(0xffffff, 0.9, 8); spot.position.set(1.5, 2.6, 2.4); S.add(spot);
       look = { pos: [0.12, 1.4, 3.1], at: [0, 1.18, 0] };
+    } else if (kind === 'full') {
+      // you, head to boots, standing on nothing (for screens that put you on their own ground)
+      add(player({ char: you ? me : 'ty', kit: homeKit(), you: true, x: 0, z: 0, face: 0.28, t: 0.35 }));
+      var spot2 = new T.PointLight(0xffffff, 0.9, 8); spot2.position.set(1.5, 2.6, 2.4); S.add(spot2);
+      look = { pos: [0.1, 1.05, 5.4], at: [0, 0.93, 0] };
     } else {
       add(patch(3)); add(ball(0, 0));
     }
@@ -324,5 +329,6 @@
   }
   // the card portrait changes with your character and kit: its key carries them
   function cardKey() { var A = window.AMChars; return 'card:' + (A ? A.pref() : '') + ':' + JSON.stringify(homeKit()); }
-  window.AMPosters = { get: get, cardKey: cardKey };
+  function fullKey() { return 'full' + cardKey().slice(4); }
+  window.AMPosters = { get: get, cardKey: cardKey, fullKey: fullKey };
 })();
