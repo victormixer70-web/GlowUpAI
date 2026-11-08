@@ -11,6 +11,12 @@
 <helmet>
 <style>
 @keyframes pdLive{0%,100%{opacity:1}50%{opacity:.25}}
+.pd-cd{position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(40% 55% at 50% 50%,#02040C99,transparent 75%)}
+.pd-cd b{font-family:'Titulos',sans-serif;font-size:150px;line-height:1;background:linear-gradient(180deg,#FFFFFF 10%,#BFE3FF 50%,#1E8BFF);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 26px #1E8BFF);animation:pdCdPop 1s cubic-bezier(.2,1.6,.4,1) both}
+.pd-cd b.go{font-size:96px;background:linear-gradient(180deg,#FFF6C8,#FFC53D 60%,#F59E0B);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 26px #FFC53D)}
+.pd-cd i{position:absolute;left:50%;top:50%;width:220px;height:220px;margin:-110px 0 0 -110px;border-radius:50%;box-shadow:inset 0 0 0 4px #3DA9FFCC,0 0 30px #1E8BFF88;animation:pdCdRing 1s ease-out both}
+@keyframes pdCdPop{0%{transform:scale(2.2);opacity:0}25%{transform:scale(1);opacity:1}100%{transform:scale(.9);opacity:1}}
+@keyframes pdCdRing{0%{transform:scale(.4);opacity:1}100%{transform:scale(1.6);opacity:0}}
 @keyframes pdCo{0%{opacity:0;transform:translateX(-80px) skewX(0deg) scale(1.3)}12%{opacity:1;transform:translateX(6px) skewX(0deg) scale(1)}18%{transform:translateX(0) skewX(0deg)}}
 @keyframes pdCoS{0%,15%{opacity:0;transform:translateY(-6px)}30%{opacity:1;transform:none}}
 @keyframes pdSuper{0%,100%{box-shadow:0 5px 0 #A3361A,0 0 14px #FF7A2E}50%{box-shadow:0 5px 0 #A3361A,0 0 30px #FFB02E}}
@@ -240,6 +246,10 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </sc-if>
 
+  <!-- 3, 2, 1… ¡YA!: the kick-off countdown -->
+  <sc-if value="{{showCount}}" hint-placeholder-val="{{ false }}">
+    <div class="pd-cd" key="{{countKey}}"><i></i><b class="{{countCls}}">{{countTxt}}</b></div>
+  </sc-if>
   <sc-if value="{{showReady}}" hint-placeholder-val="{{ true }}">
     <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
       <div class="am-arena" aria-hidden="true"><i class="aa-pitch"></i><i class="aa-beam" style="left: 18%"></i><i class="aa-beam r" style="left: 82%"></i><i class="aa-flash" style="left: 12%; top: 22%"></i><i class="aa-flash" style="left: 31%; top: 30%; animation-delay: -1.1s"></i><i class="aa-flash" style="left: 58%; top: 18%; animation-delay: -2.3s"></i><i class="aa-flash" style="left: 77%; top: 27%; animation-delay: -0.6s"></i><i class="aa-flash" style="left: 90%; top: 20%; animation-delay: -1.8s"></i></div>
@@ -837,11 +847,16 @@ class Component extends DCLogic {
       this.loop();
       return;
     }
-    this.sfx('whistle', 1);
     this.g.phase = 'play';
     this.g.pt = 0;
-    this.narrate('kickoff', '', null, true);
+    this.countdown();
     this.loop();
+  }
+  // 3, 2, 1… before the match starts (not in the tutorial or free practice)
+  countdown() {
+    const g = this.g;
+    if (this.props.tutorial || this.props.practice) { this.sfx('whistle', 1); this.narrate('kickoff', '', null, true); return; }
+    g.countT = 3; g.countGo = 0; this.sfx('tick', 1);
   }
   // the three shots of the intro: home end, away end, the whole stadium
   introShot() { const t = this.g.pt; return t < 2.8 ? 0 : t < 5.6 ? 1 : 2; }
@@ -863,8 +878,7 @@ class Component extends DCLogic {
     if (g.phase !== 'intro') return;
     this.flare = null;
     g.phase = 'play'; g.pt = 0;
-    this.sfx('whistle', 1);
-    this.narrate('kickoff', '', null, true);
+    this.countdown();
   }
   loop() {
     if (this.raf) return;
@@ -1466,6 +1480,17 @@ class Component extends DCLogic {
     if (g.phase === 'goal') { this.goalStep(dt); return; }
     if (g.phase === 'intro') { this.introStep(); return; }
     if (g.phase !== 'play') return;
+    if (g.countGo > 0) g.countGo -= dt;
+    if (g.countT > 0) {
+      const before = Math.ceil(g.countT);
+      g.countT -= dt;
+      // nobody moves and the ball stays on the spot until it is over
+      g.charging = false; g.charge = 0; g.own = -1; Object.assign(b, { x: 30, y: 15, z: 0, vx: 0, vy: 0, vz: 0 });
+      g.ps.forEach((p) => { p.vx = 0; p.vy = 0; });
+      if (g.countT <= 0) { g.countT = 0; g.countGo = 0.8; this.sfx('whistle', 1); this.narrate('kickoff', '', null, true); this.vib([30]); }
+      else if (Math.ceil(g.countT) !== before) this.sfx('tick', 1);
+      return;
+    }
     if (!this.props.tutorial && !this.props.practice) g.t -= dt;
     if (this.props.practice) this.practiceStep(dt);
     if (g.t <= 0) {
@@ -4525,6 +4550,8 @@ class Component extends DCLogic {
       tutTargetStyle: (() => { const t = g.tut && g.tut.target ? SP(g.tut.target.x, g.tut.target.y) : { x: -99, y: -99 }; return 'position: absolute; left: 0; top: 0; pointer-events: none; transform: translate(' + (t.x - 35).toFixed(1) + 'px, ' + (t.y - 22).toFixed(1) + 'px);'; })(),
       goalStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 110px; line-height: 1; letter-spacing: 4px; color: #22D3EE; text-shadow: 0 6px 0 #0B0B14, 0 0 40px #22D3EE99; transform: scale(' + goalScale.toFixed(3) + ') rotate(-4deg);',
       showReady: g.phase === 'ready',
+      showCount: g.phase === 'play' && (g.countT > 0 || (g.countGo || 0) > 0),
+      countTxt: g.countT > 0 ? String(Math.ceil(g.countT)) : '¡YA!', countCls: g.countT > 0 ? '' : 'go', countKey: 'cd' + (g.countT > 0 ? Math.ceil(g.countT) : 0),
       readyTitle: (P.coach ? 'MODO ENTRENADOR' : mode === 'comp' ? 'PARTIDO CLASIFICATORIO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA') + ' · ' + n + ' VS ' + n,
       showEnd: g.phase === 'end',
       showWin: g.phase === 'winners' && !this.hl,
