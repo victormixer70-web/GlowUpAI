@@ -29,7 +29,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 46px; height: 38px; background: #251443; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
       <span class="bc-title hd" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 28px; letter-spacing: 2px">PERFIL</span>
     </div>
-    <div style="flex: 1; min-height: 0; border-radius: 18px; background: radial-gradient(70% 55% at 50% 30%, #22D3EE99, transparent 70%), radial-gradient(70% 60% at 100% 100%, #EC489988, transparent 70%), linear-gradient(160deg, #4F46E5, #7C3AED 50%, #9D174D); border: 1.5px solid #C4B5FD; box-shadow: inset 0 1px 0 #ffffff44, 0 0 20px #7C3AED66; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px">
+    <div style="flex: 1; min-height: 0; border-radius: 18px; background: radial-gradient(60% 45% at 50% 28%, #1E8BFF66, transparent 70%), linear-gradient(180deg, #06102E99 0%, #02040CF0 75%), url(assets/bg_tribuna.jpg) center 30%/cover; box-shadow: inset 0 0 0 1.5px #3DA9FF88, inset 0 1px 0 #ffffff33, 0 10px 24px #0008, 0 0 22px #0A6CFF44; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px">
       <button type="button" onClick="{{nextPic}}" aria-label="Cambiar foto de perfil" class="pf-av"><img src="{{pic}}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block"><span class="pf-edit"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4"/></svg></span></button>
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1" translate="no">{{myName}}</span>
       <button type="button" onClick="{{nextTitle}}" class="pf-title" aria-label="Cambiar título: {{title}}">{{title}}<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 10l5 5l5-5"/></svg></button>
@@ -43,27 +43,27 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <sc-if value="{{hasBadge}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: -6px; top: -8px; min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box; border-radius: 12px; background: #FF5C5C; color: #FFFFFF; font: 800 13px Exo2, sans-serif; display: flex; align-items: center; justify-content: center; font-style: normal; letter-spacing: 0">{{badge}}</span></sc-if>
     </a>
     <div style="display: flex; gap: 6px">
-      <a href="Taquilla.dc.html" style="flex: 1; display: flex; align-items: center; justify-content: center; height: 36px; border-radius: 12px; background: linear-gradient(135deg, #0EA5E9, #14B8A6); border: 1px solid #A5F3FC; color: #FFFFFF; text-decoration: none; font-weight: 800; font-size: 12px">Taquilla</a>
-      <a href="MiEstadio.dc.html" style="flex: 1.1; display: flex; align-items: center; justify-content: center; gap: 5px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, #16A34A, #0EA5E9); border: 1px solid #86EFAC; color: #FFFFFF; text-decoration: none; font-weight: 800; font-size: 12px; white-space: nowrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 20h18M5 20V10l7-5l7 5v10M9 20v-5h6v5"/></svg>Mi estadio</a>
-      <a href="Ajustes.dc.html" style="flex: 1.3; display: flex; align-items: center; justify-content: center; gap: 6px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, #8B5CF6, #DB2777); border: 1px solid #F0ABFC; color: #FFFFFF; text-decoration: none; font-weight: 800; font-size: 12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Configuración</a>
+      <a href="Taquilla.dc.html" style="flex: 1; display: flex; align-items: center; justify-content: center; height: 36px; border-radius: 12px; background: linear-gradient(180deg, #0B1A44, #050C24); border: 0; box-shadow: inset 0 0 0 1.5px #22D3EE99, inset 0 -3px 0 #22D3EE, 0 4px 10px #0007; color: #FFFFFF; text-decoration: none; font-weight: 800; font-size: 12px">Taquilla</a>
+      <a href="MiEstadio.dc.html" style="flex: 1.1; display: flex; align-items: center; justify-content: center; gap: 5px; height: 36px; border-radius: 12px; background: linear-gradient(180deg, #0B1A44, #050C24); border: 0; box-shadow: inset 0 0 0 1.5px #53D88E99, inset 0 -3px 0 #53D88E, 0 4px 10px #0007; color: #FFFFFF; text-decoration: none; font-weight: 800; font-size: 12px; white-space: nowrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 20h18M5 20V10l7-5l7 5v10M9 20v-5h6v5"/></svg>Mi estadio</a>
+      <a href="Ajustes.dc.html" style="flex: 1.3; display: flex; align-items: center; justify-content: center; gap: 6px; height: 36px; border-radius: 12px; background: linear-gradient(180deg, #0B1A44, #050C24); border: 0; box-shadow: inset 0 0 0 1.5px #A78BFA99, inset 0 -3px 0 #A78BFA, 0 4px 10px #0007; color: #FFFFFF; text-decoration: none; font-weight: 800; font-size: 12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Configuración</a>
     </div>
   </div>
   <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px">
-    <div role="tablist" style="position: relative; display: flex; padding: 4px; border-radius: 16px; background: linear-gradient(90deg, #1E3A8ACC, #5B21B6CC, #9D174DCC); border: 1px solid #C4B5FD88">
+    <div role="tablist" style="position: relative; display: flex; padding: 4px; border-radius: 16px; background: linear-gradient(90deg, #06102EE6, #0A1A4AE6); border: 1px solid #3DA9FF66; box-shadow: 0 6px 16px #0006">
       <span style="{{thumb}}"></span>
       <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3"><button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button></sc-for>
     </div>
     <div key="{{sportKey}}" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
       <sc-for list="{{tiles}}" as="s" hint-placeholder-count="9">
         <div style="{{s.box}}">
-          <span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #FFFFFFD9">{{s.label}}</span>
-          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 32px; line-height: 1; color: {{s.color}}; text-shadow: 0 2px 0 #0006, 0 0 14px {{s.glow}}">{{s.value}}</span>
+          <span style="font-size: 10.5px; font-weight: 800; letter-spacing: 1.5px; color: {{s.glow}}">{{s.label}}</span>
+          <span style="font-family: 'Titulos', sans-serif; font-size: 30px; line-height: 1; color: {{s.color}}; text-shadow: 0 2px 0 #0008, 0 0 16px {{s.glow}}88">{{s.value}}</span>
         </div>
       </sc-for>
     </div>
     <div style="display: flex; flex-direction: column; gap: 4px">
       <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>VICTORIAS · EMPATES · DERROTAS</span><span>{{totalLabel}}</span></div>
-      <div style="display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: linear-gradient(90deg, #3B1A8A, #6B21A8); box-shadow: inset 0 1px 3px #0009"><div style="{{barW}}"></div><div style="{{barD}}"></div><div style="{{barL}}"></div></div>
+      <div style="display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: linear-gradient(90deg, #0B1A44, #06102E); box-shadow: inset 0 0 0 1px #3DA9FF44, inset 0 1px 3px #0009"><div style="{{barW}}"></div><div style="{{barD}}"></div><div style="{{barL}}"></div></div>
     </div>
   </div>
 </div>
@@ -130,7 +130,7 @@ class Component extends DCLogic {
     const s = this.state, R = this.store('arenamix.record.v1', {}), r = R[s.sport] || { played: 0, won: 0, lost: 0, drawn: 0, gf: 0, ga: 0, clean: 0, best: 0 };
     const goals = s.sport === 'all' || s.sport === 'futbol', pct = (a) => (r.played ? Math.round(a / r.played * 100) : 0);
     // every tile in its own colour: a coloured glass card with a glow behind the number
-    const tile = (label, value, color, tint) => { const c = tint || color || '#A78BFA'; return { label, value: String(value), color: '#FFFFFF', glow: c, box: 'position: relative; display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 14px; overflow: hidden; background: radial-gradient(80% 90% at 15% 100%, ' + c + 'AA, transparent 70%), radial-gradient(60% 60% at 100% 0%, ' + c + '55, transparent 70%), linear-gradient(160deg, color-mix(in srgb, ' + c + ' 45%, #2A1070), color-mix(in srgb, ' + c + ' 18%, #1A0C44)); border: 1.5px solid color-mix(in srgb, ' + c + ' 65%, #FFFFFF); box-shadow: inset 0 1px 0 #ffffff40, 0 6px 14px #0006, 0 0 14px ' + c + '44;' }; };
+    const tile = (label, value, color, tint) => { const c = tint || color || '#A78BFA'; return { label, value: String(value), color: '#FFFFFF', glow: c, box: 'position: relative; display: flex; flex-direction: column; gap: 3px; padding: 10px 12px 10px 16px; border-radius: 14px; overflow: hidden; background: radial-gradient(70% 90% at 100% 0%, ' + c + '33, transparent 70%), linear-gradient(160deg, #0B1A44F0, #040A1EF0); box-shadow: inset 4px 0 0 ' + c + ', inset 0 0 0 1px ' + c + '55, inset 0 1px 0 #ffffff22, 0 6px 14px #0007;' }; };
     const tiles = [
       tile('PARTIDOS', r.played, null, '#3B82F6'), tile('VICTORIAS', r.won, '#53D88E'), tile('DERROTAS', r.lost, '#FF8A8E'),
       tile('EMPATES', r.drawn, null, '#94A3B8'), tile('% VICTORIAS', pct(r.won) + '%', '#22D3EE'), tile('MEJOR RACHA', r.best, '#FFC53D'),
@@ -138,7 +138,7 @@ class Component extends DCLogic {
     ];
     const labels = { all: 'Todos', futbol: 'Fútbol' };
     const keys = Object.keys(labels), ti = Math.max(0, keys.indexOf(s.sport));
-    const tabs = keys.map((k) => ({ label: labels[k], sel: k === s.sport ? 'true' : 'false', pick: () => this.setState({ sport: k }), style: 'position: relative; z-index: 1; flex: 1; height: 34px; border: 0; border-radius: 12px; font: 800 13px Exo2, sans-serif; cursor: pointer; background: transparent; transition: color .3s; color: ' + (k === s.sport ? '#150925;' : '#FFFFFF;') }));
+    const tabs = keys.map((k) => ({ label: labels[k], sel: k === s.sport ? 'true' : 'false', pick: () => this.setState({ sport: k }), style: 'position: relative; z-index: 1; flex: 1; height: 34px; border: 0; border-radius: 12px; font: 800 13px Exo2, sans-serif; cursor: pointer; background: transparent; transition: color .3s; color: ' + (k === s.sport ? '#FFFFFF;' : '#9FB6E0;') }));
     const cl = this.claimed(), ready = this.achievements().filter((a) => a.cur >= a.goal && !cl[a.id]).length;
     const mmr = this.store('arenamix.mmr.v1', {}), top = Object.keys(mmr).reduce((m, k) => Math.max(m, mmr[k] || 0), 0);
     const tiers = [['Bronce', 0], ['Plata', 300], ['Oro', 750], ['Platino', 1350], ['Diamante', 2100], ['Campeón', 3075], ['Super campeón', 4275], ['Élite', 5775]];
@@ -148,7 +148,7 @@ class Component extends DCLogic {
       myLv: String(window.AMProgress ? window.AMProgress.level().level : 1),
       ...this.extrasVals(),
       tiles, tabs, sportKey: s.sport, myName: window.AMOnline ? window.AMOnline.myName() : 'Tú',
-      thumb: 'position: absolute; top: 4px; bottom: 4px; left: calc(4px + ' + ti + ' * (100% - 8px) / 2); width: calc((100% - 8px) / 2); border-radius: 12px; background: linear-gradient(135deg, #FFFFFF, #7EF0FF 40%, #22D3EE); box-shadow: 0 0 14px #22D3EE; transition: left .4s cubic-bezier(.3,1.5,.5,1);', coins: this.fmt(this.coins()), bestRank: best,
+      thumb: 'position: absolute; top: 4px; bottom: 4px; left: calc(4px + ' + ti + ' * (100% - 8px) / 2); width: calc((100% - 8px) / 2); border-radius: 12px; background: linear-gradient(180deg, #3DA9FF, #0A3DCC); box-shadow: inset 0 1px 0 #FFFFFF66, 0 0 14px #1E8BFF; transition: left .4s cubic-bezier(.3,1.5,.5,1);', coins: this.fmt(this.coins()), bestRank: best,
       hasBadge: ready > 0, badge: String(ready),
       totalLabel: r.played + ' partidos',
       barW: w(r.won, '#53D88E'), barD: w(r.drawn, '#8C8CB0'), barL: w(r.lost, '#FF5C5C')
