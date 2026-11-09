@@ -1157,7 +1157,10 @@ class Component extends DCLogic {
   passBall(p, q) {
     const g = this.g, b = g.ball, i = g.ps.indexOf(p);
     if (this.dist(p, b) > (g.own === i ? 1.7 : 1.5) || b.z > 1.4 || (g.own !== i && p.cd > 0)) return false;
-    const d0 = this.dist(p, q), lead = Math.min(0.9, d0 / 14);
+    // where he will be when it gets there: the rolling ball slows, so the time comes from that, not a guess
+    const rollT = (dd, h) => { const a = 0.75 + 0.06 * h; const disc = h * h - 2 * a * dd; return disc > 0 ? (h - Math.sqrt(disc)) / a : dd / Math.max(4, h * 0.6); };
+    let lead = Math.min(1.3, rollT(this.dist(p, q), Math.min(20, Math.sqrt(81 + 3.4 * this.dist(p, q)))));
+    for (let it = 0; it < 2; it++) { const ex = q.x + q.vx * lead, ey = q.y + q.vy * lead, dd = Math.hypot(ex - b.x, ey - b.y); lead = Math.min(1.3, rollT(dd, Math.min(20, Math.sqrt(81 + 3.4 * dd)))); }
     let tx = q.x + q.vx * lead, ty = q.y + q.vy * lead;
     const sg = q.team === 0 ? 1 : -1;
     if (q.role !== 'gk' && (q.vx * sg > 2)) tx += sg * 1.5;
@@ -1165,10 +1168,10 @@ class Component extends DCLogic {
     const d = Math.hypot(tx - b.x, ty - b.y), dir = Math.atan2(ty - b.y, tx - b.x);
     let h, vz;
     if (d > 19) { vz = 4.2 + 0.12 * d; h = d / (2 * vz / 9.81 * 0.95); }
-    else { h = Math.min(20, Math.sqrt(81 + 3.4 * d)); vz = 0.15; }
+    else { h = Math.min(20, Math.max(Math.sqrt(81 + 3.4 * d), Math.sqrt(64 + 2 * (0.75 + 0.06 * 12) * d))); vz = 0.15; }
     b.vx = Math.cos(dir) * h; b.vy = Math.sin(dir) * h; b.vz = vz; b.spin = 0; b.dip = 0; b.kn = 0;
     this.release(p);
-    g.recv = { i: g.ps.indexOf(q), t: d / h + 1 };
+    g.recv = { i: g.ps.indexOf(q), t: d / h + 1, tx, ty };
     p.act = { type: p.role === 'gk' ? 'throw' : 'pass', t: 0, dur: p.role === 'gk' ? 0.5 : 0.32 };
     return true;
   }
@@ -1860,7 +1863,25 @@ class Component extends DCLogic {
       return [rx, ry, maxV * 1.2, 14];
     }
     if (g.recv && g.recv.i === i) {
-      const t = Math.min(0.6, this.dist(p, b) / 10);
+      // step across onto the ball's line, a little ahead of it, and wait there facing it
+      const bs = Math.hypot(b.vx, b.vy) || 1, ux = b.vx / bs, uy = b.vy / bs;
+      const db = this.dist(p, b);
+      // the pass was played to a spot: he goes there (or to the nearest point of the ball's line to it)
+      const ax = g.recv.tx != null ? g.recv.tx : p.x, ay = g.recv.ty != null ? g.recv.ty : p.y;
+      const along = (ax - b.x) * ux + (ay - b.y) * uy;
+      if (along > 0 && bs > 3) {
+        const lx = b.x + ux * along, ly = b.y + uy * along;
+        [dx, dy] = this.seek(p, lx, ly, 0.15);
+        const there = Math.hypot(lx - p.x, ly - p.y) < 1.2;
+        if (there) {
+          p.face = Math.atan2(-uy, -ux);
+          // on the line: step towards it to meet it (shortens the pass, like a real player showing for it)
+          [dx, dy] = this.seek(p, b.x, b.y, 0.3);
+          return [dx, dy, maxV * (db < 3 ? 0.35 : 0.6), acc * 1.2];
+        }
+        return [dx, dy, maxV, acc * 1.2];
+      }
+      const t = Math.min(0.6, db / 10);
       [dx, dy] = this.seek(p, b.x + b.vx * t, b.y + b.vy * t, 0.6);
       return [dx, dy, maxV * 1.05, acc];
     }
@@ -2430,6 +2451,8 @@ class Component extends DCLogic {
       const r = sliding ? 0.6 : BR;
       const dx = b.x - p.x, dy = b.y - p.y, d = Math.hypot(dx, dy);
       if (d >= r || d === 0) continue;
+      // a loose ball reaching a player who can take it is controlled, not bounced off him
+      if (!owner && !sliding && p.role !== 'gk' && p.cd <= 0 && !(p.act && p.act.lock) && b.z < 0.8 && Math.hypot(b.vx - p.vx, b.vy - p.vy) < (g.recv && g.recv.i === i ? 26 : 18)) continue;
       if (owner && !sliding) {
         // a defender's body meets a ball under close control: a contest, not an automatic loss
         const shield = () => { p.x = b.x - dx / d * r; p.y = b.y - dy / d * r; p.vx *= 0.5; p.vy *= 0.5; };
@@ -2459,22 +2482,32 @@ class Component extends DCLogic {
     for (let i = 0; i < g.ps.length; i++) {
       const p = g.ps[i];
       if (p.role === 'gk' || p.cd > 0 || (p.act && p.act.lock) || (g.gkSafe && p.team !== g.gkSafe.team)) continue;
-      const d = Math.hypot(b.x - p.x, b.y - p.y);
-      if (d > 0.95 || b.z > 0.8) continue;
+      const d = Math.hypot(b.x - p.x, b.y - p.y), meant = !!(g.recv && g.recv.i === i);
+      if (d > (meant ? 1.15 : 0.95) || b.z > 0.8) continue;
       const rs = Math.hypot(b.vx - p.vx, b.vy - p.vy), ctrl = i === g.ctl ? this.tt('con') : 0.3;
-      if (rs > 16 + 6 * ctrl) continue;
+      if (rs > 16 + 6 * ctrl + (meant ? 6 : 0)) continue;
       if (d < bd) { bd = d; best = i; }
     }
     if (best >= 0) {
       const p = g.ps[best];
       g.own = best; g.last = best; b.spin = 0; b.dip = 0; b.kn = 0;
-      // first touch: cushion the ball to the feet instead of sticking it there
-      const rs = Math.hypot(b.vx - p.vx, b.vy - p.vy), keep = this.clamp(0.15 + rs * 0.012, 0.15, 0.35);
-      b.vx = p.vx + (b.vx - p.vx) * keep; b.vy = p.vy + (b.vy - p.vy) * keep; b.vz = Math.min(b.vz, 0);
+      // first touch: the ball is cushioned and set a step in front, where he is going (with the stick,
+      // where you push it: a directional first touch); a hard ball and poor control leave it a little looser
+      const rs = Math.hypot(b.vx - p.vx, b.vy - p.vy), ctrl = best === g.ctl ? this.tt('con') : 0.45;
+      const human = best === g.ctl && !this.autoplay, inp = this.inp || [0, 0], il = Math.hypot(inp[0], inp[1]);
+      const ps = Math.hypot(p.vx, p.vy);
+      let fx, fy;
+      if (human && il > 0.25) { fx = inp[0] / il; fy = inp[1] / il; }
+      else if (ps > 1) { fx = p.vx / ps; fy = p.vy / ps; }
+      else { const bd2 = Math.hypot(b.x - p.x, b.y - p.y) || 1; fx = (b.x - p.x) / bd2; fy = (b.y - p.y) / bd2; }
+      const loose = this.clamp((rs - 8) * 0.025 * (1 - ctrl), 0, 0.3);
+      const push = 0.6 + 2.2 * loose + (human && il > 0.25 ? 1.2 : 0);
+      b.vx = p.vx + fx * push + (b.vx - p.vx) * loose; b.vy = p.vy + fy * push + (b.vy - p.vy) * loose; b.vz = Math.min(b.vz, 0);
+      p.face = Math.atan2(fy, fx);
       p.touchT = 0.12;
       if (g.recv && g.recv.i === best) g.recv = null;
       if (best === g.ctl && g.buf && g.buf.t > 0) { this.firstTime(); return; }
-      if (p.team === 0 && best !== g.ctl && this.props.coach) { g.ctl = best; g.charging = false; }
+      if (p.team === 0 && best !== g.ctl && p.role !== 'gk' && !this.keeperMode() && !this.netHuman(best) && (this.props.coach || !this.netHuman(g.ctl))) { g.ctl = best; g.charging = false; }
     }
   }
   // the keeper of team takes the ball in hand on the edge of the six-yard box and plays it out;
