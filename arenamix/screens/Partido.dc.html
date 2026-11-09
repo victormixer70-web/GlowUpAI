@@ -1808,6 +1808,25 @@ class Component extends DCLogic {
       const tx = b.x + b.vx * t - p.x, ty = b.y + b.vy * t - p.y, n = Math.hypot(tx, ty) || 1;
       dx = tx / n * Math.min(1, n / 0.8); dy = ty / n * Math.min(1, n / 0.8);
     }
+    // a pass is coming to me (or I asked for it): he goes for the ball by himself, onto its line and then
+    // towards it to meet it; the stick still bends the run, it doesn't have to fight it
+    const comingToMe = g.phase === 'play' && g.own < 0 && g.hold < 0 && p.role !== 'gk' && !(p.act && p.act.lock) &&
+      ((g.recv && g.recv.i === i) || this.incoming(i));
+    if (comingToMe) {
+      const bs = Math.hypot(b.vx, b.vy), db = this.dist(p, b);
+      let ax, ay;
+      if (bs > 3) {
+        const ux = b.vx / bs, uy = b.vy / bs, along = (p.x - b.x) * ux + (p.y - b.y) * uy;
+        const lx = b.x + ux * along, ly = b.y + uy * along, off = Math.hypot(lx - p.x, ly - p.y);
+        // off the line: cut across to it, a little up the line towards the ball; on it: run at the ball
+        if (along > 0 && off > 0.6) [ax, ay] = this.seek(p, lx - ux * Math.min(2, along * 0.3), ly - uy * Math.min(2, along * 0.3), 0);
+        else if (along > 0) [ax, ay] = this.seek(p, b.x, b.y, 0);
+        else { const t = Math.min(0.6, db / 10); [ax, ay] = this.seek(p, b.x + b.vx * t, b.y + b.vy * t, 0); }
+      } else [ax, ay] = this.seek(p, b.x, b.y, 0.3);
+      if (moving) { const mx = dx * 0.35 + ax * 0.65, my = dy * 0.35 + ay * 0.65, mn = Math.hypot(mx, my) || 1; dx = mx / mn; dy = my / mn; }
+      else { dx = ax; dy = ay; }
+      if (db < 2.5 && !moving) maxV *= 0.7;   // settle into the touch instead of crashing into it
+    }
     const spr = g.sprint && p.stam > 0.04 && Math.hypot(dx, dy) > 0.3;
     if (spr) { maxV *= 1.28; p.stam = Math.max(0, p.stam - dt * (0.2 - 0.1 * this.tt('res'))); }
     else p.stam = Math.min(1, p.stam + dt * (0.09 + 0.05 * this.tt('res')));
