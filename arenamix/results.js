@@ -259,7 +259,38 @@
     '#am-rw .ok{border-radius:14px;padding:0 46px;background:linear-gradient(180deg,#3DA9FF,#0A3DCC);box-shadow:inset 0 2px 0 #FFFFFF66,0 5px 0 #06102E,0 0 22px #1E8BFF99;color:#FFFFFF;font-style:normal;text-shadow:0 2px 0 #0008}',
     '#am-rw .tap{font-style:normal;color:#FFE38A;text-shadow:0 2px 0 #000,0 0 14px #FFC53D}',
     '#am-rw .twk{position:absolute;width:6px;height:6px;border-radius:50%;background:#FFF6C8;box-shadow:0 0 10px #FFE38A;opacity:0;pointer-events:none;animation:amRwTwk 2.4s ease-in-out infinite}',
-    '@keyframes amRwTwk{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1.3)}}'
+    '@keyframes amRwTwk{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1.3)}}',
+    // ---- the chest opening, in stages: drop, idle, three taps (light leaking more each time), the burst ----
+    '#am-rw{--rc:#FFC53D}',
+    '#am-rw.shk{animation:amRwShk .35s linear}',
+    '@keyframes amRwShk{0%,100%{transform:none}20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-4px)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-2px)}}',
+    '#am-rw .aura{position:absolute;left:50%;top:50%;width:300px;height:70px;margin:52px 0 0 -150px;border-radius:50%;background:radial-gradient(closest-side,var(--rc),transparent);opacity:.55;filter:blur(2px);animation:amRwAura 1.6s ease-in-out infinite;pointer-events:none}',
+    '@keyframes amRwAura{0%,100%{transform:scale(.9);opacity:.45}50%{transform:scale(1.08);opacity:.8}}',
+    '#am-rw .dust{position:absolute;left:50%;top:50%;width:260px;height:60px;margin:60px 0 0 -130px;border-radius:50%;background:radial-gradient(closest-side,#FFFFFFAA,transparent);opacity:0;animation:amRwDust .7s .5s ease-out both;pointer-events:none}',
+    '@keyframes amRwDust{0%{opacity:.9;transform:scale(.4)}100%{opacity:0;transform:scale(1.8)}}',
+    '#am-rw .ch{animation:amRwDrop .6s cubic-bezier(.3,1.6,.5,1) both,amRwBob 2.2s .7s ease-in-out infinite}',
+    '@keyframes amRwBob{0%,100%{translate:0 0}50%{translate:0 -8px}}',
+    // light leaking from under the lid: stronger with each tap
+    '#am-rw .leak{position:absolute;left:50%;top:50%;width:190px;height:16px;margin:-110px 0 0 -95px;border-radius:50%;background:radial-gradient(closest-side,#FFFFFF,var(--rc) 45%,transparent);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;mix-blend-mode:screen}',
+    '#am-rw.t1 .leak{opacity:.45}#am-rw.t2 .leak{opacity:.75;transform:scaleX(1.15)}#am-rw.t3 .leak{opacity:1;transform:scale(1.3,1.6)}',
+    '#am-rw .lk{position:absolute;left:50%;top:50%;width:6px;height:120px;margin:-170px 0 0 -3px;transform-origin:50% 100%;background:linear-gradient(0deg,var(--rc),transparent);opacity:0;transition:opacity .25s;pointer-events:none;mix-blend-mode:screen}',
+    '#am-rw.t2 .lk{opacity:.5}#am-rw.t3 .lk{opacity:.9}',
+    '#am-rw .tsp{position:absolute;left:422px;top:170px;width:7px;height:7px;border-radius:50%;background:var(--rc);box-shadow:0 0 8px var(--rc);pointer-events:none;animation:amRwTsp .6s ease-out forwards}',
+    '@keyframes amRwTsp{from{transform:translate(0,0);opacity:1}to{transform:translate(var(--dx),var(--dy));opacity:0}}',
+    // the burst
+    '#am-rw .pillar{position:absolute;left:50%;top:-20px;width:150px;height:300px;margin-left:-75px;background:linear-gradient(0deg,var(--rc),#FFFFFF88 40%,transparent);opacity:0;filter:blur(4px);pointer-events:none;mix-blend-mode:screen}',
+    '#am-rw.open .pillar{animation:amRwPillar 1.6s ease-out both}',
+    '@keyframes amRwPillar{0%{opacity:0;transform:scaleX(.2)}12%{opacity:1;transform:scaleX(1.2)}100%{opacity:0;transform:scaleX(.6)}}',
+    '#am-rw .wave{position:absolute;left:50%;top:45%;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;box-shadow:inset 0 0 0 6px var(--rc),0 0 30px var(--rc);opacity:0;pointer-events:none}',
+    '#am-rw.open .wave{animation:amRwWave .8s ease-out both}#am-rw.open .wave.w2{animation-delay:.15s}',
+    '@keyframes amRwWave{0%{opacity:1;transform:scale(.3)}100%{opacity:0;transform:scale(5)}}',
+    '#am-rw.open .rays{background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--rc) 40%,transparent) 0deg 5deg,transparent 7deg 16deg)!important}',
+    '#am-rw.open .ch{animation:amRwOpen .55s cubic-bezier(.2,1.6,.4,1) both,amRwBob 2.4s .6s ease-in-out infinite}',
+    '#am-rw .cf{position:absolute;left:400px;top:150px;width:34px;height:34px;pointer-events:none;animation:amRwCoin 1.3s cubic-bezier(.25,.7,.5,1) forwards;filter:drop-shadow(0 3px 3px #0008)}',
+    '@keyframes amRwCoin{0%{transform:translate(0,0) rotate(0) scale(.4);opacity:1}45%{transform:translate(calc(var(--dx)*.6),var(--up)) rotate(200deg) scale(1)}100%{transform:translate(var(--dx),240px) rotate(480deg) scale(.8);opacity:0}}',
+    // the loot flies out of the chest to its place
+    '#am-rw.open .it{animation:amRwFly .6s cubic-bezier(.2,1.4,.4,1) both}',
+    '@keyframes amRwFly{from{opacity:0;transform:translate(var(--fx,0),-70px) scale(.15) rotate(-20deg)}to{opacity:1;transform:none}}'
   ].join('\n');
   document.head.appendChild(css2);
   function reward(r, onClose) {
@@ -273,16 +304,35 @@
     if (r.coins) loot.push('<div class="it" style="animation-delay:.12s"><img src="' + P(r.coins >= 300 ? 'coins:14' : 'coins:6') + '" alt=""><span>VCD</span><b>+' + r.coins + '</b></div>');
     var twk = ''; for (var t = 0; t < 14; t++) twk += '<i class="twk" style="left:' + (8 + (t * 53) % 84) + '%;top:' + (12 + (t * 37) % 70) + '%;animation-delay:' + (-(t * 0.37) % 2.4).toFixed(2) + 's"></i>';
     el.innerHTML = '<div class="rays"></div><div class="glow"></div>' + twk + '<div class="k">¡RECOMPENSA!<small>' + esc((m.name || 'PREMIO').toUpperCase()) + '</small></div>' +
-      '<img class="ch" src="' + (isChest ? P('chest:' + m.chest) : (m.pic || P(m.icon))) + '" alt="">' +
+      '<div class="pillar"></div><i class="wave"></i><i class="wave w2"></i><div class="aura"></div><div class="dust"></div>' +
+      (isChest ? '<i class="lk" style="rotate:-28deg"></i><i class="lk" style="rotate:0deg"></i><i class="lk" style="rotate:28deg"></i>' : '') +
+      '<img class="ch" src="' + (isChest ? P('chest:' + m.chest) : (m.pic || P(m.icon))) + '" alt=""><div class="leak"></div>' +
       '<div class="fl"></div><div class="tap">' + (isChest ? '¡TOCA PARA ABRIR!' : '¡TOCA PARA RECOGER!') + '</div>' +
       '<div class="loot">' + loot.join('') + '</div><button type="button" class="ok">' + (r.items && r.items.length ? 'GENIAL' : 'RECOGER') + '</button>';
+    // the rarity's colour runs through the whole opening
+    var RC = { common: '#FFC53D', rare: '#3DA9FF', epic: '#FF5CC8', legend: '#7EF0FF' };
+    el.style.setProperty('--rc', isChest ? (RC[m.chest] || '#FFC53D') : '#FFC53D');
     stage.appendChild(el);
     var ch = el.querySelector('.ch'), taps = 0, opened = false;
+    var shake = function () { el.classList.remove('shk'); void el.offsetWidth; el.classList.add('shk'); };
+    setTimeout(shake, 480);   // it lands
+    // the loot cards come out of the chest: each starts from the middle
+    [].forEach.call(el.querySelectorAll('.it'), function (it, i, all) { it.style.setProperty('--fx', ((all.length - 1) / 2 - i) * 176 + 'px'); it.style.animationDelay = (0.25 + i * 0.12).toFixed(2) + 's'; });
     var open = function () {
       if (opened) return; opened = true;
       if (isChest) ch.src = P('chest:' + m.chest + ':open');
-      el.classList.add('open');
+      el.classList.remove('t1', 't2', 't3');
+      el.classList.add('open'); shake();
       if (sfx && sfx.chest) sfx.chest();
+      try { if (navigator.vibrate) navigator.vibrate([40, 30, 80]); } catch (e) {}
+      // a fountain of coins out of the chest
+      var cp = P('coins:1');
+      for (var c = 0; c < 16; c++) {
+        var cf = document.createElement('img'); cf.className = 'cf'; cf.src = cp; cf.alt = '';
+        cf.style.setProperty('--dx', ((Math.random() - 0.5) * 520).toFixed(0) + 'px'); cf.style.setProperty('--up', (-120 - Math.random() * 120).toFixed(0) + 'px');
+        cf.style.animationDelay = (c * 0.035).toFixed(2) + 's';
+        el.appendChild(cf);
+      }
       // confetti
       for (var k = 0; k < 46; k++) {
         var s = document.createElement('i'); s.className = 'spark';
@@ -305,6 +355,14 @@
       if (!isChest) { open(); return; }
       taps++;
       ch.className = 'ch'; void ch.offsetWidth; ch.className = 'ch s' + Math.min(3, taps);
+      el.classList.remove('t1', 't2', 't3'); el.classList.add('t' + Math.min(3, taps));
+      if (taps >= 2) shake();
+      for (var q = 0; q < 6 + taps * 4; q++) {
+        var tp = document.createElement('i'); tp.className = 'tsp';
+        var ta = -Math.PI / 2 + (Math.random() - 0.5) * 2.4, td = 40 + Math.random() * 60 * taps;
+        tp.style.setProperty('--dx', (Math.cos(ta) * td).toFixed(0) + 'px'); tp.style.setProperty('--dy', (Math.sin(ta) * td).toFixed(0) + 'px');
+        el.appendChild(tp); setTimeout(function (n) { n.remove(); }.bind(null, tp), 700);
+      }
       if (sfx && sfx.thud) sfx.thud(taps);
       if (taps >= 3) setTimeout(open, 380);
     });

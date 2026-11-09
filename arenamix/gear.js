@@ -413,10 +413,10 @@
      stained wood with gold and pink gems (epic), ebony with gold, glowing runes and a crown (legendary).
      A barrel lid hinged at the back, metal straps over body and lid, corner caps, rivets and a lock plate. */
   var CHESTS = {
-    common: { wood: '#C07A3E', metal: '#8E98AA', gem: null, glow: '#FFE38A' },
-    rare: { wood: '#A0663A', metal: '#E3EDF7', gem: '#3DA9FF', glow: '#9FD4FF' },
-    epic: { wood: '#7A44B8', metal: '#FFC53D', gem: '#FF5CC8', glow: '#FFB3E6' },
-    legend: { wood: '#2C2540', metal: '#FFD86B', gem: '#22D3EE', glow: '#7EF0FF', runes: true }
+    common: { wood: '#C07A3E', metal: '#8E98AA', gem: null, glow: '#FFE38A', enamel: '#D9482B' },
+    rare: { wood: '#A0663A', metal: '#E3EDF7', gem: '#3DA9FF', glow: '#9FD4FF', enamel: '#1E6BFF' },
+    epic: { wood: '#7A44B8', metal: '#FFC53D', gem: '#FF5CC8', glow: '#FFB3E6', enamel: '#C21E8A' },
+    legend: { wood: '#2C2540', metal: '#FFD86B', gem: '#22D3EE', glow: '#7EF0FF', runes: true, enamel: '#0A3DCC' }
   };
   var woodTex = null;
   function planks() {
@@ -470,6 +470,7 @@
     lidG.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.material.side = T.DoubleSide; } });
     lid.add(lidG);
     var lip = rbox(W + 0.14, 0.14, 0.16, 0.04, metal); lip.position.set(0, 0.02, D); lid.add(lip);
+    for (var lx = -1.3; lx <= 1.31; lx += 0.26) lid.add(mesh(new T.SphereGeometry(0.045, 8, 6), metal, lx, 0.02, D + 0.09));
     if (C.gem) [-0.88, 0.88].forEach(function (sx) { var gm = mesh(new T.OctahedronGeometry(0.16), std(C.gem, { r: 0.08, m: 0.2, em: C.gem, ei: 0.55 }), sx, R * KY + 0.06, R); gm.scale.y = 1.25; lid.add(gm); });
     if (C.runes) {
       var crown = hat('crown'); crown.scale.setScalar(0.4); crown.position.set(0, R * KY + 0.05, R); lid.add(crown);
@@ -477,6 +478,18 @@
     g.add(lid);
     // the lock plate with its keyhole, a gem above it for the better chests
     var plate = rbox(0.66, 0.74, 0.14, 0.08, metal); plate.position.set(0, top - 0.28, D / 2 + 0.08); g.add(plate);
+    // under the lock, an enamelled shield with a star (the rarity's colour)
+    var en = std(C.enamel, { r: 0.25, m: 0.1, em: C.enamel, ei: 0.15 });
+    var sh = new T.Shape(); sh.moveTo(-0.32, 0.26); sh.lineTo(0.32, 0.26); sh.lineTo(0.32, -0.02); sh.quadraticCurveTo(0.3, -0.28, 0, -0.42); sh.quadraticCurveTo(-0.3, -0.28, -0.32, -0.02); sh.closePath();
+    var shG = new T.ExtrudeGeometry(sh, { depth: 0.06, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.04, bevelSegments: 2 });
+    var shM = new T.Mesh(shG, metal); shM.position.set(0, 0.58, D / 2 + 0.02); g.add(shM);
+    var shI = new T.Mesh(new T.ShapeGeometry(sh), en); shI.scale.setScalar(0.8); shI.position.set(0, 0.6, D / 2 + 0.115); g.add(shI);
+    var st5 = new T.Shape(); for (var si = 0; si < 10; si++) { var sa = -Math.PI / 2 + si * Math.PI / 5, sr = si % 2 ? 0.07 : 0.16; if (si) st5.lineTo(Math.cos(sa) * sr, -Math.sin(sa) * sr); else st5.moveTo(Math.cos(sa) * sr, -Math.sin(sa) * sr); }
+    var star = new T.Mesh(new T.ExtrudeGeometry(st5, { depth: 0.03, bevelEnabled: false }), metal); star.position.set(0, 0.56, D / 2 + 0.12); g.add(star);
+    // studs along the top edge of the box
+    for (var sx2 = -1.25; sx2 <= 1.26; sx2 += 0.25) if (Math.abs(Math.abs(sx2) - 0.88) > 0.2 && Math.abs(sx2) > 0.4) g.add(mesh(new T.SphereGeometry(0.05, 8, 6), metal, sx2, top - 0.06, D / 2 + 0.08));
+    // a ring handle on each side
+    [-1, 1].forEach(function (e) { var hd = mesh(new T.TorusGeometry(0.22, 0.05, 8, 20), metal, e * (W / 2 + 0.12), 0.08 + H * 0.62, 0); hd.rotation.y = Math.PI / 2; g.add(hd); var mt = rbox(0.06, 0.24, 0.42, 0.02, metal); mt.position.set(e * (W / 2 + 0.03), 0.08 + H * 0.78, 0); g.add(mt); });
     var hole = mesh(new T.CylinderGeometry(0.075, 0.075, 0.06, 14), dark, 0, top - 0.22, D / 2 + 0.16); hole.rotation.x = Math.PI / 2; g.add(hole);
     var slot = rbox(0.06, 0.18, 0.06, 0.01, dark); slot.position.set(0, top - 0.34, D / 2 + 0.16); g.add(slot);
     if (C.gem) g.add(mesh(new T.OctahedronGeometry(0.12), std(C.gem, { r: 0.08, em: C.gem, ei: 0.6 }), 0, top - 0.02, D / 2 + 0.17));
@@ -488,6 +501,7 @@
       lid.rotation.x = -1.95;
       // light pouring out, the treasure heaped up, a few coins and sparks in the air
       g.add(mesh(new T.BoxGeometry(W - 0.2, 0.06, D - 0.2), new T.MeshBasicMaterial({ color: C.glow }), 0, top - 0.1, 0));
+      var vel = mesh(new T.BoxGeometry(W - 0.16, 0.5, 0.06), std(C.enamel, { r: 0.9 }), 0, top - 0.3, -D / 2 + 0.12); g.add(vel);
       var heap = coinPile(14); heap.scale.setScalar(0.32); heap.position.set(-0.15, top - 0.12, 0.1); g.add(heap);
       if (C.gem) { var bg = mesh(new T.OctahedronGeometry(0.24), std(C.gem, { r: 0.08, em: C.gem, ei: 0.6 }), 0.7, top + 0.25, 0.2); bg.rotation.set(0.4, 0.6, 0.2); g.add(bg); }
       var glow = mesh(new T.CylinderGeometry(1.0, 1.45, 2.2, 28, 1, true), new T.MeshBasicMaterial({ color: C.glow, transparent: true, opacity: 0.22, side: T.DoubleSide, depthWrite: false, blending: T.AdditiveBlending }), 0, top + 1.1, 0);
