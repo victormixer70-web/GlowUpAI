@@ -16,7 +16,7 @@ body{margin:0}
 @keyframes psSwayL{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(8deg)}}
 @keyframes psSwayR{0%,100%{transform:rotate(14deg)}50%{transform:rotate(-8deg)}}
 @keyframes psIn{from{opacity:0;translate:0 14px}to{opacity:1;translate:0 0}}
-.ps-track{scrollbar-width:none;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+.ps-track{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 34px),transparent);mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 34px),transparent);scrollbar-width:none;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
 .ps-track::-webkit-scrollbar{display:none}
 .ps-card{animation:psIn .4s both}
 .ps-card.rdy img{animation:psWiggle 2s ease-in-out infinite;transform-origin:50% 85%}
@@ -84,7 +84,7 @@ body{margin:0}
           <svg class="ps-crown" width="28" height="28" viewBox="0 0 24 24"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z" fill="#FFC53D" stroke="#7A4E0E" stroke-width="1.2" stroke-linejoin="round"/><circle cx="12" cy="5" r="1.6" fill="#FFE9A8"/><circle cx="3" cy="8" r="1.4" fill="#FFE9A8"/><circle cx="21" cy="8" r="1.4" fill="#FFE9A8"/></svg>
           <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; color: #FFE38A">PREMIUM</span>
           <sc-if value="{{notPremium}}" hint-placeholder-val="{{ true }}">
-            <button type="button" onClick="{{openBuy}}" class="ps-gold" style="height: 30px; border: 0; padding: 0 8px; transform: skewX(0deg); color: #2A1C02; font: 800 14px 'Barlow Condensed', sans-serif; letter-spacing: .5px; cursor: pointer">{{price}}</button>
+            <button type="button" onClick="{{openBuy}}" class="ps-gold" style="align-self: stretch; height: 28px; border: 0; border-radius: 9px; padding: 0 4px; transform: skewX(0deg); color: #2A1C02; font: 800 11.5px 'Barlow Condensed', sans-serif; letter-spacing: .3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer">{{price}}</button>
           </sc-if>
           <sc-if value="{{isPremium}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; line-height: 1.3; color: #FFE38A">Desbloqueado</span></sc-if>
         </div>
@@ -198,7 +198,7 @@ class Component extends DCLogic {
         name: x.owned ? x.name + ' (ya lo tienes)' : x.name, img, ready: x.ready, claimed: x.claimed, locked: locked && !x.claimed,
         waiting: !x.ready && !x.claimed && !locked, tagText,
         cls: 'ps-card' + (x.ready ? ' rdy' : ''),
-        tag: tagText ? 'position: absolute; left: 0; top: 0; padding: 2px 6px; font-size: 8.5px; font-weight: 800; letter-spacing: 1px; color: #150925; background: ' + rc + ';' : 'display: none',
+        tag: tagText ? 'position: absolute; left: 0; top: 0; padding: 2px 7px 2px 8px; border-radius: 0 0 9px 0; box-shadow: 0 2px 6px #0006; font-size: 8.5px; font-weight: 800; letter-spacing: 1px; color: #150925; background: ' + rc + ';' : 'display: none',
         imgStyle: 'width: 66px; height: 62px; object-fit: contain; filter: drop-shadow(0 5px 6px #000a)' + (locked && !x.claimed ? ' grayscale(.35) brightness(.8)' : '') + '; opacity: ' + (img ? 1 : 0) + '; transition: opacity .3s',
         card: 'position: relative; width: 92px; height: 132px; box-sizing: border-box; padding: 14px 4px 7px 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; clip-path: inset(0 round 12px); background: ' + bgFull + '; border: 1.5px solid ' + (x.ready ? '#FFE38A' : x.claimed ? rc + '66' : 'color-mix(in srgb, ' + hue + ' 60%, #FFFFFF)') + '; box-shadow: inset 0 1px 0 #ffffff33; ' + (x.ready ? 'box-shadow: 0 0 16px #FFC53D66;' : x.rare >= 2 && !x.claimed ? 'box-shadow: 0 0 10px ' + rc + '33;' : '') + (x.claimed ? ' opacity: .7;' : ''),
         tap: () => {
@@ -215,7 +215,7 @@ class Component extends DCLogic {
       return {
         lv: String(lv), f: cell(f, false), p: cell(S.prem[i], true), big,
         colStyle: 'position: absolute; left: ' + (i * COLW + 4) + 'px; top: 0; width: 92px; display: flex; flex-direction: column; align-items: center; gap: 0',
-        badge: 'position: relative; z-index: 2; margin: 2px 0; width: ' + (big ? 34 : 28) + 'px; height: 34px; display: flex; align-items: center; justify-content: center; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: ' + (big ? 19 : 16) + 'px; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); ' + (reached ? 'background: linear-gradient(180deg, #FFE38A, #FFC53D); color: #2A1C02;' : S.level + 1 === lv ? 'background: #FF8A3D; color: #150925;' : 'background: #3F246E; color: #8686A6;')
+        badge: 'position: relative; z-index: 2; width: ' + (big ? 34 : 30) + 'px; height: ' + (big ? 39 : 34) + 'px; margin-top: ' + (big ? -1 : 2) + 'px; margin-bottom: ' + (big ? 0 : 2) + 'px; display: flex; align-items: center; justify-content: center; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: ' + (big ? 19 : 16) + 'px; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); ' + (reached ? 'background: linear-gradient(180deg, #FFE38A, #FFC53D); color: #2A1C02;' : S.level + 1 === lv ? 'background: #FF8A3D; color: #150925;' : 'background: #3F246E; color: #8686A6;')
       };
     });
     const fillTo = S.level >= 30 ? 30 * COLW : S.level * COLW - COLW / 2 + (S.into / S.need) * COLW;

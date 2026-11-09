@@ -276,7 +276,7 @@
       season: se.n, daysLeft: se.daysLeft, xp: P.xp, level: level, into: level >= 30 ? PASS_XP : P.xp - level * PASS_XP, need: PASS_XP,
       premium: P.premium, free: free, prem: prem,
       ready: free.concat(prem).filter(function (x) { return x.ready; }).length,
-      price: PAYMENTS ? '4,99 €' : 'PRÓXIMAMENTE'
+      price: PAYMENTS ? '4,99 €' : 'PRONTO'
     };
   }
   function addPassXp(n) { var P = passState(), lv0 = Math.min(30, Math.floor(P.xp / PASS_XP)); P.xp += n; put('arenamix.pass.v1', P); return { before: lv0, after: Math.min(30, Math.floor(P.xp / PASS_XP)) }; }
