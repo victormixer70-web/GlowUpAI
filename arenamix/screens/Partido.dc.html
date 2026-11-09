@@ -1159,16 +1159,17 @@ class Component extends DCLogic {
     if (this.dist(p, b) > (g.own === i ? 1.7 : 1.5) || b.z > 1.4 || (g.own !== i && p.cd > 0)) return false;
     // where he will be when it gets there: the rolling ball slows, so the time comes from that, not a guess
     const rollT = (dd, h) => { const a = 0.75 + 0.06 * h; const disc = h * h - 2 * a * dd; return disc > 0 ? (h - Math.sqrt(disc)) / a : dd / Math.max(4, h * 0.6); };
-    let lead = Math.min(1.3, rollT(this.dist(p, q), Math.min(20, Math.sqrt(81 + 3.4 * this.dist(p, q)))));
-    for (let it = 0; it < 2; it++) { const ex = q.x + q.vx * lead, ey = q.y + q.vy * lead, dd = Math.hypot(ex - b.x, ey - b.y); lead = Math.min(1.3, rollT(dd, Math.min(20, Math.sqrt(81 + 3.4 * dd)))); }
+    const passH = (dd) => Math.min(25, 13 + 0.45 * dd);   // firm, driven along the floor
+    let lead = Math.min(1.1, rollT(this.dist(p, q), passH(this.dist(p, q))));
+    for (let it = 0; it < 2; it++) { const ex = q.x + q.vx * lead, ey = q.y + q.vy * lead, dd = Math.hypot(ex - b.x, ey - b.y); lead = Math.min(1.1, rollT(dd, passH(dd))); }
     let tx = q.x + q.vx * lead, ty = q.y + q.vy * lead;
     const sg = q.team === 0 ? 1 : -1;
     if (q.role !== 'gk' && (q.vx * sg > 2)) tx += sg * 1.5;
     tx = this.clamp(tx, 1, 59); ty = this.clamp(ty, 1, 29);
     const d = Math.hypot(tx - b.x, ty - b.y), dir = Math.atan2(ty - b.y, tx - b.x);
     let h, vz;
-    if (d > 19) { vz = 4.2 + 0.12 * d; h = d / (2 * vz / 9.81 * 0.95); }
-    else { h = Math.min(20, Math.max(Math.sqrt(81 + 3.4 * d), Math.sqrt(64 + 2 * (0.75 + 0.06 * 12) * d))); vz = 0.15; }
+    if (d > 27) { vz = 4.2 + 0.12 * d; h = d / (2 * vz / 9.81 * 0.95); }
+    else { h = passH(d); vz = 0.1; }
     b.vx = Math.cos(dir) * h; b.vy = Math.sin(dir) * h; b.vz = vz; b.spin = 0; b.dip = 0; b.kn = 0;
     this.release(p);
     g.recv = { i: g.ps.indexOf(q), t: d / h + 1, tx, ty };
@@ -1317,9 +1318,10 @@ class Component extends DCLogic {
     let best = null, bs = -1e9;
     g.ps.forEach((q) => {
       if (q === p || q.team !== p.team || q.role === 'gk' || q.out) return;
-      const a = Math.atan2(q.y - p.y, q.x - p.x), c = Math.cos(this.ang(a - dir)), d = this.dist(p, q);
-      if ((c < 0.3 && !any) || d < 2) return;
-      const s = c * 1.3 - d / 40;
+      const a = Math.atan2(q.y - p.y, q.x - p.x), off = Math.abs(this.ang(a - dir)), c = Math.cos(off), d = this.dist(p, q);
+      if ((off > 1.2 && !any) || d < 2) return;
+      // aimed: the one you point at wins (the angle rules, distance barely counts); not aimed: the nearest in front
+      const s = any ? c * 1.3 - d / 40 : -off * 3 - d / 90;
       if (s > bs) { bs = s; best = q; }
     });
     return best;
@@ -2452,7 +2454,7 @@ class Component extends DCLogic {
       const dx = b.x - p.x, dy = b.y - p.y, d = Math.hypot(dx, dy);
       if (d >= r || d === 0) continue;
       // a loose ball reaching a player who can take it is controlled, not bounced off him
-      if (!owner && !sliding && p.role !== 'gk' && p.cd <= 0 && !(p.act && p.act.lock) && b.z < 0.8 && Math.hypot(b.vx - p.vx, b.vy - p.vy) < (g.recv && g.recv.i === i ? 26 : 18)) continue;
+      if (!owner && !sliding && p.role !== 'gk' && p.cd <= 0 && !(p.act && p.act.lock) && b.z < 0.8 && Math.hypot(b.vx - p.vx, b.vy - p.vy) < (g.recv && g.recv.i === i ? 32 : 18)) continue;
       if (owner && !sliding) {
         // a defender's body meets a ball under close control: a contest, not an automatic loss
         const shield = () => { p.x = b.x - dx / d * r; p.y = b.y - dy / d * r; p.vx *= 0.5; p.vy *= 0.5; };
@@ -2485,7 +2487,7 @@ class Component extends DCLogic {
       const d = Math.hypot(b.x - p.x, b.y - p.y), meant = !!(g.recv && g.recv.i === i);
       if (d > (meant ? 1.15 : 0.95) || b.z > 0.8) continue;
       const rs = Math.hypot(b.vx - p.vx, b.vy - p.vy), ctrl = i === g.ctl ? this.tt('con') : 0.3;
-      if (rs > 16 + 6 * ctrl + (meant ? 6 : 0)) continue;
+      if (rs > 16 + 6 * ctrl + (meant ? 12 : 0)) continue;
       if (d < bd) { bd = d; best = i; }
     }
     if (best >= 0) {
@@ -2500,7 +2502,7 @@ class Component extends DCLogic {
       if (human && il > 0.25) { fx = inp[0] / il; fy = inp[1] / il; }
       else if (ps > 1) { fx = p.vx / ps; fy = p.vy / ps; }
       else { const bd2 = Math.hypot(b.x - p.x, b.y - p.y) || 1; fx = (b.x - p.x) / bd2; fy = (b.y - p.y) / bd2; }
-      const loose = this.clamp((rs - 8) * 0.025 * (1 - ctrl), 0, 0.3);
+      const loose = this.clamp((rs - 12) * 0.02 * (1 - ctrl), 0, 0.25);
       const push = 0.6 + 2.2 * loose + (human && il > 0.25 ? 1.2 : 0);
       b.vx = p.vx + fx * push + (b.vx - p.vx) * loose; b.vy = p.vy + fy * push + (b.vy - p.vy) * loose; b.vz = Math.min(b.vz, 0);
       p.face = Math.atan2(fy, fx);
