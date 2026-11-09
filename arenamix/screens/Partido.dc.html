@@ -1173,7 +1173,7 @@ class Component extends DCLogic {
     b.vx = Math.cos(dir) * h; b.vy = Math.sin(dir) * h; b.vz = vz; b.spin = 0; b.dip = 0; b.kn = 0;
     this.release(p);
     g.recv = { i: g.ps.indexOf(q), t: d / h + 1, tx, ty };
-    p.act = { type: p.role === 'gk' ? 'throw' : 'pass', t: 0, dur: p.role === 'gk' ? 0.5 : 0.32 };
+    p.act = { type: p.role === 'gk' ? 'throw' : 'pass', t: 0, dur: p.role === 'gk' ? 0.5 : 0.42 };
     return true;
   }
   pushAhead(p, dir, speed) {
@@ -1182,7 +1182,7 @@ class Component extends DCLogic {
     b.vx = Math.cos(dir) * speed; b.vy = Math.sin(dir) * speed; b.vz = 0.1; b.spin = 0; b.dip = 0; b.kn = 0;
     this.release(p);
     p.cd = 0.15;
-    p.act = { type: 'pass', t: 0, dur: 0.3 };
+    p.act = { type: 'pass', t: 0, dur: 0.42 };
     return true;
   }
   doSkill(p, side, pick) {
@@ -1450,7 +1450,7 @@ class Component extends DCLogic {
     this.release(p);
     b.z = Math.max(b.z, 0.05);
     this.loftTo(b, tx, ty, 0, T);
-    p.act = { type: 'pass', t: 0, dur: 0.36 }; p.cd = 0.4;
+    p.act = { type: 'pass', t: 0, dur: 0.42 }; p.cd = 0.4;
     g.recv = q ? { i: g.ps.indexOf(q), t: T + 1 } : null;
     if (q) q.runTo = { x: tx, y: ty, t: T + 0.6 };
     this.flashMsg('Pase bombeado', 0.7);
@@ -1468,7 +1468,7 @@ class Component extends DCLogic {
     this.release(p);
     g.recv = { i: g.ps.indexOf(q), t: d / h + 1.4 };
     q.runTo = { x: tx, y: ty, t: d / h + 0.8 };
-    p.act = { type: 'pass', t: 0, dur: 0.32 };
+    p.act = { type: 'pass', t: 0, dur: 0.42 };
     this.flashMsg('¡Al hueco!', 0.7);
     this.superAdd(0.1);
     return true;
@@ -1763,6 +1763,11 @@ class Component extends DCLogic {
       else if (sp > 0.6) want = Math.atan2(p.vy, p.vx);
       else { want = Math.atan2(b.y - p.y, b.x - p.x); rate = 4; }
       if (p.act && p.act.type === 'windup' && p.act.face != null) { want = p.act.face; rate = 22; }
+      // passing: the body turns to where the ball was played, so the swing goes through it
+      if (p.act && p.act.type === 'pass' && p.role !== 'gk') {
+        if (p.act.face == null && Math.hypot(b.vx, b.vy) > 3 && g.last === i) p.act.face = Math.atan2(b.vy, b.vx);
+        if (p.act.face != null && p.act.t < p.act.dur * 0.75) { want = p.act.face; rate = 20; }
+      }
       if (p.role === 'gk') {
         const base = p.team === 0 ? 0 : Math.PI;
         want = base + this.clamp(this.ang(want - base), -1, 1);
@@ -4253,7 +4258,7 @@ class Component extends DCLogic {
       const k = Math.min(1, a.t / a.dur);
       if (a.type === 'windup') { const f0 = a.from ?? 0.12; act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.75 + 0.3 * k : f0 + (0.42 - f0) * k, key: 'strike' }; }
       else if (a.type === 'kick') act = gk ? { id: 'gkKick', t: 2.05 + 0.6 * k, key: a } : { id: 'shot', t: 0.42 + 0.8 * k, key: 'strike' };
-      else if (a.type === 'pass') act = { id: 'pass', t: 0.28 + 0.22 * k, key: a };
+      else if (a.type === 'pass') act = { id: 'pass', t: 0.09 + 0.41 * k, key: a };   // backswing -> contact (~0.13 s, when the ball leaves) -> follow-through
       else if (a.type === 'throw') act = { id: 'gkThrow', t: 1.3 + 0.6 * k, key: a };
       else if (a.type === 'slide') act = { id: 'slide', t: 0.2 + 0.75 * k, key: a };
       else if (a.type === 'block') act = { id: 'catch', t: 0.35 + 0.45 * k, key: a };
@@ -4276,7 +4281,7 @@ class Component extends DCLogic {
       st.act.live = false; st.act.t += dt;
     }
     if (st.act) {
-      st.act.w += ((st.act.live ? 1 : 0) - st.act.w) * Math.min(1, dt * (st.act.live ? (st.act.key === 'strike' ? 40 : 14) : (st.act.id === 'shot' ? 4 : 6)));
+      st.act.w += ((st.act.live ? 1 : 0) - st.act.w) * Math.min(1, dt * (st.act.live ? (st.act.key === 'strike' || st.act.id === 'pass' ? 40 : 14) : (st.act.id === 'shot' ? 4 : 6)));
       if (!st.act.live && st.act.w < 0.02) st.act = null;
     }
     const aw = st.act ? st.act.w : 0;
@@ -4850,7 +4855,7 @@ class Component extends DCLogic {
     this.release(p);
     b.z = Math.max(b.z, 0.05);
     this.loftTo(b, tx, ty, zT, T);
-    p.act = { type: 'pass', t: 0, dur: 0.32 }; p.cd = 0.5;
+    p.act = { type: 'pass', t: 0, dur: 0.42 }; p.cd = 0.5;
     g.cross = { i: qi, x: tx, y: ty, t: T + 0.7, team: p.team, kind, toYou: qi === g.ctl };
     g.recv = { i: qi, t: T + 0.7 };
     if (qi === g.ctl) { g.volleyReq = 0; this.flashMsg(kind === 'header' ? '¡Centro alto! Pulsa CHUT para rematar de cabeza' : '¡Centro! Pulsa CHUT para la CHILENA', 1.4); }
