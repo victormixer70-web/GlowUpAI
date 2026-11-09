@@ -1820,7 +1820,8 @@ class Component extends DCLogic {
     if (comingToMe) {
       const bs = Math.hypot(b.vx, b.vy), db = this.dist(p, b);
       let ax, ay;
-      if (bs > 3) {
+      if (g.cross && g.cross.i === i) [ax, ay] = this.seek(p, g.cross.x, g.cross.y, 0.3);
+      else if (bs > 3) {
         const ux = b.vx / bs, uy = b.vy / bs, along = (p.x - b.x) * ux + (p.y - b.y) * uy;
         const lx = b.x + ux * along, ly = b.y + uy * along, off = Math.hypot(lx - p.x, ly - p.y);
         // off the line: cut across to it, a little up the line towards the ball; on it: run at the ball
@@ -2477,6 +2478,8 @@ class Component extends DCLogic {
       const r = sliding ? 0.6 : BR;
       const dx = b.x - p.x, dy = b.y - p.y, d = Math.hypot(dx, dy);
       if (d >= r || d === 0) continue;
+      // the one who just struck it: the ball leaves his foot, it doesn't hit his own body (a pass or cross played back across him)
+      if (!owner && i === g.last && p.act && (p.act.type === 'pass' || p.act.type === 'kick' || p.act.type === 'throw') && p.act.t < 0.3) continue;
       // a loose ball reaching a player who can take it is controlled, not bounced off him
       if (!owner && !sliding && p.role !== 'gk' && p.cd <= 0 && !(p.act && p.act.lock) && b.z < 0.8 && Math.hypot(b.vx - p.vx, b.vy - p.vy) < (g.recv && g.recv.i === i ? 32 : 18)) continue;
       if (owner && !sliding) {
@@ -4831,7 +4834,10 @@ class Component extends DCLogic {
     const sg = p.team === 0 ? 1 : -1, gx = p.team === 0 ? 60 : 0, spotX = gx - sg * 8;
     const mates = g.ps.filter((q) => q.team === p.team && q.role !== 'gk' && !q.out && q !== p);
     if (!mates.length) return;
-    const q = mates.sort((u, v) => Math.hypot(u.x - spotX, u.y - 15) - Math.hypot(v.x - spotX, v.y - 15))[0];
+    // aimed with the stick: the teammate you point at; otherwise the best placed in front of goal
+    const [ix, iy] = this.inp || [0, 0];
+    let q = Math.hypot(ix, iy) > 0.3 ? this.pickPassTarget(p, Math.atan2(iy, ix), false) : null;
+    if (!q) q = mates.sort((u, v) => Math.hypot(u.x - spotX, u.y - 15) - Math.hypot(v.x - spotX, v.y - 15))[0];
     this.crossFrom(p, q, Math.random() < 0.6 ? 'header' : 'bicycle');
     this.flashMsg('¡Centro!', 0.8);
   }
@@ -4847,8 +4853,13 @@ class Component extends DCLogic {
       // to you: just ahead of where you are, so it is all about the timing
       tx = this.clamp(q.x + sg * 0.6 + (q.vx || 0) * 0.5, sg > 0 ? 44 : 4, sg > 0 ? 56 : 16); ty = this.clamp(q.y + (q.vy || 0) * 0.5, 9, 21);
     } else {
-      // into the space between the penalty spot and the six-yard box, on the far side from the crosser
-      tx = gx - sg * (5.5 + Math.random() * 3); ty = this.clamp(15 + (p.y < 15 ? 1 : -1) * (0.8 + Math.random() * 2.2), 11.5, 18.5);
+      // towards the space between the penalty spot and the six-yard box, but only as far as he can get to
+      // in the ball's flight: the cross is played to HIM, not to an empty spot
+      const sx = gx - sg * (5.5 + Math.random() * 2.5), sy = this.clamp(15 + (p.y < 15 ? 1 : -1) * (0.5 + Math.random() * 1.5), 11.5, 18.5);
+      const T0 = this.clamp(0.7 + Math.hypot(sx - b.x, sy - b.y) / 24, 0.85, 1.6), reach = 6 * T0 * 0.7;
+      const ex = sx - q.x, ey = sy - q.y, ed = Math.hypot(ex, ey) || 1, k = Math.min(1, reach / ed);
+      tx = q.x + ex * k; ty = q.y + ey * k;
+      tx = this.clamp(tx, sg > 0 ? 30 : 3, sg > 0 ? 57 : 30); ty = this.clamp(ty, 4, 26);
     }
     const zT = kind === 'header' ? 1.95 : 1.15;   // head height or waist height (bicycle kick)
     const d = Math.hypot(tx - b.x, ty - b.y), T = this.clamp(0.7 + d / 24, 0.85, 1.6);

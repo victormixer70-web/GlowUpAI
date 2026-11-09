@@ -98,7 +98,20 @@
     '#am-res .pn,#am-res .mvp,#am-res .mst{overflow:hidden}',
     '#am-res .mvp .nt{animation:amResNt 1.6s 1.2s ease-in-out infinite}@keyframes amResNt{0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 #FBBF24)}50%{transform:scale(1.1);filter:drop-shadow(0 0 14px #FBBF24)}}',
     '#am-res .cn b{animation:amResPopN .5s .9s cubic-bezier(.2,2,.4,1) both}@keyframes amResPopN{from{transform:scale(.3);opacity:0}}',
-    '#am-res .sc{animation:amResPopN .5s .7s cubic-bezier(.2,2,.4,1) both}'
+    '#am-res .sc{animation:amResPopN .5s .7s cubic-bezier(.2,2,.4,1) both}',
+    // ---- steady on phones: static rays and photo, no endless wobble under a filtered title, no sweeping shines ----
+    '#am-res .rays,#am-rw .rays{animation:none!important;transform:rotate(8deg)}',
+    '#am-res .photo{animation:none!important;transform:scale(1.06)}',
+    '#am-res .t{filter:drop-shadow(0 4px 0 #000)!important}',
+    '#am-res .t .lt{animation:amResLt .5s cubic-bezier(.2,2,.4,1) both!important}',
+    '#am-res.lost .t .lt{animation:amResLtL .6s cubic-bezier(.5,0,.6,1.6) both!important}',
+    '#am-res .pn::after,#am-res .mvp::after,#am-res .mst::after{content:none!important;animation:none!important}',
+    '#am-res .mvp .nt{animation:amResNtS 1.6s 1.2s ease-in-out infinite!important}@keyframes amResNtS{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}',
+    '#am-res .stars i{filter:none!important}',
+    '#am-res .pile{filter:none!important}',
+    // the screen underneath is covered: it stops drawing while the overlay is up
+    '#stage.am-ovl>:not(#am-res):not(#am-rw):not(#fx-layer){visibility:hidden!important}',
+    '#stage.am-ovl>:not(#am-res):not(#am-rw):not(#fx-layer) *{animation-play-state:paused!important}'
   ].join('\n');
   document.head.appendChild(css);
 
@@ -119,8 +132,8 @@
     var dots = ''; for (var i = 1; i <= 10; i++) dots += '<i data-n="' + i + '" class="' + ((S.milestones || []).some(function (m) { return m.at === i; }) ? 'm' : '') + '"></i>';
     el.innerHTML =
       '<div class="photo"></div><div class="bg"></div><div class="rays"></div>' +
-      (S.won ? '<div class="cf">' + Array.from({ length: 34 }, function (_, k) { return '<i style="left:' + ((k * 37) % 100) + '%;background:' + ['#22D3EE', '#FFC53D', '#FF5C8A', '#53D88E', '#A78BFA', '#FFFFFF'][k % 6] + ';animation-duration:' + (2.6 + (k % 7) * 0.45).toFixed(2) + 's;animation-delay:' + (-(k % 9) * 0.37).toFixed(2) + 's"></i>'; }).join('') + '</div>' : '') +
-      (S.lost ? '<div class="rn">' + Array.from({ length: 40 }, function (_, k) { return '<i style="left:' + ((k * 29) % 110) + '%;animation-duration:' + (0.7 + (k % 5) * 0.12).toFixed(2) + 's;animation-delay:' + (-(k % 8) * 0.13).toFixed(2) + 's"></i>'; }).join('') + '</div>' : '') +
+      (S.won ? '<div class="cf">' + Array.from({ length: 18 }, function (_, k) { return '<i style="left:' + ((k * 37) % 100) + '%;background:' + ['#22D3EE', '#FFC53D', '#FF5C8A', '#53D88E', '#A78BFA', '#FFFFFF'][k % 6] + ';animation-duration:' + (2.6 + (k % 7) * 0.45).toFixed(2) + 's;animation-delay:' + (-(k % 9) * 0.37).toFixed(2) + 's"></i>'; }).join('') + '</div>' : '') +
+      (S.lost ? '<div class="rn">' + Array.from({ length: 20 }, function (_, k) { return '<i style="left:' + ((k * 29) % 110) + '%;animation-duration:' + (0.7 + (k % 5) * 0.12).toFixed(2) + 's;animation-delay:' + (-(k % 8) * 0.13).toFixed(2) + 's"></i>'; }).join('') + '</div>' : '') +
       '<div class="band"></div>' +
       '<div class="k">FINAL DEL PARTIDO</div>' +
       '<div class="t">' + (S.won ? '¡VICTORIA!' : S.lost ? 'DERROTA' : 'EMPATE').split('').map(function (ch, k) { return '<span class="lt" style="animation-delay:' + (0.15 + k * 0.05).toFixed(2) + 's,' + (1.2 + k * 0.08).toFixed(2) + 's">' + ch + '</span>'; }).join('') + '</div>' +
@@ -153,6 +166,7 @@
       }).join('') + '</div>' +
       '<button type="button" class="go"><span>CONTINUAR</span></button>';
     stage.appendChild(el);
+    var hideT = setTimeout(function () { if (el.isConnected) stage.classList.add('am-ovl'); }, 400);
     var q = function (s) { return el.querySelector(s); }, lines = el.querySelectorAll('.xpl');
     var t0 = performance.now(), raf = 0, xpShown = 0, lvShown = S.before.level, popped = {};
     var burst = function (x, y, n, colors) {
@@ -204,7 +218,8 @@
     };
     raf = requestAnimationFrame(step);
     q('.go').addEventListener('click', function () {
-      cancelAnimationFrame(raf);
+      cancelAnimationFrame(raf); clearTimeout(hideT);
+      if (!stage.querySelector('#am-rw')) stage.classList.remove('am-ovl');
       el.classList.add('out');
       setTimeout(function () { el.remove(); if (onClose) onClose(); }, 280);
     });
@@ -290,7 +305,13 @@
     '@keyframes amRwCoin{0%{transform:translate(0,0) rotate(0) scale(.4);opacity:1}45%{transform:translate(calc(var(--dx)*.6),var(--up)) rotate(200deg) scale(1)}100%{transform:translate(var(--dx),240px) rotate(480deg) scale(.8);opacity:0}}',
     // the loot flies out of the chest to its place
     '#am-rw.open .it{animation:amRwFly .6s cubic-bezier(.2,1.4,.4,1) both}',
-    '@keyframes amRwFly{from{opacity:0;transform:translate(var(--fx,0),-70px) scale(.15) rotate(-20deg)}to{opacity:1;transform:none}}'
+    '@keyframes amRwFly{from{opacity:0;transform:translate(var(--fx,0),-70px) scale(.15) rotate(-20deg)}to{opacity:1;transform:none}}',
+    // ---- steady on phones: no blend modes, no blurred beams redrawn every frame, the screen itself doesn't move ----
+    '#am-rw .leak,#am-rw .lk,#am-rw .pillar{mix-blend-mode:normal!important}',
+    '#am-rw .pillar{filter:none!important}',
+    '#am-rw::before,#am-rw::after{filter:none!important;animation:none!important;opacity:.6}',
+    '#am-rw.shk{animation:none!important}',
+    '#am-rw .ch.s1,#am-rw .ch.s2,#am-rw .ch.s3{translate:0 0}'
   ].join('\n');
   document.head.appendChild(css2);
   function reward(r, onClose) {
@@ -313,14 +334,18 @@
     var RC = { common: '#FFC53D', rare: '#3DA9FF', epic: '#FF5CC8', legend: '#7EF0FF' };
     el.style.setProperty('--rc', isChest ? (RC[m.chest] || '#FFC53D') : '#FFC53D');
     stage.appendChild(el);
+    var hideT = setTimeout(function () { if (el.isConnected) stage.classList.add('am-ovl'); }, 350);
     var ch = el.querySelector('.ch'), taps = 0, opened = false;
-    var shake = function () { el.classList.remove('shk'); void el.offsetWidth; el.classList.add('shk'); };
+    // the open chest is decoded now, so swapping to it later never leaves a blank frame
+    var openPic = isChest ? P('chest:' + m.chest + ':open') : '';
+    if (openPic) { var pre = new Image(); pre.src = openPic; if (pre.decode) pre.decode().catch(function () {}); }
+    var shake = function () { try { if (navigator.vibrate) navigator.vibrate(25); } catch (e) {} };
     setTimeout(shake, 480);   // it lands
     // the loot cards come out of the chest: each starts from the middle
     [].forEach.call(el.querySelectorAll('.it'), function (it, i, all) { it.style.setProperty('--fx', ((all.length - 1) / 2 - i) * 176 + 'px'); it.style.animationDelay = (0.25 + i * 0.12).toFixed(2) + 's'; });
     var open = function () {
       if (opened) return; opened = true;
-      if (isChest) ch.src = P('chest:' + m.chest + ':open');
+      if (isChest) ch.src = openPic;
       el.classList.remove('t1', 't2', 't3');
       el.classList.add('open'); shake();
       if (sfx && sfx.chest) sfx.chest();
@@ -346,7 +371,8 @@
     var auto = setTimeout(open, 3200);
     el.addEventListener('click', function (e) {
       if (e.target.classList.contains('ok')) {
-        clearTimeout(auto);
+        clearTimeout(auto); clearTimeout(hideT);
+        if (!stage.querySelector('#am-res')) stage.classList.remove('am-ovl');
         el.classList.add('out'); el.style.animation = 'amResOut .3s ease-in both';
         setTimeout(function () { el.remove(); if (onClose) onClose(); }, 280);
         return;
@@ -354,7 +380,8 @@
       if (opened) return;
       if (!isChest) { open(); return; }
       taps++;
-      ch.className = 'ch'; void ch.offsetWidth; ch.className = 'ch s' + Math.min(3, taps);
+      clearTimeout(auto); if (taps < 3) auto = setTimeout(open, 3200);   // tapping: it waits for you
+      ch.className = 'ch s' + Math.min(3, taps);
       el.classList.remove('t1', 't2', 't3'); el.classList.add('t' + Math.min(3, taps));
       if (taps >= 2) shake();
       for (var q = 0; q < 6 + taps * 4; q++) {
@@ -367,5 +394,11 @@
       if (taps >= 3) setTimeout(open, 380);
     });
   }
+  // never leave the screen underneath hidden: once no overlay is left, it shows again (whatever removed it)
+  (function () {
+    var st = document.getElementById('stage');
+    if (!st) { document.addEventListener('DOMContentLoaded', arguments.callee); return; }
+    new MutationObserver(function () { if (st.classList.contains('am-ovl') && !st.querySelector(':scope>#am-res,:scope>#am-rw')) st.classList.remove('am-ovl'); }).observe(st, { childList: true });
+  })();
   window.AMResults = { show: show, reward: reward };
 })();
