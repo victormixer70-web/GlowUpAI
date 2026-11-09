@@ -386,6 +386,45 @@
     };
   }
 
+  /* The owner's "max out" switch: open the game once with ?maxear=<code> and this device's account gets
+     everything (coins, BOB, level, the whole season pass, every item, celebration and trail, boosts,
+     player attributes at their cap and the top rank in every competitive mode). Only this device: progress
+     lives in the phone, nothing is sent anywhere. */
+  var MAX_CODE = 'ARENAMIX-VICTOR-MAX';
+  function maxOut() {
+    put('arenamix.wallet.v1', { coins: 999999 });
+    put('arenamix.gems.v1', { n: 99999 });
+    // level 100
+    var x = 0; for (var n = 1; n < 100; n++) x += need(n); put('arenamix.xp.v1', { xp: x + 10 });
+    // the season pass: premium and every level (the prizes are still yours to collect, one tap each)
+    var P = passState(); P.premium = true; P.xp = Math.max(P.xp, 30 * PASS_XP); put('arenamix.pass.v1', P);
+    // every item in the Taquilla, every kit (leagues x teams, generous), every celebration and trail
+    var L = locker(), own = L.bought || [];
+    ['h0','h1','h2','h3','h4','h5','h6','h7','h8','h9','h10','h11','f0','f1','f2','f3','f4','f5','f6','s1','s2','s3','s4','s5','s6','s7','s8'].concat(Object.keys(ITEMS)).forEach(function (id) { if (own.indexOf(id) < 0) own.push(id); });
+    for (var lg = 0; lg < 10; lg++) for (var tm = 0; tm < 32; tm++) { var kid = 'futbol-' + lg + '-' + tm; if (own.indexOf(kid) < 0) own.push(kid); }
+    L.bought = own; put('arenamix.locker.v1', L);
+    var C = celebState(); CELEBS.forEach(function (c) { if (C.own.indexOf(c.id) < 0) C.own.push(c.id); }); put('arenamix.celebs.v1', C);
+    var Tr = trailState(); TRAILS.forEach(function (t) { if (Tr.own.indexOf(t.id) < 0) Tr.own.push(t.id); }); put('arenamix.trails.v1', Tr);
+    var B = boosts(); BOOSTS.forEach(function (b) { B[b.id] = 99; }); put('arenamix.boosts.v1', B);
+    // the player card: every football attribute at its cap (150), points to spare
+    var S2 = get('arenamix.stats.v2', null) || {};
+    S2.futbol = Object.assign({}, S2.futbol || {}, { level: 60, pm: 999, stats: { vel: 150, pot: 150, pre: 150, con: 150, res: 150, ref: 150 } });
+    put('arenamix.stats.v2', S2); put('arenamix.stats.v1', S2.futbol);
+    // the top rank (Élite) in every competitive football mode, placement matches done
+    var EPOCH = Date.UTC(2026, 9, 1), LEN = 30 * 864e5, sn = Math.max(0, Math.floor((Date.now() - EPOCH) / LEN));
+    var SE = get('arenamix.season.v1', null); if (!SE || SE.n !== sn) SE = { n: sn, placed: {}, prev: {}, notice: false };
+    var MM = get('arenamix.mmr.v1', null) || {};
+    ['m1', 'm2', 'm3', 'm4', 'pens', 'fk'].forEach(function (id) { var k = 'futbol:' + id; SE.placed[k] = { g: 5, w: 5, d: 0, res: ['w', 'w', 'w', 'w', 'w'] }; MM[k] = 6800; });
+    put('arenamix.season.v1', SE); put('arenamix.mmr.v1', MM);
+  }
+  try {
+    var mq = /[?&]maxear=([^&#]+)/.exec(location.search);
+    if (mq && decodeURIComponent(mq[1]) === MAX_CODE) {
+      maxOut();
+      history.replaceState(null, '', location.pathname + location.hash);
+      setTimeout(function () { alert('¡Cuenta maxeada! Monedas, BOB, nivel 100, pase completo, todo desbloqueado y rango Élite.'); }, 1500);
+    }
+  } catch (e) {}
   window.AMProgress = {
     streak: function () { return get('arenamix.career.v1', { streak: 0 }).streak || 0; },
     coins: coins, addCoins: addCoins, gems: gems, addGems: addGems, spendGems: spendGems,
