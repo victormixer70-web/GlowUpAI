@@ -315,6 +315,16 @@
       R.setClearColor(0, 0); R.setSize(512, 512, false);
     } catch (e) { R = null; return false; }
     S = new T.Scene();
+    try {
+      var ev = document.createElement('canvas'); ev.width = 256; ev.height = 128;
+      var ex = ev.getContext('2d'), eg = ex.createLinearGradient(0, 0, 0, 128);
+      eg.addColorStop(0, '#FFFFFF'); eg.addColorStop(0.35, '#BFD8FF'); eg.addColorStop(0.5, '#FFE7C2'); eg.addColorStop(0.62, '#3A3550'); eg.addColorStop(1, '#0B0B18');
+      ex.fillStyle = eg; ex.fillRect(0, 0, 256, 128);
+      // soft boxes: bright patches that become the highlights on gold and on the facets of the gems
+      [[40, 30, 26], [150, 22, 34], [215, 40, 18], [95, 52, 14]].forEach(function (q) { var rg = ex.createRadialGradient(q[0], q[1], 1, q[0], q[1], q[2]); rg.addColorStop(0, '#FFFFFF'); rg.addColorStop(1, 'rgba(255,255,255,0)'); ex.fillStyle = rg; ex.fillRect(q[0] - q[2], q[1] - q[2], q[2] * 2, q[2] * 2); });
+      var et = new T.CanvasTexture(ev); et.mapping = T.EquirectangularReflectionMapping; et.encoding = T.sRGBEncoding;
+      var pm = new T.PMREMGenerator(R); S.environment = pm.fromEquirectangular(et).texture; pm.dispose();
+    } catch (e) {}
     S.add(new T.HemisphereLight(0xe8eeff, 0x302848, 0.8));
     var k = new T.DirectionalLight(0xffffff, 1.4); k.position.set(2, 4, 3); S.add(k);
     var r = new T.DirectionalLight(0x22d3ee, 1.0); r.position.set(-3, 1, -2); S.add(r);
@@ -382,10 +392,25 @@
     var y = e.getContext('2d'); for (var i = 0; i < 64; i++) { y.fillStyle = i % 2 ? '#D8981C' : '#FFCF4D'; y.fillRect(i, 0, 1, 8); }
     var edge = new T.CanvasTexture(e); edge.encoding = T.sRGBEncoding; edge.wrapS = T.RepeatWrapping; edge.repeat.x = 6;
     var mk = function (map) { return new T.MeshStandardMaterial({ map: map, metalness: 0.35, roughness: 0.32, emissive: new T.Color('#5A3A00'), emissiveIntensity: 0.35 }); };
-    coinMats = [mk(edge), mk(face), mk(face)];
+    var goldM = new T.MeshStandardMaterial({ color: '#FFAA00', metalness: 0.9, roughness: 0.28, envMapIntensity: 0.55, emissive: new T.Color('#7A4200'), emissiveIntensity: 0.45 });
+    var starM = new T.MeshStandardMaterial({ color: '#FFD24A', metalness: 0.85, roughness: 0.15, envMapIntensity: 0.7, emissive: new T.Color('#8A5600'), emissiveIntensity: 0.5 });
+    coinMats = [mk(edge), goldM, mk(face), starM];
     return coinMats;
   }
-  function coin() { var m = new T.Mesh(new T.CylinderGeometry(1, 1, 0.2, 40), coinMaterials()); m.castShadow = true; return m; }
+  var coinGeo = null, coinStar = null;
+  function coin() {
+    var gold = coinMaterials()[1];
+    if (!coinGeo) {
+      // the profile, from the middle of the bottom face out to the rim and back in over the top
+      var P = [[0, -0.075], [0.8, -0.075], [0.84, -0.1], [0.97, -0.1], [1.0, -0.075], [1.0, 0.075], [0.97, 0.1], [0.84, 0.1], [0.8, 0.075], [0, 0.075]].map(function (q) { return new T.Vector2(q[0], q[1]); });
+      coinGeo = new T.LatheGeometry(P, 48);
+      var st = new T.Shape(); for (var k = 0; k < 10; k++) { var a = Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? 0.22 : 0.5; if (k) st.lineTo(Math.cos(a) * r, Math.sin(a) * r); else st.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
+      coinStar = new T.ExtrudeGeometry(st, { depth: 0.04, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.03, bevelSegments: 2 });
+    }
+    var g = new T.Group(), body = new T.Mesh(coinGeo, gold); body.castShadow = true; g.add(body);
+    [1, -1].forEach(function (sd) { var sm = new T.Mesh(coinStar, coinMaterials()[3]); sm.rotation.x = -sd * Math.PI / 2; sm.position.y = sd * 0.075; g.add(sm); });
+    return g;
+  }
   // n coins: a few stacks, more coins = taller stacks and some lying around them
   function coinPile(n) {
     var g = new T.Group(), stacks = n < 8 ? 1 : n < 20 ? 3 : 5, per = Math.ceil(n / stacks), k = 0;
@@ -513,9 +538,19 @@
     g.rotation.z = open ? -0.04 : 0.03;
     return g;
   }
+  var spark = null;
+  function sparkTex() {
+    if (spark) return spark;
+    var c = document.createElement('canvas'); c.width = c.height = 64; var x = c.getContext('2d');
+    var rg = x.createRadialGradient(32, 32, 0, 32, 32, 30); rg.addColorStop(0, 'rgba(255,255,255,1)'); rg.addColorStop(0.25, 'rgba(255,255,255,.5)'); rg.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = rg; x.fillRect(0, 0, 64, 64);
+    x.fillStyle = '#FFFFFF'; x.beginPath(); x.moveTo(32, 2); x.lineTo(35, 29); x.lineTo(62, 32); x.lineTo(35, 35); x.lineTo(32, 62); x.lineTo(29, 35); x.lineTo(2, 32); x.lineTo(29, 29); x.closePath(); x.fill();
+    spark = new T.CanvasTexture(c); return spark;
+  }
   function prizeModel(kind) {
     var p = kind.split(':'), g = new T.Group();
-    if (p[0] === 'coins') { g.add(coinPile(+p[1] || 6)); g.rotation.y = -0.4; }
+    if (p[0] === 'coin') { var one = coin(); one.rotation.set(Math.PI / 2 - 0.32, 0, 0.18); g.add(one); }
+    else if (p[0] === 'coins') { g.add(coinPile(+p[1] || 6)); g.rotation.y = -0.4; }
     else if (p[0] === 'chest') { var c = chest(p[1], p[2] === 'open'); c.rotation.y = 0.2; g.add(c); }
     else if (p[0] === 'bag') {
       // a sack of coins, tied, with coins spilling at its foot
@@ -529,15 +564,21 @@
       g.rotation.y = -0.3;
     } else if (p[0] === 'gems') {
       // BOB: cut gems (an octahedron stretched and faceted), a big one in front and smaller ones behind
-      var n = +p[1] || 1, pink = std('#FF5CC8', { r: 0.12, m: 0.3, em: '#7A1050', ei: 0.35 });
+      // a brilliant cut: a flat table, a crown of facets, a thin girdle and a deep pointed pavilion;
+      // glassy, with the studio's reflections in the facets and a glow from inside
+      var n = +p[1] || 1;
+      var pink = new T.MeshStandardMaterial({ color: '#D80080', metalness: 0.25, roughness: 0.14, envMapIntensity: 0.22, emissive: new T.Color('#C0107A'), emissiveIntensity: 0.55, flatShading: true });
+      var pale = new T.MeshStandardMaterial({ color: '#FF3FB4', metalness: 0.2, roughness: 0.1, envMapIntensity: 0.3, emissive: new T.Color('#FF2FA8'), emissiveIntensity: 0.45, flatShading: true });
       var gem = function (sc, x, y, z, ry) {
         var gg = new T.Group();
-        var top = new T.Mesh(new T.CylinderGeometry(0.55, 0.95, 0.42, 8, 1), pink); top.position.y = 0.21; gg.add(top);
-        var bot = new T.Mesh(new T.ConeGeometry(0.95, 1.05, 8, 1), pink); bot.rotation.x = Math.PI; bot.position.y = -0.52; gg.add(bot);
-        var tab = new T.Mesh(new T.CylinderGeometry(0.55, 0.55, 0.02, 8), std('#FFC2EC', { r: 0.1, m: 0.2, em: '#FF8AD8', ei: 0.4 })); tab.position.y = 0.43; gg.add(tab);
-        gg.flatShading = true; gg.scale.setScalar(sc); gg.position.set(x, y, z); gg.rotation.set(0.25, ry, 0.12); return gg;
+        var crown = new T.Mesh(new T.CylinderGeometry(0.58, 1.0, 0.42, 16, 1), pink); crown.position.y = 0.21; gg.add(crown);
+        var girdle = new T.Mesh(new T.CylinderGeometry(1.0, 1.0, 0.06, 16, 1), pale); girdle.position.y = -0.03; gg.add(girdle);
+        var pav = new T.Mesh(new T.ConeGeometry(1.0, 1.15, 16, 1), pink); pav.rotation.x = Math.PI; pav.position.y = -0.635; gg.add(pav);
+        var table = new T.Mesh(new T.CylinderGeometry(0.58, 0.58, 0.02, 16), pale); table.position.y = 0.43; gg.add(table);
+        // a star of light on the table
+        var sp = new T.Sprite(new T.SpriteMaterial({ map: sparkTex(), color: '#FFFFFF', transparent: true, depthWrite: false, blending: T.AdditiveBlending })); sp.scale.setScalar(0.9); sp.position.set(-0.25, 0.5, 0.35); gg.add(sp);
+        gg.scale.setScalar(sc); gg.position.set(x, y, z); gg.rotation.set(0.28, ry, 0.1); return gg;
       };
-      pink.flatShading = true;
       g.add(gem(1, 0, 1.0, 0, 0.3));
       if (n > 1) g.add(gem(0.6, -1.05, 0.55, -0.4, 0.8));
       if (n > 2) g.add(gem(0.55, 1.05, 0.5, -0.3, -0.5));

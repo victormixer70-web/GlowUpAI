@@ -12,6 +12,14 @@
 @keyframes tdWiggle{0%,62%,100%{rotate:0deg;scale:1}66%{rotate:-9deg;scale:1.08}72%{rotate:8deg;scale:1.1}78%{rotate:-6deg}84%{rotate:4deg}90%{rotate:0deg;scale:1}}
 @keyframes tdSnore{0%,100%{scale:1 1}50%{scale:1.04 .96}}
 .td-wiggle img{animation:tdWiggle 2.2s ease-in-out infinite;transform-origin:50% 90%}
+/* a prize ready to collect: light rays turning behind it, a pulsing glow and twinkles, the chest jumping */
+.td-wiggle{position:relative;isolation:isolate}
+.td-wiggle::before{content:"";position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;z-index:-1;border-radius:50%;background:repeating-conic-gradient(#FFE38A55 0 8deg,transparent 10deg 24deg);-webkit-mask-image:radial-gradient(closest-side,#000 25%,transparent 72%);mask-image:radial-gradient(closest-side,#000 25%,transparent 72%);animation:tdRays 7s linear infinite}
+.td-wiggle::after{content:"";position:absolute;left:50%;top:50%;width:96px;height:96px;margin:-48px 0 0 -48px;z-index:-1;border-radius:50%;background:radial-gradient(closest-side,#FFE38ACC,#FFC53D44 55%,transparent 75%);animation:tdGlowP 1.4s ease-in-out infinite}
+@keyframes tdRays{to{rotate:360deg}}
+@keyframes tdGlowP{0%,100%{transform:scale(.85);opacity:.6}50%{transform:scale(1.12);opacity:1}}
+.td-wiggle img{animation:tdJumpW 1.8s cubic-bezier(.3,1.4,.5,1) infinite!important;transform-origin:50% 95%}
+@keyframes tdJumpW{0%,55%,100%{translate:0 0;rotate:0deg;scale:1}62%{translate:0 -10px;rotate:-7deg;scale:1.08}70%{translate:0 0;rotate:6deg;scale:1.1 .92}78%{rotate:-4deg;scale:1}86%{rotate:2deg}}
 .td-snore img{animation:tdSnore 2.8s ease-in-out infinite;transform-origin:50% 100%}
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
@@ -242,7 +250,7 @@ class Component extends DCLogic {
         const ready = m.reached && !m.claimed, rc = m.claimed ? '#22D3EE' : ready ? '#FFC53D' : '#2A2A50';
         return {
           name: m.name, sub: ready ? (m.prize === 'chest' ? '¡Listo para abrir!' : '¡Listo para recoger!') : m.sub, at: String(m.at),
-          img: P(m.icon + (ready && m.prize === 'chest' ? ':open' : '')),
+          img: P(m.icon),
           canClaim: ready, isClaimed: m.claimed, isLocked: !m.reached,
           left: (m.at - W.wins === 1 ? 'Falta 1 victoria' : 'Faltan ' + (m.at - W.wins) + ' victorias'),
           icCls: ready ? 'td-wiggle' : (m.prize === 'chest' && !m.reached ? 'td-snore' : ''),

@@ -424,6 +424,17 @@
   // the backgrounds, decoded once and kept: no blank frame while a big photo is decoded again on each screen change
   window.__amBgs = ['assets/bg_estadio.jpg', 'assets/bg_tribuna.jpg', 'assets/bg_trofeos.jpg', 'assets/lobby_bg.jpg'].map(function (u) { var im = new Image(); im.src = u; if (im.decode) im.decode().catch(function () {}); return im; });
 
+  // the coin and gem icons of the menus (flat drawings) get the 3D coin and gem: drawn once, used as the
+  // background of those little svgs (their own shapes hidden), so the screens themselves don't change
+  (function icon3d(tries) {
+    var G = window.AMGear, c = G && G.prize ? G.prize('coin') : '', g = G && G.prize ? G.prize('gems:1') : '';
+    if (!c || !g) { if (tries < 40) setTimeout(function () { icon3d(tries + 1); }, 500); return; }
+    var st = document.createElement('style'), CO = 'svg.am-coin,svg:has(>circle[r="10"][fill="#FFC53D"])', GE = 'svg:has(>path[d="M7 3h10l4 6l-9 12L3 9z"])';
+    st.textContent = CO + '{background:url(' + c + ') center/135% no-repeat;overflow:visible}' + CO.split(',').map(function (q) { return q + '>*'; }).join(',') + '{visibility:hidden}' +
+      GE + '{background:url(' + g + ') center/140% no-repeat;overflow:visible}' + GE + '>*{visibility:hidden}';
+    document.head.appendChild(st);
+  })(0);
+
   // ---- presses: squash and spring back, a burst of light; new content after a press slides or pops in ----
   var pressable = 'button, a[href], [role="tab"], [role="button"], [role="option"], [role="menuitem"]';
   var down = null, slideDir = 0, watchUntil = 0;
