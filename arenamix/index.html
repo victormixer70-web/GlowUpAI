@@ -35,13 +35,20 @@
   #loading { position: fixed; inset: 0; z-index: 5; background: #05060a; overflow: hidden; transition: opacity .45s ease; font-family: 'Rajdhani', system-ui, sans-serif; }
   #loading.out { opacity: 0; pointer-events: none; }
   /* the artwork is 1024x576 (16:9); this box covers the screen keeping that ratio, so the live bar lands exactly on the drawn one */
-  #loading .art { position: absolute; left: 50%; top: 50%; width: max(100vw, 177.78vh); height: max(56.25vw, 100vh); transform: translate(-50%, calc(-50% + max(0px, (56.25vw - 100vh) * 0.32))); background: url(icons/loading-bg3.jpg?v=3) center / 100% 100% no-repeat; }
-  /* the row of balls is the progress bar: the ones still to load are dimmed and switch on as it loads */
-  /* the progress bar, on the pitch under the logo: a glass track and a rainbow fill with a light running along it */
-  #loading .fill { position: absolute; left: 50%; width: min(46vw, 92vh); translate: -50% 0; bottom: 12%; height: max(1.1vw, 2.2vh); border-radius: 99px; background: rgba(6,10,40,.72); box-shadow: 0 0 0 2px rgba(190,240,255,.55), 0 0 22px rgba(34,211,238,.55), inset 0 2px 6px rgba(0,0,0,.6); overflow: hidden; transition: opacity .3s; }
-  #loading .fill i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: inherit; background: linear-gradient(90deg, #22D3EE, #3B82F6 35%, #A855F7 65%, #FFC53D); box-shadow: 0 0 14px #7EF0FF; transition: width .12s linear; overflow: hidden; }
-  #loading .fill i::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent) -100% 0 / 40% 100% no-repeat; animation: ldRun 1.1s linear infinite; }
-  @keyframes ldRun { to { background-position: 250% 0; } }
+  #loading .art { position: absolute; left: 50%; top: 50%; width: max(100vw, 177.78vh); height: max(56.25vw, 100vh); transform: translate(-50%, calc(-50% + max(0px, (56.25vw - 100vh) * 0.32))); background: url(icons/loading-bg3.jpg?v=4) center / 100% 100% no-repeat; }
+  /* the progress bar, dressed like the title: a slanted black plate with an electric rim, an energy fill
+     with stripes running along it, and the match ball rolling at its tip */
+  #loading .fill { --h: max(1.5vw, 2.9vh); position: absolute; left: 50%; bottom: 12%; width: min(50vw, 96vh); height: var(--h); transform: translateX(-50%) skewX(-16deg); background: repeating-linear-gradient(90deg, rgba(30,139,255,.10) 0 2px, transparent 2px 14px), linear-gradient(180deg, #050A22, #02040C); box-shadow: 0 0 0 3px #02040C, 0 0 0 5px #1E8BFF, 0 0 0 6.5px rgba(191,230,255,.8), 0 0 26px 6px rgba(30,139,255,.55), inset 0 3px 8px rgba(0,0,0,.8); transition: opacity .3s; }
+  #loading .fill i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: repeating-linear-gradient(-60deg, rgba(255,255,255,.22) 0 8px, transparent 8px 18px) 0 0 / 40px 100%, linear-gradient(180deg, #BFE6FF 0%, #3DA9FF 38%, #1E6FF0 55%, #0A3DCC 100%); box-shadow: 0 0 16px #3DA9FF, inset 0 -3px 0 rgba(2,4,12,.35); transition: width .12s linear; animation: ldStripes .6s linear infinite; }
+  @keyframes ldStripes { to { background-position: 40px 0, 0 0; } }
+  /* the white-hot front edge */
+  #loading .fill i::after { content: ''; position: absolute; right: 0; top: -2px; bottom: -2px; width: 18px; background: linear-gradient(90deg, transparent, #FFFFFF); filter: blur(2px); }
+  /* the ball rolls at the tip (straightened back up from the plate's slant) */
+  #loading .fill .ldb { position: absolute; right: 0; top: 50%; width: calc(var(--h) * 2.1); height: calc(var(--h) * 2.1); margin: calc(var(--h) * -1.05) calc(var(--h) * -1.05) 0 0; transform: skewX(16deg); filter: drop-shadow(0 0 8px #7EC8FF) drop-shadow(0 2px 2px #000A); animation: ldRoll .7s linear infinite; z-index: 2; }
+  @keyframes ldRoll { to { rotate: 360deg; } }
+  #loading .ldk { position: absolute; left: calc(50% - min(25vw, 48vh)); bottom: calc(12% + max(1.5vw, 2.9vh) + 10px); color: #BFE6FF; font-family: 'Titulos', sans-serif; font-size: max(1.15vw, 2.2vh); letter-spacing: .18em; text-shadow: 0 2px 0 #02040C, 0 0 10px #1E8BFF; }
+  #loading .ldk::after { content: '...'; display: inline-block; width: 1.4em; text-align: left; animation: ldDots 1.2s steps(4) infinite; overflow: hidden; vertical-align: bottom; }
+  @keyframes ldDots { from { width: 0; } to { width: 1.4em; } }
   #loading .pct::before { content: none; }
   @keyframes ldSpin { to { transform: rotate(360deg); } }
   /* tips that change while it loads, over the picture's own line */
@@ -50,7 +57,8 @@
   #loading .tip span { transition: opacity .3s; }
   /* the live percentage in the medallion, over the picture's own number */
   /* the percentage, just above the bar */
-  #loading .pct { position: absolute; left: 50%; bottom: calc(12% + max(1.1vw, 2.2vh) + 2px); transform: translate(-50%, 0); color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-style: italic; font-weight: 800; font-size: max(2vw, 3.6vh); letter-spacing: .04em; text-shadow: 0 0 14px #3B82F6, 0 3px 0 #05060A, 0 0 2px #05060A; z-index: 1; }
+  /* the percentage: a little plate of its own at the bar's right end, chrome figures like the title */
+  #loading .pct { position: absolute; left: calc(50% + min(25vw, 48vh) + max(1.6vw, 3vh)); bottom: calc(12% - max(.55vw, 1vh)); min-width: 3.4em; padding: .12em .5em; text-align: center; transform: skewX(-16deg); background: linear-gradient(180deg, #0A1A4A, #02040C); box-shadow: 0 0 0 3px #02040C, 0 0 0 5px #1E8BFF, 0 0 18px rgba(30,139,255,.6); color: #F4F7FF; font-family: 'Titulos', sans-serif; font-size: max(1.5vw, 2.8vh); line-height: 1.15; letter-spacing: .03em; text-shadow: 0 2px 0 #02040C, 0 0 10px #3DA9FF; z-index: 1; }
   #rotate { display: none; position: fixed; inset: 0; z-index: 10; background: #0B0B14; color: #F4F4FA; align-items: center; justify-content: center; flex-direction: column; gap: 14px; font: 700 16px Exo2, system-ui, sans-serif; text-align: center; padding: 24px; }
   body.portrait #rotate { display: flex; }
   #rotate svg { animation: turn 1.6s ease-in-out infinite; }
@@ -60,7 +68,7 @@
 <body>
 <div id="stage"></div>
 <div id="loading" role="progressbar" aria-label="Cargando ARENA MIX" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-  <div class="art"></div><div class="fill"><i id="ld-fill"></i></div><div class="pct" id="ld-pct">0%</div><div class="tip"><svg width="1.2em" height="1.2em" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2" stroke-linecap="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg><b>TIP:</b><span id="ld-tip">Mejora tu control del balón y domina la liga.</span></div>
+  <div class="art"></div><div class="ldk">CARGANDO</div><div class="fill"><i id="ld-fill"><img class="ldb" src="icons/ld-ball.webp?v=1" alt=""></i></div><div class="pct" id="ld-pct">0%</div><div class="tip"><svg width="1.2em" height="1.2em" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2" stroke-linecap="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg><b>TIP:</b><span id="ld-tip">Mejora tu control del balón y domina la liga.</span></div>
 </div>
 <div id="rotate">
   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="1.8" stroke-linecap="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
