@@ -12,7 +12,6 @@
 <style>
 @keyframes pdLive{0%,100%{opacity:1}50%{opacity:.25}}
 .pd-goal{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;--c1:#1E8BFF;--c2:#3DA9FF;--c3:#BFE6FF;--cd:#0A3DCC}
-.pd-goal.them{--c1:#FF3B4A;--c2:#FF7A6B;--c3:#FFD0CC;--cd:#9A0F1E}
 /* the play's buttons step aside while the goal is celebrated */
 :has(> .pd-goal) > button,:has(> .pd-goal) > [aria-label^="Zona del joystick"],:has(> .pd-goal) > [aria-label^="Zona del joystick"] + div,:has(> .pd-goal) > div:has(> button){opacity:0!important;transition:opacity .25s}
 .pg-flash{position:absolute;inset:0;background:radial-gradient(60% 70% at 50% 50%,#FFFFFF,var(--c3) 40%,transparent 80%);opacity:0;animation:pgFlash .55s ease-out both}
@@ -29,7 +28,7 @@
 @keyframes pgStreak{from{transform:translateX(-200px) skewX(-20deg)}to{transform:translateX(1100px) skewX(-20deg)}}
 .pg-word{position:absolute;left:0;right:0;top:50%;margin-top:-68px;display:flex;justify-content:center;transform:rotate(-5deg)}
 .pg-word span{display:inline-block;font-family:'Titulos',sans-serif;font-size:132px;line-height:1.08;padding:0 2px;background:linear-gradient(180deg,#FFFFFF 0%,#F2F5FB 42%,#AEB9CF 50%,#E3E9F4 72%,#8D9AB6 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:3px #02040C;filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 18px var(--c1));animation:pgLetter .55s calc(.12s + var(--i) * .07s) cubic-bezier(.2,1.8,.4,1) both}
-.pd-goal.them .pg-word span{background:linear-gradient(180deg,#FFE3E0 0%,#FF8A80 45%,#FF3B4A 52%,#9A0F1E 100%);-webkit-background-clip:text;background-clip:text}
+.pd-goal .pg-word span{background:linear-gradient(180deg,#FFFFFF 0%,var(--c3) 42%,var(--cf) 52%,var(--cd) 100%);-webkit-background-clip:text;background-clip:text}
 @keyframes pgLetter{0%{opacity:0;transform:translateY(-160px) scale(2.2) rotate(-14deg)}60%{opacity:1}100%{opacity:1;transform:none}}
 .pg-sub{position:absolute;left:0;right:0;top:50%;margin-top:84px;display:flex;justify-content:center;align-items:center;gap:12px;animation:pgSub .45s .55s cubic-bezier(.2,1.5,.4,1) both}
 @keyframes pgSub{from{opacity:0;transform:translateY(24px) scale(.8)}}
@@ -53,8 +52,9 @@
 @keyframes pdGold{0%,100%{box-shadow:0 0 10px #FFC53D88}50%{box-shadow:0 0 22px #FFC53D}}
 .sb{position:relative;display:flex;align-items:flex-start;gap:0}
 .sb-team{position:relative;display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;min-width:150px;box-sizing:border-box;font:800 italic 15px 'Barlow Condensed',sans-serif;letter-spacing:.8px;color:#fff;text-shadow:0 2px 0 #0008;white-space:nowrap;overflow:hidden}
-.sb-team.h{justify-content:flex-end;border-radius:16px 0 0 16px;background:linear-gradient(90deg,#0B0B1400,#0B0B14E6 30%,color-mix(in srgb,var(--tc) 55%,#0B0B14));box-shadow:inset 0 2px 0 #ffffff22,inset 0 -2px 0 color-mix(in srgb,var(--tc) 80%,#fff)}
-.sb-team.a{justify-content:flex-start;border-radius:0 16px 16px 0;background:linear-gradient(270deg,#0B0B1400,#0B0B14E6 30%,color-mix(in srgb,var(--tc) 55%,#0B0B14));box-shadow:inset 0 2px 0 #ffffff22,inset 0 -2px 0 color-mix(in srgb,var(--tc) 80%,#fff)}
+.sb-team.h{justify-content:flex-end;border-radius:16px 0 0 16px;background:linear-gradient(90deg,#0B0B1400,color-mix(in srgb,var(--tc) 70%,#02040C) 28%,var(--tc));box-shadow:inset 0 2px 0 #ffffff22,inset 0 -2px 0 color-mix(in srgb,var(--tc) 80%,#fff)}
+.sb-team.a{justify-content:flex-start;border-radius:0 16px 16px 0;background:linear-gradient(270deg,#0B0B1400,color-mix(in srgb,var(--tc) 70%,#02040C) 28%,var(--tc));box-shadow:inset 0 2px 0 #ffffff22,inset 0 -2px 0 color-mix(in srgb,var(--tc) 80%,#fff)}
+.sb-team .sb-name{color:var(--ink,#fff);text-shadow:var(--inks,0 2px 0 #0008)}
 .sb-name{max-width:120px;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
 .sb-crest{flex:none;width:24px;height:27px;display:flex;align-items:center;justify-content:center;clip-path:path('M12 0L24 4V14C24 21 18 25 12 27C6 25 0 21 0 14V4Z');background:linear-gradient(160deg,var(--tc) 55%,var(--tt) 55%);font:800 11px Exo2,sans-serif;font-style:normal;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
 .sb-red{display:inline-block;width:8px;height:11px;border-radius:1.5px;background:#FF3B3B;box-shadow:0 0 6px #FF3B3B}
@@ -69,6 +69,7 @@
 .sb-clock em{font-style:normal;padding:0 4px;border-radius:4px;background:#22C55E;color:#052E16;font-size:12px}
 .sb-clock i{position:absolute;left:0;bottom:0;height:2px;background:linear-gradient(90deg,#3DA9FF,#0A6CFF)}
 .sb-clock.late{color:#FF6B6B;animation:sbLate 1s steps(2) infinite}@keyframes sbLate{50%{color:#fff}}
+.sb-score.tc{background:linear-gradient(100deg,color-mix(in srgb,var(--hc) 82%,#02040C) 0 50%,color-mix(in srgb,var(--ac) 82%,#02040C) 50% 100%)}
 .sb.gold .sb-score{background:linear-gradient(180deg,#FFE08A,#FFC53D 55%,#C98A12);box-shadow:inset 0 2px 0 #ffffff88,inset 0 -3px 0 #7C4A03,0 0 0 2px #0B0B14,0 0 22px #FFC53DAA}
 .sb.gold .sb-n{text-shadow:0 0 10px #FDE68A}.sb.gold .sb-clock{color:#FFC53D}
 .pd-co-t{display:inline-block;padding:4px 18px 2px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-style:italic;font-size:34px;line-height:1;letter-spacing:1px;text-shadow:0 4px 0 #05050A;animation:pdCo .5s cubic-bezier(.2,1.4,.4,1) both}
@@ -156,17 +157,17 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <div style="position: absolute; left: 0; right: 0; top: 7px; height: 34px; display: flex; align-items: flex-start; justify-content: center; pointer-events: none">
     <span style="position: absolute; left: 12px; top: 2px; padding: 3px 10px; transform: skewX(0deg); background: {{modeColor}}; color: #0B0B14; font: 800 10px Exo2, sans-serif; letter-spacing: 1.5px; white-space: nowrap">{{modeLabel}}</span>
     <div class="{{sbCls}}">
-      <div class="sb-team h" style="--tc: {{homeC}}; --tt: {{homeT}}">
+      <div class="sb-team h" style="--tc: {{homeC}}; --tt: {{homeT}}; {{homeInk}}">
         <span class="sb-name" translate="no"><sc-for list="{{homeReds}}" item="x"><i class="sb-red"></i></sc-for>{{homeName}}</span>
         <span class="sb-crest"><b>{{homeIni}}</b></span>
       </div>
       <div class="sb-mid">
-        <div class="sb-score">
+        <div class="sb-score tc" style="--hc: {{homeC}}; --ac: {{awayC}}">
           <span key="{{s0Key}}" class="sb-n">{{s0}}</span><span class="sb-dash"></span><span key="{{s1Key}}" class="sb-n">{{s1}}</span>
         </div>
         <div class="{{clockCls}}"><span>{{clock}}</span><sc-if value="{{hasExtra}}" hint-placeholder-val="{{ false }}"><em>+{{extraN}}</em></sc-if><i style="{{progStyle}}"></i></div>
       </div>
-      <div class="sb-team a" style="--tc: {{awayC}}; --tt: {{awayT}}">
+      <div class="sb-team a" style="--tc: {{awayC}}; --tt: {{awayT}}; {{awayInk}}">
         <span class="sb-crest"><b>{{awayIni}}</b></span>
         <span class="sb-name" translate="no">{{awayName}}<sc-for list="{{awayReds}}" item="x"><i class="sb-red"></i></sc-for></span>
       </div>
@@ -266,7 +267,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </sc-if>
   <sc-if value="{{showGoal}}" hint-placeholder-val="{{ false }}">
-    <div class="{{goalCls}}" key="{{goalKey}}">
+    <div class="{{goalCls}}" key="{{goalKey}}" style="{{goalVars}}">
       <i class="pg-flash"></i><i class="pg-rays"></i><i class="pg-glow"></i>
       <div class="pg-band"><i class="pg-rim"></i><i class="pg-rim b"></i><i class="pg-streak"></i></div>
       <div class="pg-word"><span style="--i: 0">¡</span><span style="--i: 1">G</span><span style="--i: 2">O</span><span style="--i: 3">L</span><span style="--i: 4">!</span></div>
@@ -3780,6 +3781,19 @@ class Component extends DCLogic {
     return this._awayCol;
   }
   // your team wears the kit equipped in Taquilla (unless the mode sets the colours)
+  // colour helpers for the HUD: a team colour as rgb, its lightness, and mixes
+  rgbOf(c) { try { const x = new THREE.Color(c); return [x.r * 255, x.g * 255, x.b * 255]; } catch (e) { return [30, 139, 255]; } }
+  hexOf(r) { return '#' + r.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join(''); }
+  mixC(a, b, t) { return a.map((v, i) => v + (b[i] - v) * t); }
+  lumOf(r) { return (0.2126 * r[0] + 0.7152 * r[1] + 0.0722 * r[2]) / 255; }
+  // text on a team's colour: dark on light colours, white on the rest
+  inkFor(c) { return this.lumOf(this.rgbOf(c)) > 0.62 ? '--ink: #02040C; --inks: 0 1px 0 #ffffff66' : '--ink: #FFFFFF; --inks: 0 2px 0 #0009'; }
+  // the goal screen in the scoring team's colour (a very dark one is lifted so its glow still shows)
+  teamVars(c) {
+    const W = [255, 255, 255], K = [2, 4, 12], r = this.rgbOf(c), L = this.lumOf(r);
+    const glow = L < 0.18 ? this.mixC(r, W, 0.45) : L > 0.85 ? this.mixC(r, [30, 139, 255], 0.35) : r;
+    return '--c1: ' + this.hexOf(glow) + '; --c2: ' + this.hexOf(this.mixC(glow, W, 0.3)) + '; --c3: ' + this.hexOf(this.mixC(r, W, 0.7)) + '; --cf: ' + this.hexOf(r) + '; --cd: ' + this.hexOf(this.mixC(r, K, 0.45));
+  }
   homeKit() {
     if (!this._homeKit) {
       const o = window.AMChars && window.AMChars.outfit('futbol');
@@ -4748,7 +4762,8 @@ class Component extends DCLogic {
       crossBtnStyle: n > 1 && ctx === 'ball' && !gkc && !P.tutorial ? btn(186, 16, 56, '#FFC53D', '#B7871A', 13) : 'display: none;',
       sprintBtnStyle: btn(98, 92, 56, sprintOn ? '#FFC53D' : '#22D3EE', '#0E8FA3', 14, glow(tutI === 2)),
       showGoal: g.phase === 'goal' && !this.rp, scorerText: this.hl ? '' : g.scorer,
-      goalCls: 'pd-goal' + (g.concede === 0 ? ' them' : ''), goalKey: 'g' + g.score[0] + '-' + g.score[1],
+      goalCls: 'pd-goal' + (g.concede === 0 ? ' them' : ''), goalVars: this.teamVars(g.concede === 0 ? ac : hc),
+      homeInk: this.inkFor(hc), awayInk: this.inkFor(ac), goalKey: 'g' + g.score[0] + '-' + g.score[1],
       goalWho: (g.concede === 0 && !/propia/i.test(g.scorer || '') ? 'GOL DEL RIVAL' + (g.scorer ? ' · ' + String(g.scorer).replace(/^Gol de /, '').toUpperCase() : '') : String(g.scorer || '¡GOL!').toUpperCase()),
       goalScore: g.score[0] + ' - ' + g.score[1],
       showReplay: !!this.rp,
