@@ -17,7 +17,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 @keyframes rgPulse{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
 @keyframes rgDash{to{stroke-dashoffset:-24}}
 @keyframes rgPin{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.rg-node{position:absolute;width:64px;height:78px;margin:-39px 0 0 -32px;padding:0;border:0;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.rg-node{position:absolute;width:64px;height:82px;margin:-44px 0 0 -32px;padding:0;border:0;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
 .rg-node:hover{transform:translateY(-4px) scale(1.06)}
 .rg-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:linear-gradient(180deg,#0F062A 0%,#1E0D4F 55%,#2D0F60 100%);contain:layout paint}
 .rg-stars{position:absolute;inset:0 0 35% 0;background:radial-gradient(circle,#ffffffcc 1px,transparent 1.6px) 0 0/53px 41px,radial-gradient(circle,#ffffff88 .8px,transparent 1.4px) 21px 17px/37px 29px;-webkit-mask-image:linear-gradient(180deg,#000,transparent);mask-image:linear-gradient(180deg,#000,transparent)}
@@ -41,6 +41,15 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .rg-ped{position:absolute;left:50%;width:150px;height:26px;margin-left:-75px;border-radius:50%;pointer-events:none}
 .rg-bar{height:8px;border-radius:4px;background:#150925;box-shadow:inset 0 1px 2px #000a;overflow:hidden}
 .rg-bar i{display:block;height:100%;border-radius:4px}
+.rg-mt,.rg-cloud,.rg-aur{display:none}
+.rg-badge{display:block;filter:drop-shadow(0 6px 8px #000c);transition:filter .3s}
+.rg-badge.lk{filter:grayscale(.4) brightness(.72) drop-shadow(0 4px 6px #000c)}
+.rg-ped2{position:absolute;left:50%;top:40px;width:62px;height:16px;margin-left:-31px;border-radius:50%;background:radial-gradient(closest-side,var(--nc),transparent);opacity:.75;pointer-events:none}
+.rg-hero{position:absolute;left:18px;top:60px;width:282px;bottom:12px;box-sizing:border-box;padding:10px 12px 12px;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:space-between;background:radial-gradient(90% 55% at 50% 22%,color-mix(in srgb,var(--rc) 40%,transparent),transparent 70%),linear-gradient(180deg,#06102EE6,#02040CF2);box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--rc) 70%,#02040C),inset 0 2px 0 #ffffff22,0 0 24px color-mix(in srgb,var(--rc) 35%,transparent),0 10px 24px #000a}
+.rg-name{position:relative;margin-top:-6px;font-family:'Titulos',sans-serif;font-size:30px;line-height:1.05;letter-spacing:1px;background:linear-gradient(180deg,#FFFFFF 0%,color-mix(in srgb,var(--rc) 35%,#fff) 45%,var(--rc) 55%,color-mix(in srgb,var(--rc) 55%,#02040C) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1.5px #02040C;filter:drop-shadow(0 3px 0 #02040C) drop-shadow(0 0 12px color-mix(in srgb,var(--rc) 60%,transparent))}
+.rg-info{flex:1;height:44px;display:flex;align-items:center;gap:8px;padding:0 10px;min-width:0;border-radius:12px;background:linear-gradient(180deg,#06102EE6,#02040CF2);box-shadow:inset 0 0 0 1.5px var(--ic),inset 0 2px 0 #ffffff14,0 0 12px color-mix(in srgb,var(--ic) 30%,transparent)}
+.rg-info b{font-family:'Titulos',sans-serif;font-size:21px;color:var(--ic);text-shadow:0 2px 0 #02040C}
+.rg-info span{font-size:10px;line-height:1.2;font-weight:700;color:#DCE6F5}
 .rg-step{display:flex;align-items:center;gap:6px;padding:0 8px;min-width:0;border-radius:12px;box-shadow:inset 0 2px 0 #ffffff14,inset 0 -3px 0 #0007}
 </style>
 </helmet>
@@ -64,23 +73,16 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </div>
 
   <!-- the chosen rank, up close -->
-  <section style="{{heroStyle}}">
-    <div style="position: absolute; left: 50%; top: 92px; width: 300px; height: 300px; margin: -150px 0 0 -150px; border-radius: 50%; background: repeating-conic-gradient({{heroC}}33 0 9deg, transparent 11deg 24deg); -webkit-mask-image: radial-gradient(closest-side, #000, transparent); mask-image: radial-gradient(closest-side, #000, transparent); animation: rgSpin 30s linear infinite; pointer-events: none"></div>
+  <section class="rg-hero">
+    <div style="position: absolute; left: 50%; top: 86px; width: 320px; height: 320px; margin: -160px 0 0 -160px; border-radius: 50%; background: repeating-conic-gradient(color-mix(in srgb, var(--rc) 30%, transparent) 0 8deg, transparent 10deg 22deg); -webkit-mask-image: radial-gradient(closest-side, #000, transparent); mask-image: radial-gradient(closest-side, #000, transparent); pointer-events: none"></div>
     <div key="{{heroKey}}" style="position: relative; display: flex; flex-direction: column; align-items: center; animation: rgPop .45s cubic-bezier(.2,1.6,.4,1) both">
-      <span class="rg-ped" style="top: 104px; background: radial-gradient(closest-side, {{heroC}}AA, {{heroC}}22 60%, transparent)"></span>
-      <svg width="118" height="124" viewBox="-6 -12 76 82" style="animation: rgFloat 3s ease-in-out infinite; filter: drop-shadow(0 8px 12px #000a) drop-shadow(0 0 18px {{heroC}}88)">
-        <sc-if value="{{heroWings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{heroC}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{heroC}}"/></sc-if>
-        <path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{heroC}}"/>
-        <path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{heroC2}}"/>
-        <path d="M32 8L50 14V30C50 41 42 49 32 53Z" fill="#000000" opacity=".18"/>
-        <path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{heroC}}"/>
-        <sc-if value="{{heroCrown}}" hint-placeholder-val="{{ false }}"><path d="M20 6L21 -7L27 -1L32 -9L37 -1L43 -7L44 6Z" fill="#FFC53D" stroke="#7A4E0E" stroke-width="1.5" stroke-linejoin="round"/></sc-if>
-      </svg>
-      <span style="position: relative; padding: 2px 26px 4px; clip-path: polygon(0 0, 100% 0, 92% 50%, 100% 100%, 0 100%, 8% 50%); background: linear-gradient(90deg, {{heroC2}}, {{heroC2}}EE 50%, {{heroC2}}); font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 32px; line-height: 1; color: {{heroText}}; text-shadow: 0 3px 0 #0D0418, 0 0 20px {{heroC}}66">{{heroName}}</span>
-      <span style="margin-top: 4px; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #CACAE0">{{heroSub}}</span>
+      <span class="rg-ped" style="top: 118px; background: radial-gradient(closest-side, {{heroC}}AA, {{heroC}}22 60%, transparent)"></span>
+      <img class="rg-badge" src="{{heroBadge}}" alt="" width="132" height="143" style="animation: rgFloat 3s ease-in-out infinite">
+      <span class="rg-name">{{heroName}}</span>
+      <span style="margin-top: 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 1.5px; color: #BFD0EA">{{heroSub}}</span>
     </div>
     <!-- where you stand against this rank -->
-    <div key="{{heroKey}}p" style="position: relative; width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 14px; background: #150925AA; box-shadow: inset 0 0 0 1px {{heroC}}44; display: flex; flex-direction: column; gap: 5px; animation: rgPop .4s .1s cubic-bezier(.2,1.6,.4,1) both">
+    <div key="{{heroKey}}p" style="position: relative; width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 14px; background: #02040CB3; box-shadow: inset 0 0 0 1px {{heroC}}66; display: flex; flex-direction: column; gap: 5px; animation: rgPop .4s .1s cubic-bezier(.2,1.6,.4,1) both">
       <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px">
         <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 1.5px; color: {{heroText}}">{{progTitle}}</span>
         <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 15px; color: {{progColor}}">{{progRight}}</span>
@@ -104,20 +106,16 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <svg width="518" height="268" viewBox="0 0 518 268" style="position: absolute; inset: 0; overflow: visible">
       <defs><linearGradient id="rgPath" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#C07A3E"/><stop offset=".3" stop-color="#C9D2DF"/><stop offset=".5" stop-color="#F2C14E"/><stop offset=".7" stop-color="#6FB6FF"/><stop offset="1" stop-color="#FFE38A"/></linearGradient></defs>
       <path d="M0 268 L60 222 L118 236 L182 176 L246 190 L310 128 L372 140 L436 74 L518 40 L518 268Z" fill="#ffffff06"/>
-      <path d="{{pathD}}" fill="none" stroke="#3F246E" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="{{pathD}}" fill="none" stroke="#02040C" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
+      <path d="{{pathD}}" fill="none" stroke="#0A1A4A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="{{pathD}}" fill="none" stroke="#ffffff22" stroke-width="2" stroke-dasharray="6 6" stroke-linecap="round" style="animation: rgDash 1.4s linear infinite"/>
-      <path d="{{pathD}}" fill="none" stroke="url(#rgPath)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="{{pathDone}}" style="filter: drop-shadow(0 0 6px #FFC53D88)"/>
+      <path d="{{pathD}}" fill="none" stroke="url(#rgPath)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="{{pathDone}}" style="filter: drop-shadow(0 0 8px #3DA9FF)"/>
     </svg>
     <sc-for list="{{nodes}}" as="r" hint-placeholder-count="8">
       <button type="button" class="rg-node" onClick="{{r.pick}}" aria-label="{{r.name}}" style="{{r.pos}}">
         <sc-if value="{{r.sel}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 50%; top: 26px; width: 70px; height: 70px; margin: -35px 0 0 -35px; border-radius: 50%; background: radial-gradient(closest-side, {{r.c1}}88, transparent); animation: rgPulse 1.6s ease-in-out infinite"></span></sc-if>
-        <svg width="52" height="54" viewBox="-6 -12 76 82" style="{{r.svgStyle}}">
-          <sc-if value="{{r.wings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{r.c1}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{r.c1}}"/></sc-if>
-          <path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{r.c1}}"/>
-          <path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{r.c2}}"/>
-          <path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{r.c1}}"/>
-          <sc-if value="{{r.crown}}" hint-placeholder-val="{{ false }}"><path d="M20 6L21 -7L27 -1L32 -9L37 -1L43 -7L44 6Z" fill="#FFC53D" stroke="#7A4E0E" stroke-width="1.5" stroke-linejoin="round"/></sc-if>
-        </svg>
+        <span class="rg-ped2" style="--nc: {{r.c1}}"></span>
+        <img class="{{r.badgeCls}}" src="{{r.badge}}" alt="" style="{{r.svgStyle}}">
         <span style="{{r.labelStyle}}">{{r.short}}</span>
         <sc-if value="{{r.locked}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: 6px; top: 2px; width: 18px; height: 18px; border-radius: 9px; background: #150925; display: flex; align-items: center; justify-content: center"><svg width="10" height="10" viewBox="0 0 24 24" fill="#8686A6"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg></span></sc-if>
       </button>
@@ -136,9 +134,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 
   <!-- how you climb -->
   <div style="position: absolute; left: 312px; right: 14px; bottom: 12px; display: flex; gap: 8px">
-    <div class="rg-step" style="flex: 1; height: 44px; background: linear-gradient(135deg, #1D4A2E, #10261A); color: #53D88E"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px">+25</span><span style="font-size: 10.5px; line-height: 1.2; color: #CDEFD9">MMR por victoria<br>(+20 desde Campeón)</span></div>
-    <div class="rg-step" style="flex: 1; height: 44px; background: linear-gradient(135deg, #4A1D24, #261014); color: #FF8A8E"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px">−25</span><span style="font-size: 10.5px; line-height: 1.2; color: #F2CFD2">MMR por derrota<br>(−12 en Bronce)</span></div>
-    <div class="rg-step" style="flex: 1.3; height: 44px; background: linear-gradient(135deg, #2A2450, #221145); color: #C79BFF"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg><span style="font-size: 10.5px; line-height: 1.2; color: #E2D6FA">5 partidas de clasificación al empezar<br>cada temporada fijan tu rango</span></div>
+    <div class="rg-info" style="--ic: #34D399"><b>+25</b><span>MMR por victoria<br>(+20 desde Campeón)</span></div>
+    <div class="rg-info" style="--ic: #FF6B7A"><b>−25</b><span>MMR por derrota<br>(−12 en Bronce)</span></div>
+    <div class="rg-info" style="--ic: #3DA9FF; flex: 1.25"><b>5</b><span>partidas de clasificación<br>al empezar cada temporada</span></div>
   </div>
 </div>
 </x-dc>
@@ -186,6 +184,52 @@ class Component extends DCLogic {
     }
     return { progTitle: 'SUPERADO', progRight: '✓', progColor: '#53D88E', progBar: 'width: 100%; background: linear-gradient(90deg, #2F8A57, #53D88E)', progText: 'Ya has pasado por aquí. ¡Sigue subiendo!' };
   }
+  // each rank's badge, drawn as an SVG: a metal shield with the match ball, gaining ornaments as you climb
+  badge(r, k) {
+    const key = 'b' + k; this._bc = this._bc || {}; if (this._bc[key]) return this._bc[key];
+    const lt = (h, t) => { const n = parseInt(h.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255].map((v) => Math.round(v + (255 - v) * t)); return '#' + c.map((v) => v.toString(16).padStart(2, '0')).join(''); };
+    const dk = (h, t) => { const n = parseInt(h.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255].map((v) => Math.round(v * (1 - t))); return '#' + c.map((v) => v.toString(16).padStart(2, '0')).join(''); };
+    const c1 = r.c1, c2 = r.c2, O = '#02040C';
+    let g = '<defs><linearGradient id="m" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + lt(c1, 0.55) + '"/><stop offset=".45" stop-color="' + c1 + '"/><stop offset=".55" stop-color="' + dk(c1, 0.2) + '"/><stop offset="1" stop-color="' + dk(c1, 0.45) + '"/></linearGradient>' +
+      '<radialGradient id="f" cx=".5" cy=".35" r=".7"><stop offset="0" stop-color="' + lt(c2, 0.15) + '"/><stop offset="1" stop-color="' + dk(c2, 0.6) + '"/></radialGradient>' +
+      '<linearGradient id="gm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".4" stop-color="' + lt(c1, 0.3) + '"/><stop offset="1" stop-color="' + dk(c1, 0.3) + '"/></linearGradient>' +
+      '<radialGradient id="h" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="' + c1 + '" stop-opacity=".7"/><stop offset="1" stop-color="' + c1 + '" stop-opacity="0"/></radialGradient></defs>';
+    // Élite: a halo of rays behind everything
+    if (k >= 7) { g += '<circle cx="60" cy="62" r="60" fill="url(#h)"/>'; for (let a = 0; a < 16; a++) { const t = a / 16 * Math.PI * 2; g += '<path d="M60 62L' + (60 + Math.cos(t - 0.07) * 62).toFixed(1) + ' ' + (62 + Math.sin(t - 0.07) * 62).toFixed(1) + 'L' + (60 + Math.cos(t + 0.07) * 62).toFixed(1) + ' ' + (62 + Math.sin(t + 0.07) * 62).toFixed(1) + 'Z" fill="' + c1 + '" opacity=".28"/>'; } }
+    // Diamante: a cut diamond behind the shield
+    if (k === 4) g += '<path d="M60 2L112 60L60 126L8 60Z" fill="url(#gm)" stroke="' + O + '" stroke-width="3" stroke-linejoin="round"/><path d="M60 2L60 126M8 60L112 60" stroke="#ffffff55" stroke-width="1.5"/>';
+    // wings: Campeón and up (bigger for the top two)
+    if (k >= 5) {
+      const big = k >= 6 ? 1.25 : 1;
+      [-1, 1].forEach((sd) => {
+        for (let f = 0; f < 4; f++) {
+          const y = 34 + f * 13, L = (40 - f * 6) * big, x0 = 60 + sd * 30;
+          g += '<path d="M' + x0 + ' ' + (y + 8) + 'Q' + (x0 + sd * L * 0.6) + ' ' + (y - 10 - f * 2) + ' ' + (x0 + sd * L) + ' ' + (y - 6 + f * 3) + 'Q' + (x0 + sd * L * 0.55) + ' ' + (y + 6) + ' ' + x0 + ' ' + (y + 16) + 'Z" fill="url(#m)" stroke="' + O + '" stroke-width="2.5" stroke-linejoin="round"/>';
+        }
+      });
+    }
+    // Oro: laurel branches
+    if (k === 2 || k === 3) [-1, 1].forEach((sd) => { for (let f = 0; f < 5; f++) { const y = 34 + f * 15, x = 60 + sd * (40 + Math.sin(f / 4 * Math.PI) * 6); g += '<ellipse cx="' + x.toFixed(1) + '" cy="' + y + '" rx="5" ry="10" transform="rotate(' + (sd * (35 + f * 6)) + ' ' + x.toFixed(1) + ' ' + y + ')" fill="url(#m)" stroke="' + O + '" stroke-width="2"/>'; } });
+    // Plata: side spikes
+    if (k === 1) [-1, 1].forEach((sd) => { g += '<path d="M' + (60 + sd * 36) + ' 30L' + (60 + sd * 52) + ' 22L' + (60 + sd * 40) + ' 48Z" fill="url(#m)" stroke="' + O + '" stroke-width="2.5" stroke-linejoin="round"/>'; });
+    // the shield
+    const sh = k >= 3 ? 'M60 6L74 16L98 22V66C98 92 82 108 60 120C38 108 22 92 22 66V22L46 16Z' : 'M60 8L98 22V66C98 92 82 108 60 120C38 108 22 92 22 66V22Z';
+    g += '<path d="' + sh + '" fill="url(#m)" stroke="' + O + '" stroke-width="3.5" stroke-linejoin="round"/>';
+    g += '<path d="M60 20L88 30V66C88 86 76 99 60 108C44 99 32 86 32 66V30Z" fill="url(#f)" stroke="' + dk(c1, 0.5) + '" stroke-width="2"/>';
+    g += '<path d="M60 20L88 30V48C78 42 70 40 60 40C50 40 42 42 32 48V30Z" fill="#ffffff" opacity=".12"/>';
+    // the ball in the middle
+    g += '<circle cx="60" cy="64" r="17" fill="#F7F8FC" stroke="' + O + '" stroke-width="2.5"/><path d="M60 55L68 61L65 70H55L52 61Z" fill="' + O + '"/>' +
+      '<path d="M60 55V48M68 61L75 58M65 70L70 77M55 70L50 77M52 61L45 58" stroke="' + O + '" stroke-width="2"/>';
+    // stars under the ball: one more for each rank inside a group of three
+    const ns = k < 7 ? (k % 3) + 1 : 3;
+    for (let q = 0; q < ns; q++) { const x = 60 + (q - (ns - 1) / 2) * 13, y = 94; g += '<path d="M' + x + ' ' + (y - 6) + 'l1.8 3.8 4.2.6-3 2.9.7 4.1-3.7-2-3.7 2 .7-4.1-3-2.9 4.2-.6z" fill="' + lt(c1, 0.4) + '" stroke="' + O + '" stroke-width="1.2"/>'; }
+    // Platino: a gem on top
+    if (k === 3) g += '<path d="M60 0L68 9L60 20L52 9Z" fill="url(#gm)" stroke="' + O + '" stroke-width="2.5" stroke-linejoin="round"/>';
+    // crowns: Super campeón and Élite
+    if (k >= 6) g += '<path d="M40 14L42 -6L51 4L60 -10L69 4L78 -6L80 14Z" fill="#FFC53D" stroke="' + O + '" stroke-width="3" stroke-linejoin="round"/><circle cx="60" cy="4" r="3" fill="#FF3D7F" stroke="' + O + '" stroke-width="1.5"/><path d="M42 10H78" stroke="#FFF2B8" stroke-width="2" opacity=".7"/>';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -14 132 144" width="132" height="144">' + g + '</svg>';
+    return (this._bc[key] = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
+  }
   tierOf(m) { const R = this.ranks(); let i = R.length - 1; while (i > 0 && m < R[i].start) i--; return i; }
   fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
   renderVals() {
@@ -207,7 +251,7 @@ class Component extends DCLogic {
       return {
         n: String(k + 1),
         range: hi === null ? this.fmt(lo) + '+' : this.fmt(lo) + '–' + this.fmt(hi),
-        style: 'flex: 1; height: ' + (34 + k * 9) + 'px; color: ' + (yours ? '#150925' : r.text) + '; background: ' + (yours ? r.c1 : 'linear-gradient(180deg, ' + r.c2 + 'cc, #150925)') + ';' + (yours ? ' box-shadow: inset 0 2px 0 #ffffff66, inset 0 -3px 0 #0005, 0 0 14px ' + r.c1 + '88;' : '')
+        style: 'flex: 1; height: ' + (34 + k * 9) + 'px; color: ' + (yours ? '#150925' : r.text) + '; background: ' + (yours ? r.c1 : 'linear-gradient(180deg, ' + r.c2 + 'aa, #02040C)') + '; box-shadow: inset 0 0 0 1.5px ' + r.c1 + '66;' + (yours ? ' box-shadow: inset 0 2px 0 #ffffff66, inset 0 -3px 0 #0005, 0 0 14px ' + r.c1 + '88;' : '')
       };
     });
     const rnd = (k) => { const x = Math.sin(k * 77.3) * 43758.5; return x - Math.floor(x); };
@@ -217,7 +261,7 @@ class Component extends DCLogic {
       season: 'Temporada 1',
       heroStyle: 'position: absolute; left: 18px; top: 60px; width: 282px; bottom: 12px; box-sizing: border-box; padding: 14px 12px 12px; border-radius: 22px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between; background: radial-gradient(90% 60% at 50% 25%, ' + r.c2 + '88, #1D0E43 70%); box-shadow: inset 0 2px 0 #ffffff18, inset 0 -4px 0 #0008, inset 0 0 0 2px ' + r.c1 + '55, 0 10px 24px #0008;',
       heroKey: 'h' + sel, heroC: r.c1, heroC2: r.c2, heroText: r.text, heroName: r.name.toUpperCase(),
-      heroWings: !!r.wings, heroCrown: !!r.crown,
+      heroWings: !!r.wings, heroCrown: !!r.crown, heroBadge: this.badge(r, i),
       heroSub: '3 DIVISIONES · ≈ ' + r.wins + ' VICTORIAS CADA UNA',
       divs,
       pathD, pathDone: along.toFixed(1) + ' 100',
@@ -225,8 +269,9 @@ class Component extends DCLogic {
         name: x.name, short: x.short, c1: x.c1, c2: x.c2, wings: !!x.wings, crown: !!x.crown,
         sel: x.id === sel, locked: k > mi,
         pos: 'left: ' + P[k][0] + 'px; top: ' + P[k][1] + 'px;',
-        svgStyle: 'position: relative; filter: drop-shadow(0 4px 6px #000a)' + (k > mi ? ' grayscale(.75) brightness(.6)' : '') + ';',
-        labelStyle: 'position: relative; margin-top: -2px; padding: 1px 7px; border-radius: 8px; background: #150925D9; font: 800 10px Exo2, sans-serif; white-space: nowrap; color: ' + (x.id === sel ? x.text : k > mi ? '#6A6A8A' : '#CACAE0') + ';',
+        badge: this.badge(x, k), badgeCls: 'rg-badge' + (k > mi ? ' lk' : ''),
+        svgStyle: 'position: relative; width: ' + (x.id === sel ? 62 : 52) + 'px; height: ' + (x.id === sel ? 68 : 57) + 'px;',
+        labelStyle: 'position: relative; margin-top: -2px; padding: 1px 7px; border-radius: 8px; background: #02040CE0; box-shadow: inset 0 0 0 1px ' + (x.id === sel ? x.c1 : '#1E8BFF44') + '; font: 800 10px Exo2, sans-serif; white-space: nowrap; color: ' + (x.id === sel ? x.text : k > mi ? '#6A7A9A' : '#DCE6F5') + ';',
         pick: () => this.setState({ sel: x.id })
       })),
       pinArrow: py > 90 ? 'width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #22D3EE' : 'order: -1; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 8px solid #22D3EE',

@@ -1,5 +1,5 @@
 /* Network-first so every update you publish reaches the phone; cache is the offline fallback. */
-const CACHE = 'arenamix-v309';
+const CACHE = 'arenamix-v310';
 const CORE = ['./', 'index.html', 'app.js', 'manifest.webmanifest', 'vendor/preact.min.js', 'vendor/three.min.js', 'vendor/GLTFLoader.js', 'vendor/SkeletonUtils.js', 'chars.js', 'gear.js', 'posters.js', 'hero.js', 'progress.js', 'results.js', 'daily.js', 'sfx.js', 'online.js', 'social.js', 'mystad.js', 'vendor/peerjs.min.js', 'grass.js', 'sky.js', 'ball.js', 'vendor/RGBELoader.js', 'stadium.js', 'music.js', 'ui-fx.js', 'juice.js', 'i18n.js', 'i18n-en.js', 'assets/stadium/stadium.glb', 'assets/stadium/seats.json', 'assets/stadium/goal.glb', 'assets/sky/stadium_bg.jpg', 'assets/sky/stadium_env.hdr', 'assets/grass/color.jpg', 'assets/grass/normal.jpg', 'assets/grass/rough.jpg', 'assets/chars/anims.json', 'assets/ball/starball.webp?v=1', 'icons/logo-192.png', 'privacidad.html', 'icons/loading-bg3.jpg', 'icons/ld-ball.webp?v=1', 'assets/lobby_bg.jpg', 'assets/bg_estadio.jpg', 'assets/bg_tribuna.jpg', 'assets/bg_trofeos.jpg', 'assets/grain.png', 'vendor/fonts/luckiestguy-latin.woff2', 'vendor/fonts/russoone-latin.woff2', 'vendor/fonts/lilitaone-latin.woff2', 'vendor/fonts/rajdhani-500.woff2', 'vendor/fonts/rajdhani-600.woff2', 'vendor/fonts/rajdhani-700.woff2'];
 
 self.addEventListener('install', (e) => {
