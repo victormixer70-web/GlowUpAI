@@ -11,6 +11,32 @@
 <helmet>
 <style>
 @keyframes pdLive{0%,100%{opacity:1}50%{opacity:.25}}
+.pd-goal{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;--c1:#1E8BFF;--c2:#3DA9FF;--c3:#BFE6FF;--cd:#0A3DCC}
+.pd-goal.them{--c1:#FF3B4A;--c2:#FF7A6B;--c3:#FFD0CC;--cd:#9A0F1E}
+/* the play's buttons step aside while the goal is celebrated */
+:has(> .pd-goal) > button,:has(> .pd-goal) > [aria-label^="Zona del joystick"],:has(> .pd-goal) > [aria-label^="Zona del joystick"] + div,:has(> .pd-goal) > div:has(> button){opacity:0!important;transition:opacity .25s}
+.pg-flash{position:absolute;inset:0;background:radial-gradient(60% 70% at 50% 50%,#FFFFFF,var(--c3) 40%,transparent 80%);opacity:0;animation:pgFlash .55s ease-out both}
+@keyframes pgFlash{0%{opacity:.95}100%{opacity:0}}
+.pg-glow{position:absolute;left:50%;top:50%;width:760px;height:420px;margin:-210px 0 0 -380px;background:radial-gradient(closest-side,color-mix(in srgb,var(--c1) 55%,transparent),transparent);animation:pgIn .4s both}
+.pg-rays{position:absolute;left:50%;top:50%;width:900px;height:900px;margin:-450px 0 0 -450px;border-radius:50%;background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--c2) 38%,transparent) 0deg 6deg,transparent 6deg 18deg);opacity:0;animation:pgRays 3.2s ease-out both;will-change:transform,opacity}
+@keyframes pgRays{0%{opacity:0;transform:scale(.3) rotate(0)}12%{opacity:.75}100%{opacity:.35;transform:scale(1) rotate(40deg)}}
+@keyframes pgIn{from{opacity:0;transform:scale(.6)}}
+.pg-band{position:absolute;left:-60px;right:-60px;top:50%;height:150px;margin-top:-62px;transform:skewY(-5deg);transform-origin:0 50%;background:linear-gradient(180deg,#02040CF2,#06102EF2 50%,#02040CF2);animation:pgBand .42s .05s cubic-bezier(.2,1.1,.3,1) both;box-shadow:0 0 40px color-mix(in srgb,var(--c1) 50%,transparent)}
+@keyframes pgBand{from{transform:skewY(-5deg) scaleX(0)}}
+.pg-rim{position:absolute;left:0;right:0;top:0;height:5px;background:linear-gradient(90deg,transparent,var(--c1) 15%,var(--c3) 50%,var(--c1) 85%,transparent);box-shadow:0 0 14px var(--c1)}
+.pg-rim.b{top:auto;bottom:0}
+.pg-streak{position:absolute;top:0;bottom:0;width:180px;left:0;background:linear-gradient(100deg,transparent,#FFFFFF33,transparent);animation:pgStreak 1.6s .4s ease-in-out infinite}
+@keyframes pgStreak{from{transform:translateX(-200px) skewX(-20deg)}to{transform:translateX(1100px) skewX(-20deg)}}
+.pg-word{position:absolute;left:0;right:0;top:50%;margin-top:-68px;display:flex;justify-content:center;transform:rotate(-5deg)}
+.pg-word span{display:inline-block;font-family:'Titulos',sans-serif;font-size:132px;line-height:1.08;padding:0 2px;background:linear-gradient(180deg,#FFFFFF 0%,#F2F5FB 42%,#AEB9CF 50%,#E3E9F4 72%,#8D9AB6 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:3px #02040C;filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 18px var(--c1));animation:pgLetter .55s calc(.12s + var(--i) * .07s) cubic-bezier(.2,1.8,.4,1) both}
+.pd-goal.them .pg-word span{background:linear-gradient(180deg,#FFE3E0 0%,#FF8A80 45%,#FF3B4A 52%,#9A0F1E 100%);-webkit-background-clip:text;background-clip:text}
+@keyframes pgLetter{0%{opacity:0;transform:translateY(-160px) scale(2.2) rotate(-14deg)}60%{opacity:1}100%{opacity:1;transform:none}}
+.pg-sub{position:absolute;left:0;right:0;top:50%;margin-top:84px;display:flex;justify-content:center;align-items:center;gap:12px;animation:pgSub .45s .55s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes pgSub{from{opacity:0;transform:translateY(24px) scale(.8)}}
+.pg-who,.pg-score{display:inline-block;transform:skewX(-14deg);padding:5px 16px 4px;font-family:'Titulos',sans-serif;font-size:20px;letter-spacing:1px;color:#F4F7FF;background:linear-gradient(180deg,#0A1A4A,#02040C);box-shadow:0 0 0 2.5px #02040C,0 0 0 4.5px var(--c1),0 0 18px color-mix(in srgb,var(--c1) 60%,transparent);text-shadow:0 2px 0 #02040C}
+.pg-score{font-size:24px;padding:3px 14px 2px;background:linear-gradient(180deg,var(--c2),var(--cd))}
+.pg-sp{position:absolute;left:50%;top:50%;width:26px;height:4px;margin:-2px 0 0 -13px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--c3),#FFFFFF);box-shadow:0 0 8px var(--c2);opacity:0;transform:rotate(var(--a)) translateX(20px);animation:pgSp .7s .1s ease-out both}
+@keyframes pgSp{0%{opacity:1;transform:rotate(var(--a)) translateX(20px) scaleX(.4)}70%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) scaleX(1.4)}}
 .pd-cd{position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(40% 55% at 50% 50%,#02040C99,transparent 75%)}
 .pd-cd b{font-family:'Titulos',sans-serif;font-size:150px;line-height:1;background:linear-gradient(180deg,#FFFFFF 10%,#BFE3FF 50%,#1E8BFF);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 26px #1E8BFF);animation:pdCdPop 1s cubic-bezier(.2,1.6,.4,1) both}
 .pd-cd b.go{font-size:96px;background:linear-gradient(180deg,#FFF6C8,#FFC53D 60%,#F59E0B);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 26px #FFC53D)}
@@ -240,9 +266,12 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </sc-if>
   <sc-if value="{{showGoal}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; pointer-events: none">
-      <span style="{{goalStyle}}">¡GOL!</span>
-      <span style="padding: 3px 12px; border-radius: 8px; background: #0B0B14CC; font-weight: 800; font-size: 14px">{{scorerText}}</span>
+    <div class="{{goalCls}}" key="{{goalKey}}">
+      <i class="pg-flash"></i><i class="pg-rays"></i><i class="pg-glow"></i>
+      <div class="pg-band"><i class="pg-rim"></i><i class="pg-rim b"></i><i class="pg-streak"></i></div>
+      <div class="pg-word"><span style="--i: 0">¡</span><span style="--i: 1">G</span><span style="--i: 2">O</span><span style="--i: 3">L</span><span style="--i: 4">!</span></div>
+      <div class="pg-sub"><span class="pg-who">{{goalWho}}</span><span class="pg-score">{{goalScore}}</span></div>
+      <i class="pg-sp" style="--a: 10deg; --d: 260px"></i><i class="pg-sp" style="--a: 35deg; --d: 320px; animation-delay: .05s"></i><i class="pg-sp" style="--a: 62deg; --d: 240px"></i><i class="pg-sp" style="--a: 100deg; --d: 300px; animation-delay: .08s"></i><i class="pg-sp" style="--a: 140deg; --d: 280px"></i><i class="pg-sp" style="--a: 168deg; --d: 340px; animation-delay: .04s"></i><i class="pg-sp" style="--a: 195deg; --d: 260px"></i><i class="pg-sp" style="--a: 222deg; --d: 330px; animation-delay: .1s"></i><i class="pg-sp" style="--a: 250deg; --d: 220px"></i><i class="pg-sp" style="--a: 290deg; --d: 300px; animation-delay: .06s"></i><i class="pg-sp" style="--a: 318deg; --d: 260px"></i><i class="pg-sp" style="--a: 342deg; --d: 320px; animation-delay: .03s"></i>
     </div>
   </sc-if>
 
@@ -4719,6 +4748,9 @@ class Component extends DCLogic {
       crossBtnStyle: n > 1 && ctx === 'ball' && !gkc && !P.tutorial ? btn(186, 16, 56, '#FFC53D', '#B7871A', 13) : 'display: none;',
       sprintBtnStyle: btn(98, 92, 56, sprintOn ? '#FFC53D' : '#22D3EE', '#0E8FA3', 14, glow(tutI === 2)),
       showGoal: g.phase === 'goal' && !this.rp, scorerText: this.hl ? '' : g.scorer,
+      goalCls: 'pd-goal' + (g.concede === 0 ? ' them' : ''), goalKey: 'g' + g.score[0] + '-' + g.score[1],
+      goalWho: (g.concede === 0 && !/propia/i.test(g.scorer || '') ? 'GOL DEL RIVAL' + (g.scorer ? ' · ' + String(g.scorer).replace(/^Gol de /, '').toUpperCase() : '') : String(g.scorer || '¡GOL!').toUpperCase()),
+      goalScore: g.score[0] + ' - ' + g.score[1],
       showReplay: !!this.rp,
       hasVoice: !!this.voice && g.phase !== 'winners',
       micOn: this.voice && this.voice.on ? 'true' : 'false', micMuted: !(this.voice && this.voice.on),
