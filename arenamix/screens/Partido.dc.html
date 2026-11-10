@@ -3086,7 +3086,22 @@ class Component extends DCLogic {
       // the model is open on the side-on camera's side; for the cameras that look along the pitch (Pro and
       // goalkeeper) the bowl is closed with a mirror image of its far half, each half clipped at the halfway
       // plane z = 0 so they meet cleanly
-      let seatList = STAD.seats().map(([x, y, z]) => [x * KX, y, z * KZ]);
+      let seatList = STAD.seats().map(([x, y, z]) => [x * KX, y, z * KZ, z < 0 ? 'f' : 'o']);
+      this.bowl = null;
+      if (!full) {
+        // the side-on cameras keep the near side open (it would hide the pitch), but the replays, the intro
+        // and the line-up look into it: the same mirrored near half is built, hidden, and shown for those
+        this.R.localClippingEnabled = false;
+        const clipTo = (m, nz) => m.traverse((o) => {
+          if (!o.isMesh) return;
+          const mats = [].concat(o.material).map((mt) => { const c2 = mt.clone(); c2.clippingPlanes = [new T.Plane(new T.Vector3(0, 0, nz), 0)]; return c2; });
+          o.material = mats.length === 1 ? mats[0] : mats;
+        });
+        clipTo(model, -1);
+        const mirror = STAD.model(); mirror.position.y = -0.03; mirror.scale.set(KX, 1, -KZ); if (night) dim(mirror); clipTo(mirror, 1); mirror.visible = false; S.add(mirror);
+        this.bowl = { mirror, o: [], c: [], closed: false };
+        seatList = seatList.concat(seatList.filter((q) => q[3] === 'f').map(([x, y, z]) => [x, y, -z, 'c']));
+      }
       if (full) {
         this.R.localClippingEnabled = true;
         const clipTo = (m, nz) => m.traverse((o) => {
@@ -3097,7 +3112,7 @@ class Component extends DCLogic {
         clipTo(model, -1);
         const mirror = STAD.model(); mirror.position.y = -0.03; mirror.scale.set(KX, 1, -KZ); if (night) dim(mirror); clipTo(mirror, 1); S.add(mirror);
         const far = seatList.filter((q) => q[2] < 0);
-        seatList = far.concat(far.map(([x, y, z]) => [x, y, -z]));
+        seatList = far.concat(far.map(([x, y, z]) => [x, y, -z, 'f']));
       }
       // a fuller house: more fans squeezed in along each row wherever the seats leave a gap
       {
@@ -3107,10 +3122,10 @@ class Component extends DCLogic {
         seatList.forEach(add);
         const extra = [];
         const fillK = this.gfxNow === 'alta' ? 1 : this.gfxNow === 'media' ? 0.45 : 0;
-        seatList.forEach(([x, y, z]) => {
+        seatList.forEach(([x, y, z, tag]) => {
           if (Math.random() >= fillK) return;
           const endS = Math.abs(x) > 31, tx = endS ? 0 : 1, tz = endS ? 1 : 0;
-          [-1, 1].forEach((d) => { const nx = x + tx * d * 0.5, nz = z + tz * d * 0.5; if (!near(nx, y, nz)) { const q = [nx, y, nz]; add(q); extra.push(q); } });
+          [-1, 1].forEach((d) => { const nx = x + tx * d * 0.5, nz = z + tz * d * 0.5; if (!near(nx, y, nz)) { const q = [nx, y, nz, tag]; add(q); extra.push(q); } });
         });
         seatList = seatList.concat(extra);
       }
@@ -3118,25 +3133,33 @@ class Component extends DCLogic {
       // fans in the model's seats, facing the pitch; ultras behind the goals
       // low graphics: a thinner crowd (most of the triangles on screen are fans)
       const skipK = this.gfxNow === 'baja' ? 0.55 : 0.04;
-      seatList.forEach(([wx, wy, wz]) => {
+      seatList.forEach(([wx, wy, wz, tag]) => {
         if (Math.random() < skipK) return;
         const tx = Math.max(-26, Math.min(26, wx)), rotY = Math.atan2(tx - wx, -wz);
         const team = wx < 0 ? 0 : 1, ultra = Math.abs(wx) > 31, row = Math.round(wy / 0.5);
         const key = (wz < -18 ? 'far' : wz > 18 ? 'near' : Math.abs(wx) > 31 ? (wx < 0 ? 'west' : 'east') : 'side') + ':' + Math.floor((wx + 60) / 8) + ':' + (ultra ? 'u' : 'n');
-        put(key, team, ultra, wx, wy - 0.02, wz, rotY, fanColor(team, ultra, row));
+        put(key + (tag === 'o' || tag === 'c' ? ':' + tag : ''), team, ultra, wx, wy - 0.02, wz, rotY, fanColor(team, ultra, row));
       });
     } else {
     addStand('far', 0, -19, 71.2, Math.PI, () => true);
     addStand('west', -35.6, kv ? 0 : 8, kv ? 38 : 54, -Math.PI / 2, () => true);
     addStand('east', 35.6, kv ? 0 : 8, kv ? 38 : 54, Math.PI / 2, () => true);
     addCorner('cw', -35.6, -19, Math.PI); addCorner('ce', 35.6, -19, Math.PI / 2);
-    // the near touchline stand is behind the normal camera, so it is only built when it can be seen (goalkeeper view)
+    // the near touchline stand is behind the normal camera: always there for the goalkeeper view, and built
+    // hidden otherwise, shown for the replays, the intro and the line-up (which look into it)
     if (kv) { addStand('near', 0, 19, 71.2, 0, () => true); addCorner('nw', -35.6, 19, Math.PI * 1.5); addCorner('ne', 35.6, 19, 0); }
+    else {
+      const n0 = S.children.length, sA = seatSpots.length, tA = stepSpots.length;
+      addStand('near', 0, 19, 71.2, 0, () => true); addCorner('nw', -35.6, 19, Math.PI * 1.5); addCorner('ne', 35.6, 19, 0);
+      const nearG = new T.Group(); S.children.slice(n0).forEach((o) => nearG.add(o)); nearG.visible = false; S.add(nearG);
+      // its seats and steps go with it (drawn as their own blocks, inside the hidden group)
+      this.bowl = { mirror: nearG, o: [], c: [], closed: false, noClip: true, nearKeys: true, seats: seatSpots.splice(sA), steps: stepSpots.splice(tA) };
+    }
     }
     // crowd: one group per section so whole blocks can bounce cheaply
     this.fanGroups = [];
     const m4 = new T.Matrix4(), q = new T.Quaternion(), sc = new T.Vector3(1, 1, 1), pos = new T.Vector3(), col = new T.Color(), up = new T.Vector3(0, 1, 0);
-    sections.forEach((sec) => {
+    sections.forEach((sec, skey) => {
       const n = sec.items.length, grp = new T.Group();
       // a look per fan: ultras mostly with scarves held up and arms up, the rest mostly calm
       const lookOf = sec.items.map(() => pickLook(sec.ultra));
@@ -3173,7 +3196,21 @@ class Component extends DCLogic {
       const spots = []; for (let j = 0; j < Math.min(10, n); j++) { const it = sec.items[Math.floor(Math.random() * n)]; spots.push([it.wx, it.wy, it.wz]); }
       grp.userData = { team: sec.team, ultra: sec.ultra, ph: Math.random() * 6.28, w: sec.ultra ? 6.5 + Math.random() : 1.5 + Math.random(), at: mid ? [mid.wx, mid.wy, mid.wz] : null, spots };
       this.fanGroups.push(grp);
+      // the near-side blocks: the model's own (open view) or the mirrored ones (closed view)
+      const bt = /:([oc])$/.exec(skey);
+      if (bt && this.bowl) { this.bowl[bt[1]].push(grp); grp.visible = bt[1] === 'o'; }
+      else if (this.bowl && this.bowl.nearKeys && /^(near|nw|ne)/.test(skey)) { this.bowl.c.push(grp); grp.visible = false; }
     });
+    const nearSeats = this.bowl && this.bowl.seats;
+    if (nearSeats && nearSeats.length) {
+      const seats = new T.InstancedMesh(seatGeo, this.mat(0xffffff, { roughness: 0.6 }), nearSeats.length);
+      const steps = new T.InstancedMesh(new T.BoxGeometry(0.62, 0.05, 0.8), this.mat(0x8a90a3, { roughness: 0.9 }), Math.max(1, this.bowl.steps.length));
+      const seatCols = [new T.Color('#24304f'), new T.Color('#2b3a5e')].map((c) => c.convertSRGBToLinear());
+      nearSeats.forEach((s2, i) => { q.setFromAxisAngle(up, s2.rotY); sc.set(1, 1, 1); m4.compose(pos.set(s2.x, s2.y, s2.z), q, sc); seats.setMatrixAt(i, m4); seats.setColorAt(i, seatCols[i % 2]); });
+      this.bowl.steps.forEach((s2, i) => { q.setFromAxisAngle(up, s2.rotY); m4.compose(pos.set(s2.x, s2.y + 0.02, s2.z), q, sc); steps.setMatrixAt(i, m4); });
+      steps.count = this.bowl.steps.length;
+      this.bowl.mirror.add(seats); this.bowl.mirror.add(steps);
+    }
     if (seatSpots.length) {
       const seats = new T.InstancedMesh(seatGeo, this.mat(0xffffff, { roughness: 0.6 }), seatSpots.length);
       const steps = new T.InstancedMesh(new T.BoxGeometry(0.62, 0.05, 0.8), this.mat(0x8a90a3, { roughness: 0.9 }), stepSpots.length);
@@ -3756,11 +3793,14 @@ class Component extends DCLogic {
     if (g.phase !== 'play' && !(g.phase === 'goal' && g.pt < 1.3)) return;
     const b = g.ball, buf = this.rbuf || (this.rbuf = []);
     buf.push({
-      ps: g.ps.map((p) => [p.x, p.y, p.face, p.run, p.turn || 0, p.vx, p.vy, p.act ? { type: p.act.type, t: p.act.t, dur: p.act.dur, loft: p.act.loft, s: p.act.s, h: p.act.h, face: p.act.face, from: p.act.from, lock: p.act.lock } : null, p.touchAnim || 0]),
+      ps: g.ps.map((p) => [p.x, p.y, p.face, p.run, p.turn || 0, p.vx, p.vy, p.act ? this.actCopy(p.act) : null, p.touchAnim || 0]),
       b: [b.x, b.y, b.z, b.vx, b.vy, b.vz], dt: this.lastDt || 0.016
     });
     if (buf.length > 260) buf.shift();
   }
+  // every plain value of an action (its side, trick, flight...): the animations need them all, and a missing one
+  // turned a player's pose into NaN, so he vanished from the replay for that moment
+  actCopy(a) { const o = {}; for (const k in a) { const v = a[k]; if (v == null || typeof v === 'number' || typeof v === 'string' || typeof v === 'boolean') o[k] = v; } return o; }
   startReplay() {
     const buf = this.rbuf || [];
     // from about 2.8 s before the goal
@@ -4012,6 +4052,15 @@ class Component extends DCLogic {
     this.camPos.lerp(want, f); this.camLook.lerp(look, f);
     this.cam.position.copy(this.camPos);
     this.cam.lookAt(this.camLook);
+    }
+    // the near stand: closed for the cameras that look into it (replays, the intro, the line-up)
+    if (this.bowl) {
+      const closed = !!this.inReplayDraw || g.phase === 'intro' || g.phase === 'winners';
+      if (closed !== this.bowl.closed) {
+        const B = this.bowl; B.closed = closed;
+        B.mirror.visible = closed; if (!B.noClip) this.R.localClippingEnabled = closed;
+        B.o.forEach((x) => { x.visible = !closed; }); B.c.forEach((x) => { x.visible = closed; });
+      }
     }
     const tnow = performance.now() / 1000, scoring = g.phase === 'goal' ? 1 - g.concede : g.phase === 'intro' && this.flare ? this.flare.team : -1;
     (this.fanGroups || []).forEach((fg) => {
