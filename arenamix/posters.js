@@ -306,9 +306,9 @@
     }, 30);
   }
   // kept on the phone too, so the cards have their pictures straight away next time the app is opened
-  var PKEY = 'arenamix.poster2.';
+  var PKEY = 'arenamix.poster3.';   // 3: the new star ball
   // the pictures kept by an older version were smaller: let them go
-  try { for (var oi = localStorage.length - 1; oi >= 0; oi--) { var ok = localStorage.key(oi); if (ok && ok.indexOf('arenamix.poster.') === 0) localStorage.removeItem(ok); } } catch (e) {}
+  try { for (var oi = localStorage.length - 1; oi >= 0; oi--) { var ok = localStorage.key(oi); if (ok && (ok.indexOf('arenamix.poster.') === 0 || ok.indexOf('arenamix.poster2.') === 0)) localStorage.removeItem(ok); } } catch (e) {}
   function stored(key) { try { return localStorage.getItem(PKEY + key); } catch (e) { return null; } }
   function store(key, url) {
     if (!url) return;
