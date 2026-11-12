@@ -1651,7 +1651,7 @@ class Component extends DCLogic {
       if (sp > 0.5) p.face += this.ang(Math.atan2(p.vy, p.vx) - p.face) * Math.min(1, dt * 8);
       if (sp > 0.25) p.run += 2 * Math.PI * (0.9 + 0.09 * sp) * dt;
     });
-    if (g.pt > 1.4 && !this.rp && !this.rpDone && !this.props.tutorial && !this.props.practice) this.startReplay();
+    if (g.pt > 2.5 && !this.rp && !this.rpDone && !this.props.tutorial && !this.props.practice) this.startReplay();
     if (this.props.practice && g.pt > 1.8) { g.phase = 'play'; g.pt = 0; this.practiceReset(); return; }
     if (g.pt > 3 && !this.rp && this.props.rules === 'oro') { this.rpDone = false; g.t = 0; g.charging = false; this.setupWinners(); return; }
     if (g.pt > 3 && !this.rp) { this.rpDone = false; if (this.props.tutorial) { this.tutSetup(6); g.phase = 'play'; g.pt = 0; return; } this.kickoff(g.concede); g.phase = 'play'; g.pt = 0; this.sfx('whistle', 1); }
@@ -1683,7 +1683,7 @@ class Component extends DCLogic {
       if (c.pen > 0) {
         const [nd, nz] = c.n;
         let vn = vout * nd + b.vz * nz;
-        vn += (-260 * c.pen - 16 * vn) * dt;
+        vn += (-140 * c.pen - 11 * vn) * dt;   // a soft net: the ball sinks well into it
         if (vn < 0) vn *= Math.exp(-10 * dt);
         let pen = c.pen;
         if (pen > c.give) { const back = pen - c.give; dep -= nd * back; b.z -= nz * back; pen = c.give; if (vn > 0) vn = 0; }
@@ -4769,7 +4769,8 @@ class Component extends DCLogic {
       // CENTRO: team modes, with the ball, left of PASE
       crossBtnStyle: n > 1 && ctx === 'ball' && !gkc && !P.tutorial ? btn(186, 16, 56, '#FFC53D', '#B7871A', 13) : 'display: none;',
       sprintBtnStyle: btn(98, 92, 56, sprintOn ? '#FFC53D' : '#22D3EE', '#0E8FA3', 14, glow(tutI === 2)),
-      showGoal: g.phase === 'goal' && !this.rp, scorerText: this.hl ? '' : g.scorer,
+      // the GOAL screen waits until the ball has hit the net (you see it go in first), then stays a good while
+      showGoal: g.phase === 'goal' && !this.rp && (g.pt > 0.95 || !!this.rpDone), scorerText: this.hl ? '' : g.scorer,
       goalCls: 'pd-goal' + (g.concede === 0 ? ' them' : ''), goalVars: this.teamVars(g.concede === 0 ? ac : hc),
       homeInk: this.inkFor(hc), awayInk: this.inkFor(ac), goalKey: 'g' + g.score[0] + '-' + g.score[1],
       goalWho: (g.concede === 0 && !/propia/i.test(g.scorer || '') ? 'GOL DEL RIVAL' + (g.scorer ? ' · ' + String(g.scorer).replace(/^Gol de /, '').toUpperCase() : '') : String(g.scorer || '¡GOL!').toUpperCase()),

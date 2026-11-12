@@ -42,6 +42,20 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <input id="fk-height" type="range" min="0" max="100" step="1" value="{{heightVal}}" onInput="{{onHeight}}" style="width: 100%; accent-color: #FFC53D">
     </div>
   </sc-if>
+  <sc-if value="{{specShow}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 12px; bottom: 12px; width: 286px; padding: 8px 10px; border-radius: 14px; background: #0B0B14D9; border: 1px solid #2E2E52">
+      <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #FFC53D"><span>TIRO ESPECIAL</span><span style="color: #A3A3C2">{{specNote}}</span></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px">
+        <sc-for list="{{specList}}" as="q" hint-placeholder-count="4"><button type="button" aria-pressed="{{q.on}}" disabled="{{q.off}}" onClick="{{q.pick}}" style="{{q.style}}">{{q.name}}</button></sc-for>
+      </div>
+      <div style="margin-top: 5px; font-size: 10.5px; line-height: 1.25; color: #CACAE0">{{specDesc}}</div>
+    </div>
+  </sc-if>
+  <sc-if value="{{specFlash}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 0; right: 0; top: 118px; display: flex; justify-content: center; pointer-events: none">
+      <span style="padding: 4px 18px; border-radius: 10px; background: #FFC53D; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 2px; box-shadow: 0 4px 0 #8A5A00">¡{{specFlash}}!</span>
+    </div>
+  </sc-if>
   <sc-if value="{{aimUI}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; right: 14px; bottom: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px">
       <div style="position: relative; width: 22px; height: 130px; border-radius: 11px; background: #0B0B14D9; border: 2px solid #2E2E52; overflow: hidden">
@@ -144,6 +158,15 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 <script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","options":["pen","free"],"default":"pen"},"mode":{"editor":"enum","options":["duel","practice","daily"],"default":"duel"},"rivalName":{"editor":"text","default":"Kai_Striker"},"aiLevel":{"editor":null},"onEnd":{"editor":null},"$preview":{"width":844,"height":390}}'>
 // penalty taker: starts the run-up at Duelo_RUN0 s (rival) and strikes Duelo_RUN s later
 const Duelo_RUN0 = 1.6, Duelo_RUN = 1.1;
+// special penalties in a shoot-out: one for every five of your shots
+const Duelo_SPECIALS = [
+  { id: 'panenka', name: 'PANENKA', desc: 'Vaselina suave al centro: si el portero se tira, gol; si se queda, la para' },
+  { id: 'rabona', name: 'RABONA', desc: 'Con efecto, por detrás de la pierna: sorprende al portero, zona verde más pequeña' },
+  { id: 'zurda', name: 'PIERNA CAMBIADA', desc: 'Con la otra pierna: al portero le cuesta leerte, pero es menos preciso' },
+  { id: 'falso', name: 'TIRO FALSO', desc: 'Paras en la carrera: el portero se lanza antes de tiempo' }
+];
+// a pause in the run-up for the fake shot (s)
+const Duelo_FAKE = 0.55;
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -281,6 +304,7 @@ class Component extends DCLogic {
     if (this.kind === 'pen') { this.D = 11; this.GX = 0; this.WALL = []; }
     else this.applyFK(this.practice && !this.daily ? (this.fk || 0) : Math.floor(this.rand() * this.FKS().length), false);
     this.sh = { you: [], rival: [] };
+    this.specUsed = {}; this.specSel = null;
     this.pts = 0;
     this.turn = this.ol && !this.ol.isHost ? 'rival' : 'you'; this.winner = null;
     this.resetShot();
@@ -311,7 +335,7 @@ class Component extends DCLogic {
     // free kicks: target on goal, curve and height chosen by the player (EA FC style)
     if (this.kind === 'pen') { if (!this.aim || this.aim.pen !== true) this.aim = { pen: true, x: this.GX + 1.6, y: 0.9, s: 0, h: 0 }; }
     else if (!this.aim || this.aim.fk !== this.fk) this.aim = { fk: this.fk, x: this.GX + (this.GX >= 1 ? -2.3 : 2.3), y: 1.75, s: 0.45, h: 0.45 };
-    this.plan = null; this.charge = null; this.shotRisk = 0;
+    this.plan = null; this.charge = null; this.shotRisk = 0; this.special = null;
     this.k = { x: this.GX, y: 0, a: 0, aT: 0, xT: this.GX, decided: false, up: false, early: false };
     this.phase = this.turn === 'you' ? 'aim' : 'defend';
     this.pt = 0; this.result = null; this.trail = []; this.swipe = null; this.tap = null; this.pendingDive = null; this.pendingShot = null;
@@ -378,7 +402,7 @@ class Component extends DCLogic {
       if (c.pen > 0) {
         const [nd, nz] = c.n;
         let vn = b.vz * nd + b.vy * nz;
-        vn += (-260 * c.pen - 16 * vn) * dt;
+        vn += (-140 * c.pen - 11 * vn) * dt;   // a soft net: the ball sinks well into it
         if (vn < 0) vn *= Math.exp(-10 * dt);
         if (c.pen > c.give) { const back = c.pen - c.give; dep -= nd * back; b.y -= nz * back; if (vn > 0) vn = 0; }
         // tangential: the cords grab the ball
@@ -410,14 +434,13 @@ class Component extends DCLogic {
     k.decided = true;
     if (Math.abs(dx) < 0.7 && py < 2.1) { k.aT = 0; k.up = py > 1.3; k.xT = px; k.liftT = 0; }
     else {
-      const lift = this.clamp((py - 0.9) * 0.6, 0, 0.85);
+      // a real dive: off the ground, the body nearly flat for a low ball, the hands reaching the spot
       const s = dx > 0 ? 1 : -1;
-      let xT = k.x + this.clamp(dx * 0.45, -2.0, 2.0);
-      // still out of reach: push off further towards the ball
-      const h = Math.max(0.2, py - lift), need = Math.sqrt(Math.max(0, L * L - h * h));
-      if (Math.abs(px - xT) > need) xT = px - s * need;
+      const lift = this.clamp((py - 0.6) * 0.55, 0.2, 0.85);
+      const h = this.clamp(py - lift, 0.12, L * 0.98), a = Math.acos(h / L);
+      const xT = px - s * Math.sin(a) * L * 0.92;
       k.xT = this.clamp(xT, k.x - 2.7, k.x + 2.7);
-      k.aT = this.clamp(Math.atan2(px - k.xT, h), -1.5, 1.5);
+      k.aT = s * this.clamp(Math.atan2(Math.abs(px - k.xT), h), 0.55, 1.5);
       k.liftT = lift;
       k.up = true;
     }
@@ -539,25 +562,49 @@ class Component extends DCLogic {
       else if (this.pt < Duelo_RUN0) this.pt = Duelo_RUN0;
       if (ns && this.pt >= Duelo_RUN0 + Duelo_RUN) { this.launchPendingDirect(ns, 0); return; }
     } else if (this.phase === 'defend' && this.pt >= Duelo_RUN0 + Duelo_RUN) { this.rivalShot(); return; }
-    if (this.phase === 'runup' && this.pt >= Duelo_RUN) { this.launchPending(); return; }
+    if (this.phase === 'runup' && this.pt >= this.runLen()) { this.launchPending(); return; }
+    // the fake shot: the keeper, fooled by the stop, throws himself before the ball is struck
+    if (this.phase === 'runup' && this.special && this.special.id === 'falso' && !this.ol && !this.k.decided && !this.special.held && this.pt > 0.6 * Duelo_RUN + 0.3) {
+      // a calm keeper (a good one more often) does not bite and waits for the shot
+      if (Math.random() < 0.25 + (this.aiLevel() - 0.5) * 0.4) { this.special.held = true; return; }
+      const a = this.aim, right = Math.random() < this.clamp(0.3 + (this.aiLevel() - 0.5) * 0.3, 0.1, 0.5);
+      const side = right ? Math.sign(a.x - this.GX || 1) : -Math.sign(a.x - this.GX || 1);
+      if (right && Math.abs(a.x - this.GX) < 0.7) this.aimKeeper(a.x, a.y); else this.aimKeeper(this.GX + side * (1.8 + Math.random() * 1.2), 0.3 + Math.random() * 1.4);
+    }
     if (this.phase === 'flight' || this.phase === 'result') {
       if (this.WALL.length) this.wallJ = this.pt < 1 && this.phase === 'flight' ? Math.max(0, Math.sin(Math.min(1, Math.max(0, (this.pt - 0.12) / 0.55)) * Math.PI)) * 0.3 : Math.max(0, this.wallJ - dt);
       // (a well-struck shot into the corner: he reads it later and guesses wrong more often)
       const rk = this.shotRisk || 0;
-      if (this.turn === 'you' && !this.ol && !k.decided && this.phase === 'flight' && this.pt > (this.kind === 'pen' ? 0.32 + 0.05 * rk : 0.62)) {
+      if (this.turn === 'you' && !this.ol && !k.decided && this.phase === 'flight' && this.kind === 'pen' && this.pt > Math.max(0.12, (this.D - 0.4) / Math.max(6, this.b.vz) - 0.42)) {
+        // a penalty keeper goes as the ball is struck: he guesses a side (or now and then stays in the middle)
+        // and throws himself there. A good keeper guesses right more often; a well-struck shot into the corner
+        // is hard to read
+        const pr = this.predict(), ai = this.aiLevel(), sp = this.special && this.special.id;
+        const stay = Math.random() < (sp === 'panenka' ? 0.22 + (ai - 0.5) * 0.2 : 0.14);
+        // (a panenka: he either stays, and has it, or goes to a side and is beaten)
+        const right = sp !== 'panenka' && Math.random() < this.clamp(0.52 + (ai - 0.5) * 0.4 - 0.28 * rk + (this.b.vz < 16 ? 0.3 : 0) - (sp === 'zurda' ? 0.1 : sp === 'rabona' ? 0.12 : 0), 0.1, 0.85);
+        if (stay) this.aimKeeper(GX, 1.0);
+        else if (right) this.aimKeeper(pr.x, pr.y);
+        else {
+          // the wrong guess: the other side (a ball down the middle beats him whichever way he goes)
+          const side = Math.abs(pr.x - GX) < 0.7 ? (Math.random() < 0.5 ? -1 : 1) : -Math.sign(pr.x - GX);
+          this.aimKeeper(GX + side * (1.6 + Math.random() * 1.6), 0.3 + Math.random() * 1.7);
+        }
+      }
+      if (this.turn === 'you' && !this.ol && !k.decided && this.phase === 'flight' && this.kind !== 'pen' && this.pt > 0.62) {
         const pr = this.predict();
         let px = pr.x;
-        if (Math.random() < (this.kind === 'pen' ? 0.35 + 0.45 * rk : 0.25) + (0.5 - this.aiLevel()) * 0.5) px = GX - (px - GX);
+        if (Math.random() < 0.25 + (0.5 - this.aiLevel()) * 0.5) px = GX - (px - GX);
         this.aimKeeper(px, pr.y);
       }
       if (k.decided) {
-        const rate = this.turn === 'rival' ? 4.2 + 1.8 * this.tt('ref') : 4.6;
+        const rate = this.turn === 'rival' ? 4.2 + 1.8 * this.tt('ref') : this.kind === 'pen' ? 6.2 : 4.6;
         k.a += Math.max(-rate * dt, Math.min(rate * dt, k.aT - k.a));
-        k.x += Math.max(-6.5 * dt, Math.min(6.5 * dt, k.xT - k.x));
+        k.x += Math.max(-7.5 * dt, Math.min(7.5 * dt, k.xT - k.x));
         // a dive is a jump: up off the line and down again with gravity, lying on the grass once it lands
         // (never held up in the air)
         k.dt = (k.dt || 0) + dt;
-        const peak = Math.abs(k.aT) > 0.4 ? Math.max(0.22, k.liftT || 0) : 0, T = 0.42 + 0.3 * (k.liftT || 0);
+        const peak = Math.abs(k.aT) > 0.4 ? Math.max(0.22, k.liftT || 0) : 0, T = 0.5 + 0.3 * (k.liftT || 0);
         const q = Math.min(1, k.dt / T);
         k.y = peak * 4 * q * (1 - q);
       }
@@ -581,7 +628,7 @@ class Component extends DCLogic {
           const vx = bx - ax, vy = by - ay, t = Math.max(0, Math.min(1, ((c.x - ax) * vx + (c.y - ay) * vy) / (vx * vx + vy * vy)));
           let dist = Math.hypot(c.x - (ax + vx * t), c.y - (ay + vy * t));
           if (!k.up && Math.abs(c.y - (k.y + 1.25)) < 0.3) dist = Math.min(dist, Math.max(0, Math.abs(c.x - k.x) - 0.65));
-          if (dist < (this.turn === 'you' && !this.ol ? (0.24 + 0.18 * this.aiLevel()) * (1 - 0.75 * (this.shotRisk || 0)) : 0.33)) {
+          if (dist < (this.turn === 'you' && !this.ol ? (0.24 + 0.18 * this.aiLevel()) * (1 - 0.3 * (this.shotRisk || 0)) : 0.33)) {
             b.z = kz - 0.05; b.vz = -Math.abs(b.vz) * 0.35; b.vx = (c.x - k.x) * 3 + (Math.random() - 0.5) * 3; b.vy = 3; b.curve = 0; b.res = null;
             this.setResult('parada', this.turn === 'rival' ? '¡La has parado!' : 'El portero lo adivina');
           }
@@ -1427,16 +1474,17 @@ class Component extends DCLogic {
     other.visible = false; shooter.visible = true;
     let kt = null, run = 0, amp = 0, sx = -1.25, sz = -1.9;
     if (this.phase === 'runup' || (this.phase === 'defend' && this.pt > Duelo_RUN0)) {
-      const t = this.phase === 'runup' ? this.pt / Duelo_RUN : (this.pt - Duelo_RUN0) / Duelo_RUN;
+      const t = this.phase === 'runup' ? this.runFrac() : (this.pt - Duelo_RUN0) / Duelo_RUN;
       sx = -1.25 + 0.95 * t; sz = -1.9 + 1.55 * t; run = t * 9; amp = 1; kt = t > 0.55 ? (t - 0.55) / 0.45 * 0.6 : null;
     } else if (this.phase === 'flight' || this.phase === 'result') { sx = -0.3; sz = -0.35; kt = Math.min(1, 0.6 + this.pt * 3); }
     // the Mixamo clip strikes with the right foot, so that shooter runs in from the other side of the ball
     const mxs = !!shooter.userData.anim;
     shooter.position.set(mxs ? -sx - 0.05 : sx, 0, sz);
     shooter.rotation.y = mxs ? -0.25 : 0.25;
+    if (youShoot && this.special && this.special.id === 'rabona' && kt != null) shooter.rotation.y += (mxs ? 1 : -1) * 0.75 * Math.min(1, kt / 0.6);
     this.pose(shooter, { run, amp, kick: kt });
     // Mixamo shooter: the penalty-kick clip, its strike (0.73 s) lined up with the ball leaving the foot
-    if (this.phase === 'runup' || (this.phase === 'defend' && this.pt > Duelo_RUN0)) this.mc(shooter, 'penalty', 0.73 * Math.min(1, this.phase === 'runup' ? this.pt / Duelo_RUN : (this.pt - Duelo_RUN0) / Duelo_RUN), dt);
+    if (this.phase === 'runup' || (this.phase === 'defend' && this.pt > Duelo_RUN0)) this.mc(shooter, 'penalty', 0.73 * Math.min(1, this.phase === 'runup' ? this.runFrac() : (this.pt - Duelo_RUN0) / Duelo_RUN), dt);
     else if (this.phase === 'flight' || this.phase === 'result') this.mc(shooter, 'penalty', Math.min(1.5, 0.73 + this.pt), dt);
     else this.mc(shooter, 'idle', now, dt);
     // wall jump
@@ -1521,6 +1569,17 @@ class Component extends DCLogic {
   fkMode() { return this.kind === 'free' && (this.turn === 'you' || this.practice); }
   // your shot, penalty or free kick: a target on the goal and the power bar (no more swiping)
   aimMode() { return (this.kind === 'free' || this.kind === 'pen') && (this.turn === 'you' || this.practice); }
+  // special shots: in a real shoot-out (not practice or the daily game), one in each block of five shots
+  specOn() { return this.kind === 'pen' && !this.practice && !this.daily && this.turn === 'you'; }
+  specBlock() { return Math.floor(this.sh.you.length / 5); }
+  specFree() { return this.specOn() && !this.specUsed[this.specBlock()]; }
+  // where the shooter is in the run-up (0..1); the fake shot stops for a moment just before the ball
+  runFrac() {
+    const t = this.pt, a = 0.6 * Duelo_RUN;
+    if (!(this.special && this.special.id === 'falso') || t < a) return t / Duelo_RUN;
+    return t < a + Duelo_FAKE ? 0.6 : (t - Duelo_FAKE) / Duelo_RUN;
+  }
+  runLen() { return Duelo_RUN + (this.special && this.special.id === 'falso' ? Duelo_FAKE : 0); }
   xSign() {
     // which way +x goes on screen (the camera looks down the pitch, so it can be mirrored)
     if (!this.cam) return 1;
@@ -1556,6 +1615,8 @@ class Component extends DCLogic {
     let w = 0.09 + 0.08 * this.tt('pre');
     // a penalty: the closer to the posts and the bar, the smaller the green (the safe middle is easy)
     if (this.kind === 'pen' && this.aim) w *= 1.9 - 1.1 * this.penRisk();
+    const sp = this.specSel && this.specFree() ? this.specSel : null;
+    if (sp) w *= { panenka: 1.15, rabona: 0.7, zurda: 0.85, falso: 1.2 }[sp] || 1;
     return [0.74 - w / 2, 0.74 + w / 2];
   }
   penRisk() {
@@ -1565,18 +1626,31 @@ class Component extends DCLogic {
   penShoot() {
     const m = this.meter(), [lo, hi] = this.zone(), a = this.aim;
     this.charge = null;
+    const sp = this.specSel && this.specFree() ? this.specSel : null;
+    this.specSel = null;
+    if (sp) { this.specUsed[this.specBlock()] = sp; this.special = { id: sp }; }
+    if (sp === 'panenka') {
+      // a soft chip down the middle: too soft and it dies at the keeper, too hard and it floats over
+      const dev0 = m < lo ? (m - lo) * 1.5 : m > hi ? m - hi : 0;
+      const v0 = this.aimFor({ x: this.GX + (a.x >= this.GX ? 0.25 : -0.25), y: Math.max(0.5, 1.55 + (dev0 > 0 ? dev0 * 3.5 : dev0 * 1.2)) }, 10.5 * (1 + Math.min(0, dev0) * 0.35), 0);
+      this.lastTiming = dev0 === 0 ? 'perfect' : dev0 < 0 ? 'low' : 'high';
+      this.shotRisk = 0; this.lastSwipe = null;
+      this.queueShot(v0, (0.1 + Math.abs(dev0) * 2) / v0.T);
+      return;
+    }
     // in the green: the ball goes where you aimed, hard. Too soft: slower and lower (easier to save);
     // too hard: it rises and drifts (over the bar or wide if you aimed close to the frame)
     const dev = m < lo ? (m - lo) * 1.5 : m > hi ? m - hi : 0;
-    const speed = Math.max(11, (21 + 3 * this.tt('pot')) * (1 + Math.min(0, dev) * 0.9));
+    const speed = Math.max(11, (21 + 3 * this.tt('pot')) * (1 + Math.min(0, dev) * 0.9)) * (sp === 'rabona' ? 0.93 : sp === 'falso' ? 0.88 : 1);
     const tx = a.x + (dev > 0 ? Math.sign(a.x - this.GX || 1) * dev * 2.2 : 0), ty = Math.max(0.12, a.y + (dev > 0 ? dev * 3.2 : dev * 1.2));
-    const v = this.aimFor({ x: tx, y: ty }, speed, 0);
+    // the rabona bends in towards the side it is aimed at
+    const v = this.aimFor({ x: tx, y: ty }, speed, sp === 'rabona' ? -Math.sign(a.x - this.GX || 1) * 0.9 * this.xSign() : 0);
     this.lastTiming = dev === 0 ? 'perfect' : dev < 0 ? 'low' : 'high';
     // a well-struck shot into the corner is close to unstoppable, as in real life (the keeper only gets a
     // fingertip on it if he guessed right); a soft one or one down the middle he can deal with
     this.shotRisk = dev === 0 ? 0.25 + 0.75 * this.penRisk() : 0;
     this.lastSwipe = null;
-    this.queueShot(v, (0.2 * (1 - this.tt('pre')) + Math.abs(dev) * 4) / v.T);
+    this.queueShot(v, ((0.2 * (1 - this.tt('pre')) + Math.abs(dev) * 4) * (sp === 'zurda' ? 2.8 : 1)) / v.T);
   }
   fkShoot() {
     const m = this.meter(), [lo, hi] = this.zone();
@@ -1713,6 +1787,24 @@ class Component extends DCLogic {
     const m = this.meter(), [zlo, zhi] = this.zone();
     const sAbs = Math.round(Math.abs(this.aim ? this.aim.s : 0) * 100);
     return {
+      ...(() => {
+        // the special shots panel (shoot-outs only)
+        const on = aimUI && this.specOn(), free = this.specFree(), used = this.specUsed[this.specBlock()];
+        const nextAt = (this.specBlock() + 1) * 5 + 1;
+        const cur = Duelo_SPECIALS.find((q) => q.id === this.specSel);
+        return {
+          specShow: on,
+          specNote: free ? '1 cada 5 penaltis' : 'Usado · otro en el penalti ' + nextAt,
+          specDesc: free ? (cur ? cur.desc : 'Elige uno (opcional) y chuta como siempre') : 'Ya has usado ' + ((Duelo_SPECIALS.find((q) => q.id === used) || {}).name || 'el tuyo').toLowerCase() + ' en esta serie',
+          specList: Duelo_SPECIALS.map((q) => {
+            const sel = this.specSel === q.id;
+            return { name: q.name, on: sel ? 'true' : 'false', off: !free,
+              style: 'height: 30px; padding: 0 6px; border-radius: 9px; font: 800 11px Exo2, sans-serif; letter-spacing: .5px; cursor: ' + (free ? 'pointer' : 'default') + '; border: 2px solid ' + (sel ? '#FFC53D' : '#2E2E52') + '; background: ' + (sel ? '#FFC53D' : '#141428') + '; color: ' + (sel ? '#0B0B14' : free ? '#F4F4FA' : '#5A5A7A') + ';',
+              pick: (e) => { e.stopPropagation(); if (!free) return; this.specSel = sel ? null : q.id; this.forceUpdate(); } };
+          }),
+          specFlash: this.special && youTurn && (this.phase === 'runup' || this.phase === 'flight') && !this.replaying ? (Duelo_SPECIALS.find((q) => q.id === this.special.id) || {}).name || '' : ''
+        };
+      })(),
       fkAim, aimUI, trajPts, retXf, apexXf, trajCol, trajOp: showTraj || penAim ? (this.phase === 'runup' ? '0.5' : '0.95') : '0',
       curveVal: String(Math.round((this.aim ? this.aim.s : 0) * 100)), heightVal: String(Math.round((this.aim ? this.aim.h : 0) * 100)),
       curveTxt: sAbs < 5 ? 'Recto' : (this.aim.s > 0 ? 'Derecha ' : 'Izquierda ') + sAbs + '%',
@@ -1733,7 +1825,7 @@ class Component extends DCLogic {
       chargeDown: (e) => { if (!aimUI) return; e.preventDefault(); e.stopPropagation(); this.charge = { t0: performance.now() }; this.loop(); this.forceUpdate(); },
       chargeUp: (e) => { if (!this.charge) return; e.preventDefault(); e.stopPropagation(); if (this.kind === 'pen') this.penShoot(); else this.fkShoot(); },
       chargeCancel: () => { this.charge = null; this.forceUpdate(); },
-      hintWrap: 'position: absolute; left: 0; right: 0; bottom: ' + (fkAim ? 150 : aimUI ? 12 : 12) + 'px; display: flex; justify-content: center; pointer-events: none;',
+      hintWrap: 'position: absolute; left: 0; right: 0; bottom: ' + (fkAim ? 150 : aimUI && this.specOn() ? 140 : 12) + 'px; display: flex; justify-content: center; pointer-events: none;',
       canvasRef: this.canvasRef,
       no3d: !!this.no3d,
       ghostPts: this.lastSwipe && this.phase !== 'aim' ? this.lastSwipe.pts.map((q) => f2(q.x) + ',' + f2(q.y)).join(' ') : '',
@@ -1763,7 +1855,7 @@ class Component extends DCLogic {
       showResult: this.phase === 'result' && !!R && !this.replaying,
       showReplay: !!this.replaying,
       resultText: rm[0],
-      resultSub: R ? R.sub + (this.lastSpeed ? ' · ' + Math.round(this.lastSpeed * 3.6) + ' km/h' : '') : '',
+      resultSub: R ? (this.special && youTurn ? ((Duelo_SPECIALS.find((q) => q.id === this.special.id) || {}).name || '').toLowerCase().replace(/^./, (c) => c.toUpperCase()) + ' · ' : '') + R.sub + (this.lastSpeed ? ' · ' + Math.round(this.lastSpeed * 3.6) + ' km/h' : '') : '',
       resultStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 72px; line-height: 1; letter-spacing: 2px; color: ' + rm[1] + '; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (0.4 + rs * 0.6).toFixed(2) + ');',
       showDone: this.phase === 'done' && !this.daily,
       doneKicker: this.practice ? 'RONDA COMPLETADA' : this.kind === 'pen' ? 'TANDA DE PENALTIS' : 'DUELO DE TIROS LIBRES',

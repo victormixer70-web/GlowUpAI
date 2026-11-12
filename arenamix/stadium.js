@@ -101,7 +101,7 @@
   function cloth(geo, nu, nv, free, cellK, out) {
     var P = geo.attributes.position, n = P.count, rest = Float32Array.from(P.array), prev = Float32Array.from(P.array);
     var kr = new Float32Array(n), KL = cellK || 3200, live = false, quiet = 0, hits = [];
-    for (var k = 0; k < n; k++) kr[k] = free[k] <= 0 ? 0 : 110 * (1 + 2.5 * (1 - free[k]));
+    for (var k = 0; k < n; k++) kr[k] = free[k] <= 0 ? 0 : 70 * (1 + 2.5 * (1 - free[k]));
     var W = nu + 1, H = 1 / 240;
     function collide(bx, by, bz, R) {
       var R2 = R * R, a = P.array;
@@ -138,7 +138,7 @@
           var lv = (a[q - 3] - prev[q - 3]) + (a[q + 3] - prev[q + 3]) + (a[q - W * 3] - prev[q - W * 3]) + (a[q + W * 3] - prev[q + W * 3]) - 4 * (x - prev[q]);
           var nx = x + v + 0.12 * lv + acc * h2;
           // a net stretches only so far
-          var lim = 1.1 * (0.25 + free[k]);
+          var lim = 1.6 * (0.25 + free[k]);
           if (nx - rest[q] > lim) nx = rest[q] + lim; else if (nx - rest[q] < -lim) nx = rest[q] - lim;
           nxt[q] = nx;
           var av = Math.abs(v); if (av > maxV) maxV = av;
@@ -248,7 +248,7 @@
      the point on the net and how much that point can give (cords tied at the frame and the ground give least).
      press() each frame where the ball is, then step(): the net wraps round the ball and springs back after. */
   function shellNet(w, H, d1, d2) {
-    var hw = w / 2, Lb = Math.hypot(d2 - d1, H), total = d1 + Lb, SMAX = 0.85;
+    var hw = w / 2, Lb = Math.hypot(d2 - d1, H), total = d1 + Lb, SMAX = 1.3;
     var nb = [H / Lb, (d2 - d1) / Lb];   // outward normal of the back, in (depth, height)
     function give(u, v) { return Math.sqrt(Math.max(0, Math.sin(Math.PI * u))) * Math.sqrt(Math.max(0, Math.sin(Math.PI * Math.min(1, v)))); }
     function contact(x, dep, zc, R) {
