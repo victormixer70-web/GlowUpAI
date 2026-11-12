@@ -362,20 +362,38 @@ class Component extends DCLogic {
   // in the goal: the side nets and the roof stop the ball, and the back of the net stretches, slows it down
   // and drops it, so it stays in the goal (it never goes through)
   netBall(b, dt) {
-    const D = this.D, GX = this.GX ?? 0, R = 0.11, back = D + 2 - R;
+    const D = this.D, GX = this.GX ?? 0, R = 0.11;
     b.curve = 0; b.res = null;
-    if (Math.abs(b.x - GX) > 3.66 - R) { b.x = GX + Math.sign(b.x - GX) * (3.66 - R); b.vx = -b.vx * 0.15; b.vz *= 0.7; }
-    const top = 2.5 - 0.16 * Math.sin(Math.PI * Math.min(1, (b.z - D) / 2)) - R;
-    if (b.y > top) { b.y = top; if (b.vy > 0) b.vy = -b.vy * 0.1; }
-    const pen = b.z - back;
-    if (pen > 0) {
-      b.vz += (-300 * pen - 17 * b.vz) * dt;
-      if (b.vz < 0) b.vz *= Math.exp(-9 * dt);   // a net soaks up the rebound
-      b.vx *= Math.exp(-4 * dt);
-      if (pen > 1) { b.z = back + 1; b.vz = Math.min(b.vz, 0); }
+    // side nets: the ball stops against them (they give a few centimetres, and the mesh shows it)
+    if (Math.abs(b.x - GX) > 3.66 - R) { b.x = GX + Math.sign(b.x - GX) * (3.66 - R); b.vx = -b.vx * 0.12; b.vz *= 0.75; b.vy *= 0.85; }
+    const C = this.net && this.net.contact;
+    let dep = b.z - D;
+    if (C) {
+      // the roof and the back: exactly the net that is drawn. It gives like a spring as far as that spot allows
+      // (least by the frame and the ground pegs) and then holds; it soaks up the speed and drops the ball
+      const c = this.net.contact(b.x - GX, dep, b.y, R);
+      if (c.pen > 0) {
+        const [nd, nz] = c.n;
+        let vn = b.vz * nd + b.vy * nz;
+        vn += (-260 * c.pen - 16 * vn) * dt;
+        if (vn < 0) vn *= Math.exp(-10 * dt);
+        if (c.pen > c.give) { const back = c.pen - c.give; dep -= nd * back; b.y -= nz * back; if (vn > 0) vn = 0; }
+        // tangential: the cords grab the ball
+        const vt = b.vz * nz - b.vy * nd, f = Math.exp(-5 * dt);
+        b.vz = vn * nd + vt * nz * f; b.vy = vn * nz - vt * nd * f;
+        b.vx *= Math.exp(-3 * dt);
+        b.z = D + dep;
+      }
+    } else {
+      const top = 2.5 - 0.16 * Math.sin(Math.PI * Math.min(1, dep / 2)) - R;
+      if (b.y > top) { b.y = top; if (b.vy > 0) b.vy = -b.vy * 0.1; }
+      const pen = b.z - (D + 2 - R);
+      if (pen > 0) { b.vz += (-300 * pen - 17 * b.vz) * dt; if (b.vz < 0) b.vz *= Math.exp(-9 * dt); b.vx *= Math.exp(-4 * dt); if (pen > 1) { b.z = D + 2 - R + 1; b.vz = Math.min(b.vz, 0); } }
     }
+    if (b.y < R) b.y = R;
+    // it can come back off the net a little, but not roll back out over the line
     if (b.z < D + 0.4 && b.vz < 0) { b.z = D + 0.4; b.vz = 0; }
-    if (b.y <= 0.11 && b.vy === 0) { const f = Math.exp(-1.8 * dt); b.vx *= f; b.vz *= f; }
+    if (b.y <= R && b.vy === 0) { const f = Math.exp(-1.8 * dt); b.vx *= f; b.vz *= f; }
   }
   predict() {
     const b = { ...this.b }, kz = this.D - 0.4;
@@ -1419,10 +1437,11 @@ class Component extends DCLogic {
     // wall jump
     (this.wallMen || []).forEach((w) => { w.position.y = this.wallJ; });
     // the net wraps round the ball pressing into it, then springs back
-    if (this.ol) {
+    // (on every device: it used to move only in online games)
+    if (this.net) {
       const GX = this.GX ?? 0;
       // the goal's net: press(across, depth past the line, height, radius); older nets took push()
-      if (b.z > D && Math.abs(b.x - GX) < 3.66) {
+      if (b.z > D && Math.abs(b.x - GX) < 3.75) {
         if (this.net.press) this.net.press(b.x - GX, b.z - D, b.y, 0.11);
         else if (this.net.push) this.net.push(b.x - GX, b.y, b.z - (D + 2 - 0.11));
       }

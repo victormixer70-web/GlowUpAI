@@ -92,6 +92,83 @@
     var m = new T.Mesh(g, material()); m.renderOrder = 2;
     return m;
   }
+  /* A net that behaves like one: every knot of the mesh is a point that moves (position-based, with its own
+     speed), tied to its neighbours (the cords pull a dent into a cone round the ball and carry waves across the
+     mesh) and, more loosely, to where it hangs at rest (so it settles back after a while, swaying a few times).
+     The knots on the frame and on the ground are tied fast. The ball pushes the knots it touches out of its way
+     along its path between frames, so a fast shot drags the mesh with it and the bag forms round the ball.
+     geo: the sheet's geometry (a grid nu+1 by nv+1, row by row); free[k]: 0 tied fast .. 1 loose. */
+  function cloth(geo, nu, nv, free, cellK, out) {
+    var P = geo.attributes.position, n = P.count, rest = Float32Array.from(P.array), prev = Float32Array.from(P.array);
+    var kr = new Float32Array(n), KL = cellK || 3200, live = false, quiet = 0, hits = [];
+    for (var k = 0; k < n; k++) kr[k] = free[k] <= 0 ? 0 : 110 * (1 + 2.5 * (1 - free[k]));
+    var W = nu + 1, H = 1 / 240;
+    function collide(bx, by, bz, R) {
+      var R2 = R * R, a = P.array;
+      for (var k = 0; k < n; k++) {
+        if (!kr[k]) continue;
+        var ox = out[k * 3], oy = out[k * 3 + 1], oz = out[k * 3 + 2];
+        var dx = a[k * 3] - bx, dy = a[k * 3 + 1] - by, dz = a[k * 3 + 2] - bz;
+        // the ball is always inside the goal: a knot may not be inside it, nor behind it (between the ball and
+        // the inside of the goal), or the ball would slip through the mesh. Such a knot goes to the ball's
+        // surface on the outer side, where it is across the net's face.
+        var on = dx * ox + dy * oy + dz * oz, lx = dx - on * ox, ly = dy - on * oy, lz = dz - on * oz, l2 = lx * lx + ly * ly + lz * lz;
+        // a ball well outside the net (gone wide past the side net, over the roof) leaves it alone
+        if (l2 >= R2 || on < -0.35) continue;
+        var up = Math.sqrt(R2 - l2);
+        if (on >= up) continue;
+        a[k * 3] = bx + lx + ox * up; a[k * 3 + 1] = by + ly + oy * up; a[k * 3 + 2] = bz + lz + oz * up;
+        live = true; quiet = 0;
+      }
+    }
+    var nxt = new Float32Array(P.array.length);
+    function sub() {
+      var a = P.array, h2 = H * H, damp = 1 - 1.6 * H, maxV = 0;
+      // every knot from the same moment (computed into a copy, then swapped in), or the sheet runs away
+      nxt.set(a);
+      for (var j = 1; j < nv; j++) for (var i = 1; i < nu; i++) {
+        var k = j * W + i; if (!kr[k]) continue;
+        for (var c = 0; c < 3; c++) {
+          var q = k * 3 + c, x = a[q], disp = x - rest[q];
+          // the cords: the knot pulled towards its four neighbours' displacement
+          var lap = (a[q - 3] - rest[q - 3]) + (a[q + 3] - rest[q + 3]) + (a[q - W * 3] - rest[q - W * 3]) + (a[q + W * 3] - rest[q + W * 3]) - 4 * disp;
+          var acc = -kr[k] * disp + KL * lap, v = (x - prev[q]) * damp;
+          // cords rub on cords: a knot moving differently from its neighbours is slowed down, so kinks smooth out
+          // at once while the big swing of the whole bag carries on
+          var lv = (a[q - 3] - prev[q - 3]) + (a[q + 3] - prev[q + 3]) + (a[q - W * 3] - prev[q - W * 3]) + (a[q + W * 3] - prev[q + W * 3]) - 4 * (x - prev[q]);
+          var nx = x + v + 0.12 * lv + acc * h2;
+          // a net stretches only so far
+          var lim = 1.1 * (0.25 + free[k]);
+          if (nx - rest[q] > lim) nx = rest[q] + lim; else if (nx - rest[q] < -lim) nx = rest[q] - lim;
+          nxt[q] = nx;
+          var av = Math.abs(v); if (av > maxV) maxV = av;
+        }
+      }
+      prev.set(a); a.set(nxt);
+      return maxV;
+    }
+    return {
+      // the ball (in the sheet's own frame) from where it was last frame to where it is now
+      ball: function (x0, y0, z0, x1, y1, z1, R) { hits.push([x0, y0, z0, x1, y1, z1, R]); },
+      step: function (dt) {
+        dt = Math.min(0.05, Math.max(0, dt));
+        if (!live && !hits.length) return;
+        live = true;
+        var m = Math.max(1, Math.round(dt / H)), maxV = 0;
+        for (var s2 = 0; s2 < m; s2++) {
+          var t = (s2 + 1) / m;
+          for (var h = 0; h < hits.length; h++) { var b = hits[h]; collide(b[0] + (b[3] - b[0]) * t, b[1] + (b[4] - b[1]) * t, b[2] + (b[5] - b[2]) * t, b[6]); }
+          maxV = Math.max(maxV, sub());
+          // and the ball stays wrapped: the cords never pull a knot back inside it
+          for (h = 0; h < hits.length; h++) { b = hits[h]; collide(b[0] + (b[3] - b[0]) * t, b[1] + (b[4] - b[1]) * t, b[2] + (b[5] - b[2]) * t, b[6]); }
+        }
+        hits.length = 0;
+        P.needsUpdate = true;
+        // asleep again once it has settled: back exactly where it hangs
+        if (maxV < 2e-5) { if (++quiet > 30) { P.array.set(rest); prev.set(rest); P.needsUpdate = true; live = false; } } else quiet = 0;
+      }
+    };
+  }
   /* A real goal: round white posts and crossbar, a short roof, the back net sloping from the roof down to the
      ground, curved white supports behind and bars along the ground. Local frame: goal line on z = 0, net
      towards +z, posts at x = ±w/2, ground at y = 0; d is how deep the net is at the ground.
@@ -113,6 +190,7 @@
       var gb = new T.Mesh(new T.CylinderGeometry(thin, thin, d2, 10), white); gb.rotation.x = Math.PI / 2; gb.position.set(x, thin, d2 / 2); G.add(gb);
     });
     var back = new T.Mesh(new T.CylinderGeometry(thin, thin, w + r, 10), white); back.rotation.z = Math.PI / 2; back.position.set(0, thin, d2); G.add(back);
+    var sides = [];
     // side nets: the goal's profile (goal line, roof, sloping back), a little slack in the middle
     [-1, 1].forEach(function (s) {
       var x = s * hw, nz = Math.ceil(d2 / 0.2), ny = Math.ceil(H / 0.2), pos = [], uv = [], idx = [];
@@ -123,10 +201,30 @@
       }
       for (j = 0; j < ny; j++) for (i = 0; i < nz; i++) { var a = j * (nz + 1) + i; idx.push(a, a + 1, a + nz + 2, a, a + nz + 2, a + nz + 1); }
       var g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); g.setIndex(idx); g.computeVertexNormals();
-      var m = new T.Mesh(g, material()); m.renderOrder = 2; G.add(m);
+      var m = new T.Mesh(g, material()); m.renderOrder = 2; m.frustumCulled = false; G.add(m);
+      // tied all round: posts, ground, roof and the back support
+      var fr = new Float32Array((nz + 1) * (ny + 1));
+      for (j = 0; j <= ny; j++) for (i = 0; i <= nz; i++) fr[j * (nz + 1) + i] = (i === 0 || j === 0 || j === ny || i === nz) ? 0 : Math.sqrt(Math.sin(Math.PI * i / nz) * Math.sin(Math.PI * j / ny));
+      var so = new Float32Array(fr.length * 3); for (var q = 0; q < fr.length; q++) so[q * 3] = s;
+      sides.push(cloth(g, nz, ny, fr, 1400, so));
     });
     var net = shellNet(w, H, d1, d2);
     G.add(net.mesh);
+    // press() each frame while the ball is in the goal: the ball sweeps the mesh along its path since the last
+    // frame (a fast shot drags the net with it), the roof, the back and the side nets alike
+    var last = null, seen = false;
+    net.press = function (x, dep, zc, R) {
+      var a = last || [x, dep, zc];
+      net.cloth.ball(a[0], a[2], a[1], x, zc, dep, R + 0.02);
+      sides.forEach(function (sd) { sd.ball(a[0], a[2], a[1], x, zc, dep, R + 0.035); });
+      last = [x, dep, zc]; seen = true;
+    };
+    net.step = function (dt) {
+      // a frame without the ball in the goal: the next one starts a new path (no sweep from where it left)
+      if (!seen) last = null;
+      seen = false;
+      net.cloth.step(dt); sides.forEach(function (sd) { sd.step(dt); });
+    };
     return { group: G, net: net };
   }
   /* The roof and back of the net as one sheet: u across the goal (0..1), v along its profile from the crossbar
@@ -167,33 +265,15 @@
     var geo = new T.BufferGeometry();
     geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); geo.setIndex(idx); geo.computeVertexNormals();
     var mesh = new T.Mesh(geo, material()); mesh.renderOrder = 2; mesh.frustumCulled = false;
-    var P = geo.attributes.position, A = 0, vA = 0, cx = 0, cs = 0, cg = 1, pushed = -1, rip = 0, tt = 0, live = false;
+    var fr = new Float32Array(gv.length);
+    for (j = 0; j <= nv; j++) for (i = 0; i <= nu; i++) fr[j * (nu + 1) + i] = (i === 0 || i === nu || j === 0 || j === nv) ? 0 : Math.max(0.05, gv[j * (nu + 1) + i]);
+    var no = new Float32Array(fr.length * 3); for (var q = 0; q < fr.length; q++) { no[q * 3 + 1] = nrm[q * 2]; no[q * 3 + 2] = nrm[q * 2 + 1]; }
+    var C = cloth(geo, nu, nv, fr, 3200, no);
     return {
-      mesh: mesh, contact: contact, dims: { w: w, H: H, d1: d1, d2: d2 },
+      mesh: mesh, contact: contact, dims: { w: w, H: H, d1: d1, d2: d2 }, cloth: C,
       // the ball (centre x across, dep deep, zc high, radius R) where it is now
-      press: function (x, dep, zc, R) {
-        var c = contact(x, dep, zc, R);
-        if (c.pen > 0 && c.pen > pushed) { pushed = Math.min(c.pen, c.give); cx = x; cs = c.v * total; cg = Math.max(0.2, give(c.u, c.v)); }
-      },
-      step: function (dt) {
-        dt = Math.min(0.05, Math.max(0, dt));
-        if (pushed > 0) { vA = (pushed - A) / Math.max(dt, 0.008); A = pushed; live = true; }
-        else if (Math.abs(A) > 0.001 || Math.abs(vA) > 0.01) { var om = 11, z = 0.1; vA += (-om * om * A - 2 * z * om * vA) * dt; A += vA * dt; live = true; }
-        pushed = -1;
-        tt += dt; rip += (Math.min(0.1, Math.abs(vA) * 0.01) - rip) * Math.min(1, dt * 5);
-        if (!live) return;
-        if (Math.abs(A) < 0.001 && Math.abs(vA) < 0.01 && rip < 0.002) { A = 0; vA = 0; live = false; }
-        var s2 = 2 * 0.6 * 0.6;
-        for (var n = 0; n < gv.length; n++) {
-          var dx = uu[n] - cx, ds = vv[n] - cs, r2 = dx * dx + ds * ds, r = Math.sqrt(r2);
-          // a dent the shape of the ball, the whole sheet billowing a little with it, ripples after
-          var amt = gv[n] / cg * (A * (0.8 * Math.exp(-r2 / s2) + 0.2 * Math.exp(-r2 / 6))) + gv[n] * rip * Math.sin(r * 5 - tt * 16) * Math.exp(-r * 0.8);
-          P.array[n * 3] = rest[n * 3];
-          P.array[n * 3 + 1] = rest[n * 3 + 1] + nrm[n * 2] * amt;
-          P.array[n * 3 + 2] = rest[n * 3 + 2] + nrm[n * 2 + 1] * amt;
-        }
-        P.needsUpdate = true;
-      }
+      press: function (x, dep, zc, R) { C.ball(x, zc, dep, x, zc, dep, R + 0.02); },
+      step: function (dt) { C.step(dt); }
     };
   }
   /* A goal's back net that gives: a grid w wide and h high in its local x/y plane, pushed out along +z.
