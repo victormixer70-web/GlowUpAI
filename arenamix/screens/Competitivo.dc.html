@@ -421,7 +421,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
   <!-- a draw in Competitivo: penalty shoot-out -->
   <sc-if value="{{isShootout}}" hint-placeholder-val="{{ false }}">
-    <dc-import name="Duelo" ai-level="{{aiLevel}}" kind="pen" shootout="{{ true }}" rival-name="{{oppName}}" on-end="{{onPens}}" hint-size="844px,390px"></dc-import>
+    <dc-import name="Duelo" ai-level="{{aiLevel}}" kind="pen" shootout="{{ true }}" away-color="{{oppColor}}" away-trim="{{oppTrim}}" rival-name="{{oppName}}" on-end="{{onPens}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isDuelMatch}}" hint-placeholder-val="{{ false }}">
     <dc-import name="Duelo" ai-level="{{aiLevel}}" kind="{{duelKind}}" online="{{duelOnline}}" rival-name="{{oppName}}" on-end="{{onEnd}}" hint-size="844px,390px"></dc-import>

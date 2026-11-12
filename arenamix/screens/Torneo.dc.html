@@ -310,7 +310,7 @@ body{margin:0}
     <dc-import name="Partido" ai-level="{{m_ai}}" label="{{m_label}}" mode="comp" duration="{{m_dur}}" team-size="{{m_n}}" autostart="{{ true }}" home-name="{{m_home}}" mates="{{m_mates}}" rivals="{{m_rivals}}" away-name="{{m_away}}" away-color="{{m_color}}" away-trim="{{m_trim}}" start-score="{{m_start}}" rules="{{m_rules}}" on-end="{{onMatchEnd}}" hint-size="844px,390px"></dc-import>
   </sc-if>
   <sc-if value="{{isShootout}}" hint-placeholder-val="{{ false }}">
-    <dc-import name="Duelo" ai-level="{{m_ai}}" kind="pen" shootout="{{ true }}" rival-name="{{m_away}}" on-end="{{onPens}}" hint-size="844px,390px"></dc-import>
+    <dc-import name="Duelo" ai-level="{{m_ai}}" kind="pen" shootout="{{ true }}" away-color="{{m_color}}" away-trim="{{m_trim}}" rival-name="{{m_away}}" on-end="{{onPens}}" hint-size="844px,390px"></dc-import>
   </sc-if>
 </div>
 </x-dc>

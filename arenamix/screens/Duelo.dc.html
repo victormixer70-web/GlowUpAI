@@ -16,9 +16,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 /* ---- shoot-out HUD: a TV broadcast look in the ARENA MIX blues ---- */
 .du-sb{position:absolute;left:50%;top:8px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;pointer-events:none;z-index:4}
 .du-sb-row{display:flex;align-items:stretch;filter:drop-shadow(0 6px 14px #02040Ccc)}
-.du-team{width:150px;height:36px;display:flex;align-items:center;gap:8px;padding:0 14px;font-family:'Titulos',sans-serif;font-size:17px;letter-spacing:.5px;color:#F4F7FF;white-space:nowrap;overflow:hidden}
-.du-team.y{justify-content:flex-end;clip-path:polygon(14px 0,100% 0,100% 100%,0 100%);background:linear-gradient(180deg,#1E8BFF,#0A3DCC 60%,#06102E);box-shadow:inset 0 2px 0 #7CC4FF}
-.du-team.r{clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%);background:linear-gradient(180deg,#FF7A3D,#C2410C 60%,#3A1204);box-shadow:inset 0 2px 0 #FFB38A}
+.du-team{width:150px;height:36px;display:flex;align-items:center;gap:8px;padding:0 14px;font-family:'Titulos',sans-serif;font-size:17px;letter-spacing:.5px;white-space:nowrap;overflow:hidden}
+.du-team.y{justify-content:flex-end;clip-path:polygon(14px 0,100% 0,100% 100%,0 100%);background:linear-gradient(180deg,var(--yl),var(--yc) 45%,var(--yd));box-shadow:inset 0 2px 0 var(--yl);color:var(--yi);text-shadow:var(--ys)}
+.du-team.r{clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%);background:linear-gradient(180deg,var(--rl),var(--rc) 45%,var(--rd));box-shadow:inset 0 2px 0 var(--rl);color:var(--ri);text-shadow:var(--rs)}
 .du-team span{overflow:hidden;text-overflow:ellipsis}
 .du-tag{flex:none;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:12px;background:#02040C88;box-shadow:inset 0 0 0 1.5px #FFFFFF55}
 .du-score{min-width:96px;height:40px;margin-top:-2px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 12px;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 2px #02040C,0 0 0 3.5px #1E8BFF,0 0 18px #1E8BFF88;font-family:'Titulos',sans-serif;font-size:30px;line-height:1;color:#FFFFFF}
@@ -31,7 +31,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .du-pip.ko{background:radial-gradient(circle at 35% 30%,#FF9A9A,#DC2626);box-shadow:0 0 8px #EF4444}
 .du-pip.ok::after{content:'';width:6px;height:3px;border:solid #02240F;border-width:0 0 2px 2px;transform:rotate(-45deg) translate(1px,-1px)}
 .du-pip.ko::after{content:'×';font:900 13px/1 Exo2,sans-serif;color:#3A0606;margin-top:-1px}
-.du-pip.cur{box-shadow:inset 0 0 0 1.5px #3DA9FF,0 0 0 2px #3DA9FF55;animation:duPip 1s ease-in-out infinite}
+.du-pip.cur{box-shadow:inset 0 0 0 1.5px var(--yl),0 0 0 2px var(--yc);animation:duPip 1s ease-in-out infinite}
 @keyframes duPip{50%{box-shadow:inset 0 0 0 1.5px #BFE6FF,0 0 0 4px #3DA9FF33}}
 .du-rib{margin-top:5px;padding:2px 14px 1px;transform:skewX(-14deg);background:#02040Cdd;box-shadow:0 0 0 1.5px #1E8BFF66;font-family:'Titulos',sans-serif;font-size:11px;letter-spacing:2px;color:#9FD0FF}
 .du-rib.sd{background:linear-gradient(90deg,#B45309,#FFC53D,#B45309);color:#1A0E00;box-shadow:0 0 14px #FFC53D88;animation:duSd 1.2s ease-in-out infinite}
@@ -40,16 +40,16 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .du-turn{position:absolute;left:0;right:0;top:96px;display:flex;justify-content:center;pointer-events:none}
 .du-turn b{display:flex;align-items:center;gap:10px;padding:5px 22px 4px;transform:skewX(-14deg);font-family:'Titulos',sans-serif;font-weight:400;font-size:22px;letter-spacing:2px;color:#FFFFFF;animation:duIn .45s cubic-bezier(.2,1.4,.4,1) both}
 .du-turn b>*{transform:skewX(14deg)}
-.du-turn.you b{background:linear-gradient(90deg,transparent,#0A3DCC 18%,#1E8BFF 50%,#0A3DCC 82%,transparent);text-shadow:0 2px 0 #02040C}
-.du-turn.gk b{background:linear-gradient(90deg,transparent,#9A3412 18%,#FF7A3D 50%,#9A3412 82%,transparent);text-shadow:0 2px 0 #2A0A00}
+.du-turn.you b{background:linear-gradient(90deg,transparent,var(--yd) 15%,var(--yc) 50%,var(--yd) 85%,transparent);color:var(--yi);text-shadow:var(--ys)}
+.du-turn.gk b{background:linear-gradient(90deg,transparent,var(--rd) 15%,var(--rc) 50%,var(--rd) 85%,transparent);color:var(--ri);text-shadow:var(--rs)}
 @keyframes duIn{from{opacity:0;transform:skewX(-14deg) translateX(-60px)}}
 .du-cd{position:absolute;left:0;right:0;top:134px;display:flex;justify-content:center;pointer-events:none}
 .du-cd b{font-family:'Titulos',sans-serif;font-weight:400;font-size:84px;line-height:1;background:linear-gradient(180deg,#FFFFFF 10%,#BFE3FF 50%,#1E8BFF);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 5px 0 #02040C) drop-shadow(0 0 20px #1E8BFF)}
 .du-cd.wait b{font-size:30px;letter-spacing:2px}
 .du-res{position:absolute;left:0;right:0;top:96px;display:flex;flex-direction:column;align-items:center;pointer-events:none}
 .du-res .w{font-family:'Titulos',sans-serif;font-weight:400;font-size:86px;line-height:1.05;padding:0 6px;transform:rotate(-4deg);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:2px #02040C;filter:drop-shadow(0 6px 0 #02040C);animation:duRes .5s cubic-bezier(.2,1.6,.4,1) both}
-.du-res.goal .w{background-image:linear-gradient(180deg,#FFFFFF 0%,#BFE6FF 40%,#3DA9FF 55%,#0A3DCC 100%);filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 24px #1E8BFF)}
-.du-res.save .w{background-image:linear-gradient(180deg,#FFFFFF 0%,#FFE0C2 40%,#FF8A3D 55%,#9A3412 100%);filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 24px #FF7A3D)}
+.du-res.goal .w{background-image:linear-gradient(180deg,#FFFFFF 0%,var(--yl) 40%,var(--yc) 55%,var(--yd) 100%);filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 24px var(--yc))}
+.du-res.save .w{background-image:linear-gradient(180deg,#FFFFFF 0%,var(--rl) 40%,var(--rc) 55%,var(--rd) 100%);filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 24px var(--rc))}
 .du-res.miss .w{background-image:linear-gradient(180deg,#FFFFFF 0%,#D7DCE8 45%,#8D9AB6 55%,#3A4766 100%)}
 @keyframes duRes{from{opacity:0;transform:rotate(-4deg) scale(2.3)}}
 .du-res .s{margin-top:6px;padding:4px 16px 3px;transform:skewX(-14deg);background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 1.5px #1E8BFF;font-family:'Titulos',sans-serif;font-size:15px;letter-spacing:1px;color:#E6F2FF;animation:duIn .4s .2s both}
@@ -71,7 +71,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .du-shoot{position:absolute;right:14px;bottom:14px;display:flex;align-items:flex-end;gap:10px}
 .du-meter{position:relative;width:20px;height:150px;border-radius:10px;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 1.5px #1E8BFF88,inset 0 0 8px #000;overflow:hidden}
 .du-meter::before{content:'';position:absolute;inset:3px;border-radius:7px;background:linear-gradient(0deg,#1E8BFF22,#FF5C5C33)}
-.du-go{width:98px;height:98px;border-radius:50%;border:0;touch-action:none;cursor:pointer;display:grid;place-items:center;font-family:'Titulos',sans-serif;font-size:21px;letter-spacing:1px;color:#FFFFFF;text-shadow:0 2px 0 #02040C;background:radial-gradient(circle at 50% 35%,#5BB8FF,#1E8BFF 45%,#0A3DCC 80%);box-shadow:0 0 0 3px #02040C,0 0 0 5.5px #7CC4FF,0 6px 0 5px #02040C,0 0 26px #1E8BFF}
+.du-go{width:98px;height:98px;border-radius:50%;border:0;touch-action:none;cursor:pointer;display:grid;place-items:center;font-family:'Titulos',sans-serif;font-size:21px;letter-spacing:1px;color:var(--yi);text-shadow:var(--ys);background:radial-gradient(circle at 50% 35%,var(--yl),var(--yc) 50%,var(--yd) 95%);box-shadow:0 0 0 3px #02040C,0 0 0 5.5px var(--yl),0 6px 0 5px #02040C,0 0 26px var(--yc)}
 .du-go.c-in{background:radial-gradient(circle at 50% 35%,#A7F3C5,#22C55E 50%,#15803D);box-shadow:0 0 0 3px #02040C,0 0 0 5.5px #BBF7D0,0 6px 0 5px #02040C,0 0 30px #22C55E}
 .du-go.c-out{background:radial-gradient(circle at 50% 35%,#FFE58A,#FFC53D 50%,#B45309);box-shadow:0 0 0 3px #02040C,0 0 0 5.5px #FFE58A,0 6px 0 5px #02040C,0 0 26px #FFC53D}
 .du-rep{position:absolute;left:66px;top:12px;display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:12px;background:#02040Ccc;box-shadow:0 0 0 1.5px #E5484D88;pointer-events:none}
@@ -79,11 +79,11 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .du-rep b{font-family:'Titulos',sans-serif;font-weight:400;font-size:17px;letter-spacing:2px}
 .du-rep small{font-size:11px;font-weight:700;color:#A3A3C2}
 .du-done{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(60% 70% at 50% 45%,#06102Ecc,#02040Cf2);z-index:6}
-.du-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;padding:18px 34px 20px;border-radius:22px;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 2px #1E8BFF,0 0 40px #1E8BFF66;animation:duRes .5s cubic-bezier(.2,1.4,.4,1) both}
-.du-card.lose{box-shadow:0 0 0 2px #FF5C5C,0 0 40px #FF5C5C55}
+.du-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;padding:18px 34px 20px;border-radius:22px;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 2px var(--yc),0 0 40px var(--yc);animation:duRes .5s cubic-bezier(.2,1.4,.4,1) both}
+.du-card.lose{box-shadow:0 0 0 2px var(--rc),0 0 40px var(--rc)}
 .du-card .k{font:400 12px 'Titulos',sans-serif;letter-spacing:3px;color:#7CC4FF}
-.du-card .t{font-family:'Titulos',sans-serif;font-size:40px;line-height:1.05;text-align:center;background:linear-gradient(180deg,#FFFFFF,#BFE6FF 45%,#3DA9FF 55%,#0A3DCC);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #02040C)}
-.du-card.lose .t{background-image:linear-gradient(180deg,#FFFFFF,#FFD0D0 45%,#FF5C5C 55%,#991B1B)}
+.du-card .t{font-family:'Titulos',sans-serif;font-size:40px;line-height:1.05;text-align:center;background:linear-gradient(180deg,#FFFFFF,var(--yl) 45%,var(--yc) 55%,var(--yd));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #02040C)}
+.du-card.lose .t{background-image:linear-gradient(180deg,#FFFFFF,var(--rl) 45%,var(--rc) 55%,var(--rd))}
 .du-final{display:flex;align-items:center;gap:0;margin-top:2px}
 .du-final .du-team{width:130px}
 .du-final .du-score{font-size:34px;height:44px}
@@ -97,7 +97,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .du-prac b{font-family:'Titulos',sans-serif;font-weight:400;font-size:22px;line-height:1}
 </style>
 </helmet>
-<div data-am-game="1" style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0E0E1C; color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none; -webkit-user-select: none">
+<div data-am-game="1" style="{{teamVars}} position: relative; width: 844px; height: 390px; overflow: hidden; background: #0E0E1C; color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none; -webkit-user-select: none">
   <canvas ref="{{canvasRef}}" width="844" height="390" style="position: absolute; left: 0; top: 0; width: 844px; height: 390px; display: block"></canvas>
 
   <svg width="844" height="390" viewBox="0 0 844 390" style="position: absolute; left: 0; top: 0; pointer-events: none">
@@ -385,6 +385,27 @@ class Component extends DCLogic {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   }
   shotN() { return this.sh.you.length + this.sh.rival.length; }
+  // the two sides' colours: yours from the kit you wear (Taquilla), the rival's from the match (kept apart from yours)
+  homeCol() { const o = window.AMChars && window.AMChars.outfit && window.AMChars.outfit('futbol'); return (o && o.primary) || '#FF8A3D'; }
+  rivalCol() {
+    if (!this._rc) {
+      const T = THREE, home = new T.Color(this.homeCol()), want = this.props.awayColor ?? '#3EA6FF';
+      const far = (c) => { const x = new T.Color(c); return Math.abs(x.r - home.r) + Math.abs(x.g - home.g) + Math.abs(x.b - home.b) > 0.55; };
+      this._rc = far(want) ? want : ['#3EA6FF', '#F4F4FA', '#FFC53D', '#2FBF71', '#E5484D', '#A78BFA'].find(far) || want;
+    }
+    return this._rc;
+  }
+  // CSS colours for the HUD: base, light, dark and the ink that reads on it
+  hudVars() {
+    const T = THREE, one = (c, k) => {
+      const x = new T.Color(c), hx = (q) => '#' + q.getHexString();
+      const lum = 0.2126 * x.r + 0.7152 * x.g + 0.0722 * x.b;
+      // a near-black kit is lifted so its plates still glow
+      const base = lum < 0.08 ? x.clone().lerp(new T.Color('#5A6A8A'), 0.45) : x.clone();
+      return '--' + k + 'c: ' + hx(base) + '; --' + k + 'l: ' + hx(base.clone().lerp(new T.Color('#FFFFFF'), 0.45)) + '; --' + k + 'd: ' + hx(base.clone().lerp(new T.Color('#02040C'), 0.72)) + '; --' + k + 'i: ' + (lum > 0.62 ? '#02040C' : '#FFFFFF') + '; --' + k + 's: ' + (lum > 0.62 ? '0 1px 0 #ffffff88' : '0 2px 0 #02040C') + ';';
+    };
+    return one(this.homeCol(), 'y') + ' ' + one(this.rivalCol(), 'r');
+  }
   setup(init) {
     if (this.ol) { let h = 7; const c = String(this.ol.room.code || 'duelo'); for (let i = 0; i < c.length; i++) h = (h * 31 + c.charCodeAt(i)) >>> 0; this.seed = h; }
     this.st = this.loadStats();
@@ -1430,7 +1451,8 @@ class Component extends DCLogic {
     this.keeper.rotation.y = Math.PI;
     S.add(this.keeper);
     this.shooterYou = this.makePlayer({ you: true, sport: 'futbol', shirt: 0xff8a3d, shorts: 0x141b2d, socks: 0xf2f5fa, number: '10', trimCss: '#0B0B14' });
-    this.shooterRival = this.makePlayer({ shirt: 0x3ea6ff, shorts: 0xf2f5fa, socks: 0x3ea6ff, number: '9', trimCss: '#F4F4FA', hair: 0xc9a227, boot: 0xf2f5fa });
+    const rc = new THREE.Color(this.rivalCol()).getHex();
+    this.shooterRival = this.makePlayer({ shirt: rc, shorts: 0xf2f5fa, socks: rc, number: '9', trimCss: this.props.awayTrim ?? '#F4F4FA', hair: 0xc9a227, boot: 0xf2f5fa });
     S.add(this.shooterYou); S.add(this.shooterRival);
     this.wallMen = []; this.targets = [];
     this.placeWallAndTargets();
@@ -1901,6 +1923,7 @@ class Component extends DCLogic {
           specFlash: this.special && youTurn && (this.phase === 'runup' || this.phase === 'flight') && !this.replaying ? (Duelo_SPECIALS.find((q) => q.id === this.special.id) || {}).name || '' : ''
         };
       })(),
+      teamVars: this.hudVars(),
       penCtl: aimUI && this.kind === 'pen',
       curveOff: this.specSel === 'panenka' || this.specSel === 'rabona',
       chutCls: 'du-go' + (this.charge ? (m >= zlo && m <= zhi ? ' c-in' : ' c-out') : ''),
