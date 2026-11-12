@@ -41,6 +41,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <label for="fk-height" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>ALTURA</span><span style="color: #F4F4FA">{{heightTxt}}</span></label>
       <input id="fk-height" type="range" min="0" max="100" step="1" value="{{heightVal}}" onInput="{{onHeight}}" style="width: 100%; accent-color: #FFC53D">
     </div>
+  </sc-if>
+  <sc-if value="{{aimUI}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; right: 14px; bottom: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px">
       <div style="position: relative; width: 22px; height: 130px; border-radius: 11px; background: #0B0B14D9; border: 2px solid #2E2E52; overflow: hidden">
         <div style="{{zoneStyle}}"></div>
@@ -206,7 +208,7 @@ class Component extends DCLogic {
     if (window.AMPad) window.AMPad.hold();
     const youTurn = this.turn === 'you' || this.practice;
     if (youTurn && this.phase === 'aim') {
-      if (this.fkMode()) {
+      if (this.aimMode()) {
         const a = this.aim;
         a.x = cl(a.x + sx * xs * 3.2 * dt, GX - 5, GX + 5); a.y = cl(a.y - sy * 2.2 * dt, 0.15, 3.3);
         if (st.b[4] && !pv.b[4]) a.s = cl(Math.round((a.s - 0.25) * 4) / 4, -1, 1);
@@ -214,7 +216,7 @@ class Component extends DCLogic {
         if (st.b[3] && !pv.b[3]) a.h = cl(Math.round((a.h + 0.25) * 4) / 4, 0, 1);
         if (st.b[2] && !pv.b[2]) a.h = cl(Math.round((a.h - 0.25) * 4) / 4, 0, 1);
         if (A && !this.charge) { this.charge = { t0: performance.now() }; this.loop(); }
-        if (Aup && this.charge) this.fkShoot();
+        if (Aup && this.charge) { if (this.kind === 'pen') this.penShoot(); else this.fkShoot(); }
         this.forceUpdate();
         return;
       }
@@ -307,8 +309,9 @@ class Component extends DCLogic {
     this.padAim = null; this.padCharge = null;
     this.b = { x: 0, y: 0.11, z: 0, vx: 0, vy: 0, vz: 0, curve: 0 };
     // free kicks: target on goal, curve and height chosen by the player (EA FC style)
-    if (!this.aim || this.aim.fk !== this.fk) this.aim = { fk: this.fk, x: this.GX + (this.GX >= 1 ? -2.3 : 2.3), y: 1.75, s: 0.45, h: 0.45 };
-    this.plan = null; this.charge = null;
+    if (this.kind === 'pen') { if (!this.aim || this.aim.pen !== true) this.aim = { pen: true, x: this.GX + 1.6, y: 0.9, s: 0, h: 0 }; }
+    else if (!this.aim || this.aim.fk !== this.fk) this.aim = { fk: this.fk, x: this.GX + (this.GX >= 1 ? -2.3 : 2.3), y: 1.75, s: 0.45, h: 0.45 };
+    this.plan = null; this.charge = null; this.shotRisk = 0;
     this.k = { x: this.GX, y: 0, a: 0, aT: 0, xT: this.GX, decided: false, up: false, early: false };
     this.phase = this.turn === 'you' ? 'aim' : 'defend';
     this.pt = 0; this.result = null; this.trail = []; this.swipe = null; this.tap = null; this.pendingDive = null; this.pendingShot = null;
@@ -539,10 +542,12 @@ class Component extends DCLogic {
     if (this.phase === 'runup' && this.pt >= Duelo_RUN) { this.launchPending(); return; }
     if (this.phase === 'flight' || this.phase === 'result') {
       if (this.WALL.length) this.wallJ = this.pt < 1 && this.phase === 'flight' ? Math.max(0, Math.sin(Math.min(1, Math.max(0, (this.pt - 0.12) / 0.55)) * Math.PI)) * 0.3 : Math.max(0, this.wallJ - dt);
-      if (this.turn === 'you' && !this.ol && !k.decided && this.phase === 'flight' && this.pt > (this.kind === 'pen' ? 0.32 : 0.62)) {
+      // (a well-struck shot into the corner: he reads it later and guesses wrong more often)
+      const rk = this.shotRisk || 0;
+      if (this.turn === 'you' && !this.ol && !k.decided && this.phase === 'flight' && this.pt > (this.kind === 'pen' ? 0.32 + 0.05 * rk : 0.62)) {
         const pr = this.predict();
         let px = pr.x;
-        if (Math.random() < (this.kind === 'pen' ? 0.35 : 0.25) + (0.5 - this.aiLevel()) * 0.5) px = GX - (px - GX);
+        if (Math.random() < (this.kind === 'pen' ? 0.35 + 0.45 * rk : 0.25) + (0.5 - this.aiLevel()) * 0.5) px = GX - (px - GX);
         this.aimKeeper(px, pr.y);
       }
       if (k.decided) {
@@ -576,7 +581,7 @@ class Component extends DCLogic {
           const vx = bx - ax, vy = by - ay, t = Math.max(0, Math.min(1, ((c.x - ax) * vx + (c.y - ay) * vy) / (vx * vx + vy * vy)));
           let dist = Math.hypot(c.x - (ax + vx * t), c.y - (ay + vy * t));
           if (!k.up && Math.abs(c.y - (k.y + 1.25)) < 0.3) dist = Math.min(dist, Math.max(0, Math.abs(c.x - k.x) - 0.65));
-          if (dist < (this.turn === 'you' && !this.ol ? 0.24 + 0.18 * this.aiLevel() : 0.33)) {
+          if (dist < (this.turn === 'you' && !this.ol ? (0.24 + 0.18 * this.aiLevel()) * (1 - 0.75 * (this.shotRisk || 0)) : 0.33)) {
             b.z = kz - 0.05; b.vz = -Math.abs(b.vz) * 0.35; b.vx = (c.x - k.x) * 3 + (Math.random() - 0.5) * 3; b.vy = 3; b.curve = 0; b.res = null;
             this.setResult('parada', this.turn === 'rival' ? '¡La has parado!' : 'El portero lo adivina');
           }
@@ -1514,6 +1519,8 @@ class Component extends DCLogic {
     return this.aiL;
   }
   fkMode() { return this.kind === 'free' && (this.turn === 'you' || this.practice); }
+  // your shot, penalty or free kick: a target on the goal and the power bar (no more swiping)
+  aimMode() { return (this.kind === 'free' || this.kind === 'pen') && (this.turn === 'you' || this.practice); }
   xSign() {
     // which way +x goes on screen (the camera looks down the pitch, so it can be mirrored)
     if (!this.cam) return 1;
@@ -1546,8 +1553,30 @@ class Component extends DCLogic {
     return 1 - Math.abs((t % 2) - 1);
   }
   zone() {
-    const w = 0.09 + 0.08 * this.tt('pre');
+    let w = 0.09 + 0.08 * this.tt('pre');
+    // a penalty: the closer to the posts and the bar, the smaller the green (the safe middle is easy)
+    if (this.kind === 'pen' && this.aim) w *= 1.9 - 1.1 * this.penRisk();
     return [0.74 - w / 2, 0.74 + w / 2];
+  }
+  penRisk() {
+    const a = this.aim, rx = Math.abs(a.x - this.GX) / 3.66, ry = a.y / 2.44;
+    return Math.max(0, Math.min(1, (Math.max(rx, ry * 0.9) - 0.35) / 0.6));
+  }
+  penShoot() {
+    const m = this.meter(), [lo, hi] = this.zone(), a = this.aim;
+    this.charge = null;
+    // in the green: the ball goes where you aimed, hard. Too soft: slower and lower (easier to save);
+    // too hard: it rises and drifts (over the bar or wide if you aimed close to the frame)
+    const dev = m < lo ? (m - lo) * 1.5 : m > hi ? m - hi : 0;
+    const speed = Math.max(11, (21 + 3 * this.tt('pot')) * (1 + Math.min(0, dev) * 0.9));
+    const tx = a.x + (dev > 0 ? Math.sign(a.x - this.GX || 1) * dev * 2.2 : 0), ty = Math.max(0.12, a.y + (dev > 0 ? dev * 3.2 : dev * 1.2));
+    const v = this.aimFor({ x: tx, y: ty }, speed, 0);
+    this.lastTiming = dev === 0 ? 'perfect' : dev < 0 ? 'low' : 'high';
+    // a well-struck shot into the corner is close to unstoppable, as in real life (the keeper only gets a
+    // fingertip on it if he guessed right); a soft one or one down the middle he can deal with
+    this.shotRisk = dev === 0 ? 0.25 + 0.75 * this.penRisk() : 0;
+    this.lastSwipe = null;
+    this.queueShot(v, (0.2 * (1 - this.tt('pre')) + Math.abs(dev) * 4) / v.T);
   }
   fkShoot() {
     const m = this.meter(), [lo, hi] = this.zone();
@@ -1663,8 +1692,16 @@ class Component extends DCLogic {
     const k = this.k, f2 = (n) => n.toFixed(1);
     const tab = (on) => 'height: 36px; padding: 0 14px; border: 0; border-radius: 10px; font: 800 13px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
     const fkAim = this.fkMode() && this.phase === 'aim' && !!this.cam;
+    const aimUI = this.aimMode() && this.phase === 'aim' && !!this.cam;
     const showTraj = this.fkMode() && !!this.cam && (this.phase === 'aim' || this.phase === 'runup');
+    const penAim = this.kind === 'pen' && this.aimMode() && !!this.cam && (this.phase === 'aim' || this.phase === 'runup');
     let trajPts = '', retXf = 'translate(-99 -99)', apexXf = 'translate(-99 -99)', trajCol = '#FFFFFF';
+    if (penAim) {
+      // a penalty: just the target on the goal (red outside the frame)
+      const rs = this.toScreen(this.aim.x, this.aim.y, this.D);
+      retXf = 'translate(' + f2(rs.x) + ' ' + f2(rs.y) + ')';
+      trajCol = Math.abs(this.aim.x - this.GX) > 3.55 || this.aim.y > 2.33 ? '#FF5C5C' : '#FFFFFF';
+    }
     if (showTraj) {
       const pl = this.fkPlan();
       trajPts = pl.path.map((q) => { const s = this.toScreen(q.x, q.y, q.z); return f2(s.x) + ',' + f2(s.y); }).join(' ');
@@ -1676,7 +1713,7 @@ class Component extends DCLogic {
     const m = this.meter(), [zlo, zhi] = this.zone();
     const sAbs = Math.round(Math.abs(this.aim ? this.aim.s : 0) * 100);
     return {
-      fkAim, trajPts, retXf, apexXf, trajCol, trajOp: showTraj ? (this.phase === 'runup' ? '0.5' : '0.95') : '0',
+      fkAim, aimUI, trajPts, retXf, apexXf, trajCol, trajOp: showTraj || penAim ? (this.phase === 'runup' ? '0.5' : '0.95') : '0',
       curveVal: String(Math.round((this.aim ? this.aim.s : 0) * 100)), heightVal: String(Math.round((this.aim ? this.aim.h : 0) * 100)),
       curveTxt: sAbs < 5 ? 'Recto' : (this.aim.s > 0 ? 'Derecha ' : 'Izquierda ') + sAbs + '%',
       heightTxt: !this.aim ? '' : this.aim.h < 0.25 ? 'Tenso' : this.aim.h < 0.65 ? 'Medio' : 'Bombeado',
@@ -1693,10 +1730,10 @@ class Component extends DCLogic {
       zoneStyle: 'position: absolute; left: 0; right: 0; bottom: ' + (zlo * 100).toFixed(1) + '%; height: ' + ((zhi - zlo) * 100).toFixed(1) + '%; background: #53D88E;',
       meterStyle: 'position: absolute; left: 3px; right: 3px; bottom: ' + (m * 100).toFixed(1) + '%; height: 4px; margin-bottom: -2px; border-radius: 2px; background: #F4F4FA; box-shadow: 0 0 6px #FFFFFF;',
       chutBg: this.charge ? (m >= zlo && m <= zhi ? '#53D88E' : '#FFC53D') : '#F4F4FA',
-      chargeDown: (e) => { if (!fkAim) return; e.preventDefault(); e.stopPropagation(); this.charge = { t0: performance.now() }; this.loop(); this.forceUpdate(); },
-      chargeUp: (e) => { if (!this.charge) return; e.preventDefault(); e.stopPropagation(); this.fkShoot(); },
+      chargeDown: (e) => { if (!aimUI) return; e.preventDefault(); e.stopPropagation(); this.charge = { t0: performance.now() }; this.loop(); this.forceUpdate(); },
+      chargeUp: (e) => { if (!this.charge) return; e.preventDefault(); e.stopPropagation(); if (this.kind === 'pen') this.penShoot(); else this.fkShoot(); },
       chargeCancel: () => { this.charge = null; this.forceUpdate(); },
-      hintWrap: 'position: absolute; left: 0; right: 0; bottom: ' + (fkAim ? 150 : 12) + 'px; display: flex; justify-content: center; pointer-events: none;',
+      hintWrap: 'position: absolute; left: 0; right: 0; bottom: ' + (fkAim ? 150 : aimUI ? 12 : 12) + 'px; display: flex; justify-content: center; pointer-events: none;',
       canvasRef: this.canvasRef,
       no3d: !!this.no3d,
       ghostPts: this.lastSwipe && this.phase !== 'aim' ? this.lastSwipe.pts.map((q) => f2(q.x) + ',' + f2(q.y)).join(' ') : '',
@@ -1721,8 +1758,8 @@ class Component extends DCLogic {
       countLabel: this.ol && this.waiting ? 'EL RIVAL APUNTA…' : cd > 0.8 ? String(Math.ceil(cd - 0.8)) : '¡CHUTA!',
       countStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + (this.ol && this.waiting ? 30 : 60) + 'px; line-height: 1; color: #F4F4FA; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (this.ol && this.waiting ? 1 : (1.3 - ((2.4 - cd) % 0.8) * 0.4)).toFixed(2) + ');',
       showHint: !this.replaying && ((this.phase === 'aim' && !this.swipe && !this.charge && !this.dragAim) || (this.phase === 'defend' && !this.tap) || (this.phase === 'flight' && !youTurn && !this.tap)),
-      hintText: this.padOn ? (this.fkMode() ? 'Mando: stick = diana · L1/R1 = efecto · □/△ = altura · mantén ○ y suelta en la zona verde' : youTurn ? 'Mando: apunta con el stick · mantén ○ para la potencia y suelta para chutar' : 'Mando: mueve la mira con el stick y pulsa ○ para lanzarte') : this.fkMode() ? 'Arrastra la diana en la portería · ajusta efecto y altura · mantén CHUTAR y suelta en la zona verde' : youTurn ? 'Desliza desde el balón hacia la portería · más rápido = más potencia · curva el gesto para dar efecto' : 'Toca la portería donde quieras lanzarte · si te tiras antes del disparo, el rival puede leerte',
-      zoneLabel: youTurn ? 'Zona de tiro: desliza desde el balón hacia la portería' : 'Portería: toca donde quieras que se lance el portero',
+      hintText: this.padOn ? (this.fkMode() ? 'Mando: stick = diana · L1/R1 = efecto · □/△ = altura · mantén ○ y suelta en la zona verde' : youTurn ? 'Mando: mueve la diana con el stick · mantén ○ y suelta en la zona verde' : 'Mando: mueve la mira con el stick y pulsa ○ para lanzarte') : this.fkMode() ? 'Arrastra la diana en la portería · ajusta efecto y altura · mantén CHUTAR y suelta en la zona verde' : youTurn ? 'Arrastra la diana donde quieras tirar · mantén CHUTAR y suelta en la zona verde · cuanto más a la escuadra, más pequeña' : 'Toca la portería donde quieras lanzarte · si te tiras antes del disparo, el rival puede leerte',
+      zoneLabel: youTurn ? 'Portería: toca o arrastra para mover la diana' : 'Portería: toca donde quieras que se lance el portero',
       showResult: this.phase === 'result' && !!R && !this.replaying,
       showReplay: !!this.replaying,
       resultText: rm[0],
@@ -1745,7 +1782,7 @@ class Component extends DCLogic {
         if (youTurn || this.practice) {
           if (this.phase !== 'aim') return;
           e.preventDefault();
-          if (this.fkMode()) {
+          if (this.aimMode()) {
             // move the target on the goal mouth
             if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
             this.dragAim = true; this.setAim(e); return;
