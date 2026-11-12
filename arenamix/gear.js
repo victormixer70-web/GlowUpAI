@@ -348,10 +348,16 @@
     cam.position.set(c.x + d * 0.45, c.y + d * lift, c.z + d * 0.84);
     cam.lookAt(c);
   }
+  // the pictures are kept on the phone: drawing one costs a moment, and they were drawn again on every launch
+  // (about twenty when the modes or the profile first open). Change GKEY when the drawings change.
+  var GKEY = 'arenamix.gear1.';
+  function kept(key) { try { return localStorage.getItem(GKEY + key) || ''; } catch (e) { return ''; } }
+  function keep(key, url) { try { if (url) localStorage.setItem(GKEY + key, url); } catch (e) {} }
   function snap(obj, fill) {
     S.add(obj); obj.updateMatrixWorld(true); frame(obj, fill);
     R.render(S, cam);
-    var url = R.domElement.toDataURL('image/png');
+    // webp: a fifth of the size of png, transparency included
+    var url = R.domElement.toDataURL('image/webp', 0.9); if (url.indexOf('data:image/webp') !== 0) url = R.domElement.toDataURL('image/png');
     S.remove(obj);
     obj.traverse(function (m) { if (m.geometry) m.geometry.dispose(); });
     return url;
@@ -360,6 +366,7 @@
     if (!it) return '';
     var key = cat + ':' + it.id + ':' + (it.color || '');
     if (cache[key]) return cache[key];
+    if ((cache[key] = kept('t:' + key))) return cache[key];
     if (!stage()) return '';
     var g = new T.Group();
     if (cat === 'calzado') { var b = boot(it.color); b.rotation.y = 0.45; b.rotation.z = 0.08; g.add(b); b.position.set(0.7, 0, 0.7); var b2 = boot(it.color); b2.rotation.y = 0.3; b2.position.set(-0.9, 0.0, -1.1); g.add(b2); }
@@ -372,6 +379,7 @@
     }
     g.userData.low = cat === 'calzado';
     cache[key] = snap(g, cat === 'calzado' ? 0.92 : 0.95);
+    keep('t:' + key, cache[key]);
     return cache[key];
   }
 
@@ -642,10 +650,12 @@
   var pcache = {};
   function prize(kind) {
     if (pcache[kind]) return pcache[kind];
+    if ((pcache[kind] = kept('p:' + kind))) return pcache[kind];
     if (!stage()) return '';
     var g = prizeModel(kind);
     g.userData.low = kind.indexOf('boots') === 0;
     pcache[kind] = snap(g, kind.indexOf('chest') === 0 ? 0.8 : 0.84);
+    keep('p:' + kind, pcache[kind]);
     return pcache[kind];
   }
 

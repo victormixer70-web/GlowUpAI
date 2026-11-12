@@ -4117,6 +4117,14 @@ class Component extends DCLogic {
       f.m.rotation.y = Math.sin(tnow * 2.2 * k + f.ph) * 0.9; f.m.rotation.z = Math.sin(tnow * 3.1 * k + f.ph) * 0.15;
     });
     this.fxFrame(dt || 0);
+    // players out of the picture are not drawn: the eight animated players are most of the picture's work.
+    // The test sphere is generous (4 m round the body) so a player at the edge, a dive or a shadow falling
+    // into the picture is never cut.
+    if (this.pMeshes) {
+      const F = this.frus || (this.frus = { f: new T.Frustum(), m: new T.Matrix4(), s: new T.Sphere(new T.Vector3(), 4) });
+      this.cam.updateMatrixWorld(); F.m.multiplyMatrices(this.cam.projectionMatrix, this.cam.matrixWorldInverse); F.f.setFromProjectionMatrix(F.m);
+      this.pMeshes.forEach((m) => { F.s.center.set(m.position.x, m.position.y + 1, m.position.z); m.visible = F.f.intersectsSphere(F.s); });
+    }
     this.R.render(this.S, this.cam);
   }
   mat(color, o) {

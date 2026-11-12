@@ -300,6 +300,39 @@
   // (a mutation observer runs before the next paint, so the new screen is never drawn with the wrong colours)
   try { new MutationObserver(syncAttr).observe(stage || document.body, { childList: true, subtree: false, attributes: true, attributeFilter: ['data-screen'] }); } catch (e) {}
   setInterval(syncAttr, 1500);
+
+  // ---- light menus for modest phones ----
+  // looping effects that change a background position, a glow (box-shadow), a filter or a clip make the phone
+  // repaint that part of the screen on every frame; a modest phone spends its time there and the menus stutter.
+  // On such a phone (Gráficos: Baja, or Automático on a phone with few cores / little memory, or one that already had
+  // to drop the shadows in a match) those loops are stopped at their first frame. Moves, fades and turns
+  // (transform, opacity) are cheap and keep running.
+  var liteMenus = function () {
+    var P = {}; try { P = window.AMPlay ? window.AMPlay() : {}; } catch (e) {}
+    if (P.gfx === 'baja') return true;
+    if (P.gfx && P.gfx !== 'auto') return false;
+    var A = null; try { A = JSON.parse(localStorage.getItem('arenamix.gfxdyn.v1') || 'null'); } catch (e) {}
+    if (A) return !A.shadows;
+    return (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 3;
+  };
+  var CHEAP = /^(offset|easing|composite|computedOffset|transform|opacity|translate|scale|rotate)$/;
+  var stopped = typeof WeakSet === 'function' ? new WeakSet() : null;
+  var calm = function () {
+    if (!stopped || !document.getAnimations || inGame() || !liteMenus()) return;
+    var L = document.getAnimations();
+    for (var i = 0; i < L.length; i++) {
+      var a = L[i];
+      if (stopped.has(a) || a.playState !== 'running' || !a.effect || a.effect.getTiming().iterations !== Infinity) continue;
+      stopped.add(a);
+      var heavy = false;
+      try { a.effect.getKeyframes().forEach(function (k) { for (var p in k) if (!CHEAP.test(p) && k[p] != null) heavy = true; }); } catch (e) {}
+      if (heavy) { try { a.currentTime = 0; a.pause(); } catch (e) {} }
+    }
+  };
+  if (!reduce) {
+    window.addEventListener('hashchange', function () { setTimeout(calm, 400); setTimeout(calm, 1500); });
+    setTimeout(calm, 1200); setInterval(calm, 2500);
+  }
   if (reduce) return;
 
   var layer = document.createElement('div'); layer.id = 'fx-layer';
