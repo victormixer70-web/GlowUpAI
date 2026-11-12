@@ -1161,9 +1161,9 @@ class Component extends DCLogic {
       arc(MID, 9.15, 0, Math.PI * 2); dot(MID, 0.2);
       // both ends: six-yard box, penalty box, spot and the arc
       [[D, -1], [FAR, 1]].forEach(([gz, s]) => {
-        ln(-9.16, gz - s * 5.5, 9.16, gz - s * 5.5); ln(-9.16, gz - s * 5.5, -9.16, gz); ln(9.16, gz - s * 5.5, 9.16, gz);
-        ln(-20.16, gz - s * 16.5, 20.16, gz - s * 16.5); ln(-20.16, gz - s * 16.5, -20.16, gz); ln(20.16, gz - s * 16.5, 20.16, gz);
-        dot(gz - s * 11, 0.15);
+        ln(-9.16, gz + s * 5.5, 9.16, gz + s * 5.5); ln(-9.16, gz + s * 5.5, -9.16, gz); ln(9.16, gz + s * 5.5, 9.16, gz);
+        ln(-20.16, gz + s * 16.5, 20.16, gz + s * 16.5); ln(-20.16, gz + s * 16.5, -20.16, gz); ln(20.16, gz + s * 16.5, 20.16, gz);
+        dot(gz + s * 11, 0.15);
         if (s < 0) arc(gz - 11, 9.15, Math.PI * 1.205, Math.PI * 1.795); else arc(gz + 11, 9.15, Math.PI * 0.205, Math.PI * 0.795);
         // corner arcs
         [-1, 1].forEach((sx) => { c.beginPath(); c.arc(X(GX + sx * HW), Z(gz), ppm, s < 0 ? (sx < 0 ? Math.PI * 1.5 : Math.PI) : (sx < 0 ? 0 : Math.PI * 0.5), s < 0 ? (sx < 0 ? Math.PI * 2 : Math.PI * 1.5) : (sx < 0 ? Math.PI * 0.5 : Math.PI), false); c.stroke(); });
