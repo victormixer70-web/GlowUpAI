@@ -12,6 +12,89 @@
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
+
+/* ---- shoot-out HUD: a TV broadcast look in the ARENA MIX blues ---- */
+.du-sb{position:absolute;left:50%;top:8px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;pointer-events:none;z-index:4}
+.du-sb-row{display:flex;align-items:stretch;filter:drop-shadow(0 6px 14px #02040Ccc)}
+.du-team{width:150px;height:36px;display:flex;align-items:center;gap:8px;padding:0 14px;font-family:'Titulos',sans-serif;font-size:17px;letter-spacing:.5px;color:#F4F7FF;white-space:nowrap;overflow:hidden}
+.du-team.y{justify-content:flex-end;clip-path:polygon(14px 0,100% 0,100% 100%,0 100%);background:linear-gradient(180deg,#1E8BFF,#0A3DCC 60%,#06102E);box-shadow:inset 0 2px 0 #7CC4FF}
+.du-team.r{clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%);background:linear-gradient(180deg,#FF7A3D,#C2410C 60%,#3A1204);box-shadow:inset 0 2px 0 #FFB38A}
+.du-team span{overflow:hidden;text-overflow:ellipsis}
+.du-tag{flex:none;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:12px;background:#02040C88;box-shadow:inset 0 0 0 1.5px #FFFFFF55}
+.du-score{min-width:96px;height:40px;margin-top:-2px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 12px;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 2px #02040C,0 0 0 3.5px #1E8BFF,0 0 18px #1E8BFF88;font-family:'Titulos',sans-serif;font-size:30px;line-height:1;color:#FFFFFF}
+.du-score i{font-style:normal;color:#3DA9FF;font-size:22px}
+.du-pips{display:flex;width:442px;justify-content:space-between;margin-top:5px}
+.du-pips>div{width:170px;display:flex;gap:5px}
+.du-pips>div.y{justify-content:flex-end}
+.du-pip{width:15px;height:15px;border-radius:50%;display:grid;place-items:center;background:#02040Ccc;box-shadow:inset 0 0 0 1.5px #3A4A78}
+.du-pip.ok{background:radial-gradient(circle at 35% 30%,#8BF5B5,#16A34A);box-shadow:0 0 8px #22C55E}
+.du-pip.ko{background:radial-gradient(circle at 35% 30%,#FF9A9A,#DC2626);box-shadow:0 0 8px #EF4444}
+.du-pip.ok::after{content:'';width:6px;height:3px;border:solid #02240F;border-width:0 0 2px 2px;transform:rotate(-45deg) translate(1px,-1px)}
+.du-pip.ko::after{content:'×';font:900 13px/1 Exo2,sans-serif;color:#3A0606;margin-top:-1px}
+.du-pip.cur{box-shadow:inset 0 0 0 1.5px #3DA9FF,0 0 0 2px #3DA9FF55;animation:duPip 1s ease-in-out infinite}
+@keyframes duPip{50%{box-shadow:inset 0 0 0 1.5px #BFE6FF,0 0 0 4px #3DA9FF33}}
+.du-rib{margin-top:5px;padding:2px 14px 1px;transform:skewX(-14deg);background:#02040Cdd;box-shadow:0 0 0 1.5px #1E8BFF66;font-family:'Titulos',sans-serif;font-size:11px;letter-spacing:2px;color:#9FD0FF}
+.du-rib.sd{background:linear-gradient(90deg,#B45309,#FFC53D,#B45309);color:#1A0E00;box-shadow:0 0 14px #FFC53D88;animation:duSd 1.2s ease-in-out infinite}
+@keyframes duSd{50%{filter:brightness(1.25)}}
+.du-back{position:absolute;left:12px;top:10px;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#F4F7FF;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 1.5px #1E8BFF88;z-index:5}
+.du-turn{position:absolute;left:0;right:0;top:96px;display:flex;justify-content:center;pointer-events:none}
+.du-turn b{display:flex;align-items:center;gap:10px;padding:5px 22px 4px;transform:skewX(-14deg);font-family:'Titulos',sans-serif;font-weight:400;font-size:22px;letter-spacing:2px;color:#FFFFFF;animation:duIn .45s cubic-bezier(.2,1.4,.4,1) both}
+.du-turn b>*{transform:skewX(14deg)}
+.du-turn.you b{background:linear-gradient(90deg,transparent,#0A3DCC 18%,#1E8BFF 50%,#0A3DCC 82%,transparent);text-shadow:0 2px 0 #02040C}
+.du-turn.gk b{background:linear-gradient(90deg,transparent,#9A3412 18%,#FF7A3D 50%,#9A3412 82%,transparent);text-shadow:0 2px 0 #2A0A00}
+@keyframes duIn{from{opacity:0;transform:skewX(-14deg) translateX(-60px)}}
+.du-cd{position:absolute;left:0;right:0;top:134px;display:flex;justify-content:center;pointer-events:none}
+.du-cd b{font-family:'Titulos',sans-serif;font-weight:400;font-size:84px;line-height:1;background:linear-gradient(180deg,#FFFFFF 10%,#BFE3FF 50%,#1E8BFF);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 5px 0 #02040C) drop-shadow(0 0 20px #1E8BFF)}
+.du-cd.wait b{font-size:30px;letter-spacing:2px}
+.du-res{position:absolute;left:0;right:0;top:96px;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.du-res .w{font-family:'Titulos',sans-serif;font-weight:400;font-size:86px;line-height:1.05;padding:0 6px;transform:rotate(-4deg);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:2px #02040C;filter:drop-shadow(0 6px 0 #02040C);animation:duRes .5s cubic-bezier(.2,1.6,.4,1) both}
+.du-res.goal .w{background-image:linear-gradient(180deg,#FFFFFF 0%,#BFE6FF 40%,#3DA9FF 55%,#0A3DCC 100%);filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 24px #1E8BFF)}
+.du-res.save .w{background-image:linear-gradient(180deg,#FFFFFF 0%,#FFE0C2 40%,#FF8A3D 55%,#9A3412 100%);filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 24px #FF7A3D)}
+.du-res.miss .w{background-image:linear-gradient(180deg,#FFFFFF 0%,#D7DCE8 45%,#8D9AB6 55%,#3A4766 100%)}
+@keyframes duRes{from{opacity:0;transform:rotate(-4deg) scale(2.3)}}
+.du-res .s{margin-top:6px;padding:4px 16px 3px;transform:skewX(-14deg);background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 1.5px #1E8BFF;font-family:'Titulos',sans-serif;font-size:15px;letter-spacing:1px;color:#E6F2FF;animation:duIn .4s .2s both}
+.du-flash{position:absolute;left:0;right:0;top:128px;display:flex;justify-content:center;pointer-events:none}
+.du-flash b{padding:4px 22px 3px;transform:skewX(-14deg);background:linear-gradient(180deg,#FFE58A,#FFC53D 50%,#B45309);box-shadow:0 0 0 2px #02040C,0 0 22px #FFC53D;font-family:'Titulos',sans-serif;font-weight:400;font-size:28px;letter-spacing:2px;color:#1A0E00;animation:duRes .45s cubic-bezier(.2,1.6,.4,1) both}
+.du-hint{position:absolute;left:0;right:0;display:flex;justify-content:center;pointer-events:none}
+.du-hint span{max-width:520px;padding:6px 16px;border-radius:999px;background:#02040Ccc;box-shadow:0 0 0 1px #1E8BFF55;font-size:12px;font-weight:700;color:#CFE3FF;text-align:center}
+.du-panel{position:absolute;left:12px;bottom:12px;width:286px;padding:9px 11px 10px;border-radius:16px;background:linear-gradient(180deg,#0B1A44ee,#02040Cee);box-shadow:0 0 0 1.5px #1E8BFF66,0 10px 24px #02040C99;display:flex;flex-direction:column;gap:6px}
+.du-panel h4{margin:0;display:flex;justify-content:space-between;font:400 11px 'Titulos',sans-serif;letter-spacing:1.5px;color:#7CC4FF}
+.du-panel h4 em{font-style:normal;color:#E6F2FF}
+.du-panel h4 small{font:700 10px Exo2,sans-serif;letter-spacing:.5px;color:#8FA3C8}
+.du-panel input[type=range]{width:100%;margin:0;accent-color:#3DA9FF}
+.du-panel .gold{color:#FFC53D}
+.du-spec{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.du-spec button{height:30px;padding:0 6px;border-radius:9px;border:1.5px solid #24407E;background:#06102E;color:#E6F2FF;font:400 11px 'Titulos',sans-serif;letter-spacing:.5px;cursor:pointer}
+.du-spec button[aria-pressed="true"]{background:linear-gradient(180deg,#FFE58A,#FFC53D);border-color:#FFC53D;color:#1A0E00;box-shadow:0 0 12px #FFC53D88}
+.du-spec button:disabled{opacity:.35;cursor:default}
+.du-desc{font-size:10.5px;line-height:1.25;color:#BBD0F0}
+.du-shoot{position:absolute;right:14px;bottom:14px;display:flex;align-items:flex-end;gap:10px}
+.du-meter{position:relative;width:20px;height:150px;border-radius:10px;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 1.5px #1E8BFF88,inset 0 0 8px #000;overflow:hidden}
+.du-meter::before{content:'';position:absolute;inset:3px;border-radius:7px;background:linear-gradient(0deg,#1E8BFF22,#FF5C5C33)}
+.du-go{width:98px;height:98px;border-radius:50%;border:0;touch-action:none;cursor:pointer;display:grid;place-items:center;font-family:'Titulos',sans-serif;font-size:21px;letter-spacing:1px;color:#FFFFFF;text-shadow:0 2px 0 #02040C;background:radial-gradient(circle at 50% 35%,#5BB8FF,#1E8BFF 45%,#0A3DCC 80%);box-shadow:0 0 0 3px #02040C,0 0 0 5.5px #7CC4FF,0 6px 0 5px #02040C,0 0 26px #1E8BFF}
+.du-go.c-in{background:radial-gradient(circle at 50% 35%,#A7F3C5,#22C55E 50%,#15803D);box-shadow:0 0 0 3px #02040C,0 0 0 5.5px #BBF7D0,0 6px 0 5px #02040C,0 0 30px #22C55E}
+.du-go.c-out{background:radial-gradient(circle at 50% 35%,#FFE58A,#FFC53D 50%,#B45309);box-shadow:0 0 0 3px #02040C,0 0 0 5.5px #FFE58A,0 6px 0 5px #02040C,0 0 26px #FFC53D}
+.du-rep{position:absolute;left:66px;top:12px;display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:12px;background:#02040Ccc;box-shadow:0 0 0 1.5px #E5484D88;pointer-events:none}
+.du-rep i{width:9px;height:9px;border-radius:50%;background:#E5484D;box-shadow:0 0 8px #E5484D;animation:duSd 1s infinite}
+.du-rep b{font-family:'Titulos',sans-serif;font-weight:400;font-size:17px;letter-spacing:2px}
+.du-rep small{font-size:11px;font-weight:700;color:#A3A3C2}
+.du-done{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(60% 70% at 50% 45%,#06102Ecc,#02040Cf2);z-index:6}
+.du-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;padding:18px 34px 20px;border-radius:22px;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 2px #1E8BFF,0 0 40px #1E8BFF66;animation:duRes .5s cubic-bezier(.2,1.4,.4,1) both}
+.du-card.lose{box-shadow:0 0 0 2px #FF5C5C,0 0 40px #FF5C5C55}
+.du-card .k{font:400 12px 'Titulos',sans-serif;letter-spacing:3px;color:#7CC4FF}
+.du-card .t{font-family:'Titulos',sans-serif;font-size:40px;line-height:1.05;text-align:center;background:linear-gradient(180deg,#FFFFFF,#BFE6FF 45%,#3DA9FF 55%,#0A3DCC);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #02040C)}
+.du-card.lose .t{background-image:linear-gradient(180deg,#FFFFFF,#FFD0D0 45%,#FF5C5C 55%,#991B1B)}
+.du-final{display:flex;align-items:center;gap:0;margin-top:2px}
+.du-final .du-team{width:130px}
+.du-final .du-score{font-size:34px;height:44px}
+.du-card .rw{padding:5px 14px;border-radius:999px;background:#FFC53D1f;box-shadow:inset 0 0 0 1.5px #FFC53D88;font-size:13px;font-weight:800;color:#FFD772}
+.du-card .bt{display:flex;gap:10px;margin-top:6px}
+.du-card .bt button{height:48px;padding:0 30px;border:0;border-radius:14px;cursor:pointer;font-family:'Titulos',sans-serif;font-size:19px;letter-spacing:2px;color:#FFFFFF;background:linear-gradient(180deg,#3DA9FF,#0A3DCC);box-shadow:0 5px 0 #02040C,0 0 18px #1E8BFF88}
+.du-card .bt a{display:flex;align-items:center;height:48px;padding:0 20px;border-radius:14px;box-shadow:inset 0 0 0 1.5px #7CC4FF;color:#E6F2FF;text-decoration:none;font-weight:800;font-size:14px}
+.du-prac{position:absolute;right:12px;top:10px;display:flex;gap:6px;z-index:4}
+.du-prac span{display:flex;flex-direction:column;align-items:center;min-width:60px;padding:4px 10px;border-radius:12px;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 1.5px #1E8BFF66}
+.du-prac small{font:400 10px 'Titulos',sans-serif;letter-spacing:1px;color:#7CC4FF}
+.du-prac b{font-family:'Titulos',sans-serif;font-weight:400;font-size:22px;line-height:1}
 </style>
 </helmet>
 <div data-am-game="1" style="position: relative; width: 844px; height: 390px; overflow: hidden; background: #0E0E1C; color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none; -webkit-user-select: none">
@@ -35,34 +118,36 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <div style="{{padCurStyle}}" aria-hidden="true"><svg width="54" height="54" viewBox="-27 -27 54 54"><circle r="20" fill="none" stroke="{{padCurC}}" stroke-width="3"/><circle r="20" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="{{padPow}}" transform="rotate(-90)"/><path d="M-26 0h10M16 0h10M0 -26v10M0 16v10" stroke="{{padCurC}}" stroke-width="3" stroke-linecap="round"/><circle r="3" fill="{{padCurC}}"/></svg></div>
   </sc-if>
   <sc-if value="{{fkAim}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; left: 12px; bottom: 12px; width: 236px; padding: 10px 12px; border-radius: 14px; background: #0B0B14D9; display: flex; flex-direction: column; gap: 6px">
-      <label for="fk-curve" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>EFECTO</span><span style="color: #F4F4FA">{{curveTxt}}</span></label>
-      <input id="fk-curve" type="range" min="-100" max="100" step="1" value="{{curveVal}}" onInput="{{onCurve}}" style="width: 100%; accent-color: #22D3EE">
-      <label for="fk-height" style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2"><span>ALTURA</span><span style="color: #F4F4FA">{{heightTxt}}</span></label>
-      <input id="fk-height" type="range" min="0" max="100" step="1" value="{{heightVal}}" onInput="{{onHeight}}" style="width: 100%; accent-color: #FFC53D">
+    <div class="du-panel">
+      <h4><label for="fk-curve">EFECTO</label><em>{{curveTxt}}</em></h4>
+      <input id="fk-curve" type="range" min="-100" max="100" step="1" value="{{curveVal}}" onInput="{{onCurve}}">
+      <h4><label for="fk-height">ALTURA</label><em>{{heightTxt}}</em></h4>
+      <input id="fk-height" type="range" min="0" max="100" step="1" value="{{heightVal}}" onInput="{{onHeight}}">
     </div>
   </sc-if>
-  <sc-if value="{{specShow}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; left: 12px; bottom: 12px; width: 286px; padding: 8px 10px; border-radius: 14px; background: #0B0B14D9; border: 1px solid #2E2E52">
-      <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #FFC53D"><span>TIRO ESPECIAL</span><span style="color: #A3A3C2">{{specNote}}</span></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px">
-        <sc-for list="{{specList}}" as="q" hint-placeholder-count="4"><button type="button" aria-pressed="{{q.on}}" disabled="{{q.off}}" onClick="{{q.pick}}" style="{{q.style}}">{{q.name}}</button></sc-for>
-      </div>
-      <div style="margin-top: 5px; font-size: 10.5px; line-height: 1.25; color: #CACAE0">{{specDesc}}</div>
+  <sc-if value="{{penCtl}}" hint-placeholder-val="{{ false }}">
+    <div class="du-panel">
+      <h4><label for="pen-curve">EFECTO</label><em>{{curveTxt}}</em></h4>
+      <input id="pen-curve" type="range" min="-100" max="100" step="1" value="{{curveVal}}" onInput="{{onCurve}}" disabled="{{curveOff}}">
+      <sc-if value="{{specShow}}" hint-placeholder-val="{{ false }}">
+        <h4 style="margin-top: 2px"><span class="gold">TIRO ESPECIAL</span><small>{{specNote}}</small></h4>
+        <div class="du-spec">
+          <sc-for list="{{specList}}" as="q" hint-placeholder-count="4"><button type="button" aria-pressed="{{q.on}}" disabled="{{q.off}}" onClick="{{q.pick}}">{{q.name}}</button></sc-for>
+        </div>
+        <div class="du-desc">{{specDesc}}</div>
+      </sc-if>
     </div>
   </sc-if>
   <sc-if value="{{specFlash}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; left: 0; right: 0; top: 118px; display: flex; justify-content: center; pointer-events: none">
-      <span style="padding: 4px 18px; border-radius: 10px; background: #FFC53D; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 2px; box-shadow: 0 4px 0 #8A5A00">¡{{specFlash}}!</span>
-    </div>
+    <div class="du-flash"><b>¡{{specFlash}}!</b></div>
   </sc-if>
   <sc-if value="{{aimUI}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; right: 14px; bottom: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px">
-      <div style="position: relative; width: 22px; height: 130px; border-radius: 11px; background: #0B0B14D9; border: 2px solid #2E2E52; overflow: hidden">
+    <div class="du-shoot">
+      <div class="du-meter">
         <div style="{{zoneStyle}}"></div>
         <div style="{{meterStyle}}"></div>
       </div>
-      <button type="button" aria-label="Chutar: mantén pulsado y suelta en la zona verde" onPointerDown="{{chargeDown}}" onPointerUp="{{chargeUp}}" onPointerCancel="{{chargeCancel}}" style="width: 96px; height: 96px; border-radius: 48px; border: 0; touch-action: none; cursor: pointer; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 24px; color: #0B0B14; background: {{chutBg}}; box-shadow: 0 5px 0 #A3A3C2">CHUTAR</button>
+      <button type="button" class="{{chutCls}}" aria-label="Chutar: mantén pulsado y suelta en la zona verde" onPointerDown="{{chargeDown}}" onPointerUp="{{chargeUp}}" onPointerCancel="{{chargeCancel}}">CHUTAR</button>
     </div>
   </sc-if>
 
@@ -70,86 +155,88 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 40px; text-align: center; font-weight: 700; color: #CACAE0">Tu navegador no permite gráficos 3D (WebGL) en esta vista.</div>
   </sc-if>
 
-  <div style="position: absolute; left: 12px; top: 10px; display: flex; align-items: center; gap: 8px">
-    <a href="{{backHref}}" onClick="{{backClick}}" aria-label="Volver" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; background: #0B0B14CC; color: #F4F4FA">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
-    </a>
-    <span style="padding: 8px 12px; border-radius: 12px; background: #0B0B14CC; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1px">{{titleLabel}}</span>
-    <sc-if value="{{isPractice}}" hint-placeholder-val="{{ false }}">
-      <div style="display: flex; padding: 4px; gap: 4px; border-radius: 14px; background: #0B0B14CC">
+  <a href="{{backHref}}" onClick="{{backClick}}" aria-label="Volver" class="du-back">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
+  </a>
+  <sc-if value="{{isPractice}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 64px; top: 10px; display: flex; align-items: center; gap: 8px; z-index: 4">
+      <span style="padding: 8px 14px; border-radius: 12px; background: linear-gradient(180deg,#0B1A44,#02040C); box-shadow: 0 0 0 1.5px #1E8BFF66; font-family: 'Titulos', sans-serif; font-size: 17px; letter-spacing: 1px">{{titleLabel}}</span>
+      <div style="display: flex; padding: 4px; gap: 4px; border-radius: 14px; background: #02040Ccc; box-shadow: 0 0 0 1.5px #1E8BFF44">
         <button type="button" onClick="{{setPen}}" style="{{penTab}}">Penaltis</button>
         <button type="button" onClick="{{setFree}}" style="{{freeTab}}">Tiro libre</button>
       </div>
-    </sc-if>
-  </div>
+    </div>
+  </sc-if>
 
   <sc-if value="{{isFree}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; left: 12px; top: 62px; display: flex; align-items: center; gap: 6px">
-      <span style="padding: 5px 10px; border-radius: 10px; background: #0B0B14CC; font-size: 12px; font-weight: 800; color: #FFC53D">{{fkLabel}}</span>
-      <sc-if value="{{isPractice}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{nextFK}}" style="height: 30px; padding: 0 12px; border: 1px solid #2E2E52; border-radius: 10px; background: #0B0B14CC; color: #F4F4FA; font: 800 12px Exo2, sans-serif; cursor: pointer">Cambiar escenario ›</button></sc-if>
+    <div style="position: absolute; left: 12px; top: 62px; display: flex; align-items: center; gap: 6px; z-index: 4">
+      <span style="padding: 4px 12px; transform: skewX(-14deg); background: #02040Ccc; box-shadow: 0 0 0 1.5px #FFC53D88; font-family: 'Titulos', sans-serif; font-size: 12px; letter-spacing: 1px; color: #FFC53D">{{fkLabel}}</span>
+      <sc-if value="{{isPractice}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{nextFK}}" style="height: 30px; padding: 0 12px; border: 0; border-radius: 10px; background: #02040Ccc; box-shadow: 0 0 0 1.5px #1E8BFF66; color: #E6F2FF; font: 800 12px Exo2, sans-serif; cursor: pointer">Cambiar escenario ›</button></sc-if>
     </div>
   </sc-if>
   <sc-if value="{{isDuel}}" hint-placeholder-val="{{ true }}">
-    <div style="position: absolute; right: 12px; top: 10px; padding: 6px 12px; border-radius: 12px; background: #0B0B14CC; display: flex; flex-direction: column; gap: 4px">
-      <div style="display: flex; align-items: center; gap: 6px">
-        <span style="width: 92px; font-size: 12px; font-weight: 800">Tú</span>
-        <sc-for list="{{youDots}}" as="d" hint-placeholder-count="5"><span style="{{d.style}}"></span></sc-for>
-        <span style="margin-left: 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; color: #22D3EE">{{youGoals}}</span>
+    <div class="du-sb">
+      <div class="du-sb-row">
+        <div class="du-team y"><span>TÚ</span><i class="du-tag">★</i></div>
+        <div class="du-score">{{youGoals}}<i>–</i>{{rivalGoals}}</div>
+        <div class="du-team r"><i class="du-tag">⚑</i><span>{{rivalName}}</span></div>
       </div>
-      <div style="display: flex; align-items: center; gap: 6px">
-        <span style="width: 92px; font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rivalName}}</span>
-        <sc-for list="{{rivalDots}}" as="d" hint-placeholder-count="5"><span style="{{d.style}}"></span></sc-for>
-        <span style="margin-left: 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; color: #FF8A8E">{{rivalGoals}}</span>
+      <div class="du-pips">
+        <div class="y"><sc-for list="{{youDots}}" as="d" hint-placeholder-count="5"><i class="{{d.cls}}"></i></sc-for></div>
+        <div><sc-for list="{{rivalDots}}" as="d" hint-placeholder-count="5"><i class="{{d.cls}}"></i></sc-for></div>
       </div>
-      <sc-if value="{{sudden}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #FFC53D">MUERTE SÚBITA</span></sc-if>
+      <span class="{{ribCls}}">{{ribText}}</span>
     </div>
   </sc-if>
   <sc-if value="{{isPracticeHud}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; right: 12px; top: 10px; display: flex; gap: 6px">
-      <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">TIRO</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1">{{shotLabel}}</span></span>
-      <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">GOLES</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1">{{youGoals}}</span></span>
-      <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">PUNTOS</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; color: #22D3EE">{{ptsLabel}}</span></span>
+    <div class="du-prac">
+      <span><small>TIRO</small><b>{{shotLabel}}</b></span>
+      <span><small>GOLES</small><b>{{youGoals}}</b></span>
+      <span><small>PUNTOS</small><b style="color: #3DA9FF">{{ptsLabel}}</b></span>
     </div>
   </sc-if>
 
   <sc-if value="{{showTurn}}" hint-placeholder-val="{{ true }}">
-    <div style="position: absolute; left: 0; right: 0; top: 62px; display: flex; justify-content: center; pointer-events: none">
-      <span style="{{turnStyle}}">{{turnLabel}}</span>
-    </div>
+    <div class="{{turnCls}}" key="{{turnKey}}"><b><span>{{turnLabel}}</span></b></div>
   </sc-if>
   <sc-if value="{{showCount}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; left: 0; right: 0; top: 96px; display: flex; justify-content: center; pointer-events: none">
-      <span style="{{countStyle}}">{{countLabel}}</span>
-    </div>
+    <div class="{{countCls}}" key="{{countLabel}}"><b style="{{countStyle}}">{{countLabel}}</b></div>
   </sc-if>
   <sc-if value="{{showHint}}" hint-placeholder-val="{{ true }}">
-    <div style="{{hintWrap}}">
-      <span style="padding: 6px 14px; border-radius: 10px; background: #0B0B14CC; font-size: 12px; font-weight: 700; color: #CACAE0">{{hintText}}</span>
-    </div>
+    <div class="du-hint" style="{{hintWrap}}"><span>{{hintText}}</span></div>
   </sc-if>
   <sc-if value="{{showReplay}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; left: 14px; top: 12px; display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 10px; background: #0B0B14CC; pointer-events: none">
-      <span style="width: 9px; height: 9px; border-radius: 50%; background: #E5484D"></span>
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 2px; color: #F4F4FA">REPETICIÓN</span>
-      <span style="font-size: 11px; font-weight: 700; color: #A3A3C2">toca para saltar</span>
-    </div>
+    <div class="du-rep"><i></i><b>REPETICIÓN</b><small>toca para saltar</small></div>
   </sc-if>
   <sc-if value="{{showResult}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; left: 0; right: 0; top: 64px; display: flex; flex-direction: column; align-items: center; pointer-events: none">
-      <span style="{{resultStyle}}">{{resultText}}</span>
-      <span style="font-size: 13px; font-weight: 800; color: #F4F4FA; text-shadow: 0 2px 0 #0B0B14">{{resultSub}}</span>
+    <div class="{{resultCls}}" key="{{resultKey}}">
+      <span class="w">{{resultText}}</span>
+      <span class="s">{{resultSub}}</span>
     </div>
   </sc-if>
   <sc-if value="{{showDone}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
-      <div class="am-arena" aria-hidden="true"><i class="aa-pitch"></i><i class="aa-beam" style="left: 18%"></i><i class="aa-beam r" style="left: 82%"></i><i class="aa-flash" style="left: 12%; top: 22%"></i><i class="aa-flash" style="left: 31%; top: 30%; animation-delay: -1.1s"></i><i class="aa-flash" style="left: 58%; top: 18%; animation-delay: -2.3s"></i><i class="aa-flash" style="left: 77%; top: 27%; animation-delay: -0.6s"></i><i class="aa-flash" style="left: 90%; top: 20%; animation-delay: -1.8s"></i></div>
-      <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">{{doneKicker}}</span>
-      <span style="{{doneStyle}}">{{doneTitle}}</span>
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 52px; line-height: 1">{{doneScore}}</span>
-      <span style="font-size: 14px; font-weight: 700; color: #FFC53D">{{doneReward}}</span>
-      <div style="display: flex; gap: 8px; margin-top: 8px">
-        <button type="button" onClick="{{rematch}}" style="height: 50px; padding: 0 30px; border: 0; border-radius: 14px; background: #22D3EE; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #0E8FA3">{{rematchLabel}}</button>
-        <a href="Modos.dc.html" style="display: flex; align-items: center; height: 50px; padding: 0 20px; border-radius: 14px; border: 1.5px solid #F4F4FA; color: #F4F4FA; text-decoration: none; font-weight: 800; font-size: 14px">Salir</a>
+    <div class="du-done">
+      <div class="am-arena" aria-hidden="true"><i class="aa-beam" style="left: 18%"></i><i class="aa-beam r" style="left: 82%"></i><i class="aa-flash" style="left: 12%; top: 22%"></i><i class="aa-flash" style="left: 31%; top: 30%; animation-delay: -1.1s"></i><i class="aa-flash" style="left: 58%; top: 18%; animation-delay: -2.3s"></i><i class="aa-flash" style="left: 77%; top: 27%; animation-delay: -0.6s"></i><i class="aa-flash" style="left: 90%; top: 20%; animation-delay: -1.8s"></i></div>
+      <div class="{{doneCls}}">
+        <span class="k">{{doneKicker}}</span>
+        <span class="t">{{doneTitle}}</span>
+        <sc-if value="{{isDuel}}" hint-placeholder-val="{{ true }}">
+          <div class="du-final">
+            <div class="du-team y"><span>TÚ</span></div>
+            <div class="du-score">{{youGoals}}<i>–</i>{{rivalGoals}}</div>
+            <div class="du-team r"><span>{{rivalName}}</span></div>
+          </div>
+          <div class="du-pips" style="width: 386px">
+            <div class="y" style="width: 150px"><sc-for list="{{youDots}}" as="d" hint-placeholder-count="5"><i class="{{d.cls}}"></i></sc-for></div>
+            <div style="width: 150px"><sc-for list="{{rivalDots}}" as="d" hint-placeholder-count="5"><i class="{{d.cls}}"></i></sc-for></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{isPracticeHud}}" hint-placeholder-val="{{ false }}"><span style="font-family: 'Titulos', sans-serif; font-size: 34px">{{doneScore}}</span></sc-if>
+        <span class="rw">{{doneReward}}</span>
+        <div class="bt">
+          <button type="button" onClick="{{rematch}}">{{rematchLabel}}</button>
+          <a href="Modos.dc.html">Salir</a>
+        </div>
       </div>
     </div>
   </sc-if>
@@ -333,7 +420,7 @@ class Component extends DCLogic {
     this.padAim = null; this.padCharge = null;
     this.b = { x: 0, y: 0.11, z: 0, vx: 0, vy: 0, vz: 0, curve: 0 };
     // free kicks: target on goal, curve and height chosen by the player (EA FC style)
-    if (this.kind === 'pen') { if (!this.aim || this.aim.pen !== true) this.aim = { pen: true, x: this.GX + 1.6, y: 0.9, s: 0, h: 0 }; }
+    if (this.kind === 'pen') { if (!this.aim || this.aim.pen !== true) this.aim = { pen: true, x: this.GX + 1.6, y: 0.9, s: 0, h: 0 }; this.pplan = null; }
     else if (!this.aim || this.aim.fk !== this.fk) this.aim = { fk: this.fk, x: this.GX + (this.GX >= 1 ? -2.3 : 2.3), y: 1.75, s: 0.45, h: 0.45 };
     this.plan = null; this.charge = null; this.shotRisk = 0; this.special = null;
     this.k = { x: this.GX, y: 0, a: 0, aT: 0, xT: this.GX, decided: false, up: false, early: false };
@@ -1619,6 +1706,14 @@ class Component extends DCLogic {
     if (sp) w *= { panenka: 1.15, rabona: 0.7, zurda: 0.85, falso: 1.2 }[sp] || 1;
     return [0.74 - w / 2, 0.74 + w / 2];
   }
+  // the flight of a penalty with the chosen curve, for the dotted line (only drawn when it bends)
+  penPlan() {
+    const a = this.aim, key = [a.x, a.y, a.s].map((v) => (+v).toFixed(3)).join('|');
+    if (this.pplan && this.pplan.key === key) return this.pplan;
+    const sh = this.aimFor({ x: a.x, y: a.y }, 22, (a.s || 0) * 3.2 * this.xSign());
+    this.pplan = { key, path: [{ x: 0, y: 0.11, z: 0 }].concat(sh.path || []) };
+    return this.pplan;
+  }
   penRisk() {
     const a = this.aim, rx = Math.abs(a.x - this.GX) / 3.66, ry = a.y / 2.44;
     return Math.max(0, Math.min(1, (Math.max(rx, ry * 0.9) - 0.35) / 0.6));
@@ -1643,8 +1738,8 @@ class Component extends DCLogic {
     const dev = m < lo ? (m - lo) * 1.5 : m > hi ? m - hi : 0;
     const speed = Math.max(11, (21 + 3 * this.tt('pot')) * (1 + Math.min(0, dev) * 0.9)) * (sp === 'rabona' ? 0.93 : sp === 'falso' ? 0.88 : 1);
     const tx = a.x + (dev > 0 ? Math.sign(a.x - this.GX || 1) * dev * 2.2 : 0), ty = Math.max(0.12, a.y + (dev > 0 ? dev * 3.2 : dev * 1.2));
-    // the rabona bends in towards the side it is aimed at
-    const v = this.aimFor({ x: tx, y: ty }, speed, sp === 'rabona' ? -Math.sign(a.x - this.GX || 1) * 0.9 * this.xSign() : 0);
+    // the curve you chose (the rabona always bends in towards the side it is aimed at)
+    const v = this.aimFor({ x: tx, y: ty }, speed, sp === 'rabona' ? -Math.sign(a.x - this.GX || 1) * 0.9 * this.xSign() : (a.s || 0) * 3.2 * this.xSign());
     this.lastTiming = dev === 0 ? 'perfect' : dev < 0 ? 'low' : 'high';
     // a well-struck shot into the corner is close to unstoppable, as in real life (the keeper only gets a
     // fingertip on it if he guessed right); a soft one or one down the middle he can deal with
@@ -1755,26 +1850,27 @@ class Component extends DCLogic {
       const n = Math.max(5, arr.length + ((youTurn === isYou && this.phase !== 'done' && !R) ? 1 : 0));
       const out = [];
       for (let i = Math.max(0, n - 7); i < n; i++) {
-        const v = arr[i], c = v === true ? '#53D88E' : v === false ? '#FF5C5C' : '#2E2E52';
+        const v = arr[i];
         const cur = i === arr.length && youTurn === isYou && this.phase !== 'done';
-        out.push({ style: 'width: 12px; height: 12px; border-radius: 6px; background: ' + c + ';' + (cur ? ' box-shadow: 0 0 0 2px #F4F4FA;' : '') });
+        out.push({ cls: 'du-pip' + (v === true ? ' ok' : v === false ? ' ko' : cur ? ' cur' : '') });
       }
       return out;
     };
     const yg = this.sh.you.filter(Boolean).length, rg = this.sh.rival.filter(Boolean).length;
     const cd = 2.4 - this.pt, won = this.winner === 'you';
     const k = this.k, f2 = (n) => n.toFixed(1);
-    const tab = (on) => 'height: 36px; padding: 0 14px; border: 0; border-radius: 10px; font: 800 13px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #0B0B14;' : 'background: transparent; color: #CACAE0;');
+    const tab = (on) => 'height: 36px; padding: 0 14px; border: 0; border-radius: 10px; font: 800 13px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: linear-gradient(180deg,#3DA9FF,#0A3DCC); color: #FFFFFF;' : 'background: transparent; color: #BBD0F0;');
     const fkAim = this.fkMode() && this.phase === 'aim' && !!this.cam;
     const aimUI = this.aimMode() && this.phase === 'aim' && !!this.cam;
     const showTraj = this.fkMode() && !!this.cam && (this.phase === 'aim' || this.phase === 'runup');
     const penAim = this.kind === 'pen' && this.aimMode() && !!this.cam && (this.phase === 'aim' || this.phase === 'runup');
     let trajPts = '', retXf = 'translate(-99 -99)', apexXf = 'translate(-99 -99)', trajCol = '#FFFFFF';
     if (penAim) {
-      // a penalty: just the target on the goal (red outside the frame)
+      // a penalty: the target on the goal (red outside the frame) and, with curve, the bend it will take
       const rs = this.toScreen(this.aim.x, this.aim.y, this.D);
       retXf = 'translate(' + f2(rs.x) + ' ' + f2(rs.y) + ')';
       trajCol = Math.abs(this.aim.x - this.GX) > 3.55 || this.aim.y > 2.33 ? '#FF5C5C' : '#FFFFFF';
+      if (Math.abs(this.aim.s || 0) > 0.05 && !(this.specSel === 'panenka' || this.specSel === 'rabona')) trajPts = this.penPlan().path.map((q) => { const s2 = this.toScreen(q.x, q.y, q.z); return f2(s2.x) + ',' + f2(s2.y); }).join(' ');
     }
     if (showTraj) {
       const pl = this.fkPlan();
@@ -1805,6 +1901,16 @@ class Component extends DCLogic {
           specFlash: this.special && youTurn && (this.phase === 'runup' || this.phase === 'flight') && !this.replaying ? (Duelo_SPECIALS.find((q) => q.id === this.special.id) || {}).name || '' : ''
         };
       })(),
+      penCtl: aimUI && this.kind === 'pen',
+      curveOff: this.specSel === 'panenka' || this.specSel === 'rabona',
+      chutCls: 'du-go' + (this.charge ? (m >= zlo && m <= zhi ? ' c-in' : ' c-out') : ''),
+      ribCls: 'du-rib' + (this.sh.you.length >= 5 && this.sh.rival.length >= 5 && this.phase !== 'done' && !this.practice ? ' sd' : ''),
+      ribText: this.sh.you.length >= 5 && this.sh.rival.length >= 5 && this.phase !== 'done' && !this.practice ? 'MUERTE SÚBITA' : this.props.shootout ? 'TANDA DE PENALTIS · COPA' : this.kind === 'pen' ? 'TANDA DE PENALTIS' : 'DUELO DE TIROS LIBRES',
+      turnCls: 'du-turn ' + (youTurn ? 'you' : 'gk'), turnKey: 'turn' + this.shotN(),
+      countCls: 'du-cd' + (this.ol && this.waiting ? ' wait' : ''),
+      resultCls: 'du-res ' + (!R ? '' : (youTurn || this.practice) ? (R.kind === 'gol' || R.kind === 'diana' ? 'goal' : R.kind === 'parada' ? 'save' : 'miss') : (R.kind === 'gol' ? 'save' : 'goal')),
+      resultKey: 'res' + this.shotN() + (R ? R.kind : ''),
+      doneCls: 'du-card' + (!this.practice && this.winner !== 'you' ? ' lose' : ''),
       fkAim, aimUI, trajPts, retXf, apexXf, trajCol, trajOp: showTraj || penAim ? (this.phase === 'runup' ? '0.5' : '0.95') : '0',
       curveVal: String(Math.round((this.aim ? this.aim.s : 0) * 100)), heightVal: String(Math.round((this.aim ? this.aim.h : 0) * 100)),
       curveTxt: sAbs < 5 ? 'Recto' : (this.aim.s > 0 ? 'Derecha ' : 'Izquierda ') + sAbs + '%',
@@ -1819,13 +1925,14 @@ class Component extends DCLogic {
       })(),
       onCurve: (e) => { this.aim.s = +e.currentTarget.value / 100; this.forceUpdate(); },
       onHeight: (e) => { this.aim.h = +e.currentTarget.value / 100; this.forceUpdate(); },
-      zoneStyle: 'position: absolute; left: 0; right: 0; bottom: ' + (zlo * 100).toFixed(1) + '%; height: ' + ((zhi - zlo) * 100).toFixed(1) + '%; background: #53D88E;',
+      zoneStyle: 'position: absolute; left: 3px; right: 3px; border-radius: 3px; bottom: ' + (zlo * 100).toFixed(1) + '%; height: ' + ((zhi - zlo) * 100).toFixed(1) + '%; background: linear-gradient(90deg,#16A34A,#8BF5B5,#16A34A); box-shadow: 0 0 10px #22C55E;',
       meterStyle: 'position: absolute; left: 3px; right: 3px; bottom: ' + (m * 100).toFixed(1) + '%; height: 4px; margin-bottom: -2px; border-radius: 2px; background: #F4F4FA; box-shadow: 0 0 6px #FFFFFF;',
       chutBg: this.charge ? (m >= zlo && m <= zhi ? '#53D88E' : '#FFC53D') : '#F4F4FA',
       chargeDown: (e) => { if (!aimUI) return; e.preventDefault(); e.stopPropagation(); this.charge = { t0: performance.now() }; this.loop(); this.forceUpdate(); },
       chargeUp: (e) => { if (!this.charge) return; e.preventDefault(); e.stopPropagation(); if (this.kind === 'pen') this.penShoot(); else this.fkShoot(); },
       chargeCancel: () => { this.charge = null; this.forceUpdate(); },
-      hintWrap: 'position: absolute; left: 0; right: 0; bottom: ' + (fkAim ? 150 : aimUI && this.specOn() ? 140 : 12) + 'px; display: flex; justify-content: center; pointer-events: none;',
+      // while aiming, the hint sits between the left panel and the shoot button
+      hintWrap: aimUI ? 'left: 308px; right: 136px; bottom: 14px;' : 'left: 0; right: 0; bottom: 12px;',
       canvasRef: this.canvasRef,
       no3d: !!this.no3d,
       ghostPts: this.lastSwipe && this.phase !== 'aim' ? this.lastSwipe.pts.map((q) => f2(q.x) + ',' + f2(q.y)).join(' ') : '',
@@ -1848,7 +1955,7 @@ class Component extends DCLogic {
       turnStyle: 'padding: 6px 16px; border-radius: 10px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 22px; letter-spacing: 2px; ' + (youTurn ? 'background: #22D3EE; color: #0B0B14;' : 'background: #A78BFA; color: #0B0B14;'),
       showCount: this.phase === 'defend',
       countLabel: this.ol && this.waiting ? 'EL RIVAL APUNTA…' : cd > 0.8 ? String(Math.ceil(cd - 0.8)) : '¡CHUTA!',
-      countStyle: 'font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + (this.ol && this.waiting ? 30 : 60) + 'px; line-height: 1; color: #F4F4FA; text-shadow: 0 5px 0 #0B0B14; transform: scale(' + (this.ol && this.waiting ? 1 : (1.3 - ((2.4 - cd) % 0.8) * 0.4)).toFixed(2) + ');',
+      countStyle: 'display: inline-block; transform: scale(' + (this.ol && this.waiting ? 1 : (1.3 - ((2.4 - cd) % 0.8) * 0.4)).toFixed(2) + ');',
       showHint: !this.replaying && ((this.phase === 'aim' && !this.swipe && !this.charge && !this.dragAim) || (this.phase === 'defend' && !this.tap) || (this.phase === 'flight' && !youTurn && !this.tap)),
       hintText: this.padOn ? (this.fkMode() ? 'Mando: stick = diana · L1/R1 = efecto · □/△ = altura · mantén ○ y suelta en la zona verde' : youTurn ? 'Mando: mueve la diana con el stick · mantén ○ y suelta en la zona verde' : 'Mando: mueve la mira con el stick y pulsa ○ para lanzarte') : this.fkMode() ? 'Arrastra la diana en la portería · ajusta efecto y altura · mantén CHUTAR y suelta en la zona verde' : youTurn ? 'Arrastra la diana donde quieras tirar · mantén CHUTAR y suelta en la zona verde · cuanto más a la escuadra, más pequeña' : 'Toca la portería donde quieras lanzarte · si te tiras antes del disparo, el rival puede leerte',
       zoneLabel: youTurn ? 'Portería: toca o arrastra para mover la diana' : 'Portería: toca donde quieras que se lance el portero',
