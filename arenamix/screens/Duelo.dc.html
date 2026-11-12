@@ -510,7 +510,7 @@ class Component extends DCLogic {
       if (c.pen > 0) {
         const [nd, nz] = c.n;
         let vn = b.vz * nd + b.vy * nz;
-        vn += (-140 * c.pen - 11 * vn) * dt;   // a soft net: the ball sinks well into it
+        vn += (-75 * c.pen - 8 * vn) * dt;   // a soft net: the ball sinks well into it
         if (vn < 0) vn *= Math.exp(-10 * dt);
         if (c.pen > c.give) { const back = c.pen - c.give; dep -= nd * back; b.y -= nz * back; if (vn > 0) vn = 0; }
         // tangential: the cords grab the ball

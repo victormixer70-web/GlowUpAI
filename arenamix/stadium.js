@@ -98,10 +98,10 @@
      The knots on the frame and on the ground are tied fast. The ball pushes the knots it touches out of its way
      along its path between frames, so a fast shot drags the mesh with it and the bag forms round the ball.
      geo: the sheet's geometry (a grid nu+1 by nv+1, row by row); free[k]: 0 tied fast .. 1 loose. */
-  function cloth(geo, nu, nv, free, cellK, out) {
+  function cloth(geo, nu, nv, free, cellK, out, maxOut) {
     var P = geo.attributes.position, n = P.count, rest = Float32Array.from(P.array), prev = Float32Array.from(P.array);
     var kr = new Float32Array(n), KL = cellK || 3200, live = false, quiet = 0, hits = [];
-    for (var k = 0; k < n; k++) kr[k] = free[k] <= 0 ? 0 : 70 * (1 + 2.5 * (1 - free[k]));
+    for (var k = 0; k < n; k++) kr[k] = free[k] <= 0 ? 0 : 34 * (1 + 2.5 * (1 - free[k]));
     var W = nu + 1, H = 1 / 240;
     function collide(bx, by, bz, R) {
       var R2 = R * R, a = P.array;
@@ -123,7 +123,7 @@
     }
     var nxt = new Float32Array(P.array.length);
     function sub() {
-      var a = P.array, h2 = H * H, damp = 1 - 1.6 * H, maxV = 0;
+      var a = P.array, h2 = H * H, damp = 1 - 0.9 * H, maxV = 0;
       // every knot from the same moment (computed into a copy, then swapped in), or the sheet runs away
       nxt.set(a);
       for (var j = 1; j < nv; j++) for (var i = 1; i < nu; i++) {
@@ -136,9 +136,9 @@
           // cords rub on cords: a knot moving differently from its neighbours is slowed down, so kinks smooth out
           // at once while the big swing of the whole bag carries on
           var lv = (a[q - 3] - prev[q - 3]) + (a[q + 3] - prev[q + 3]) + (a[q - W * 3] - prev[q - W * 3]) + (a[q + W * 3] - prev[q + W * 3]) - 4 * (x - prev[q]);
-          var nx = x + v + 0.12 * lv + acc * h2;
+          var nx = x + v + 0.07 * lv + acc * h2;
           // a net stretches only so far
-          var lim = 1.6 * (0.25 + free[k]);
+          var lim = Math.min(maxOut || 9, 2.3 * (0.25 + free[k]));
           if (nx - rest[q] > lim) nx = rest[q] + lim; else if (nx - rest[q] < -lim) nx = rest[q] - lim;
           nxt[q] = nx;
           var av = Math.abs(v); if (av > maxV) maxV = av;
@@ -174,7 +174,7 @@
      towards +z, posts at x = ±w/2, ground at y = 0; d is how deep the net is at the ground.
      Returns { group, net }: the net (roof and back) gives where the ball presses into it, and net.contact()
      tells the match physics exactly where that net is, so the ball and the drawing always agree. */
-  function boxGoal(w, h, d) {
+  function boxGoal(w, h, d, maxBag) {
     // a box goal, as in the big stadiums: the roof runs flat all the way back and the back net hangs straight
     // down, the net held taut from outside by dark poles at the back corners (no curved supports)
     var G = new T.Group(), r = 0.06, hw = w / 2, H = h + r, d2 = d, d1 = d;
@@ -223,7 +223,7 @@
       var so = new Float32Array(fr.length * 3); for (var q = 0; q < fr.length; q++) so[q * 3] = s;
       sides.push(cloth(g, nz, ny, fr, 1400, so));
     });
-    var net = shellNet(w, H, d1, d2);
+    var net = shellNet(w, H, d1, d2, maxBag);
     G.add(net.mesh);
     // press() each frame while the ball is in the goal: the ball sweeps the mesh along its path since the last
     // frame (a fast shot drags the net with it), the roof, the back and the side nets alike
@@ -247,8 +247,9 @@
      of radius R centred there presses through the resting net (pen > 0), the outward normal (in depth/height),
      the point on the net and how much that point can give (cords tied at the frame and the ground give least).
      press() each frame where the ball is, then step(): the net wraps round the ball and springs back after. */
-  function shellNet(w, H, d1, d2) {
-    var hw = w / 2, Lb = Math.hypot(d2 - d1, H), total = d1 + Lb, SMAX = 1.3;
+  function shellNet(w, H, d1, d2, maxBag) {
+    // how far the net can be pushed out (less where something stands close behind the goal)
+    var hw = w / 2, Lb = Math.hypot(d2 - d1, H), total = d1 + Lb, SMAX = maxBag || 1.85;
     var nb = [H / Lb, (d2 - d1) / Lb];   // outward normal of the back, in (depth, height)
     function give(u, v) { return Math.sqrt(Math.max(0, Math.sin(Math.PI * u))) * Math.sqrt(Math.max(0, Math.sin(Math.PI * Math.min(1, v)))); }
     function contact(x, dep, zc, R) {
@@ -283,7 +284,7 @@
     var fr = new Float32Array(gv.length);
     for (j = 0; j <= nv; j++) for (i = 0; i <= nu; i++) fr[j * (nu + 1) + i] = (i === 0 || i === nu || j === 0 || j === nv) ? 0 : Math.max(0.05, gv[j * (nu + 1) + i]);
     var no = new Float32Array(fr.length * 3); for (var q = 0; q < fr.length; q++) { no[q * 3 + 1] = nrm[q * 2]; no[q * 3 + 2] = nrm[q * 2 + 1]; }
-    var C = cloth(geo, nu, nv, fr, 3200, no);
+    var C = cloth(geo, nu, nv, fr, 3200, no, SMAX + 0.15);
     return {
       mesh: mesh, contact: contact, dims: { w: w, H: H, d1: d1, d2: d2 }, cloth: C,
       // the ball (centre x across, dep deep, zc high, radius R) where it is now

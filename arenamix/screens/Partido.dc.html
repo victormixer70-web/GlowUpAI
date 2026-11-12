@@ -1683,7 +1683,7 @@ class Component extends DCLogic {
       if (c.pen > 0) {
         const [nd, nz] = c.n;
         let vn = vout * nd + b.vz * nz;
-        vn += (-140 * c.pen - 11 * vn) * dt;   // a soft net: the ball sinks well into it
+        vn += (-75 * c.pen - 8 * vn) * dt;   // a soft net: the ball sinks well into it
         if (vn < 0) vn *= Math.exp(-10 * dt);
         let pen = c.pen;
         if (pen > c.give) { const back = pen - c.give; dep -= nd * back; b.z -= nz * back; pen = c.give; if (vn > 0) vn = 0; }
@@ -3369,7 +3369,8 @@ class Component extends DCLogic {
     this.nets = {};
     if (window.AMNet && window.AMNet.goal) {
       [-1, 1].forEach((s) => {
-        const G = window.AMNet.goal(6, 2.44, 1.9);
+        // the boards stand about 2.9 m behind the line: the net may bag out only so far
+        const G = window.AMNet.goal(6, 2.44, 1.75, 0.95);
         G.group.position.set(30 * s, 0, 0); G.group.rotation.y = s * Math.PI / 2; S.add(G.group);
         this.nets[s] = G.net;
       });
