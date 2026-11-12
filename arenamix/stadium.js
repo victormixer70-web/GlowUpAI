@@ -175,20 +175,35 @@
      Returns { group, net }: the net (roof and back) gives where the ball presses into it, and net.contact()
      tells the match physics exactly where that net is, so the ball and the drawing always agree. */
   function boxGoal(w, h, d) {
-    var G = new T.Group(), r = 0.06, hw = w / 2, H = h + r, d2 = d, d1 = d * 0.47;
+    // a box goal, as in the big stadiums: the roof runs flat all the way back and the back net hangs straight
+    // down, the net held taut from outside by dark poles at the back corners (no curved supports)
+    var G = new T.Group(), r = 0.06, hw = w / 2, H = h + r, d2 = d, d1 = d;
     var white = new T.MeshStandardMaterial({ color: 0xf6f7fa, roughness: 0.35, metalness: 0.15 });
     [-1, 1].forEach(function (s) {
       var post = new T.Mesh(new T.CylinderGeometry(r, r, h + r, 20), white); post.position.set(s * (hw + r), (h + r) / 2, 0); post.castShadow = true; G.add(post);
     });
     var bar = new T.Mesh(new T.CylinderGeometry(r, r, w + 4 * r, 20), white); bar.rotation.z = Math.PI / 2; bar.position.set(0, h + r, 0); bar.castShadow = true; G.add(bar);
-    // the supports behind: from the top of each post back along the roof, then curving down to the ground
     var thin = 0.035;
+    // the frame on the ground: a bar along each side and one across the back
     [-1, 1].forEach(function (s) {
       var x = s * (hw + r * 0.5);
-      var curve = new T.CatmullRomCurve3([new T.Vector3(x, H, 0.02), new T.Vector3(x, H, d1 * 0.7), new T.Vector3(x, H * 0.92, d1 * 1.08), new T.Vector3(x, H * 0.5, (d1 + d2) / 2 + 0.06), new T.Vector3(x, thin, d2)], false, 'catmullrom', 0.2);
-      var arm = new T.Mesh(new T.TubeGeometry(curve, 28, thin, 8, false), white); arm.castShadow = true; G.add(arm);
       var gb = new T.Mesh(new T.CylinderGeometry(thin, thin, d2, 10), white); gb.rotation.x = Math.PI / 2; gb.position.set(x, thin, d2 / 2); G.add(gb);
     });
+    // the dark poles that hold the net up from outside the back corners, a cord from each to the corner of the
+    // roof, and the taut cords along the top edges of the box
+    var dark = new T.MeshStandardMaterial({ color: 0x15161c, roughness: 0.55, metalness: 0.3 }), cordM = new T.MeshStandardMaterial({ color: 0xf2f4f8, roughness: 0.8 });
+    var cord = function (a, b2, rad) {
+      var A = new T.Vector3(a[0], a[1], a[2]), B = new T.Vector3(b2[0], b2[1], b2[2]), L = A.distanceTo(B);
+      var m = new T.Mesh(new T.CylinderGeometry(rad, rad, L, 5), cordM);
+      m.position.copy(A).add(B).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), B.clone().sub(A).normalize()); G.add(m); return m;
+    };
+    [-1, 1].forEach(function (s) {
+      var px = s * (hw + 0.45), pz = d2 + 0.45, ph = H + 0.4;
+      var pole = new T.Mesh(new T.CylinderGeometry(0.05, 0.06, ph, 10), dark); pole.position.set(px, ph / 2, pz); pole.castShadow = true; G.add(pole);
+      cord([px, ph - 0.05, pz], [s * hw, H, d2], 0.008);
+      cord([s * hw, H, 0.05], [s * hw, H, d2], 0.012);
+    });
+    cord([-hw, H, d2], [hw, H, d2], 0.012);
     var back = new T.Mesh(new T.CylinderGeometry(thin, thin, w + r, 10), white); back.rotation.z = Math.PI / 2; back.position.set(0, thin, d2); G.add(back);
     var sides = [];
     // side nets: the goal's profile (goal line, roof, sloping back), a little slack in the middle
@@ -196,7 +211,7 @@
       var x = s * hw, nz = Math.ceil(d2 / 0.2), ny = Math.ceil(H / 0.2), pos = [], uv = [], idx = [];
       for (var j = 0; j <= ny; j++) for (var i = 0; i <= nz; i++) {
         var y = H * j / ny, zb = Math.min(d1 + (d2 - d1) * (1 - y / H), d2), z = zb * i / nz;
-        var sag = 0.05 * Math.sin(Math.PI * i / nz) * Math.sin(Math.PI * j / ny);
+        var sag = 0.03 * Math.sin(Math.PI * i / nz) * Math.sin(Math.PI * j / ny);
         pos.push(x - s * sag, y, z); uv.push(z / CELL, y / CELL);
       }
       for (j = 0; j < ny; j++) for (i = 0; i < nz; i++) { var a = j * (nz + 1) + i; idx.push(a, a + 1, a + nz + 2, a, a + nz + 2, a + nz + 1); }
@@ -253,10 +268,10 @@
       var u = i / nu, v = j / nv, sl = v * total, x = -hw + u * w, y, z, ny, nz;
       if (sl <= d1) { y = H; z = sl; ny = 1; nz = 0; } else { var t = (sl - d1) / Lb; y = H - t * H; z = d1 + t * (d2 - d1); ny = nb[1]; nz = nb[0]; }
       // round the corner between roof and back
-      var k = Math.max(0, 1 - Math.abs(sl - d1) / 0.25);
+      var k = Math.max(0, 1 - Math.abs(sl - d1) / 0.12);
       if (k > 0) { ny = ny * (1 - k * 0.5) + (sl <= d1 ? nb[1] : 1) * k * 0.5; nz = nz * (1 - k * 0.5) + (sl <= d1 ? nb[0] : 0) * k * 0.5; var l = Math.hypot(ny, nz); ny /= l; nz /= l; }
       // and a little slack: the roof sags, the back hangs out
-      var slack = 0.07 * Math.sin(Math.PI * u) * Math.sin(Math.PI * v);
+      var slack = 0.035 * Math.sin(Math.PI * u) * Math.sin(Math.PI * v);
       y -= (sl <= d1 ? slack : 0); z += (sl > d1 ? slack * 0.6 : 0);
       pos.push(x, y, z); rest.push(x, y, z); nrm.push(ny, nz); gv.push(give(u, v)); uu.push(x); vv.push(sl);
       uv.push(u * w / CELL, sl / CELL);
