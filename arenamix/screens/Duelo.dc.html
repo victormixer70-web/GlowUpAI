@@ -1142,25 +1142,37 @@ class Component extends DCLogic {
     E.add(sun); E.add(sun.target);
     const fill = new T.DirectionalLight(0x9fc3ff, night ? 0.7 : 0.35); fill.position.set(20, 18, D + 25); E.add(fill);
 
-    const zMin = Math.min(-30, D - 61.5), zMax = D + 14, W = 100, L = zMax - zMin, ppm = 20;
+    // a whole pitch, 68 m wide and as long as the stadium (114 m, the match's pitch at this scale), centred on
+    // this goal: both halves, the halfway line and centre circle, both boxes and the far goal
+    const PL = 114, FAR = D - PL, HW = 34, MID = D - PL / 2;
+    const zMin = FAR - 10, zMax = D + 10, W = 84, L = zMax - zMin, ppm = 18;
     const tex = this.canvasTex(W * ppm, L * ppm, (c, w, h) => {
-      const X = (x) => (x + 50) * ppm, Z = (z) => (z - zMin) * ppm;
+      const X = (x) => (x - GX + W / 2) * ppm, Z = (z) => (z - zMin) * ppm;
       c.fillStyle = '#095c04'; c.fillRect(0, 0, w, h);
-      for (let z = Math.floor(zMin / 5) * 5, i = 0; z < zMax; z += 5, i++) if (i % 2) { c.fillStyle = '#0b6c05'; c.fillRect(0, Z(z), w, 5 * ppm); }
-      for (let i = 0; i < 6000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.035)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
+      // mowing stripes, 5.7 m each, meeting at the halfway line
+      for (let i = 0; i < 20; i++) if (i % 2) { c.fillStyle = '#0b6c05'; c.fillRect(0, Z(FAR + i * 5.7), w, 5.7 * ppm); }
+      for (let i = 0; i < 9000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.035)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
       c.strokeStyle = '#f4f8f4'; c.lineWidth = 0.12 * ppm; c.lineCap = 'round';
-      const ln = (x1, z1, x2, z2) => { c.beginPath(); c.moveTo(X(x1), Z(z1)); c.lineTo(X(x2), Z(z2)); c.stroke(); };
-      ln(-34, D, 34, D);
-      ln(GX - 9.16, D - 5.5, GX + 9.16, D - 5.5); ln(GX - 9.16, D - 5.5, GX - 9.16, D); ln(GX + 9.16, D - 5.5, GX + 9.16, D);
-      ln(GX - 20.16, D - 16.5, GX + 20.16, D - 16.5); ln(GX - 20.16, D - 16.5, GX - 20.16, D); ln(GX + 20.16, D - 16.5, GX + 20.16, D);
-      c.beginPath(); c.arc(X(GX), Z(D - 11), 9.15 * ppm, Math.PI * 1.2, Math.PI * 1.8, false); c.stroke();
-      c.fillStyle = '#f4f8f4'; c.beginPath(); c.arc(X(GX), Z(D - 11), 0.15 * ppm, 0, Math.PI * 2); c.fill();
-      ln(-34, D, -34, zMin); ln(34, D, 34, zMin);
+      const ln = (x1, z1, x2, z2) => { c.beginPath(); c.moveTo(X(GX + x1), Z(z1)); c.lineTo(X(GX + x2), Z(z2)); c.stroke(); };
+      const arc = (z, r, a0, a1) => { c.beginPath(); c.arc(X(GX), Z(z), r * ppm, a0, a1, false); c.stroke(); };
+      const dot = (z, r) => { c.fillStyle = '#f4f8f4'; c.beginPath(); c.arc(X(GX), Z(z), r * ppm, 0, Math.PI * 2); c.fill(); };
+      // the outline and the halfway line
+      ln(-HW, D, HW, D); ln(-HW, FAR, HW, FAR); ln(-HW, D, -HW, FAR); ln(HW, D, HW, FAR); ln(-HW, MID, HW, MID);
+      arc(MID, 9.15, 0, Math.PI * 2); dot(MID, 0.2);
+      // both ends: six-yard box, penalty box, spot and the arc
+      [[D, -1], [FAR, 1]].forEach(([gz, s]) => {
+        ln(-9.16, gz - s * 5.5, 9.16, gz - s * 5.5); ln(-9.16, gz - s * 5.5, -9.16, gz); ln(9.16, gz - s * 5.5, 9.16, gz);
+        ln(-20.16, gz - s * 16.5, 20.16, gz - s * 16.5); ln(-20.16, gz - s * 16.5, -20.16, gz); ln(20.16, gz - s * 16.5, 20.16, gz);
+        dot(gz - s * 11, 0.15);
+        if (s < 0) arc(gz - 11, 9.15, Math.PI * 1.205, Math.PI * 1.795); else arc(gz + 11, 9.15, Math.PI * 0.205, Math.PI * 0.795);
+        // corner arcs
+        [-1, 1].forEach((sx) => { c.beginPath(); c.arc(X(GX + sx * HW), Z(gz), ppm, s < 0 ? (sx < 0 ? Math.PI * 1.5 : Math.PI) : (sx < 0 ? 0 : Math.PI * 0.5), s < 0 ? (sx < 0 ? Math.PI * 2 : Math.PI * 1.5) : (sx < 0 ? Math.PI * 0.5 : Math.PI), false); c.stroke(); });
+      });
     });
     // real lawn texture tiled under the painted stripes and lines
     const pitch = new T.Mesh(new T.PlaneGeometry(W, L), window.AMGrass ? window.AMGrass.material(tex, W, L) : new T.MeshStandardMaterial({ map: tex, roughness: 0.95 }));
     pitch.rotation.x = -Math.PI / 2;
-    pitch.position.set(0, 0, (zMin + zMax) / 2);
+    pitch.position.set(GX, 0, (zMin + zMax) / 2);
     pitch.receiveShadow = true;
     E.add(pitch);
     const apron = new T.Mesh(new T.PlaneGeometry(400, 400), this.mat(0x0a3a0c, { roughness: 1 }));
@@ -1175,17 +1187,17 @@ class Component extends DCLogic {
     if (window.AMStadium && window.AMStadium.load) { const pr = window.AMStadium.load(); if (pr && pr.then) pr.then(() => { if (this.R && !this.usingModel && window.AMStadium.ready() && this.phase !== 'flight') { this.buildScene(); this.camSnap = true; } }); }
     // stadium: a full bowl. Stand behind the goal (ultras in the middle), both touchline stands, and the
     // stand at the far end, behind the penalty taker (it fills the background when you play in goal)
-    const far = D - 61;
+    const far = FAR - 9;
     this.fans = this.buildStadium(E, [
-      ['goal', 0, D + 9, 81, 0, () => true, (w) => Math.abs(w.x) < 15],
-      ['west', -40.5, D - 26, 70, -Math.PI / 2, () => true],
-      ['east', 40.5, D - 26, 70, Math.PI / 2, () => true],
-      ['back', 0, far, 81, Math.PI, () => true, (w) => Math.abs(w.x) < 12],
-      ['corner', 'cw', -40.5, D + 9, Math.PI * 1.5],
-      ['corner', 'ce', 40.5, D + 9, 0],
-      ['corner', 'bw', -40.5, far, Math.PI],
-      ['corner', 'be', 40.5, far, Math.PI / 2]
-    ], teamCols, (w) => (w.x < 0 ? 0 : 1));
+      ['goal', GX, D + 9, 81, 0, () => true, (w) => Math.abs(w.x - GX) < 15],
+      ['west', GX - 40.5, MID, PL + 18, -Math.PI / 2, () => true],
+      ['east', GX + 40.5, MID, PL + 18, Math.PI / 2, () => true],
+      ['back', GX, far, 81, Math.PI, () => true, (w) => Math.abs(w.x - GX) < 12],
+      ['corner', 'cw', GX - 40.5, D + 9, Math.PI * 1.5],
+      ['corner', 'ce', GX + 40.5, D + 9, 0],
+      ['corner', 'bw', GX - 40.5, far, Math.PI],
+      ['corner', 'be', GX + 40.5, far, Math.PI / 2]
+    ], teamCols, (w) => (w.x < GX ? 0 : 1));
 
     // ad boards
     const adTex = this.canvasTex(2048, 64, (c, w, h) => {
@@ -1195,16 +1207,16 @@ class Component extends DCLogic {
     });
     adTex.wrapS = T.RepeatWrapping; adTex.repeat.set(2, 1);
     const adMat = new T.MeshStandardMaterial({ map: adTex, emissive: 0xffffff, emissiveMap: adTex, emissiveIntensity: 0.9 });
-    const board = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); board.position.set(0, 0.45, D + 7); E.add(board);
-    const board2 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); board2.position.set(0, 0.45, far + 2); E.add(board2);
-    [-1, 1].forEach((s) => { const sb = new T.Mesh(new T.BoxGeometry(0.15, 0.9, 50), adMat); sb.position.set(36 * s, 0.45, D - 18); E.add(sb); });
+    const board = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); board.position.set(GX, 0.45, D + 7); E.add(board);
+    const board2 = new T.Mesh(new T.BoxGeometry(70, 0.9, 0.15), adMat); board2.position.set(GX, 0.45, FAR - 7); E.add(board2);
+    [-1, 1].forEach((s) => { const sb = new T.Mesh(new T.BoxGeometry(0.15, 0.9, PL), adMat); sb.position.set(GX + 37 * s, 0.45, MID); E.add(sb); });
 
     // floodlights
     const glowTex = this.canvasTex(128, 128, (c) => { const g = c.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(220,232,255,0.5)'); g.addColorStop(1, 'rgba(220,232,255,0)'); c.fillStyle = g; c.fillRect(0, 0, 128, 128); });
-    [[-66, D + 30], [66, D + 30], [-66, D - 50], [66, D - 50]].forEach(([x, z]) => {
+    [[GX - 66, D + 30], [GX + 66, D + 30], [GX - 66, FAR - 30], [GX + 66, FAR - 30]].forEach(([x, z]) => {
       const pole = new T.Mesh(new T.CylinderGeometry(0.4, 0.7, 36, 8), this.mat(0x2a3556)); pole.position.set(x, 18, z); E.add(pole);
       const panel = new T.Mesh(new T.BoxGeometry(6, 3, 0.4), new T.MeshStandardMaterial({ color: 0xffffff, emissive: 0xf4f8ff, emissiveIntensity: 1.6 }));
-      panel.position.set(x, 36, z); panel.lookAt(0, 0, D / 2); E.add(panel);
+      panel.position.set(x, 36, z); panel.lookAt(GX, 0, MID); E.add(panel);
       const sp = new T.Sprite(new T.SpriteMaterial({ map: glowTex, blending: T.AdditiveBlending, depthWrite: false, transparent: true, opacity: SKY ? 0.3 : 0.85 }));
       sp.scale.set(30, 30, 1); sp.position.set(x, 36, z); E.add(sp);
     });
@@ -1223,6 +1235,18 @@ class Component extends DCLogic {
     const GOALm = window.AMNet.goal(7.32, 2.44, 2);
     GOALm.group.position.set(GX, 0, D); E.add(GOALm.group);
     this.net = GOALm.net;
+    // the goal at the other end of the pitch (only to be seen: the ball never gets there)
+    const GOAL2 = window.AMNet.goal(7.32, 2.44, 2);
+    GOAL2.group.position.set(GX, 0, FAR); GOAL2.group.rotation.y = Math.PI; E.add(GOAL2.group);
+    // corner flags at the four corners
+    {
+      const poleG = new T.CylinderGeometry(0.025, 0.025, 1.5, 6), poleM = this.mat(0xf4f4fa, { roughness: 0.5 });
+      const flagG = new T.PlaneGeometry(0.42, 0.3), flagM = new T.MeshStandardMaterial({ color: 0xffc53d, emissive: 0x6a3d00, emissiveIntensity: 0.5, side: T.DoubleSide, roughness: 0.7 });
+      [D, FAR].forEach((z) => [-1, 1].forEach((sx) => {
+        const pole = new T.Mesh(poleG, poleM); pole.position.set(GX + sx * HW, 0.75, z); pole.castShadow = true; E.add(pole);
+        const fl = new T.Mesh(flagG, flagM); fl.position.set(GX + sx * HW - sx * 0.21, 1.33, z); fl.rotation.y = 0.5 * sx; E.add(fl);
+      }));
+    }
 
     // ball
     const ballTex = this.canvasTex(512, 256, (c, w, h) => {
