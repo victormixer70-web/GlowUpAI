@@ -135,7 +135,7 @@ class Component extends DCLogic {
     if (this.pendingJoin) { this.joinTries = 6; this.joinRoom(this.pendingJoin); } else if (this.sport === 'futbol') this.openHost(); this.pingT = setInterval(() => { if (this.room && this.state.phase === 'room') this.forceUpdate(); }, 2000); }
   look() {
     const A = window.AMChars, o = A ? A.outfit('futbol') : null;
-    return { cols: window.AMTeams ? window.AMTeams.prefs() : null, club: window.AMTeams ? window.AMTeams.myClub() : null, char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none', stad: window.AMStad ? window.AMStad.get() : null };
+    return { cols: window.AMTeams ? window.AMTeams.prefs() : null, club: window.AMTeams ? window.AMTeams.myClub() : null, char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none', stad: window.AMStad ? window.AMStad.get() : null, st: (() => { try { const j = JSON.parse(localStorage.getItem('arenamix.stats.v1') || 'null'); return j && j.stats ? j.stats : null; } catch (e) { return null; } })() };
   }
   openHost() {
     const O = window.AMOnline;

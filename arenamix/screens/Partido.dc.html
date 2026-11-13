@@ -402,6 +402,12 @@ const AMNAR = {
   endDraw: [['¡Final! Reparto de puntos: {s}', 'Full time! Honours even: {s}'], ['Empate a todo: {s}', 'All square: {s}']]
 };
 const Partido_BR = 0.17;
+// a player's upgrades as sent in the room (an old app sends none: the starting values)
+const Partido_stats = (st) => {
+  const o = { vel: 10, pot: 10, pre: 10, con: 10, res: 10, ref: 10 };
+  if (st && typeof st === 'object') for (const k in o) { const v = Number(st[k]); if (isFinite(v)) o[k] = Math.max(10, Math.min(150, v)); }
+  return o;
+};
 // the guest placeholder name the screens pass stands for you: shown as your real player name
 const Partido_me = (n) => n != null && /^Invitado_\d+$/.test(n) && window.AMOnline && window.AMOnline.myName ? (window.AMOnline.myName() || n) : n;
 class Component extends DCLogic {
@@ -605,7 +611,7 @@ class Component extends DCLogic {
       b: [r2(b.x), r2(b.y), r2(b.z), r2(b.vx), r2(b.vy), r2(b.vz)],
       own: g.own, hold: g.hold, sc: g.score, tm: r2(g.t), ex: g.extra || 0, ph: g.phase, pt: r2(g.pt), con: g.concede, sci: g.sci ?? -1,
       chat: g.chat.map((c) => [g.ps.indexOf(c.p), c.text, r2(c.t)]), ctl,
-      fx: g.fx ? [r2(g.fx.x), r2(g.fx.y), r2(g.fx.t)] : 0
+      fx: g.fx ? [r2(g.fx.x), r2(g.fx.y), r2(g.fx.t)] : 0, cd: r2(g.countT || 0)
     });
   }
   // a guest turns the host's view into its own: mirrored if it plays on the other team
@@ -623,7 +629,7 @@ class Component extends DCLogic {
     return {
       ps, b: { x: X(b[0]), y: Y(b[1]), z: b[2], vx: V(b[3]), vy: V(b[4]), vz: b[5] },
       own: mi(m.own), hold: mi(m.hold), sc: M ? [m.sc[1], m.sc[0]] : m.sc, tm: m.tm, ex: m.ex || 0, ph: m.ph, pt: m.pt, con: M ? 1 - m.con : m.con, sci: mi(m.sci),
-      chat: m.chat.map((c) => [mi(c[0]), c[1], c[2]]), ctl: mi(m.ctl[N.me] ?? -1), fx: m.fx ? { x: X(m.fx[0]), y: Y(m.fx[1]), t: m.fx[2] } : null
+      chat: m.chat.map((c) => [mi(c[0]), c[1], c[2]]), ctl: mi(m.ctl[N.me] ?? -1), fx: m.fx ? { x: X(m.fx[0]), y: Y(m.fx[1]), t: m.fx[2] } : null, cd: m.cd || 0
     };
   }
   // a guest's frame: send the stick, then glide everything towards where the host says it is
@@ -649,6 +655,15 @@ class Component extends DCLogic {
     const S = N.snap;
     if (!S) return;
     if (S.ph === 'winners') { if (g.phase !== 'winners') { g.score = S.sc.slice(); this.setupWinners(); } return; }
+    // the kick-off countdown: the host's clock (a guest's own one never ran, so it stayed on 3 all match)
+    if (g.countGo > 0) g.countGo -= dt;
+    const cd0 = g.countT || 0, cd1 = g.phase === 'play' || S.ph === 'play' ? Math.max(0, S.cd - Math.min(0.25, (performance.now() - N.snapAt) / 1000)) : 0;
+    if (cd0 > 0 && cd1 <= 0) { g.countGo = 0.8; this.sfx('whistle', 1); this.narrate('kickoff', '', null, true); this.vib([30]); }
+    else if (cd1 > 0 && Math.ceil(cd1) !== Math.ceil(cd0)) this.sfx('tick', 1);
+    g.countT = cd1;
+    // the goal replay plays on every phone, not only the host's; it ends when the host restarts play
+    if (S.ph === 'play' && this.rp && !this.rp.hl) { this.recStop(); this.rp = null; }
+    if (S.ph === 'play') this.rpDone = false;
     if (S.ph === 'goal' && g.phase !== 'goal') { this.sfx('net'); this.sfx('roar', S.con === 1); this.flare = { team: S.con === 1 ? 0 : 1 }; }
     if (S.ph === 'play' && g.phase === 'goal') this.sfx('whistle', 1);
     const bsp = Math.hypot(S.b.vx, S.b.vy), bsp0 = this.lastBsp || 0;
@@ -657,6 +672,7 @@ class Component extends DCLogic {
     if (S.ex && !g.extra) { g.extra = S.ex; this.callout('+' + S.ex + ' DE DESCUENTO', 'El cuarto árbitro levanta el cartel', '#53D88E'); this.narrate('extra', '', S.ex, true); }
     const age = Math.min(0.25, (performance.now() - N.snapAt) / 1000), k = 1 - Math.exp(-dt * 14);
     g.score = S.sc; g.t = Math.max(0, S.tm - (g.phase === 'play' ? age : 0)); g.pt = S.pt + age; g.own = S.own; g.hold = S.hold; g.concede = S.con;
+    if (g.phase === 'goal' && g.pt > 2.5 && !this.rp && !this.rpDone) this.startReplay();
     if (S.ctl != null && S.ctl >= 0 && S.ctl !== g.ctl) { g.ctl = S.ctl; g.charging = false; }
     g.ps.forEach((p, i) => {
       const s = S.ps[i];
@@ -737,7 +753,7 @@ class Component extends DCLogic {
       // everyone else in the room plays a player of their own on the host's phone
       this.net.humans = (O.roster || []).filter((r) => r.id !== this.net.me).map((r) => {
         const i = ps.findIndex((p) => p.team === r.team && p.slot === r.slot && p.role !== 'gk');
-        return { id: r.id, name: r.name, team: r.team, home: i, i, inp: [0, 0], sprint: false, press: false, charging: false, charge: 0, q: [] };
+        return { id: r.id, name: r.name, team: r.team, home: i, i, inp: [0, 0], sprint: false, press: false, charging: false, charge: 0, q: [], st: Partido_stats(r.look && r.look.st) };
       }).filter((h) => h.i >= 0);
       this.netListen();
     } else if (this.net) this.netListen();
@@ -752,7 +768,8 @@ class Component extends DCLogic {
     return { vel: 10, pot: 10, pre: 10, con: 10, res: 10, ref: 10 };
   }
   tt(k) {
-    const s = this.st || {};
+    // a remote player's own upgrades on the host's phone (never the host's), yours otherwise
+    const s = (this.ctxH ? this.ctxH.st : this.st) || {};
     return Math.max(0, Math.min(1, ((s[k] ?? 10) - 10) / 140));
   }
   diff(team) {
@@ -908,6 +925,8 @@ class Component extends DCLogic {
   countdown() {
     const g = this.g;
     if (this.props.tutorial || this.props.practice) { this.sfx('whistle', 1); this.narrate('kickoff', '', null, true); return; }
+    // a guest follows the host's countdown (it comes with every snapshot)
+    if (this.net && !this.net.host) return;
     g.countT = 3; g.countGo = 0; this.sfx('tick', 1);
   }
   // the three shots of the intro: home end, away end, the whole stadium

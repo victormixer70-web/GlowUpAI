@@ -169,7 +169,10 @@
   /* ---------- the party ---------- */
   function look() {
     var A = window.AMChars, o = A ? A.outfit('futbol') : null;
-    return { char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none' };
+    // the kit too, so friends see you in it (only the plain colour fields)
+    var kit = null;
+    if (o) { kit = {}; ['primary', 'secondary', 'pattern', 'shorts', 'socks', 'shoe'].forEach(function (k) { if (typeof o[k] === 'string') kit[k] = o[k].slice(0, 24); }); }
+    return { char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none', kit: kit };
   }
   function partyOut() { if (party && party.leader && party.room) party.room.send({ t: 'party', members: party.members }); changed(); }
   // lead a party: my phone hosts it

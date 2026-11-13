@@ -69,6 +69,25 @@
     }
     return V.heroModel;
   }
+  // friends in your party, standing beside you: [{ key, look: { char, kit }, x (pixels from your centre), s (size) }]
+  var mates = [];
+  function setMates(list) { mates = (list || []).filter(function (m) { return m && m.look && m.look.char && m.look.char !== 'clasico'; }); }
+  function mateModels(V) {
+    var A = window.AMChars, have = V.mateModels || (V.mateModels = {}), want = {};
+    mates.forEach(function (m) {
+      var k = m.key + '|' + m.look.char + '|' + JSON.stringify(m.look.kit || null);
+      want[k] = 1;
+      if (!have[k]) {
+        var md = null;
+        try { md = A.make({ char: m.look.char, kit: m.look.kit || null, noRing: true }); } catch (e) { md = null; }
+        have[k] = md || 'none';
+        if (md) V.S.add(md);
+      }
+      m.model = have[k] === 'none' ? null : have[k];
+    });
+    for (var k in have) if (!want[k]) { if (have[k] !== 'none') V.S.remove(have[k]); delete have[k]; }
+  }
+  function hideMates(V) { var have = V && V.mateModels; if (have) for (var k in have) if (have[k] !== 'none') have[k].visible = false; }
   function frame() {
     var V = window.__amTaqV, me = token;
     if (!V || V.owner !== me || !holder) return;
@@ -122,7 +141,24 @@
     m.rotation.y = baseRot + extra;
     if (an && A.clip('idle')) an.layers = layers.length ? layers : [{ id: 'idle', t: t, w: 1 }];
     var fov = V.cam.fov * Math.PI / 360;
-    var fit = Math.max(2.05 / (2 * Math.tan(fov)), 0.9 / (2 * Math.tan(fov) * V.cam.aspect));
+    // with friends beside you the view is wider: the height still sets the size, so you look the same
+    var fit = mates.length ? 2.05 / (2 * Math.tan(fov)) : Math.max(2.05 / (2 * Math.tan(fov)), 0.9 / (2 * Math.tan(fov) * V.cam.aspect));
+    hideMates(V);
+    if (mates.length) {
+      mateModels(V);
+      var ppm = h / 2.05;
+      mates.forEach(function (q, i) {
+        var md = q.model; if (!md) return;
+        // a step behind you, at their spot on the screen
+        var z = -0.55, d = (fit - z) / fit;
+        md.visible = true;
+        md.position.set(q.x / ppm * d, 0, z);
+        md.scale.setScalar(q.s || 1);
+        md.rotation.y = (q.x < 0 ? 0.35 : -0.35) + Math.sin(t * 0.45 + i * 1.7) * 0.1;
+        var ma = md.userData.anim;
+        if (ma && A.clip('idle')) ma.layers = [{ id: 'idle', t: t + i * 0.73, w: 1 }];
+      });
+    }
     V.cam.position.set(0, 1.0, fit);
     V.cam.lookAt(0, 0.92, 0);
     V.R.render(V.S, V.cam);
@@ -145,6 +181,7 @@
       V.owner = null;
       if (V.heroModel) V.heroModel.visible = false;
       if (V.heroBall) V.heroBall.visible = false;
+      hideMates(V);
       if (V.model) V.model.visible = true;
     }
     if (V.cv.parentNode === el) el.removeChild(V.cv);
@@ -159,5 +196,5 @@
     m.visible = vis;
   }
   window.AMViewer = viewer;
-  window.AMHero = { attach: attach, detach: detach, warm: warm, play: play };
+  window.AMHero = { attach: attach, detach: detach, warm: warm, play: play, setMates: setMates };
 })();

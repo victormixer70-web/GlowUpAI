@@ -348,7 +348,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <a href="Social.dc.html" onClick="{{sl.tap}}" class="{{sl.cls}}" style="{{sl.style}}" aria-label="{{sl.aria}}">
       <svg width="58" height="118" viewBox="0 0 64 130" aria-hidden="true" style="{{sl.svg}}"><circle cx="32" cy="22" r="15"/><path d="M8 126V70c0-16 10-26 24-26s24 10 24 26v56"/></svg>
       <sc-if value="{{sl.free}}" hint-placeholder-val="{{ true }}"><span class="plus">+</span></sc-if>
-      <sc-if value="{{sl.filled}}" hint-placeholder-val="{{ false }}"><img class="pic" src="{{sl.pic}}" alt=""><span class="ini" style="{{sl.iniStyle}}">{{sl.ini}}</span></sc-if>
+      <sc-if value="{{sl.flat}}" hint-placeholder-val="{{ false }}"><img class="pic" src="{{sl.pic}}" alt=""><span class="ini" style="{{sl.iniStyle}}">{{sl.ini}}</span></sc-if>
       <span class="lbl" translate="no" style="{{sl.lblStyle}}">{{sl.label}}</span>
     </a>
   </sc-for>
@@ -356,7 +356,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <a href="Social.dc.html" class="lb-party">TU EQUIPO · {{partyN}}/4</a>
   <!-- you, in 3D, on the stage (the 2D figure only if 3D isn't available) -->
   <sc-if value="{{hero3d}}" hint-placeholder-val="{{ true }}">
-    <div ref="{{heroRef}}" role="button" aria-label="Tu jugador: tócalo para que haga una jugada" onClick="{{heroTap}}" style="position: absolute; left: 322px; top: 140px; width: 176px; height: 236px; z-index: 3; cursor: pointer; filter: drop-shadow(0 14px 18px #000C)"></div>
+    <!-- the 3D view: you, and the friends in your party beside you (then it is wider) -->
+    <div ref="{{heroRef}}" aria-hidden="true" style="{{heroBox}}"></div>
+    <div role="button" aria-label="Tu jugador: tócalo para que haga una jugada" onClick="{{heroTap}}" style="position: absolute; left: 322px; top: 140px; width: 176px; height: 236px; z-index: 3; cursor: pointer"></div>
   </sc-if>
   <sc-if value="{{hero2d}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; left: 341px; top: 70px; z-index: 3; pointer-events: none; filter: drop-shadow(0 12px 16px #000C); animation: hmPlayer 3.4s ease-in-out infinite">
@@ -420,7 +422,7 @@ class Component extends DCLogic {
     };
   }
   componentDidMount() { if (window.AMSocial) { window.AMSocial.start(); this.soOff = window.AMSocial.on(() => this.forceUpdate()); } }
-  componentWillUnmount() { if (this.soOff) this.soOff(); if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; }
+  componentWillUnmount() { if (this.soOff) this.soOff(); if (window.AMHero && window.AMHero.setMates) window.AMHero.setMates([]); if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; }
   store(key, def) { try { const v = JSON.parse(localStorage.getItem(key) || 'null'); return v == null ? def : v; } catch (e) { return def; } }
   // the lobby's mode card, its PLAY, the event and the stage sparks
   lobbyVals(tr, mmr, lo, hi, nextRank, mDone, done) {
@@ -464,6 +466,11 @@ class Component extends DCLogic {
     const COLS = ['#22D3EE', '#FFC53D', '#FF5CC8', '#53D88E', '#A78BFA', '#FF8A3D', '#3EA6FF'];
     const colOf = (n) => { let h = 0; for (const c of String(n)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return COLS[h % COLS.length]; };
     const POS = [[232, 206, ''], [500, 206, ''], [574, 188, ' transform: scale(.84);']];
+    // friends in your team stand beside you in 3D, in their own character and kit (a picture if 3D is off)
+    const can3d = !!(window.AMHero && window.AMHero.setMates && window.THREE && window.AMChars && window.AMChars.pref() !== 'clasico');
+    const mates3d = can3d ? others.slice(0, 3).map((m, k) => ({ key: String(k) + m.name, look: m.look, x: POS[k][0] + 34 - 410, s: k === 2 ? 0.9 : 1 })).filter((q) => q.look && q.look.char && q.look.char !== 'clasico') : [];
+    this.mates3d = mates3d.length;
+    if (window.AMHero && window.AMHero.setMates) window.AMHero.setMates(mates3d);
     const toSocial = () => { try { localStorage.setItem('arenamix.social.tab', JSON.stringify({ tab: st && st.friends.length ? 'friends' : 'search', invite: true })); } catch (e) {} };
     const member = P && !P.leader, withParty = !!P && P.leader && P.members.length > 1;
     const n0 = /^m\d$/.test(selId) ? +selId.slice(1) : 2, fmt = 'm' + Math.min(4, Math.max(n0, P ? P.members.length : 1, 2));
@@ -475,12 +482,12 @@ class Component extends DCLogic {
       partyN: String(P ? P.members.length : 1),
       hasReq: !!(SO && SO.pending() > 0), reqN: String(SO ? SO.pending() : 0),
       slots: POS.map(([x, y, tf], k) => {
-        const m = others[k], c = m ? colOf(m.name) : '#C4B5FD';
+        const m = others[k], c = m ? colOf(m.name) : '#C4B5FD', solid = !!(m && can3d && m.look && m.look.char && m.look.char !== 'clasico');
         return {
-          k: String(k), free: !m, filled: !!m, ini: m ? m.name.charAt(0).toUpperCase() : '', label: m ? m.name : 'INVITAR',
+          k: String(k), free: !m, filled: !!m, flat: !!m && !solid, ini: m ? m.name.charAt(0).toUpperCase() : '', label: m ? m.name : 'INVITAR',
           cls: 'lb-slot' + (m ? ' in' : ''), aria: m ? m.name + ' está en tu equipo' : 'Invitar a un amigo a tu equipo',
           style: 'left: ' + x + 'px; top: ' + y + 'px;' + tf + (m ? '' : k === 2 ? ' opacity: .6;' : ''),
-          svg: m ? 'fill: ' + c + '33; stroke: ' + c : '',
+          svg: solid ? 'display: none' : m ? 'fill: ' + c + '33; stroke: ' + c : '',
           iniStyle: 'background: ' + c,
           // a friend in your team shows up as a player (a portrait picked from their name)
           pic: m ? 'assets/chars/' + (m.look && m.look.char && m.look.char !== 'clasico' ? m.look.char : ['ty', 'vegas', 'granny', 'remy', 'leo', 'nico', 'dani'][[...m.name].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7) % 7]) + '.png' : '',
@@ -587,6 +594,7 @@ class Component extends DCLogic {
       openWheel: (e) => { if (e) e.preventDefault(); if (window.AMJuice) { window.AMJuice.wheel.open(); const re = () => { window.removeEventListener('am:wheel', re); this.forceUpdate(); }; window.addEventListener('am:wheel', re); } },
       heroTap: (e) => { if (e) { e.preventDefault(); e.stopPropagation(); } if (window.AMHero && window.AMHero.play) window.AMHero.play(); },
       hero3d: hero3d, hero2d: !hero3d,
+      heroBox: 'position: absolute; top: 140px; height: 236px; pointer-events: none; filter: drop-shadow(0 14px 18px #000C); ' + (hero3d && this.mates3d ? 'left: 170px; width: 480px; z-index: 1;' : 'z-index: 3;') + (hero3d && this.mates3d ? '' : 'left: 322px; width: 176px;'),
       face: hero3d ? 'assets/chars/' + window.AMChars.pref() + '.png' : '', hasFace: hero3d, noFace: !hero3d,
       kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#0B0B14', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#17172A', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE'
     };

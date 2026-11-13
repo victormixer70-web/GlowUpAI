@@ -578,7 +578,7 @@ class Component extends DCLogic {
     if (!O || !O.available() || !this.netMode()) return;
     const duel = this.pl.kind === 'duel';
     const A = window.AMChars, o = A ? A.outfit('futbol') : null;
-    const look = { cols: window.AMTeams ? window.AMTeams.prefs() : null, club: window.AMTeams ? window.AMTeams.myClub() : null, char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none', stad: window.AMStad ? window.AMStad.get() : null };
+    const look = { cols: window.AMTeams ? window.AMTeams.prefs() : null, club: window.AMTeams ? window.AMTeams.myClub() : null, char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none', stad: window.AMStad ? window.AMStad.get() : null, st: (() => { try { const j = JSON.parse(localStorage.getItem('arenamix.stats.v1') || 'null'); return j && j.stats ? j.stats : null; } catch (e) { return null; } })() };
     this.endOnline();
     const SO = window.AMSocial, party = SO && SO.partyNames ? SO.partyNames() : null;
     const handlers = {
