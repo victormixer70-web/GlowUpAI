@@ -102,6 +102,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .lb-week{position:absolute;left:96px;top:238px;width:160px;height:62px;box-sizing:border-box;padding:8px 10px;border-radius:16px;display:flex;flex-direction:column;justify-content:center;gap:4px;text-decoration:none;color:#F4F4FA;background:linear-gradient(170deg,#2E1C5CE6,#120D2CE6);box-shadow:inset 0 0 0 1px #A78BFA66,0 6px 14px #0008}
 .lb-slot{position:absolute;width:68px;height:196px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-decoration:none;color:#C4B5FD;z-index:2;opacity:.75;transition:opacity .2s,transform .2s}
 .lb-slot:hover{opacity:1 !important;filter:brightness(1.2)}
+.lb-cols{position:absolute;left:690px;top:138px;width:142px;height:26px;z-index:3;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;cursor:pointer;background:linear-gradient(180deg,#0B1A44e6,#02040Ce6);box-shadow:0 0 0 1.5px var(--cc,#1E8BFF),0 0 14px color-mix(in srgb,var(--cc,#1E8BFF) 45%,transparent);color:#E6F2FF;font:400 10px Titulos,sans-serif;letter-spacing:1.5px}
+.lb-cols .sw{display:flex}.lb-cols .sw i{width:11px;height:15px;border-radius:3px;box-shadow:0 0 0 1.2px #02040C,0 0 0 2px #ffffff55}.lb-cols .sw i+i{margin-left:-3px;transform:rotate(8deg)}
 .lb-party{position:absolute;left:520px;top:64px;text-decoration:none;padding:3px 9px;border-radius:8px;background:#05050ACC;box-shadow:inset 0 0 0 1px #A78BFA66;font:800 9.5px Exo2,sans-serif;letter-spacing:1px;color:#C4B5FD;z-index:2}
 .lb-slot svg{position:absolute;top:22px;fill:#C4B5FD12;stroke:#C4B5FD88;stroke-width:2;stroke-dasharray:5 5}
 .lb-slot .plus{position:absolute;top:76px;width:30px;height:30px;border-radius:15px;background:#A78BFA;color:#0B0B14;font:800 22px/30px Exo2,sans-serif;text-align:center;box-shadow:0 0 0 3px #05050A,0 0 14px #A78BFA;animation:lbPulse 2s ease-in-out infinite}
@@ -350,6 +352,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <span class="lbl" translate="no" style="{{sl.lblStyle}}">{{sl.label}}</span>
     </a>
   </sc-for>
+  <sc-if value="{{colOn}}" hint-placeholder-val="{{ false }}"><button type="button" class="lb-cols" style="--cc: {{colHome}}" onClick="{{openCols}}" aria-label="Mis colores para el 1 contra 1: local {{colHomeName}}, visitante {{colAwayName}}. Toca para cambiarlos"><span class="sw"><i style="background: {{colHome}}"></i><i style="background: {{colAway}}"></i></span>MIS COLORES</button></sc-if>
   <a href="Social.dc.html" class="lb-party">TU EQUIPO · {{partyN}}/4</a>
   <!-- you, in 3D, on the stage (the 2D figure only if 3D isn't available) -->
   <sc-if value="{{hero3d}}" hint-placeholder-val="{{ true }}">
@@ -448,6 +451,8 @@ class Component extends DCLogic {
       hasNextRank: !!nextRank, nextRankUp: (nextRank || '').toUpperCase(),
       missLeft: mDone < 3,
       ...this.partyVals(id, href),
+      ...(() => { const T = window.AMTeams; if (!T) return { colOn: false }; const pr = T.prefs();
+        return { colOn: true, colHome: pr.home, colAway: pr.away, colHomeName: T.nameOf(pr.home), colAwayName: T.nameOf(pr.away), openCols: () => T.openPicker(() => this.forceUpdate()) }; })(),
       dorsal: (() => { try { return String(+localStorage.getItem('arenamix.dorsal.v1') || 10); } catch (e) { return '10'; } })(),
       sparks: Array.from({ length: 12 }, (_, k) => 'left: ' + (290 + rnd(k + 1) * 240).toFixed(0) + 'px; animation-delay: -' + (rnd(k + 7) * 5).toFixed(2) + 's; animation-duration: ' + (4 + rnd(k + 3) * 3).toFixed(2) + 's; background: ' + (k % 3 ? '#FFE38A' : '#22D3EE'))
     };

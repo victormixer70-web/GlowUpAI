@@ -12,7 +12,12 @@
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
-.pv-pitch{position:absolute;left:14px;right:14px;top:112px;bottom:70px;border-radius:16px;overflow:hidden;pointer-events:none;background:linear-gradient(90deg,#FF8A3D22,transparent 30%,transparent 70%,#3EA6FF22),repeating-linear-gradient(90deg,#17603333 0 54px,#14552D33 54px 108px);box-shadow:inset 0 0 0 2px #FFFFFF14}
+.pv-th{display:flex;align-items:center;gap:8px;height:22px}
+.pv-th b{font:400 12px Titulos,sans-serif;letter-spacing:2px}
+.pv-th i{width:14px;height:18px;border-radius:4px;box-shadow:0 0 0 1.5px #02040C,0 0 0 2.5px #ffffff55,0 0 10px var(--tc)}
+.pv-th em{font-style:normal;font-size:10.5px;font-weight:700;color:#9FB4D8}
+.pv-th button{margin-left:auto;height:22px;padding:0 10px;border:0;border-radius:11px;background:#06102E;box-shadow:0 0 0 1.5px var(--tc);color:#fff;font:400 10px Titulos,sans-serif;letter-spacing:1px;cursor:pointer}
+.pv-pitch{position:absolute;left:14px;right:14px;top:112px;bottom:70px;border-radius:16px;overflow:hidden;pointer-events:none;background:linear-gradient(90deg,color-mix(in srgb,var(--ca) 22%,transparent),transparent 30%,transparent 70%,color-mix(in srgb,var(--cb) 22%,transparent)),repeating-linear-gradient(90deg,#17603333 0 54px,#14552D33 54px 108px);box-shadow:inset 0 0 0 2px #FFFFFF14}
 .pv-pitch::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:#FFFFFF22}
 .pv-pitch::after{content:"";position:absolute;left:50%;top:50%;width:90px;height:90px;margin:-45px;border-radius:50%;box-shadow:inset 0 0 0 2px #FFFFFF22}
 .pv-vs{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#FFE38A,#FFC53D 60%,#B7791F);color:#2A1C02;font:800 italic 18px 'Barlow Condensed',sans-serif;box-shadow:0 0 0 3px #150925,0 0 18px #FFC53D88;z-index:2;animation:pvVs 1.6s ease-in-out infinite;pointer-events:none}
@@ -53,17 +58,17 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <div style="position: absolute; left: 14px; top: 72px; right: 14px; display: flex; gap: 6px; flex-wrap: wrap">
       <sc-for list="{{formats}}" as="f" hint-placeholder-count="6"><button type="button" onClick="{{f.pick}}" style="{{f.style}}">{{f.title}}</button></sc-for>
     </div>
-    <div class="pv-pitch" aria-hidden="true"></div>
+    <div class="pv-pitch" aria-hidden="true" style="--ca: {{colA}}; --cb: {{colB}}"></div>
     <span class="pv-vs" aria-hidden="true" style="top: 216px">VS</span>
     <div style="position: absolute; left: 24px; top: 120px; right: 24px; bottom: 78px; display: flex; gap: 60px">
       <div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
-        <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE">EQUIPO NARANJA</span>
+        <div class="pv-th" style="--tc: {{colA}}"><i style="background: {{colA}}"></i><b style="color: {{inkA}}">LOCAL</b><em>{{nameA}}</em><sc-if value="{{colBtn}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{openCols}}" aria-label="Elegir mis colores de local y visitante">MIS COLORES</button></sc-if></div>
         <sc-for list="{{teamA}}" as="p" hint-placeholder-count="2">
           <button type="button" onClick="{{p.tap}}" style="{{p.style}}"><span class="pv-av" style="{{p.avStyle}}">{{p.ini}}</span><span style="flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</span><span style="{{p.tagStyle}}">{{p.tag}}</span></button>
         </sc-for>
       </div>
       <div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
-        <span style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #FF8A8E">EQUIPO RIVAL</span>
+        <div class="pv-th" style="--tc: {{colB}}"><i style="background: {{colB}}"></i><b style="color: {{inkB}}">VISITANTE</b><em>{{nameB}}</em></div>
         <sc-for list="{{teamB}}" as="p" hint-placeholder-count="2">
           <button type="button" onClick="{{p.tap}}" style="{{p.style}}"><span class="pv-av" style="{{p.avStyle}}">{{p.ini}}</span><span style="flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</span><span style="{{p.tagStyle}}">{{p.tag}}</span></button>
         </sc-for>
@@ -130,7 +135,7 @@ class Component extends DCLogic {
     if (this.pendingJoin) { this.joinTries = 6; this.joinRoom(this.pendingJoin); } else if (this.sport === 'futbol') this.openHost(); this.pingT = setInterval(() => { if (this.room && this.state.phase === 'room') this.forceUpdate(); }, 2000); }
   look() {
     const A = window.AMChars, o = A ? A.outfit('futbol') : null;
-    return { char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none', stad: window.AMStad ? window.AMStad.get() : null };
+    return { cols: window.AMTeams ? window.AMTeams.prefs() : null, club: window.AMTeams ? window.AMTeams.myClub() : null, char: A ? A.pref() : 'ty', hat: o ? o.hat || 'none' : 'none', hatColor: o ? o.hatColor || '' : '', face: o ? o.face || 'none' : 'none', stad: window.AMStad ? window.AMStad.get() : null };
   }
   openHost() {
     const O = window.AMOnline;
@@ -330,7 +335,7 @@ class Component extends DCLogic {
           if (you || occ) return;
           if (online) {
             // sit here: the host only on its own team (it runs the match from that side)
-            if (s.net === 'host') { if (tn !== 0) { this.say('El anfitrión juega en el equipo naranja'); return; } this.setRoster(s.roster.map((x) => (x.id === meId ? { ...x, slot: i } : x))); }
+            if (s.net === 'host') { if (tn !== 0) { this.say('El anfitrión juega en el equipo local'); return; } this.setRoster(s.roster.map((x) => (x.id === meId ? { ...x, slot: i } : x))); }
             else this.room.send({ t: 'seat', team: tn, slot: i });
             return;
           }
@@ -339,6 +344,39 @@ class Component extends DCLogic {
       };
     };
     const teamA = Array.from({ length: n }, (_, i) => slot('A', i)), teamB = Array.from({ length: n }, (_, i) => slot('B', i));
+    // the colours each team will wear (the same rules as the match: AMTeams)
+    const TM = window.AMTeams, plan = (() => {
+      if (!TM) return { home: { c: '#FF8A3D' }, away: { c: '#3EA6FF' } };
+      const lookAt = (tn, i) => { const o = online ? s.roster.find((x) => x.team === tn && x.slot === i) : null; return o && o.id !== meId ? o.look || null : null; };
+      const isMe = (tn, i) => (online ? !!s.roster.find((x) => x.team === tn && x.slot === i && x.id === meId) : tn === 0 && i === 0);
+      if (n === 1) {
+        const pA = isMe(0, 0) ? TM.prefs() : (lookAt(0, 0) || {}).cols || TM.aiPrefs(null, 'IA local');
+        const pB = isMe(1, 0) ? TM.prefs() : (lookAt(1, 0) || {}).cols || TM.aiPrefs(null, 'IA rival');
+        return TM.resolve1v1(pA, pB);
+      }
+      const clubs = (tn) => Array.from({ length: n }, (_, i) => (isMe(tn, i) ? TM.myClub() : (lookAt(tn, i) || {}).club || null));
+      return TM.resolveTeams(clubs(0), clubs(1));
+    })();
+    const inkOf = (c) => (TM && !TM.clash(c, '#0A0F24') ? c : '#9FB4D8');
+    // player cards in their team's colour, bigger when there are fewer of them (the room fills the space)
+    const H = n === 1 ? 112 : n === 2 ? 80 : n === 3 ? 58 : 44, AV = n === 1 ? 78 : n === 2 ? 56 : n === 3 ? 42 : 32;
+    const card = (p, c, side) => {
+      const you = p.tag === 'TÚ';
+      p.style = 'display: flex; justify-content: space-between; align-items: center; gap: 12px; height: ' + H + 'px; padding: 0 14px 0 10px; border-radius: 14px; border: 0; cursor: ' + (you ? 'default' : 'pointer') + '; text-align: left; color: #F4F7FF; font: 400 ' + (n <= 2 ? 17 : 13) + 'px Titulos, sans-serif; letter-spacing: .5px; background: linear-gradient(' + (side ? 270 : 90) + 'deg, ' + c + (you ? '66' : '33') + ', #06102EE6 62%); box-shadow: inset ' + (side ? -5 : 5) + 'px 0 0 ' + c + ', inset 0 0 0 1px ' + c + (you ? 'AA' : '44') + ', 0 6px 14px #0007' + (you ? ', 0 0 18px ' + c + '55' : '') + ';';
+      p.avStyle += ' width: ' + AV + 'px; height: ' + AV + 'px; --pc: ' + c + ';';
+    };
+    teamA.forEach((p) => card(p, plan.home.c, 0));
+    teamB.forEach((p) => card(p, plan.away.c, 1));
+    const colV = { colA: plan.home.c, colB: plan.away.c, inkA: inkOf(plan.home.c), inkB: inkOf(plan.away.c),
+      nameA: TM ? (n === 1 ? TM.nameOf(plan.home.c) : plan.home.c === TM.LOGO.home.c ? 'Colores ARENA MIX' : 'Color del club') : '',
+      nameB: TM ? (n === 1 ? TM.nameOf(plan.away.c) : plan.away.c === TM.LOGO.away.c ? 'Colores ARENA MIX' : 'Color del club') : '',
+      colBtn: !!TM && n === 1,
+      openCols: () => { if (!TM) return; TM.openPicker(() => {
+        // tell the room: the host updates its own seat, a guest says hello again with its new colours
+        if (this.room && s.net === 'host') this.setRoster(this.state.roster.map((x) => (x.id === meId ? { ...x, look: this.look() } : x)));
+        else if (this.room && s.net === 'guest') this.room.send({ t: 'hello', name: this.myName, look: this.look() });
+        this.forceUpdate();
+      }); } };
     const res = s.res, won = res && res.home > res.away, lost = res && res.home < res.away;
     const live = s.phase === 'match';
     const mates = teamA.slice(1).map((p) => p.name.replace(' (tú)', '')).map((x) => (x === 'Amigo invitado' ? 'IA (amigo)' : x));
@@ -364,7 +402,7 @@ class Component extends DCLogic {
       isRoom: s.phase === 'room', isResult: s.phase === 'result',
       isDuelMatch: live && f.kind === 'duel',
       isBasket: live && f.kind === 'mg' && f.comp === 'Baloncesto', isTenis: live && f.kind === 'mg' && f.comp === 'Tenis', isVoley: live && f.kind === 'mg' && f.comp === 'Voley',
-      formats, teamA, teamB,
+      formats, teamA, teamB, ...colV,
       note: online ? (guest ? 'Toca un hueco libre para cambiarte de sitio. El anfitrión elige el modo y empieza el partido.' : 'Pasa el código ' + this.code + ' a tus amigos: entran con «Unirse con código». Los huecos libres los juega la IA.') : f.kind === 'team' && n > 1 ? 'Los huecos libres los juega la IA. En el partido puedes darle órdenes: ¡Pásala!, ¡Chuta!, ¡Atrás! y ¡Presiona!.' : 'Sin conexión online: de momento tu rival lo juega la IA.',
       showJoin: s.showJoin, joinCode: s.joinCode,
       toggleJoin: () => this.setState({ showJoin: !s.showJoin }),

@@ -386,8 +386,25 @@ class Component extends DCLogic {
   }
   shotN() { return this.sh.you.length + this.sh.rival.length; }
   // the two sides' colours: yours from the kit you wear (Taquilla), the rival's from the match (kept apart from yours)
-  homeCol() { const o = window.AMChars && window.AMChars.outfit && window.AMChars.outfit('futbol'); return (o && o.primary) || '#FF8A3D'; }
+  // 1 vs 1 colours (AMTeams): you and the rival in your home/away colours, never alike. In practice your own kit
+  teamPlan() {
+    if (this._tp !== undefined) return this._tp;
+    const T = window.AMTeams;
+    if (!T || this.practice) return (this._tp = null);
+    const O = this.ol, roster = O && O.roster ? O.roster : [], riv = O ? roster.find((x) => x.id !== O.me) : null;
+    const rivP = riv && riv.look && riv.look.cols ? riv.look.cols : T.aiPrefs(this.props.awayColor, this.props.rivalName);
+    const localIsMe = !O || O.isHost, r = localIsMe ? T.resolve1v1(T.prefs(), rivP) : T.resolve1v1(rivP, T.prefs());
+    return (this._tp = localIsMe ? { mine: r.home, rival: r.away } : { mine: r.away, rival: r.home });
+  }
+  homeCol() { const tp = this.teamPlan(); if (tp) return tp.mine.c; const o = window.AMChars && window.AMChars.outfit && window.AMChars.outfit('futbol'); return (o && o.primary) || '#FF8A3D'; }
+  // your kit in 3D: the Taquilla one if it is already your colour, else a plain shirt in it
+  myKit() {
+    const o = window.AMChars && window.AMChars.outfit && window.AMChars.outfit('futbol'), tp = this.teamPlan();
+    if (!o || !tp || tp.mine.c.toLowerCase() === String(o.primary).toLowerCase()) return null;
+    return Object.assign({}, o, { primary: tp.mine.c, secondary: tp.mine.t, pattern: 'solid', socks: tp.mine.c });
+  }
   rivalCol() {
+    if (!this._rc && this.teamPlan()) this._rc = this.teamPlan().rival.c;
     if (!this._rc) {
       const T = THREE, home = new T.Color(this.homeCol()), want = this.props.awayColor ?? '#3EA6FF';
       const far = (c) => { const x = new T.Color(c); return Math.abs(x.r - home.r) + Math.abs(x.g - home.g) + Math.abs(x.b - home.b) > 0.55; };
@@ -1455,9 +1472,9 @@ class Component extends DCLogic {
     this.keeperInner = this.keeper.userData.body;
     this.keeper.rotation.y = Math.PI;
     S.add(this.keeper);
-    this.shooterYou = this.makePlayer({ you: true, sport: 'futbol', shirt: 0xff8a3d, shorts: 0x141b2d, socks: 0xf2f5fa, number: '10', trimCss: '#0B0B14' });
+    this.shooterYou = this.makePlayer({ you: true, sport: 'futbol', kit: this.myKit() || undefined, shirt: 0xff8a3d, shorts: 0x141b2d, socks: 0xf2f5fa, number: '10', trimCss: '#0B0B14' });
     const rc = new THREE.Color(this.rivalCol()).getHex();
-    this.shooterRival = this.makePlayer({ shirt: rc, shorts: 0xf2f5fa, socks: rc, number: '9', trimCss: this.props.awayTrim ?? '#F4F4FA', hair: 0xc9a227, boot: 0xf2f5fa });
+    this.shooterRival = this.makePlayer({ shirt: rc, shorts: 0xf2f5fa, socks: rc, number: '9', trimCss: this.teamPlan() ? this.teamPlan().rival.t : (this.props.awayTrim ?? '#F4F4FA'), hair: 0xc9a227, boot: 0xf2f5fa });
     S.add(this.shooterYou); S.add(this.shooterRival);
     this.wallMen = []; this.targets = [];
     this.placeWallAndTargets();

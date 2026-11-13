@@ -2748,7 +2748,7 @@ class Component extends DCLogic {
     const T = THREE, g = this.g;
     if (!this.confetti) {
       const N = 420, pos = new Float32Array(N * 3), col = new Float32Array(N * 3), vel = [];
-      const P = this.props, cols = g.win && g.win.team === 1 ? [this.awayCol(), P.awayTrim ?? '#F4F4FA', '#FFC53D'] : g.win && g.win.team === 0 ? [P.homeColor ?? this.homeKit().primary, P.homeTrim ?? this.homeKit().secondary, '#FFC53D'] : ['#FFC53D', '#F4F4FA', '#22D3EE'];
+      const P = this.props, cols = g.win && g.win.team === 1 ? [this.awayCol(), this.awayTrim(), '#FFC53D'] : g.win && g.win.team === 0 ? [P.homeColor ?? this.homeKit().primary, P.homeTrim ?? this.homeKit().secondary, '#FFC53D'] : ['#FFC53D', '#F4F4FA', '#22D3EE'];
       const cc = cols.map((h) => new T.Color(h));
       for (let i = 0; i < N; i++) {
         pos[i * 3] = (Math.random() - 0.5) * 18; pos[i * 3 + 1] = 2 + Math.random() * 9; pos[i * 3 + 2] = (Math.random() - 0.5) * 8;
@@ -2906,7 +2906,7 @@ class Component extends DCLogic {
     apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; S.add(apron);
     // ---------- big open-air stadium: two tiers on three sides, ultras behind each goal ----------
     const P = this.props;
-    const teamCols = [[P.homeColor ?? this.homeKit().primary, P.homeTrim ?? this.homeKit().secondary], [this.awayCol(), P.awayTrim ?? '#F4F4FA']];
+    const teamCols = [[P.homeColor ?? this.homeKit().primary, P.homeTrim ?? this.homeKit().secondary], [this.awayCol(), this.awayTrim()]];
     const standMat = this.mat(0x2a3044, { roughness: 0.92 });
     const seatMat = this.mat(0x1b2236, { roughness: 0.9 });
     const LOW = 14, UP = 10;
@@ -3469,7 +3469,7 @@ class Component extends DCLogic {
     this.amb = null;
     if (STAD && this.endSeats) {
       const P = this.props, hk = this.homeKit();
-      const cols = [[P.homeColor ?? hk.primary, P.homeTrim ?? hk.secondary, (Partido_me(P.homeName) ?? 'Tu equipo').toUpperCase()], [this.awayCol(), P.awayTrim ?? '#F4F4FA', (P.awayName ?? 'Rival').toUpperCase()]];
+      const cols = [[P.homeColor ?? hk.primary, P.homeTrim ?? hk.secondary, (Partido_me(P.homeName) ?? 'Tu equipo').toUpperCase()], [this.awayCol(), this.awayTrim(), (P.awayName ?? 'Rival').toUpperCase()]];
       [0, 1].forEach((team) => {
         const sx = team === 0 ? -1 : 1, [c1, c2, name] = cols[team];
         const es = this.endSeats.filter((q) => q[0] * sx > 31 && Math.abs(q[2]) < 13);
@@ -3795,7 +3795,9 @@ class Component extends DCLogic {
     }
   }
   // rival colour, swapped for another when it is too close to your kit
+  awayTrim() { const tp = this.teamPlan(); return tp ? tp.rival.t : (this.props.awayTrim ?? '#F4F4FA'); }
   awayCol() {
+    if (!this._awayCol && this.teamPlan()) this._awayCol = this.teamPlan().rival.c;
     if (!this._awayCol) {
       const P = this.props, want = P.awayColor ?? '#A78BFA', home = new THREE.Color(P.homeColor ?? this.homeKit().primary);
       const far = (c) => { const x = new THREE.Color(c); return Math.abs(x.r - home.r) + Math.abs(x.g - home.g) + Math.abs(x.b - home.b) > 0.55; };
@@ -3820,9 +3822,39 @@ class Component extends DCLogic {
   homeKit() {
     if (!this._homeKit) {
       const o = window.AMChars && window.AMChars.outfit('futbol');
-      this._homeKit = o || { primary: '#FF8A3D', secondary: '#0B0B14', pattern: 'solid', shorts: '#17172A', socks: '#FF8A3D', shoe: '#C8F031' };
+      let k = o || { primary: '#FF8A3D', secondary: '#0B0B14', pattern: 'solid', shorts: '#17172A', socks: '#FF8A3D', shoe: '#C8F031' };
+      // the colours of this match (AMTeams): your Taquilla kit if it is already your colour, else a plain shirt in it
+      const tp = this.teamPlan();
+      if (tp && tp.mine.c.toLowerCase() !== String(k.primary).toLowerCase()) k = Object.assign({}, k, { primary: tp.mine.c, secondary: tp.mine.t, pattern: 'solid', socks: tp.mine.c, shorts: window.AMTeams.clash(tp.mine.c, '#17172A') ? '#F4F7FF' : '#17172A' });
+      this._homeKit = k;
     }
     return this._homeKit;
+  }
+  // who wears what in this match: 1 vs 1 each player's home/away colours; bigger teams the logo's colours, or
+  // the club's when a whole team is from the same club. null in practice and the tutorial (your own kit then)
+  teamPlan() {
+    if (this._tp !== undefined) return this._tp;
+    const P = this.props, T = window.AMTeams;
+    if (!T || P.practice || P.tutorial || P.homeColor) return (this._tp = null);
+    const n = Math.max(1, Math.min(4, Number(P.teamSize) || 1)), O = P.online && P.online.room ? P.online : null;
+    const roster = O ? O.roster || [] : [], myTeam = O ? (O.isHost ? 0 : O.myTeam || 0) : 0, localIsMe = !O || myTeam === 0;
+    let r;
+    if (n === 1) {
+      const riv = roster.find((x) => x.id !== O.me && x.team !== myTeam);
+      const rivP = riv && riv.look && riv.look.cols ? riv.look.cols : T.aiPrefs(P.awayColor, P.awayName);
+      r = localIsMe ? T.resolve1v1(T.prefs(), rivP) : T.resolve1v1(rivP, T.prefs());
+    } else {
+      // the clubs of each team's players (AI players belong to none)
+      const mine = [T.myClub()], theirs = [];
+      if (O) {
+        roster.forEach((x) => { if (x.id === O.me) return; (x.team === myTeam ? mine : theirs).push(x.look && x.look.club ? x.look.club : null); });
+        const humansMine = roster.filter((x) => x.team === myTeam).length, humansTheirs = roster.filter((x) => x.team !== myTeam).length;
+        for (let k = humansMine; k < n; k++) mine.push(null);
+        for (let k = humansTheirs; k < n; k++) theirs.push(null);
+      } else { for (let k = 1; k < n; k++) mine.push(null); theirs.push(null); }
+      r = localIsMe ? T.resolveTeams(mine, theirs) : T.resolveTeams(theirs, mine);
+    }
+    return (this._tp = localIsMe ? { mine: r.home, rival: r.away } : { mine: r.away, rival: r.home });
   }
   // your shirt number, chosen when you signed (the name screen)
   myDorsal() { try { return String(+localStorage.getItem('arenamix.dorsal.v1') || 10); } catch (e) { return '10'; } }
@@ -3830,7 +3862,7 @@ class Component extends DCLogic {
     const g = this.g, P = this.props;
     if (this.meshFor === g.ps) return;
     (this.pMeshes || []).forEach((m) => this.S.remove(m));
-    const hc = P.homeColor ?? this.homeKit().primary, ht = P.homeTrim ?? this.homeKit().secondary, ac = this.awayCol(), at = P.awayTrim ?? '#F4F4FA';
+    const hc = P.homeColor ?? this.homeKit().primary, ht = P.homeTrim ?? this.homeKit().secondary, ac = this.awayCol(), at = this.awayTrim();
     const nums = [['10', '8', '7', '4'], ['9', '11', '6', '5']];
     this.pMeshes = g.ps.map((p, idx) => {
       const gk = p.role === 'gk', home = p.team === 0;
@@ -4666,7 +4698,7 @@ class Component extends DCLogic {
     const g = this.g, b = g.ball, P = this.props;
     const SP = (x, y, z) => this.scr(x, y, z || 0);
     const hc = P.homeColor ?? this.homeKit().primary, ht = P.homeTrim ?? this.homeKit().secondary;
-    const ac = this.awayCol(), at = P.awayTrim ?? '#F4F4FA';
+    const ac = this.awayCol(), at = this.awayTrim();
     const ldV = (() => {
       const L = this.ld; if (!L || !L.on) return { ldOn: false };
       const n0 = this.size(), mode = P.mode || 'test';
