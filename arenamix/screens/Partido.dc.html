@@ -1670,7 +1670,7 @@ class Component extends DCLogic {
       b.z = 0;
       if (b.vz < -1.2) { b.vz = -b.vz * 0.45; b.vx *= 0.8; b.vy *= 0.8; } else b.vz = 0;
     }
-    if (b.z === 0 && b.vz === 0) { const f = Math.exp(-1.8 * dt); b.vx *= f; b.vy *= f; }
+    if (b.z === 0 && b.vz === 0) { const f = Math.exp(-2.6 * dt); b.vx *= f; b.vy *= f; }
     let dep = s < 0 ? -b.x : b.x - 60, vout = s * b.vx;
     const net = this.nets && this.nets[s];
     if (dep > 0 && net && net.contact) {
@@ -1683,14 +1683,14 @@ class Component extends DCLogic {
       if (c.pen > 0) {
         const [nd, nz] = c.n;
         let vn = vout * nd + b.vz * nz;
-        vn += (-75 * c.pen - 8 * vn) * dt;   // a soft net: the ball sinks well into it
-        if (vn < 0) vn *= Math.exp(-10 * dt);
+        vn += (-75 * c.pen - 6 * vn) * dt;   // a soft net: the ball sinks well into it
+        if (vn < 0) vn *= Math.exp(-6 * dt);   // it comes back off the net a little, not like off a wall
         let pen = c.pen;
         if (pen > c.give) { const back = pen - c.give; dep -= nd * back; b.z -= nz * back; pen = c.give; if (vn > 0) vn = 0; }
         // tangential: the cords grab the ball
-        const vt = vout * nz - b.vz * nd, f = Math.exp(-5 * dt);
+        const vt = vout * nz - b.vz * nd, f = Math.exp(-1.2 * dt);
         vout = vn * nd + vt * nz * f; b.vz = vn * nz - vt * nd * f;
-        b.vy *= Math.exp(-3 * dt);
+        b.vy *= Math.exp(-1 * dt);
         if (b.z < 0) b.z = 0;
       }
     } else if (dep > 0) {

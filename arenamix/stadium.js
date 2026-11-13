@@ -101,7 +101,7 @@
   function cloth(geo, nu, nv, free, cellK, out, maxOut) {
     var P = geo.attributes.position, n = P.count, rest = Float32Array.from(P.array), prev = Float32Array.from(P.array);
     var kr = new Float32Array(n), KL = cellK || 3200, live = false, quiet = 0, hits = [];
-    for (var k = 0; k < n; k++) kr[k] = free[k] <= 0 ? 0 : 20 * (1 + 2.5 * (1 - free[k]));
+    for (var k = 0; k < n; k++) kr[k] = free[k] <= 0 ? 0 : 14 * (1 + 2.5 * (1 - free[k]));
     var W = nu + 1, H = 1 / 240;
     function collide(bx, by, bz, R) {
       var R2 = R * R, a = P.array;
@@ -123,7 +123,7 @@
     }
     var nxt = new Float32Array(P.array.length);
     function sub() {
-      var a = P.array, h2 = H * H, damp = 1 - 0.9 * H, maxV = 0;
+      var a = P.array, h2 = H * H, damp = 1 - 0.35 * H, maxV = 0;
       // every knot from the same moment (computed into a copy, then swapped in), or the sheet runs away
       nxt.set(a);
       for (var j = 1; j < nv; j++) for (var i = 1; i < nu; i++) {
@@ -134,11 +134,11 @@
           var lap = (a[q - 3] - rest[q - 3]) + (a[q + 3] - rest[q + 3]) + (a[q - W * 3] - rest[q - W * 3]) + (a[q + W * 3] - rest[q + W * 3]) - 4 * disp;
           var acc = -kr[k] * disp + KL * lap, v = (x - prev[q]) * damp;
           // a knot the ball has just shoved does not fly on by itself (no spikes in the mesh)
-          if (v > 0.03) v = 0.03; else if (v < -0.03) v = -0.03;
+          if (v > 0.045) v = 0.045; else if (v < -0.045) v = -0.045;
           // cords rub on cords: a knot moving differently from its neighbours is slowed down, so kinks smooth out
           // at once while the big swing of the whole bag carries on
           var lv = (a[q - 3] - prev[q - 3]) + (a[q + 3] - prev[q + 3]) + (a[q - W * 3] - prev[q - W * 3]) + (a[q + W * 3] - prev[q + W * 3]) - 4 * (x - prev[q]);
-          var nx = x + v + 0.1 * lv + acc * h2;
+          var nx = x + v + 0.06 * lv + acc * h2;
           // a net stretches only so far
           var lim = Math.min(maxOut || 9, 2.3 * (0.25 + free[k]));
           if (nx - rest[q] > lim) nx = rest[q] + lim; else if (nx - rest[q] < -lim) nx = rest[q] - lim;
@@ -167,7 +167,7 @@
         hits.length = 0;
         P.needsUpdate = true;
         // asleep again once it has settled: back exactly where it hangs
-        if (maxV < 2e-5) { if (++quiet > 30) { P.array.set(rest); prev.set(rest); P.needsUpdate = true; live = false; } } else quiet = 0;
+        if (maxV < 1e-5) { if (++quiet > 45) { P.array.set(rest); prev.set(rest); P.needsUpdate = true; live = false; } } else quiet = 0;
       }
     };
   }

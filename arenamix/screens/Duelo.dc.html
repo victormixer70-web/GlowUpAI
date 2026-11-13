@@ -510,13 +510,13 @@ class Component extends DCLogic {
       if (c.pen > 0) {
         const [nd, nz] = c.n;
         let vn = b.vz * nd + b.vy * nz;
-        vn += (-75 * c.pen - 8 * vn) * dt;   // a soft net: the ball sinks well into it
-        if (vn < 0) vn *= Math.exp(-10 * dt);
+        vn += (-75 * c.pen - 6 * vn) * dt;   // a soft net: the ball sinks well into it
+        if (vn < 0) vn *= Math.exp(-6 * dt);   // it comes back off the net a little, not like off a wall
         if (c.pen > c.give) { const back = c.pen - c.give; dep -= nd * back; b.y -= nz * back; if (vn > 0) vn = 0; }
         // tangential: the cords grab the ball
-        const vt = b.vz * nz - b.vy * nd, f = Math.exp(-5 * dt);
+        const vt = b.vz * nz - b.vy * nd, f = Math.exp(-1.2 * dt);
         b.vz = vn * nd + vt * nz * f; b.vy = vn * nz - vt * nd * f;
-        b.vx *= Math.exp(-3 * dt);
+        b.vx *= Math.exp(-1 * dt);
         b.z = D + dep;
       }
     } else {
@@ -528,7 +528,8 @@ class Component extends DCLogic {
     if (b.y < R) b.y = R;
     // it can come back off the net a little, but not roll back out over the line
     if (b.z < D + 0.4 && b.vz < 0) { b.z = D + 0.4; b.vz = 0; }
-    if (b.y <= R && b.vy === 0) { const f = Math.exp(-1.8 * dt); b.vx *= f; b.vz *= f; }
+    // rolling on the grass inside the goal it slows down well before the line
+    if (b.y <= R + 0.005 && Math.abs(b.vy) < 0.5) { const f = Math.exp(-2.6 * dt); b.vx *= f; b.vz *= f; }
   }
   predict() {
     const b = { ...this.b }, kz = this.D - 0.4;
@@ -1539,9 +1540,14 @@ class Component extends DCLogic {
     this.cam.lookAt(this.camLook);
     // ball
     this.ball.position.set(b.x, b.y, b.z);
-    const sp = Math.hypot(b.vx, b.vz);
-    this.ball.rotation.x += sp * (dt || 0) / 0.11 * 0.3;
-    this.ball.rotation.y += b.curve * 25 * (dt || 0);
+    // the ball keeps its spin: in the air it carries on turning (slowly losing it, also when it hits the net),
+    // on the grass it rolls at its speed
+    const sp = Math.hypot(b.vx, b.vz), ddt = dt || 0;
+    const roll = sp / 0.11 * 0.35, onGround = b.y <= 0.115;
+    this.bSpin = this.phase === 'aim' || this.phase === 'runup' ? 0 : onGround ? sp / 0.11 : Math.max(roll, (this.bSpin || 0) * Math.exp(-0.5 * ddt));
+    this.ball.rotation.x += this.bSpin * ddt;
+    this.bSide = b.curve ? b.curve * 25 : (this.bSide || 0) * Math.exp(-0.8 * ddt);
+    this.ball.rotation.y += this.bSide * ddt;
     const tp = this.trailLine.geometry.attributes.position;
     for (let i = 0; i < 16; i++) { const q = this.trail[Math.min(i, this.trail.length - 1)] || [b.x, b.y, b.z]; tp.setXYZ(i, q[0], q[1], q[2]); }
     tp.needsUpdate = true;
