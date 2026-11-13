@@ -683,11 +683,13 @@ class Component extends DCLogic {
       if (this.WALL.length) this.wallJ = this.pt < 1 && this.phase === 'flight' ? Math.max(0, Math.sin(Math.min(1, Math.max(0, (this.pt - 0.12) / 0.55)) * Math.PI)) * 0.3 : Math.max(0, this.wallJ - dt);
       // (a well-struck shot into the corner: he reads it later and guesses wrong more often)
       const rk = this.shotRisk || 0;
-      if (this.turn === 'you' && !this.ol && !k.decided && this.phase === 'flight' && this.kind === 'pen' && this.pt > Math.max(0.12, (this.D - 0.4) / Math.max(6, this.b.vz) - 0.42)) {
+      if (this.turn === 'you' && !this.ol && !k.decided && this.phase === 'flight' && this.kind === 'pen' && this.pt > Math.max(0.06, (this.D - 0.4) / Math.max(6, this.b.vz) - 0.36)) {
         // a penalty keeper goes as the ball is struck: he guesses a side (or now and then stays in the middle)
         // and throws himself there. A good keeper guesses right more often; a well-struck shot into the corner
         // is hard to read
         const pr = this.predict(), ai = this.aiLevel(), sp = this.special && this.special.id;
+        // the dive is timed to the ball: full stretch, at the top of his jump, as it arrives
+        k.dur = Math.max(0.24, (this.D - 0.4) / Math.max(6, this.b.vz) - this.pt); k.x0 = k.x; k.a0 = k.a;
         const stay = Math.random() < (sp === 'panenka' ? 0.22 + (ai - 0.5) * 0.2 : 0.14);
         // (a panenka: he either stays, and has it, or goes to a side and is beaten)
         const right = sp !== 'panenka' && Math.random() < this.clamp(0.52 + (ai - 0.5) * 0.4 - 0.28 * rk + (this.b.vz < 16 ? 0.3 : 0) - (sp === 'zurda' ? 0.1 : sp === 'rabona' ? 0.12 : 0), 0.1, 0.85);
@@ -706,13 +708,15 @@ class Component extends DCLogic {
         this.aimKeeper(px, pr.y);
       }
       if (k.decided) {
-        const rate = this.turn === 'rival' ? 4.2 + 1.8 * this.tt('ref') : this.kind === 'pen' ? 6.2 : 4.6;
+        let rate = this.turn === 'rival' ? 4.2 + 1.8 * this.tt('ref') : this.kind === 'pen' ? 6.2 : 4.6, xs = 7.5;
+        if (k.dur) { rate = Math.max(2.5, Math.abs(k.aT - (k.a0 || 0)) / k.dur); xs = Math.max(1.5, Math.abs(k.xT - (k.x0 || 0)) / k.dur); }
         k.a += Math.max(-rate * dt, Math.min(rate * dt, k.aT - k.a));
-        k.x += Math.max(-7.5 * dt, Math.min(7.5 * dt, k.xT - k.x));
+        k.x += Math.max(-xs * dt, Math.min(xs * dt, k.xT - k.x));
         // a dive is a jump: up off the line and down again with gravity, lying on the grass once it lands
         // (never held up in the air)
         k.dt = (k.dt || 0) + dt;
-        const peak = Math.abs(k.aT) > 0.4 ? Math.max(0.22, k.liftT || 0) : 0, T = 0.5 + 0.3 * (k.liftT || 0);
+        // a timed dive: a real jump, highest as the ball arrives (a low ball: a flat flight, still off the ground)
+        const peak = Math.abs(k.aT) > 0.4 ? Math.max(k.dur ? 0.38 : 0.22, k.liftT || 0) : 0, T = k.dur ? 2 * k.dur : 0.5 + 0.3 * (k.liftT || 0);
         const q = Math.min(1, k.dt / T);
         k.y = peak * 4 * q * (1 - q);
       }

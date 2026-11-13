@@ -101,7 +101,7 @@
   function cloth(geo, nu, nv, free, cellK, out, maxOut) {
     var P = geo.attributes.position, n = P.count, rest = Float32Array.from(P.array), prev = Float32Array.from(P.array);
     var kr = new Float32Array(n), KL = cellK || 3200, live = false, quiet = 0, hits = [];
-    for (var k = 0; k < n; k++) kr[k] = free[k] <= 0 ? 0 : 34 * (1 + 2.5 * (1 - free[k]));
+    for (var k = 0; k < n; k++) kr[k] = free[k] <= 0 ? 0 : 20 * (1 + 2.5 * (1 - free[k]));
     var W = nu + 1, H = 1 / 240;
     function collide(bx, by, bz, R) {
       var R2 = R * R, a = P.array;
@@ -133,10 +133,12 @@
           // the cords: the knot pulled towards its four neighbours' displacement
           var lap = (a[q - 3] - rest[q - 3]) + (a[q + 3] - rest[q + 3]) + (a[q - W * 3] - rest[q - W * 3]) + (a[q + W * 3] - rest[q + W * 3]) - 4 * disp;
           var acc = -kr[k] * disp + KL * lap, v = (x - prev[q]) * damp;
+          // a knot the ball has just shoved does not fly on by itself (no spikes in the mesh)
+          if (v > 0.03) v = 0.03; else if (v < -0.03) v = -0.03;
           // cords rub on cords: a knot moving differently from its neighbours is slowed down, so kinks smooth out
           // at once while the big swing of the whole bag carries on
           var lv = (a[q - 3] - prev[q - 3]) + (a[q + 3] - prev[q + 3]) + (a[q - W * 3] - prev[q - W * 3]) + (a[q + W * 3] - prev[q + W * 3]) - 4 * (x - prev[q]);
-          var nx = x + v + 0.07 * lv + acc * h2;
+          var nx = x + v + 0.1 * lv + acc * h2;
           // a net stretches only so far
           var lim = Math.min(maxOut || 9, 2.3 * (0.25 + free[k]));
           if (nx - rest[q] > lim) nx = rest[q] + lim; else if (nx - rest[q] < -lim) nx = rest[q] - lim;
@@ -211,7 +213,7 @@
       var x = s * hw, nz = Math.ceil(d2 / 0.2), ny = Math.ceil(H / 0.2), pos = [], uv = [], idx = [];
       for (var j = 0; j <= ny; j++) for (var i = 0; i <= nz; i++) {
         var y = H * j / ny, zb = Math.min(d1 + (d2 - d1) * (1 - y / H), d2), z = zb * i / nz;
-        var sag = 0.03 * Math.sin(Math.PI * i / nz) * Math.sin(Math.PI * j / ny);
+        var sag = 0.09 * Math.sin(Math.PI * i / nz) * Math.sin(Math.PI * j / ny);
         pos.push(x - s * sag, y, z); uv.push(z / CELL, y / CELL);
       }
       for (j = 0; j < ny; j++) for (i = 0; i < nz; i++) { var a = j * (nz + 1) + i; idx.push(a, a + 1, a + nz + 2, a, a + nz + 2, a + nz + 1); }
@@ -221,7 +223,7 @@
       var fr = new Float32Array((nz + 1) * (ny + 1));
       for (j = 0; j <= ny; j++) for (i = 0; i <= nz; i++) fr[j * (nz + 1) + i] = (i === 0 || j === 0 || j === ny || i === nz) ? 0 : Math.sqrt(Math.sin(Math.PI * i / nz) * Math.sin(Math.PI * j / ny));
       var so = new Float32Array(fr.length * 3); for (var q = 0; q < fr.length; q++) so[q * 3] = s;
-      sides.push(cloth(g, nz, ny, fr, 1400, so));
+      sides.push(cloth(g, nz, ny, fr, 650, so));
     });
     var net = shellNet(w, H, d1, d2, maxBag);
     G.add(net.mesh);
@@ -272,7 +274,8 @@
       var k = Math.max(0, 1 - Math.abs(sl - d1) / 0.12);
       if (k > 0) { ny = ny * (1 - k * 0.5) + (sl <= d1 ? nb[1] : 1) * k * 0.5; nz = nz * (1 - k * 0.5) + (sl <= d1 ? nb[0] : 0) * k * 0.5; var l = Math.hypot(ny, nz); ny /= l; nz /= l; }
       // and a little slack: the roof sags, the back hangs out
-      var slack = 0.035 * Math.sin(Math.PI * u) * Math.sin(Math.PI * v);
+      // a real net hangs loose: the roof sags, the back hangs out
+      var slack = 0.13 * Math.sin(Math.PI * u) * Math.sin(Math.PI * v);
       y -= (sl <= d1 ? slack : 0); z += (sl > d1 ? slack * 0.6 : 0);
       pos.push(x, y, z); rest.push(x, y, z); nrm.push(ny, nz); gv.push(give(u, v)); uu.push(x); vv.push(sl);
       uv.push(u * w / CELL, sl / CELL);
@@ -284,7 +287,7 @@
     var fr = new Float32Array(gv.length);
     for (j = 0; j <= nv; j++) for (i = 0; i <= nu; i++) fr[j * (nu + 1) + i] = (i === 0 || i === nu || j === 0 || j === nv) ? 0 : Math.max(0.05, gv[j * (nu + 1) + i]);
     var no = new Float32Array(fr.length * 3); for (var q = 0; q < fr.length; q++) { no[q * 3 + 1] = nrm[q * 2]; no[q * 3 + 2] = nrm[q * 2 + 1]; }
-    var C = cloth(geo, nu, nv, fr, 3200, no, SMAX + 0.15);
+    var C = cloth(geo, nu, nv, fr, 1500, no, SMAX + 0.15);
     return {
       mesh: mesh, contact: contact, dims: { w: w, H: H, d1: d1, d2: d2 }, cloth: C,
       // the ball (centre x across, dep deep, zc high, radius R) where it is now
