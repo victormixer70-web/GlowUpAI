@@ -375,6 +375,13 @@
   };
   var CHEAP = /^(offset|easing|composite|computedOffset|transform|opacity|translate|scale|rotate)$/;
   var stopped = typeof WeakSet === 'function' ? new WeakSet() : null;
+  // modest phones: the menus drop the frosted-glass blur (each blurred card makes the phone repaint what is behind it)
+  // and the light sweeping across the background; they keep their colours and look the same otherwise
+  var liteCss = document.createElement('style');
+  liteCss.textContent = '#stage.am-lite *,#stage.am-lite *::before,#stage.am-lite *::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}#stage.am-lite .bc-stage::after,#stage.am-lite .am-rar::before{animation:none!important;display:none!important}#stage.am-lite .am-rar.r3{animation:none!important}';
+  document.head.appendChild(liteCss);
+  var syncLite = function () { if (stage) stage.classList.toggle('am-lite', !!liteMenus()); };
+  syncLite(); window.addEventListener('hashchange', function () { setTimeout(syncLite, 50); }); setInterval(syncLite, 4000);
   var calm = function () {
     if (!stopped || !document.getAnimations || inGame() || !liteMenus()) return;
     var L = document.getAnimations();
