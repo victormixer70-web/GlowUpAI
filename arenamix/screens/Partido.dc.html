@@ -67,28 +67,27 @@
 .pd-nar-t{padding:6px 12px;background:linear-gradient(90deg,#0B0B14F2,#17172AE6);color:#F4F4FA;font:800 italic 14px 'Barlow Condensed',sans-serif;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @keyframes pdNarIn{from{opacity:0;translate:-50% 14px}}
 @keyframes pdGold{0%,100%{box-shadow:0 0 10px #FFC53D88}50%{box-shadow:0 0 22px #FFC53D}}
-.sb{position:relative;display:flex;align-items:flex-start;gap:0}
-.sb-team{position:relative;display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;min-width:150px;box-sizing:border-box;font:800 italic 15px 'Barlow Condensed',sans-serif;letter-spacing:.8px;color:#fff;text-shadow:0 2px 0 #0008;white-space:nowrap;overflow:hidden}
-.sb-team.h{justify-content:flex-end;border-radius:16px 0 0 16px;background:linear-gradient(90deg,#0B0B1400,color-mix(in srgb,var(--tc) 70%,#02040C) 28%,var(--tc));box-shadow:inset 0 2px 0 #ffffff22,inset 0 -2px 0 color-mix(in srgb,var(--tc) 80%,#fff)}
-.sb-team.a{justify-content:flex-start;border-radius:0 16px 16px 0;background:linear-gradient(270deg,#0B0B1400,color-mix(in srgb,var(--tc) 70%,#02040C) 28%,var(--tc));box-shadow:inset 0 2px 0 #ffffff22,inset 0 -2px 0 color-mix(in srgb,var(--tc) 80%,#fff)}
-.sb-team .sb-name{color:var(--ink,#fff);text-shadow:var(--inks,0 2px 0 #0008)}
-.sb-name{max-width:120px;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
-.sb-crest{flex:none;width:24px;height:27px;display:flex;align-items:center;justify-content:center;clip-path:path('M12 0L24 4V14C24 21 18 25 12 27C6 25 0 21 0 14V4Z');background:linear-gradient(160deg,var(--tc) 55%,var(--tt) 55%);font:800 11px Exo2,sans-serif;font-style:normal;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
-.sb-red{display:inline-block;width:8px;height:11px;border-radius:1.5px;background:#FF3B3B;box-shadow:0 0 6px #FF3B3B}
-.sb-mid{display:flex;flex-direction:column;align-items:center;margin-top:-3px}
-.sb-score{position:relative;display:flex;align-items:center;gap:6px;height:40px;padding:0 12px;border-radius:13px;background:linear-gradient(160deg,#1E8BFF 0%,#0A3DCC 45%,#06102E 85%);box-shadow:inset 0 2px 0 #7CC4FF88,inset 0 -3px 0 #000000AA,0 0 0 2px #000000,0 0 0 3.5px #1E8BFF,0 0 18px #0A6CFF99;overflow:hidden}
-.sb-score::after{content:'';position:absolute;top:-20%;bottom:-20%;width:30%;left:0;background:linear-gradient(100deg,transparent,#ffffff55,transparent);transform:translateX(-200%) skewX(-18deg);animation:sbShine 6s ease-in-out infinite}
-@keyframes sbShine{0%,80%{transform:translateX(-200%) skewX(-18deg)}100%{transform:translateX(450%) skewX(-18deg)}}
-.sb-n{min-width:26px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#02040CDD;box-shadow:inset 0 -2px 0 #1E8BFF55;font:800 28px/1 'Barlow Condensed',sans-serif;color:#fff;text-shadow:0 0 10px #3DA9FF;animation:sbPop .6s cubic-bezier(.2,1.8,.4,1) both}
+.sb{position:relative;display:flex;align-items:stretch;height:40px;border-radius:20px;overflow:hidden;background:linear-gradient(180deg,#0B1A44EB,#02040CF2);box-shadow:inset 0 0 0 1px #ffffff1f,inset 0 1px 0 #ffffff38,0 0 0 1px #02040C,0 8px 20px #000a}
+.sb::after{content:'';position:absolute;top:-20%;bottom:-20%;left:0;width:22%;background:linear-gradient(100deg,transparent,#ffffff26,transparent);transform:translateX(-200%) skewX(-18deg);animation:sbShine 7s ease-in-out infinite;pointer-events:none}
+@keyframes sbShine{0%,80%{transform:translateX(-200%) skewX(-18deg)}100%{transform:translateX(560%) skewX(-18deg)}}
+.sb-team{position:relative;display:flex;align-items:center;gap:8px;padding:0 12px;min-width:138px;box-sizing:border-box;font:400 13px 'Titulos',sans-serif;letter-spacing:.8px;color:#fff;text-shadow:0 1px 3px #000c;white-space:nowrap}
+.sb-team.h{justify-content:flex-end;padding-left:16px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc) 45%,transparent),color-mix(in srgb,var(--tc) 12%,transparent) 70%,transparent)}
+.sb-team.a{justify-content:flex-start;padding-right:16px;background:linear-gradient(270deg,color-mix(in srgb,var(--tc) 45%,transparent),color-mix(in srgb,var(--tc) 12%,transparent) 70%,transparent)}
+.sb-team::before{content:'';position:absolute;top:0;bottom:0;width:5px;background:var(--tc);box-shadow:0 0 12px var(--tc)}
+.sb-team.h::before{left:0}.sb-team.a::before{right:0}
+.sb-name{max-width:112px;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
+.sb-crest{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--tc) 50%,var(--tt) 50%);box-shadow:0 0 0 2px #ffffffd9,0 0 0 3px #02040C,0 0 10px color-mix(in srgb,var(--tc) 70%,transparent);font:800 9.5px Exo2,sans-serif;font-style:normal;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
+.sb-red{display:inline-block;width:7px;height:10px;border-radius:1.5px;background:#FF3B3B;box-shadow:0 0 6px #FF3B3B}
+.sb-mid{display:flex;align-items:center;padding:0 4px;background:#02040C8C;box-shadow:inset 1px 0 0 #ffffff14,inset -1px 0 0 #ffffff14}
+.sb-score{display:flex;align-items:center;gap:6px;height:100%}
+.sb-n{min-width:30px;display:flex;align-items:center;justify-content:center;font:400 26px/1 'Titulos',sans-serif;color:#fff;text-shadow:0 2px 0 #02040C,0 0 12px #3DA9FF99;animation:sbPop .6s cubic-bezier(.2,1.8,.4,1) both}
 @keyframes sbPop{0%{transform:scale(1.9);color:#FDE68A;text-shadow:0 0 22px #FBBF24}100%{transform:scale(1)}}
-.sb-dash{width:8px;height:3px;border-radius:2px;background:#BFE3FF}
-.sb-clock{position:relative;display:flex;align-items:center;gap:4px;margin-top:-3px;padding:2px 12px 3px;border-radius:0 0 10px 10px;background:#02040CF2;box-shadow:0 0 0 1.5px #000,inset 0 -2px 0 #1E8BFF88;font:800 15px/1 'Barlow Condensed',sans-serif;letter-spacing:1px;color:#F4F4FA;overflow:hidden}
-.sb-clock em{font-style:normal;padding:0 4px;border-radius:4px;background:#22C55E;color:#052E16;font-size:12px}
+.sb-clock{position:relative;display:flex;align-items:center;gap:4px;height:22px;padding:0 9px;border-radius:11px;overflow:hidden;background:#02040C;box-shadow:inset 0 0 0 1px #3DA9FF66;font:400 13px/1 'Titulos',sans-serif;letter-spacing:1px;color:#E6F2FF}
+.sb-clock em{font-style:normal;padding:1px 4px;border-radius:4px;background:#22C55E;color:#052E16;font:800 10px Exo2,sans-serif}
 .sb-clock i{position:absolute;left:0;bottom:0;height:2px;background:linear-gradient(90deg,#3DA9FF,#0A6CFF)}
-.sb-clock.late{color:#FF6B6B;animation:sbLate 1s steps(2) infinite}@keyframes sbLate{50%{color:#fff}}
-.sb-score.tc{background:linear-gradient(100deg,color-mix(in srgb,var(--hc) 82%,#02040C) 0 50%,color-mix(in srgb,var(--ac) 82%,#02040C) 50% 100%)}
-.sb.gold .sb-score{background:linear-gradient(180deg,#FFE08A,#FFC53D 55%,#C98A12);box-shadow:inset 0 2px 0 #ffffff88,inset 0 -3px 0 #7C4A03,0 0 0 2px #0B0B14,0 0 22px #FFC53DAA}
-.sb.gold .sb-n{text-shadow:0 0 10px #FDE68A}.sb.gold .sb-clock{color:#FFC53D}
+.sb-clock.late{color:#FF6B6B;box-shadow:inset 0 0 0 1px #FF6B6B88;animation:sbLate 1s steps(2) infinite}@keyframes sbLate{50%{color:#fff}}
+.sb.gold{box-shadow:inset 0 0 0 1.5px #FFC53D,inset 0 1px 0 #ffffff38,0 0 0 1px #02040C,0 0 22px #FFC53D88}
+.sb.gold .sb-n{color:#FFE08A;text-shadow:0 2px 0 #02040C,0 0 12px #FDE68A}.sb.gold .sb-clock{color:#FFC53D}
 .pd-co-t{display:inline-block;padding:4px 18px 2px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-style:italic;font-size:34px;line-height:1;letter-spacing:1px;text-shadow:0 4px 0 #05050A;animation:pdCo .5s cubic-bezier(.2,1.4,.4,1) both}
 .pd-co-s{margin-top:4px;padding:2px 10px;background:#0B0B14D9;font:800 11px Exo2,sans-serif;letter-spacing:1px;color:#F4F4FA;animation:pdCoS .7s both}
 
@@ -171,7 +170,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 
   <sc-if value="{{hud}}" hint-placeholder-val="{{ true }}">
   <!-- broadcast scoreboard -->
-  <div style="position: absolute; left: 0; right: 0; top: 7px; height: 34px; display: flex; align-items: flex-start; justify-content: center; pointer-events: none">
+  <div style="position: absolute; left: 0; right: 0; top: 7px; height: 40px; display: flex; align-items: flex-start; justify-content: center; pointer-events: none">
     <span class="pd-mode" style="background: {{modeColor}}">{{modeLabel}}</span>
     <div class="{{sbCls}}">
       <div class="sb-team h" style="--tc: {{homeC}}; --tt: {{homeT}}; {{homeInk}}">
@@ -179,10 +178,11 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <span class="sb-crest"><b>{{homeIni}}</b></span>
       </div>
       <div class="sb-mid">
-        <div class="sb-score tc" style="--hc: {{homeC}}; --ac: {{awayC}}">
-          <span key="{{s0Key}}" class="sb-n">{{s0}}</span><span class="sb-dash"></span><span key="{{s1Key}}" class="sb-n">{{s1}}</span>
+        <div class="sb-score">
+          <span key="{{s0Key}}" class="sb-n">{{s0}}</span>
+          <div class="{{clockCls}}"><span>{{clock}}</span><sc-if value="{{hasExtra}}" hint-placeholder-val="{{ false }}"><em>+{{extraN}}</em></sc-if><i style="{{progStyle}}"></i></div>
+          <span key="{{s1Key}}" class="sb-n">{{s1}}</span>
         </div>
-        <div class="{{clockCls}}"><span>{{clock}}</span><sc-if value="{{hasExtra}}" hint-placeholder-val="{{ false }}"><em>+{{extraN}}</em></sc-if><i style="{{progStyle}}"></i></div>
       </div>
       <div class="sb-team a" style="--tc: {{awayC}}; --tt: {{awayT}}; {{awayInk}}">
         <span class="sb-crest"><b>{{awayIni}}</b></span>
