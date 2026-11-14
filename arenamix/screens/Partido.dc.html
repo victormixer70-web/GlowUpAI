@@ -4033,7 +4033,9 @@ class Component extends DCLogic {
         backName: gk ? '' : idx === g.ctl && !this.net && window.AMOnline ? window.AMOnline.myName() : String(p.name || '').split(/[_\s]/)[0],
         trimCss: gk ? '#17172A' : home ? ht : at,
         hair: [0x241811, 0xc9a227, 0x3a2418, 0x141b2d][Math.floor(Math.random() * 4)],
-        char: charFor(p, idx)
+        char: charFor(p, idx),
+        // the AI players get a look of their own too: a headband, a moustache, long or short sleeves, a bigger or smaller frame
+        ...(idx !== g.ctl && !p.look && !gk ? (() => { const r = (k) => ((idx * 7919 + k * 104729 + (this.seedV || (this.seedV = Math.floor(Math.random() * 1e6)))) % 1000) / 1000; return { gear: true, fit: { sleeve: r(1) < 0.3 ? 'long' : 'short', size: ['S', 'M', 'M', 'L', 'XL'][Math.floor(r(2) * 5)] }, gearKit: { hat: r(3) < 0.32 ? 'band' : 'none', hatColor: ['#F4F4FA', '#02040C', '#FF3B5C', '#FFC53D', '#22D3EE'][Math.floor(r(4) * 5)], face: r(5) < 0.16 ? 'stache' : 'none' } }; })() : {})
       }, p.look);
       // a touch larger than life, as in arcade football: faces, kits and builds read at match distance
       m.scale.multiplyScalar(1.14);
@@ -4399,6 +4401,7 @@ class Component extends DCLogic {
     // another online player: their own character, with their hat and glasses on the team kit
     if (look && o.kit) { o = { ...o, gear: true, kit: { ...o.kit, hat: look.hat, hatColor: look.hatColor, face: look.face } }; }
     if (o.char === 'clasico') delete o.char;
+    if (o.gearKit) { o = { ...o, kit: { ...(o.kit || { primary: '#' + (o.shirt && o.shirt.getHexString ? o.shirt.getHexString() : 'ffffff'), secondary: o.trimCss, pattern: 'solid' }), ...o.gearKit } }; delete o.gearKit; }
     // Mixamo character when they are loaded and chosen in Configuración; procedural player otherwise
     const mx = window.AMChars && window.AMChars.make(o);
     if (mx) return mx;
