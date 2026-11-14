@@ -105,6 +105,26 @@ input::placeholder{color:#6E6E92}
 .lg-panel .lg-social{width:42px;height:36px;border-radius:11px;border:0;background:#02040CB3;box-shadow:inset 0 0 0 1px #1E8BFF55}
 .lg-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;font:700 10.5px Exo2,sans-serif;color:#A9BEDD}
 .lg-foot a{color:#3DA9FF;font-weight:800;text-decoration:none}.lg-foot a:hover{color:#9AD4FF}
+
+/* ---- the cover ---- */
+.lg-logo{position:absolute;left:50%;top:8px;margin-left:-39px;z-index:2;border-radius:20px;box-shadow:0 0 0 2px #1E8BFF,0 0 30px #1E8BFFAA,0 10px 22px #000a;animation:lgLogoIn .7s cubic-bezier(.2,1.4,.4,1) both,lgLogoGlow 3s 1s ease-in-out infinite;pointer-events:none}
+@keyframes lgLogoIn{from{opacity:0;scale:.4;translate:0 -30px}}
+@keyframes lgLogoGlow{0%,100%{box-shadow:0 0 0 2px #1E8BFF,0 0 30px #1E8BFFAA,0 10px 22px #000a}50%{box-shadow:0 0 0 2px #3DA9FF,0 0 46px #3DA9FFDD,0 10px 22px #000a}}
+.lg-acc{position:absolute;right:12px;top:12px;z-index:3;display:flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:0;border-radius:15px;cursor:pointer;background:linear-gradient(135deg,#02040C,#0A3DCC 70%,#1E8BFF);box-shadow:inset 0 0 0 1px #3DA9FF,0 0 12px #0A6CFF88;color:#F4F4FA;font:400 11px Titulos,sans-serif;letter-spacing:1.5px}
+.lg-me{position:absolute;right:18px;top:150px;z-index:2;display:flex;align-items:center;gap:9px;max-width:170px;padding:7px 12px 7px 7px;border-radius:30px;background:#02040CB3;box-shadow:inset 0 0 0 1px #3DA9FF66,0 0 18px #1E8BFF33;animation:lgPanelIn .6s .2s both;pointer-events:none}
+.lg-me .lg-av{width:40px;height:40px}
+.lg-me .lg-who{font-size:16px}
+.lg-tags{position:absolute;left:18px;top:140px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none;animation:lgIn .6s .15s both}
+.lg-tags span{padding:3px 10px 3px 8px;border-radius:8px;background:#02040CB3;box-shadow:inset 3px 0 0 var(--t),inset 0 0 0 1px color-mix(in srgb,var(--t) 45%,transparent);font:400 9.5px Titulos,sans-serif;letter-spacing:1.4px;color:#E6F2FF}
+.lg-play{position:absolute!important;left:50%;top:298px;width:350px;margin-left:-175px;z-index:3;height:58px!important;justify-content:center}
+.lg-play b{font-size:28px!important}
+.lg-live{position:absolute;left:0;right:0;bottom:8px;z-index:2;display:flex;align-items:center;justify-content:center;gap:6px;font:800 9.5px Exo2,sans-serif;letter-spacing:1.5px;color:#BFE3FF;pointer-events:none}
+.lg-live i{width:7px;height:7px;border-radius:4px;background:#FF4D5E;box-shadow:0 0 8px #FF4D5E;animation:lgLive 1.2s infinite}
+.lg-hint{left:560px!important;top:248px!important}
+.lg-grade{background:radial-gradient(40% 55% at 50% 62%,#1E8BFF44,transparent 70%),linear-gradient(0deg,#02040CE6 0%,#02040C00 34%),linear-gradient(180deg,#02040CB3 0%,#02040C00 26%)!important}
+.lg-modal{position:absolute;inset:0;z-index:7;display:flex;align-items:center;justify-content:center;background:#02040CCC;animation:lgFade .2s both}
+.lg-modal .lg-panel{position:relative;right:auto;top:auto;height:auto;width:340px;gap:10px}
+.lg-x{width:32px;height:32px;border:0;border-radius:10px;cursor:pointer;background:#06102E;box-shadow:inset 0 0 0 1px #3DA9FF88;color:#fff;font:800 14px Exo2,sans-serif}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: linear-gradient(160deg, #06102E 0%, #030A22 55%, #02040C 100%); color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none; {{rootVars}}" onPointerMove="{{onMove}}" onPointerDown="{{tapBg}}">
@@ -115,43 +135,41 @@ input::placeholder{color:#6E6E92}
   <div class="lg-grade" aria-hidden="true"></div>
   <!-- the 3D player on a glowing stage: tap him and he shoots -->
   <sc-if value="{{show3d}}" hint-placeholder-val="{{ false }}">
-    <canvas ref="{{canvasRef}}" role="img" aria-label="Tu jugador. Tócalo para que chute." onPointerDown="{{kick}}" style="position: absolute; left: 0; top: 0; width: 540px; height: 390px; display: block; cursor: pointer; touch-action: manipulation"></canvas>
+    <canvas ref="{{canvasRef}}" role="img" aria-label="Tu jugador. Tócalo para que chute." onPointerDown="{{kick}}" style="position: absolute; left: 152px; top: 0; width: 540px; height: 390px; display: block; cursor: pointer; touch-action: manipulation"></canvas>
     <span class="lg-hint" style="opacity: {{hintOp}}">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2.5" stroke-linecap="round"><path d="M9 11V5a2 2 0 0 1 4 0v6M13 9a2 2 0 0 1 4 0v3M17 11a2 2 0 0 1 4 0v4a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3l-3-5a2 2 0 0 1 3-2l2 2"/></svg>TÓCALO Y CHUTA</span>
   </sc-if>
   <sc-if value="{{show2d}}" hint-placeholder-val="{{ true }}">
-    <div style="position: absolute; left: 195px; top: 96px; filter: drop-shadow(0 14px 18px #000C)">
+    <div style="position: absolute; left: 347px; top: 92px; filter: drop-shadow(0 14px 18px #000C)">
       <dc-import name="Avatar" primary="{{kitP}}" secondary="{{kitS}}" pattern="{{kitPat}}" shorts="{{kitSh}}" socks="{{kitSo}}" shoe="{{kitShoe}}" number="10" hat="none" face="none" w="150" hint-size="150px,266px"></dc-import>
     </div>
   </sc-if>
 
-  <!-- the brand: logo, name and the live crowd -->
-  <div class="lg-brand">
-    <img src="icons/logo-512.png?v=5" alt="ARENA MIX" width="62" height="62">
-    <div style="display: flex; flex-direction: column; gap: 4px">
-      <span class="lg-name">ARENA <b>MIX</b></span>
-      <span class="lg-live"><i></i>EN DIRECTO · {{fans}} EN LA GRADA</span>
-    </div>
-  </div>
+  <!-- the cover: the logo big in the middle, you on the stage, a huge PLAY -->
+  <a href="Idioma.dc.html" aria-label="Cambiar idioma" style="position: absolute; left: 12px; top: 12px; z-index: 3; display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 14px; background: linear-gradient(135deg, #02040C, #0A3DCC 70%, #1E8BFF); border: 1px solid #3DA9FF; box-shadow: 0 0 12px #0A6CFF88; color: #F4F4FA; text-decoration: none; font-weight: 700; font-size: 11px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>{{langCode}}</a>
+  <button type="button" class="lg-acc" onClick="{{openLogin}}" aria-label="Iniciar sesión con tu cuenta"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7CC4FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>CUENTA</button>
+  <img class="lg-logo" src="icons/logo-512.png?v=5" alt="ARENA MIX" width="78" height="78">
   <div class="lg-tags" aria-hidden="true"><span style="--t: #FFC53D">1 VS 1 A 4 VS 4</span><span style="--t: #22D3EE">ONLINE CON AMIGOS</span><span style="--t: #2FBF71">CLUBES Y TORNEOS</span></div>
-  <a href="Idioma.dc.html" aria-label="Cambiar idioma" style="position: absolute; right: 12px; top: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 14px; background: linear-gradient(135deg, #02040C, #0A3DCC 70%, #1E8BFF); border: 1px solid #3DA9FF; box-shadow: 0 0 12px #0A6CFF88; color: #F4F4FA; text-decoration: none; font-weight: 700; font-size: 11px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>{{langCode}}</a>
+  <div class="lg-me">
+    <span class="lg-av"><img src="{{photo}}" alt="" style="display: {{photoDisp}}"></span>
+    <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span class="lg-k">BIENVENIDO</span><span class="lg-who" translate="no">{{name}}</span></span>
+  </div>
+  <button type="button" class="{{ticketCls}}" onClick="{{guest}}" aria-label="Jugar ahora: sin registro, tu progreso se guarda en este dispositivo">
+    <span class="pi"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" fill="#1A1204"/></svg></span>
+    <span class="tx"><b>JUGAR</b><small>Sin registro · tu progreso se guarda aquí</small></span>
+  </button>
+  <span class="lg-live"><i></i>EN DIRECTO · {{fans}} EN LA GRADA · TEMPORADA 1</span>
 
-  <!-- the panel: PLAY straight away, or sign in -->
-  <div class="lg-panel">
-    <div class="lg-hello">
-      <span class="lg-av"><img src="{{photo}}" alt="" style="display: {{photoDisp}}"></span>
-      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
-        <span class="lg-k">BIENVENIDO DE NUEVO</span>
-        <span class="lg-who" translate="no">{{name}}</span>
-      </div>
-      <span class="lg-season">TEMPORADA 1</span>
-    </div>
-    <button type="button" class="{{ticketCls}}" onClick="{{guest}}" aria-label="Jugar ahora: sin registro, tu progreso se guarda en este dispositivo">
-      <span class="pi"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" fill="#1A1204"/></svg></span>
-      <span class="tx"><b>JUGAR</b><small>Sin registro · tu progreso se guarda aquí</small></span>
-    </button>
-    <span class="lg-or"><i></i>O ENTRA CON TU CUENTA<i></i></span>
-    <form style="display: flex; flex-direction: column; gap: 6px" onSubmit="{{submit}}">
+  <!-- signing in: a window over the cover -->
+  <sc-if value="{{loginOpen}}" hint-placeholder-val="{{ false }}">
+    <div class="lg-modal" onPointerDown="{{closeLoginBg}}">
+      <div class="lg-panel" role="dialog" aria-label="Iniciar sesión">
+        <div style="display: flex; align-items: center; justify-content: space-between">
+          <span class="lg-who" style="font-size: 20px">TU CUENTA</span>
+          <button type="button" class="lg-x" onClick="{{closeLogin}}" aria-label="Cerrar">✕</button>
+        </div>
+        <span class="lg-or"><i></i>ENTRA PARA GUARDAR TU PROGRESO EN LA NUBE<i></i></span>
+        <form style="display: flex; flex-direction: column; gap: 6px" onSubmit="{{submit}}">
       <label class="lg-field"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7CC4FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6l9-6"/></svg><input type="email" autocomplete="email" aria-label="Correo electrónico" placeholder="Correo electrónico"></label>
       <label class="lg-field"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7CC4FF" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><input type="password" autocomplete="current-password" aria-label="Contraseña" placeholder="Contraseña"></label>
       <div style="display: flex; gap: 6px">
@@ -160,11 +178,13 @@ input::placeholder{color:#6E6E92}
         <button type="button" class="lg-social" aria-label="Entrar con Apple" onClick="{{soon}}"><svg width="14" height="16" viewBox="0 0 16 18" fill="#F4F4FA"><path d="M13 9.5c0-2 1.6-3 1.7-3c-1-1.4-2.4-1.6-2.9-1.6c-1.2-.1-2.4.7-3 .7s-1.6-.7-2.6-.7C4.8 5 3.4 5.8 2.7 7.1c-1.5 2.6-.4 6.4 1 8.5c.7 1 1.5 2.1 2.6 2.1c1-.1 1.4-.7 2.6-.7s1.6.7 2.6.7c1.1 0 1.8-1 2.5-2c.8-1.1 1.1-2.2 1.1-2.3c0 0-2.1-.8-2.1-3.9zM11 3.3c.6-.7 1-1.6.9-2.6c-.8 0-1.9.6-2.5 1.3c-.6.6-1 1.6-.9 2.5c.9.1 1.9-.5 2.5-1.2z"/></svg></button>
       </div>
     </form>
-    <div class="lg-foot">
+        <div class="lg-foot">
       <span>¿Sin cuenta? <a href="#" onClick="{{soon}}">Crear cuenta</a></span>
       <a href="privacidad.html" target="_blank" rel="noopener">Política de privacidad</a>
     </div>
-  </div>
+      </div>
+    </div>
+  </sc-if>
   <!-- before going in: the privacy policy, to read and accept (once per version of the policy) -->
   <sc-if value="{{privOpen}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; inset: 0; z-index: 9; background: #02040CE6; display: flex; align-items: center; justify-content: center; animation: lgFade .25s both">
@@ -425,7 +445,7 @@ class Component extends DCLogic {
     S.add(ball); this.ball = ball; this.bState = { mode: 'feet', t: 0 };
     this.S = S;
     this.cam = new T.PerspectiveCamera(26, 540 / 390, 0.1, 60);
-    this.cam.position.set(0, 1.2, 7.4); this.cam.lookAt(0, 0.92, 0);
+    this.cam.position.set(0, 1.3, 7.6); this.cam.lookAt(0, 0.94, 0);
     if (window.AMSky) window.AMSky.env(R).then((e) => { if (e && this.R === R) S.environment = e; });
     this.t0 = performance.now(); this.model = null;
     A.load().then(() => { if (this.R === R) this.buildModel(); });
@@ -531,6 +551,7 @@ class Component extends DCLogic {
         if (!s.kicks) this.setState({ kicks: 1 });
       },
       ticketCls: 'lg-play' + (s.torn ? ' torn' : ''),
+      loginOpen: !!s.loginOpen, openLogin: () => this.setState({ loginOpen: true }), closeLogin: () => this.setState({ loginOpen: false }), closeLoginBg: (e) => { if (e.target === e.currentTarget) this.setState({ loginOpen: false }); },
       // tear off the stub and walk in
       guest: () => {
         if (s.torn) return;
