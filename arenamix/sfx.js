@@ -99,6 +99,24 @@
         var o = hiss(t, 1.4, 0.4, 'lowpass', 500); o.f.frequency.setValueAtTime(700, t); o.f.frequency.exponentialRampToValueAtTime(250, t + 1.3);
       }
     },
+    // the strike's own sound on top of the boot: a crack for a rocket, a soft scoop for a chip, a crisp snap for a volley
+    strike: function (type) {
+      if (!ready()) return; var t = now();
+      if (type === 'trallazo') { hiss(t, 0.06, 0.75, 'highpass', 2600, 0.8); tone('square', 95, 40, t, 0.12, 0.25); }
+      else if (type === 'vaselina') { tone('sine', 260, 180, t, 0.09, 0.2); hiss(t, 0.05, 0.12, 'lowpass', 900); }
+      else if (type === 'volea') { hiss(t, 0.04, 0.55, 'bandpass', 3200, 1.5); tone('sine', 180, 60, t, 0.1, 0.35); }
+      else if (type === 'rosca') { hiss(t, 0.18, 0.18, 'bandpass', 2200, 3); }
+    },
+    // applause for a great save: thousands of hands, rising and falling
+    clap: function () {
+      if (!ready()) return; var t = now();
+      for (var k = 0; k < 26; k++) hiss(t + Math.random() * 1.4, 0.03, 0.12 + Math.random() * 0.12, 'bandpass', 1800 + Math.random() * 1600, 1.6);
+    },
+    // whistles and jeers from the stands
+    boo: function () {
+      if (!ready()) return; var t = now(), h = hiss(t, 1.6, 0.3, 'bandpass', 420, 1.8); h.f.frequency.setValueAtTime(380, t); h.f.frequency.linearRampToValueAtTime(300, t + 1.5);
+      for (var k = 0; k < 5; k++) { var f = 2200 + Math.random() * 1200; tone('sine', f, f * (0.9 + Math.random() * 0.2), t + Math.random() * 0.9, 0.35 + Math.random() * 0.3, 0.03); }
+    },
     ooh: function () { if (!ready()) return; var t = now(); var h = hiss(t, 1.1, 0.45, 'bandpass', 800, 1.2); h.f.frequency.setValueAtTime(600, t); h.f.frequency.linearRampToValueAtTime(950, t + 0.3); h.f.frequency.linearRampToValueAtTime(500, t + 1.1); },
     /* interface */
     /* a terrace chant: claps on the beat and a sung "o-le, o-le" line from thousands of voices (detuned
