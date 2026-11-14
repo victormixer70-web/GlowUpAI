@@ -321,6 +321,12 @@
     '#stage[data-theme="logo"][data-screen="Rapida"] .am-bg::before{background:radial-gradient(32% 42% at 18% 28%,#22D3EE66,transparent 70%),radial-gradient(30% 40% at 82% 72%,#1E8BFF55,transparent 70%),radial-gradient(30% 40% at 40% 90%,#22D3EE2a,transparent 70%)!important}',
     '#stage[data-theme="logo"][data-screen="Competitivo"] .bc-stage{--acc:#FFC53D;background:radial-gradient(55% 75% at 10% 4%,#FFC53DC8 0%,transparent 62%),radial-gradient(50% 70% at 94% 96%,#0A3DCCB0 0%,transparent 62%),radial-gradient(38% 50% at 78% 10%,#FFC53D66 0%,transparent 62%),linear-gradient(160deg,#06102E 0%,#030A22 55%,#02040C 100%)!important}',
     '#stage[data-theme="logo"][data-screen="Competitivo"] .am-bg::before{background:radial-gradient(32% 42% at 18% 28%,#FFC53D66,transparent 70%),radial-gradient(30% 40% at 82% 72%,#1E8BFF55,transparent 70%),radial-gradient(30% 40% at 40% 90%,#FFC53D2a,transparent 70%)!important}',
+    // ---- glass: the menus' cards blur what moves behind them, like frosted glass ----
+    '#stage[data-theme="logo"] :is(.bc-tile,.so-slot,.so-party,.cl-card,.rk-row,.cf-tile,.tn-card,.me-card,.rg-info,.id-row,.mj-card,.lb-mode,.lb-pill,.lb-ic .disc){backdrop-filter:blur(10px) saturate(1.35);-webkit-backdrop-filter:blur(10px) saturate(1.35)}',
+    // a slow sheen of light drifting across every menu's background
+    '#stage[data-theme="logo"] .bc-stage::after{content:"";position:absolute;inset:-30%;z-index:-1;pointer-events:none;background:linear-gradient(115deg,transparent 40%,#3DA9FF14 48%,#ffffff12 50%,#3DA9FF14 52%,transparent 60%);animation:amSheen 9s ease-in-out infinite}',
+    '#stage[data-theme="logo"] .bc-stage{isolation:isolate}',
+    '@keyframes amSheen{0%{translate:-40% 0}60%,100%{translate:40% 0}}',
     // ---- titles: Russo One, upright (no italic) ----
     '.bc-title,.bc-title.hd,#stage .bc-title.hd,#stage .tn-big,#stage .ttl,#am-daily h2,#am-res .t,#am-res .t .lt,#am-res .lvup,.jc-wheel .side h2,.jc-wheel .won-card b{font-family:"Titulos",sans-serif!important;font-style:normal!important;font-weight:400!important}',
     '.bc-title.hd,#stage .bc-title.hd{font-size:21px!important;letter-spacing:1px!important;padding:3px 18px 0!important}',

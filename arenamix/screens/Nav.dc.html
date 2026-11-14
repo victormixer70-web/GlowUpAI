@@ -30,18 +30,26 @@ body{margin:0}
 @keyframes nvBag{0%,55%,100%{transform:translateY(0)}65%{transform:translateY(-4px) rotate(-6deg)}75%{transform:translateY(0)}85%{transform:translateY(-2px) rotate(5deg)}}
 @keyframes nvBob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) translateY(-1px)}}
 .nv-item:not([aria-current="page"]):active{translate:0 2px}
+
+/* ---- a floating glass dock ---- */
+.nv-dock{background:transparent}
+.nv-glass{position:absolute;left:6px;right:6px;top:6px;bottom:6px;border-radius:24px;pointer-events:none;background:radial-gradient(120% 30% at 50% 0%,#1E8BFF40,transparent 70%),radial-gradient(120% 25% at 50% 100%,#0A3DCC55,transparent 70%),linear-gradient(180deg,#0B1A44E6,#040A1CF0 50%,#02040CF2);box-shadow:inset 0 0 0 1px #3DA9FF55,inset 0 1px 0 #ffffff2e,0 10px 26px #000a,0 0 22px #1E8BFF33;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.nv-item{width:60px!important;height:58px!important;border-radius:18px!important;color:#8FA8CC}
+.nv-item .ic{filter:grayscale(.35) brightness(.85);transition:scale .35s cubic-bezier(.3,1.8,.5,1),filter .3s}
+.nv-item[aria-current="page"] .ic{filter:drop-shadow(0 3px 6px #02040Caa)}
+.nv-item[aria-current="page"]{color:#fff!important;text-shadow:0 1px 6px #1E8BFF}
+.nv-item:not([aria-current="page"]):hover .ic{filter:none}
 </style>
 </helmet>
-<nav aria-label="Principal" style="position: relative; width: 80px; height: 390px; box-sizing: border-box; padding: 10px 8px; overflow: hidden; background: radial-gradient(130% 45% at 50% 0%, rgba(10,108,255,.95), transparent 72%), radial-gradient(130% 40% at 50% 100%, rgba(0,87,255,.8), transparent 72%), radial-gradient(60% 30% at 0% 50%, rgba(30,139,255,.35), transparent 70%), linear-gradient(180deg, #000000 0%, #02040C 50%, #000000 100%); border-right: 2px solid #1E8BFF; box-shadow: 0 0 18px rgba(10,108,255,.8); display: flex; flex-direction: column; align-items: center">
-  <span aria-hidden="true" style="position: absolute; inset: 0; background: repeating-linear-gradient(135deg, #ffffff06 0 2px, transparent 2px 12px); pointer-events: none"></span>
-  <span aria-hidden="true" style="position: absolute; right: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, #3DA9FF, #0057FF, #E2E8F0, #3DA9FF) 0 0 / 100% 200%; box-shadow: 0 0 10px #1E8BFF; animation: nvEdge 6s linear infinite; pointer-events: none"></span>
+<nav aria-label="Principal" class="nv-dock" style="position: relative; width: 80px; height: 390px; box-sizing: border-box; padding: 14px 8px 12px; overflow: hidden; display: flex; flex-direction: column; align-items: center">
+  <span class="nv-glass" aria-hidden="true"></span>
   <a href="Deportes.dc.html" aria-label="ARENA MIX, inicio" style="position: relative; z-index: 1; display: block; width: 44px; height: 44px; margin-bottom: 8px">
     <span aria-hidden="true" style="position: absolute; inset: -4px; border-radius: 18px; background: conic-gradient(from 0deg, #1E8BFF, #E2E8F0, #0057FF, #1E8BFF); animation: nvSpin 5s linear infinite; filter: blur(5px); opacity: .55"></span>
     <img src="icons/logo-192.png?v=5" alt="" width="44" height="44" style="position: relative; display: block; border-radius: 12px">
   </a>
   <!-- the active tab's tile glides from the tab you came from -->
-  <span aria-hidden="true" style="{{pillStyle}}"><span style="{{barStyle}}"></span></span>
-  <div style="display: flex; flex-direction: column; gap: 6px">
+  <span aria-hidden="true" style="{{pillStyle}}"></span>
+  <div style="position: relative; display: flex; flex-direction: column; gap: 6px">
     <a href="Deportes.dc.html" class="nv-item" aria-current="{{cur0}}" style="{{s0}}">
       <span class="ic"><svg width="28" height="28" viewBox="0 0 28 28"><defs><linearGradient id="nvPlay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6CC3FF"/><stop offset="1" stop-color="#0057FF"/></linearGradient></defs><circle cx="14" cy="14" r="12" fill="url(#nvPlay)"/><path d="M4.5 11a10 10 0 0 1 19 0z" fill="#FFFFFF" opacity=".22"/><path d="M11.2 8.9v10.2a.8.8 0 0 0 1.2.7l8.3-5.1a.8.8 0 0 0 0-1.4l-8.3-5.1a.8.8 0 0 0-1.2.7z" fill="#FFFFFF"/></svg></span>Jugar
     <sc-if value="{{b0on}}" hint-placeholder-val="{{ false }}"><span class="nv-dot">{{b0}}</span></sc-if></a>
@@ -86,8 +94,8 @@ class Component extends DCLogic {
     const A = window.AMChars, pref = A ? A.pref() : 'clasico', face = pref !== 'clasico' ? 'assets/chars/' + pref + '.png' : '';
     const item = (i) => 'color: ' + (i === cur ? '#FFFFFF' : '#9FB0CC') + ';';
     const v = {
-      pillStyle: 'position: absolute; z-index: 0; left: 8px; top: ' + (62 + pos * 62) + 'px; width: 64px; height: 56px; box-sizing: border-box; border-radius: 16px; background: linear-gradient(160deg, ' + COL[pos] + 'AA, ' + COL[pos] + '55 60%, ' + COL[pos] + '22); border: 1px solid ' + COL[pos] + '99; box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 6px 18px ' + COL[pos] + '40; transition: top .5s cubic-bezier(.3,1.35,.45,1), background .4s, box-shadow .4s, border-color .4s;',
-      barStyle: 'position: absolute; left: -8px; top: 12px; width: 4px; height: 32px; border-radius: 0 3px 3px 0; background: ' + COL[pos] + '; box-shadow: 0 0 10px ' + COL[pos] + '; animation: nvGlow 1.6s ease-in-out infinite;',
+      pillStyle: 'position: absolute; z-index: 0; left: 10px; top: ' + (66 + pos * 64) + 'px; width: 60px; height: 58px; box-sizing: border-box; border-radius: 18px; background: radial-gradient(90% 70% at 50% 0%, #ffffff55, transparent 60%), linear-gradient(170deg, #3DA9FF, #1E8BFF 45%, #0A3DCC); border: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -3px 0 #06247A, 0 6px 18px #1E8BFF88; transition: top .5s cubic-bezier(.3,1.35,.45,1), background .4s, box-shadow .4s, border-color .4s;',
+      barStyle: 'position: absolute; left: -10px; top: 13px; width: 4px; height: 32px; border-radius: 0 3px 3px 0; background: ' + COL[pos] + '; box-shadow: 0 0 10px ' + COL[pos] + '; animation: nvGlow 1.6s ease-in-out infinite;',
       coins: coins >= 100000 ? Math.round(coins / 1000) + 'k' : String(coins).replace(/\B(?=(\d{3})+(?!\d))/g, '.'),
       coinsAria: coins.toLocaleString('es-ES') + ' VCD. Ir a la tienda',
       face, faceImg: face ? 'width: 100%; height: 100%; object-fit: cover; display: block;' : 'display: none;',
