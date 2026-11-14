@@ -2116,6 +2116,8 @@ class Component extends DCLogic {
       tx = this.clamp(tx, 4, 56); ty = this.clamp(ty, 2.5, 27.5);
       if (p.wantsBall > 0) { tx = ref.x + sg * 3; ty = ref.y + (ref.y < 15 ? 5 : -5); }
       if (p.defend > 0) { tx = (ref.x + ownX) / 2; ty = 15 + (ref.y - 15) * 0.3; }
+      // a one-two: having laid it off, he bursts into the space beyond his marker for the return
+      if (p.wallRun && (p !== g.ps[g.ctl] || this.autoplay)) { tx = this.clamp(p.wallRun.x, 4, 56); ty = this.clamp(p.wallRun.y, 2.5, 27.5); p.sprinting = true; [dx, dy] = this.seekS(p, tx, ty, 0.8, dt); return [dx, dy, maxV * 1.08, acc * 1.2]; }
       [dx, dy] = this.seekS(p, tx, ty, 1.5, dt);
       return [dx, dy, maxV * (run ? 0.98 : 0.9), acc];
     } else if (own || p.defend > 0) {
@@ -2224,6 +2226,33 @@ class Component extends DCLogic {
     }
     if (p.passReq > 0 && caller.team === p.team && caller !== p) { p.passReq = 0; this.passBall(p, caller); this.say(p, '¡Toma!'); return; }
     const S = this.shotQuality(p);
+    // the return ball of a one-two: first time, into the runner's path
+    if (p.giveBack && g.t < p.giveBack.until && p.giveBack.to.team === p.team && !p.giveBack.to.out && this.laneOpen(p, p.giveBack.to) && (p.giveBack.to.x - p.x) * sg > -1) {
+      const to = p.giveBack.to; p.giveBack = null; to.wallRun = null; this.passBall(p, to); return;
+    }
+    p.giveBack = null;
+    if (p.team !== 0 || this.autoplay || p !== caller) {
+      // a strike from distance: a clear sight of goal from 18-26 m, now and then (more often for a good side)
+      if (S.dg > 15 && S.dg < 26 && S.block < 0.25 && S.q > 0.55 && pressure > 2.2 && Math.random() < 0.18 + 0.3 * D.skill) { this.aiShoot(p, S); return; }
+      // a one-two: under pressure with a mate close by, lay it off and run past the marker for the return
+      if (pressure < 2.6 && this.size() > 1 && Math.random() < 0.35 + 0.4 * D.skill) {
+        const wall = g.ps.filter((q) => q !== p && q.team === p.team && q.role !== 'gk' && !q.out && q !== caller && this.dist(p, q) > 3.5 && this.dist(p, q) < 10 && this.laneOpen(p, q)).sort((u, v) => this.dist(p, u) - this.dist(p, v))[0];
+        const ahead = { x: p.x + sg * 7, y: this.clamp(p.y + (p.y < 15 ? 2 : -2), 3, 27) };
+        if (wall && Math.abs(ahead.x - (sg > 0 ? 60 : 0)) > 4) {
+          this.passBall(p, wall);
+          wall.giveBack = { to: p, until: g.t - 0.25 }; wall.think = 0.05;
+          p.wallRun = { x: ahead.x, y: ahead.y };
+          setTimeout(() => { if (p.wallRun) p.wallRun = null; }, 2600);
+          return;
+        }
+      }
+      // a switch of play: crowded on this side and a mate free on the far side, a long ball across to him
+      if (pressure < 4 && this.size() > 2) {
+        const far = g.ps.filter((q) => q !== p && q.team === p.team && q.role !== 'gk' && !q.out && Math.abs(q.y - p.y) > 11 && foes.reduce((m, o) => Math.min(m, this.dist(o, q)), 99) > 4.5 && (q.x - p.x) * sg > -6)[0];
+        const crowd = foes.filter((o) => this.dist(o, p) < 8).length;
+        if (far && crowd >= 2 && Math.random() < 0.5) { this.passBall(p, far); g.ball.vz = Math.max(g.ball.vz, 5.5); this.say(p, '¡Cambio!'); return; }
+      }
+    }
     if (p.shootReq > 0 && S.dg < 30) { p.shootReq = 0; this.say(p, '¡Allá va!'); this.aiShoot(p, S); return; }
     // shoot when the chance is good: close and open, or a clear sight of goal within range
     if (S.dg < D.range && (S.q > 1.35 || (S.dg < 11 && S.q > 0.9)) && S.block < 0.5) { this.aiShoot(p, S); return; }
