@@ -3956,21 +3956,36 @@ class Component extends DCLogic {
     (this.pMeshes || []).forEach((m) => this.S.remove(m));
     const hc = P.homeColor ?? this.homeKit().primary, ht = P.homeTrim ?? this.homeKit().secondary, ac = this.awayCol(), at = this.awayTrim();
     const nums = [['10', '8', '7', '4'], ['9', '11', '6', '5']];
+    // every player a different character where there are enough: your own for you, the others shuffled
+    // without repeats inside a team (and the rival team starts further along the list, so the two differ too)
+    const CL = (window.AMChars && window.AMChars.list ? window.AMChars.list.map((c) => c.id) : []), mine = window.AMChars ? window.AMChars.pref() : '';
+    const pool = CL.filter((id) => id !== mine);
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    const used = [0, Math.ceil(pool.length / 2)];
+    const BOOTS = ['#C8F031', '#FF5C8A', '#22D3EE', '#FFC53D', '#F4F4FA', '#FF8A3D', '#A78BFA'];
+    const charFor = (p, idx) => {
+      if (p.look && p.look.char) return p.look.char;
+      if (idx === g.ctl || !pool.length) return undefined;
+      const t = p.team, c = pool[used[t] % pool.length]; used[t]++; return c;
+    };
     this.pMeshes = g.ps.map((p, idx) => {
       const gk = p.role === 'gk', home = p.team === 0;
       const m = this.makePlayer({
         you: idx === g.ctl, noOutfit: true,
         // field players: your team in your Taquilla kit, rivals in theirs
-        kit: gk ? null : home ? (P.homeColor ? null : this.homeKit()) : { primary: ac, secondary: at, pattern: 'solid', shorts: '#F4F4F6', socks: ac, shoe: '#F2F5FA' },
+        // the kit is the team's; the boots are each player's own (your Taquilla ones for you)
+        kit: gk ? null : home ? (P.homeColor ? null : idx === g.ctl ? this.homeKit() : { ...this.homeKit(), shoe: BOOTS[(p.slot + 1) % BOOTS.length] }) : { primary: ac, secondary: at, pattern: 'solid', shorts: '#F4F4F6', socks: ac, shoe: BOOTS[(p.slot + 3) % BOOTS.length] },
         shirt: new THREE.Color(gk ? (home ? '#FFC53D' : '#2FBF71') : home ? hc : ac),
         shorts: new THREE.Color(home ? (P.homeColor ? '#17172A' : this.homeKit().shorts) : '#F4F4F6'),
         socks: new THREE.Color(gk ? '#17172A' : home ? (P.homeColor ? hc : this.homeKit().socks) : ac),
-        boot: home ? (P.homeColor ? 0xc8f031 : this.homeKit().shoe) : 0xf2f5fa, gloves: gk, number: gk ? '1' : idx === g.ctl && !this.net ? this.myDorsal() : nums[p.team][p.slot] === this.myDorsal() && home ? '14' : nums[p.team][p.slot],
+        boot: home && idx === g.ctl ? (P.homeColor ? 0xc8f031 : this.homeKit().shoe) : BOOTS[(p.slot + (home ? 1 : 3)) % BOOTS.length], gloves: gk, number: gk ? '1' : idx === g.ctl && !this.net ? this.myDorsal() : nums[p.team][p.slot] === this.myDorsal() && home ? '14' : nums[p.team][p.slot],
         backName: gk ? '' : idx === g.ctl && !this.net && window.AMOnline ? window.AMOnline.myName() : String(p.name || '').split(/[_\s]/)[0],
         trimCss: gk ? '#17172A' : home ? ht : at,
         hair: [0x241811, 0xc9a227, 0x3a2418, 0x141b2d][Math.floor(Math.random() * 4)],
-        char: p.look ? p.look.char : undefined
+        char: charFor(p, idx)
       }, p.look);
+      // a touch larger than life, as in arcade football: faces, kits and builds read at match distance
+      m.scale.multiplyScalar(1.14);
       this.S.add(m);
       return m;
     });
