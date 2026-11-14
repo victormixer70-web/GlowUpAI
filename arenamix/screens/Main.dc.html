@@ -54,8 +54,8 @@ input::placeholder{color:#6E6E92}
 @keyframes lgLive{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes lgStubFly{to{translate:90px 140px;rotate:38deg;opacity:0}}
 @keyframes lgMainFlash{0%{filter:brightness(1)}40%{filter:brightness(1.8)}100%{filter:brightness(1)}}
-.lg-photo{position:absolute;left:-30px;top:-20px;width:904px;height:430px;background:url(assets/bg_tribuna.jpg) center 30%/cover no-repeat;transform:translate(calc(var(--mx,0) * -14px),calc(var(--my,0) * -8px)) scale(1.04);transition:transform .25s ease-out;animation:lgKen 18s ease-in-out infinite alternate;pointer-events:none}
-@keyframes lgKen{from{background-position:center 30%}to{background-position:center 40%}}
+.lg-photo{position:absolute;left:-30px;top:-20px;width:904px;height:430px;background:url(assets/bg_estadio.jpg) 60% 45%/cover no-repeat;filter:saturate(1.15) contrast(1.05);transform:translate(calc(var(--mx,0) * -14px),calc(var(--my,0) * -8px)) scale(1.04);transition:transform .25s ease-out;animation:lgKen 18s ease-in-out infinite alternate;pointer-events:none}
+@keyframes lgKen{from{background-position:58% 42%}to{background-position:62% 50%}}
 .lg-tint{position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 80% at 18% 50%,#0A3DCC99 0%,transparent 70%),radial-gradient(45% 70% at 92% 60%,#FFC53D33 0%,transparent 70%),linear-gradient(180deg,#02040C55 0%,#02040C00 40%,#02040C88 100%)}
 .lg-beam{position:absolute;top:-40px;width:180px;height:520px;margin-left:-90px;transform-origin:50% 0;background:linear-gradient(180deg,#E8F6FF66,#E8F6FF00 80%);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);mix-blend-mode:screen;pointer-events:none;animation:lgBeam 7s ease-in-out infinite alternate}
 @keyframes lgBeam{from{rotate:-28deg}to{rotate:22deg}}
@@ -127,7 +127,6 @@ input::placeholder{color:#6E6E92}
   <div class="lg-photo" aria-hidden="true"></div>
   <div class="lg-tint" aria-hidden="true"></div>
   <i class="lg-beam" style="left: 170px; animation-delay: -2s"></i><i class="lg-beam" style="left: 440px; animation-direction: alternate-reverse"></i>
-  <canvas ref="{{crowdRef}}" aria-hidden="true" style="position: absolute; inset: 0; width: 844px; height: 390px; display: block; cursor: pointer"></canvas>
   <div class="lg-grade" aria-hidden="true"></div>
   <!-- the 3D player on a glowing stage: tap him and he shoots -->
   <sc-if value="{{show3d}}" hint-placeholder-val="{{ false }}">
