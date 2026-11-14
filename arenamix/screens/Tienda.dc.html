@@ -23,7 +23,7 @@
 .td-snore img{animation:tdSnore 2.8s ease-in-out infinite;transform-origin:50% 100%}
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
-input::placeholder{color:#8686A6}
+input::placeholder{color:#8FA8CC}
 /* the shop at night: a string of bulbs, things floating by, a neon sign */
 .td-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .td-bulbs{position:absolute;left:80px;right:0;top:-6px;height:30px}
@@ -104,30 +104,30 @@ input::placeholder{color:#8686A6}
       <sc-if value="{{isRewards}}" hint-placeholder-val="{{ true }}">
         <div style="display: flex; flex-direction: column; gap: 12px">
           <div class="bc-tile am-shine" style="display: flex; align-items: center; gap: 14px; padding: 10px 16px 10px 20px; --bc-c: #22D3EE">
-            <span style="position: relative; width: 58px; height: 58px; border-radius: 29px; background: conic-gradient(#22D3EE {{wDeg}}deg, #2E2E52 {{wDeg}}deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px #22D3EE55"><span style="width: 48px; height: 48px; border-radius: 24px; background: #211140; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px">{{wins}}<span style="font-size: 13px; color: #8686A6">/10</span></span></span>
+            <span style="position: relative; width: 58px; height: 58px; border-radius: 29px; background: conic-gradient(#22D3EE {{wDeg}}deg, #1E3A6E {{wDeg}}deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px #22D3EE55"><span style="width: 48px; height: 48px; border-radius: 24px; background: #211140; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px">{{wins}}<span style="font-size: 13px; color: #8FA8CC">/10</span></span></span>
             <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
               <span style="font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE">RECOMPENSAS ASEGURADAS</span>
               <span style="font-size: 13px; color: #CACAE0">Cada victoria de la semana te acerca a un premio garantizado. Sin azar.</span>
             </div>
-            <span style="padding: 6px 12px; border-radius: 12px; background: #150925; border: 1px solid #2E2E52; font-size: 11px; font-weight: 800; color: #CACAE0">Se reinicia en {{wDays}}</span>
+            <span style="padding: 6px 12px; border-radius: 12px; background: #040A1C; border: 1px solid #1E3A6E; font-size: 11px; font-weight: 800; color: #CACAE0">Se reinicia en {{wDays}}</span>
           </div>
           <div style="position: relative; height: 196px; margin: 0 62px">
           <sc-for list="{{ms}}" as="m" hint-placeholder-count="5">
           <div style="{{m.pos}}">
             <div class="{{m.cardCls}}" style="{{m.card}}">
-              <sc-if value="{{m.isNext}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 50%; top: -1px; transform: translateX(-50%); padding: 2px 10px; border-radius: 0 0 8px 8px; background: #22D3EE; color: #150925; font: 800 9px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap">PRÓXIMO</span></sc-if>
+              <sc-if value="{{m.isNext}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 50%; top: -1px; transform: translateX(-50%); padding: 2px 10px; border-radius: 0 0 8px 8px; background: #22D3EE; color: #040A1C; font: 800 9px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap">PRÓXIMO</span></sc-if>
               <span class="{{m.icCls}}" style="display: flex; height: 64px; align-items: center; margin-top: -4px"><img src="{{m.img}}" alt="" style="width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 6px 8px #000a)"></span>
               <span style="font-weight: 800; font-size: 13px; line-height: 1.15">{{m.name}}</span>
-              <span style="font-size: 10px; color: #A3A3C2">{{m.sub}}</span>
+              <span style="font-size: 10px; color: #A9BEDD">{{m.sub}}</span>
               <sc-if value="{{m.canClaim}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{m.claim}}" class="bc-btn-gold am-shine" style="height: 28px; padding: 0 16px; font-size: 15px; cursor: pointer">RECLAMAR</button></sc-if>
               <sc-if value="{{m.isClaimed}}" hint-placeholder-val="{{ false }}"><span style="display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; color: #22D3EE"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg>Reclamado</span></sc-if>
-              <sc-if value="{{m.isLocked}}" hint-placeholder-val="{{ true }}"><span style="font-size: 11px; font-weight: 700; color: #8686A6">{{m.left}}</span></sc-if>
+              <sc-if value="{{m.isLocked}}" hint-placeholder-val="{{ true }}"><span style="font-size: 11px; font-weight: 700; color: #8FA8CC">{{m.left}}</span></sc-if>
             </div>
             <span style="{{m.dot}}">{{m.at}}</span>
           </div>
           </sc-for>
-            <div style="position: absolute; left: 0; right: 0; top: 172px; height: 12px; border-radius: 6px; background: repeating-linear-gradient(90deg, #39206E 0 14px, #2E1A5B 14px 22px); z-index: -1; box-shadow: inset 0 1px 3px #000A, 0 0 0 2px #251443"><div class="am-bar-shine" style="width: {{wBar}}%; height: 12px; border-radius: 6px; background: linear-gradient(90deg, #0E8FA3, #22D3EE, #9AF5FF); box-shadow: 0 0 12px #22D3EE"></div>
-              <span class="td-runner" style="left: {{wBar}}%"><svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#F4F4FA" stroke="#150925" stroke-width="1.5"/><path d="M12 7l3.4 2.5l-1.3 4h-4.2l-1.3-4z" fill="#251443"/><path d="M12 7V3.5M15.4 9.5l3.8-1.2M14.1 13.5l2.3 3.3M9.9 13.5l-2.3 3.3M8.6 9.5L4.8 8.3" stroke="#251443" stroke-width="1.3"/></svg></span>
+            <div style="position: absolute; left: 0; right: 0; top: 172px; height: 12px; border-radius: 6px; background: repeating-linear-gradient(90deg, #39206E 0 14px, #2E1A5B 14px 22px); z-index: -1; box-shadow: inset 0 1px 3px #000A, 0 0 0 2px #0B1A44"><div class="am-bar-shine" style="width: {{wBar}}%; height: 12px; border-radius: 6px; background: linear-gradient(90deg, #0E8FA3, #22D3EE, #9AF5FF); box-shadow: 0 0 12px #22D3EE"></div>
+              <span class="td-runner" style="left: {{wBar}}%"><svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#F4F4FA" stroke="#040A1C" stroke-width="1.5"/><path d="M12 7l3.4 2.5l-1.3 4h-4.2l-1.3-4z" fill="#0B1A44"/><path d="M12 7V3.5M15.4 9.5l3.8-1.2M14.1 13.5l2.3 3.3M9.9 13.5l-2.3 3.3M8.6 9.5L4.8 8.3" stroke="#0B1A44" stroke-width="1.3"/></svg></span>
             </div>
           </div>
         </div>
@@ -142,10 +142,10 @@ input::placeholder{color:#8686A6}
             <sc-for list="{{boostCards}}" as="b" hint-placeholder-count="5">
               <div class="td-boost td-card" style="{{b.card}}">
                 <span style="{{b.glow}}"></span><i class="td-halo" style="--hc: {{b.color}}"></i>
-                <sc-if value="{{b.active}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 8px; top: 8px; z-index: 1; padding: 2px 7px; background: {{b.color}}; color: #150925; font: 800 9.5px Exo2, sans-serif; letter-spacing: .5px; transform: skewX(0deg)">ACTIVO · {{b.left}}</span></sc-if>
+                <sc-if value="{{b.active}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 8px; top: 8px; z-index: 1; padding: 2px 7px; background: {{b.color}}; color: #040A1C; font: 800 9.5px Exo2, sans-serif; letter-spacing: .5px; transform: skewX(0deg)">ACTIVO · {{b.left}}</span></sc-if>
                 <span style="position: relative; height: 82px; display: flex; align-items: center; justify-content: center">
                   <img src="{{b.img}}" alt="" class="am-float" style="width: 78px; height: 78px; object-fit: contain; filter: drop-shadow(0 6px 8px #000b)">
-                  <sc-if value="{{b.hasTag}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: 6px; bottom: 4px; padding: 0 6px; background: #150925; box-shadow: inset 0 0 0 1.5px {{b.color}}; color: {{b.color}}; font: 800 italic 18px 'Barlow Condensed', sans-serif; transform: rotate(-8deg)">{{b.tag}}</span></sc-if>
+                  <sc-if value="{{b.hasTag}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: 6px; bottom: 4px; padding: 0 6px; background: #040A1C; box-shadow: inset 0 0 0 1.5px {{b.color}}; color: {{b.color}}; font: 800 italic 18px 'Barlow Condensed', sans-serif; transform: rotate(-8deg)">{{b.tag}}</span></sc-if>
                 </span>
                 <span style="position: relative; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 19px; line-height: 1; color: {{b.color}}">{{b.name}}</span>
                 <span style="position: relative; flex: 1; font-size: 10.5px; line-height: 1.35; color: #CACAE0">{{b.desc}}</span>
@@ -164,7 +164,7 @@ input::placeholder{color:#8686A6}
             <sc-for list="{{celebCards}}" as="c" hint-placeholder-count="6">
               <div style="{{c.card}}">
                 <span style="{{c.glow}}"></span><i class="td-spot" style="--sc: {{c.color}}"></i><i class="td-floor" style="--sc: {{c.color}}"></i>
-                <sc-if value="{{c.on}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 8px; top: 8px; z-index: 1; padding: 2px 7px; background: {{c.color}}; color: #150925; font: 800 9.5px Exo2, sans-serif; letter-spacing: .5px; transform: skewX(0deg)">EQUIPADA</span></sc-if>
+                <sc-if value="{{c.on}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 8px; top: 8px; z-index: 1; padding: 2px 7px; background: {{c.color}}; color: #040A1C; font: 800 9.5px Exo2, sans-serif; letter-spacing: .5px; transform: skewX(0deg)">EQUIPADA</span></sc-if>
                 <svg class="{{c.pose}}" width="74" height="74" viewBox="0 0 60 60" fill="none" stroke="{{c.color}}" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" style="position: relative; align-self: center; margin-top: 10px; filter: drop-shadow(0 0 8px {{c.color}})"><circle cx="{{c.hx}}" cy="{{c.hy}}" r="5" fill="{{c.color}}"/><path d="{{c.d}}"/><path d="{{c.fx}}" stroke-width="2" opacity=".7"/></svg>
                 <span style="position: relative; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; line-height: 1; color: {{c.color}}">{{c.name}}</span>
                 <span style="position: relative; flex: 1; font-size: 10px; line-height: 1.3; color: #CACAE0">{{c.desc}}</span>
@@ -181,17 +181,17 @@ input::placeholder{color:#8686A6}
         <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #FFB37A">PASE DE TEMPORADA</span>
         <span style="position: relative; z-index: 1; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 25px; line-height: 1; max-width: 120px; text-shadow: 0 2px 8px #000">30 niveles de premios</span>
         <span style="font-size: 11px; font-weight: 700; color: #FFB37A; max-width: 140px">Nivel {{passLv}} · {{passNote}}</span>
-        <a href="Pase.dc.html" class="bc-para" style="position: relative; z-index: 1; align-self: flex-start; display: flex; align-items: center; height: 40px; margin-top: 2px; padding: 0 20px; background: #FF8A3D; color: #150925; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px">VER PASE</a>
+        <a href="Pase.dc.html" class="bc-para" style="position: relative; z-index: 1; align-self: flex-start; display: flex; align-items: center; height: 40px; margin-top: 2px; padding: 0 20px; background: #FF8A3D; color: #040A1C; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 1px">VER PASE</a>
         <img src="{{passImg}}" alt="" style="position: absolute; right: -24px; bottom: -6px; width: 130px; height: 190px; object-fit: cover; object-position: 50% 20%; pointer-events: none; filter: drop-shadow(0 8px 12px #000a)">
       </section>
       <a href="Taquilla.dc.html" class="bc-tile" style="--bc-c: #FFC53D; display: flex; align-items: center; gap: 12px; padding: 12px 14px 12px 18px; text-decoration: none; color: #F4F4FA">
         <img src="{{prz.hat}}" alt="" style="width: 52px; height: 52px; object-fit: contain">
-        <span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 700; font-size: 14px">Sombrero de copa</span><span style="font-size: 12px; color: #A3A3C2">Ver en la Taquilla</span></span>
+        <span style="flex: 1; display: flex; flex-direction: column"><span style="font-weight: 700; font-size: 14px">Sombrero de copa</span><span style="font-size: 12px; color: #A9BEDD">Ver en la Taquilla</span></span>
         <span style="font-weight: 800; color: #FFC53D">900 VCD</span>
       </a>
           </div>
           <div style="display: flex; flex-direction: column; gap: 8px">
-            <h2 style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; color: #A3A3C2">PACKS DE BOB</h2>
+            <h2 style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; color: #A9BEDD">PACKS DE BOB</h2>
       <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
         <sc-for list="{{packs}}" as="p" hint-placeholder-count="4">
           <button type="button" class="am-shine" style="{{p.style}}">
@@ -209,7 +209,7 @@ input::placeholder{color:#8686A6}
       </sc-if>
     </div>
   </div>
-  <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%) skewX(0deg); z-index: 9; padding: 8px 18px; background: #F4F4FA; color: #150925; font: 800 13px Exo2, sans-serif; white-space: nowrap; box-shadow: 0 8px 20px #000a">{{toastText}}</span></sc-if>
+  <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%) skewX(0deg); z-index: 9; padding: 8px 18px; background: #F4F4FA; color: #040A1C; font: 800 13px Exo2, sans-serif; white-space: nowrap; box-shadow: 0 8px 20px #000a">{{toastText}}</span></sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
@@ -226,7 +226,7 @@ class Component extends DCLogic {
   renderVals() {
     const t = this.state.tab;
     const TABC = { rewards: '#22D3EE', boosts: '#FACC15', celebs: '#F472B6', shop: '#4ADE80' };
-    const tabStyle = (on, id) => { const c = TABC[id]; return 'position: relative; display: flex; align-items: center; white-space: nowrap; height: 34px; padding: 0 9px; border: 0; border-radius: 12px; font: 800 10.5px Exo2, sans-serif; letter-spacing: 0; cursor: pointer; ' + (on ? 'background: linear-gradient(180deg, #FFFFFF, ' + c + ' 55%); color: #150925; box-shadow: 0 3px 0 color-mix(in srgb, ' + c + ' 55%, #000), 0 0 16px ' + c + '88;' : 'background: ' + c + '2E; color: ' + c + '; box-shadow: inset 0 0 0 1px ' + c + '88, 0 3px 0 #150925;'); };
+    const tabStyle = (on, id) => { const c = TABC[id]; return 'position: relative; display: flex; align-items: center; white-space: nowrap; height: 34px; padding: 0 9px; border: 0; border-radius: 12px; font: 800 10.5px Exo2, sans-serif; letter-spacing: 0; cursor: pointer; ' + (on ? 'background: linear-gradient(180deg, #FFFFFF, ' + c + ' 55%); color: #040A1C; box-shadow: 0 3px 0 color-mix(in srgb, ' + c + ' 55%, #000), 0 0 16px ' + c + '88;' : 'background: ' + c + '2E; color: ' + c + '; box-shadow: inset 0 0 0 1px ' + c + '88, 0 3px 0 #040A1C;'); };
     const G = window.AMGear, P = (k) => (G ? G.prize(k) : '');
     const PR = window.AMProgress, W = PR ? PR.weekly() : { wins: 0, milestones: [], daysLeft: 7 };
     // the bar runs through the milestones, which sit at 0, 25, 50, 75 and 100 %
@@ -256,8 +256,8 @@ class Component extends DCLogic {
           icCls: ready ? 'td-wiggle' : (m.prize === 'chest' && !m.reached ? 'td-snore' : ''),
           cardCls: ready ? 'am-float td-card' : i === nextI ? 'td-card td-next' : 'td-card', isNext: i === nextI,
           pos: 'position: absolute; left: calc(' + (i * 25) + '% - 62px); top: 0; width: 124px; display: flex; flex-direction: column; align-items: center; gap: 8px',
-          card: 'position: relative; width: 120px; height: 150px; box-sizing: border-box; padding: 12px 8px 10px; border-radius: 14px; overflow: hidden; --sd: ' + (-i * 1.1).toFixed(1) + 's; background: ' + (m.claimed ? 'linear-gradient(160deg, #202958, #1E0F3D)' : ready ? 'radial-gradient(90% 60% at 50% 30%, #FFC53D88, transparent 72%), linear-gradient(160deg, #7A4A0A, #3A1A06)' : 'radial-gradient(90% 60% at 50% 30%, ' + ['#22D3EE', '#F59E0B', '#38BDF8', '#FACC15', '#F43F5E'][i % 5] + '77, transparent 72%), linear-gradient(160deg, color-mix(in srgb, ' + ['#22D3EE', '#F59E0B', '#38BDF8', '#FACC15', '#F43F5E'][i % 5] + ' 35%, #3B1A8A), #24104E)') + '; border: 1px solid ' + rc + (m.claimed ? '66' : '') + '; ' + (ready ? 'box-shadow: 0 0 18px #FFC53D55;' : '') + (m.claimed ? ' opacity: .85;' : '') + ' display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center',
-          dot: 'width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 18px; ' + (m.claimed ? 'background: #22D3EE; color: #150925; box-shadow: 0 0 12px #22D3EE;' : ready ? 'background: #FFC53D; color: #2A1C02; box-shadow: 0 0 16px #FFC53D;' : 'background: #331C58; color: #A3A3C2; border: 2px solid #3A3A66;'),
+          card: 'position: relative; width: 120px; height: 150px; box-sizing: border-box; padding: 12px 8px 10px; border-radius: 14px; overflow: hidden; --sd: ' + (-i * 1.1).toFixed(1) + 's; background: ' + (m.claimed ? 'linear-gradient(160deg, #202958, #1E0F3D)' : ready ? 'radial-gradient(90% 60% at 50% 30%, #FFC53D88, transparent 72%), linear-gradient(160deg, #7A4A0A, #3A1A06)' : 'radial-gradient(90% 60% at 50% 30%, ' + ['#22D3EE', '#F59E0B', '#38BDF8', '#FACC15', '#F43F5E'][i % 5] + '77, transparent 72%), linear-gradient(160deg, color-mix(in srgb, ' + ['#22D3EE', '#F59E0B', '#38BDF8', '#FACC15', '#F43F5E'][i % 5] + ' 35%, #0B2A78), #24104E)') + '; border: 1px solid ' + rc + (m.claimed ? '66' : '') + '; ' + (ready ? 'box-shadow: 0 0 18px #FFC53D55;' : '') + (m.claimed ? ' opacity: .85;' : '') + ' display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center',
+          dot: 'width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-size: 18px; ' + (m.claimed ? 'background: #22D3EE; color: #040A1C; box-shadow: 0 0 12px #22D3EE;' : ready ? 'background: #FFC53D; color: #2A1C02; box-shadow: 0 0 16px #FFC53D;' : 'background: #331C58; color: #A9BEDD; border: 2px solid #3A3A66;'),
           claim: () => {
             const r = PR.claim(m.id);
             if (!r) return;
@@ -283,9 +283,9 @@ class Component extends DCLogic {
           return {
             pose: 'td-pose td-pose-trail', name: c.name, desc: c.desc, color: c.color, on, hx: '44', hy: '30', d: 'M4 30h28M10 22h20M10 38h20', fx: 'M2 26h6M2 34h6',
             showGem: !own, label: on ? 'QUITAR' : own ? 'EQUIPAR' : String(c.price),
-            card: 'position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 5px; padding: 10px 9px 9px; box-sizing: border-box; border-radius: 16px; background: radial-gradient(90% 55% at 50% 22%, ' + c.color + '77, transparent 72%), radial-gradient(70% 50% at 100% 100%, ' + c.color + '40, transparent 70%), linear-gradient(170deg, color-mix(in srgb, ' + c.color + ' 38%, #3B1A8A), color-mix(in srgb, ' + c.color + ' 16%, #1E0E4A) 70%); box-shadow: inset 0 0 0 1px ' + c.color + (on ? '' : '55') + (on ? ', 0 0 18px ' + c.color + '55' : '') + ';',
+            card: 'position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 5px; padding: 10px 9px 9px; box-sizing: border-box; border-radius: 16px; background: radial-gradient(90% 55% at 50% 22%, ' + c.color + '77, transparent 72%), radial-gradient(70% 50% at 100% 100%, ' + c.color + '40, transparent 70%), linear-gradient(170deg, color-mix(in srgb, ' + c.color + ' 38%, #0B2A78), color-mix(in srgb, ' + c.color + ' 16%, #1E0E4A) 70%); box-shadow: inset 0 0 0 1px ' + c.color + (on ? '' : '55') + (on ? ', 0 0 18px ' + c.color + '55' : '') + ';',
             glow: 'position: absolute; left: 50%; top: 8px; width: 110px; height: 90px; margin-left: -55px; border-radius: 50%; background: radial-gradient(closest-side, ' + c.color + '44, transparent); pointer-events: none',
-            btn: 'position: relative; height: 32px; border: 0; transform: skewX(0deg); display: flex; align-items: center; justify-content: center; font: 800 15px \'Barlow Condensed\', sans-serif; cursor: pointer; ' + (on ? 'background: #39206E; color: ' + c.color + '; box-shadow: inset 0 0 0 1px ' + c.color + ';' : own ? 'background: ' + c.color + '; color: #150925; box-shadow: 0 3px 0 #0006;' : can ? 'background: linear-gradient(135deg, #FFC2EC, #FF5CC8); color: #2A0A20; box-shadow: 0 3px 0 #0006;' : 'background: #39206E; color: #8686A6;'),
+            btn: 'position: relative; height: 32px; border: 0; transform: skewX(0deg); display: flex; align-items: center; justify-content: center; font: 800 15px \'Barlow Condensed\', sans-serif; cursor: pointer; ' + (on ? 'background: #39206E; color: ' + c.color + '; box-shadow: inset 0 0 0 1px ' + c.color + ';' : own ? 'background: ' + c.color + '; color: #040A1C; box-shadow: 0 3px 0 #0006;' : can ? 'background: linear-gradient(135deg, #FFC2EC, #FF5CC8); color: #2A0A20; box-shadow: 0 3px 0 #0006;' : 'background: #39206E; color: #8FA8CC;'),
             act: () => {
               const toast = (m, ms) => { this.setState({ toast: m }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), ms || 2000); };
               if (own) { PR.equipTrail(c.id); toast(on ? 'Estela quitada' : 'Estela equipada: ' + c.name); this.forceUpdate(); return; }
@@ -312,9 +312,9 @@ class Component extends DCLogic {
           pose: 'td-pose td-pose-' + c.id, name: c.name, desc: c.desc, color: c.color, on, hx: String(PIC[0]), hy: String(PIC[1]), d: PIC[2], fx: PIC[3],
           showGem: !own && c.price > 0,
           label: on ? 'EN USO' : own ? 'EQUIPAR' : c.price > 0 ? String(c.price) : 'GRATIS',
-          card: 'position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 5px; padding: 10px 9px 9px; box-sizing: border-box; border-radius: 16px; background: radial-gradient(90% 55% at 50% 22%, ' + c.color + '77, transparent 72%), radial-gradient(70% 50% at 100% 100%, ' + c.color + '40, transparent 70%), linear-gradient(170deg, color-mix(in srgb, ' + c.color + ' 38%, #3B1A8A), color-mix(in srgb, ' + c.color + ' 16%, #1E0E4A) 70%); box-shadow: inset 0 0 0 1px ' + c.color + (on ? '' : '55') + (on ? ', 0 0 18px ' + c.color + '55' : '') + ';',
+          card: 'position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 5px; padding: 10px 9px 9px; box-sizing: border-box; border-radius: 16px; background: radial-gradient(90% 55% at 50% 22%, ' + c.color + '77, transparent 72%), radial-gradient(70% 50% at 100% 100%, ' + c.color + '40, transparent 70%), linear-gradient(170deg, color-mix(in srgb, ' + c.color + ' 38%, #0B2A78), color-mix(in srgb, ' + c.color + ' 16%, #1E0E4A) 70%); box-shadow: inset 0 0 0 1px ' + c.color + (on ? '' : '55') + (on ? ', 0 0 18px ' + c.color + '55' : '') + ';',
           glow: 'position: absolute; left: 50%; top: 8px; width: 110px; height: 90px; margin-left: -55px; border-radius: 50%; background: radial-gradient(closest-side, ' + c.color + '44, transparent); pointer-events: none',
-          btn: 'position: relative; height: 32px; border: 0; transform: skewX(0deg); display: flex; align-items: center; justify-content: center; font: 800 15px \'Barlow Condensed\', sans-serif; cursor: pointer; ' + (on ? 'background: #39206E; color: ' + c.color + '; box-shadow: inset 0 0 0 1px ' + c.color + ';' : own ? 'background: ' + c.color + '; color: #150925; box-shadow: 0 3px 0 #0006;' : can ? 'background: linear-gradient(135deg, #FF8AD8, #FF5CC8 55%, #C2338F); color: #2A0620; box-shadow: 0 3px 0 #7A1050;' : 'background: #39206E; color: #8686A6;'),
+          btn: 'position: relative; height: 32px; border: 0; transform: skewX(0deg); display: flex; align-items: center; justify-content: center; font: 800 15px \'Barlow Condensed\', sans-serif; cursor: pointer; ' + (on ? 'background: #39206E; color: ' + c.color + '; box-shadow: inset 0 0 0 1px ' + c.color + ';' : own ? 'background: ' + c.color + '; color: #040A1C; box-shadow: 0 3px 0 #0006;' : can ? 'background: linear-gradient(135deg, #FF8AD8, #FF5CC8 55%, #C2338F); color: #2A0620; box-shadow: 0 3px 0 #7A1050;' : 'background: #39206E; color: #8FA8CC;'),
           act: () => {
             if (on) return;
             const toast = (m, ms) => { this.setState({ toast: m }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), ms || 2000); };
@@ -332,9 +332,9 @@ class Component extends DCLogic {
         return {
           name: b.name, desc: b.desc, price: String(b.price), color: b.color, img, left: String(left), active: left > 0,
           hasTag: b.id !== 'chest' && b.id !== 'shield', tag: b.id === 'xp2' ? 'XP x2' : 'x2',
-          card: 'position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 6px; padding: 12px 10px 10px; box-sizing: border-box; border-radius: 16px; --sd: ' + (-PR.boostList.indexOf(b) * 1.3).toFixed(1) + 's; background: radial-gradient(90% 55% at 50% 22%, ' + b.color + '88, transparent 72%), radial-gradient(70% 50% at 100% 100%, ' + b.color + '44, transparent 70%), linear-gradient(170deg, color-mix(in srgb, ' + b.color + ' 42%, #3B1A8A), color-mix(in srgb, ' + b.color + ' 18%, #1E0E4A) 70%); box-shadow: inset 0 0 0 1.5px ' + b.color + (left > 0 ? '' : '66') + ', inset 0 4px 0 ' + b.color + (left > 0 ? ', 0 0 20px ' + b.color + '66' : '') + ';',
+          card: 'position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 6px; padding: 12px 10px 10px; box-sizing: border-box; border-radius: 16px; --sd: ' + (-PR.boostList.indexOf(b) * 1.3).toFixed(1) + 's; background: radial-gradient(90% 55% at 50% 22%, ' + b.color + '88, transparent 72%), radial-gradient(70% 50% at 100% 100%, ' + b.color + '44, transparent 70%), linear-gradient(170deg, color-mix(in srgb, ' + b.color + ' 42%, #0B2A78), color-mix(in srgb, ' + b.color + ' 18%, #1E0E4A) 70%); box-shadow: inset 0 0 0 1.5px ' + b.color + (left > 0 ? '' : '66') + ', inset 0 4px 0 ' + b.color + (left > 0 ? ', 0 0 20px ' + b.color + '66' : '') + ';',
           glow: 'position: absolute; left: 50%; top: 10px; width: 120px; height: 90px; margin-left: -60px; border-radius: 50%; background: radial-gradient(closest-side, ' + b.color + '44, transparent); pointer-events: none',
-          btn: 'position: relative; height: 34px; border: 0; transform: skewX(0deg); display: flex; align-items: center; justify-content: center; font: 800 16px \'Barlow Condensed\', sans-serif; cursor: pointer; ' + (can ? 'background: linear-gradient(135deg, #FF8AD8, #FF5CC8 55%, #C2338F); color: #2A0620; box-shadow: 0 3px 0 #7A1050;' : 'background: #39206E; color: #8686A6;'),
+          btn: 'position: relative; height: 34px; border: 0; transform: skewX(0deg); display: flex; align-items: center; justify-content: center; font: 800 16px \'Barlow Condensed\', sans-serif; cursor: pointer; ' + (can ? 'background: linear-gradient(135deg, #FF8AD8, #FF5CC8 55%, #C2338F); color: #2A0620; box-shadow: 0 3px 0 #7A1050;' : 'background: #39206E; color: #8FA8CC;'),
           buy: () => {
             if (!can) { this.setState({ toast: 'Te faltan BOB: gánalos subiendo de nivel, con misiones y en el pase' }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2400); return; }
             const r = PR.buyBoost(b.id);

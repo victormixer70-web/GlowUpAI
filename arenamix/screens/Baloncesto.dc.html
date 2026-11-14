@@ -34,14 +34,14 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </div>
   <div style="position: absolute; right: 12px; top: 10px; display: flex; gap: 6px">
     <sc-if value="{{isThree}}" hint-placeholder-val="{{ true }}">
-      <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">TIEMPO</span><span style="{{clockStyle}}">{{clock}}</span></span>
+      <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A9BEDD">TIEMPO</span><span style="{{clockStyle}}">{{clock}}</span></span>
     </sc-if>
-    <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">BALÓN</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1">{{ballLabel}}</span></span>
-    <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">PUNTOS</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; color: #FF8A3D">{{ptsLabel}}</span></span>
+    <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A9BEDD">BALÓN</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1">{{ballLabel}}</span></span>
+    <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A9BEDD">PUNTOS</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; color: #FF8A3D">{{ptsLabel}}</span></span>
   </div>
 
   <sc-if value="{{showMeter}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; right: 24px; top: 90px; width: 18px; height: 200px; border-radius: 9px; background: #0B0B14CC; border: 2px solid #2E2E52; overflow: hidden">
+    <div style="position: absolute; right: 24px; top: 90px; width: 18px; height: 200px; border-radius: 9px; background: #0B0B14CC; border: 2px solid #1E3A6E; overflow: hidden">
       <div style="{{greenStyle}}"></div>
       <div style="{{fillStyle}}"></div>
     </div>
@@ -66,8 +66,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
   <sc-if value="{{showDone}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; inset: 0; background: #0B0B14D9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
-      <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">{{doneKicker}}</span>
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 64px; line-height: 1; color: #FF8A3D">{{ptsLabel}} <span style="font-size: 26px; color: #A3A3C2">puntos</span></span>
+      <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A9BEDD">{{doneKicker}}</span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 64px; line-height: 1; color: #FF8A3D">{{ptsLabel}} <span style="font-size: 26px; color: #A9BEDD">puntos</span></span>
       <span style="font-size: 14px; font-weight: 700">{{doneSub}}</span>
       <button type="button" onClick="{{doneAction}}" style="margin-top: 8px; height: 50px; padding: 0 30px; border: 0; border-radius: 14px; background: #FF8A3D; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #9C4A16">{{doneBtn}}</button>
     </div>

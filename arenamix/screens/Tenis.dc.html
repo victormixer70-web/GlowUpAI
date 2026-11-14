@@ -33,8 +33,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     </div>
   </div>
   <div style="position: absolute; right: 12px; top: 10px; display: flex; gap: 6px">
-    <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">BOLA</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1">{{ballLabel}}</span></span>
-    <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">PUNTOS</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; color: #C8F031">{{ptsLabel}}</span></span>
+    <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A9BEDD">BOLA</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1">{{ballLabel}}</span></span>
+    <span style="display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 4px 10px; border-radius: 12px; background: #0B0B14CC"><span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A9BEDD">PUNTOS</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; color: #C8F031">{{ptsLabel}}</span></span>
   </div>
   <sc-if value="{{showHint}}" hint-placeholder-val="{{ true }}">
     <div style="position: absolute; left: 0; right: 0; bottom: 12px; display: flex; justify-content: center; pointer-events: none">
@@ -56,8 +56,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
   <sc-if value="{{showDone}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; inset: 0; background: #0B0B14D9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
-      <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2">{{startTitle}}</span>
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 64px; line-height: 1; color: #C8F031">{{ptsLabel}} <span style="font-size: 26px; color: #A3A3C2">puntos</span></span>
+      <span style="font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #A9BEDD">{{startTitle}}</span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 64px; line-height: 1; color: #C8F031">{{ptsLabel}} <span style="font-size: 26px; color: #A9BEDD">puntos</span></span>
       <span style="font-size: 14px; font-weight: 700">{{doneSub}}</span>
       <button type="button" onClick="{{doneAction}}" style="margin-top: 8px; height: 50px; padding: 0 30px; border: 0; border-radius: 14px; background: #C8F031; color: #0B0B14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 2px; cursor: pointer; box-shadow: 0 5px 0 #7FA012">{{doneBtn}}</button>
     </div>

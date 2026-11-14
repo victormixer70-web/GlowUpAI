@@ -211,7 +211,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <span style="font-size: 10px; font-weight: 800; letter-spacing: 1.5px; color: #FFC53D">{{tutKicker}}</span>
         <span style="font-size: 14px; font-weight: 700; line-height: 1.35">{{tutText}}</span>
       </span>
-      <button type="button" onClick="{{tutSkip}}" style="flex: none; height: 30px; padding: 0 10px; border: 1px solid #2E2E52; border-radius: 8px; background: transparent; color: #CACAE0; font: 700 12px Exo2, sans-serif; cursor: pointer">Saltar</button>
+      <button type="button" onClick="{{tutSkip}}" style="flex: none; height: 30px; padding: 0 10px; border: 1px solid #1E3A6E; border-radius: 8px; background: transparent; color: #CACAE0; font: 700 12px Exo2, sans-serif; cursor: pointer">Saltar</button>
     </div>
   </sc-if>
   <sc-if value="{{flash}}" hint-placeholder-val="{{ false }}">
@@ -241,7 +241,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-if value="{{hasQC}}" hint-placeholder-val="{{ false }}">
     <button type="button" aria-label="Chat rápido" onPointerDown="{{qcToggle}}" style="position: absolute; right: 12px; top: 56px; z-index: 6; width: 40px; height: 40px; border-radius: 20px; border: 1.5px solid #ffffffaa; background: linear-gradient(135deg, #22D3EE, #8B5CF6); color: #fff; font: 800 18px Exo2, sans-serif; cursor: pointer; box-shadow: 0 4px 12px #0008">💬</button>
     <sc-if value="{{qcOpen}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; right: 58px; top: 50px; z-index: 6; display: flex; flex-direction: column; gap: 4px">
-      <sc-for list="{{qcList}}" as="q" hint-placeholder-count="6"><button type="button" onPointerDown="{{q.send}}" style="height: 30px; padding: 0 12px; border-radius: 15px; border: 1px solid #ffffff55; background: #1A0B44E6; color: #fff; font: 800 12px Exo2, sans-serif; cursor: pointer; white-space: nowrap; text-align: left">{{q.t}}</button></sc-for>
+      <sc-for list="{{qcList}}" as="q" hint-placeholder-count="6"><button type="button" onPointerDown="{{q.send}}" style="height: 30px; padding: 0 12px; border-radius: 15px; border: 1px solid #ffffff55; background: #05123AE6; color: #fff; font: 800 12px Exo2, sans-serif; cursor: pointer; white-space: nowrap; text-align: left">{{q.t}}</button></sc-for>
     </div></sc-if>
   </sc-if>
   <sc-for list="{{qcBubbles}}" as="qb" hint-placeholder-count="0"><span style="{{qb.style}}">{{qb.t}}</span></sc-for>
@@ -4828,7 +4828,7 @@ class Component extends DCLogic {
       coFade: g.co && g.co.t < 0.35 ? 'opacity: ' + (g.co.t / 0.35).toFixed(2) + '; transition: none;' : '',
       hasSuper: !P.tutorial && !this.keeperMode(),
       superLabel: (g.superM || 0) >= 1 ? 'SÚPER ¡LISTO!' : 'SÚPER',
-      superColor: (g.superM || 0) >= 1 ? '#FF9A3D' : '#A3A3C2',
+      superColor: (g.superM || 0) >= 1 ? '#FF9A3D' : '#A9BEDD',
       superStyle: 'width: ' + ((g.superM || 0) * 100).toFixed(0) + '%; color: #FF7A2E; background: ' + ((g.superM || 0) >= 1 ? 'linear-gradient(90deg, #FF5C2E, #FFE08A)' : 'linear-gradient(90deg, #B4380E, #FF7A2E)') + ';',
       modeLabel: P.tutorial ? 'TUTORIAL' : P.label ? P.label : P.coach ? 'MODO ENTRENADOR' : mode === 'comp' ? 'COMPETITIVO' : mode === 'quick' ? 'PARTIDA RÁPIDA' : 'PARTIDO DE PRUEBA',
       modeColor: mode === 'comp' ? '#E3A56E' : '#22D3EE',
@@ -4840,13 +4840,13 @@ class Component extends DCLogic {
       knobStyle: 'position: absolute; left: -' + Math.round(28 * this.cfg.joy) + 'px; top: -' + Math.round(28 * this.cfg.joy) + 'px; width: ' + Math.round(56 * this.cfg.joy) + 'px; height: ' + Math.round(56 * this.cfg.joy) + 'px; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #FFFFFF, ' + hc + ' 55%, ' + this.hexOf(this.mixC(this.rgbOf(hc), [2, 4, 12], 0.55)) + '); box-shadow: 0 0 0 2.5px #02040C, 0 4px 0 2px #02040C, 0 0 16px ' + hc + '99; transform: translate(' + this.joy.kx.toFixed(1) + 'px, ' + this.joy.ky.toFixed(1) + 'px);',
       mainLabel: g.cross && g.cross.toYou && g.cross.i === g.ctl ? (g.cross.kind === 'header' ? '¡CABEZA!' : '¡CHILENA!') : ctx === 'gk' ? 'ESTIRADA' : ctx === 'gkball' ? 'PATADA' : atk ? ((g.superM || 0) >= 1 && ctx === 'ball' ? 'SÚPER' : 'CHUT') : 'ENTRADA',
       mainAria: atk ? 'Chutar: mantén pulsado para más potencia' : 'Entrada: tírate al suelo para robar el balón',
-      mainBtnStyle: glow(tutI === 5 || tutI === 6).length ? btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : hc) : '#FF5C5C', atk ? '#A3A3C2' : '#B33A3A', atk ? 24 : 17, glow(true)) : ((g.superM || 0) >= 1 && ctx === 'ball' ? btn(14, 20, 88, 'radial-gradient(circle at 50% 35%, #FFE08A, #FF7A2E 55%, #D9381E)', '#A3361A', 26, 'color: #FFFFFF; text-shadow: 0 2px 0 #7A1E0A; animation: pdSuper .8s infinite; transform: scale(' + (g.charging ? 0.94 + g.charge * 0.1 : 1).toFixed(3) + ');') : btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : hc) : '#FF5C5C', atk ? '#A3A3C2' : '#B33A3A', atk ? 24 : 17, 'transform: scale(' + (g.charging ? 0.94 + g.charge * 0.1 : 1).toFixed(3) + ');')),
+      mainBtnStyle: glow(tutI === 5 || tutI === 6).length ? btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : hc) : '#FF5C5C', atk ? '#A9BEDD' : '#B33A3A', atk ? 24 : 17, glow(true)) : ((g.superM || 0) >= 1 && ctx === 'ball' ? btn(14, 20, 88, 'radial-gradient(circle at 50% 35%, #FFE08A, #FF7A2E 55%, #D9381E)', '#A3361A', 26, 'color: #FFFFFF; text-shadow: 0 2px 0 #7A1E0A; animation: pdSuper .8s infinite; transform: scale(' + (g.charging ? 0.94 + g.charge * 0.1 : 1).toFixed(3) + ');') : btn(14, 20, 88, atk ? (g.charging ? '#FFC53D' : hc) : '#FF5C5C', atk ? '#A9BEDD' : '#B33A3A', atk ? 24 : 17, 'transform: scale(' + (g.charging ? 0.94 + g.charge * 0.1 : 1).toFixed(3) + ');')),
       passLabel: ctx === 'gk' ? 'SALIR' : ctx === 'gkball' ? 'SAQUE' : ctx === 'ball' ? 'PASE' : ctx === 'team' ? 'PÍDELA' : P.coach ? 'CAMBIO' : 'PRESIÓN',
       passAria: ctx === 'ball' ? 'Pase al compañero señalado (mantén pulsado para bombearlo; con sprint, al hueco)' : ctx === 'team' ? 'Pide el balón a tu compañero' : P.coach ? 'Cambiar al compañero más cercano al balón' : 'Presión: mantén pulsado para ir a por el balón',
       passBtnStyle: tutI === 3 || tutI === 6 ? btn(112, 14, 64, ctx === 'def' ? '#F4B860' : '#A78BFA', ctx === 'def' ? '#A87420' : '#6D28D9', ctx === 'ball' ? 19 : 15, glow(true)) : ctx === 'def' && !P.coach ? btn(112, 14, 64, g.press ? '#FFC53D' : '#F4B860', '#A87420', 15) : btn(112, 14, 64, ctx === 'def' ? '#8CC5FF' : '#A78BFA', ctx === 'def' ? '#3B76B8' : '#6D28D9', ctx === 'ball' ? 19 : 16),
       skillLabel: ctx === 'ball' ? 'REGATE' : 'PRESIÓN',
       skillAria: ctx === 'ball' ? 'Regate: deja atrás al rival que tienes delante' : 'Presión: mantén pulsado para ir a por el balón',
-      skillBtnStyle: gkc ? 'display: none;' : tutI === 4 ? btn(26, 120, 60, '#53D88E', '#2F8A57', 15, glow(true)) : btn(26, 120, 60, ctx === 'ball' ? (h.skillCd > 0 ? '#5E5E80' : '#53D88E') : (g.press ? '#FFC53D' : '#F4B860'), ctx === 'ball' ? '#2F8A57' : '#A87420', 15, ctx !== 'ball' && !P.coach ? 'display: none;' : ''),
+      skillBtnStyle: gkc ? 'display: none;' : tutI === 4 ? btn(26, 120, 60, '#53D88E', '#2F8A57', 15, glow(true)) : btn(26, 120, 60, ctx === 'ball' ? (h.skillCd > 0 ? '#5A7099' : '#53D88E') : (g.press ? '#FFC53D' : '#F4B860'), ctx === 'ball' ? '#2F8A57' : '#A87420', 15, ctx !== 'ball' && !P.coach ? 'display: none;' : ''),
       // CENTRO: team modes, with the ball, left of PASE
       crossBtnStyle: n > 1 && ctx === 'ball' && !gkc && !P.tutorial ? btn(186, 16, 56, '#FFC53D', '#B7871A', 13) : 'display: none;',
       sprintBtnStyle: btn(98, 92, 56, sprintOn ? '#FFC53D' : '#22D3EE', '#0E8FA3', 14, glow(tutI === 2)),

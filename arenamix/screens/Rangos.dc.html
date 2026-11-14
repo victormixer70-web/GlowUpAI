@@ -39,7 +39,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .rg-flag{transform-origin:0 50%;animation:rgWave 1.2s ease-in-out infinite alternate}
 @keyframes rgWave{from{transform:skewY(-6deg) scaleX(.94)}to{transform:skewY(5deg) scaleX(1.04)}}
 .rg-ped{position:absolute;left:50%;width:150px;height:26px;margin-left:-75px;border-radius:50%;pointer-events:none}
-.rg-bar{height:8px;border-radius:4px;background:#150925;box-shadow:inset 0 1px 2px #000a;overflow:hidden}
+.rg-bar{height:8px;border-radius:4px;background:#040A1C;box-shadow:inset 0 1px 2px #000a;overflow:hidden}
 .rg-bar i{display:block;height:100%;border-radius:4px}
 .rg-mt,.rg-cloud,.rg-aur{display:none}
 .rg-badge{display:block;filter:drop-shadow(0 6px 8px #000c);transition:filter .3s}
@@ -67,9 +67,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </div>
   <!-- header -->
   <div style="position: absolute; left: 18px; top: 12px; display: flex; align-items: center; gap: 10px; z-index: 3">
-    <a href="Modos.dc.html" aria-label="Volver" class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 46px; height: 38px; background: #251443; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+    <a href="Modos.dc.html" aria-label="Volver" class="bc-para" style="display: flex; align-items: center; justify-content: center; width: 46px; height: 38px; background: #0B1A44; color: #F4F4FA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
     <h1 class="bc-title hd" style="font-size: 28px">RANGOS</h1>
-    <span style="font-size: 12px; color: #A3A3C2; font-weight: 700">Fútbol · Competitivo · {{season}}</span>
+    <span style="font-size: 12px; color: #A9BEDD; font-weight: 700">Fútbol · Competitivo · {{season}}</span>
   </div>
 
   <!-- the chosen rank, up close -->
@@ -117,15 +117,15 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <span class="rg-ped2" style="--nc: {{r.c1}}"></span>
         <img class="{{r.badgeCls}}" src="{{r.badge}}" alt="" style="{{r.svgStyle}}">
         <span style="{{r.labelStyle}}">{{r.short}}</span>
-        <sc-if value="{{r.locked}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: 6px; top: 2px; width: 18px; height: 18px; border-radius: 9px; background: #150925; display: flex; align-items: center; justify-content: center"><svg width="10" height="10" viewBox="0 0 24 24" fill="#8686A6"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg></span></sc-if>
+        <sc-if value="{{r.locked}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: 6px; top: 2px; width: 18px; height: 18px; border-radius: 9px; background: #040A1C; display: flex; align-items: center; justify-content: center"><svg width="10" height="10" viewBox="0 0 24 24" fill="#8FA8CC"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg></span></sc-if>
       </button>
     </sc-for>
     <!-- the summit: a flag waving over Élite -->
     <svg width="34" height="44" viewBox="0 0 34 44" style="{{flagStyle}}"><path d="M3 2V44" stroke="#E6E9F0" stroke-width="2.5" stroke-linecap="round"/><g class="rg-flag"><path d="M4 3h26l-6 8l6 8H4z" fill="#FFC53D"/><path d="M12 7l1.3 2.6 2.9.4-2.1 2 .5 2.9L12 13.5l-2.6 1.4.5-2.9-2.1-2 2.9-.4z" fill="#7A4E0E"/></g></svg>
     <!-- you, on the climb -->
     <div style="{{pinStyle}}">
-      <span style="display: flex; align-items: center; gap: 6px; padding: 3px 9px 3px 3px; border-radius: 16px; background: #22D3EE; color: #150925; box-shadow: 0 0 0 2px #0D2C5B, 0 4px 0 #0D2C5B, 0 0 16px #22D3EE88; white-space: nowrap">
-        <img src="{{me}}" alt="" style="width: 24px; height: 24px; border-radius: 12px; object-fit: cover; object-position: 50% 0; background: #150925">
+      <span style="display: flex; align-items: center; gap: 6px; padding: 3px 9px 3px 3px; border-radius: 16px; background: #22D3EE; color: #040A1C; box-shadow: 0 0 0 2px #0D2C5B, 0 4px 0 #0D2C5B, 0 0 16px #22D3EE88; white-space: nowrap">
+        <img src="{{me}}" alt="" style="width: 24px; height: 24px; border-radius: 12px; object-fit: cover; object-position: 50% 0; background: #040A1C">
         <b style="font: 800 11px Exo2, sans-serif">TÚ · {{myLabel}}</b>
       </span>
       <span style="{{pinArrow}}"></span>
@@ -178,7 +178,7 @@ class Component extends DCLogic {
     }
     if (i > mi) {
       const left = r.start - mmr;
-      return { progTitle: 'BLOQUEADO', progRight: this.fmt(r.start) + ' MMR', progColor: '#8686A6',
+      return { progTitle: 'BLOQUEADO', progRight: this.fmt(r.start) + ' MMR', progColor: '#8FA8CC',
         progBar: 'width: ' + Math.max(3, Math.min(100, mmr / Math.max(1, r.start) * 100)).toFixed(1) + '%; background: #3A3A64',
         progText: 'Te faltan ' + this.fmt(left) + ' MMR (≈ ' + wins(left) + ' victorias)' };
     }
@@ -251,7 +251,7 @@ class Component extends DCLogic {
       return {
         n: String(k + 1),
         range: hi === null ? this.fmt(lo) + '+' : this.fmt(lo) + '–' + this.fmt(hi),
-        style: 'flex: 1; height: ' + (34 + k * 9) + 'px; color: ' + (yours ? '#150925' : r.text) + '; background: ' + (yours ? r.c1 : 'linear-gradient(180deg, ' + r.c2 + 'aa, #02040C)') + '; box-shadow: inset 0 0 0 1.5px ' + r.c1 + '66;' + (yours ? ' box-shadow: inset 0 2px 0 #ffffff66, inset 0 -3px 0 #0005, 0 0 14px ' + r.c1 + '88;' : '')
+        style: 'flex: 1; height: ' + (34 + k * 9) + 'px; color: ' + (yours ? '#040A1C' : r.text) + '; background: ' + (yours ? r.c1 : 'linear-gradient(180deg, ' + r.c2 + 'aa, #02040C)') + '; box-shadow: inset 0 0 0 1.5px ' + r.c1 + '66;' + (yours ? ' box-shadow: inset 0 2px 0 #ffffff66, inset 0 -3px 0 #0005, 0 0 14px ' + r.c1 + '88;' : '')
       };
     });
     const rnd = (k) => { const x = Math.sin(k * 77.3) * 43758.5; return x - Math.floor(x); };

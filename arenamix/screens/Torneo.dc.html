@@ -17,8 +17,8 @@ body{margin:0}
 @keyframes tnPulse{0%,100%{box-shadow:0 0 0 0 var(--tc),0 5px 0 #0D0418}50%{box-shadow:0 0 0 7px transparent,0 5px 0 #0D0418}}
 @keyframes tnShine{0%,60%{transform:translateX(-160%) rotate(14deg)}100%{transform:translateX(360%) rotate(14deg)}}
 @keyframes tnLine{to{stroke-dashoffset:-20}}
-.tn-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(90% 80% at 70% 0%,#2C1C5E 0%,#200C4B 55%,#0F052D 100%)}
-.tn-bg i{position:absolute;left:50%;top:-260px;width:1100px;height:1100px;margin-left:-550px;background:repeating-conic-gradient(from 0deg,#A78BFA10 0 6deg,transparent 6deg 18deg);animation:tnRay 90s linear infinite;-webkit-mask-image:radial-gradient(closest-side,#000 20%,transparent 70%);mask-image:radial-gradient(closest-side,#000 20%,transparent 70%)}
+.tn-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(90% 80% at 70% 0%,#0B2A78 0%,#071640 55%,#02061A 100%)}
+.tn-bg i{position:absolute;left:50%;top:-260px;width:1100px;height:1100px;margin-left:-550px;background:repeating-conic-gradient(from 0deg,#FF8A3D12 0 6deg,transparent 6deg 18deg);animation:tnRay 90s linear infinite;-webkit-mask-image:radial-gradient(closest-side,#000 20%,transparent 70%);mask-image:radial-gradient(closest-side,#000 20%,transparent 70%)}
 .tn-bg b{position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(0deg,#0E3A22aa,transparent);-webkit-mask-image:repeating-linear-gradient(90deg,#000 0 60px,#0008 60px 120px);mask-image:repeating-linear-gradient(90deg,#000 0 60px,#0008 60px 120px)}
 .tn-tab{position:relative;z-index:1;display:flex;align-items:center;gap:6px;height:32px;width:100px;justify-content:center;border:0;background:none;font:800 11.5px Exo2,sans-serif;letter-spacing:.5px;cursor:pointer;transition:color .3s}
 .tn-panel{position:absolute;left:16px;right:16px;top:62px;bottom:12px;animation:tnIn .4s cubic-bezier(.2,1.3,.4,1) both}
@@ -27,8 +27,8 @@ body{margin:0}
 .tn-go::after{content:'';position:absolute;top:-30%;bottom:-30%;left:0;width:26%;background:linear-gradient(90deg,transparent,#ffffffaa,transparent);animation:tnShine 3.2s ease-in-out infinite}
 .tn-go:active{transform:translateY(2px)}
 .tn-ghost{height:34px;padding:0 14px;border-radius:11px;border:1px solid #4A4180;background:#15092ACC;color:#C9C2FF;font:800 11.5px Exo2,sans-serif;cursor:pointer}
-.tn-size{width:58px;height:34px;border-radius:10px;border:1px solid #3A3270;background:#15092ACC;color:#A3A3C2;font:800 italic 16px 'Barlow Condensed',sans-serif;cursor:pointer;transition:transform .15s}
-.tn-size.on{background:#A78BFA;border-color:#C4B5FD;color:#150925;transform:translateY(-2px);box-shadow:0 3px 0 #5B3FB0,0 0 14px #A78BFA88}
+.tn-size{width:58px;height:34px;border-radius:10px;border:1px solid #3A3270;background:#15092ACC;color:#A9BEDD;font:800 italic 16px 'Barlow Condensed',sans-serif;cursor:pointer;transition:transform .15s}
+.tn-size.on{background:#A78BFA;border-color:#A6DCFF;color:#040A1C;transform:translateY(-2px);box-shadow:0 3px 0 #5B3FB0,0 0 14px #A78BFA88}
 .tn-trophy{animation:tnFloat 4s ease-in-out infinite,tnGlow 3s ease-in-out infinite}
 .tn-m{position:absolute;width:168px;border-radius:9px;background:#15092AE6;box-shadow:inset 0 0 0 1px #2E2E58;overflow:hidden}
 .tn-m.me{box-shadow:inset 0 0 0 1.5px #22D3EE,0 0 14px #22D3EE55}
@@ -42,7 +42,7 @@ body{margin:0}
 .tn-kit{flex:none;width:11px;height:13px;border-radius:2px 2px 5px 5px}
 .tn-tr{display:grid;grid-template-columns:34px 1fr 34px 30px 30px 30px 56px 40px;align-items:center;height:38px;font:700 12.5px Exo2,sans-serif;text-align:center;border-top:1px solid #ffffff0d}
 .tn-tr .t{display:flex;align-items:center;gap:8px;text-align:left;min-width:0;white-space:nowrap}
-.tn-th{height:26px;border-top:0;font-size:9.5px;letter-spacing:1px;color:#8686A6;font-weight:800}
+.tn-th{height:26px;border-top:0;font-size:9.5px;letter-spacing:1px;color:#8FA8CC;font-weight:800}
 .tn-tr.me{background:#22D3EE1c;color:#F4F4FA;box-shadow:inset 3px 0 0 #22D3EE;border-radius:8px}
 .tn-pos{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:7px;font:800 13px 'Barlow Condensed',sans-serif}
 .tn-reto{position:relative;display:flex;flex-direction:column;gap:8px;padding:16px 16px 14px;box-sizing:border-box;width:258px;height:300px;border-radius:22px;animation:tnIn .45s cubic-bezier(.2,1.3,.4,1) both}
@@ -58,16 +58,16 @@ body{margin:0}
 .tn-heroimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;z-index:-1;transform:scale(1.15);animation:tnZoom 12s ease-in-out infinite alternate}
 @keyframes tnZoom{to{transform:scale(1.28) translateY(-4px)}}
 .tn-herofade{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,transparent 30%,color-mix(in srgb,var(--tc) 30%,#0F052D) 78%,#0F052D)}
-.tn-tag{position:absolute;left:12px;top:12px;padding:3px 9px;border-radius:9px;background:var(--tc);color:#150925;font:800 9.5px Exo2,sans-serif;letter-spacing:1.2px;box-shadow:0 0 12px var(--tc)}
+.tn-tag{position:absolute;left:12px;top:12px;padding:3px 9px;border-radius:9px;background:var(--tc);color:#040A1C;font:800 9.5px Exo2,sans-serif;letter-spacing:1.2px;box-shadow:0 0 12px var(--tc)}
 .tn-gold{--tc:#FBBF24}.tn-violet{--tc:#A78BFA}
 .tn-hero{box-shadow:inset 0 0 0 2px var(--tc),0 0 26px color-mix(in srgb,var(--tc) 45%,transparent),0 14px 30px #0009!important}
-.tn-side{background:radial-gradient(70% 60% at 100% 0%,color-mix(in srgb,var(--tc) 40%,transparent),transparent 70%),linear-gradient(165deg,color-mix(in srgb,var(--tc) 22%,#3B1A8A),#1C0B43 70%)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--tc) 55%,transparent),inset 0 1px 0 #ffffff30,0 14px 30px #0009!important}
+.tn-side{background:radial-gradient(70% 60% at 100% 0%,color-mix(in srgb,var(--tc) 40%,transparent),transparent 70%),linear-gradient(165deg,color-mix(in srgb,var(--tc) 22%,#0B2A78),#1C0B43 70%)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--tc) 55%,transparent),inset 0 1px 0 #ffffff30,0 14px 30px #0009!important}
 .tn-side>span{color:color-mix(in srgb,var(--tc) 70%,#fff)!important}
 .tn-prize{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:12px;font:800 11.5px Exo2,sans-serif;color:#fff}
-.tn-prize .md{flex:none;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--pc);color:#150925;font:800 12px 'Barlow Condensed',sans-serif;box-shadow:0 0 8px var(--pc)}
+.tn-prize .md{flex:none;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--pc);color:#040A1C;font:800 12px 'Barlow Condensed',sans-serif;box-shadow:0 0 8px var(--pc)}
 .tn-prize b{font-size:11px;color:#FFE38A;white-space:nowrap}
 .tn-size{background:#ffffff14!important;border-color:#ffffff33!important;color:#fff!important}
-.tn-size.on{background:var(--tc,#A78BFA)!important;color:#150925!important;box-shadow:0 3px 0 #0006,0 0 14px var(--tc,#A78BFA)!important}
+.tn-size.on{background:var(--tc,#A78BFA)!important;color:#040A1C!important;box-shadow:0 3px 0 #0006,0 0 14px var(--tc,#A78BFA)!important}
 .tn-reto{overflow:hidden;isolation:isolate}
 .tn-retoimg{position:absolute;left:0;right:0;top:168px;height:96px;width:100%;object-fit:cover;object-position:50% 45%;z-index:-1;opacity:.9;-webkit-mask-image:linear-gradient(180deg,transparent,#000 25%,#000 70%,transparent);mask-image:linear-gradient(180deg,transparent,#000 25%,#000 70%,transparent);filter:hue-rotate(0deg) saturate(1.2)}
 .tn-reto h3{text-shadow:0 3px 0 #0D0418,0 0 16px var(--rc)}
@@ -82,7 +82,7 @@ body{margin:0}
 .tn-feats svg{color:var(--tc)}
 .tn-lead{font:700 italic 11px Exo2,sans-serif;color:color-mix(in srgb,var(--tc) 35%,#fff);opacity:.9;text-align:center;padding:0 18px}
 .tn-sec{display:flex;align-items:center;gap:6px;font:800 10px Exo2,sans-serif;letter-spacing:2px;color:color-mix(in srgb,var(--tc) 70%,#fff)}
-.tn-sec svg{flex:none;width:20px;height:20px;padding:4px;box-sizing:border-box;border-radius:7px;background:var(--tc);color:#150925}
+.tn-sec svg{flex:none;width:20px;height:20px;padding:4px;box-sizing:border-box;border-radius:7px;background:var(--tc);color:#040A1C}
 .tn-sec i{flex:1;height:2px;border-radius:1px;background:linear-gradient(90deg,var(--tc),transparent)}
 .tn-reto{--tc:var(--rc)}
 .tn-reto>div,.tn-reto>p,.tn-reto>h3{position:relative;z-index:1}
@@ -95,11 +95,11 @@ body{margin:0}
     <div class="tn-bg" aria-hidden="true"><i></i><b></b></div>
     <!-- header: back, title, the three competitions -->
     <div style="position: absolute; left: 16px; right: 16px; top: 12px; height: 40px; display: flex; align-items: center; gap: 12px">
-      <a href="Modos.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 46px; height: 38px; display: flex; align-items: center; justify-content: center; background: #251443; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+      <a href="Modos.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 46px; height: 38px; display: flex; align-items: center; justify-content: center; background: #0B1A44; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
       <h1 class="bc-title hd" style="font-size: 28px">TORNEOS</h1>
       <span style="display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 10px; background: #15092ACC; font: 800 12px Exo2, sans-serif; color: #FFC53D"><svg width="15" height="15" viewBox="0 0 24 24" fill="#FFC53D"><path d="M7 3h10v6a5 5 0 0 1-10 0zM5 4H2v2a4 4 0 0 0 5 4M19 4h3v2a4 4 0 0 1-5 4M10 15h4v3h3v3H7v-3h3z"/></svg>{{trophyCount}}</span>
       <span style="flex: 1"></span>
-      <div role="tablist" aria-label="Competición" style="position: relative; display: flex; padding: 3px; border-radius: 14px; background: #150925CC; border: 1px solid #2E2E58">
+      <div role="tablist" aria-label="Competición" style="position: relative; display: flex; padding: 3px; border-radius: 14px; background: #040A1CCC; border: 1px solid #2E2E58">
         <span aria-hidden="true" style="{{thumbStyle}}"></span>
         <sc-for list="{{tabs}}" as="t" key="id">
           <button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" class="tn-tab" style="{{t.style}}">{{t.label}}</button>
@@ -147,7 +147,7 @@ body{margin:0}
           <svg class="tn-trophy" width="70" height="70" viewBox="0 0 120 120"><path d="M34 14h52v26c0 16-11 28-26 28S34 56 34 40z" fill="#FFC53D" stroke="#5A3A08" stroke-width="3"/><path d="M34 22H18v8c0 12 9 19 19 19M86 22h16v8c0 12-9 19-19 19" fill="none" stroke="#FFC53D" stroke-width="7" stroke-linecap="round"/><path d="M52 68h16v14H52zM38 82h44l4 14H34z" fill="#D9A230" stroke="#5A3A08" stroke-width="3"/><rect x="30" y="96" width="60" height="12" rx="3" fill="#2A1E5E" stroke="#5A3A08" stroke-width="3"/></svg>
           <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #A78BFA">{{cupStage}}</span>
           <span style="font: 800 italic 24px/1.05 'Barlow Condensed', sans-serif; letter-spacing: .5px" translate="no">{{cupHeadline}}</span>
-          <span style="font-size: 11px; font-weight: 700; color: #A3A3C2; line-height: 1.4">{{cupSub}}</span>
+          <span style="font-size: 11px; font-weight: 700; color: #A9BEDD; line-height: 1.4">{{cupSub}}</span>
           <span style="flex: 1"></span>
           <sc-if value="{{cupCanPlay}}" hint-placeholder-val="{{ true }}"><button type="button" class="tn-go" style="width: 100%; font-size: 19px; padding: 0 10px" onClick="{{playCup}}">{{cupPlayLabel}}</button></sc-if>
           <sc-if value="{{cupOver}}" hint-placeholder-val="{{ false }}"><button type="button" class="tn-go" style="width: 100%" onClick="{{resetCup}}">NUEVA COPA</button></sc-if>
@@ -192,10 +192,10 @@ body{margin:0}
             <sc-for list="{{lgDays}}" as="d" key="k"><span style="{{d}}"></span></sc-for>
           </div>
           <span style="font: 800 italic 24px/1.05 'Barlow Condensed', sans-serif; letter-spacing: .5px" translate="no">{{lgHeadline}}</span>
-          <span style="font-size: 11px; font-weight: 700; color: #A3A3C2; line-height: 1.4">{{lgSub}}</span>
+          <span style="font-size: 11px; font-weight: 700; color: #A9BEDD; line-height: 1.4">{{lgSub}}</span>
           <sc-if value="{{lgHasLast}}" hint-placeholder-val="{{ false }}">
             <div style="width: 100%; display: flex; flex-direction: column; gap: 3px; padding: 8px 10px; box-sizing: border-box; border-radius: 12px; background: #15092AAA; text-align: left">
-              <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #8686A6">{{lgLastHead}}</span>
+              <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #8FA8CC">{{lgLastHead}}</span>
               <sc-for list="{{lgLast}}" as="x" key="k"><span style="{{x.style}}" translate="no">{{x.t}}</span></sc-for>
             </div>
           </sc-if>
@@ -237,7 +237,7 @@ body{margin:0}
           <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #53D88E">{{crStage}}</span>
           <div style="display: flex; align-items: center; gap: 10px">
             <div style="width: 52px; height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px 10px 18px 18px; background: linear-gradient(170deg, #FDE68A, #B7791F); color: #2A1400; box-shadow: 0 0 14px #FBBF2477"><b style="font: 800 italic 26px/1 'Barlow Condensed', sans-serif">{{crOvr}}</b><span style="font-size: 8px; font-weight: 800; letter-spacing: 1px">MEDIA</span></div>
-            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; min-width: 0"><span style="font: 800 italic 19px/1.05 'Barlow Condensed', sans-serif" translate="no">{{crClub}}</span><span style="font-size: 10.5px; font-weight: 700; color: #A3A3C2">{{crSeason}}</span></div>
+            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; min-width: 0"><span style="font: 800 italic 19px/1.05 'Barlow Condensed', sans-serif" translate="no">{{crClub}}</span><span style="font-size: 10.5px; font-weight: 700; color: #A9BEDD">{{crSeason}}</span></div>
           </div>
           <span style="font-size: 11px; font-weight: 700; color: #DADAF0; line-height: 1.4">{{crSub}}</span>
           <span style="flex: 1"></span>
@@ -262,7 +262,7 @@ body{margin:0}
             <sc-for list="{{evPips}}" as="d" key="k"><span style="{{d}}"></span></sc-for>
             <span style="font-size: 12px; font-weight: 800; color: #FFC53D">{{evPrize}}</span>
           </div>
-          <span style="font-size: 11px; font-weight: 700; color: #A3A3C2">{{evWhen}}</span>
+          <span style="font-size: 11px; font-weight: 700; color: #A9BEDD">{{evWhen}}</span>
           <span style="flex: 1"></span>
           <sc-if value="{{evCanClaim}}" hint-placeholder-val="{{ false }}"><button type="button" class="tn-go" onClick="{{evClaim}}">¡RECOGER PREMIO!</button></sc-if>
           <sc-if value="{{evCanPlay}}" hint-placeholder-val="{{ false }}"><button type="button" class="tn-go" onClick="{{evPlay}}">JUGAR EVENTO</button></sc-if>
@@ -292,7 +292,7 @@ body{margin:0}
           </div>
         </sc-for>
       </div>
-      <span style="position: absolute; left: 0; right: 0; bottom: 4px; text-align: center; font-size: 10px; font-weight: 700; color: #8686A6">Retos nuevos cada día · {{retosLeft}}</span>
+      <span style="position: absolute; left: 0; right: 0; bottom: 4px; text-align: center; font-size: 10px; font-weight: 700; color: #8FA8CC">Retos nuevos cada día · {{retosLeft}}</span>
     </sc-if>
 
     <sc-if value="{{hasBanner}}" hint-placeholder-val="{{ false }}">
@@ -367,7 +367,7 @@ class Component extends DCLogic {
     return null;
   }
   me() { return window.AMOnline && window.AMOnline.myName ? window.AMOnline.myName() : 'Tú'; }
-  myClub() { return [this.me() + ' FC', '#22D3EE', '#150925']; }
+  myClub() { return [this.me() + ' FC', '#22D3EE', '#040A1C']; }
   shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   names(n, avoid) {
     const out = [], pool = this.shuffle(TN_NAMES).filter((x) => !(avoid || []).includes(x));
@@ -599,7 +599,7 @@ class Component extends DCLogic {
     const out = {
       isHub: s.phase === 'hub', isMatch: s.phase === 'match', isShootout: s.phase === 'shootout',
       trophyCount: String((TR.copa || 0) + (TR.liga || 0)),
-      tabs: TABS.map(([id, label, c], i) => ({ id, label, sel: i === ti ? 'true' : 'false', style: 'color: ' + (i === ti ? '#150925' : c), pick: () => { this.setState({ tab: id }); try { const S = this.store('arenamix.sel') || {}; this.store('arenamix.sel', { ...S, cat: 'tour', id }); } catch (e) {} } })),
+      tabs: TABS.map(([id, label, c], i) => ({ id, label, sel: i === ti ? 'true' : 'false', style: 'color: ' + (i === ti ? '#040A1C' : c), pick: () => { this.setState({ tab: id }); try { const S = this.store('arenamix.sel') || {}; this.store('arenamix.sel', { ...S, cat: 'tour', id }); } catch (e) {} } })),
       thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 100) + 'px; width: 100px; height: 32px; border-radius: 11px; background: ' + TABS[ti][2] + '; box-shadow: 0 0 16px ' + TABS[ti][2] + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s',
       sizes: [1, 2, 3, 4].map((n) => ({ n: String(n), label: n + ' VS ' + n, cls: 'tn-size' + (n === s.size ? ' on' : ''), pick: () => this.setState({ size: n }) })),
       copaImg: window.AMPosters ? window.AMPosters.get('copa', () => this.forceUpdate()) : '', ligaImg: window.AMPosters ? window.AMPosters.get('liga', () => this.forceUpdate()) : '', retosImg: window.AMPosters ? window.AMPosters.get('retos', () => this.forceUpdate()) : '',
@@ -647,7 +647,7 @@ class Component extends DCLogic {
       const opp = mm ? C.teams[mm.pair[mm.home ? 1 : 0]] : null;
       Object.assign(out, {
         matches, links,
-        roundHeads: TN_ROUND.map((t, r) => ({ t, style: 'position: absolute; left: ' + X[r] + 'px; top: 0; width: ' + W + 'px; text-align: center; font-size: 9.5px; font-weight: 800; letter-spacing: 2px; color: ' + (r === C.round && !C.out && !C.done ? '#22D3EE' : '#8686A6') })),
+        roundHeads: TN_ROUND.map((t, r) => ({ t, style: 'position: absolute; left: ' + X[r] + 'px; top: 0; width: ' + W + 'px; text-align: center; font-size: 9.5px; font-weight: 800; letter-spacing: 2px; color: ' + (r === C.round && !C.out && !C.done ? '#22D3EE' : '#8FA8CC') })),
         cupStage: C.done && C.champ ? '¡CAMPEÓN!' : C.out ? 'ELIMINADO' : C.done ? 'COPA TERMINADA' : TN_ROUND[C.round] + ' · ' + C.n + ' VS ' + C.n,
         cupHeadline: champ ? champ.c[0] : opp ? 'vs ' + opp.c[0] : '',
         cupSub: C.done && C.champ ? 'Has ganado la Copa Arena. El trofeo ya está en tus vitrinas.' : champ ? (C.out ? 'Ganó la copa. Tú quedaste fuera, ¡la próxima es tuya!' : 'Ganó la copa.') : opp ? 'Rival de ' + ['nivel bajo', 'nivel medio', 'nivel alto'][Math.min(2, Math.floor(opp.str * 3.2 - 0.6))] + '. Si hay empate, penaltis.' : '',
@@ -669,7 +669,7 @@ class Component extends DCLogic {
       const PC = ['#FFC53D', '#C9CAE0', '#CD7F32'];
       const last = L.res.length ? L.res[L.res.length - 1] : null, lastDay = L.days[L.res.length - 1];
       Object.assign(out, {
-        table: T.map((x, k) => ({ k: String(x.k), pos: String(k + 1), name: L.teams[x.k].c[0], kit: kit(L.teams[x.k].c), pj: String(x.pj), g: String(x.g), e: String(x.e), p: String(x.p), gl: x.gf + ':' + x.gc, pts: String(x.pts), cls: 'tn-tr' + (L.teams[x.k].me ? ' me' : ''), posStyle: k < 3 ? 'background: ' + PC[k] + '; color: #150925' : 'background: #251443; color: #A3A3C2' })),
+        table: T.map((x, k) => ({ k: String(x.k), pos: String(k + 1), name: L.teams[x.k].c[0], kit: kit(L.teams[x.k].c), pj: String(x.pj), g: String(x.g), e: String(x.e), p: String(x.p), gl: x.gf + ':' + x.gc, pts: String(x.pts), cls: 'tn-tr' + (L.teams[x.k].me ? ' me' : ''), posStyle: k < 3 ? 'background: ' + PC[k] + '; color: #040A1C' : 'background: #0B1A44; color: #A9BEDD' })),
         lgStage: L.done ? 'LIGA TERMINADA' : 'JORNADA ' + (L.day + 1) + ' DE 5 · ' + L.n + ' VS ' + L.n,
         lgDays: L.days.map((_, k) => 'width: 26px; height: 6px; border-radius: 3px; background: ' + (k < L.day ? '#22D3EE' : k === L.day && !L.done ? '#FFC53D' : '#2E2E58')),
         lgHeadline: L.done ? (pos === 0 ? '¡CAMPEÓN!' : pos + 1 + '.º PUESTO') : 'vs ' + opp.c[0],
@@ -696,7 +696,7 @@ class Component extends DCLogic {
       const pos = T.findIndex((x) => K.teams[x.k].me), PC = ['#53D88E', '#53D88E', '#C9CAE0'];
       Object.assign(out, {
         crDiv: D.name, crOvr: String(K.ovr), crClub: K.club[0], crSeason: 'Temporada ' + K.season + ' · ' + (K.titles || 0) + (K.titles === 1 ? ' título' : ' títulos'),
-        crTable: T.map((x, k) => ({ k: String(x.k), pos: String(k + 1), name: K.teams[x.k].c[0], kit: kit(K.teams[x.k].c), pj: String(x.pj), g: String(x.g), e: String(x.e), p: String(x.p), gl: x.gf + ':' + x.gc, pts: String(x.pts), cls: 'tn-tr' + (K.teams[x.k].me ? ' me' : ''), posStyle: k < 2 ? 'background: ' + PC[k] + '; color: #150925' : k === 5 ? 'background: #FF5C5C; color: #150925' : 'background: #251443; color: #A3A3C2' })),
+        crTable: T.map((x, k) => ({ k: String(x.k), pos: String(k + 1), name: K.teams[x.k].c[0], kit: kit(K.teams[x.k].c), pj: String(x.pj), g: String(x.g), e: String(x.e), p: String(x.p), gl: x.gf + ':' + x.gc, pts: String(x.pts), cls: 'tn-tr' + (K.teams[x.k].me ? ' me' : ''), posStyle: k < 2 ? 'background: ' + PC[k] + '; color: #040A1C' : k === 5 ? 'background: #FF5C5C; color: #040A1C' : 'background: #0B1A44; color: #A9BEDD' })),
         crStage: K.done ? 'FIN DE TEMPORADA' : 'JORNADA ' + (K.day + 1) + ' DE 5 · ' + K.n + ' VS ' + K.n,
         crSub: K.done ? K.note + '. Elige tu futuro:' : 'Vas ' + (pos + 1) + '.º. Los dos primeros reciben ofertas de ' + (K.tier < 4 ? CR_DIV[K.tier + 1].name.toLowerCase() : 'renovación') + '; el último desciende. Próximo rival: ' + opp.c[0] + '.',
         crCanPlay: !!mm, crPlayLabel: mm ? 'JUGAR JORNADA ' + (K.day + 1) : '',
@@ -719,7 +719,7 @@ class Component extends DCLogic {
       Object.assign(out, {
         isEvento: tab === 'evento', evTitle: EV.title, evTag: open ? 'EVENTO · ¡ABIERTO!' : 'PRÓXIMO EVENTO', evFeats: EV.feats, evDesc: EV.desc,
         evHero: '--tc: ' + EV.c + '; flex: none; width: 330px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; padding-bottom: 16px; text-align: center; background: radial-gradient(80% 60% at 50% 20%, ' + EV.c + '99, transparent 70%), linear-gradient(170deg, color-mix(in srgb, ' + EV.c + ' 45%, #2A1460), #160A36)',
-        evPips: [0, 1, 2].map((k) => 'width: 30px; height: 30px; border-radius: 50%; display: inline-block; background: ' + (k < E.wins ? EV.c : '#251443') + '; box-shadow: ' + (k < E.wins ? '0 0 12px ' + EV.c : 'inset 0 0 0 1.5px #3A3270')),
+        evPips: [0, 1, 2].map((k) => 'width: 30px; height: 30px; border-radius: 50%; display: inline-block; background: ' + (k < E.wins ? EV.c : '#0B1A44') + '; box-shadow: ' + (k < E.wins ? '0 0 12px ' + EV.c : 'inset 0 0 0 1.5px #3A3270')),
         evPrize: EV.prize.gems + ' BOB + ' + EV.prize.coins + ' VCD' + (E.claimed ? ' · ¡recogido!' : ''),
         evWhen: open ? 'Abierto hasta el domingo a medianoche.' : 'Abre en ' + toFri + (toFri === 1 ? ' día' : ' días') + ': de viernes a domingo.',
         evCanPlay: open && !(E.wins >= 3 && !E.claimed), evClosed: !open, evCanClaim: E.wins >= 3 && !E.claimed,
@@ -736,7 +736,7 @@ class Component extends DCLogic {
       return {
         id: R.id, num: String(k + 1), title: R.title, desc: R.desc, setup: R.setup, reward: String(R.reward), icon: R.icon, c: R.c, done: ok,
         style: '--rc: ' + R.c + '; background: radial-gradient(90% 50% at 50% 0%, ' + R.c + 'AA, transparent 70%), linear-gradient(170deg, color-mix(in srgb, ' + R.c + ' 50%, #2A1460), color-mix(in srgb, ' + R.c + ' 18%, #1A0B40) 75%); box-shadow: inset 0 0 0 1px color-mix(in srgb, ' + R.c + ' 45%, transparent), 0 14px 30px #0009; animation-delay: ' + (k * 0.08).toFixed(2) + 's;' + (ok ? ' filter: saturate(.6);' : ''),
-        badge: 'display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 11px; background: ' + R.c + '; color: #150925; box-shadow: 0 0 14px ' + R.c + '88',
+        badge: 'display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 11px; background: ' + R.c + '; color: #040A1C; box-shadow: 0 0 14px ' + R.c + '88',
         label: ok ? 'JUGAR OTRA VEZ' : '¡ACEPTO!',
         btn: ok ? 'background: #39206E; color: #C9C2FF; animation: none' : '',
         play: () => this.play({ kind: 'reto', reto: R.id, n: R.n, ai: R.ai, dur: R.dur, start: R.start || null, away: TN_CLUBS[(k * 5 + 3) % TN_CLUBS.length][0], color: TN_CLUBS[(k * 5 + 3) % TN_CLUBS.length][1], trim: TN_CLUBS[(k * 5 + 3) % TN_CLUBS.length][2], label: 'RETO · ' + R.title })

@@ -11,7 +11,7 @@
 <style>
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
-input::placeholder{color:#8686A6}
+input::placeholder{color:#8FA8CC}
 @keyframes tqRing{to{rotate:360deg}}
 @keyframes tqBeam{0%,100%{rotate:-8deg}50%{rotate:8deg}}
 @keyframes tqTag{0%,100%{rotate:-4deg}50%{rotate:3deg}}
@@ -31,7 +31,7 @@ input::placeholder{color:#8686A6}
 @keyframes tqPulse{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.85;transform:scale(1.06)}}
 .tq-item::after{content:"";position:absolute;inset:0;border-radius:12px;background:linear-gradient(105deg,transparent 35%,#FFFFFF22 50%,transparent 65%) -150% 0/200% 100% no-repeat;pointer-events:none;transition:background-position .6s}
 .tq-item:hover::after{background-position:150% 0}
-.tq-badge{position:absolute;right:-5px;top:-5px;z-index:2;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #150925}
+.tq-badge{position:absolute;right:-5px;top:-5px;z-index:2;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #040A1C}
 .tq-3d{transition:transform .25s cubic-bezier(.3,1.6,.5,1)}.tq-item:hover .tq-3d,.tq-item:active .tq-3d{transform:scale(1.12) rotate(-5deg)}
 
 /* the shirts on the rail: bigger, with folds and light, a collar, cuffs, a number and their colour glowing behind */
@@ -91,8 +91,8 @@ input::placeholder{color:#8686A6}
       <h1 class="bc-title hd">TAQUILLA</h1>
     </div>
     <div style="position: absolute; right: 14px; top: 10px; transform-origin: 50% 0; animation: tqTag 3s ease-in-out infinite; display: flex; flex-direction: column; align-items: center">
-      <span style="width: 2px; height: 12px; background: #A3A3C2"></span>
-      <div style="position: relative; width: 112px; padding: 14px 8px 8px; box-sizing: border-box; border-radius: 6px; background: linear-gradient(160deg, #FFFFFF, #DCE3EC); color: #150925; text-align: center; box-shadow: 0 8px 16px #0009">
+      <span style="width: 2px; height: 12px; background: #A9BEDD"></span>
+      <div style="position: relative; width: 112px; padding: 14px 8px 8px; box-sizing: border-box; border-radius: 6px; background: linear-gradient(160deg, #FFFFFF, #DCE3EC); color: #040A1C; text-align: center; box-shadow: 0 8px 16px #0009">
         <span style="position: absolute; left: 50%; top: 4px; width: 8px; height: 8px; margin-left: -4px; border-radius: 4px; background: #1C1145"></span>
         <div style="font-size: 8px; font-weight: 800; letter-spacing: 1.5px; color: #4A5468">EQUIPACIÓN</div>
         <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 15px; line-height: 1.05">{{kitTeam}}</div>
@@ -156,11 +156,11 @@ input::placeholder{color:#8686A6}
       <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 6px">
       <sc-for list="{{items}}" as="it" hint-placeholder-count="8">
         <button type="button" class="tq-item" onClick="{{it.pick}}" style="{{it.style}}">
-          <sc-if value="{{it.isOn}}" hint-placeholder-val="{{ false }}"><span class="tq-badge" style="background: #22D3EE"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#150925" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg></span></sc-if>
+          <sc-if value="{{it.isOn}}" hint-placeholder-val="{{ false }}"><span class="tq-badge" style="background: #22D3EE"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#040A1C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg></span></sc-if>
           <sc-if value="{{it.isLocked}}" hint-placeholder-val="{{ false }}"><span class="tq-badge" style="background: #0B1A44; box-shadow: 0 0 0 2px #02040C, inset 0 0 0 1.5px {{it.lockC}}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="{{it.lockC}}" stroke-width="3" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></sc-if>
           <sc-if value="{{it.isNew}}" hint-placeholder-val="{{ false }}"><span class="tq-new">¡NUEVO!</span></sc-if>
           <sc-if value="{{it.hasRar}}" hint-placeholder-val="{{ false }}"><span class="{{it.rarCls}}" style="{{it.rarStyle}}">{{it.rar}}</span></sc-if>
-          <svg width="26" height="12" viewBox="0 0 26 12" style="position: absolute; top: -9px; left: 50%; margin-left: -13px"><path d="M13 10V5a2.5 2.5 0 1 1 2.5-2.5M2 11L13 6l11 5" fill="none" stroke="#A3A3C2" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <svg width="26" height="12" viewBox="0 0 26 12" style="position: absolute; top: -9px; left: 50%; margin-left: -13px"><path d="M13 10V5a2.5 2.5 0 1 1 2.5-2.5M2 11L13 6l11 5" fill="none" stroke="#A9BEDD" stroke-width="1.6" stroke-linecap="round"/></svg>
           <sc-if value="{{it.isKit}}" hint-placeholder-val="{{ true }}">
             <span class="tq-jw" style="{{it.jwStyle}}"><sc-if value="{{it.has3dShirt}}" hint-placeholder-val="{{ false }}"><img class="tq-shirt3d" src="{{it.shirtImg}}" alt="" draggable="false"></sc-if><span style="{{it.jerseyStyle}}"><i class="tq-shade"></i><i class="tq-cuff l" style="{{it.cuffStyle}}"></i><i class="tq-cuff r" style="{{it.cuffStyle}}"></i><b class="tq-num" style="{{it.numStyle}}">10</b><span style="{{it.crestStyle}}">{{it.crest}}</span></span><i class="tq-collar" style="{{it.collarStyle}}"></i></span>
           </sc-if>
@@ -189,7 +189,7 @@ input::placeholder{color:#8686A6}
         <span style="font-size: 11px; color: #FDE7F3">{{selHint}}</span>
       </div>
       <sc-if value="{{showEquip}}" hint-placeholder-val="{{ true }}">
-        <button type="button" onClick="{{doEquip}}" class="am-pulse am-shine" style="height: 40px; padding: 0 18px; border: 0; transform: skewX(0deg); background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #150925; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1.5px; cursor: pointer">EQUIPAR</button>
+        <button type="button" onClick="{{doEquip}}" class="am-pulse am-shine" style="height: 40px; padding: 0 18px; border: 0; transform: skewX(0deg); background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #040A1C; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1.5px; cursor: pointer">EQUIPAR</button>
       </sc-if>
       <sc-if value="{{showEquipped}}" hint-placeholder-val="{{ false }}">
         <span style="display: flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border-radius: 18px; background: #22D3EE1F; border: 1px solid #22D3EE66; color: #22D3EE; font-weight: 800; font-size: 12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg>Puesto</span>
@@ -198,7 +198,7 @@ input::placeholder{color:#8686A6}
         <button type="button" onClick="{{doBuy}}" style="{{buyStyle}}">COMPRAR · {{selPrice}}</button>
       </sc-if>
       <sc-if value="{{showReward}}" hint-placeholder-val="{{ false }}">
-        <a href="{{rewardHref}}" style="display: flex; align-items: center; height: 38px; padding: 0 14px; transform: skewX(0deg); border: 2px solid #9B6BFF; color: #C4B5FD; text-decoration: none; font-weight: 800; font-size: 12px"><span style="transform: skewX(0deg)">CÓMO CONSEGUIRLO</span></a>
+        <a href="{{rewardHref}}" style="display: flex; align-items: center; height: 38px; padding: 0 14px; transform: skewX(0deg); border: 2px solid #9B6BFF; color: #A6DCFF; text-decoration: none; font-weight: 800; font-size: 12px"><span style="transform: skewX(0deg)">CÓMO CONSEGUIRLO</span></a>
       </sc-if>
       <sc-if value="{{showPremium}}" hint-placeholder-val="{{ false }}">
         <span style="display: flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border-radius: 10px; border: 1.5px dashed #FFFFFFAA; background: #00000033; color: #FFFFFFDD; font-weight: 800; font-size: 11px; letter-spacing: 1px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>PRÓXIMAMENTE</span>
@@ -387,7 +387,7 @@ class Component extends DCLogic {
           ['Clairmont Marino', '#2A246B', W, 'solid', '#2A246B', '#2A246B'], ['Mirabelle Granate', '#7A1C2C', W, 'solid', W, '#7A1C2C']] },
         // the season pass's kits (progress.js gives them out: futbol-5-n)
         { name: 'Pase de temporada', country: 'Temporada', pass: [30, 6, 14, 15], teams: [
-          ['Temporada Oro', '#211125', '#FFC53D', 'stripes', '#211125', '#FFC53D'], ['Temporada Neón', '#150925', '#22D3EE', 'diag', '#150925', '#22D3EE'],
+          ['Temporada Oro', '#211125', '#FFC53D', 'stripes', '#211125', '#FFC53D'], ['Temporada Neón', '#040A1C', '#22D3EE', 'diag', '#040A1C', '#22D3EE'],
           ['Temporada Lava', '#FF5A1F', '#2A0A0A', 'halves', '#2A0A0A', '#FF5A1F'], ['Temporada Hielo', '#E8F7FF', '#3EA6FF', 'pin', '#3EA6FF', '#E8F7FF']] },
         // your own kit, designed in the editor below the rail (arenamix.mykit.v1)
         { name: '★ Mi equipo', country: 'Tuyo', custom: true, teams: [(() => { const k = this.myKit(); return [k.name, k.primary, k.secondary, k.pattern, k.shorts, k.socks]; })()] }
@@ -631,11 +631,11 @@ class Component extends DCLogic {
       { id: 'equipos', label: 'Equipos' }, { id: 'cabeza', label: 'Cabeza' },
       { id: 'cara', label: 'Cara' }, { id: 'calzado', label: 'Calzado' }
     ];
-    const tab = (on) => 'min-height: 40px; padding: 0 4px; border-radius: 12px; font: 800 13px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #150925; border: 0; box-shadow: 0 3px 0 #0E8FA3;' : 'background: #0B1A44; color: #BFD3F5; border: 1px solid #3DA9FF44;');
+    const tab = (on) => 'min-height: 40px; padding: 0 4px; border-radius: 12px; font: 800 13px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #040A1C; border: 0; box-shadow: 0 3px 0 #0E8FA3;' : 'background: #0B1A44; color: #BFD3F5; border: 1px solid #3DA9FF44;');
     // each category and each league in its own colour
     const CATC = { equipos: ['#22D3EE', '#3B82F6'], cabeza: ['#F472B6', '#A855F7'], cara: ['#FACC15', '#F97316'], calzado: ['#4ADE80', '#14B8A6'] };
     const LGC = ['#FACC15', '#F43F5E', '#22D3EE', '#A855F7', '#4ADE80', '#F97316', '#3B82F6', '#EC4899'];
-    const chip = (on, id) => 'position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 46px; border: 0; border-radius: 11px; background: transparent; font: 800 10px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (on ? '#150925;' : (CATC[id] || ['#A3A3C2'])[0] + ';');
+    const chip = (on, id) => 'position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 46px; border: 0; border-radius: 11px; background: transparent; font: 800 10px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (on ? '#040A1C;' : (CATC[id] || ['#A9BEDD'])[0] + ';');
     const lchip = (on, i) => { const c = LGC[i % LGC.length]; return 'flex: none; height: 28px; padding: 0 12px; border-radius: 14px; font: 800 11px Exo2, sans-serif; cursor: pointer; white-space: nowrap; ' + (on ? 'background: linear-gradient(135deg, #FFFFFF, ' + c + ' 45%); color: #1A1206; border: 0; box-shadow: 0 0 12px ' + c + 'AA;' : 'background: ' + c + '2E; color: ' + c + '; border: 1px solid ' + c + '88;'); };
 
     // only football for now: the other sports' kits come back with their own game
@@ -654,7 +654,7 @@ class Component extends DCLogic {
       const own = owned(it);
       const equipped = eq[s.cat] === it.id;
       const sel = it.id === selId;
-      let label = 'En propiedad', color = '#A3A3C2';
+      let label = 'En propiedad', color = '#A9BEDD';
       if (equipped) { label = 'Equipado'; color = '#22D3EE'; }
       else if (!own && it.st === 'coins') { label = this.fmt(it.price); color = '#FFC53D'; }
       else if (!own && it.st === 'reward') { label = it.req; color = '#CACAE0'; }
@@ -673,9 +673,9 @@ class Component extends DCLogic {
         awStyle: '--ac: ' + (it.color || ({ cabeza: '#F472B6', cara: '#FACC15', calzado: '#4ADE80' })[s.cat] || '#A855F7') + 'AA;',
         shirtImg: s.cat === 'equipos' ? this.shirtPic(it) : '', has3dShirt: s.cat === 'equipos' && !!this.shirtPic(it),
         jwStyle: '--jc: ' + (it.primary || '#7C3AED') + ';',
-        cuffStyle: 'background: ' + (it.secondary || '#150925') + ';',
-        numStyle: 'color: ' + (it.secondary || '#150925') + ';',
-        collarStyle: 'background: ' + (it.secondary || '#150925') + '; box-shadow: inset 0 -3px 0 ' + (it.primary || '#fff') + ';',
+        cuffStyle: 'background: ' + (it.secondary || '#040A1C') + ';',
+        numStyle: 'color: ' + (it.secondary || '#040A1C') + ';',
+        collarStyle: 'background: ' + (it.secondary || '#040A1C') + '; box-shadow: inset 0 -3px 0 ' + (it.primary || '#fff') + ';',
         jerseyStyle: s.cat === 'equipos' ? 'position: relative; display: ' + (this.shirtPic(it) ? 'none' : 'block') + '; width: 64px; height: 58px; overflow: hidden; background: ' + this.jerseyBg(it.primary, it.secondary, it.pattern) + '; clip-path: polygon(32% 0, 68% 0, 100% 18%, 88% 42%, 78% 36%, 78% 100%, 22% 100%, 22% 36%, 12% 42%, 0 18%); filter: drop-shadow(0 2px 0 #00000055);' : '',
         isCoins: !own && it.st === 'coins', isOn: equipped, isLocked: !own, lockC: it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D',
         isReward: !own && it.st === 'reward',
@@ -722,7 +722,7 @@ class Component extends DCLogic {
       };
     });
     const A2 = window.AMChars, fitNow = A2 && A2.fitPref ? A2.fitPref() : { sleeve: 'short', size: 'M' };
-    const fitBtn = (on) => 'height: 26px; padding: 0; border-radius: 8px; font: 800 11px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #150925; border: 0; box-shadow: 0 2px 0 #0E8FA3;' : 'background: #251443; color: #CACAE0; border: 1px solid #2E2E52;');
+    const fitBtn = (on) => 'height: 26px; padding: 0; border-radius: 8px; font: 800 11px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #040A1C; border: 0; box-shadow: 0 2px 0 #0E8FA3;' : 'background: #0B1A44; color: #CACAE0; border: 1px solid #1E3A6E;');
     const setFit = (f) => { if (A2 && A2.setFit) { A2.setFit(f); window.AMSfx && window.AMSfx.tap && window.AMSfx.tap(); this.forceUpdate(); } };
     const sleeveBtns = [['short', 'CORTA'], ['long', 'LARGA']].map(([id, label]) => ({ label, on: String(fitNow.sleeve === id), style: fitBtn(fitNow.sleeve === id), pick: () => setFit({ sleeve: id }) }));
     const sizeBtns = (A2 && A2.sizes || ['S', 'M', 'L', 'XL']).map((id) => ({ label: id, on: String(fitNow.size === id), style: fitBtn(fitNow.size === id), pick: () => setFit({ size: id }) }));
@@ -762,7 +762,7 @@ class Component extends DCLogic {
       rarChips: [[null, 'TODAS', '#E9D5FF']].concat(Taq_RAR.map((r, i) => [i, r[0], r[1]])).map(([v, label, c]) => {
         const on = (s.rarF ?? null) === v;
         return { label, on: on ? 'true' : 'false', pick: () => this.setState({ rarF: v }),
-          style: 'flex: none; height: 26px; padding: 0 10px; border-radius: 13px; font: 800 9.5px Exo2, sans-serif; letter-spacing: .6px; cursor: pointer; ' + (on ? 'background: ' + c + '; color: #150925; border: 0; box-shadow: 0 0 10px ' + c + 'AA;' : 'background: ' + c + '2A; color: ' + c + '; border: 1px solid ' + c + '88;') };
+          style: 'flex: none; height: 26px; padding: 0 10px; border-radius: 13px; font: 800 9.5px Exo2, sans-serif; letter-spacing: .6px; cursor: pointer; ' + (on ? 'background: ' + c + '; color: #040A1C; border: 0; box-shadow: 0 0 10px ' + c + 'AA;' : 'background: ' + c + '2A; color: ' + c + '; border: 1px solid ' + c + '88;') };
       }),
       kit: kitItem,
       kitName: kitItem.name + ' · ' + league.name,

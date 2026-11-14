@@ -13,7 +13,7 @@ body{margin:0}
 /* one background only: the photo of our stadium. The drawn stadium (roof, stands, towers, big word, pitch, rays) is left out */
 .md-roof,.md-stands,.md-tower,.md-word,.md-pitchw,.md-rays,.md-dots,.md-neon,.md-chalk,.md-cone{display:none!important}
 a{color:#22D3EE}a:hover{color:#67E8F9}
-input::placeholder{color:#8686A6}
+input::placeholder{color:#8FA8CC}
 .md-card{position:absolute;padding:0;border:0;background:none;cursor:pointer;transition:transform .25s cubic-bezier(.3,1.6,.5,1);-webkit-tap-highlight-color:transparent;animation:mdIn .4s cubic-bezier(.2,1.3,.4,1) both}
 @media (hover:hover){.md-card:hover{transform:translateY(-3px)}}
 .md-card:active{transform:scale(.96)}
@@ -46,8 +46,8 @@ input::placeholder{color:#8686A6}
 .md-sweep{position:absolute;inset:0;border-radius:18px;overflow:hidden;pointer-events:none}
 .md-sweep::after{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:45%;background:linear-gradient(100deg,transparent,#FFFFFF30,transparent);transform:translateX(-160%) skewX(-14deg);animation:mdSweep 4.5s ease-in-out infinite;will-change:transform}
 @keyframes mdSweep{0%,65%{transform:translateX(-160%) skewX(-14deg)}100%{transform:translateX(320%) skewX(-14deg)}}
-.md-rib{position:absolute;top:14px;right:-30px;width:110px;padding:3px 0;transform:rotate(40deg);text-align:center;font:800 9px Exo2,sans-serif;letter-spacing:1px;color:#150925;box-shadow:0 2px 6px #0008}
-.md-arrow{position:absolute;top:110px;width:38px;height:38px;border-radius:50%;border:0;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;background:#150925CC;box-shadow:inset 0 0 0 2px var(--ac),0 0 14px var(--ac);color:var(--ac);transition:transform .2s cubic-bezier(.3,1.8,.5,1)}
+.md-rib{position:absolute;top:14px;right:-30px;width:110px;padding:3px 0;transform:rotate(40deg);text-align:center;font:800 9px Exo2,sans-serif;letter-spacing:1px;color:#040A1C;box-shadow:0 2px 6px #0008}
+.md-arrow{position:absolute;top:110px;width:38px;height:38px;border-radius:50%;border:0;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;background:#040A1CCC;box-shadow:inset 0 0 0 2px var(--ac),0 0 14px var(--ac);color:var(--ac);transition:transform .2s cubic-bezier(.3,1.8,.5,1)}
 .md-arrow:active{transform:scale(.88)}
 .md-arrow svg{animation:mdNudge 1.6s ease-in-out infinite}
 @keyframes mdNudge{0%,100%{translate:0 0}50%{translate:var(--nx,3px) 0}}
@@ -101,10 +101,10 @@ input::placeholder{color:#8686A6}
   <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; height: 390px; z-index: 3"><dc-import name="Nav" active="jugar" hint-size="80px,390px"></dc-import></div>
   <!-- header: back, title, the three kinds of play -->
   <div style="position: absolute; left: 96px; right: 12px; top: 10px; height: 40px; display: flex; align-items: center; gap: 10px; z-index: 4">
-    <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 44px; height: 36px; display: flex; align-items: center; justify-content: center; background: #251443; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+    <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 44px; height: 36px; display: flex; align-items: center; justify-content: center; background: #0B1A44; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
     <h1 class="bc-title hd" style="font-size: 23px; white-space: nowrap">¿A QUÉ JUGAMOS?</h1>
     <span style="flex: 1"></span>
-    <div role="tablist" aria-label="Tipo de partida" style="position: relative; display: flex; gap: 0; padding: 3px; border-radius: 14px; background: #150925CC; border: 1px solid #2E2E58">
+    <div role="tablist" aria-label="Tipo de partida" style="position: relative; display: flex; gap: 0; padding: 3px; border-radius: 14px; background: #040A1CCC; border: 1px solid #2E2E58">
       <span aria-hidden="true" style="{{thumbStyle}}"></span>
       <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
         <button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" style="{{t.style}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{t.icon}}"/></svg>{{t.label}}</button>
@@ -136,19 +136,19 @@ input::placeholder{color:#8686A6}
         <a href="Rangos.dc.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #F4F4FA">
           <span style="font-size: 11px; font-weight: 800; color: {{rankColor}}; white-space: nowrap">{{rankLabel}}</span>
           <span class="bc-para" style="flex: 0 1 160px; height: 6px; background: #39206E"><span class="am-bar-shine" style="display: block; {{rankBar}}"></span></span>
-          <span style="font-size: 10px; font-weight: 700; color: #A3A3C2; white-space: nowrap">{{mmrLabel}} · {{seasonLabel}}</span>
+          <span style="font-size: 10px; font-weight: 700; color: #A9BEDD; white-space: nowrap">{{mmrLabel}} · {{seasonLabel}}</span>
         </a>
       </sc-if>
       <sc-if value="{{showDiff}}" hint-placeholder-val="{{ false }}">
         <div role="radiogroup" aria-label="Dificultad de la IA" style="display: flex; align-items: center; gap: 6px">
-          <span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A3A3C2">IA</span>
+          <span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A9BEDD">IA</span>
           <sc-for list="{{diffs}}" as="d" hint-placeholder-count="3">
             <button type="button" role="radio" aria-checked="{{d.on}}" onClick="{{d.pick}}" style="{{d.style}}">{{d.label}}</button>
           </sc-for>
         </div>
       </sc-if>
     </div>
-    <a href="{{playHref}}" onClick="{{saveSel}}" class="bc-btn am-shine am-logo-btn" style="flex: none; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 30px 0 24px; text-decoration: none; font-size: 26px; white-space: nowrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="#150925"><path d="M6 3l15 9l-15 9z"/></svg>{{playLabel}}</a>
+    <a href="{{playHref}}" onClick="{{saveSel}}" class="bc-btn am-shine am-logo-btn" style="flex: none; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 30px 0 24px; text-decoration: none; font-size: 26px; white-space: nowrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="#040A1C"><path d="M6 3l15 9l-15 9z"/></svg>{{playLabel}}</a>
   </div>
 </div>
 </x-dc>
@@ -300,21 +300,21 @@ class Component extends DCLogic {
         pens: ['#A3E635', '#22C55E', '#14532D', '#06200E'], fk: ['#FDE047', '#F97316', '#78350F', '#241004'], private: ['#38BDF8', '#8B5CF6', '#312E81', '#0E0B30'],
         copa: ['#FDE047', '#F59E0B', '#7C2D12', '#2A0E04'], liga: ['#A78BFA', '#3B82F6', '#3730A3', '#0E0B36'], retos: ['#F472B6', '#F43F5E', '#831843', '#2A0618'], carrera: ['#4ADE80', '#10B981', '#065F46', '#04201A'], evento: ['#FB923C', '#EF4444', '#7C2D12', '#250A06'],
         libre: ['#4ADE80', '#22D3EE', '#065F46', '#04201A'], train: ['#FB923C', '#FDE047', '#7C2D12', '#250A06'], tut: ['#22D3EE', '#A855F7', '#1E3A8A', '#0B1030'] };
-      const pal = PAL[m.id] || [CAT[0], '#A855F7', '#2A1B6E', '#0F061E'];
+      const pal = PAL[m.id] || [CAT[0], '#A855F7', '#0B2160', '#0F061E'];
       const kicker = m.kind === 'team' ? 'PARTIDO · ' + m.n + ' CONTRA ' + m.n : m.kind === 'duel' ? 'DUELO · CARA A CARA' : m.kind === 'private' ? 'ONLINE · CÓDIGO DE SALA' : m.kind === 'tour' ? (m.id === 'retos' ? 'DESAFÍOS · CADA DÍA' : m.id === 'carrera' ? 'CARRERA · TEMPORADAS' : m.id === 'evento' ? 'EVENTO · FIN DE SEMANA' : 'TORNEO · UN JUGADOR') : 'PRÁCTICA';
       const title = m.kind === 'team' ? m.n + ' VS ' + m.n : m.title;
       return {
         title, tag, kicker, img, on: on ? 'true' : 'false', isOn: on,
         hasRib: !!RIB[m.id], rib: (RIB[m.id] || [])[0] || '', ribC: (RIB[m.id] || [])[1] || '', aria: title + '. ' + m.desc,
-        glow: on ? CAT[0] + '88' : 'transparent', sub: on ? CAT[0] : '#A3A3C2',
+        glow: on ? CAT[0] + '88' : 'transparent', sub: on ? CAT[0] : '#A9BEDD',
         style: '--mc: ' + CAT[0] + '; left: ' + cx.toFixed(1) + 'px; top: ' + cy.toFixed(1) + 'px; width: ' + cw.toFixed(1) + 'px; height: ' + ch.toFixed(1) + 'px; z-index: ' + (on ? 2 : 1) + '; animation-delay: ' + (i * 0.04).toFixed(2) + 's;',
         bg: 'position: absolute; inset: 0; border-radius: 18px; overflow: hidden; background: radial-gradient(70% 55% at 50% 38%, ' + pal[0] + 'CC 0%, transparent 70%), radial-gradient(60% 50% at 100% 0%, ' + pal[1] + 'AA 0%, transparent 70%), radial-gradient(60% 50% at 0% 100%, ' + pal[1] + '88 0%, transparent 70%), linear-gradient(165deg, ' + pal[2] + ' 0%, ' + pal[3] + ' 100%); --mc: ' + CAT[0] + '; ' + (on ? 'animation: mdGlow 2.4s ease-in-out infinite;' : 'box-shadow: 0 0 0 1px #7C5CFF66, 0 10px 20px #000a;'),
         fadeStyle: 'background: linear-gradient(180deg, transparent, ' + pal[3] + 'F0 78%);',
         rayStyle: 'background: repeating-conic-gradient(from 0deg at 50% 40%, ' + pal[0] + '40 0 7deg, transparent 7deg 18deg);',
         imgStyle: 'opacity: ' + (img ? 1 : 0) + ';',
-        tagStyle: 'position: absolute; left: 10px; top: 10px; padding: 3px 9px; border-radius: 9px; background: ' + (on ? CAT[0] : '#251443CC') + '; color: ' + (on ? '#150925' : '#CACAE0') + '; font: 800 9.5px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap;',
+        tagStyle: 'position: absolute; left: 10px; top: 10px; padding: 3px 9px; border-radius: 9px; background: ' + (on ? CAT[0] : '#0B1A44CC') + '; color: ' + (on ? '#040A1C' : '#CACAE0') + '; font: 800 9.5px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap;',
         titleStyle: 'position: absolute; left: 12px; right: 10px; bottom: ' + (big ? 34 : 24) + 'px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + (big ? (title.length > 12 ? 34 : title.length > 7 ? 42 : 60) : (title.length > 12 ? 19 : title.length > 7 ? 23 : 34)) + 'px; line-height: .92; letter-spacing: -.5px; text-align: left; color: #F4F4FA; text-shadow: 0 3px 0 #0F061E, 0 0 18px ' + (on ? CAT[0] + '88' : 'transparent') + ';',
-        kickStyle: 'position: absolute; left: 13px; right: 8px; bottom: ' + (big ? 14 : 9) + 'px; font-size: ' + (big ? 10 : 8.5) + 'px; font-weight: 800; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; color: ' + (on ? CAT[0] : '#A3A3C2') + ';',
+        kickStyle: 'position: absolute; left: 13px; right: 8px; bottom: ' + (big ? 14 : 9) + 'px; font-size: ' + (big ? 10 : 8.5) + 'px; font-weight: 800; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; color: ' + (on ? CAT[0] : '#A9BEDD') + ';',
         pick: () => { if (!on) this.setState({ id: m.id }); }
       };
     });
@@ -337,7 +337,7 @@ class Component extends DCLogic {
       ...nav,
       tabs: TABS.map((t, i) => ({
         label: t.label, icon: t.icon, sel: i === ti ? 'true' : 'false',
-        style: 'position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; height: 32px; width: 108px; justify-content: center; border: 0; background: none; font: 800 11.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (i === ti ? '#150925' : t.color) + ';',
+        style: 'position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; height: 32px; width: 108px; justify-content: center; border: 0; background: none; font: 800 11.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (i === ti ? '#040A1C' : t.color) + ';',
         pick: () => { if (i !== ti) this.setState({ cat: t.id, id: null }); }
       })),
       thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 108) + 'px; width: 108px; height: 32px; border-radius: 11px; background: ' + TABS[ti].color + '; box-shadow: 0 0 16px ' + TABS[ti].color + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s, box-shadow .3s;',
@@ -363,10 +363,10 @@ class Component extends DCLogic {
         return [['auto', 'ADAPTATIVA', '#FFC53D'], ['facil', 'FÁCIL', '#53D88E'], ['normal', 'NORMAL', '#22D3EE'], ['dificil', 'DIFÍCIL', '#FF5C5C']].map(([id, label, c]) => ({
           label, on: id === now ? 'true' : 'false',
           pick: () => { if (A && A.setAiPref) { A.setAiPref(id); this.forceUpdate(); } },
-          style: 'height: 22px; padding: 0 10px; border: 0; transform: skewX(0deg); font: 800 10.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; ' + (id === now ? 'background: ' + c + '; color: #150925; box-shadow: 0 0 10px ' + c + '88;' : 'background: #251443CC; color: ' + c + '; box-shadow: inset 0 0 0 1px ' + c + '55;')
+          style: 'height: 22px; padding: 0 10px; border: 0; transform: skewX(0deg); font: 800 10.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; ' + (id === now ? 'background: ' + c + '; color: #040A1C; box-shadow: 0 0 10px ' + c + '88;' : 'background: #0B1A44CC; color: ' + c + '; box-shadow: inset 0 0 0 1px ' + c + '55;')
         }));
       })(),
-      rankLabel: curPlacing ? 'Sin clasificar' : R.label, rankColor: curPlacing ? '#A3A3C2' : R.text,
+      rankLabel: curPlacing ? 'Sin clasificar' : R.label, rankColor: curPlacing ? '#A9BEDD' : R.text,
       mmrLabel: curPlacing ? 'Clasificatorias ' + curPc.g + '/5' : mmr + ' MMR',
       seasonLabel: 'T' + S.num + ' · ' + S.daysLeft + (S.daysLeft === 1 ? ' día' : ' días'),
       rankBar: 'height: 6px; box-shadow: 0 0 8px ' + R.text + '; background: ' + R.text + '; width: ' + (Math.max(0, Math.min(1, (mmr - R.lo) / (R.hi - R.lo))) * 100).toFixed(1) + '%;',

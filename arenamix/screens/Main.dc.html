@@ -28,7 +28,7 @@ input::placeholder{color:#6E6E92}
 .nm-spot{position:absolute;left:50%;top:-20px;width:240px;height:300px;margin-left:-120px;background:conic-gradient(from 180deg at 50% 0%,transparent 160deg,#FFF3C422 172deg,#FFF3C433 180deg,#FFF3C422 188deg,transparent 200deg);pointer-events:none;animation:nmSpot 5s ease-in-out infinite;transform-origin:50% 0}
 @keyframes nmSpot{0%,100%{rotate:-3deg}50%{rotate:3deg}}
 .nm-new{position:relative;font:800 italic 13px 'Barlow Condensed',sans-serif;letter-spacing:2px;color:#1A1204;background:linear-gradient(135deg,#FFE38A,#FFC53D);padding:2px 10px;border-radius:4px;transform:skewX(-10deg);box-shadow:0 3px 0 #B7791F}
-.nm-d{width:32px;height:30px;border-radius:8px;border:1px solid #3A3A6E;background:#15092ACC;color:#A3A3C2;font:800 italic 16px 'Barlow Condensed',sans-serif;cursor:pointer;padding:0;transition:transform .15s,background .15s}
+.nm-d{width:32px;height:30px;border-radius:8px;border:1px solid #3A3A6E;background:#15092ACC;color:#A9BEDD;font:800 italic 16px 'Barlow Condensed',sans-serif;cursor:pointer;padding:0;transition:transform .15s,background .15s}
 .nm-d.on{background:linear-gradient(135deg,#FFE38A,#FFC53D);color:#1A1204;border-color:#FFE38A;transform:translateY(-3px);box-shadow:0 3px 0 #B7791F,0 0 14px #FFC53D66}
 .nm-num{animation:nmNum .35s cubic-bezier(.2,1.6,.4,1)}@keyframes nmNum{from{opacity:0}}
 .nm-led{display:flex;align-items:center;gap:8px;height:30px;padding:0 10px;border-radius:8px;background:#0D041A;border:1px solid #3F246E;box-shadow:inset 0 0 12px #000}
@@ -38,7 +38,7 @@ input::placeholder{color:#6E6E92}
 .nm-led-in span.run{padding-left:100%;animation:nmRun 7s linear infinite}
 @keyframes nmRun{to{transform:translateX(-100%)}}
 .nm-sign{position:relative;flex:1;min-width:0;display:flex;align-items:center;gap:8px;height:46px;padding:10px 4px 0 2px;border:0;border-bottom:2px dashed #4A4A7E;transition:border-color .2s,box-shadow .2s}
-.nm-sign-lb{position:absolute;left:2px;top:0;font-size:8.5px;font-weight:800;letter-spacing:2px;color:#8686A6}
+.nm-sign-lb{position:absolute;left:2px;top:0;font-size:8.5px;font-weight:800;letter-spacing:2px;color:#8FA8CC}
 .nm-sign input{flex:1;min-width:0;height:100%;border:0;outline:0;background:transparent;color:#F4F4FA;font:800 italic 22px 'Barlow Condensed',sans-serif;letter-spacing:1px}
 .nm-sign:focus-within{border-bottom-color:#22D3EE}
 .nm-idea{height:24px;padding:0 9px;border-radius:12px;border:1px solid #3A3A6E;background:#7C5CFF1F;color:#C9C2FF;font:700 11px Exo2,sans-serif;cursor:pointer;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;transition:background .15s,transform .15s}
@@ -57,23 +57,23 @@ input::placeholder{color:#6E6E92}
 @keyframes lgMainFlash{0%{filter:brightness(1)}40%{filter:brightness(1.8)}100%{filter:brightness(1)}}
 .lg-photo{position:absolute;left:-30px;top:-20px;width:904px;height:430px;background:url(assets/bg_tribuna.jpg) center 30%/cover no-repeat;transform:translate(calc(var(--mx,0) * -14px),calc(var(--my,0) * -8px)) scale(1.04);transition:transform .25s ease-out;animation:lgKen 18s ease-in-out infinite alternate;pointer-events:none}
 @keyframes lgKen{from{background-position:center 30%}to{background-position:center 40%}}
-.lg-tint{position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 80% at 18% 50%,#4C1D9599 0%,transparent 70%),radial-gradient(45% 70% at 92% 60%,#DB277766 0%,transparent 70%),linear-gradient(180deg,#0E052A55 0%,#0E052A00 40%,#0A042088 100%)}
+.lg-tint{position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 80% at 18% 50%,#0A3DCC99 0%,transparent 70%),radial-gradient(45% 70% at 92% 60%,#FFC53D33 0%,transparent 70%),linear-gradient(180deg,#02040C55 0%,#02040C00 40%,#02040C88 100%)}
 .lg-beam{position:absolute;top:-40px;width:180px;height:520px;margin-left:-90px;transform-origin:50% 0;background:linear-gradient(180deg,#E8F6FF66,#E8F6FF00 80%);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);mix-blend-mode:screen;pointer-events:none;animation:lgBeam 7s ease-in-out infinite alternate}
 @keyframes lgBeam{from{rotate:-28deg}to{rotate:22deg}}
 .lg-tap{position:absolute;inset:0;cursor:crosshair}
 .lg-outline{transform:translate(calc(var(--mx,0) * 10px),calc(var(--my,0) * 6px));transition:transform .3s ease-out}
 .lg-card{position:absolute;left:514px;top:44px;width:304px;height:330px;transform-origin:50% -46px;animation:lgIn .6s cubic-bezier(.2,1.4,.4,1) both,lgSwing 6s 0.6s ease-in-out infinite}
 .lg-card:focus-within{animation-play-state:running,paused}
-.lg-field{display:flex;align-items:center;gap:8px;height:36px;padding:0 10px;border-radius:9px;border:1px solid #A78BFA99;background:#1E0B4ACC;transition:border-color .2s,box-shadow .2s}
+.lg-field{display:flex;align-items:center;gap:8px;height:36px;padding:0 10px;border-radius:9px;border:1px solid #3DA9FF99;background:#06102ECC;transition:border-color .2s,box-shadow .2s}
 .lg-field:focus-within{border-color:#22D3EE;box-shadow:0 0 0 3px #22D3EE33}
 .lg-field input{flex:1;min-width:0;height:100%;border:0;outline:0;background:transparent;color:#F4F4FA;font:700 13px Exo2,sans-serif}
 .lg-ticket{position:absolute;left:266px;bottom:30px;width:238px;height:70px;display:flex;border:0;padding:0;background:none;cursor:pointer;animation:lgTicketIn .5s .25s cubic-bezier(.2,1.3,.4,1) both;filter:drop-shadow(0 10px 18px #000c)}
 .lg-ticket .main{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 14px;background:linear-gradient(120deg,#FFE38A,#FFC53D 45%,#F59E0B);border-radius:10px 0 0 10px;color:#1A1206;text-align:left;-webkit-mask:radial-gradient(circle 7px at 100% 50%,#0000 98%,#000);mask:radial-gradient(circle 7px at 100% 50%,#0000 98%,#000);animation:lgPulse 2s 1s ease-in-out infinite}
-.lg-ticket .stub{position:relative;width:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:linear-gradient(120deg,#22D3EE,#8B5CF6);border-radius:0 10px 10px 0;color:#150925;border-left:2px dashed #15092566;-webkit-mask:radial-gradient(circle 7px at 0 50%,#0000 98%,#000);mask:radial-gradient(circle 7px at 0 50%,#0000 98%,#000)}
+.lg-ticket .stub{position:relative;width:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:linear-gradient(120deg,#22D3EE,#8B5CF6);border-radius:0 10px 10px 0;color:#040A1C;border-left:2px dashed #040A1C66;-webkit-mask:radial-gradient(circle 7px at 0 50%,#0000 98%,#000);mask:radial-gradient(circle 7px at 0 50%,#0000 98%,#000)}
 .lg-ticket.torn .stub{animation:lgStubFly .38s cubic-bezier(.5,0,.8,.5) forwards}
 .lg-ticket.torn .main{animation:lgMainFlash .3s ease-out}
 .lg-ticket:active .main{translate:0 2px}
-.lg-social{flex:none;width:40px;height:36px;border-radius:9px;border:1px solid #A78BFA99;background:#1E0B4ACC;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.lg-social{flex:none;width:40px;height:36px;border-radius:9px;border:1px solid #3DA9FF99;background:#06102ECC;display:flex;align-items:center;justify-content:center;cursor:pointer}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(55% 70% at 15% 15%, #7C3AEDCC 0%, transparent 65%), radial-gradient(50% 70% at 95% 95%, #DB2777BB 0%, transparent 62%), radial-gradient(40% 55% at 60% 0%, #0EA5E9AA 0%, transparent 62%), linear-gradient(160deg, #2A1170 0%, #1A0B4A 55%, #2A0A3A 100%); color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none; {{rootVars}}" onPointerMove="{{onMove}}" onPointerDown="{{tapBg}}">
@@ -81,10 +81,10 @@ input::placeholder{color:#6E6E92}
   <div class="lg-tint" aria-hidden="true"></div>
   <i class="lg-beam" style="left: 96px; animation-delay: -2s"></i><i class="lg-beam" style="left: 760px; animation-direction: alternate-reverse"></i>
   <canvas ref="{{crowdRef}}" aria-hidden="true" style="position: absolute; inset: 0; width: 844px; height: 390px; display: block; cursor: pointer"></canvas>
-  <span class="lg-outline" aria-hidden="true" style="position: absolute; left: 6px; top: 64px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 150px; line-height: .8; white-space: nowrap; color: transparent; -webkit-text-stroke: 2px #F0ABFC66; animation: lgTitleIn 1s cubic-bezier(.2,.8,.2,1) both; pointer-events: none">ARENA<br>MIX</span>
+  <span class="lg-outline" aria-hidden="true" style="position: absolute; left: 6px; top: 64px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 150px; line-height: .8; white-space: nowrap; color: transparent; -webkit-text-stroke: 2px #7CC4FF66; animation: lgTitleIn 1s cubic-bezier(.2,.8,.2,1) both; pointer-events: none">ARENA<br>MIX</span>
   <sc-if value="{{show3d}}" hint-placeholder-val="{{ false }}">
     <canvas ref="{{canvasRef}}" role="img" aria-label="Tu jugador. Tócalo para que chute." onPointerDown="{{kick}}" style="position: absolute; left: 0; top: 0; width: 500px; height: 390px; display: block; cursor: pointer; touch-action: manipulation"></canvas>
-    <span style="position: absolute; left: 92px; top: 300px; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; background: #150925CC; border: 1px solid #2E2E58; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #CACAE0; pointer-events: none; animation: lgHint 1.8s ease-in-out infinite; opacity: {{hintOp}}; transition: opacity .4s">
+    <span style="position: absolute; left: 92px; top: 300px; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; background: #040A1CCC; border: 1px solid #2E2E58; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #CACAE0; pointer-events: none; animation: lgHint 1.8s ease-in-out infinite; opacity: {{hintOp}}; transition: opacity .4s">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2.5" stroke-linecap="round"><path d="M9 11V5a2 2 0 0 1 4 0v6M13 9a2 2 0 0 1 4 0v3M17 11a2 2 0 0 1 4 0v4a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3l-3-5a2 2 0 0 1 3-2l2 2"/></svg>TÓCALO Y CHUTA</span>
   </sc-if>
   <sc-if value="{{show2d}}" hint-placeholder-val="{{ true }}">
@@ -107,7 +107,7 @@ input::placeholder{color:#6E6E92}
       <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 23px; line-height: 1; letter-spacing: .3px; white-space: nowrap">JUGAR COMO INVITADO</span>
     </span>
     <span class="stub">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="#150925"><path d="M7 4l13 8l-13 8z"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#040A1C"><path d="M7 4l13 8l-13 8z"/></svg>
       <span style="font-size: 9px; font-weight: 800; letter-spacing: 1px">YA</span>
     </span>
   </button>
@@ -116,15 +116,15 @@ input::placeholder{color:#6E6E92}
   <a href="Idioma.dc.html" aria-label="Cambiar idioma" style="position: absolute; right: 12px; top: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 14px; background: linear-gradient(135deg, #02040C, #0A3DCC 70%, #1E8BFF); border: 1px solid #3DA9FF; box-shadow: 0 0 12px #0A6CFF88; color: #F4F4FA; text-decoration: none; font-weight: 700; font-size: 11px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>{{langCode}}</a>
 
   <!-- the lanyard -->
-  <svg aria-hidden="true" width="844" height="390" style="position: absolute; inset: 0; pointer-events: none"><path d="M610 -6L656 40M720 -6L676 40" stroke="#22D3EE" stroke-width="9" stroke-linecap="round"/><path d="M610 -6L656 40M720 -6L676 40" stroke="#150925" stroke-opacity=".35" stroke-width="2" stroke-dasharray="3 6"/><rect x="652" y="34" width="28" height="16" rx="4" fill="#A3A3C2" stroke="#4C4C78" stroke-width="2"/></svg>
+  <svg aria-hidden="true" width="844" height="390" style="position: absolute; inset: 0; pointer-events: none"><path d="M610 -6L656 40M720 -6L676 40" stroke="#22D3EE" stroke-width="9" stroke-linecap="round"/><path d="M610 -6L656 40M720 -6L676 40" stroke="#040A1C" stroke-opacity=".35" stroke-width="2" stroke-dasharray="3 6"/><rect x="652" y="34" width="28" height="16" rx="4" fill="#A9BEDD" stroke="#3A5A8C" stroke-width="2"/></svg>
 
   <div class="lg-card">
-    <div style="position: absolute; inset: 0; border-radius: 16px; background: radial-gradient(80% 50% at 50% 25%, #22D3EE55, transparent 70%), radial-gradient(70% 50% at 100% 100%, #EC489977, transparent 70%), linear-gradient(165deg, #4C1D95 0%, #3B1A8A 50%, #5B1A6E 100%); border: 1.5px solid #C4B5FD; box-shadow: 0 20px 40px #000c, inset 0 1px 0 #ffffff1a; overflow: hidden">
-      <div style="height: 44px; background: linear-gradient(100deg, #22D3EE, #7C5CFF, #FF5C8A, #FFC53D, #22D3EE) 0 0 / 200% 100%; animation: lgHolo 6s linear infinite; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 14px 6px 14px; box-sizing: border-box; color: #150925">
+    <div style="position: absolute; inset: 0; border-radius: 16px; background: radial-gradient(80% 50% at 50% 25%, #22D3EE55, transparent 70%), radial-gradient(70% 50% at 100% 100%, #FFC53D44, transparent 70%), linear-gradient(165deg, #0A3DCC 0%, #0B2A78 50%, #06102E 100%); border: 1.5px solid #A6DCFF; box-shadow: 0 20px 40px #000c, inset 0 1px 0 #ffffff1a; overflow: hidden">
+      <div style="height: 44px; background: linear-gradient(100deg, #22D3EE, #7C5CFF, #FF5C8A, #FFC53D, #22D3EE) 0 0 / 200% 100%; animation: lgHolo 6s linear infinite; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 14px 6px 14px; box-sizing: border-box; color: #040A1C">
         <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 17px; letter-spacing: 1px">ACREDITACIÓN</span>
         <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px">TEMPORADA 1</span>
       </div>
-      <div style="position: absolute; left: 50%; top: 8px; width: 34px; height: 8px; margin-left: -17px; border-radius: 4px; background: #150925"></div>
+      <div style="position: absolute; left: 50%; top: 8px; width: 34px; height: 8px; margin-left: -17px; border-radius: 4px; background: #040A1C"></div>
       <div style="padding: 10px 14px 0 14px; display: flex; flex-direction: column; gap: 7px">
         <div style="display: flex; align-items: center; gap: 10px">
           <span style="flex: none; width: 52px; height: 52px; border-radius: 10px; overflow: hidden; border: 2px solid #22D3EE; background: radial-gradient(circle at 50% 30%, #2A3A7A, #1C0E43); box-shadow: 0 0 12px #22D3EE55"><img src="{{photo}}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: {{photoDisp}}"></span>
@@ -133,14 +133,14 @@ input::placeholder{color:#6E6E92}
             <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{name}}</span>
             <span style="font-size: 10px; font-weight: 800; color: #22D3EE">ACCESO: CAMPO · VESTUARIO</span>
           </div>
-          <svg width="34" height="34" viewBox="0 0 7 7" aria-hidden="true" style="flex: none; border-radius: 4px; background: #F4F4FA; padding: 3px; box-sizing: border-box"><path d="M0 0h3v3H0zM4 0h3v3H4zM0 4h3v3H0zM1 1h1v1H1zM5 1h1v1H5zM1 5h1v1H1zM4 4h1v1H4zM6 4h1v1H6zM5 5h1v1H5zM4 6h1v1H4zM6 6h1v1H6z" fill="#150925" fill-rule="evenodd"/></svg>
+          <svg width="34" height="34" viewBox="0 0 7 7" aria-hidden="true" style="flex: none; border-radius: 4px; background: #F4F4FA; padding: 3px; box-sizing: border-box"><path d="M0 0h3v3H0zM4 0h3v3H4zM0 4h3v3H0zM1 1h1v1H1zM5 1h1v1H5zM1 5h1v1H1zM4 4h1v1H4zM6 4h1v1H6zM5 5h1v1H5zM4 6h1v1H4zM6 6h1v1H6z" fill="#040A1C" fill-rule="evenodd"/></svg>
         </div>
-        <span style="display: flex; align-items: center; gap: 8px; font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #F0ABFC">INICIA SESIÓN<span style="flex: 1; height: 1px; background: linear-gradient(90deg, #F0ABFC, transparent)"></span></span>
+        <span style="display: flex; align-items: center; gap: 8px; font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #7CC4FF">INICIA SESIÓN<span style="flex: 1; height: 1px; background: linear-gradient(90deg, #7CC4FF, transparent)"></span></span>
         <form style="display: flex; flex-direction: column; gap: 6px" onSubmit="{{submit}}">
-          <label class="lg-field"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8686A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6l9-6"/></svg><input type="email" autocomplete="email" aria-label="Correo electrónico" placeholder="Correo electrónico"></label>
-          <label class="lg-field"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8686A6" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><input type="password" autocomplete="current-password" aria-label="Contraseña" placeholder="Contraseña"></label>
+          <label class="lg-field"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8FA8CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6l9-6"/></svg><input type="email" autocomplete="email" aria-label="Correo electrónico" placeholder="Correo electrónico"></label>
+          <label class="lg-field"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8FA8CC" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><input type="password" autocomplete="current-password" aria-label="Contraseña" placeholder="Contraseña"></label>
           <div style="display: flex; gap: 6px">
-            <button type="submit" style="flex: 1; height: 38px; border: 0; padding: 0; transform: skewX(0deg); background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #150925; cursor: pointer; box-shadow: 0 4px 0 #0E8FA3"><span style="display: inline-block; transform: skewX(0deg); font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 19px; letter-spacing: 1.5px">ENTRAR</span></button>
+            <button type="submit" style="flex: 1; height: 38px; border: 0; padding: 0; transform: skewX(0deg); background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #040A1C; cursor: pointer; box-shadow: 0 4px 0 #0E8FA3"><span style="display: inline-block; transform: skewX(0deg); font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 19px; letter-spacing: 1.5px">ENTRAR</span></button>
             <button type="button" class="lg-social" aria-label="Entrar con Google" onClick="{{soon}}"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z" fill="#4285F4"/><path d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z" fill="#34A853"/><path d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2z" fill="#FBBC05"/><path d="M12 6c1.5 0 2.8.5 3.8 1.5l2.8-2.8A10 10 0 0 0 3.1 7.4L6.4 10C7.2 7.8 9.4 6 12 6z" fill="#EA4335"/></svg></button>
             <button type="button" class="lg-social" aria-label="Entrar con Apple" onClick="{{soon}}"><svg width="14" height="16" viewBox="0 0 16 18" fill="#F4F4FA"><path d="M13 9.5c0-2 1.6-3 1.7-3c-1-1.4-2.4-1.6-2.9-1.6c-1.2-.1-2.4.7-3 .7s-1.6-.7-2.6-.7C4.8 5 3.4 5.8 2.7 7.1c-1.5 2.6-.4 6.4 1 8.5c.7 1 1.5 2.1 2.6 2.1c1-.1 1.4-.7 2.6-.7s1.6.7 2.6.7c1.1 0 1.8-1 2.5-2c.8-1.1 1.1-2.2 1.1-2.3c0 0-2.1-.8-2.1-3.9zM11 3.3c.6-.7 1-1.6.9-2.6c-.8 0-1.9.6-2.5 1.3c-.6.6-1 1.6-.9 2.5c.9.1 1.9-.5 2.5-1.2z"/></svg></button>
           </div>
@@ -151,7 +151,7 @@ input::placeholder{color:#6E6E92}
           <span aria-hidden="true" style="display: block; width: 120px; height: 22px; background: repeating-linear-gradient(90deg, #F4F4FA 0 2px, transparent 2px 4px, #F4F4FA 4px 5px, transparent 5px 8px, #F4F4FA 8px 11px, transparent 11px 12px); opacity: .85"></span>
           <span style="font-size: 8px; letter-spacing: 2px; color: #6E6E92">AM-2026-0010-{{serial}}</span>
         </div>
-        <span style="font-size: 11px; color: #A3A3C2; text-align: right">¿Sin cuenta?<br><a href="#" onClick="{{soon}}" style="font-weight: 800">Crear cuenta</a><br><a href="privacidad.html" target="_blank" rel="noopener" style="font-size: 9.5px; color: #7CC4FF">Política de privacidad</a></span>
+        <span style="font-size: 11px; color: #A9BEDD; text-align: right">¿Sin cuenta?<br><a href="#" onClick="{{soon}}" style="font-weight: 800">Crear cuenta</a><br><a href="privacidad.html" target="_blank" rel="noopener" style="font-size: 9.5px; color: #7CC4FF">Política de privacidad</a></span>
       </div>
     </div>
   </div>
@@ -192,14 +192,14 @@ input::placeholder{color:#6E6E92}
               <defs><linearGradient id="lg-sh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".25"/><stop offset=".6" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient></defs>
               <!-- hanger -->
               <path d="M50 -12 Q55 -12 55 -7 Q55 -3 50 -1 L50 4 M50 4 L22 14 M50 4 L78 14" fill="none" stroke="#C9CAE0" stroke-width="2" stroke-linecap="round"/>
-              <path d="M34 6 Q50 12 66 6 L90 16 L99 42 L84 48 L80 40 L80 102 L20 102 L20 40 L16 48 L1 42 L10 16 Z" fill="{{shirtP}}" stroke="#150925" stroke-width="1.6" stroke-linejoin="round"/>
+              <path d="M34 6 Q50 12 66 6 L90 16 L99 42 L84 48 L80 40 L80 102 L20 102 L20 40 L16 48 L1 42 L10 16 Z" fill="{{shirtP}}" stroke="#040A1C" stroke-width="1.6" stroke-linejoin="round"/>
               <path d="M34 6 Q50 12 66 6 L90 16 L99 42 L84 48 L80 40 L80 102 L20 102 L20 40 L16 48 L1 42 L10 16 Z" fill="url(#lg-sh)"/>
               <path d="M34 6 Q50 12 66 6" fill="none" stroke="{{shirtS}}" stroke-width="3"/>
               <text x="50" y="34" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="{{shirtFs}}" letter-spacing=".5" fill="{{shirtS}}" translate="no">{{shirtName}}</text>
-              <text class="nm-num" x="50" y="86" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="48" fill="{{shirtS}}" stroke="#150925" stroke-opacity=".25" stroke-width=".8">{{dorsal}}</text>
+              <text class="nm-num" x="50" y="86" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="48" fill="{{shirtS}}" stroke="#040A1C" stroke-opacity=".25" stroke-width=".8">{{dorsal}}</text>
             </svg>
           </div>
-          <span style="position: relative; font-size: 9px; font-weight: 800; letter-spacing: 2px; color: #A3A3C2; margin-top: 4px">ELIGE TU DORSAL</span>
+          <span style="position: relative; font-size: 9px; font-weight: 800; letter-spacing: 2px; color: #A9BEDD; margin-top: 4px">ELIGE TU DORSAL</span>
           <div style="position: relative; display: flex; gap: 5px; margin-top: 5px">
             <sc-for list="{{dorsals}}" as="d" key="n">
               <button type="button" onClick="{{d.pick}}" class="{{d.cls}}">{{d.n}}</button>
@@ -210,7 +210,7 @@ input::placeholder{color:#6E6E92}
         <div style="position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 20px 22px 18px 20px; background: repeating-linear-gradient(0deg, #ffffff05 0 1px, transparent 1px 22px), linear-gradient(170deg, #2A1966, #1A0E41 70%)">
           <div style="display: flex; align-items: center; justify-content: space-between">
             <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #22D3EE">CONTRATO DE FICHAJE</span>
-            <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #8686A6; border: 1px solid #2E2E58; border-radius: 5px; padding: 2px 6px">TEMPORADA 1</span>
+            <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #8FA8CC; border: 1px solid #2E2E58; border-radius: 5px; padding: 2px 6px">TEMPORADA 1</span>
           </div>
           <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: .95">¿CÓMO TE LLAMAS, CRACK?</span>
           <!-- the stadium announcer reads out your name as you type it -->
@@ -238,7 +238,7 @@ input::placeholder{color:#6E6E92}
     </div>
   </sc-if>
   <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
-    <span role="status" style="position: absolute; left: 514px; width: 304px; top: 196px; z-index: 5; padding: 8px 12px; box-sizing: border-box; border-radius: 10px; background: #F4F4FA; color: #150925; font-size: 12px; font-weight: 800; text-align: center">{{toast}}</span>
+    <span role="status" style="position: absolute; left: 514px; width: 304px; top: 196px; z-index: 5; padding: 8px 12px; box-sizing: border-box; border-radius: 10px; background: #F4F4FA; color: #040A1C; font-size: 12px; font-weight: 800; text-align: center">{{toast}}</span>
   </sc-if>
 </div>
 </x-dc>
@@ -424,7 +424,7 @@ class Component extends DCLogic {
   }
   buildModel() {
     const A = window.AMChars, o = A.outfit('futbol') || {};
-    const kit = { primary: o.primary || '#FF8A3D', secondary: o.secondary || '#150925', pattern: o.pattern || 'solid', shorts: o.shorts || '#251443', socks: o.socks || '#F4F4FA', shoe: o.shoe || '#C8F031', hat: o.hat, hatColor: o.hatColor, face: o.face };
+    const kit = { primary: o.primary || '#FF8A3D', secondary: o.secondary || '#040A1C', pattern: o.pattern || 'solid', shorts: o.shorts || '#0B1A44', socks: o.socks || '#F4F4FA', shoe: o.shoe || '#C8F031', hat: o.hat, hatColor: o.hatColor, face: o.face };
     const m = A.make({ char: A.pref(), kit, noRing: true, gear: true });
     if (!m) return;
     m.rotation.y = 0.45; this.S.add(m); this.model = m;
@@ -509,7 +509,7 @@ class Component extends DCLogic {
         try { if (window.AMSfx && window.AMSfx.roar) window.AMSfx.roar(true); else if (window.AMSfx && window.AMSfx.crowd) window.AMSfx.crowd(1); } catch (er) {}
         if (navigator.vibrate) try { navigator.vibrate(15); } catch (er) {}
       },
-      kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#150925', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#251443', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE',
+      kitP: kit.primary || '#FF8A3D', kitS: kit.secondary || '#040A1C', kitPat: kit.pattern || 'solid', kitSh: kit.shorts || '#0B1A44', kitSo: kit.socks || '#F4F4FA', kitShoe: kit.shoe || '#22D3EE',
       fans: this.fans.toLocaleString('es-ES'), serial: this.serial, name: name.toUpperCase(),
       photo: show3d ? 'assets/chars/' + pref + '.png' : '', photoDisp: show3d ? 'block' : 'none',
       hintOp: s.kicks ? '0' : '1',
@@ -551,11 +551,11 @@ class Component extends DCLogic {
       signed: !!s.signed,
       nameBad: !!nmErr,
       nameMsg: !s.nameDraft ? '3 a 16 caracteres: letras, números, _ . -' : nmErr || '¡Buen nombre!',
-      nameMsgStyle: 'font-size: 11px; font-weight: 800; min-height: 14px; color: ' + (!s.nameDraft ? '#8686A6' : nmErr ? '#FF8A8E' : '#53D88E'),
+      nameMsgStyle: 'font-size: 11px; font-weight: 800; min-height: 14px; color: ' + (!s.nameDraft ? '#8FA8CC' : nmErr ? '#FF8A8E' : '#53D88E'),
       nameField: s.nameDraft && nmErr ? 'border-bottom-color: #FF5C5C' : s.nameDraft ? 'border-bottom-color: #53D88E' : '',
       nameBtn: 'height: 44px; border: 0; padding: 0; transform: skewX(0deg); cursor: ' + (nmErr ? 'default' : 'pointer') + '; ' + (nmErr ? 'background: #39206E; color: #6E6E92;' : 'background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #F59E0B); color: #1A1204; box-shadow: 0 4px 0 #B7791F, 0 0 18px #FFC53D66;'),
       shirtName: (s.nameDraft || 'TU NOMBRE').toUpperCase(), shirtFs: String(Math.max(7, Math.min(13, 130 / Math.max(6, (s.nameDraft || 'TU NOMBRE').length)))),
-      shirtP: kit.primary || '#FF8A3D', shirtS: kit.secondary || '#150925',
+      shirtP: kit.primary || '#FF8A3D', shirtS: kit.secondary || '#040A1C',
       nameSubmit: (e) => {
         e.preventDefault();
         if (nmErr || !O) return;

@@ -12,7 +12,7 @@
 body{margin:0}
 @keyframes soIn{from{opacity:0;transform:translateY(14px)}}
 @keyframes soDot{0%,100%{box-shadow:0 0 0 0 #53D88E88}50%{box-shadow:0 0 0 5px #53D88E00}}
-.so-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(80% 90% at 30% 0%,#2A1C5E 0%,#1E0C4B 55%,#0F052D 100%)}
+.so-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(80% 90% at 30% 0%,#0B2A78 0%,#071640 55%,#02061A 100%)}
 .so-bg i{position:absolute;border-radius:50%;filter:blur(40px);opacity:.35}
 .so-tab{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:6px;height:32px;width:132px;border:0;background:none;font:800 11.5px Exo2,sans-serif;letter-spacing:.5px;cursor:pointer;transition:color .3s}
 .so-tab em{min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:#FF3B5C;color:#fff;font:800 10px/18px Exo2,sans-serif;font-style:normal}
@@ -20,44 +20,44 @@ body{margin:0}
 .so-list::-webkit-scrollbar{display:none}
 .so-card{position:relative;display:flex;align-items:center;gap:9px;padding:0 8px 0 10px;border-radius:16px;background:linear-gradient(170deg,#2E166BF2,#1C0B43F2);box-shadow:inset 0 0 0 1px #3A3270;animation:soIn .35s cubic-bezier(.2,1.3,.4,1) both}
 .so-card.on{box-shadow:inset 0 0 0 1px #53D88E77,0 0 14px #53D88E22}
-.so-av{position:relative;flex:none;width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;font:800 18px 'Barlow Condensed',sans-serif;color:#150925}
+.so-av{position:relative;flex:none;width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;font:800 18px 'Barlow Condensed',sans-serif;color:#040A1C}
 .so-av i{position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:6px;box-shadow:0 0 0 2px #1C0B43}
-.so-av i.on{background:#53D88E;animation:soDot 1.6s infinite}.so-av i.off{background:#5E5E80}
+.so-av i.on{background:#53D88E;animation:soDot 1.6s infinite}.so-av i.off{background:#5A7099}
 .so-nm{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .so-nm b{font:800 14px Exo2,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .so-nm span{font-size:10px;font-weight:800;letter-spacing:.5px}
 .so-btn{flex:none;height:30px;padding:0 11px;border:0;border-radius:10px;font:800 11.5px Exo2,sans-serif;cursor:pointer;white-space:nowrap}
 .so-btn.go{background:linear-gradient(135deg,#FFE38A,#FFC53D);color:#1A1204;box-shadow:0 3px 0 #B7791F}
-.so-btn.ok{background:#53D88E;color:#150925;box-shadow:0 3px 0 #2E8A57}
+.so-btn.ok{background:#53D88E;color:#040A1C;box-shadow:0 3px 0 #2E8A57}
 .so-btn.no{background:#ffffff14;color:#CACAE0}
-.so-btn.dim{background:#39206E;color:#8686A6;cursor:default}
+.so-btn.dim{background:#39206E;color:#8FA8CC;cursor:default}
 .so-x{flex:none;width:26px;height:26px;border:0;border-radius:13px;background:transparent;color:#6E6E92;font:800 14px Exo2,sans-serif;cursor:pointer}
 .so-x:hover{background:#FF5C5C22;color:#FF8A8E}
-.so-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;height:220px;text-align:center;color:#A3A3C2;font-size:12.5px;font-weight:700;line-height:1.45}
-.so-party{position:absolute;left:612px;right:12px;top:12px;bottom:12px;padding:12px;box-sizing:border-box;border-radius:20px;background:linear-gradient(170deg,#2E1C5CEE,#1E0B45EE);box-shadow:inset 0 0 0 1px #A78BFA66,0 14px 30px #0009;display:flex;flex-direction:column;gap:7px}
-.so-slot{display:flex;align-items:center;gap:8px;height:46px;padding:0 8px;border-radius:12px;background:#15092AAA;box-shadow:inset 0 0 0 1px #3A3270}
-.so-slot.free{box-shadow:inset 0 0 0 1.5px #A78BFA55;background:transparent;border:0;color:#C4B5FD;cursor:pointer;font:800 11.5px Exo2,sans-serif;width:100%}
+.so-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;height:220px;text-align:center;color:#A9BEDD;font-size:12.5px;font-weight:700;line-height:1.45}
+.so-party{position:absolute;left:612px;right:12px;top:12px;bottom:12px;padding:12px;box-sizing:border-box;border-radius:20px;background:radial-gradient(70% 40% at 100% 0%,#2FBF7140,transparent 70%),linear-gradient(170deg,#0B1A44EE,#040A1CEE);box-shadow:inset 0 0 0 1px #2FBF7166,0 14px 30px #0009;display:flex;flex-direction:column;gap:7px}
+.so-slot{display:flex;align-items:center;gap:8px;height:46px;padding:0 8px;border-radius:12px;background:#06102EAA;box-shadow:inset 0 0 0 1px #1E3A6E}
+.so-slot.free{box-shadow:inset 0 0 0 1.5px #2FBF7155;background:transparent;border:0;color:#A6DCFF;cursor:pointer;font:800 11.5px Exo2,sans-serif;width:100%}
 .so-search{display:flex;gap:8px;align-items:center}
 .so-search input{flex:1;min-width:0;height:42px;padding:0 14px;border-radius:12px;border:1px solid #3A3270;background:#0F061ECC;color:#F4F4FA;font:800 15px Exo2,sans-serif;outline:0}
 .so-search input:focus{border-color:#22D3EE;box-shadow:0 0 0 3px #22D3EE33}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
-  <div class="so-bg" aria-hidden="true"><i style="left: 80px; top: 200px; width: 260px; height: 200px; background: #7C5CFF"></i><i style="left: 420px; top: -60px; width: 300px; height: 200px; background: #22D3EE"></i></div>
+  <div class="so-bg" aria-hidden="true"><i style="left: 80px; top: 200px; width: 260px; height: 200px; background: #1E8BFF"></i><i style="left: 420px; top: -60px; width: 300px; height: 200px; background: #22D3EE"></i></div>
   <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; height: 390px; z-index: 3"><dc-import name="Nav" active="social" hint-size="80px,390px"></dc-import></div>
 
   <!-- header: title, your status and your name, the three tabs -->
   <div style="position: absolute; left: 96px; width: 504px; top: 12px; display: flex; align-items: center; gap: 10px">
-    <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 44px; height: 36px; display: flex; align-items: center; justify-content: center; background: #251443; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+    <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 44px; height: 36px; display: flex; align-items: center; justify-content: center; background: #0B1A44; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
     <h1 class="bc-title hd" style="font-size: 26px; white-space: nowrap">{{title}}</h1>
     <span style="{{statusStyle}}"><i style="{{statusDot}}"></i>{{statusText}}</span>
     <span style="flex: 1"></span>
     <button type="button" onClick="{{shareName}}" style="flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; padding: 0; border: 0; background: none; color: #F4F4FA; cursor: pointer; text-align: right">
-      <span style="font-size: 8.5px; font-weight: 800; letter-spacing: 1.5px; color: #A3A3C2">TU NOMBRE · TOCA PARA COMPARTIR</span>
+      <span style="font-size: 8.5px; font-weight: 800; letter-spacing: 1.5px; color: #A9BEDD">TU NOMBRE · TOCA PARA COMPARTIR</span>
       <span style="font: 800 15px Exo2, sans-serif; color: #22D3EE" translate="no">{{me}}</span>
     </button>
   </div>
-  <div role="tablist" aria-label="Social" style="position: absolute; left: 96px; top: 58px; display: flex; padding: 3px; border-radius: 14px; background: #150925CC; border: 1px solid #2E2E58">
+  <div role="tablist" aria-label="Social" style="position: absolute; left: 96px; top: 58px; display: flex; padding: 3px; border-radius: 14px; background: #040A1CCC; border: 1px solid #2E2E58">
     <span aria-hidden="true" style="{{thumbStyle}}"></span>
     <sc-for list="{{tabs}}" as="t" key="id">
       <button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" class="so-tab" style="{{t.style}}">{{t.label}}<sc-if value="{{t.hasN}}" hint-placeholder-val="{{ false }}"><em>{{t.n}}</em></sc-if></button>
@@ -77,7 +77,7 @@ body{margin:0}
       </sc-for>
       <sc-if value="{{noFriends}}" hint-placeholder-val="{{ false }}">
         <div class="so-empty">
-          <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M17 8v6M14 11h6"/></svg>
+          <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#2FBF71" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M17 8v6M14 11h6"/></svg>
           <span>Aún no tienes amigos en ARENA MIX.<br>Busca a tus amigos por su nombre de jugador en <b style="color: #22D3EE">BUSCAR</b>.</span>
           <button type="button" class="so-btn go" onClick="{{toSearch}}">BUSCAR AMIGOS</button>
         </div>
@@ -99,7 +99,7 @@ body{margin:0}
       <sc-for list="{{outgoing}}" as="r" key="name">
         <div class="so-card">
           <span class="so-av" style="{{r.av}}">{{r.ini}}</span>
-          <span class="so-nm"><b translate="no">{{r.name}}</b><span style="color: #8686A6">ENVIADA · ESPERANDO</span></span>
+          <span class="so-nm"><b translate="no">{{r.name}}</b><span style="color: #8FA8CC">ENVIADA · ESPERANDO</span></span>
           <button type="button" class="so-btn no" onClick="{{r.cancel}}">CANCELAR</button>
         </div>
       </sc-for>
@@ -123,7 +123,7 @@ body{margin:0}
           <sc-if value="{{resCanAdd}}" hint-placeholder-val="{{ false }}"><button type="button" class="so-btn go" onClick="{{addResult}}">{{resBtn}}</button></sc-if>
         </div>
       </sc-if>
-      <span style="font-size: 11.5px; font-weight: 700; color: #A3A3C2; line-height: 1.5">{{searchHint}}</span>
+      <span style="font-size: 11.5px; font-weight: 700; color: #A9BEDD; line-height: 1.5">{{searchHint}}</span>
     </div>
   </sc-if>
 
@@ -131,7 +131,7 @@ body{margin:0}
   <div class="so-party">
     <div style="display: flex; align-items: center; justify-content: space-between">
       <span style="font: 800 italic 20px/1 'Barlow Condensed', sans-serif; letter-spacing: .5px">TU EQUIPO</span>
-      <span style="font-size: 11px; font-weight: 800; color: #C4B5FD">{{partyN}}/4</span>
+      <span style="font-size: 11px; font-weight: 800; color: #A6DCFF">{{partyN}}/4</span>
     </div>
     <sc-for list="{{partySlots}}" as="p" key="k">
       <sc-if value="{{p.filled}}" hint-placeholder-val="{{ true }}">
@@ -142,27 +142,27 @@ body{margin:0}
         </div>
       </sc-if>
       <sc-if value="{{p.free}}" hint-placeholder-val="{{ false }}">
-        <button type="button" class="so-slot free" onClick="{{toFriends}}"><span style="width: 32px; height: 32px; border-radius: 16px; border: 1.5px dashed #A78BFA88; display: flex; align-items: center; justify-content: center; font-size: 18px">+</span>Hueco libre · invita</button>
+        <button type="button" class="so-slot free" onClick="{{toFriends}}"><span style="width: 32px; height: 32px; border-radius: 16px; border: 1.5px dashed #2FBF7188; display: flex; align-items: center; justify-content: center; font-size: 18px">+</span>Hueco libre · invita</button>
       </sc-if>
     </sc-for>
     <span style="flex: 1"></span>
-    <span style="font-size: 10px; font-weight: 700; color: #A3A3C2; line-height: 1.4">{{partyNote}}</span>
+    <span style="font-size: 10px; font-weight: 700; color: #A9BEDD; line-height: 1.4">{{partyNote}}</span>
     <sc-if value="{{inParty}}" hint-placeholder-val="{{ false }}"><button type="button" class="so-btn no" style="width: 100%" onClick="{{leaveParty}}">{{leaveLabel}}</button></sc-if>
     <a href="Deportes.dc.html" class="so-btn go" style="display: flex; align-items: center; justify-content: center; text-decoration: none; height: 38px; font-size: 14px">IR AL LOBBY</a>
   </div>
   <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
-    <span role="status" style="position: absolute; left: 96px; width: 504px; bottom: 16px; z-index: 5; padding: 9px 14px; box-sizing: border-box; border-radius: 12px; background: #F4F4FA; color: #150925; font-size: 12.5px; font-weight: 800; text-align: center">{{toast}}</span>
+    <span role="status" style="position: absolute; left: 96px; width: 504px; bottom: 16px; z-index: 5; padding: 9px 14px; box-sizing: border-box; border-radius: 12px; background: #F4F4FA; color: #040A1C; font-size: 12.5px; font-weight: 800; text-align: center">{{toast}}</span>
   </sc-if>
   <sc-if value="{{hasProf}}" hint-placeholder-val="{{ false }}">
     <div onClick="{{closeProf}}" style="position: absolute; inset: 0; z-index: 30; background: #04020FCC; display: flex; align-items: center; justify-content: center">
-      <div onClick="{{stopProf}}" style="position: relative; width: 420px; padding: 18px; box-sizing: border-box; border-radius: 22px; display: flex; gap: 16px; align-items: center; background: radial-gradient(80% 60% at 20% 20%, #22D3EE66, transparent 70%), linear-gradient(160deg, #4C1D95, #1A0B44); box-shadow: inset 0 0 0 1.5px #C4B5FD, 0 20px 50px #000a">
+      <div onClick="{{stopProf}}" style="position: relative; width: 420px; padding: 18px; box-sizing: border-box; border-radius: 22px; display: flex; gap: 16px; align-items: center; background: radial-gradient(80% 60% at 20% 20%, #22D3EE66, transparent 70%), linear-gradient(160deg, #4C1D95, #05123A); box-shadow: inset 0 0 0 1.5px #A6DCFF, 0 20px 50px #000a">
         <img src="{{profPic}}" alt="" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 4px #fff, 0 0 22px #22D3EE">
         <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
-          <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 2px; color: #C4B5FD">PERFIL DE AMIGO</span>
+          <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 2px; color: #A6DCFF">PERFIL DE AMIGO</span>
           <b translate="no" style="font: 800 italic 26px/1 'Barlow Condensed', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{profName}}</b>
           <span style="{{profStStyle}}">{{profSt}}</span>
           <span style="font-size: 11px; font-weight: 700; color: #E9D5FF">{{profSince}}</span>
-          <span style="font-size: 10px; color: #C4B5FD">Juega con él en una partida privada o en tu equipo para ver su rango.</span>
+          <span style="font-size: 10px; color: #A6DCFF">Juega con él en una partida privada o en tu equipo para ver su rango.</span>
           <div style="display: flex; gap: 6px; margin-top: 4px"><button type="button" class="so-btn go" onClick="{{profInvite}}">INVITAR AL EQUIPO</button><button type="button" class="so-btn dim" onClick="{{closeProf}}">CERRAR</button></div>
         </div>
       </div>
@@ -186,13 +186,13 @@ class Component extends DCLogic {
   say(t) { this.setState({ toast: t }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2600); }
   renderVals() {
     const s = this.state, SO = window.AMSocial, st = SO ? SO.state() : { me: 'Jugador', online: false, taken: false, friends: [], incoming: [], outgoing: [], party: null };
-    const COLS = ['#22D3EE', '#FFC53D', '#FF5CC8', '#53D88E', '#A78BFA', '#FF8A3D', '#3EA6FF'];
+    const COLS = ['#22D3EE', '#FFC53D', '#FF5CC8', '#53D88E', '#2FBF71', '#FF8A3D', '#3EA6FF'];
     const colOf = (n) => { let h = 0; for (const c of String(n)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return COLS[h % COLS.length]; };
     const av = (n) => 'background: ' + colOf(n);
     const ini = (n) => String(n || '?').charAt(0).toUpperCase();
     const P = st.party, inParty = !!P && P.members.length > 0, leader = !P || P.leader;
     const memberNames = P ? P.members.map((m) => m.name.toLowerCase()) : [];
-    const TABS = [['friends', 'AMIGOS', '#22D3EE', st.friends.length], ['reqs', 'SOLICITUDES', '#FFC53D', st.incoming.length], ['search', 'BUSCAR', '#A78BFA', 0]];
+    const TABS = [['friends', 'AMIGOS', '#22D3EE', st.friends.length], ['reqs', 'SOLICITUDES', '#FFC53D', st.incoming.length], ['search', 'BUSCAR', '#2FBF71', 0]];
     const ti = Math.max(0, TABS.findIndex((t) => t[0] === s.tab));
     const r = s.result;
     const members = P ? P.members : [{ name: st.me, leader: true }];
@@ -201,7 +201,7 @@ class Component extends DCLogic {
       statusText: st.taken ? 'NOMBRE EN USO' : st.online ? 'EN LÍNEA' : 'CONECTANDO…',
       statusStyle: 'display: flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 8px; background: #15092ACC; font: 800 10px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap; color: ' + (st.taken ? '#FF8A8E' : st.online ? '#53D88E' : '#FFC53D'),
       statusDot: 'width: 7px; height: 7px; border-radius: 4px; background: currentColor; box-shadow: 0 0 6px currentColor',
-      tabs: TABS.map(([id, label, c, n], i) => ({ id, label, n: String(n), hasN: id === 'reqs' ? n > 0 : false, sel: i === ti ? 'true' : 'false', style: 'color: ' + (i === ti ? '#150925' : c), pick: () => this.setState({ tab: id }) })),
+      tabs: TABS.map(([id, label, c, n], i) => ({ id, label, n: String(n), hasN: id === 'reqs' ? n > 0 : false, sel: i === ti ? 'true' : 'false', style: 'color: ' + (i === ti ? '#040A1C' : c), pick: () => this.setState({ tab: id }) })),
       thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 132) + 'px; width: 132px; height: 32px; border-radius: 11px; background: ' + TABS[ti][2] + '; box-shadow: 0 0 14px ' + TABS[ti][2] + '88; transition: left .4s cubic-bezier(.3,1.4,.45,1), background .3s',
       isFriends: s.tab === 'friends', isReqs: s.tab === 'reqs', isSearch: s.tab === 'search',
       toSearch: () => this.setState({ tab: 'search' }), toFriends: () => this.setState({ tab: 'friends' }),
@@ -220,7 +220,7 @@ class Component extends DCLogic {
         const inP = memberNames.includes(f.name.toLowerCase());
         return {
           name: f.name, ini: ini(f.name), av: av(f.name), dot: f.on ? 'on' : 'off', cls: 'so-card' + (f.on ? ' on' : ''),
-          sub: inP ? 'EN TU EQUIPO' : f.on ? 'EN LÍNEA' : 'DESCONECTADO', subStyle: 'color: ' + (inP ? '#A78BFA' : f.on ? '#53D88E' : '#6E6E92'),
+          sub: inP ? 'EN TU EQUIPO' : f.on ? 'EN LÍNEA' : 'DESCONECTADO', subStyle: 'color: ' + (inP ? '#2FBF71' : f.on ? '#53D88E' : '#6E6E92'),
           btn: inP ? 'EN EQUIPO' : 'INVITAR', btnCls: 'so-btn ' + (f.on && !inP && leader ? 'go' : 'dim'),
           open: () => this.setState({ prof: f.name }),
           invite: () => {
@@ -249,7 +249,7 @@ class Component extends DCLogic {
       resName: r ? r.name : '', resIni: r ? ini(r.name) : '', resAv: r ? av(r.name) : '',
       resDot: r && (r.state === 'online' || r.state === 'friend') ? 'on' : 'off',
       resSub: !r ? '' : r.state === 'busy' ? 'BUSCANDO…' : r.state === 'me' ? 'ERES TÚ' : r.state === 'friend' ? 'YA ES TU AMIGO' : r.state === 'online' ? 'EN LÍNEA AHORA' : st.outgoing.some((n) => n.toLowerCase() === r.name.toLowerCase()) ? 'SOLICITUD ENVIADA' : 'NO ESTÁ CONECTADO (O NO EXISTE)',
-      resSubStyle: 'color: ' + (r && r.state === 'online' ? '#53D88E' : r && r.state === 'busy' ? '#FFC53D' : '#A3A3C2'),
+      resSubStyle: 'color: ' + (r && r.state === 'online' ? '#53D88E' : r && r.state === 'busy' ? '#FFC53D' : '#A9BEDD'),
       resStyle: r && r.state === 'online' ? 'box-shadow: inset 0 0 0 1px #53D88E88, 0 0 16px #53D88E33' : '',
       resCanAdd: !!r && (r.state === 'online' || r.state === 'offline') && !st.outgoing.some((n) => n.toLowerCase() === r.name.toLowerCase()),
       resBtn: r && r.state === 'online' ? 'AÑADIR' : 'ENVIAR IGUAL',

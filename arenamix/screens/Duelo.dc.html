@@ -77,7 +77,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .du-rep{position:absolute;left:66px;top:12px;display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:12px;background:#02040Ccc;box-shadow:0 0 0 1.5px #E5484D88;pointer-events:none}
 .du-rep i{width:9px;height:9px;border-radius:50%;background:#E5484D;box-shadow:0 0 8px #E5484D;animation:duSd 1s infinite}
 .du-rep b{font-family:'Titulos',sans-serif;font-weight:400;font-size:17px;letter-spacing:2px}
-.du-rep small{font-size:11px;font-weight:700;color:#A3A3C2}
+.du-rep small{font-size:11px;font-weight:700;color:#A9BEDD}
 .du-done{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(60% 70% at 50% 45%,#06102Ecc,#02040Cf2);z-index:6}
 .du-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;padding:18px 34px 20px;border-radius:22px;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 2px var(--yc),0 0 40px var(--yc);animation:duRes .5s cubic-bezier(.2,1.4,.4,1) both}
 .du-card.lose{box-shadow:0 0 0 2px var(--rc),0 0 40px var(--rc)}
@@ -1278,7 +1278,7 @@ class Component extends DCLogic {
     {
       const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 512;
       const c = cv.getContext('2d'), w = 1024, h = 512;
-      const gr = c.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#1A0B44'); gr.addColorStop(0.55, '#3B1A8A'); gr.addColorStop(1, '#0B1F5C');
+      const gr = c.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#05123A'); gr.addColorStop(0.55, '#0B2A78'); gr.addColorStop(1, '#0B1F5C');
       c.fillStyle = gr; c.fillRect(0, 0, w, h);
       c.fillStyle = 'rgba(255,255,255,0.05)'; for (let x = 0; x < w; x += 8) c.fillRect(x, 0, 3, h);
       c.textAlign = 'center'; c.textBaseline = 'middle';
@@ -1891,7 +1891,7 @@ class Component extends DCLogic {
   renderVals() {
     const R = this.result, youTurn = this.turn === 'you';
     const resultMap = youTurn || this.practice
-      ? { gol: ['¡GOL!', '#22D3EE'], diana: ['¡DIANA!', '#FFC53D'], parada: ['¡PARADA!', '#FF8A8E'], palo: ['¡AL PALO!', '#FF8A3D'], fuera: ['FUERA', '#A3A3C2'], barrera: ['BARRERA', '#E5484D'] }
+      ? { gol: ['¡GOL!', '#22D3EE'], diana: ['¡DIANA!', '#FFC53D'], parada: ['¡PARADA!', '#FF8A8E'], palo: ['¡AL PALO!', '#FF8A3D'], fuera: ['FUERA', '#A9BEDD'], barrera: ['BARRERA', '#E5484D'] }
       : { gol: ['GOL RIVAL', '#FF8A8E'], parada: ['¡PARADÓN!', '#22D3EE'], palo: ['¡AL PALO!', '#22D3EE'], fuera: ['¡FUERA!', '#22D3EE'], barrera: ['¡BARRERA!', '#22D3EE'] };
     const rm = R ? resultMap[R.kind] || ['', '#FFFFFF'] : ['', '#FFFFFF'];
     const rs = Math.min(1, this.pt / 0.25);
@@ -1944,7 +1944,7 @@ class Component extends DCLogic {
           specList: Duelo_SPECIALS.map((q) => {
             const sel = this.specSel === q.id;
             return { name: q.name, on: sel ? 'true' : 'false', off: !free,
-              style: 'height: 30px; padding: 0 6px; border-radius: 9px; font: 800 11px Exo2, sans-serif; letter-spacing: .5px; cursor: ' + (free ? 'pointer' : 'default') + '; border: 2px solid ' + (sel ? '#FFC53D' : '#2E2E52') + '; background: ' + (sel ? '#FFC53D' : '#141428') + '; color: ' + (sel ? '#0B0B14' : free ? '#F4F4FA' : '#5A5A7A') + ';',
+              style: 'height: 30px; padding: 0 6px; border-radius: 9px; font: 800 11px Exo2, sans-serif; letter-spacing: .5px; cursor: ' + (free ? 'pointer' : 'default') + '; border: 2px solid ' + (sel ? '#FFC53D' : '#1E3A6E') + '; background: ' + (sel ? '#FFC53D' : '#141428') + '; color: ' + (sel ? '#0B0B14' : free ? '#F4F4FA' : '#5A5A7A') + ';',
               pick: (e) => { e.stopPropagation(); if (!free) return; this.specSel = sel ? null : q.id; this.forceUpdate(); } };
           }),
           specFlash: this.special && youTurn && (this.phase === 'runup' || this.phase === 'flight') && !this.replaying ? (Duelo_SPECIALS.find((q) => q.id === this.special.id) || {}).name || '' : ''
