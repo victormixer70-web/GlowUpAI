@@ -190,6 +190,19 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .lx-bar span{position:absolute;left:16px;top:0;bottom:0;display:flex;align-items:center;font:400 10px 'Titulos',sans-serif;letter-spacing:1.6px;color:#fff;text-shadow:0 1px 3px #000}
 .lx-bar b{position:absolute;right:14px;top:0;bottom:0;display:flex;align-items:center;font:400 15px 'Titulos',sans-serif;color:#fff;text-shadow:0 1px 3px #000}
 .lx-tip{border-radius:14px !important;background:linear-gradient(180deg,#0B1A44D9,#02040CD9) !important;border:0 !important;box-shadow:inset 0 0 0 1px #FFC53D55}
+
+/* ---- TV-style callouts: a dark glass band that slides in from the side, a stripe of the callout's colour ---- */
+.pd-co-t{position:relative;padding:6px 26px 4px 30px !important;font:400 30px/1 'Titulos',sans-serif !important;font-style:normal !important;letter-spacing:2px !important;color:#fff !important;text-shadow:0 2px 0 #02040C,0 0 16px var(--cc,#3DA9FF) !important;background:linear-gradient(90deg,color-mix(in srgb,var(--cc,#3DA9FF) 35%,#02040C) 0%,#0B1A44F2 30%,#02040CF2 100%);clip-path:polygon(0 0,100% 0,calc(100% - 16px) 100%,0 100%);box-shadow:inset 0 1px 0 #ffffff33;animation:pdTv .45s cubic-bezier(.2,1.2,.3,1) both !important}
+.pd-co-t::before{content:'';position:absolute;left:0;top:0;bottom:0;width:10px;background:var(--cc,#3DA9FF);box-shadow:0 0 14px var(--cc,#3DA9FF)}
+@keyframes pdTv{from{opacity:0;transform:translateX(-120px)}}
+.pd-co-s{border-radius:0 0 8px 8px !important;background:#02040CE6 !important;font:400 10px 'Titulos',sans-serif !important;letter-spacing:1.5px !important;color:#BFE3FF !important}
+/* ---- the replay: a TV frame, vignette and a slow pulse on the badge ---- */
+.pd-rpv{position:absolute;inset:34px 0;pointer-events:none;box-shadow:inset 0 0 90px 30px #02040Cbb;border-top:2px solid #FFC53D88;border-bottom:2px solid #FFC53D88}
+.pd-rpbug{position:absolute;right:18px;top:46px;display:flex;align-items:center;gap:8px;padding:4px 14px 4px 5px;border-radius:20px;background:linear-gradient(180deg,#0B1A44EB,#02040CF2);box-shadow:inset 0 0 0 1.5px #FFC53D,0 0 16px #FFC53D55}
+.pd-rpbug img{border-radius:8px}
+.pd-rpbug b{font:400 13px 'Titulos',sans-serif;letter-spacing:2px;color:#FFE7A3}
+.pd-rpbug i{width:8px;height:8px;border-radius:50%;background:#FF4D5E;box-shadow:0 0 8px #FF4D5E;animation:pdLive 1s infinite}
+@keyframes pdPm{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 </style>
 </helmet>
 <section data-am-game="1" tabIndex="0" data-hc="1" aria-label="Partido. Muévete con WASD o flechas, Espacio chuta o hace entrada, E pasa o cambia de jugador, F regatea o presiona, Mayúsculas esprinta" onKeyDown="{{onKeyDown}}" onKeyUp="{{onKeyUp}}" style="{{hudVars}} position: relative; width: 844px; height: 390px; overflow: hidden; background: #0D0D1A; color: #F4F4FA; font-family: Exo2, sans-serif; outline: none; user-select: none; -webkit-user-select: none">
@@ -202,16 +215,17 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   <sc-for list="{{rings}}" as="r" hint-placeholder-count="1">
     <div style="{{r.style}}">
       <svg width="44" height="44" viewBox="-22 -22 44 44">
-        <ellipse rx="15" ry="9" fill="none" stroke="#22D3EE" stroke-width="2.5"/>
-        <g transform="scale(1 0.6) rotate({{r.arrowDeg}})" opacity="{{r.arrowOp}}"><path d="M17 -6L27 0L17 6Z" fill="#22D3EE" stroke="#0B0B14" stroke-width="1"/></g>
-        <circle r="19" fill="none" stroke="#FFC53D" stroke-width="3.5" stroke-linecap="round" pathLength="100" stroke-dasharray="{{r.charge}}" transform="rotate(-90)"/>
+        <ellipse rx="15" ry="9" fill="none" stroke="var(--hc)" stroke-width="1.6" opacity=".95" style="filter: drop-shadow(0 0 3px var(--hc))"/>
+        <ellipse rx="11" ry="6.6" fill="var(--hc)" opacity=".16"/>
+        <g transform="scale(1 0.6) rotate({{r.arrowDeg}})" opacity="{{r.arrowOp}}"><path d="M18 -4.5L26 0L18 4.5Z" fill="#FFFFFF" style="filter: drop-shadow(0 0 3px var(--hc))"/></g>
+        <circle r="19" fill="none" stroke="#FFC53D" stroke-width="2.4" stroke-linecap="round" pathLength="100" stroke-dasharray="{{r.charge}}" transform="rotate(-90)" style="filter: drop-shadow(0 0 4px #FFC53D)"/>
       </svg>
     </div>
   </sc-for>
 
   <sc-if value="{{hasPassMark}}" hint-placeholder-val="{{ false }}">
     <div style="{{passMarkStyle}}">
-      <svg width="18" height="14" viewBox="0 0 18 14"><path d="M1 1h16L9 13z" fill="#22D3EE" stroke="#0B0B14" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <svg width="18" height="14" viewBox="0 0 18 14" style="overflow: visible; animation: pdPm 1s ease-in-out infinite"><path d="M3 2h12L9 11z" fill="#FFFFFF" stroke="var(--hc)" stroke-width="1.6" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px var(--hc))"/></svg>
     </div>
   </sc-if>
 
@@ -331,10 +345,11 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <div onPointerDown="{{skipReplay}}" style="position: absolute; inset: 0; z-index: 30; cursor: pointer">
       <span style="position: absolute; left: 0; right: 0; top: 0; height: 34px; background: #000"></span>
       <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 34px; background: #000"></span>
-      <span style="position: absolute; left: 18px; top: 46px; display: flex; align-items: center; gap: 8px; padding: 4px 14px 4px 10px; transform: skewX(0deg); background: #0B0B14E6; border-left: 4px solid #FF5C5C; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 2px"><span style="width: 9px; height: 9px; border-radius: 5px; background: #FF5C5C; box-shadow: 0 0 8px #FF5C5C; animation: pdLive 1s infinite"></span>{{replayTag}}</span>
       <sc-if value="{{hlOn}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 18px; top: 82px; padding: 3px 12px; background: #FFC53D; color: #1A1204; font: 800 12px Exo2, sans-serif; letter-spacing: 1px">{{hlLine}}</span></sc-if>
-      <span style="position: absolute; right: 18px; bottom: 44px; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #CACAE0">TOCA PARA SALTAR</span>
-      <span style="position: absolute; left: 0; right: 0; top: 7px; text-align: center; font-size: 12px; font-weight: 800; letter-spacing: 3px; color: #FFC53D">{{scorerText}}</span>
+      <span class="pd-rpv"></span>
+      <span class="pd-rpbug"><img src="icons/logo-192.png?v=5" alt="" width="26" height="26"><b>{{replayTag}}</b><i></i></span>
+      <span style="position: absolute; right: 18px; bottom: 44px; font: 400 10px Titulos, sans-serif; letter-spacing: 1.5px; color: #BFE3FF">TOCA PARA SALTAR</span>
+      <span style="position: absolute; left: 0; right: 0; top: 9px; text-align: center; font: 400 12px Titulos, sans-serif; letter-spacing: 3px; color: #FFC53D">{{scorerText}}</span>
     </div>
   </sc-if>
   <sc-if value="{{showGoal}}" hint-placeholder-val="{{ false }}">
@@ -4890,7 +4905,7 @@ class Component extends DCLogic {
       hasNar: !!g.nar && (g.phase === 'play' || g.phase === 'goal' || g.phase === 'winners'), narKey: g.nar ? 'nar' + g.nar.id : 'nar', narText: g.nar ? g.nar.text : '',
       narWho: window.AMI18n && window.AMI18n.lang() === 'en' ? 'COMMENTARY' : 'NARRADOR', narFade: g.nar && g.nar.t < 0.4 ? 'opacity: ' + (g.nar.t / 0.4).toFixed(2) : '',
       hasCo: !!g.co, coKey: g.co ? 'co' + g.co.id : 'co', coText: g.co ? g.co.text : '', coSub: g.co ? g.co.sub : '', coHasSub: !!(g.co && g.co.sub),
-      coStyle: g.co ? 'background: linear-gradient(90deg, transparent, #0B0B14E6 12%, #0B0B14E6 88%, transparent); color: ' + g.co.color + '; text-shadow: 0 4px 0 #05050A, 0 0 22px ' + g.co.color + '88;' : '',
+      coStyle: g.co ? '--cc: ' + g.co.color + ';' : '',
       coFade: g.co && g.co.t < 0.35 ? 'opacity: ' + (g.co.t / 0.35).toFixed(2) + '; transition: none;' : '',
       hasSuper: !P.tutorial && !this.keeperMode(),
       superLabel: (g.superM || 0) >= 1 ? 'SÚPER ¡LISTO!' : 'SÚPER',
