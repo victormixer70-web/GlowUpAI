@@ -530,6 +530,8 @@ class Component extends DCLogic {
     // swerve (Magnus effect): a steady sideways push proportional to the speed, so it fades as the ball slows
     b.age = (b.age || 0) + dt;
     b.vx += b.curve * 0.16 * Math.hypot(b.vx, b.vz) * dt;
+    // the knuckleball's wobble: a sideways sway and a little up and down, that grows as it flies and averages out
+    if (b.kn) { const w = Math.min(1, b.age * 2.2); b.vx += Math.sin(b.age * 7.5 + b.knP) * 1.5 * b.kn * w * dt; b.vy += Math.cos(b.age * 5.3 + b.knP) * 1.1 * b.kn * w * dt; }
     b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
     if (b.res && b.vz > 0) { const r = this.resAt(b.res, b.z); b.x += r - (b.resR || 0); b.resR = r; }
     if (b.y < 0.11) { b.y = 0.11; if (b.vy < -1) { b.vy = -b.vy * 0.6; b.vx *= 0.8; b.vz *= 0.8; } else b.vy = 0; }
@@ -572,7 +574,8 @@ class Component extends DCLogic {
     if (b.y <= R + 0.005 && Math.abs(b.vy) < 0.5) { const f = Math.exp(-2.6 * dt); b.vx *= f; b.vz *= f; }
   }
   predict() {
-    const b = { ...this.b }, kz = this.D - 0.4;
+    // the keeper reads the flight without the knuckle's wobble: he can't see that coming
+    const b = { ...this.b, kn: 0 }, kz = this.D - 0.4;
     for (let i = 0; i < 400 && b.z < kz; i++) this.integrate(b, 1 / 240);
     return b;
   }
@@ -614,6 +617,10 @@ class Component extends DCLogic {
     const { v, err } = this.pendingShot;
     this.pendingShot = null;
     Object.assign(this.b, { vx: v.vx + (Math.random() * 2 - 1) * err, vy: v.vy + (Math.random() * 2 - 1) * err * 0.6, vz: v.vz, curve: v.curve, res: v.res || null, resR: 0, age: 0 });
+    // a hard free kick struck clean through the middle (no curl) knuckles: it wobbles side to side in the air
+    const spd = Math.hypot(v.vx, v.vy, v.vz);
+    this.b.kn = this.kind === 'free' && Math.abs(v.curve || 0) < 0.12 && spd > 21 ? 0.7 + 0.5 * Math.min(1, (spd - 21) / 6) : 0;
+    this.b.knP = Math.random() * 6;
     this.lastSpeed = v.vz;
     this.phase = 'flight'; this.pt = 0; this.trail = [];
     if (window.AMSfx) try { window.AMSfx.kick(0.8); } catch (e) {}
@@ -1621,6 +1628,8 @@ class Component extends DCLogic {
     const sp = Math.hypot(b.vx, b.vz), ddt = dt || 0;
     const roll = sp / 0.11 * 0.35, onGround = b.y <= 0.115;
     this.bSpin = this.phase === 'aim' || this.phase === 'runup' ? 0 : onGround ? sp / 0.11 : Math.max(roll, (this.bSpin || 0) * Math.exp(-0.5 * ddt));
+    // a knuckleball hardly turns: that is what makes it wobble
+    if (b.kn && !onGround && this.phase === 'flight') this.bSpin = 1.2;
     this.ball.rotation.x += this.bSpin * ddt;
     this.bSide = b.curve ? b.curve * 25 : (this.bSide || 0) * Math.exp(-0.8 * ddt);
     this.ball.rotation.y += this.bSide * ddt;
