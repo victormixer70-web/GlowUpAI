@@ -115,6 +115,8 @@
         [-14, -6, 0, 7, 13].forEach(function (d) { var o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f * Math.pow(2, d / 1200); o.connect(bp); o.start(st); o.stop(st + dur + 0.1); });
       });
     },
+    // a soft click for buttons: a short pop, quiet
+    press: function () { if (!ready()) return; var t = now(); tone('sine', 620, 380, t, 0.06, 0.045); },
     tick: function () { if (!ready()) return; tone('square', 1400, 1800, now(), 0.04, 0.04); },
     coin: function () { if (!ready()) return; var t = now(); tone('square', 1320, 0, t, 0.07, 0.05); tone('square', 1760, 0, t + 0.07, 0.16, 0.05); },
     levelUp: function () { if (!ready()) return; var t = now(); [523, 659, 784, 1047].forEach(function (f, i) { tone('triangle', f, 0, t + i * 0.09, 0.25, 0.18); }); },

@@ -335,6 +335,13 @@
     '.am-rar.r3{animation:amRarGlow 2s ease-in-out infinite}',
     '@keyframes amRarShine{0%{background-position:160% 0}60%,100%{background-position:-60% 0}}',
     '@keyframes amRarGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.12) drop-shadow(0 0 10px #FFC53D88)}}',
+    // ---- '?' buttons: the long explanations live behind them (data-help), shown in a bubble on tap ----
+    '.am-q{flex:none;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border:0;border-radius:50%;cursor:pointer;background:radial-gradient(circle at 50% 30%,#5CB8FF,#1E8BFF 55%,#0A3DCC);box-shadow:inset 0 1px 0 #ffffff88,0 0 0 2px #02040C,0 0 12px #1E8BFF88;color:#fff;font:400 15px/1 Titulos,sans-serif;text-shadow:0 1px 2px #02040C}',
+    '.am-q:active{transform:scale(.9)}',
+    '#am-qb{position:absolute;z-index:90;max-width:340px;padding:10px 14px;border-radius:14px;background:linear-gradient(170deg,#0B1A44F7,#02040CF7);box-shadow:inset 0 0 0 1.5px #3DA9FF,0 12px 30px #000c,0 0 20px #1E8BFF55;font:700 12px/1.45 Exo2,sans-serif;color:#E6F2FF;animation:amQb .22s cubic-bezier(.2,1.5,.4,1) both;pointer-events:none}',
+    '@keyframes amQb{from{opacity:0;transform:translateY(6px) scale(.92)}}',
+    '.fx-sweep{position:absolute;top:-10%;bottom:-10%;left:-40%;width:38%;z-index:70;pointer-events:none;transform:skewX(-16deg);background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--sc) 55%,transparent) 40%,color-mix(in srgb,var(--sc) 80%,#fff) 50%,color-mix(in srgb,var(--sc) 55%,transparent) 60%,transparent);mix-blend-mode:screen;animation:fxSweep .6s cubic-bezier(.4,0,.2,1) forwards}',
+    '@keyframes fxSweep{to{left:120%}}',
     // ---- titles: Russo One, upright (no italic) ----
     '.bc-title,.bc-title.hd,#stage .bc-title.hd,#stage .tn-big,#stage .ttl,#am-daily h2,#am-res .t,#am-res .t .lt,#am-res .lvup,.jc-wheel .side h2,.jc-wheel .won-card b{font-family:"Titulos",sans-serif!important;font-style:normal!important;font-weight:400!important}',
     '.bc-title.hd,#stage .bc-title.hd{font-size:21px!important;letter-spacing:1px!important;padding:3px 18px 0!important}',
@@ -441,9 +448,18 @@
       requestAnimationFrame(wait);
     }, 140);
   };
+  // the accent of each screen: a sweep of that colour crosses the stage as you go there
+  var ACC = { Tienda: '#FFC53D', Pase: '#FFB020', Logros: '#FFC53D', Ranking: '#22D3EE', Social: '#2FBF71', Clubes: '#14B8A6', Minijuegos: '#EC4899', Torneo: '#FF8A3D', Perfil: '#22D3EE', Estadisticas: '#FF8A3D', Ajustes: '#3DA9FF', Idioma: '#22D3EE', MiEstadio: '#2FBF71', Privada: '#22D3EE', Taquilla: '#3DA9FF', Modos: '#2FBF71', Rapida: '#22D3EE', Competitivo: '#FFC53D', Deportes: '#1E8BFF' };
+  var sweep = function () {
+    var m = /#\/(\w+)/.exec(location.hash), c = m && ACC[m[1]];
+    if (!c || !stage) return;
+    var w = document.createElement('div'); w.className = 'fx-sweep'; w.style.setProperty('--sc', c);
+    stage.appendChild(w); setTimeout(function () { w.remove(); }, 700);
+  };
   window.AMFX = {
     swap: function (doSwap) {
       var tk = ++tok;
+      if (!inGame()) setTimeout(sweep, 30);
       clearAll();
       mountFx();
       var old = rootOf();
@@ -542,6 +558,7 @@
     var el = e.target.closest && e.target.closest(pressable);
     if (!el || !stage.contains(el)) return;
     el.classList.add('fx-btn', 'fx-down'); down = el;
+    try { if (window.AMSfx && window.AMSfx.press) window.AMSfx.press(); } catch (err) {}
     try { if (navigator.vibrate) navigator.vibrate(8); } catch (err) {}
     lastTap = stageXY(e);
     burst(lastTap);
@@ -663,4 +680,16 @@
 
   // first screen
   var first = rootOf(); if (first) { enter(first); motes(first); }
+
+  // a tap on a '?' shows its explanation; any other tap closes it
+  document.addEventListener('pointerdown', function (e) {
+    var old = document.getElementById('am-qb'), q = e.target && e.target.closest ? e.target.closest('.am-q') : null;
+    if (old) old.remove();
+    if (!q || !q.getAttribute('data-help')) return;
+    var st = document.getElementById('stage') || document.body, sr = st.getBoundingClientRect(), k = sr.width / (st.offsetWidth || sr.width) || 1, r = q.getBoundingClientRect();
+    var b = document.createElement('div'); b.id = 'am-qb'; b.textContent = q.getAttribute('data-help'); st.appendChild(b);
+    var x = (r.left - sr.left) / k + r.width / k / 2 - b.offsetWidth / 2, y = (r.top - sr.top) / k - b.offsetHeight - 8;
+    if (y < 6) y = (r.bottom - sr.top) / k + 8;
+    b.style.left = Math.max(6, Math.min((st.offsetWidth || 844) - b.offsetWidth - 6, x)) + 'px'; b.style.top = y + 'px';
+  }, true);
 })();
