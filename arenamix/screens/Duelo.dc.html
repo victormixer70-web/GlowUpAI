@@ -96,6 +96,28 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .du-prac span{display:flex;flex-direction:column;align-items:center;min-width:60px;padding:4px 10px;border-radius:12px;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 1.5px #1E8BFF66}
 .du-prac small{font:400 10px 'Titulos',sans-serif;letter-spacing:1px;color:#7CC4FF}
 .du-prac b{font-family:'Titulos',sans-serif;font-weight:400;font-size:22px;line-height:1}
+
+/* ---- the shoot-out scoreboard, redone like the match's: a glass capsule, each side's colour stripe and round crest ---- */
+.du-sb-row{position:relative;height:40px;border-radius:20px;overflow:hidden;background:linear-gradient(180deg,#0B1A44EB,#02040CF2);box-shadow:inset 0 0 0 1px #ffffff1f,inset 0 1px 0 #ffffff38,0 0 0 1px #02040C,0 8px 20px #000a;filter:none}
+.du-sb-row::after{content:'';position:absolute;top:-20%;bottom:-20%;left:0;width:22%;background:linear-gradient(100deg,transparent,#ffffff26,transparent);transform:translateX(-200%) skewX(-18deg);animation:duSbShine 7s ease-in-out infinite;pointer-events:none}
+@keyframes duSbShine{0%,80%{transform:translateX(-200%) skewX(-18deg)}100%{transform:translateX(560%) skewX(-18deg)}}
+.du-team{position:relative;width:156px;height:40px;clip-path:none !important;box-shadow:none !important;color:#fff !important;text-shadow:0 1px 3px #000c !important;font-size:14px;letter-spacing:.8px}
+.du-team.y{background:linear-gradient(90deg,color-mix(in srgb,var(--yc) 50%,transparent),color-mix(in srgb,var(--yc) 12%,transparent) 70%,transparent) !important;padding-left:16px}
+.du-team.r{background:linear-gradient(270deg,color-mix(in srgb,var(--rc) 50%,transparent),color-mix(in srgb,var(--rc) 12%,transparent) 70%,transparent) !important;padding-right:16px}
+.du-team::before{content:'';position:absolute;top:0;bottom:0;width:5px}
+.du-team.y::before{left:0;background:var(--yc);box-shadow:0 0 12px var(--yc)}
+.du-team.r::before{right:0;background:var(--rc);box-shadow:0 0 12px var(--rc)}
+.du-team .du-tag{flex:none;width:26px;height:26px;border-radius:50% !important;display:grid;place-items:center;font-style:normal;font-size:12px;color:#fff;text-shadow:0 1px 2px #000;box-shadow:0 0 0 2px #ffffffd9,0 0 0 3px #02040C !important}
+.du-team.y .du-tag{background:linear-gradient(135deg,var(--yl),var(--yd)) !important}
+.du-team.r .du-tag{background:linear-gradient(135deg,var(--rl),var(--rd)) !important}
+.du-score{height:40px !important;margin:0 !important;min-width:92px;background:#02040C8C !important;box-shadow:inset 1px 0 0 #ffffff14,inset -1px 0 0 #ffffff14 !important;font-size:28px !important;text-shadow:0 2px 0 #02040C,0 0 12px #3DA9FF99}
+.du-score i{width:8px;height:3px;border-radius:2px;background:#BFE3FF;font-size:0 !important}
+.du-pips{width:400px !important;margin-top:6px !important}
+.du-pips>div{width:150px !important;gap:6px !important;padding:4px 8px;border-radius:12px;background:#02040CB3;box-shadow:inset 0 0 0 1px #ffffff1a}
+.du-pips>div.y{justify-content:center !important}.du-pips>div:not(.y){justify-content:center}
+.du-pip{width:14px !important;height:14px !important}
+.du-rib{transform:none !important;border-radius:10px;padding:3px 14px 2px !important;background:#02040CCC !important;box-shadow:inset 0 0 0 1px #3DA9FF66 !important}
+.du-rib.sd{background:linear-gradient(90deg,#B45309,#FFC53D,#B45309) !important}
 </style>
 </helmet>
 <div data-am-game="1" style="{{teamVars}} position: relative; width: 844px; height: 390px; overflow: hidden; background: #0E0E1C; color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none; -webkit-user-select: none">
@@ -1275,20 +1297,52 @@ class Component extends DCLogic {
     const b = place(STAD.model(), true); clip(b, planes[1]); E.add(b);
     // night: the stands in the dark (their materials were just cloned for the clipping)
     [a, b].forEach((m) => m.traverse((o) => { if (o.isMesh && o.material) [].concat(o.material).forEach((mt) => { if (mt.color) mt.color.multiplyScalar(0.45); }); }));
-    // the two big video screens of the stadium: the ARENA MIX board with what is being played
+    // the two big video screens of the stadium: the logo and what is being played, in the logo's colours
     {
       const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 512;
-      const c = cv.getContext('2d'), w = 1024, h = 512;
-      const gr = c.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#05123A'); gr.addColorStop(0.55, '#0B2A78'); gr.addColorStop(1, '#0B1F5C');
-      c.fillStyle = gr; c.fillRect(0, 0, w, h);
-      c.fillStyle = 'rgba(255,255,255,0.05)'; for (let x = 0; x < w; x += 8) c.fillRect(x, 0, 3, h);
-      c.textAlign = 'center'; c.textBaseline = 'middle';
-      c.font = 'italic 800 170px Barlow Condensed, Arial'; c.fillStyle = '#22D3EE'; c.shadowColor = '#22D3EE'; c.shadowBlur = 30; c.fillText('ARENA MIX', w / 2, 200);
-      c.shadowBlur = 0; c.font = 'italic 800 84px Barlow Condensed, Arial'; c.fillStyle = '#FFC53D';
-      c.fillText(this.kind === 'pen' ? (this.props.shootout ? 'TANDA DE PENALTIS' : 'PENALTIS') : 'TIROS LIBRES', w / 2, 360);
+      const c = cv.getContext('2d'), w = 1024, h = 512, label = this.kind === 'pen' ? (this.props.shootout ? 'TANDA DE PENALTIS' : 'PENALTIS') : 'TIROS LIBRES';
+      const paint = (logo) => {
+        const gr = c.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#02040C'); gr.addColorStop(0.5, '#06102E'); gr.addColorStop(1, '#0A3DCC');
+        c.fillStyle = gr; c.fillRect(0, 0, w, h);
+        const gl = c.createRadialGradient(w * 0.28, h * 0.5, 10, w * 0.28, h * 0.5, 320); gl.addColorStop(0, 'rgba(30,139,255,.55)'); gl.addColorStop(1, 'rgba(30,139,255,0)');
+        c.fillStyle = gl; c.fillRect(0, 0, w, h);
+        c.fillStyle = 'rgba(255,255,255,0.04)'; for (let y = 0; y < h; y += 6) c.fillRect(0, y, w, 2);
+        c.strokeStyle = '#3DA9FF'; c.lineWidth = 10; c.shadowColor = '#1E8BFF'; c.shadowBlur = 24; c.strokeRect(14, 14, w - 28, h - 28); c.shadowBlur = 0;
+        if (logo) c.drawImage(logo, 70, 86, 340, 340);
+        c.textAlign = 'left'; c.textBaseline = 'middle';
+        c.font = '400 92px Titulos, Barlow Condensed, Arial'; c.fillStyle = '#FFFFFF'; c.shadowColor = '#3DA9FF'; c.shadowBlur = 26; c.fillText('ARENA', 450, 190);
+        c.fillStyle = '#3DA9FF'; c.fillText('MIX', 450, 290); c.shadowBlur = 0;
+        c.fillStyle = '#FFC53D'; c.fillRect(450, 352, 500, 64); c.fillStyle = '#02040C'; c.font = '400 40px Titulos, Barlow Condensed, Arial'; c.fillText(label, 466, 386);
+      };
+      paint(null);
       const tex = new T.CanvasTexture(cv); tex.encoding = T.sRGBEncoding;
+      const img = new Image(); img.onload = () => { paint(img); tex.needsUpdate = true; }; img.src = 'icons/logo-512.png?v=5';
       const mat = new T.MeshBasicMaterial({ map: tex, toneMapped: false });
       [-1, 1].forEach((sx) => { const m = new T.Mesh(new T.PlaneGeometry(12.4, 6.1), mat); m.position.set(sx * 40.9, 9.1, -0.2); m.rotation.y = sx > 0 ? -Math.PI / 2 : Math.PI / 2; a.add(m); });
+    }
+    // the LED advertising boards behind the goal: bright panels in the logo's colours that scroll along
+    {
+      const cv = document.createElement('canvas'); cv.width = 2048; cv.height = 96;
+      const c = cv.getContext('2d'), W = 2048, H = 96, seg = 512;
+      const ads = [
+        ['#0A3DCC', '#1E8BFF', '#FFFFFF', 'ARENA MIX', '#3DA9FF'],
+        ['#02040C', '#06102E', '#FFC53D', '⚡ ¡A POR EL GOL!', '#FFC53D'],
+        ['#1E8BFF', '#3DA9FF', '#02040C', 'ARENA MIX', '#FFFFFF'],
+        ['#02040C', '#0A1A44', '#22D3EE', this.kind === 'pen' ? 'TANDA DE PENALTIS' : 'TIROS LIBRES', '#22D3EE']
+      ];
+      ads.forEach(([a1, a2, ink, txt, edge], i) => {
+        const x0 = i * seg, g = c.createLinearGradient(x0, 0, x0 + seg, H); g.addColorStop(0, a1); g.addColorStop(1, a2);
+        c.fillStyle = g; c.fillRect(x0, 0, seg, H);
+        c.fillStyle = edge; c.fillRect(x0, 0, seg, 5); c.fillRect(x0, H - 5, seg, 5);
+        c.fillStyle = 'rgba(255,255,255,0.06)'; for (let x = x0; x < x0 + seg; x += 6) c.fillRect(x, 0, 2, H);
+        c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = '400 50px Titulos, Barlow Condensed, Arial'; c.fillStyle = ink;
+        c.shadowColor = ink; c.shadowBlur = 14; c.fillText(txt, x0 + seg / 2, H / 2 + 3); c.shadowBlur = 0;
+      });
+      const tex = new T.CanvasTexture(cv); tex.encoding = T.sRGBEncoding; tex.wrapS = T.RepeatWrapping; tex.repeat.set(2.2, 1);
+      const mat = new T.MeshBasicMaterial({ map: tex, toneMapped: false });
+      const board = new T.Mesh(new T.BoxGeometry(56, 0.95, 0.18), [this.mat(0x0b1a44), this.mat(0x0b1a44), this.mat(0x0b1a44), this.mat(0x0b1a44), mat, this.mat(0x0b1a44)]);
+      board.position.set(GX, 0.48, D + 4.6); board.rotation.y = Math.PI; E.add(board);
+      this.adLED = tex;
     }
     a.updateMatrix(); b.updateMatrix();
     const v = new T.Vector3(), cx = GX, cz = D - 30 * KL, items = [];
@@ -1559,6 +1613,7 @@ class Component extends DCLogic {
     this.cam.position.copy(this.camPos);
     if (this.shake > 0) this.cam.position.add(new T.Vector3((Math.random() - 0.5) * this.shake * 0.25, (Math.random() - 0.5) * this.shake * 0.2, 0));
     this.cam.lookAt(this.camLook);
+    if (this.adLED) this.adLED.offset.x = (performance.now() / 1000 * 0.035) % 1;
     // ball
     this.ball.position.set(b.x, b.y, b.z);
     // the ball keeps its spin: in the air it carries on turning (slowly losing it, also when it hits the net),
