@@ -13,7 +13,6 @@ body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 input::placeholder{color:#6E6E92}
 @keyframes lgSwing{0%,100%{rotate:-1.6deg}50%{rotate:1.6deg}}
-.lg-card>div:first-child{transform:perspective(700px) rotateY(calc(var(--mx,0) * 7deg)) rotateX(calc(var(--my,0) * -5deg));transition:transform .25s ease-out}
 @keyframes lgHolo{to{background-position:200% 0}}
 @keyframes lgPulse{0%,100%{box-shadow:0 0 0 0 #FFC53D77,0 8px 22px #000a}50%{box-shadow:0 0 0 8px #FFC53D00,0 8px 22px #000a}}
 @keyframes lgFade{from{opacity:0}}
@@ -21,30 +20,30 @@ input::placeholder{color:#6E6E92}
 .lg-shirt{animation:lgShirt 3.2s ease-in-out infinite;transform-origin:50% 0}@keyframes lgShirt{0%,100%{rotate:-2deg}50%{rotate:2deg}}
 .lg-dice:active svg{rotate:200deg;transition:rotate .3s}
 .lg-nm .lg-field{height:44px}
-.nm-wall{position:relative;flex:none;width:236px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(120% 80% at 50% 0%,#2A2363,#1E0D4F 60%,#140832);overflow:hidden;border-right:1px solid #2E2E58}
+.nm-wall{position:relative;flex:none;width:236px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(120% 80% at 50% 0%,#0B2A78,#071640 60%,#02061A);overflow:hidden;border-right:1px solid #1E3A6E}
 .nm-logos{position:absolute;left:-60px;top:-40px;width:380px;display:flex;flex-wrap:wrap;gap:14px 18px;rotate:-14deg;opacity:.07;font:800 italic 15px 'Barlow Condensed',sans-serif;letter-spacing:1px;color:#fff;pointer-events:none}
 .nm-flash{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff;opacity:0;box-shadow:0 0 18px 10px #ffffffcc,0 0 50px 24px #9fe8ff55;animation:nmFlash 4s ease-out infinite;pointer-events:none}
 @keyframes nmFlash{0%,86%,100%{opacity:0;transform:scale(.4)}88%{opacity:1;transform:scale(1.2)}93%{opacity:.2;transform:scale(1)}}
 .nm-spot{position:absolute;left:50%;top:-20px;width:240px;height:300px;margin-left:-120px;background:conic-gradient(from 180deg at 50% 0%,transparent 160deg,#FFF3C422 172deg,#FFF3C433 180deg,#FFF3C422 188deg,transparent 200deg);pointer-events:none;animation:nmSpot 5s ease-in-out infinite;transform-origin:50% 0}
 @keyframes nmSpot{0%,100%{rotate:-3deg}50%{rotate:3deg}}
 .nm-new{position:relative;font:800 italic 13px 'Barlow Condensed',sans-serif;letter-spacing:2px;color:#1A1204;background:linear-gradient(135deg,#FFE38A,#FFC53D);padding:2px 10px;border-radius:4px;transform:skewX(-10deg);box-shadow:0 3px 0 #B7791F}
-.nm-d{width:32px;height:30px;border-radius:8px;border:1px solid #3A3A6E;background:#15092ACC;color:#A9BEDD;font:800 italic 16px 'Barlow Condensed',sans-serif;cursor:pointer;padding:0;transition:transform .15s,background .15s}
+.nm-d{width:32px;height:30px;border-radius:8px;border:1px solid #1E3A6E;background:#06102ECC;color:#A9BEDD;font:800 italic 16px 'Barlow Condensed',sans-serif;cursor:pointer;padding:0;transition:transform .15s,background .15s}
 .nm-d.on{background:linear-gradient(135deg,#FFE38A,#FFC53D);color:#1A1204;border-color:#FFE38A;transform:translateY(-3px);box-shadow:0 3px 0 #B7791F,0 0 14px #FFC53D66}
 .nm-num{animation:nmNum .35s cubic-bezier(.2,1.6,.4,1)}@keyframes nmNum{from{opacity:0}}
-.nm-led{display:flex;align-items:center;gap:8px;height:30px;padding:0 10px;border-radius:8px;background:#0D041A;border:1px solid #3F246E;box-shadow:inset 0 0 12px #000}
+.nm-led{display:flex;align-items:center;gap:8px;height:30px;padding:0 10px;border-radius:8px;background:#02040C;border:1px solid #1E3A6E;box-shadow:inset 0 0 12px #000}
 .nm-led-in{position:relative;flex:1;min-width:0;height:100%;overflow:hidden;display:flex;align-items:center;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
 .nm-led-in span{white-space:nowrap;font:800 13px 'Barlow Condensed',sans-serif;letter-spacing:2px;color:#FFC53D;text-shadow:0 0 6px #FFC53DAA;background-image:radial-gradient(#0005 35%,transparent 36%);background-size:3px 3px}
 .nm-led-in span.idle{color:#6E6E92;text-shadow:none;animation:lgLive 1.6s ease-in-out infinite}
 .nm-led-in span.run{padding-left:100%;animation:nmRun 7s linear infinite}
 @keyframes nmRun{to{transform:translateX(-100%)}}
-.nm-sign{position:relative;flex:1;min-width:0;display:flex;align-items:center;gap:8px;height:46px;padding:10px 4px 0 2px;border:0;border-bottom:2px dashed #4A4A7E;transition:border-color .2s,box-shadow .2s}
+.nm-sign{position:relative;flex:1;min-width:0;display:flex;align-items:center;gap:8px;height:46px;padding:10px 4px 0 2px;border:0;border-bottom:2px dashed #3A5A8C;transition:border-color .2s,box-shadow .2s}
 .nm-sign-lb{position:absolute;left:2px;top:0;font-size:8.5px;font-weight:800;letter-spacing:2px;color:#8FA8CC}
 .nm-sign input{flex:1;min-width:0;height:100%;border:0;outline:0;background:transparent;color:#F4F4FA;font:800 italic 22px 'Barlow Condensed',sans-serif;letter-spacing:1px}
 .nm-sign:focus-within{border-bottom-color:#22D3EE}
-.nm-idea{height:24px;padding:0 9px;border-radius:12px;border:1px solid #3A3A6E;background:#7C5CFF1F;color:#C9C2FF;font:700 11px Exo2,sans-serif;cursor:pointer;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;transition:background .15s,transform .15s}
-.nm-idea:active{transform:scale(.94);background:#7C5CFF44}
+.nm-idea{height:24px;padding:0 9px;border-radius:12px;border:1px solid #1E3A6E;background:#1E8BFF1F;color:#BFE3FF;font:700 11px Exo2,sans-serif;cursor:pointer;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;transition:background .15s,transform .15s}
+.nm-idea:active{transform:scale(.94);background:#1E8BFF44}
 .nm-stamp{position:absolute;left:50%;top:44%;z-index:4;pointer-events:none;translate:-50% -50%;animation:nmStamp .4s cubic-bezier(.3,1.6,.5,1) both}
-.nm-stamp span{display:block;padding:6px 18px;border:4px solid #FF4D5E;border-radius:10px;color:#FF4D5E;font:800 italic 48px 'Barlow Condensed',sans-serif;letter-spacing:2px;rotate:-12deg;background:#190D3DCC;box-shadow:0 0 0 3px #FF4D5E33,0 10px 30px #000a;text-shadow:0 0 12px #FF4D5E77}
+.nm-stamp span{display:block;padding:6px 18px;border:4px solid #FF4D5E;border-radius:10px;color:#FF4D5E;font:800 italic 48px 'Barlow Condensed',sans-serif;letter-spacing:2px;rotate:-12deg;background:#06102ECC;box-shadow:0 0 0 3px #FF4D5E33,0 10px 30px #000a;text-shadow:0 0 12px #FF4D5E77}
 @keyframes nmStamp{from{opacity:0;scale:2.6}to{opacity:1;scale:1}}
 .nm-boom{position:absolute;inset:0;z-index:5;pointer-events:none;background:#fff;animation:nmBoom .5s .1s ease-out both}
 @keyframes nmBoom{0%{opacity:0}15%{opacity:.75}100%{opacity:0}}
@@ -61,98 +60,109 @@ input::placeholder{color:#6E6E92}
 .lg-beam{position:absolute;top:-40px;width:180px;height:520px;margin-left:-90px;transform-origin:50% 0;background:linear-gradient(180deg,#E8F6FF66,#E8F6FF00 80%);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);mix-blend-mode:screen;pointer-events:none;animation:lgBeam 7s ease-in-out infinite alternate}
 @keyframes lgBeam{from{rotate:-28deg}to{rotate:22deg}}
 .lg-tap{position:absolute;inset:0;cursor:crosshair}
-.lg-outline{transform:translate(calc(var(--mx,0) * 10px),calc(var(--my,0) * 6px));transition:transform .3s ease-out}
-.lg-card{position:absolute;left:514px;top:44px;width:304px;height:330px;transform-origin:50% -46px;animation:lgIn .6s cubic-bezier(.2,1.4,.4,1) both,lgSwing 6s 0.6s ease-in-out infinite}
-.lg-card:focus-within{animation-play-state:running,paused}
 .lg-field{display:flex;align-items:center;gap:8px;height:36px;padding:0 10px;border-radius:9px;border:1px solid #3DA9FF99;background:#06102ECC;transition:border-color .2s,box-shadow .2s}
 .lg-field:focus-within{border-color:#22D3EE;box-shadow:0 0 0 3px #22D3EE33}
 .lg-field input{flex:1;min-width:0;height:100%;border:0;outline:0;background:transparent;color:#F4F4FA;font:700 13px Exo2,sans-serif}
-.lg-ticket{position:absolute;left:266px;bottom:30px;width:238px;height:70px;display:flex;border:0;padding:0;background:none;cursor:pointer;animation:lgTicketIn .5s .25s cubic-bezier(.2,1.3,.4,1) both;filter:drop-shadow(0 10px 18px #000c)}
-.lg-ticket .main{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 14px;background:linear-gradient(120deg,#FFE38A,#FFC53D 45%,#F59E0B);border-radius:10px 0 0 10px;color:#1A1206;text-align:left;-webkit-mask:radial-gradient(circle 7px at 100% 50%,#0000 98%,#000);mask:radial-gradient(circle 7px at 100% 50%,#0000 98%,#000);animation:lgPulse 2s 1s ease-in-out infinite}
-.lg-ticket .stub{position:relative;width:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:linear-gradient(120deg,#22D3EE,#8B5CF6);border-radius:0 10px 10px 0;color:#040A1C;border-left:2px dashed #040A1C66;-webkit-mask:radial-gradient(circle 7px at 0 50%,#0000 98%,#000);mask:radial-gradient(circle 7px at 0 50%,#0000 98%,#000)}
-.lg-ticket.torn .stub{animation:lgStubFly .38s cubic-bezier(.5,0,.8,.5) forwards}
-.lg-ticket.torn .main{animation:lgMainFlash .3s ease-out}
-.lg-ticket:active .main{translate:0 2px}
 .lg-social{flex:none;width:40px;height:36px;border-radius:9px;border:1px solid #3DA9FF99;background:#06102ECC;display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+/* ---- the redesign: night blue, the logo's electric blue, gold for PLAY ---- */
+.lg-grade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#02040C00 0%,#02040C00 46%,#02040CB0 64%,#02040CE6 100%),radial-gradient(45% 60% at 26% 78%,#1E8BFF55,transparent 70%),linear-gradient(0deg,#02040CCC 0%,#02040C00 30%)}
+.lg-brand{position:absolute;left:18px;top:14px;z-index:2;display:flex;align-items:center;gap:12px;animation:lgIn .5s both;pointer-events:none}
+.lg-brand img{display:block;flex:none;border-radius:16px;box-shadow:0 0 0 2px #1E8BFF,0 0 22px #1E8BFF99,0 8px 18px #000a}
+.lg-name{font:400 30px/1 Titulos,sans-serif;letter-spacing:1px;color:#fff;text-shadow:0 3px 0 #02040C,0 0 18px #1E8BFF88}
+.lg-name b{font-weight:400;background:linear-gradient(180deg,#9AD4FF,#3DA9FF 55%,#1E8BFF);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 3px 0 #02040C)}
+.lg-tags{position:absolute;left:300px;top:150px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none;animation:lgIn .6s .15s both}
+.lg-tags span{padding:3px 10px 3px 8px;border-radius:8px;background:#02040CB3;box-shadow:inset 3px 0 0 var(--t),inset 0 0 0 1px color-mix(in srgb,var(--t) 45%,transparent);font:400 9.5px Titulos,sans-serif;letter-spacing:1.4px;color:#E6F2FF}
+.lg-live{display:flex;align-items:center;gap:6px;font:800 10px Exo2,sans-serif;letter-spacing:1.5px;color:#BFE3FF}
+.lg-live i{width:7px;height:7px;border-radius:4px;background:#FF4D5E;box-shadow:0 0 8px #FF4D5E;animation:lgLive 1.2s infinite}
+.lg-hint{position:absolute;left:150px;top:338px;display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:14px;background:#02040CD9;box-shadow:inset 0 0 0 1.5px #FFC53D88,0 0 14px #FFC53D44;font:400 10px Titulos,sans-serif;letter-spacing:1.5px;color:#FFE7A3;pointer-events:none;animation:lgHint 1.8s ease-in-out infinite;transition:opacity .4s}
+.lg-panel{position:absolute;right:16px;top:50px;width:318px;height:326px;box-sizing:border-box;padding:14px 16px 12px;display:flex;flex-direction:column;gap:9px;border-radius:22px;background:radial-gradient(90% 50% at 100% 0%,#1E8BFF33,transparent 70%),linear-gradient(170deg,#0B1A44F2,#040A1CF2 60%,#02040CF7);box-shadow:inset 0 0 0 1.5px #3DA9FF66,inset 0 1px 0 #ffffff22,0 0 0 1px #02040C,0 22px 44px #000c,0 0 36px #0A3DCC55;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:lgPanelIn .55s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes lgPanelIn{from{opacity:0;translate:40px 0}}
+.lg-hello{display:flex;align-items:center;gap:10px}
+.lg-av{flex:none;width:46px;height:46px;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 30%,#3DA9FF,#0A3DCC 70%);box-shadow:0 0 0 2px #02040C,0 0 0 4px #3DA9FF,0 0 14px #1E8BFF88}
+.lg-av img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}
+.lg-k{font:800 9px Exo2,sans-serif;letter-spacing:1.8px;color:#7CC4FF}
+.lg-who{font:400 20px/1 Titulos,sans-serif;letter-spacing:.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lg-season{flex:none;align-self:flex-start;padding:3px 8px;border-radius:8px;background:#FFC53D1f;box-shadow:inset 0 0 0 1px #FFC53D88;font:800 8.5px Exo2,sans-serif;letter-spacing:1.2px;color:#FFD872}
+.lg-play{position:relative;flex:none;height:66px;display:flex;align-items:center;gap:12px;padding:0 16px;border:0;border-radius:16px;cursor:pointer;text-align:left;color:#1A1204;overflow:hidden;background:linear-gradient(180deg,#FFF0B0 0%,#FFD34D 30%,#FFB020 70%,#F59E0B 100%);box-shadow:inset 0 2px 0 #ffffffcc,inset 0 -4px 0 #B7791F,0 6px 0 #7A4E0E,0 10px 26px #FFB02066;transition:translate .1s}
+.lg-play::before{content:"";position:absolute;inset:0;border-radius:16px;box-shadow:0 0 0 0 #FFC53D99;animation:lgRing 2s 1s ease-out infinite;pointer-events:none}
+@keyframes lgRing{0%,100%{box-shadow:inset 0 0 0 0 #FFFFFF00}50%{box-shadow:inset 0 0 18px 2px #FFFFFF88}}
+.lg-play::after{content:"";position:absolute;top:-40%;bottom:-40%;left:0;width:30%;background:linear-gradient(100deg,transparent,#ffffffaa,transparent);transform:translateX(-160%) skewX(-18deg);animation:bcTitleShine 3.6s ease-in-out infinite}
+.lg-play:active{translate:0 3px;box-shadow:inset 0 2px 0 #ffffffcc,inset 0 -4px 0 #B7791F,0 3px 0 #7A4E0E,0 6px 18px #FFB02066}
+.lg-play .pi{flex:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#ffffff8a;box-shadow:inset 0 0 0 2px #1A120433;padding-left:3px;box-sizing:border-box}
+.lg-play .tx{display:flex;flex-direction:column;gap:2px}
+.lg-play b{font:400 30px/1 Titulos,sans-serif;letter-spacing:2px}
+.lg-play small{font:800 10px Exo2,sans-serif;letter-spacing:.3px;opacity:.75}
+.lg-play.torn{animation:lgGo .3s ease-out both}
+@keyframes lgGo{0%{filter:brightness(1)}40%{filter:brightness(1.6);scale:1.04}100%{filter:brightness(1.1);scale:.98}}
+.lg-or{display:flex;align-items:center;gap:8px;font:800 8.5px Exo2,sans-serif;letter-spacing:1.6px;color:#8FB4E0}
+.lg-or i{flex:1;height:1px;background:linear-gradient(90deg,transparent,#3DA9FF66,transparent)}
+.lg-panel .lg-field{height:34px;border-radius:11px;border:0;background:#02040CB3;box-shadow:inset 0 0 0 1px #1E8BFF55}
+.lg-panel .lg-field:focus-within{box-shadow:inset 0 0 0 1.5px #3DA9FF,0 0 0 3px #1E8BFF33}
+.lg-panel .lg-field input::placeholder{color:#6F88B3}
+.lg-enter{flex:1;height:36px;border:0;border-radius:11px;cursor:pointer;color:#fff;font:400 15px Titulos,sans-serif;letter-spacing:2px;background:linear-gradient(180deg,#5CB8FF,#1E8BFF 50%,#0A3DCC);box-shadow:inset 0 1px 0 #ffffff88,inset 0 -3px 0 #06247A,0 4px 0 #031447;text-shadow:0 2px 0 #06247A}
+.lg-enter:active{translate:0 2px}
+.lg-panel .lg-social{width:42px;height:36px;border-radius:11px;border:0;background:#02040CB3;box-shadow:inset 0 0 0 1px #1E8BFF55}
+.lg-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;font:700 10.5px Exo2,sans-serif;color:#A9BEDD}
+.lg-foot a{color:#3DA9FF;font-weight:800;text-decoration:none}.lg-foot a:hover{color:#9AD4FF}
 </style>
 </helmet>
-<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: radial-gradient(55% 70% at 15% 15%, #7C3AEDCC 0%, transparent 65%), radial-gradient(50% 70% at 95% 95%, #DB2777BB 0%, transparent 62%), radial-gradient(40% 55% at 60% 0%, #0EA5E9AA 0%, transparent 62%), linear-gradient(160deg, #2A1170 0%, #1A0B4A 55%, #2A0A3A 100%); color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none; {{rootVars}}" onPointerMove="{{onMove}}" onPointerDown="{{tapBg}}">
+<div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: linear-gradient(160deg, #06102E 0%, #030A22 55%, #02040C 100%); color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none; {{rootVars}}" onPointerMove="{{onMove}}" onPointerDown="{{tapBg}}">
   <div class="lg-photo" aria-hidden="true"></div>
   <div class="lg-tint" aria-hidden="true"></div>
-  <i class="lg-beam" style="left: 96px; animation-delay: -2s"></i><i class="lg-beam" style="left: 760px; animation-direction: alternate-reverse"></i>
+  <i class="lg-beam" style="left: 96px; animation-delay: -2s"></i><i class="lg-beam" style="left: 420px; animation-direction: alternate-reverse"></i>
   <canvas ref="{{crowdRef}}" aria-hidden="true" style="position: absolute; inset: 0; width: 844px; height: 390px; display: block; cursor: pointer"></canvas>
-  <span class="lg-outline" aria-hidden="true" style="position: absolute; left: 6px; top: 64px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 150px; line-height: .8; white-space: nowrap; color: transparent; -webkit-text-stroke: 2px #7CC4FF66; animation: lgTitleIn 1s cubic-bezier(.2,.8,.2,1) both; pointer-events: none">ARENA<br>MIX</span>
+  <div class="lg-grade" aria-hidden="true"></div>
+  <!-- the 3D player on a glowing stage: tap him and he shoots -->
   <sc-if value="{{show3d}}" hint-placeholder-val="{{ false }}">
     <canvas ref="{{canvasRef}}" role="img" aria-label="Tu jugador. Tócalo para que chute." onPointerDown="{{kick}}" style="position: absolute; left: 0; top: 0; width: 500px; height: 390px; display: block; cursor: pointer; touch-action: manipulation"></canvas>
-    <span style="position: absolute; left: 92px; top: 300px; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; background: #040A1CCC; border: 1px solid #2E2E58; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #CACAE0; pointer-events: none; animation: lgHint 1.8s ease-in-out infinite; opacity: {{hintOp}}; transition: opacity .4s">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2.5" stroke-linecap="round"><path d="M9 11V5a2 2 0 0 1 4 0v6M13 9a2 2 0 0 1 4 0v3M17 11a2 2 0 0 1 4 0v4a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3l-3-5a2 2 0 0 1 3-2l2 2"/></svg>TÓCALO Y CHUTA</span>
+    <span class="lg-hint" style="opacity: {{hintOp}}">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2.5" stroke-linecap="round"><path d="M9 11V5a2 2 0 0 1 4 0v6M13 9a2 2 0 0 1 4 0v3M17 11a2 2 0 0 1 4 0v4a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3l-3-5a2 2 0 0 1 3-2l2 2"/></svg>TÓCALO Y CHUTA</span>
   </sc-if>
   <sc-if value="{{show2d}}" hint-placeholder-val="{{ true }}">
-    <div style="position: absolute; left: 150px; top: 96px; filter: drop-shadow(0 14px 18px #000C)">
+    <div style="position: absolute; left: 160px; top: 96px; filter: drop-shadow(0 14px 18px #000C)">
       <dc-import name="Avatar" primary="{{kitP}}" secondary="{{kitS}}" pattern="{{kitPat}}" shorts="{{kitSh}}" socks="{{kitSo}}" shoe="{{kitShoe}}" number="10" hat="none" face="none" w="150" hint-size="150px,266px"></dc-import>
     </div>
   </sc-if>
 
-  <div style="position: absolute; left: 18px; top: 14px; display: flex; align-items: center; gap: 10px; animation: lgIn .5s both">
-    <img src="icons/logo-192.png?v=5" alt="ARENA MIX" width="46" height="46" style="display: block; flex: none; border-radius: 12px; filter: drop-shadow(0 0 12px #3B82F688)">
-    <div style="display: flex; flex-direction: column; gap: 3px">
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 26px; line-height: .9; letter-spacing: .5px">ARENA <span style="color: #22D3EE">MIX</span></span>
-      <span style="display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 800; letter-spacing: 1.5px; color: #FF8A8E"><span style="width: 7px; height: 7px; border-radius: 4px; background: #FF5C5C; box-shadow: 0 0 8px #FF5C5C; animation: lgLive 1.2s infinite"></span>NOCHE DE PARTIDO · {{fans}} EN LA GRADA</span>
+  <!-- the brand: logo, name and the live crowd -->
+  <div class="lg-brand">
+    <img src="icons/logo-512.png?v=5" alt="ARENA MIX" width="62" height="62">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span class="lg-name">ARENA <b>MIX</b></span>
+      <span class="lg-live"><i></i>EN DIRECTO · {{fans}} EN LA GRADA</span>
     </div>
   </div>
-
-  <button type="button" class="{{ticketCls}}" onClick="{{guest}}" aria-label="Jugar como invitado: sin registro, tu progreso se guarda en este móvil">
-    <span class="main">
-      <span style="font-size: 9px; font-weight: 800; letter-spacing: 2px; opacity: .75">ENTRADA · PUERTA 10</span>
-      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 23px; line-height: 1; letter-spacing: .3px; white-space: nowrap">JUGAR COMO INVITADO</span>
-    </span>
-    <span class="stub">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="#040A1C"><path d="M7 4l13 8l-13 8z"/></svg>
-      <span style="font-size: 9px; font-weight: 800; letter-spacing: 1px">YA</span>
-    </span>
-  </button>
-  <span style="position: absolute; left: 270px; bottom: 12px; font-size: 10px; color: #E9D5FF">Tu progreso se guarda en este móvil</span>
-
+  <div class="lg-tags" aria-hidden="true"><span style="--t: #FFC53D">1 VS 1 A 4 VS 4</span><span style="--t: #22D3EE">ONLINE CON AMIGOS</span><span style="--t: #2FBF71">CLUBES Y TORNEOS</span></div>
   <a href="Idioma.dc.html" aria-label="Cambiar idioma" style="position: absolute; right: 12px; top: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 14px; background: linear-gradient(135deg, #02040C, #0A3DCC 70%, #1E8BFF); border: 1px solid #3DA9FF; box-shadow: 0 0 12px #0A6CFF88; color: #F4F4FA; text-decoration: none; font-weight: 700; font-size: 11px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>{{langCode}}</a>
 
-  <!-- the lanyard -->
-  <svg aria-hidden="true" width="844" height="390" style="position: absolute; inset: 0; pointer-events: none"><path d="M610 -6L656 40M720 -6L676 40" stroke="#22D3EE" stroke-width="9" stroke-linecap="round"/><path d="M610 -6L656 40M720 -6L676 40" stroke="#040A1C" stroke-opacity=".35" stroke-width="2" stroke-dasharray="3 6"/><rect x="652" y="34" width="28" height="16" rx="4" fill="#A9BEDD" stroke="#3A5A8C" stroke-width="2"/></svg>
-
-  <div class="lg-card">
-    <div style="position: absolute; inset: 0; border-radius: 16px; background: radial-gradient(80% 50% at 50% 25%, #22D3EE55, transparent 70%), radial-gradient(70% 50% at 100% 100%, #FFC53D44, transparent 70%), linear-gradient(165deg, #0A3DCC 0%, #0B2A78 50%, #06102E 100%); border: 1.5px solid #A6DCFF; box-shadow: 0 20px 40px #000c, inset 0 1px 0 #ffffff1a; overflow: hidden">
-      <div style="height: 44px; background: linear-gradient(100deg, #22D3EE, #7C5CFF, #FF5C8A, #FFC53D, #22D3EE) 0 0 / 200% 100%; animation: lgHolo 6s linear infinite; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 14px 6px 14px; box-sizing: border-box; color: #040A1C">
-        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 17px; letter-spacing: 1px">ACREDITACIÓN</span>
-        <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px">TEMPORADA 1</span>
+  <!-- the panel: PLAY straight away, or sign in -->
+  <div class="lg-panel">
+    <div class="lg-hello">
+      <span class="lg-av"><img src="{{photo}}" alt="" style="display: {{photoDisp}}"></span>
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+        <span class="lg-k">BIENVENIDO DE NUEVO</span>
+        <span class="lg-who" translate="no">{{name}}</span>
       </div>
-      <div style="position: absolute; left: 50%; top: 8px; width: 34px; height: 8px; margin-left: -17px; border-radius: 4px; background: #040A1C"></div>
-      <div style="padding: 10px 14px 0 14px; display: flex; flex-direction: column; gap: 7px">
-        <div style="display: flex; align-items: center; gap: 10px">
-          <span style="flex: none; width: 52px; height: 52px; border-radius: 10px; overflow: hidden; border: 2px solid #22D3EE; background: radial-gradient(circle at 50% 30%, #2A3A7A, #1C0E43); box-shadow: 0 0 12px #22D3EE55"><img src="{{photo}}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: {{photoDisp}}"></span>
-          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
-            <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #E9D5FF">JUGADOR</span>
-            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{name}}</span>
-            <span style="font-size: 10px; font-weight: 800; color: #22D3EE">ACCESO: CAMPO · VESTUARIO</span>
-          </div>
-          <svg width="34" height="34" viewBox="0 0 7 7" aria-hidden="true" style="flex: none; border-radius: 4px; background: #F4F4FA; padding: 3px; box-sizing: border-box"><path d="M0 0h3v3H0zM4 0h3v3H4zM0 4h3v3H0zM1 1h1v1H1zM5 1h1v1H5zM1 5h1v1H1zM4 4h1v1H4zM6 4h1v1H6zM5 5h1v1H5zM4 6h1v1H4zM6 6h1v1H6z" fill="#040A1C" fill-rule="evenodd"/></svg>
-        </div>
-        <span style="display: flex; align-items: center; gap: 8px; font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #7CC4FF">INICIA SESIÓN<span style="flex: 1; height: 1px; background: linear-gradient(90deg, #7CC4FF, transparent)"></span></span>
-        <form style="display: flex; flex-direction: column; gap: 6px" onSubmit="{{submit}}">
-          <label class="lg-field"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8FA8CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6l9-6"/></svg><input type="email" autocomplete="email" aria-label="Correo electrónico" placeholder="Correo electrónico"></label>
-          <label class="lg-field"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8FA8CC" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><input type="password" autocomplete="current-password" aria-label="Contraseña" placeholder="Contraseña"></label>
-          <div style="display: flex; gap: 6px">
-            <button type="submit" style="flex: 1; height: 38px; border: 0; padding: 0; transform: skewX(0deg); background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #040A1C; cursor: pointer; box-shadow: 0 4px 0 #0E8FA3"><span style="display: inline-block; transform: skewX(0deg); font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 19px; letter-spacing: 1.5px">ENTRAR</span></button>
-            <button type="button" class="lg-social" aria-label="Entrar con Google" onClick="{{soon}}"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z" fill="#4285F4"/><path d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z" fill="#34A853"/><path d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2z" fill="#FBBC05"/><path d="M12 6c1.5 0 2.8.5 3.8 1.5l2.8-2.8A10 10 0 0 0 3.1 7.4L6.4 10C7.2 7.8 9.4 6 12 6z" fill="#EA4335"/></svg></button>
-            <button type="button" class="lg-social" aria-label="Entrar con Apple" onClick="{{soon}}"><svg width="14" height="16" viewBox="0 0 16 18" fill="#F4F4FA"><path d="M13 9.5c0-2 1.6-3 1.7-3c-1-1.4-2.4-1.6-2.9-1.6c-1.2-.1-2.4.7-3 .7s-1.6-.7-2.6-.7C4.8 5 3.4 5.8 2.7 7.1c-1.5 2.6-.4 6.4 1 8.5c.7 1 1.5 2.1 2.6 2.1c1-.1 1.4-.7 2.6-.7s1.6.7 2.6.7c1.1 0 1.8-1 2.5-2c.8-1.1 1.1-2.2 1.1-2.3c0 0-2.1-.8-2.1-3.9zM11 3.3c.6-.7 1-1.6.9-2.6c-.8 0-1.9.6-2.5 1.3c-.6.6-1 1.6-.9 2.5c.9.1 1.9-.5 2.5-1.2z"/></svg></button>
-          </div>
-        </form>
+      <span class="lg-season">TEMPORADA 1</span>
+    </div>
+    <button type="button" class="{{ticketCls}}" onClick="{{guest}}" aria-label="Jugar ahora: sin registro, tu progreso se guarda en este dispositivo">
+      <span class="pi"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" fill="#1A1204"/></svg></span>
+      <span class="tx"><b>JUGAR</b><small>Sin registro · tu progreso se guarda aquí</small></span>
+    </button>
+    <span class="lg-or"><i></i>O ENTRA CON TU CUENTA<i></i></span>
+    <form style="display: flex; flex-direction: column; gap: 6px" onSubmit="{{submit}}">
+      <label class="lg-field"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7CC4FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6l9-6"/></svg><input type="email" autocomplete="email" aria-label="Correo electrónico" placeholder="Correo electrónico"></label>
+      <label class="lg-field"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7CC4FF" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><input type="password" autocomplete="current-password" aria-label="Contraseña" placeholder="Contraseña"></label>
+      <div style="display: flex; gap: 6px">
+        <button type="submit" class="lg-enter">ENTRAR</button>
+        <button type="button" class="lg-social" aria-label="Entrar con Google" onClick="{{soon}}"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z" fill="#4285F4"/><path d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z" fill="#34A853"/><path d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2z" fill="#FBBC05"/><path d="M12 6c1.5 0 2.8.5 3.8 1.5l2.8-2.8A10 10 0 0 0 3.1 7.4L6.4 10C7.2 7.8 9.4 6 12 6z" fill="#EA4335"/></svg></button>
+        <button type="button" class="lg-social" aria-label="Entrar con Apple" onClick="{{soon}}"><svg width="14" height="16" viewBox="0 0 16 18" fill="#F4F4FA"><path d="M13 9.5c0-2 1.6-3 1.7-3c-1-1.4-2.4-1.6-2.9-1.6c-1.2-.1-2.4.7-3 .7s-1.6-.7-2.6-.7C4.8 5 3.4 5.8 2.7 7.1c-1.5 2.6-.4 6.4 1 8.5c.7 1 1.5 2.1 2.6 2.1c1-.1 1.4-.7 2.6-.7s1.6.7 2.6.7c1.1 0 1.8-1 2.5-2c.8-1.1 1.1-2.2 1.1-2.3c0 0-2.1-.8-2.1-3.9zM11 3.3c.6-.7 1-1.6.9-2.6c-.8 0-1.9.6-2.5 1.3c-.6.6-1 1.6-.9 2.5c.9.1 1.9-.5 2.5-1.2z"/></svg></button>
       </div>
-      <div style="position: absolute; left: 14px; right: 14px; bottom: 10px; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px">
-        <div style="display: flex; flex-direction: column; gap: 3px">
-          <span aria-hidden="true" style="display: block; width: 120px; height: 22px; background: repeating-linear-gradient(90deg, #F4F4FA 0 2px, transparent 2px 4px, #F4F4FA 4px 5px, transparent 5px 8px, #F4F4FA 8px 11px, transparent 11px 12px); opacity: .85"></span>
-          <span style="font-size: 8px; letter-spacing: 2px; color: #6E6E92">AM-2026-0010-{{serial}}</span>
-        </div>
-        <span style="font-size: 11px; color: #A9BEDD; text-align: right">¿Sin cuenta?<br><a href="#" onClick="{{soon}}" style="font-weight: 800">Crear cuenta</a><br><a href="privacidad.html" target="_blank" rel="noopener" style="font-size: 9.5px; color: #7CC4FF">Política de privacidad</a></span>
-      </div>
+    </form>
+    <div class="lg-foot">
+      <span>¿Sin cuenta? <a href="#" onClick="{{soon}}">Crear cuenta</a></span>
+      <a href="privacidad.html" target="_blank" rel="noopener">Política de privacidad</a>
     </div>
   </div>
   <!-- before going in: the privacy policy, to read and accept (once per version of the policy) -->
@@ -177,9 +187,9 @@ input::placeholder{color:#6E6E92}
   </sc-if>
   <!-- the first time in: your presentation as the club's new signing. Pick a shirt number, sign the contract with your player name -->
   <sc-if value="{{nameOpen}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; inset: 0; z-index: 8; background: #0D0418E6; display: flex; align-items: center; justify-content: center; animation: lgFade .25s both">
-      <form onSubmit="{{nameSubmit}}" class="lg-nm" style="position: relative; width: 640px; height: 340px; box-sizing: border-box; display: flex; border-radius: 18px; background: #190D3D; border: 1px solid #3A3A6E; box-shadow: 0 24px 50px #000d, 0 0 50px #7C5CFF2A; overflow: hidden">
-        <div style="position: absolute; left: 0; right: 0; top: 0; height: 5px; z-index: 3; background: linear-gradient(100deg, #22D3EE, #7C5CFF, #FF5C8A, #FFC53D, #22D3EE) 0 0 / 200% 100%; animation: lgHolo 6s linear infinite"></div>
+    <div style="position: absolute; inset: 0; z-index: 8; background: #02040CE6; display: flex; align-items: center; justify-content: center; animation: lgFade .25s both">
+      <form onSubmit="{{nameSubmit}}" class="lg-nm" style="position: relative; width: 640px; height: 340px; box-sizing: border-box; display: flex; border-radius: 18px; background: #06102E; border: 1px solid #1E3A6E; box-shadow: 0 24px 50px #000d, 0 0 50px #1E8BFF2A; overflow: hidden">
+        <div style="position: absolute; left: 0; right: 0; top: 0; height: 5px; z-index: 3; background: linear-gradient(100deg, #22D3EE, #1E8BFF, #FF5C8A, #FFC53D, #22D3EE) 0 0 / 200% 100%; animation: lgHolo 6s linear infinite"></div>
         <!-- press wall: the sponsor backdrop, camera flashes, a spotlight on your new shirt -->
         <div class="nm-wall">
           <div class="nm-logos" aria-hidden="true"><span>ARENA MIX</span><span>★</span><span>ARENA MIX</span><span>★</span><span>ARENA MIX</span><span>★</span><span>ARENA MIX</span><span>★</span><span>ARENA MIX</span><span>★</span><span>ARENA MIX</span><span>★</span><span>ARENA MIX</span><span>★</span><span>ARENA MIX</span><span>★</span><span>ARENA MIX</span><span>★</span><span>ARENA MIX</span><span>★</span></div>
@@ -207,17 +217,17 @@ input::placeholder{color:#6E6E92}
           </div>
         </div>
         <!-- the contract -->
-        <div style="position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 20px 22px 18px 20px; background: repeating-linear-gradient(0deg, #ffffff05 0 1px, transparent 1px 22px), linear-gradient(170deg, #2A1966, #1A0E41 70%)">
+        <div style="position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 20px 22px 18px 20px; background: repeating-linear-gradient(0deg, #ffffff05 0 1px, transparent 1px 22px), linear-gradient(170deg, #0B1A44, #040A1C 70%)">
           <div style="display: flex; align-items: center; justify-content: space-between">
             <span style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #22D3EE">CONTRATO DE FICHAJE</span>
-            <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #8FA8CC; border: 1px solid #2E2E58; border-radius: 5px; padding: 2px 6px">TEMPORADA 1</span>
+            <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #8FA8CC; border: 1px solid #1E3A6E; border-radius: 5px; padding: 2px 6px">TEMPORADA 1</span>
           </div>
           <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 30px; line-height: .95">¿CÓMO TE LLAMAS, CRACK?</span>
           <!-- the stadium announcer reads out your name as you type it -->
           <div class="nm-led"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M3 10v4h4l6 5V5L7 10z"/><path d="M17 8a5 5 0 0 1 0 8"/></svg><div class="nm-led-in" translate="no"><span class="{{ledCls}}">{{ledText}}</span></div></div>
           <div style="display: flex; gap: 8px; align-items: flex-end; margin-top: 2px">
             <label class="nm-sign" style="{{nameField}}"><span class="nm-sign-lb">FIRMA AQUÍ</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><input type="text" maxLength="16" autocomplete="nickname" autocapitalize="off" spellcheck="false" aria-label="Nombre de jugador" placeholder="Tu nombre" value="{{nameDraft}}" onInput="{{nameInput}}" translate="no"></label>
-            <button type="button" onClick="{{nameDice}}" aria-label="Sugerir un nombre" class="lg-dice" style="flex: none; width: 46px; height: 46px; border-radius: 11px; border: 1px solid #2E2E58; background: #0F061ECC; color: #FFC53D; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg></button>
+            <button type="button" onClick="{{nameDice}}" aria-label="Sugerir un nombre" class="lg-dice" style="flex: none; width: 46px; height: 46px; border-radius: 11px; border: 1px solid #1E3A6E; background: #0F061ECC; color: #FFC53D; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg></button>
           </div>
           <div style="display: flex; gap: 6px; align-items: center; min-height: 24px">
             <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 1px; color: #6E6E92; flex: none">IDEAS:</span>
@@ -238,7 +248,7 @@ input::placeholder{color:#6E6E92}
     </div>
   </sc-if>
   <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
-    <span role="status" style="position: absolute; left: 514px; width: 304px; top: 196px; z-index: 5; padding: 8px 12px; box-sizing: border-box; border-radius: 10px; background: #F4F4FA; color: #040A1C; font-size: 12px; font-weight: 800; text-align: center">{{toast}}</span>
+    <span role="status" style="position: absolute; right: 16px; width: 318px; top: 16px; z-index: 5; padding: 8px 12px; box-sizing: border-box; border-radius: 10px; background: #F4F4FA; color: #040A1C; font-size: 12px; font-weight: 800; text-align: center">{{toast}}</span>
   </sc-if>
 </div>
 </x-dc>
@@ -290,10 +300,10 @@ class Component extends DCLogic {
     }
     // the LED advertising board along the touchline
     const led = s.createLinearGradient(0, 0, 844, 0);
-    ['#22D3EE', '#A855F7', '#EC4899', '#F97316', '#FACC15', '#4ADE80', '#22D3EE'].forEach((c, i, a) => led.addColorStop(i / (a.length - 1), c));
-    s.fillStyle = '#12082E'; s.fillRect(150, 226, 544, 12);
+    ['#1E8BFF', '#3DA9FF', '#22D3EE', '#FFC53D', '#3DA9FF', '#0A3DCC', '#1E8BFF'].forEach((c, i, a) => led.addColorStop(i / (a.length - 1), c));
+    s.fillStyle = '#02040C'; s.fillRect(150, 226, 544, 12);
     s.globalAlpha = 0.85; s.fillStyle = led; s.fillRect(152, 228, 540, 8); s.globalAlpha = 1;
-    s.font = 'italic 800 8px Barlow Condensed, Arial'; s.fillStyle = '#12082E'; s.textBaseline = 'middle';
+    s.font = 'italic 800 8px Barlow Condensed, Arial'; s.fillStyle = '#02040C'; s.textBaseline = 'middle';
     for (let k = 0; k < 9; k++) s.fillText('ARENA MIX', 166 + k * 60, 232.5);
     s.strokeStyle = '#FFFFFF33'; s.lineWidth = 2;
     s.beginPath(); s.ellipse(250, 330, 150, 34, 0, 0, Math.PI * 2); s.stroke();
@@ -301,7 +311,7 @@ class Component extends DCLogic {
     // floodlight towers
     this.lights = [[96, 52], [760, 52]];
     this.lights.forEach(([lx, ly]) => {
-      s.fillStyle = '#15092A'; s.fillRect(lx - 1.5, ly, 3, 130);
+      s.fillStyle = '#06102E'; s.fillRect(lx - 1.5, ly, 3, 130);
       s.fillStyle = '#E8F6FF'; for (let i = 0; i < 4; i++) for (let j = 0; j < 2; j++) s.fillRect(lx - 14 + i * 7, ly - 8 + j * 6, 5, 4);
     });
     this.flashes = Array.from({ length: 36 }, () => ({ x: Math.random() * 844, y: 70 + Math.random() * 160, t: Math.random() * 3 }));
@@ -367,7 +377,7 @@ class Component extends DCLogic {
     S.add(new T.HemisphereLight(0xdfe8ff, 0x1a2040, 0.85));
     const key = new T.DirectionalLight(0xffffff, 1.2); key.position.set(2.5, 5, 4); S.add(key);
     const rim = new T.DirectionalLight(0x22d3ee, 1.1); rim.position.set(-3, 2.5, -3); S.add(rim);
-    const rim3 = new T.DirectionalLight(0xf472b6, 0.8); rim3.position.set(0, 2, -4); S.add(rim3);
+    const rim3 = new T.DirectionalLight(0x1e8bff, 0.9); rim3.position.set(0, 2, -4); S.add(rim3);
     const rim2 = new T.DirectionalLight(0xffc53d, 0.6); rim2.position.set(3, 1.5, -3); S.add(rim2);
     // a pool of light on the grass
     const c = document.createElement('canvas'); c.width = c.height = 128;
@@ -379,12 +389,12 @@ class Component extends DCLogic {
     const ring = new T.Mesh(new T.RingGeometry(0.78, 0.82, 64), new T.MeshBasicMaterial({ color: 0x22d3ee, transparent: true, opacity: 0.7, depthWrite: false }));
     ring.rotation.x = -Math.PI / 2; ring.position.y = 0.012; S.add(ring); this.ring = ring;
     // a low round podium with a neon edge under your feet
-    const podium = new T.Mesh(new T.CylinderGeometry(0.98, 1.04, 0.06, 64), new T.MeshBasicMaterial({ color: 0x3b1585 }));
+    const podium = new T.Mesh(new T.CylinderGeometry(0.98, 1.04, 0.06, 64), new T.MeshBasicMaterial({ color: 0x06102e }));
     podium.position.y = -0.042; S.add(podium);
-    const edge = new T.Mesh(new T.TorusGeometry(1.06, 0.018, 8, 96), new T.MeshBasicMaterial({ color: 0xf472b6 }));
+    const edge = new T.Mesh(new T.TorusGeometry(1.06, 0.018, 8, 96), new T.MeshBasicMaterial({ color: 0x1e8bff }));
     edge.rotation.x = -Math.PI / 2; edge.position.y = -0.01; S.add(edge); this.edge = edge;
     // more rings, in the game's colours, turning the other way
-    this.rings = [[0.92, 0.95, 0xa855f7], [1.18, 1.2, 0xfacc15], [1.32, 1.335, 0x4ade80]].map(([a, b2, col], i) => {
+    this.rings = [[0.92, 0.95, 0x3da9ff], [1.18, 1.2, 0xffc53d], [1.32, 1.335, 0x22d3ee]].map(([a, b2, col], i) => {
       const geo = new T.RingGeometry(a, b2, 64, 1, 0, Math.PI * (1.2 + i * 0.25));
       const r2 = new T.Mesh(geo, new T.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.8, depthWrite: false, side: T.DoubleSide }));
       r2.rotation.x = -Math.PI / 2; r2.position.y = 0.014 + i * 0.002; S.add(r2); return r2;
@@ -392,12 +402,12 @@ class Component extends DCLogic {
     // a spotlight beam from above
     const bc = document.createElement('canvas'); bc.width = 4; bc.height = 128;
     const bg = bc.getContext('2d'), bgr = bg.createLinearGradient(0, 0, 0, 128);
-    bgr.addColorStop(0, 'rgba(255,200,240,0)'); bgr.addColorStop(0.4, 'rgba(240,170,255,.05)'); bgr.addColorStop(1, 'rgba(170,230,255,.14)');
+    bgr.addColorStop(0, 'rgba(160,210,255,0)'); bgr.addColorStop(0.4, 'rgba(120,190,255,.05)'); bgr.addColorStop(1, 'rgba(170,230,255,.14)');
     bg.fillStyle = bgr; bg.fillRect(0, 0, 4, 128);
     const beam = new T.Mesh(new T.CylinderGeometry(0.18, 0.95, 4.4, 40, 1, true), new T.MeshBasicMaterial({ map: new T.CanvasTexture(bc), transparent: true, depthWrite: false, side: T.DoubleSide, blending: T.AdditiveBlending }));
     beam.position.y = 2.2; S.add(beam);
     // sparkles floating up round you
-    const N = 70, sp = new Float32Array(N * 3), sc = new Float32Array(N * 3), PAL = [0x22d3ee, 0xf472b6, 0xfacc15, 0xa855f7, 0x4ade80, 0xffffff];
+    const N = 70, sp = new Float32Array(N * 3), sc = new Float32Array(N * 3), PAL = [0x22d3ee, 0x3da9ff, 0xffc53d, 0x1e8bff, 0xffffff, 0xffc53d];
     this.sparkD = [];
     for (let i = 0; i < N; i++) {
       const a = Math.random() * Math.PI * 2, r = 0.6 + Math.random() * 0.9;
@@ -466,7 +476,8 @@ class Component extends DCLogic {
     }
     this.ring.scale.setScalar(1 + 0.04 * Math.sin(t * 3)); this.ring.material.opacity = 0.45 + 0.25 * Math.sin(t * 3);
     (this.rings || []).forEach((r2, i) => { r2.rotation.z = t * (i % 2 ? -0.5 : 0.35) * (1 + i * 0.3); });
-    if (this.edge) this.edge.material.color.setHSL((0.9 + 0.1 * Math.sin(t * 0.8)) % 1, 0.9, 0.65);
+    // the edge glows between the logo's electric blue and cyan
+    if (this.edge) this.edge.material.color.setHSL(0.56 + 0.03 * Math.sin(t * 0.8), 1, 0.55 + 0.08 * Math.sin(t * 1.3));
     if (this.sparks) {
       const pa = this.sparks.geometry.attributes.position;
       this.sparkD.forEach((d, i) => { d.y += d.v * dt; if (d.y > 2.6) d.y = 0; const a = d.a + t * 0.3; pa.setXYZ(i, Math.cos(a) * d.r, d.y, Math.sin(a) * d.r * 0.6); });
@@ -519,7 +530,7 @@ class Component extends DCLogic {
         this.shot = { t0: (performance.now() - this.t0) / 1000, hit: false };
         if (!s.kicks) this.setState({ kicks: 1 });
       },
-      ticketCls: 'lg-ticket' + (s.torn ? ' torn' : ''),
+      ticketCls: 'lg-play' + (s.torn ? ' torn' : ''),
       // tear off the stub and walk in
       guest: () => {
         if (s.torn) return;
@@ -553,7 +564,7 @@ class Component extends DCLogic {
       nameMsg: !s.nameDraft ? '3 a 16 caracteres: letras, números, _ . -' : nmErr || '¡Buen nombre!',
       nameMsgStyle: 'font-size: 11px; font-weight: 800; min-height: 14px; color: ' + (!s.nameDraft ? '#8FA8CC' : nmErr ? '#FF8A8E' : '#53D88E'),
       nameField: s.nameDraft && nmErr ? 'border-bottom-color: #FF5C5C' : s.nameDraft ? 'border-bottom-color: #53D88E' : '',
-      nameBtn: 'height: 44px; border: 0; padding: 0; transform: skewX(0deg); cursor: ' + (nmErr ? 'default' : 'pointer') + '; ' + (nmErr ? 'background: #39206E; color: #6E6E92;' : 'background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #F59E0B); color: #1A1204; box-shadow: 0 4px 0 #B7791F, 0 0 18px #FFC53D66;'),
+      nameBtn: 'height: 44px; border: 0; padding: 0; transform: skewX(0deg); cursor: ' + (nmErr ? 'default' : 'pointer') + '; ' + (nmErr ? 'background: #0A1A44; color: #5A7099; box-shadow: inset 0 0 0 1px #1E3A6E;' : 'background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #F59E0B); color: #1A1204; box-shadow: 0 4px 0 #B7791F, 0 0 18px #FFC53D66;'),
       shirtName: (s.nameDraft || 'TU NOMBRE').toUpperCase(), shirtFs: String(Math.max(7, Math.min(13, 130 / Math.max(6, (s.nameDraft || 'TU NOMBRE').length)))),
       shirtP: kit.primary || '#FF8A3D', shirtS: kit.secondary || '#040A1C',
       nameSubmit: (e) => {
