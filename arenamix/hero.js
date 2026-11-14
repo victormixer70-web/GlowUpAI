@@ -167,6 +167,15 @@
   function attach(el) {
     var V = viewer();
     if (!V || !el) return false;
+    // back from a win: he celebrates (a jump and a spin) as the screen comes in; otherwise a trick soon after
+    act = null; nextAuto = performance.now() + 2600;
+    try {
+      var R = JSON.parse(localStorage.getItem('arenamix.lastres.v1') || 'null');
+      if (R && R.won && !R.seen && Date.now() - R.at < 10 * 60000) {
+        R.seen = true; localStorage.setItem('arenamix.lastres.v1', JSON.stringify(R));
+        setTimeout(function () { if (holder === el) { act = null; play('jump'); setTimeout(function () { if (holder === el && !act) play('throwin'); }, 1500); } }, 700);
+      }
+    } catch (e) {}
     holder = el; token = 'hero' + Math.random(); V.owner = token; t0 = performance.now();
     Array.prototype.slice.call(el.querySelectorAll('canvas[data-am-shared]')).forEach(function (c) { if (c !== V.cv) c.remove(); });
     el.appendChild(V.cv);

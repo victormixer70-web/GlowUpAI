@@ -258,7 +258,9 @@ class Component extends DCLogic {
       partyN: String(members.length),
       partySlots: Array.from({ length: 4 }, (_, k) => {
         const m = members[k];
-        return m ? { k: String(k), filled: true, free: false, name: m.name, ini: ini(m.name), av: av(m.name), tag: m.leader ? 'LÍDER' : 'LISTO', tagC: m.leader ? '#FFC53D' : '#53D88E', canKick: !!P && P.leader && !m.leader, kick: () => SO.kick(m.name) }
+        // each member as their own character (yours from the Taquilla, a friend's from what they shared), the initial if none
+        const ch = m && (m.name === st.me ? (window.AMChars && window.AMChars.pref()) : m.look && m.look.char), pic = ch && ch !== 'clasico' ? 'assets/chars/' + ch + '.png' : '';
+        return m ? { k: String(k), filled: true, free: false, name: m.name, ini: pic ? '' : ini(m.name), av: pic ? av(m.name) + '; background: url(' + pic + ') center 18%/cover, radial-gradient(circle at 50% 30%, #3DA9FF, #0A3DCC); box-shadow: 0 0 0 2px #02040C, 0 0 0 3.5px #3DA9FF' : av(m.name), tag: m.leader ? 'LÍDER' : 'LISTO', tagC: m.leader ? '#FFC53D' : '#53D88E', canKick: !!P && P.leader && !m.leader, kick: () => SO.kick(m.name) }
           : { k: String(k), filled: false, free: true, name: '', ini: '', av: '', tag: '', tagC: '', canKick: false, kick: () => {} };
       }),
       inParty: !!P && P.members.length > 1 || (!!P && !P.leader),

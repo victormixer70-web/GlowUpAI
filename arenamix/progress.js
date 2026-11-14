@@ -326,6 +326,8 @@
     var pen = info.pen && info.home === info.away ? info.pen : null;
     var st = info.stats || {}, won = info.home > info.away || !!(pen && pen[0] > pen[1]), lost = info.home < info.away || !!(pen && pen[0] < pen[1]), kind = info.kind || 'team';
     var goals = st.goals != null ? st.goals : (kind === 'team' ? 0 : info.home || 0);
+    // the home screen's player celebrates a win when you get back
+    try { localStorage.setItem('arenamix.lastres.v1', JSON.stringify({ won: won, lost: lost, at: Date.now() })); } catch (e) {}
     // experience
     var lines = [{ label: 'Partido jugado', xp: 50 }];
     if (won) lines.push({ label: pen ? 'Victoria en los penaltis' : 'Victoria', xp: pen ? 45 : 60 }); else if (!lost) lines.push({ label: 'Empate', xp: 25 }); else if (pen) lines.push({ label: 'Empate (penaltis perdidos)', xp: 20 });
