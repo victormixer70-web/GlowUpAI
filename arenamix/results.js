@@ -109,6 +109,14 @@
     '#am-res .mvp .nt{animation:amResNtS 1.6s 1.2s ease-in-out infinite!important}@keyframes amResNtS{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}',
     '#am-res .stars i{filter:none!important}',
     '#am-res .pile{filter:none!important}',
+    // ---- the redesign: glass panels in the logo's night blue, the score in a capsule, the rating card in electric blue and gold ----
+    '#am-res .pn{background:radial-gradient(90% 40% at 50% 0%,color-mix(in srgb,var(--pc) 22%,transparent),transparent 70%),linear-gradient(170deg,#0B1A44EE,#02040CF2 70%)!important;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--pc) 70%,transparent),inset 0 1px 0 #ffffff33,0 10px 24px #000a,0 0 18px color-mix(in srgb,var(--pc) 25%,transparent)!important}',
+    '#am-res .h{color:#02040C!important}',
+    '#am-res .mvp{background:radial-gradient(80% 70% at 15% 30%,#FFC53D55,transparent 70%),linear-gradient(140deg,#1E8BFF,#0A3DCC 55%,#06102E)!important;box-shadow:inset 0 0 0 1.5px #FFC53D,inset 0 1px 0 #ffffff55,0 0 22px #FFC53D55!important}',
+    '#am-res .mst{background:linear-gradient(170deg,#0B1A44EE,#02040CF2)!important;box-shadow:inset 0 0 0 1.5px #3DA9FF,inset 0 1px 0 #ffffff33,0 0 18px #1E8BFF44!important}',
+    '#am-res .mi{background:linear-gradient(170deg,#0B1A44EE,#02040CF2)!important;box-shadow:inset 0 0 0 1.5px #53D88E99,inset 0 1px 0 #ffffff26!important}',
+    '#am-res .sc{left:50%!important;right:auto!important;translate:-50% 0;padding:4px 22px 3px;border-radius:18px;background:linear-gradient(180deg,#0B1A44EB,#02040CF2);box-shadow:inset 0 0 0 1px #ffffff1f,inset 0 1px 0 #ffffff38,0 6px 16px #000a;font-family:"Titulos",sans-serif!important;font-size:26px!important;letter-spacing:4px!important;white-space:nowrap}',
+    '#am-res .bar,#am-res .dots i{background:#02040C!important;box-shadow:inset 0 0 0 1px #1E3A6E}',
     // the screen underneath is covered: it stops drawing while the overlay is up
     '#stage.am-ovl>:not(#am-res):not(#am-rw):not(#fx-layer){visibility:hidden!important}',
     '#stage.am-ovl>:not(#am-res):not(#am-rw):not(#fx-layer) *{animation-play-state:paused!important}'
@@ -122,7 +130,7 @@
     var stage = document.getElementById('stage');
     if (!stage || !S) { if (onClose) onClose(); return; }
     var old = document.getElementById('am-res'); if (old) old.remove();
-    var col = S.won ? ['#FFC53D', '#3A2A08', '#FFC53D26'] : S.lost ? ['#FF3B5C', '#3A1420', '#FF5C5C18'] : ['#A78BFA', '#25254A', '#A78BFA22'];
+    var col = S.won ? ['#FFC53D', '#3A2A08', '#FFC53D26'] : S.lost ? ['#FF3B5C', '#3A1420', '#FF5C5C18'] : ['#3DA9FF', '#0A1A44', '#3DA9FF22'];
     var G = window.AMGear, P = function (k) { return G ? G.prize(k) : ''; };
     var nextM = (S.milestones || []).find(function (m) { return !m.claimed; });
     var readyM = (S.milestones || []).filter(function (m) { return m.reached && !m.claimed; }).length;
@@ -157,7 +165,7 @@
         '<div class="pn" style="--pc:#FFC53D;animation-delay:.4s;flex:.8"><div class="h">VCD</div><img class="pile" src="' + P(S.coinsGain + S.levelBonus > 60 ? 'coins:14' : 'coins:6') + '" alt=""><div class="cn"><b class="cv">' + fmt(S.coinsBefore) + '</b><span>+' + (S.coinsGain + S.levelBonus) + (S.levelBonus ? ' (incluye subida de nivel)' : '') + (S.gemsGain ? ' · +' + S.gemsGain + ' BOB' : '') + (S.streakBonus ? '<br>🔥 Racha x' + S.streak + ': +' + S.streakBonus : '') + '</span></div>' +
           (S.boostsUsed && S.boostsUsed.length ? '<div style="position:absolute;left:12px;right:12px;top:30px;display:flex;flex-wrap:wrap;gap:4px">' + S.boostsUsed.map(function (b) { return '<span style="padding:2px 7px;background:#FF5CC833;box-shadow:inset 0 0 0 1px #FF5CC8;color:#FFB3E6;font:800 9.5px Exo2,sans-serif;letter-spacing:.5px;transform:skewX(0deg)">⚡ ' + esc(b).toUpperCase() + '</span>'; }).join('') + '</div>' : '') +
           (S.pass ? '<div class="ps' + (S.pass.after > S.pass.before ? ' up' : '') + '"><b>PASE NV. ' + S.pass.after + '</b><i><u style="width:' + (S.pass.after >= 30 ? 100 : S.pass.into / S.pass.need * 100).toFixed(0) + '%"></u></i>' + (S.pass.ready ? '<span style="color:#FFC53D">' + S.pass.ready + ' 🎁</span>' : '') + '</div>' : '') + '</div>' +
-        '<div class="pn" style="--pc:#A78BFA;animation-delay:.55s"><div class="h">ESTA SEMANA · ' + S.weekAfter + '/10 VICTORIAS</div>' +
+        '<div class="pn" style="--pc:#22D3EE;animation-delay:.55s"><div class="h">ESTA SEMANA · ' + S.weekAfter + '/10 VICTORIAS</div>' +
           '<div class="dots">' + dots + '</div>' +
           '<div class="wk"><img src="' + (nextM ? P(nextM.icon + (nextM.reached ? ':open' : '')) : P('chest:legend:open')) + '" alt=""><span style="font-size:12px;font-weight:800;line-height:1.35;color:#CACAE0">' + esc(weekText) + '</span></div></div>' +
       '</div>' +

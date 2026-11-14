@@ -136,6 +136,19 @@
 body{margin:0}
 a{color:#22D3EE}a:hover{color:#67E8F9}
 @keyframes qcIn{from{opacity:0;transform:translateY(10px) scale(.8)}}
+
+/* ---- the final: result title, the scoreboard capsule, glass buttons ---- */
+.pd-wtop{position:absolute;left:0;right:0;top:10px;display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none}
+.pd-wres{font:400 44px/1 'Titulos',sans-serif;letter-spacing:2px;padding:0 8px;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1.5px #02040C;filter:drop-shadow(0 4px 0 #02040C) drop-shadow(0 0 18px var(--g));animation:pdWres .6s cubic-bezier(.2,1.6,.4,1) both}
+.pd-wres.w{--g:#FFC53D99;background-image:linear-gradient(180deg,#FFFFFF,#FFE7A3 40%,#FFC53D 55%,#C98A12)}
+.pd-wres.l{--g:#FF5C5C88;background-image:linear-gradient(180deg,#FFFFFF,#FFC2C2 40%,#FF5C5C 55%,#9B1C1C)}
+.pd-wres.d{--g:#3DA9FF88;background-image:linear-gradient(180deg,#FFFFFF,#DCEBFF 40%,#3DA9FF 55%,#0A3DCC)}
+@keyframes pdWres{from{opacity:0;transform:scale(.3)}}
+.pd-wsb{animation:pdWsb .5s .2s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes pdWsb{from{opacity:0;transform:translateY(-14px)}}
+.pd-wfin{padding:3px 9px 2px;border-radius:10px;background:#FFC53D;color:#1A1204;font:400 10px 'Titulos',sans-serif;letter-spacing:1.5px}
+.pd-wbtn{height:50px;padding:0 20px;border:0;border-radius:14px;cursor:pointer;display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,#0B1A44E6,#02040CE6);box-shadow:inset 0 0 0 1.5px var(--bc),inset 0 1px 0 #ffffff33,0 0 14px color-mix(in srgb,var(--bc) 40%,transparent),0 6px 14px #0009;color:var(--bc);font:400 16px 'Titulos',sans-serif;letter-spacing:1.5px}
+.pd-wbtn:active{transform:translateY(2px)}
 </style>
 </helmet>
 <section data-am-game="1" tabIndex="0" data-hc="1" aria-label="Partido. Muévete con WASD o flechas, Espacio chuta o hace entrada, E pasa o cambia de jugador, F regatea o presiona, Mayúsculas esprinta" onKeyDown="{{onKeyDown}}" onKeyUp="{{onKeyUp}}" style="{{hudVars}} position: relative; width: 844px; height: 390px; overflow: hidden; background: #0D0D1A; color: #F4F4FA; font-family: Exo2, sans-serif; outline: none; user-select: none; -webkit-user-select: none">
@@ -310,10 +323,14 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
   </sc-if>
 
   <sc-if value="{{showWin}}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; left: 0; right: 0; top: 14px; display: flex; flex-direction: column; align-items: center; pointer-events: none">
-      <span style="font: 400 12px 'Titulos', sans-serif; letter-spacing: 3px; color: #FFD772; text-shadow: 0 2px 0 #02040C">{{winKicker}}</span>
-      <span style="{{winTitleStyle}}">{{winTitle}}</span>
-      <span style="font-family: 'Titulos', sans-serif; font-size: 30px; line-height: 1; color: #FFFFFF; text-shadow: 0 3px 0 #02040C">{{s0}} – {{s1}}</span>
+    <!-- the final: the result in big letters and the scoreboard capsule with FINAL in the middle -->
+    <div class="pd-wtop">
+      <span class="{{winResCls}}">{{endText}}</span>
+      <div class="sb pd-wsb">
+        <div class="sb-team h" style="--tc: {{homeC}}; --tt: {{homeT}}"><span class="sb-name" translate="no">{{homeName}}</span><span class="sb-crest"><b>{{homeIni}}</b></span></div>
+        <div class="sb-mid"><div class="sb-score"><span class="sb-n">{{s0}}</span><span class="pd-wfin">FINAL</span><span class="sb-n">{{s1}}</span></div></div>
+        <div class="sb-team a" style="--tc: {{awayC}}; --tt: {{awayT}}"><span class="sb-crest"><b>{{awayIni}}</b></span><span class="sb-name" translate="no">{{awayName}}</span></div>
+      </div>
     </div>
     <sc-for list="{{winTags}}" as="wt" hint-placeholder-count="0">
       <div style="{{wt.style}}">
@@ -324,8 +341,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       </div>
     </sc-for>
     <div style="position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; gap: 12px">
-      <sc-if value="{{hasHL}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{replayHL}}" style="height: 50px; padding: 0 20px; border: 1.5px solid #FFC53D; border-radius: 14px; background: #0B0B14CC; color: #FFC53D; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 19px; letter-spacing: 1.5px; cursor: pointer; display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8L6 20z"/></svg>RESUMEN</button></sc-if>
-      <sc-if value="{{hasVid}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{saveVid}}" style="height: 50px; padding: 0 20px; border: 1.5px solid #53D88E; border-radius: 14px; background: #0B0B14CC; color: #53D88E; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 19px; letter-spacing: 1.5px; cursor: pointer; display: flex; align-items: center; gap: 8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4l-4 4M12 2v13"/></svg>GUARDAR GOL</button></sc-if>
+      <sc-if value="{{hasHL}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{replayHL}}" class="pd-wbtn" style="--bc: #FFC53D"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8L6 20z"/></svg>RESUMEN</button></sc-if>
+      <sc-if value="{{hasVid}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{saveVid}}" class="pd-wbtn" style="--bc: #53D88E"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4l-4 4M12 2v13"/></svg>GUARDAR GOL</button></sc-if>
       <button type="button" class="pd-go" onClick="{{finish}}">{{finishLabel}}</button>
     </div>
   </sc-if>
@@ -4905,15 +4922,16 @@ class Component extends DCLogic {
       winTitle: g.phase !== 'winners' ? '' : g.win.team < 0 ? 'EMPATE' : g.win.team === 0 ? (Partido_me(P.homeName) ?? 'TU EQUIPO') : (P.awayName ?? 'RIVAL'),
       winTitleStyle: 'font-family: \'Titulos\', sans-serif; font-weight: 400; font-size: 46px; line-height: 1; letter-spacing: 1px; text-shadow: 0 4px 0 #0B0B14; color: ' + (g.phase === 'winners' && g.win.team === 1 ? '#FF8A8E' : '#22D3EE') + '; transform: scale(' + Math.min(1, 0.5 + g.pt * 1.5).toFixed(2) + ');',
       winTags: g.phase !== 'winners' ? [] : g.win.list.map((q) => {
-        const s = SP(q.x, q.y, 2.75), me = q === h, rk = (P.ranks || {})[q.name];
+        const s = SP(q.x, q.y, 0), me = q === h, rk = (P.ranks || {})[q.name];
         return {
           name: me ? 'TÚ' : q.role === 'gk' ? 'Portero' : q.name,
           hasRank: !!rk, rank: rk ? rk.label : '', rankColor: rk ? rk.color : '#FFFFFF',
-          style: 'position: absolute; left: 0; top: 0; width: 150px; display: flex; flex-direction: column; align-items: center; gap: 3px; pointer-events: none; transform: translate(' + (s.x - 75).toFixed(1) + 'px, ' + (s.y - 26).toFixed(1) + 'px);',
-          nameStyle: 'padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 800; white-space: nowrap; background: #0B0B14D9; color: ' + (me ? '#22D3EE' : '#F4F4FA') + ';',
+          style: 'position: absolute; left: 0; top: 0; width: 150px; display: flex; flex-direction: column; align-items: center; gap: 3px; pointer-events: none; transform: translate(' + (s.x - 75).toFixed(1) + 'px, ' + (s.y + 10).toFixed(1) + 'px);',
+          nameStyle: 'padding: 3px 11px 2px; border-radius: 10px; font: 400 11px Titulos, sans-serif; letter-spacing: .8px; white-space: nowrap; background: linear-gradient(180deg, #0B1A44E6, #02040CE6); box-shadow: inset 0 0 0 1px ' + (me ? '#3DA9FF' : '#ffffff33') + ', 0 4px 10px #0008; color: ' + (me ? '#7CC4FF' : '#F4F4FA') + ';',
           rankStyle: 'display: flex; align-items: center; gap: 4px; padding: 1px 7px; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; background: #0B0B14D9; color: ' + (rk ? rk.color : '#FFFFFF') + ';'
         };
       }),
+      winResCls: 'pd-wres ' + (won ? 'w' : lost ? 'l' : 'd'),
       endText: this.forfeit ? '¡VICTORIA POR ABANDONO!' : won ? '¡VICTORIA!' : lost ? 'DERROTA' : 'EMPATE',
       endStyle: 'font-family: \'Titulos\', sans-serif; font-weight: 400; font-size: 28px; letter-spacing: 2px; color: ' + (won ? '#22D3EE' : lost ? '#FF5C5C' : '#F4F4FA') + ';',
       finishLabel: P.onEnd ? 'CONTINUAR' : 'JUGAR OTRA VEZ',
