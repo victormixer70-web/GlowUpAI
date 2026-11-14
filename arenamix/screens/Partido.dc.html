@@ -1228,21 +1228,36 @@ class Component extends DCLogic {
   shotPlan(p, power, dir, mult, spinIn, pre) {
     const g = this.g, b = g.ball, sg = p.team === 0 ? 1 : -1, gx = p.team === 0 ? 60 : 0;
     const sp = (9 + 19 * power) * (mult || 1), atGoal = Math.cos(dir) * sg > 0.3;
-    const side = (p.y < 15 ? 1 : -1) * sg;
-    let spin = spinIn || 0;
-    if (Math.abs(spin) < 0.05) spin = side * (0.1 + 0.16 * (1 - power)) * (atGoal ? 1 : 0.5);
-    const dip = power > 0.82 ? 0.3 * (power - 0.82) / 0.18 : 0, kn = power > 0.9 ? 6 : 0;
+    const side = (p.y < 15 ? 1 : -1) * sg, R = Math.random;
+    // every shot gets its own shape, like a real strike (they all used to fly the same arc):
+    //  - the contact: inside of the foot (curls in), outside of the foot (bends away), or struck clean through the middle
+    //  - the spin over the ball: topspin dips it, a struck-under ball floats; a hard clean hit can knuckle
+    //  - where it crosses the line: low, at mid height or rising, picked each time (a soft one stays low)
+    let spin = spinIn || 0, natural = false;
+    if (Math.abs(spin) < 0.05) {
+      natural = true;
+      const c = R(), mag = (0.06 + R() * 0.2) * (1 - 0.45 * power);
+      spin = c < 0.5 ? side * mag : c < 0.68 ? -side * mag * 0.8 : (R() - 0.5) * 0.06;
+      if (!atGoal) spin *= 0.5;
+    }
+    const top = R();
+    let dip = top < 0.4 ? 0.1 + 0.35 * R() * power : top < 0.62 ? -0.12 * R() * (1 - power) : 0;
+    if (power > 0.82) dip = Math.max(dip, 0.3 * (power - 0.82) / 0.18);
+    const far = atGoal && Math.abs(gx - p.x) > 17, kn = power > 0.85 && far && R() < 0.4 ? 3 + 5 * R() : power > 0.9 ? 6 : 0;
     let vz, aim = dir;
     if (atGoal) {
       const d = Math.abs((gx - p.x) / Math.cos(dir)), t = (d / sp) * (1 + 0.006 * sp * (d / sp));
-      // target height on the goal line (ball's bottom): a little random, more so with low precision
-      const zg = Math.max(0.05, 0.12 + 1.85 * Math.pow(power, 1.6) + (Math.random() - 0.5) * (0.25 + 0.6 * (1 - (pre ?? 0.5))) * power);
+      // target height on the goal line (ball's bottom): its own band each time, wider with less precision
+      const hz = R(), band = hz < 0.38 ? [0.05, 0.55] : hz < 0.72 ? [0.55, 1.35] : [1.35, 2.25];
+      const reach = 0.35 + 1.95 * Math.pow(power, 1.2);
+      const zg = Math.max(0.05, Math.min(band[0] + R() * (band[1] - band[0]), reach) + (R() - 0.5) * (0.2 + 0.5 * (1 - (pre ?? 0.5))) * power);
       vz = (zg - b.z + 0.5 * 9.81 * (1 + dip) * t * t) / Math.max(0.15, t);
-      // but never a lob: the top of the flight is capped by the power, so a soft shot stays low and skids
-      const hMax = 0.25 + 2.3 * Math.pow(power, 1.5);
-      vz = this.clamp(Math.min(vz, Math.sqrt(2 * 9.81 * (1 + dip) * hMax)), 0.2, 9);
-      // the natural curl bends it in towards the far post, so it starts where aimed
-      aim = dir - (Math.abs(spinIn || 0) >= 0.05 ? spin * Math.min(t, 1.2) * 0.25 : 0);
+      // never a lob: the top of the flight is capped by the power, so a soft shot stays low and skids
+      const hMax = 0.25 + 2.4 * Math.pow(power, 1.5);
+      vz = this.clamp(Math.min(vz, Math.sqrt(2 * 9.81 * Math.max(0.5, 1 + dip) * hMax)), 0.2, 9);
+      // start it off line by how much it will bend, so it ends up where it was aimed (a little less for the
+      // natural curl: it may still swing a touch inside or outside the post, as real shots do)
+      aim = dir - spin * Math.min(t, 1.2) * (natural ? 0.22 + 0.06 * R() : 0.25);
     } else vz = 1 + 3.2 * power;
     return { dir: aim, vz, spin, dip, kn };
   }
@@ -4172,9 +4187,17 @@ class Component extends DCLogic {
     const bsp = Math.hypot(b.vx, b.vy);
     if (bsp > 0.01 && dt) {
       if (!this.qTmp) { this.qTmp = new T.Quaternion(); this.aTmp = new T.Vector3(); }
-      this.aTmp.set(b.vy / bsp, 0, -b.vx / bsp);
-      this.qTmp.setFromAxisAngle(this.aTmp, bsp * dt / Partido_BR);
-      this.ball3.quaternion.premultiply(this.qTmp);
+      if (b.z > 0.08 && Math.hypot(b.vx, b.vy) > 8) {
+        // in the air it spins the way it was struck: around the vertical for a curler, over the top for a dipping
+        // shot, backwards for one struck underneath, and hardly at all for a knuckleball (that wobbles instead)
+        const side = (b.spin || 0) * 55, over = (b.kn > 0 ? 0.6 : (b.dip || 0) > 0.05 ? 24 : (b.dip || 0) < -0.02 ? -16 : 9);
+        this.aTmp.set(b.vy / bsp * over, side, -b.vx / bsp * over);
+        const w = this.aTmp.length(); if (w > 0) { this.aTmp.divideScalar(w); this.qTmp.setFromAxisAngle(this.aTmp, w * dt); this.ball3.quaternion.premultiply(this.qTmp); }
+      } else {
+        this.aTmp.set(b.vy / bsp, 0, -b.vx / bsp);
+        this.qTmp.setFromAxisAngle(this.aTmp, bsp * dt / Partido_BR);
+        this.ball3.quaternion.premultiply(this.qTmp);
+      }
     }
     const c = g.ps[g.ctl];
     if (this.inReplayDraw) {
