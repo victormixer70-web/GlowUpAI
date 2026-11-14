@@ -46,6 +46,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .du-cd{position:absolute;left:0;right:0;top:134px;display:flex;justify-content:center;pointer-events:none}
 .du-cd b{font-family:'Titulos',sans-serif;font-weight:400;font-size:84px;line-height:1;background:linear-gradient(180deg,#FFFFFF 10%,#BFE3FF 50%,#1E8BFF);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 5px 0 #02040C) drop-shadow(0 0 20px #1E8BFF)}
 .du-cd.wait b{font-size:30px;letter-spacing:2px}
+.du-res.goal,.du-res.save{top:206px}
 .du-res{position:absolute;left:0;right:0;top:96px;display:flex;flex-direction:column;align-items:center;pointer-events:none}
 .du-res .w{font-family:'Titulos',sans-serif;font-weight:400;font-size:86px;line-height:1.05;padding:0 6px;transform:rotate(-4deg);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:2px #02040C;filter:drop-shadow(0 6px 0 #02040C);animation:duRes .5s cubic-bezier(.2,1.6,.4,1) both}
 .du-res.goal .w{background-image:linear-gradient(180deg,#FFFFFF 0%,var(--yl) 40%,var(--yc) 55%,var(--yd) 100%);filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 24px var(--yc))}
@@ -1539,8 +1540,11 @@ class Component extends DCLogic {
       return { pos: new T.Vector3(kx, 3.6, D + 6.2), look: new T.Vector3(GX * 0.4 + this.b.x * 0.2, 0.9, D - 7), fov: 60 };
     }
     const fwd = this.phase === 'flight' || this.phase === 'result' ? Math.min(1, this.pt * 0.8) : 0;
-    const hi = this.kind === 'free' ? 0.75 : 0;
-    return { pos: new T.Vector3(-0.15, 1.55 + hi + fwd * 0.2, -5.2 + fwd * 1.2), look: new T.Vector3(GX * 0.75, 1.05, D), fov: 40 };
+    // free kicks: a higher camera, the goal over the taker's head. Penalties: it rises and closes in as the ball
+    // flies, so the taker no longer hides the goal and you see the ball shake the net (as in the free kicks)
+    const fp = this.kind === 'free' ? fwd : this.phase === 'flight' || this.phase === 'result' ? Math.min(1, (this.phase === 'result' ? 1 : this.pt * 2.6)) : 0;
+    const hi = this.kind === 'free' ? 0.75 : 1.0 * fp;
+    return { pos: new T.Vector3(-0.15 + (this.kind === 'free' ? 0 : 0.5 * fp), 1.55 + hi + fwd * 0.2, -5.2 + fwd * 1.2), look: new T.Vector3(GX * 0.75, 1.05 + (this.kind === 'free' ? 0 : 0.1 * fp), D), fov: this.kind === 'free' ? 40 : 40 - 7 * fp };
   }
   draw3D(dt) {
     if (!this.R || !this.S) return;
@@ -2009,7 +2013,8 @@ class Component extends DCLogic {
       showHint: !this.replaying && ((this.phase === 'aim' && !this.swipe && !this.charge && !this.dragAim) || (this.phase === 'defend' && !this.tap) || (this.phase === 'flight' && !youTurn && !this.tap)),
       hintText: this.padOn ? (this.fkMode() ? 'Mando: stick = diana · L1/R1 = efecto · □/△ = altura · mantén ○ y suelta en la zona verde' : youTurn ? 'Mando: mueve la diana con el stick · mantén ○ y suelta en la zona verde' : 'Mando: mueve la mira con el stick y pulsa ○ para lanzarte') : this.fkMode() ? 'Arrastra la diana en la portería · ajusta efecto y altura · mantén CHUTAR y suelta en la zona verde' : youTurn ? 'Arrastra la diana donde quieras tirar · mantén CHUTAR y suelta en la zona verde · cuanto más a la escuadra, más pequeña' : 'Toca la portería donde quieras lanzarte · si te tiras antes del disparo, el rival puede leerte',
       zoneLabel: youTurn ? 'Portería: toca o arrastra para mover la diana' : 'Portería: toca donde quieras que se lance el portero',
-      showResult: this.phase === 'result' && !!R && !this.replaying,
+      // a goal: the banner waits a moment and sits low, so you see the ball shake the net first (it used to cover the goal)
+      showResult: this.phase === 'result' && !!R && !this.replaying && (!(R.kind === 'gol' || R.kind === 'diana') || this.pt > 0.35),
       showReplay: !!this.replaying,
       resultText: rm[0],
       resultSub: R ? (this.special && youTurn ? ((Duelo_SPECIALS.find((q) => q.id === this.special.id) || {}).name || '').toLowerCase().replace(/^./, (c) => c.toUpperCase()) + ' · ' : '') + R.sub + (this.lastSpeed ? ' · ' + Math.round(this.lastSpeed * 3.6) + ' km/h' : '') : '',
