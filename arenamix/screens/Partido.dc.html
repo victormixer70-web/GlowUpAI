@@ -2281,7 +2281,10 @@ class Component extends DCLogic {
           const gap = Math.abs(iy - p.y), standCatch = gap < 0.62 && iz > 0.3 && iz < 2.0;
           ty = p.setY + this.clamp(iy - p.setY, -0.45, 0.45); maxV = 1.6; acc = 10;
           const need = Math.min(D.react * 0.85, Math.max(0.05, (p.t0 || t) * 0.32));
-          if (p.react > need && !this.noAutoDive && !p.act && t < 0.95 && !standCatch && (gap > 0.62 || iz > 2.0 || iz < 0.3)) {
+          // he leaves the ground only as late as the dive needs, so he is at full stretch as the ball arrives
+          // (he used to go a long while before it, and was lying on the grass by the time it got there)
+          const hd = this.clamp((iz - 0.45) * 0.9, 0, 1.15), flyT = 0.36 + 0.2 * hd + 0.05 * Math.min(1, Math.max(0, gap - 1.1) / 3);
+          if (p.react > need && !this.noAutoDive && !p.act && t < Math.min(0.95, flyT + 0.06) && !standCatch && (gap > 0.62 || iz > 2.0 || iz < 0.3)) {
             // a split-second read is not perfect: the less time he had, the more he guesses
             const miss = (p.t0 || t) < 0.45 ? (Math.random() - 0.5) * (1.4 - 1.6 * (D.save || 0.5)) : 0;
             this.dive(p, iy + miss, t, D, iz);
@@ -4498,7 +4501,9 @@ class Component extends DCLogic {
         // the clip (hips over time): up off the ground by 0.85 s, on the grass at 1.42 s, lying until 2.3 s, up again by 3.15 s.
         // Its landing is put exactly at the end of the dive's flight, so he never lies flat in the air
         const fl = a.flight || 0.5, rest = Math.max(0.3, a.dur - fl), u = a.t - fl;
-        const ct = a.smother ? 1.2 + 0.65 * k : a.t < fl ? 0.85 + 0.57 * (a.t / fl) : u < rest * 0.45 ? 1.42 + 0.88 * (u / (rest * 0.45)) : Math.min(3.15, 2.3 + 0.85 * (u - rest * 0.45) / (rest * 0.55));
+        // in the air the clip is held at its full stretch (a flat, sideways dive, as the shoot-out keeper), and only after
+        // the flight does he come down: the sweep through the whole clip mid-air read as a somersault
+        const ct = a.smother ? 1.2 + 0.65 * k : a.t < fl ? 0.8 + 0.14 * Math.min(1, a.t / Math.min(fl, 0.22)) : u < 0.28 ? 0.94 + 0.48 * (u / 0.28) : u < 0.28 + rest * 0.4 ? 1.42 + 0.88 * ((u - 0.28) / (rest * 0.4)) : Math.min(3.15, 2.3 + 0.85 * (u - 0.28 - rest * 0.4) / Math.max(0.1, rest * 0.6 - 0.28));
         act = { id: a.dl > 0 ? 'diveL' : 'diveR', t: ct, key: a };
       }
     } else if (gk && g.hold === i) act = { id: 'catch', t: 0.8, key: 'hold' };
