@@ -66,16 +66,16 @@ input::placeholder{color:#6E6E92}
 .lg-social{flex:none;width:40px;height:36px;border-radius:9px;border:1px solid #3DA9FF99;background:#06102ECC;display:flex;align-items:center;justify-content:center;cursor:pointer}
 
 /* ---- the redesign: night blue, the logo's electric blue, gold for PLAY ---- */
-.lg-grade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#02040C00 0%,#02040C00 46%,#02040CB0 64%,#02040CE6 100%),radial-gradient(45% 60% at 26% 78%,#1E8BFF55,transparent 70%),linear-gradient(0deg,#02040CCC 0%,#02040C00 30%)}
+.lg-grade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#02040C00 0%,#02040C00 46%,#02040CB0 64%,#02040CE6 100%),radial-gradient(45% 60% at 36% 78%,#1E8BFF55,transparent 70%),linear-gradient(0deg,#02040CCC 0%,#02040C00 30%)}
 .lg-brand{position:absolute;left:18px;top:14px;z-index:2;display:flex;align-items:center;gap:12px;animation:lgIn .5s both;pointer-events:none}
 .lg-brand img{display:block;flex:none;border-radius:16px;box-shadow:0 0 0 2px #1E8BFF,0 0 22px #1E8BFF99,0 8px 18px #000a}
 .lg-name{font:400 30px/1 Titulos,sans-serif;letter-spacing:1px;color:#fff;text-shadow:0 3px 0 #02040C,0 0 18px #1E8BFF88}
 .lg-name b{font-weight:400;background:linear-gradient(180deg,#9AD4FF,#3DA9FF 55%,#1E8BFF);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 3px 0 #02040C)}
-.lg-tags{position:absolute;left:300px;top:150px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none;animation:lgIn .6s .15s both}
+.lg-tags{position:absolute;left:18px;top:94px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none;animation:lgIn .6s .15s both}
 .lg-tags span{padding:3px 10px 3px 8px;border-radius:8px;background:#02040CB3;box-shadow:inset 3px 0 0 var(--t),inset 0 0 0 1px color-mix(in srgb,var(--t) 45%,transparent);font:400 9.5px Titulos,sans-serif;letter-spacing:1.4px;color:#E6F2FF}
 .lg-live{display:flex;align-items:center;gap:6px;font:800 10px Exo2,sans-serif;letter-spacing:1.5px;color:#BFE3FF}
 .lg-live i{width:7px;height:7px;border-radius:4px;background:#FF4D5E;box-shadow:0 0 8px #FF4D5E;animation:lgLive 1.2s infinite}
-.lg-hint{position:absolute;left:150px;top:338px;display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:14px;background:#02040CD9;box-shadow:inset 0 0 0 1.5px #FFC53D88,0 0 14px #FFC53D44;font:400 10px Titulos,sans-serif;letter-spacing:1.5px;color:#FFE7A3;pointer-events:none;animation:lgHint 1.8s ease-in-out infinite;transition:opacity .4s}
+.lg-hint{position:absolute;left:198px;top:338px;display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:14px;background:#02040CD9;box-shadow:inset 0 0 0 1.5px #FFC53D88,0 0 14px #FFC53D44;font:400 10px Titulos,sans-serif;letter-spacing:1.5px;color:#FFE7A3;pointer-events:none;animation:lgHint 1.8s ease-in-out infinite;transition:opacity .4s}
 .lg-panel{position:absolute;right:16px;top:50px;width:318px;height:326px;box-sizing:border-box;padding:14px 16px 12px;display:flex;flex-direction:column;gap:9px;border-radius:22px;background:radial-gradient(90% 50% at 100% 0%,#1E8BFF33,transparent 70%),linear-gradient(170deg,#0B1A44F2,#040A1CF2 60%,#02040CF7);box-shadow:inset 0 0 0 1.5px #3DA9FF66,inset 0 1px 0 #ffffff22,0 0 0 1px #02040C,0 22px 44px #000c,0 0 36px #0A3DCC55;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:lgPanelIn .55s cubic-bezier(.2,1.3,.4,1) both}
 @keyframes lgPanelIn{from{opacity:0;translate:40px 0}}
 .lg-hello{display:flex;align-items:center;gap:10px}
@@ -110,17 +110,17 @@ input::placeholder{color:#6E6E92}
 <div style="position: relative; width: 844px; height: 390px; overflow: hidden; background: linear-gradient(160deg, #06102E 0%, #030A22 55%, #02040C 100%); color: #F4F4FA; font-family: Exo2, sans-serif; user-select: none; {{rootVars}}" onPointerMove="{{onMove}}" onPointerDown="{{tapBg}}">
   <div class="lg-photo" aria-hidden="true"></div>
   <div class="lg-tint" aria-hidden="true"></div>
-  <i class="lg-beam" style="left: 96px; animation-delay: -2s"></i><i class="lg-beam" style="left: 420px; animation-direction: alternate-reverse"></i>
+  <i class="lg-beam" style="left: 170px; animation-delay: -2s"></i><i class="lg-beam" style="left: 440px; animation-direction: alternate-reverse"></i>
   <canvas ref="{{crowdRef}}" aria-hidden="true" style="position: absolute; inset: 0; width: 844px; height: 390px; display: block; cursor: pointer"></canvas>
   <div class="lg-grade" aria-hidden="true"></div>
   <!-- the 3D player on a glowing stage: tap him and he shoots -->
   <sc-if value="{{show3d}}" hint-placeholder-val="{{ false }}">
-    <canvas ref="{{canvasRef}}" role="img" aria-label="Tu jugador. Tócalo para que chute." onPointerDown="{{kick}}" style="position: absolute; left: 0; top: 0; width: 500px; height: 390px; display: block; cursor: pointer; touch-action: manipulation"></canvas>
+    <canvas ref="{{canvasRef}}" role="img" aria-label="Tu jugador. Tócalo para que chute." onPointerDown="{{kick}}" style="position: absolute; left: 0; top: 0; width: 540px; height: 390px; display: block; cursor: pointer; touch-action: manipulation"></canvas>
     <span class="lg-hint" style="opacity: {{hintOp}}">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFC53D" stroke-width="2.5" stroke-linecap="round"><path d="M9 11V5a2 2 0 0 1 4 0v6M13 9a2 2 0 0 1 4 0v3M17 11a2 2 0 0 1 4 0v4a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3l-3-5a2 2 0 0 1 3-2l2 2"/></svg>TÓCALO Y CHUTA</span>
   </sc-if>
   <sc-if value="{{show2d}}" hint-placeholder-val="{{ true }}">
-    <div style="position: absolute; left: 160px; top: 96px; filter: drop-shadow(0 14px 18px #000C)">
+    <div style="position: absolute; left: 195px; top: 96px; filter: drop-shadow(0 14px 18px #000C)">
       <dc-import name="Avatar" primary="{{kitP}}" secondary="{{kitS}}" pattern="{{kitPat}}" shorts="{{kitSh}}" socks="{{kitSo}}" shoe="{{kitShoe}}" number="10" hat="none" face="none" w="150" hint-size="150px,266px"></dc-import>
     </div>
   </sc-if>
@@ -370,7 +370,7 @@ class Component extends DCLogic {
     if (!T || !A || !this.cv) return;
     this.stop3D();
     const R = new T.WebGLRenderer({ canvas: this.cv, antialias: true, alpha: true });
-    R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); R.setSize(500, 390, false);
+    R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); R.setSize(540, 390, false);
     R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.15; R.setClearColor(0, 0);
     this.R = R;
     const S = new T.Scene();
@@ -424,8 +424,8 @@ class Component extends DCLogic {
     const ball = new T.Mesh(new T.SphereGeometry(0.11, 32, 20), window.AMBall ? window.AMBall.material() : new T.MeshStandardMaterial({ color: 0xffffff }));
     S.add(ball); this.ball = ball; this.bState = { mode: 'feet', t: 0 };
     this.S = S;
-    this.cam = new T.PerspectiveCamera(26, 500 / 390, 0.1, 60);
-    this.cam.position.set(1.05, 1.2, 7.4); this.cam.lookAt(1.05, 0.92, 0);
+    this.cam = new T.PerspectiveCamera(26, 540 / 390, 0.1, 60);
+    this.cam.position.set(0, 1.2, 7.4); this.cam.lookAt(0, 0.92, 0);
     if (window.AMSky) window.AMSky.env(R).then((e) => { if (e && this.R === R) S.environment = e; });
     this.t0 = performance.now(); this.model = null;
     A.load().then(() => { if (this.R === R) this.buildModel(); });
