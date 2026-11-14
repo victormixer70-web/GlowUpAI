@@ -327,6 +327,14 @@
     '#stage[data-theme="logo"] .bc-stage::after{content:"";position:absolute;inset:-30%;z-index:-1;pointer-events:none;background:linear-gradient(115deg,transparent 40%,#3DA9FF14 48%,#ffffff12 50%,#3DA9FF14 52%,transparent 60%);animation:amSheen 9s ease-in-out infinite}',
     '#stage[data-theme="logo"] .bc-stage{isolation:isolate}',
     '@keyframes amSheen{0%{translate:-40% 0}60%,100%{translate:40% 0}}',
+    // ---- rarity frames, the same everywhere: common grey, rare blue, epic violet, legendary gold (with a running shimmer) ----
+    '.am-rar{--rc:#94A3B8;box-shadow:inset 0 0 0 2px var(--rc),inset 0 0 18px color-mix(in srgb,var(--rc) 35%,transparent),0 0 14px color-mix(in srgb,var(--rc) 40%,transparent)!important;border-color:var(--rc)!important}',
+    '.am-rar.r1{--rc:#3DA9FF}.am-rar.r2{--rc:#C084FC}.am-rar.r3{--rc:#FFC53D}',
+    '.am-rar::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;z-index:3;background:var(--rc);box-shadow:0 0 10px var(--rc);pointer-events:none}',
+    '.am-rar.r2::before,.am-rar.r3::before{height:100%;background:linear-gradient(115deg,transparent 35%,color-mix(in srgb,var(--rc) 55%,#fff) 48%,#ffffff 50%,color-mix(in srgb,var(--rc) 55%,#fff) 52%,transparent 65%) 0 0/250% 100% no-repeat;opacity:.35;box-shadow:none;mix-blend-mode:screen;animation:amRarShine 3.2s ease-in-out infinite}',
+    '.am-rar.r3{animation:amRarGlow 2s ease-in-out infinite}',
+    '@keyframes amRarShine{0%{background-position:160% 0}60%,100%{background-position:-60% 0}}',
+    '@keyframes amRarGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.12) drop-shadow(0 0 10px #FFC53D88)}}',
     // ---- titles: Russo One, upright (no italic) ----
     '.bc-title,.bc-title.hd,#stage .bc-title.hd,#stage .tn-big,#stage .ttl,#am-daily h2,#am-res .t,#am-res .t .lt,#am-res .lvup,.jc-wheel .side h2,.jc-wheel .won-card b{font-family:"Titulos",sans-serif!important;font-style:normal!important;font-weight:400!important}',
     '.bc-title.hd,#stage .bc-title.hd{font-size:21px!important;letter-spacing:1px!important;padding:3px 18px 0!important}',

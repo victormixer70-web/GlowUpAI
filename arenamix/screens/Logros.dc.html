@@ -98,14 +98,14 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
           <sc-if value="{{c.ready}}" hint-placeholder-val="{{ false }}"><i class="lg-rays"></i></sc-if>
           <svg class="lg-disc {{c.burst}}" width="72" height="80" viewBox="-36 -42 72 80" style="overflow: visible; position: relative; z-index: 1">
             <path d="M-17-40h12l7 22h-12zM17-40H5l-7 22h12z" fill="{{c.rib}}"/>
-            <circle r="31" cy="6" fill="none" stroke="#39206E" stroke-width="4"/>
+            <circle r="31" cy="6" fill="none" stroke="#0E2A66" stroke-width="4"/>
             <circle r="31" cy="6" fill="none" stroke="{{c.ringC}}" stroke-width="4" stroke-linecap="round" stroke-dasharray="{{c.dash}}" transform="rotate(-90 0 6)"/>
             <circle r="25" cy="6" fill="{{c.rim}}"/>
             <circle r="19" cy="6" fill="{{c.face}}"/>
             <path d="M-12 -6a19 19 0 0 1 24 -6" stroke="#FFFFFF" stroke-opacity="{{c.gloss}}" stroke-width="3" fill="none" stroke-linecap="round"/>
             <g transform="translate(-11 -5) scale(.92)"><path d="{{c.icon}}" fill="{{c.ink}}"/></g>
             <sc-if value="{{c.got}}" hint-placeholder-val="{{ false }}"><g transform="translate(20 24)"><circle r="8" fill="#53D88E" stroke="#040A1C" stroke-width="2"/><path d="M-3.5 0l2.5 2.5l4.5-5" stroke="#040A1C" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></sc-if>
-            <sc-if value="{{c.locked}}" hint-placeholder-val="{{ true }}"><g transform="translate(20 24)"><circle r="8" fill="#0B1A44" stroke="#3A3A64" stroke-width="1.5"/><text y="3.5" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="9" fill="#CACAE0">{{c.pct}}</text></g></sc-if>
+            <sc-if value="{{c.locked}}" hint-placeholder-val="{{ true }}"><g transform="translate(20 24)"><circle r="8" fill="#0B1A44" stroke="#1E3A6E" stroke-width="1.5"/><text y="3.5" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="9" fill="#CACAE0">{{c.pct}}</text></g></sc-if>
           </svg>
           <span style="{{c.titleStyle}}">{{c.title}}</span>
         </button>
@@ -224,13 +224,13 @@ class Component extends DCLogic {
         burst: this.burst === a.id ? 'lg-burst' : '',
         aria: a.title + ': ' + (s === 'got' ? 'conseguido' : s === 'ready' ? 'listo para reclamar' : a.cur + ' de ' + a.goal),
         pick: () => { this.setState({ sel: a.id }); if (s === 'ready') this.claim(a); },
-        rib: on ? t.rib : '#3F246B', rim: on ? t.rim : 'url(#lgm-l)', face: on ? t.face : '#1E0F3B', ink: on ? t.ink : '#4A4A72', gloss: on ? '.55' : '.08',
+        rib: on ? t.rib : '#1E3A6E', rim: on ? t.rim : 'url(#lgm-l)', face: on ? t.face : '#071640', ink: on ? t.ink : '#4A4A72', gloss: on ? '.55' : '.08',
         icon: Lg_ICON[a.icon] || Lg_ICON.rank,
         ringC: s === 'ready' ? '#FFC53D' : s === 'got' ? '#53D88E' : '#22D3EE',
         dash: (C * (s === 'locked' ? f : 1)).toFixed(1) + ' ' + C.toFixed(1),
         pct: Math.floor(f * 100) + '%',
         title: a.title,
-        titleStyle: 'position: relative; z-index: 1; max-width: 100%; font-size: 10.5px; font-weight: 800; line-height: 1.15; text-align: center; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: ' + (s === 'ready' ? '#FFE38A' : s === 'got' ? '#F4F4FA' : '#8C8CB0') + ';'
+        titleStyle: 'position: relative; z-index: 1; max-width: 100%; font-size: 10.5px; font-weight: 800; line-height: 1.15; text-align: center; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: ' + (s === 'ready' ? '#FFE38A' : s === 'got' ? '#F4F4FA' : '#8FA8CC') + ';'
       });
       if (i % 5 === 4 || i === shown.length - 1) cells.push({ shelf: true, medal: false });
     });
@@ -251,7 +251,7 @@ class Component extends DCLogic {
       doneLabel: got + ' de ' + list.length + ' logros' + (ready ? ' · ' + ready + ' por reclamar' : ''),
       ringDash: (RC * frac).toFixed(1) + ' ' + RC.toFixed(1), collTier: coll[0], collColor: coll[1],
       selC: son ? st.c : '#22D3EE', selTier: 'MEDALLA DE ' + st.name, selTitle: sel ? sel.title : '', selDesc: sel ? sel.desc : '',
-      selRib: son ? st.rib : '#3F246B', selRim: son ? st.rim : 'url(#lgm-l)', selFace: son ? st.face : '#1E0F3B', selInk: son ? st.ink : '#4A4A72', selIcon: sel ? Lg_ICON[sel.icon] || Lg_ICON.rank : '',
+      selRib: son ? st.rib : '#1E3A6E', selRim: son ? st.rim : 'url(#lgm-l)', selFace: son ? st.face : '#071640', selInk: son ? st.ink : '#4A4A72', selIcon: sel ? Lg_ICON[sel.icon] || Lg_ICON.rank : '',
       selBar: sel ? 'height: 10px; border-radius: 5px; width: ' + Math.round(sel.cur / sel.goal * 100) + '%; background: ' + (son ? 'linear-gradient(90deg, #53D88E, #9DF5C0)' : 'linear-gradient(90deg, #22D3EE, #7EF0FF)') + ';' : '',
       selProg: sel ? sel.cur + '/' + sel.goal : '', selReward: sel ? String(sel.reward) : '0',
       selCan: ss === 'ready', selGot: ss === 'got', selLeft: ss === 'locked', selLeftText: sel ? 'Te faltan ' + (sel.goal - sel.cur) : '',

@@ -182,7 +182,7 @@ class Component extends DCLogic {
     const PR = window.AMProgress, G = window.AMGear;
     const S = PR ? PR.pass() : { season: 1, daysLeft: 42, level: 0, into: 0, need: 300, premium: false, free: [], prem: [], ready: 0, price: '' };
     const COLW = 100;
-    const RC = ['#A78BFA', '#38BDF8', '#E879F9', '#FFC53D'];
+    const RC = ['#94A3B8', '#3DA9FF', '#C084FC', '#FFC53D'];
     // the free row cycles cool colours, the premium row warm ones; rarer prizes glow stronger
     const FREEC = ['#22D3EE', '#1E8BFF', '#14B8A6', '#3DA9FF', '#06B6D4'], PREMC = ['#F59E0B', '#F97316', '#EC4899', '#E11D48', '#D946EF'];
     const cell = (x, prem) => {
@@ -191,13 +191,13 @@ class Component extends DCLogic {
       const locked = prem && !S.premium, rc = RC[x.rare];
       const tagText = x.reward.t === 'item' ? (x.cat === 'kit' ? 'EQUIPACIÓN' : 'ACCESORIO') : x.reward.t === 'chest' ? 'COFRE' : '';
       const hue = (prem ? PREMC : FREEC)[(x.lv - 1) % 5], glowA = x.rare >= 2 ? 'EE' : 'BB';
-      const bgFull = x.claimed ? 'linear-gradient(165deg, ' + (prem ? '#3A2A10, #2A1030' : '#1E2E62, #1E1450') + ')'
+      const bgFull = x.claimed ? 'linear-gradient(165deg, ' + (prem ? '#3A2A10, #1A1206' : '#0B1A44, #040A1C') + ')'
         : x.ready ? 'radial-gradient(90% 60% at 50% 35%, #FFE38AAA, transparent 72%), linear-gradient(165deg, #A16207, #4A1D04)'
-        : 'radial-gradient(90% 55% at 50% 35%, ' + hue + glowA + ', transparent 72%), radial-gradient(80% 50% at 100% 100%, ' + rc + '44, transparent 70%), linear-gradient(165deg, color-mix(in srgb, ' + hue + ' 68%, #2A1070), color-mix(in srgb, ' + hue + ' 30%, #1C0C44))';
+        : 'radial-gradient(90% 55% at 50% 35%, ' + hue + glowA + ', transparent 72%), radial-gradient(80% 50% at 100% 100%, ' + rc + '44, transparent 70%), linear-gradient(165deg, color-mix(in srgb, ' + hue + ' 55%, #0B1A44), color-mix(in srgb, ' + hue + ' 18%, #040A1C))';
       return {
         name: x.owned ? x.name + ' (ya lo tienes)' : x.name, img, ready: x.ready, claimed: x.claimed, locked: locked && !x.claimed,
         waiting: !x.ready && !x.claimed && !locked, tagText,
-        cls: 'ps-card' + (x.ready ? ' rdy' : ''),
+        cls: 'ps-card am-rar r' + (x.rare || 0) + (x.ready ? ' rdy' : ''),
         tag: tagText ? 'position: absolute; left: 0; top: 0; padding: 2px 7px 2px 8px; border-radius: 0 0 9px 0; box-shadow: 0 2px 6px #0006; font-size: 8.5px; font-weight: 800; letter-spacing: 1px; color: #040A1C; background: ' + rc + ';' : 'display: none',
         imgStyle: 'width: 66px; height: 62px; object-fit: contain; filter: drop-shadow(0 5px 6px #000a)' + (locked && !x.claimed ? ' grayscale(.35) brightness(.8)' : '') + '; opacity: ' + (img ? 1 : 0) + '; transition: opacity .3s',
         card: 'position: relative; width: 92px; height: 132px; box-sizing: border-box; padding: 14px 4px 7px 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; clip-path: inset(0 round 12px); background: ' + bgFull + '; border: 1.5px solid ' + (x.ready ? '#FFE38A' : x.claimed ? rc + '66' : 'color-mix(in srgb, ' + hue + ' 60%, #FFFFFF)') + '; box-shadow: inset 0 1px 0 #ffffff33; ' + (x.ready ? 'box-shadow: 0 0 16px #FFC53D66;' : x.rare >= 2 && !x.claimed ? 'box-shadow: 0 0 10px ' + rc + '33;' : '') + (x.claimed ? ' opacity: .7;' : ''),
