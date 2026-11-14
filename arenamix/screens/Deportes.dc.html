@@ -417,12 +417,12 @@ class Component extends DCLogic {
   constructor(props) {
     super(props);
     this.heroRef = (el) => {
-      if (el && el !== this.heroEl) { if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = el; if (window.AMHero) window.AMHero.attach(el); }
+      if (el && el !== this.heroEl) { if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = el; if (window.AMHero) { if (window.AMHero.setMates) window.AMHero.setMates(this.heroMates || [], el); window.AMHero.attach(el); } }
       else if (!el && this.heroEl) { if (window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; }
     };
   }
   componentDidMount() { if (window.AMSocial) { window.AMSocial.start(); this.soOff = window.AMSocial.on(() => this.forceUpdate()); } }
-  componentWillUnmount() { if (this.soOff) this.soOff(); if (window.AMHero && window.AMHero.setMates) window.AMHero.setMates([]); if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; }
+  componentWillUnmount() { if (this.soOff) this.soOff(); if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; }
   store(key, def) { try { const v = JSON.parse(localStorage.getItem(key) || 'null'); return v == null ? def : v; } catch (e) { return def; } }
   // the lobby's mode card, its PLAY, the event and the stage sparks
   lobbyVals(tr, mmr, lo, hi, nextRank, mDone, done) {
@@ -470,7 +470,8 @@ class Component extends DCLogic {
     const can3d = !!(window.AMHero && window.AMHero.setMates && window.THREE && window.AMChars && window.AMChars.pref() !== 'clasico');
     const mates3d = can3d ? others.slice(0, 3).map((m, k) => ({ key: String(k) + m.name, look: m.look, x: POS[k][0] + 34 - 410, s: k === 2 ? 0.9 : 1 })).filter((q) => q.look && q.look.char && q.look.char !== 'clasico') : [];
     this.mates3d = mates3d.length;
-    if (window.AMHero && window.AMHero.setMates) window.AMHero.setMates(mates3d);
+    this.heroMates = mates3d;
+    if (this.heroEl && window.AMHero && window.AMHero.setMates) window.AMHero.setMates(mates3d, this.heroEl);
     const toSocial = () => { try { localStorage.setItem('arenamix.social.tab', JSON.stringify({ tab: st && st.friends.length ? 'friends' : 'search', invite: true })); } catch (e) {} };
     const member = P && !P.leader, withParty = !!P && P.leader && P.members.length > 1;
     const n0 = /^m\d$/.test(selId) ? +selId.slice(1) : 2, fmt = 'm' + Math.min(4, Math.max(n0, P ? P.members.length : 1, 2));

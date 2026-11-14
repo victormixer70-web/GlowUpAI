@@ -70,9 +70,10 @@
     return V.heroModel;
   }
   // friends in your party, standing beside you: [{ key, look: { char, kit }, x (pixels from your centre), s (size) }]
-  var mates = [];
-  function setMates(list) { mates = (list || []).filter(function (m) { return m && m.look && m.look.char && m.look.char !== 'clasico'; }); }
-  function mateModels(V) {
+  // kept on each screen's own holder, so one screen never shows another's friends
+  function setMates(list, el) { if (el) el.__amMates = (list || []).filter(function (m) { return m && m.look && m.look.char && m.look.char !== 'clasico'; }); }
+  function curMates() { return (holder && holder.__amMates) || []; }
+  function mateModels(V, mates) {
     var A = window.AMChars, have = V.mateModels || (V.mateModels = {}), want = {};
     mates.forEach(function (m) {
       var k = m.key + '|' + m.look.char + '|' + JSON.stringify(m.look.kit || null);
@@ -140,17 +141,17 @@
     if (!act || !act.a.jump) m.position.y = 0;
     m.rotation.y = baseRot + extra;
     if (an && A.clip('idle')) an.layers = layers.length ? layers : [{ id: 'idle', t: t, w: 1 }];
-    var fov = V.cam.fov * Math.PI / 360;
+    var fov = V.cam.fov * Math.PI / 360, mates = curMates();
     // with friends beside you the view is wider: the height still sets the size, so you look the same
     var fit = mates.length ? 2.05 / (2 * Math.tan(fov)) : Math.max(2.05 / (2 * Math.tan(fov)), 0.9 / (2 * Math.tan(fov) * V.cam.aspect));
     hideMates(V);
     if (mates.length) {
-      mateModels(V);
+      mateModels(V, mates);
       var ppm = h / 2.05;
       mates.forEach(function (q, i) {
         var md = q.model; if (!md) return;
         // a step behind you, at their spot on the screen
-        var z = -0.55, d = (fit - z) / fit;
+        var z = q.z != null ? q.z : -0.55, d = (fit - z) / fit;
         md.visible = true;
         md.position.set(q.x / ppm * d, 0, z);
         md.scale.setScalar(q.s || 1);

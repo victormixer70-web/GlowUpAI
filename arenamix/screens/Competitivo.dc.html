@@ -179,7 +179,10 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .vs-plat{position:absolute;left:25px;right:25px;bottom:34px;height:46px;border-radius:50%;background:radial-gradient(closest-side,var(--pc),transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--pc) 70%,#fff) inset;opacity:.9;animation:vsPlat 2s ease-in-out infinite}
 .vs-plat::before{content:"";position:absolute;left:50%;bottom:50%;width:150px;height:240px;margin-left:-75px;background:linear-gradient(0deg,color-mix(in srgb,var(--pc) 45%,transparent),transparent);clip-path:polygon(20% 100%,80% 100%,100% 0,0 0);opacity:.55}
 @keyframes vsPlat{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.08);opacity:1}}
-.vs-me3d{position:absolute;left:35px;bottom:44px;width:180px;height:220px;cursor:pointer;filter:drop-shadow(0 0 14px #1E8BFF88)}
+.vs-me3d{position:absolute;left:35px;bottom:44px;width:180px;height:220px;pointer-events:none;filter:drop-shadow(0 0 14px #1E8BFF88)}
+.vs-me3d.wide{left:-95px;width:440px}
+.vs-tap{position:absolute;left:55px;bottom:44px;width:140px;height:220px;cursor:pointer;z-index:2}
+.vs-mtag{position:absolute;z-index:3;width:80px;box-sizing:border-box;padding:2px 4px !important;text-align:center;padding:2px 0;border-radius:8px;background:linear-gradient(180deg,#0B1A44e6,#02040Ce6);box-shadow:0 0 0 1.2px #3DA9FF99;color:#E6F2FF;font:400 10px Titulos,sans-serif;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vs-me{position:absolute;left:45px;bottom:52px;width:160px;height:160px;object-fit:contain;filter:drop-shadow(0 0 16px #1E8BFF)}
 .vs-mate{position:absolute;bottom:62px;width:110px;height:110px;object-fit:contain;filter:brightness(.55) saturate(.7) drop-shadow(0 0 8px #1E8BFF88)}
 .vs-sil{position:absolute;bottom:52px;object-fit:contain;filter:brightness(0) drop-shadow(0 0 2px #FF5C8A) drop-shadow(0 0 14px #FF3B5C);animation:vsSil 2.2s ease-in-out infinite}
@@ -284,7 +287,8 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
         <div class="vs-plat" style="--pc: {{myCol}}"></div>
         <div class="vs-aura" style="--pc: {{myCol}}"><sc-for list="{{auraL}}" as="a" hint-placeholder-count="0"><i style="{{a}}"></i></sc-for></div>
         <sc-for list="{{mateSil}}" as="m" hint-placeholder-count="0"><img class="vs-mate" src="{{m.src}}" alt="" style="{{m.style}}"></sc-for>
-        <sc-if value="{{hero3d}}" hint-placeholder-val="{{ false }}"><div class="vs-me3d" ref="{{heroRef}}" onClick="{{heroTap}}"></div></sc-if>
+        <sc-if value="{{hero3d}}" hint-placeholder-val="{{ false }}"><div class="{{vs3dCls}}" ref="{{heroRef}}"></div><div class="vs-tap" role="button" aria-label="Tu jugador: tócalo para que haga una jugada" onClick="{{heroTap}}"></div></sc-if>
+        <sc-for list="{{mateTags}}" as="m" hint-placeholder-count="0"><span class="vs-mtag" style="{{m.style}}" translate="no">{{m.name}}</span></sc-for>
         <sc-if value="{{hero2d}}" hint-placeholder-val="{{ true }}"><img class="vs-me" src="{{meImg}}" alt=""></sc-if>
         <sc-if value="{{colOn}}" hint-placeholder-val="{{ false }}"><button type="button" class="vs-col" onClick="{{openCols}}" aria-label="Elegir mis colores de local y visitante" style="--tc: {{myCol}}"><span class="vs-sw"><i style="background: {{colHome}}"></i><i style="background: {{colAway}}"></i></span>MIS COLORES</button></sc-if>
         <div class="vs-tag l"><span class="vs-tk">TÚ</span><b translate="no">{{meName}}</b><span class="vs-rk" style="--rc: {{glow}}"><i></i>{{rankLine}}</span></div>
@@ -539,7 +543,7 @@ class Component extends DCLogic {
   constructor(props) {
     super(props);
     this.heroRef = (el) => {
-      if (el && el !== this.heroEl) { if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = el; if (window.AMHero) window.AMHero.attach(el); }
+      if (el && el !== this.heroEl) { if (this.heroEl && window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = el; if (window.AMHero) { if (window.AMHero.setMates) window.AMHero.setMates(this.heroMates || [], el); window.AMHero.attach(el); } }
       else if (!el && this.heroEl) { if (window.AMHero) window.AMHero.detach(this.heroEl); this.heroEl = null; }
     };
     const sel = this.store('arenamix.sel') || {};
@@ -986,15 +990,25 @@ class Component extends DCLogic {
         const A = window.AMChars, pref = A ? A.pref() : 'clasico', hero3d = !!(window.AMHero && window.THREE && A && pref !== 'clasico');
         const PICS = ['dani', 'leo', 'nico', 'remy', 'ty', 'vegas', 'granny'], mine = pref !== 'clasico' ? pref : 'dani';
         const nTeam = pl.kind === 'team' ? pl.n : 1, pick = (k) => 'assets/chars/' + PICS[(k * 3 + 1) % PICS.length] + '.png';
+        // the friends in your party stand beside you in 3D (their character and kit); the spots still to fill stay dark
+        const SOc = window.AMSocial, stc = SOc && SOc.state ? SOc.state() : null, pty = stc && stc.party;
+        const friends = pty ? pty.members.filter((m) => m.name !== stc.me).slice(0, nTeam - 1) : [];
+        const SPOT = [{ x: -100, z: -0.5, bottom: 50 }, { x: 98, z: -0.5, bottom: 50 }, { x: 165, z: -1.1, bottom: 72 }];
+        const solid = (m) => hero3d && m && m.look && m.look.char && m.look.char !== 'clasico';
+        const mates3d = friends.map((m, k) => ({ key: 'vs' + k + m.name, look: m.look, x: SPOT[k].x, z: SPOT[k].z, s: 1 })).filter((q, k) => solid(friends[k]));
+        this.heroMates = mates3d;
+        if (this.heroEl && window.AMHero && window.AMHero.setMates) window.AMHero.setMates(mates3d, this.heroEl);
         const IC = { clock: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18M12 7v5l3 2', users: 'M9 11a4 4 0 1 0 0-8a4 4 0 0 0 0 8M2 21v-1a6 6 0 0 1 12 0v1M17 11a3 3 0 1 0 0-6M18 15a5 5 0 0 1 4 5v1', trophy: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4', coin: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18M9 9h4.5a1.5 1.5 0 0 1 0 3H10.5a1.5 1.5 0 0 0 0 3H15M12 7v2M12 15v2' };
         const tl = (ic, v, l, c, k) => ({ ic: IC[ic], v, l, style: '--tc: ' + c + '; animation-delay: ' + (0.4 + k * 0.08).toFixed(2) + 's' });
         const dur = pl.kind === 'team' ? (casual ? '1:30' : '2:00') : pl.duel === 'pen' ? '5 TIROS' : pl.kind === 'duel' ? '5 RONDAS' : 'RÉCORD';
         return {
-          hero3d, hero2d: !hero3d, heroRef: this.heroRef, heroTap: () => { if (window.AMHero && window.AMHero.play) window.AMHero.play(); },
+          hero3d, hero2d: !hero3d, heroRef: this.heroRef, vs3dCls: 'vs-me3d' + (mates3d.length ? ' wide' : ''), heroTap: () => { if (window.AMHero && window.AMHero.play) window.AMHero.play(); },
           meImg: 'assets/chars/' + mine + '.png', meName: window.AMOnline ? window.AMOnline.myName() : 'Tú',
           rankLine: casual ? 'SIN RANGO · PARTIDA LIBRE' : placing ? 'SIN CLASIFICAR · ' + Math.min(5, pc.g + 1) + '/5' : R.label.toUpperCase() + ' · ' + s.mmr + ' MMR',
           plKicker: (casual ? 'INFORMAL' : 'COMPETITIVO') + ' · ' + (pl.kind === 'team' ? 'PARTIDO' : 'DUELO'),
-          mateSil: Array.from({ length: nTeam - 1 }, (_, k) => ({ src: pick(k + 2), style: 'left: ' + (k % 2 ? 150 : -6) + 'px; bottom: ' + (64 + Math.floor(k / 2) * 14) + 'px; z-index: 0' })),
+          mateSil: Array.from({ length: nTeam - 1 }, (_, k) => ({ k, src: friends[k] && friends[k].look && friends[k].look.char && friends[k].look.char !== 'clasico' ? 'assets/chars/' + friends[k].look.char + '.png' : pick(k + 2), style: 'left: ' + (k % 2 ? 150 : -6) + 'px; bottom: ' + (64 + Math.floor(k / 2) * 14) + 'px; z-index: 0' + (friends[k] ? '; filter: drop-shadow(0 0 8px #1E8BFF)' : '') })).filter((m) => !solid(friends[m.k])),
+          mateTags: friends.map((m, k) => ({ name: m.name, style: 'left: ' + Math.max(-14, 125 + SPOT[k].x - 40) + 'px; bottom: ' + SPOT[k].bottom + 'px' })),
+          vs3dWide: !!mates3d.length,
           rivalSil: Array.from({ length: nTeam }, (_, k) => { const main = k === 0, w = main ? 160 : 104; return { src: pick(k + 5), style: 'width: ' + w + 'px; height: ' + w + 'px; left: ' + (main ? 45 : k % 2 ? 146 : 0) + 'px; ' + (main ? 'z-index: 2;' : 'bottom: 66px; opacity: .7;') + ' animation-delay: ' + (-k * 0.4) + 's' }; }),
           auraL: Array.from({ length: 14 }, (_, k) => 'left: ' + ((k * 41) % 100) + '%; animation-duration: ' + (1.6 + (k % 5) * 0.35).toFixed(2) + 's; animation-delay: ' + (-k * 0.27).toFixed(2) + 's'),
           auraR: Array.from({ length: 14 }, (_, k) => 'left: ' + ((k * 53) % 100) + '%; animation-duration: ' + (1.6 + (k % 5) * 0.35).toFixed(2) + 's; animation-delay: ' + (-k * 0.31).toFixed(2) + 's'),
