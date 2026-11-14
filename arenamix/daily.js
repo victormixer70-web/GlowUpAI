@@ -39,7 +39,34 @@
     '@keyframes dlNow{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}',
     '#am-daily .d.big{flex:1.5;background:linear-gradient(170deg,#DB2777,#7E22CE)}#am-daily .d.big.now{background:linear-gradient(170deg,#FBBF24,#DB2777)}',
     '#am-daily .go{display:block;margin:16px auto 0;height:50px;padding:0 44px;border:0;border-radius:16px;background:linear-gradient(135deg,#FDE68A,#FBBF24 50%,#F97316);color:#2A1400;font:800 italic 24px "Barlow Condensed",sans-serif;letter-spacing:1px;cursor:pointer;box-shadow:inset 0 2px 0 #fff8,0 5px 0 #92400E,0 0 22px #FBBF2488}',
-    '#am-daily .go:active{transform:translateY(3px)}'
+    '#am-daily .go:active{transform:translateY(3px)}',
+    // ---- the redesign: frosted night-blue glass, gold for today, day 7 a legendary chest ----
+    '#am-daily{background:radial-gradient(60% 70% at 50% 45%,#0A3DCC55,transparent 70%),#02040CD9!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}',
+    '#am-daily .bx{width:700px!important;border-radius:26px!important;background:radial-gradient(90% 50% at 50% 0%,#1E8BFF44,transparent 70%),linear-gradient(170deg,#0B1A44F2,#02040CF7 70%)!important;box-shadow:inset 0 0 0 1.5px #3DA9FF88,inset 0 1px 0 #ffffff33,0 24px 60px #000c,0 0 50px #1E8BFF44!important;animation:dlBx .5s cubic-bezier(.2,1.4,.4,1) both}',
+    '@keyframes dlBx{from{opacity:0;transform:scale(.85) translateY(20px)}}',
+    '#am-daily h2{font:400 32px/1 Titulos,sans-serif!important;font-style:normal!important;background:linear-gradient(180deg,#FFFFFF,#FFE7A3 50%,#FFC53D)!important;-webkit-background-clip:text!important;background-clip:text!important}',
+    '#am-daily .sub{color:#9FC3F0!important;font:400 10px Titulos,sans-serif!important;letter-spacing:2px;margin:6px 0 14px!important}',
+    '#am-daily .d{border-radius:16px!important;background:radial-gradient(90% 50% at 50% 0%,#1E8BFF2e,transparent 70%),linear-gradient(170deg,#0B1A44,#040A1C)!important;box-shadow:inset 0 0 0 1px #3DA9FF55,inset 0 1px 0 #ffffff22!important;animation:dlD .45s cubic-bezier(.2,1.4,.4,1) both}',
+    '#am-daily .d:nth-child(1){animation-delay:.05s}#am-daily .d:nth-child(2){animation-delay:.1s}#am-daily .d:nth-child(3){animation-delay:.15s}#am-daily .d:nth-child(4){animation-delay:.2s}#am-daily .d:nth-child(5){animation-delay:.25s}#am-daily .d:nth-child(6){animation-delay:.3s}#am-daily .d:nth-child(7){animation-delay:.35s}',
+    '@keyframes dlD{from{opacity:0;transform:translateY(16px) scale(.9)}}',
+    '#am-daily .d b{font:400 9px Titulos,sans-serif!important;letter-spacing:1.5px!important;color:#7CC4FF!important}',
+    '#am-daily .d span{font:400 10px Titulos,sans-serif!important;letter-spacing:.5px;color:#E6F2FF}',
+    '#am-daily .d.got{opacity:.6}#am-daily .d.got::after{content:"";background:radial-gradient(circle,#22C55E 0 17px,transparent 18px) center/100% no-repeat;font-size:0!important}',
+    '#am-daily .d.got::before{content:"✓";position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;font:900 22px Exo2;color:#02240F}',
+    '#am-daily .d.now{background:radial-gradient(90% 60% at 50% 0%,#FFFFFF55,transparent 60%),linear-gradient(170deg,#FFD34D,#F59E0B 60%,#B45309)!important;box-shadow:inset 0 0 0 2px #FFF1B8,0 0 24px #FFC53DAA!important;overflow:hidden}',
+    '#am-daily .d.now b,#am-daily .d.now span{color:#2A1400!important}',
+    '#am-daily .d.now::before{content:"";position:absolute;top:-30%;bottom:-30%;left:0;width:40%;background:linear-gradient(100deg,transparent,#ffffffaa,transparent);transform:translateX(-200%) skewX(-18deg);animation:dlShine 2.2s ease-in-out infinite}',
+    '@keyframes dlShine{0%,40%{transform:translateX(-200%) skewX(-18deg)}100%{transform:translateX(400%) skewX(-18deg)}}',
+    '#am-daily .d.big{background:radial-gradient(70% 60% at 50% 30%,#FFC53D55,transparent 70%),conic-gradient(from 0deg at 50% 45%,#FFC53D22 0 10deg,transparent 10deg 30deg,#FFC53D22 30deg 40deg,transparent 40deg 60deg,#FFC53D22 60deg 70deg,transparent 70deg 90deg),linear-gradient(170deg,#0A3DCC,#06102E)!important;box-shadow:inset 0 0 0 2px #FFC53D,0 0 20px #FFC53D66!important}',
+    '#am-daily .d.big img{width:66px!important;height:66px!important;animation:dlChest 2s ease-in-out infinite}',
+    '@keyframes dlChest{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-4px) rotate(3deg)}}',
+    '#am-daily .d.big.now{background:radial-gradient(90% 60% at 50% 0%,#FFFFFF66,transparent 60%),linear-gradient(170deg,#FFD34D,#F59E0B 60%,#B45309)!important}',
+    '#am-daily .go{border-radius:18px!important;font:400 22px Titulos,sans-serif!important;font-style:normal!important;letter-spacing:2px!important;background:linear-gradient(180deg,#FFF0B0,#FFD34D 30%,#FFB020 70%,#F59E0B)!important;box-shadow:inset 0 2px 0 #ffffffcc,inset 0 -4px 0 #B7791F,0 6px 0 #7A4E0E,0 10px 26px #FFB02066!important}',
+    // collecting: today pops and bursts before the window closes
+    '#am-daily .d.claim{animation:dlClaim .6s cubic-bezier(.2,1.6,.4,1) both!important;z-index:3}',
+    '@keyframes dlClaim{0%{transform:scale(1)}35%{transform:scale(1.25) rotate(-4deg);filter:brightness(1.6)}100%{transform:scale(1.1);filter:brightness(1.2)}}',
+    '#am-daily .burst{position:absolute;width:10px;height:10px;border-radius:50%;pointer-events:none;animation:dlBurst .7s ease-out forwards}',
+    '@keyframes dlBurst{to{transform:translate(var(--bx),var(--by)) scale(.3);opacity:0}}'
   ].join('\n');
   document.head.appendChild(css);
   function show(force) {
@@ -47,7 +74,7 @@
     if (!stage || (!st.ready && !force) || document.getElementById('am-daily')) return;
     var G = window.AMGear, P = function (k) { try { return G ? G.prize(k) : ''; } catch (e) { return ''; } };
     var el = document.createElement('div'); el.id = 'am-daily';
-    el.innerHTML = '<div class="bx"><h2>RECOMPENSA DIARIA</h2><div class="sub">Entra cada día: los premios crecen. Si fallas un día, la semana vuelve a empezar.</div><div class="row">' +
+    el.innerHTML = '<div class="bx"><h2>RECOMPENSA DIARIA</h2><div class="sub">VUELVE CADA DÍA · LOS PREMIOS CRECEN</div><div class="row">' +
       DAYS.map(function (d, i) { return '<div class="d' + (i < st.idx ? ' got' : '') + (i === st.idx && st.ready ? ' now' : '') + (i === 6 ? ' big' : '') + '"><b>DÍA ' + (i + 1) + '</b><img src="' + P(d.pic) + '" alt=""><span>' + d.label + '</span></div>'; }).join('') +
       '</div><button type="button" class="go">' + (st.ready ? '¡RECOGER!' : 'VUELVE MAÑANA') + '</button></div>';
     stage.appendChild(el);
@@ -56,7 +83,15 @@
       if (!st.ready) { close(); return; }
       var d = DAYS[st.idx], PR = window.AMProgress;
       put({ last: today(), idx: st.idx });
-      close();
+      // today's card pops and throws sparks, then the window goes
+      var now = el.querySelector('.d.now');
+      if (now) {
+        now.classList.add('claim');
+        var r = now.getBoundingClientRect(), br = el.getBoundingClientRect(), sc = br.width / el.offsetWidth || 1;
+        for (var k = 0; k < 14; k++) { var sp = document.createElement('i'); sp.className = 'burst'; var a2 = k / 14 * Math.PI * 2, dd = 60 + (k % 3) * 22; sp.style.cssText = 'left:' + ((r.left - br.left) / sc + r.width / sc / 2) + 'px;top:' + ((r.top - br.top) / sc + r.height / sc / 2) + 'px;background:' + ['#FFC53D', '#3DA9FF', '#FFFFFF'][k % 3] + ';--bx:' + (Math.cos(a2) * dd).toFixed(0) + 'px;--by:' + (Math.sin(a2) * dd).toFixed(0) + 'px'; el.appendChild(sp); }
+        if (window.AMSfx && window.AMSfx.coin) try { window.AMSfx.coin(); } catch (e) {}
+      }
+      setTimeout(close, now ? 650 : 0);
       if (d.chest && window.AMResults) {
         if (PR) { PR.addCoins(d.coins); PR.addGems(d.gems); }
         window.AMResults.reward({ milestone: { prize: 'chest', chest: 'legend', name: 'Día 7 · cofre épico' }, coins: d.coins, gems: d.gems, items: [] });
