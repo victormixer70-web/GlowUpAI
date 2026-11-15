@@ -472,6 +472,14 @@ const AMNAR = {
   endDraw: [['¡Final! Reparto de puntos: {s}', 'Full time! Honours even: {s}'], ['Empate a todo: {s}', 'All square: {s}']]
 };
 const Partido_BR = 0.17;
+// the dive clip for a ball at that height: diveL low (F 1.15) or mid (F 0.95), diveR high (F 0.92),
+// mirrored for the other side; hand: where the hands are at that frame (for the height correction)
+const Partido_diveShape = (a) => {
+  const z = a.z ?? 0.5, left = a.dl > 0;
+  if (z < 0.55) return { id: "diveL", mir: !left, F: 1.15, hand: 0.5 };
+  if (z < 1.2) return { id: "diveL", mir: !left, F: 0.95, hand: 0.98 };
+  return { id: "diveR", mir: left, F: 0.92, hand: 1.4 };
+};
 // a player's upgrades as sent in the room (an old app sends none: the starting values)
 const Partido_stats = (st) => {
   const o = { vel: 10, pot: 10, pre: 10, con: 10, res: 10, ref: 10 };
@@ -1223,7 +1231,7 @@ class Component extends DCLogic {
     g.fx = { x: b.x, y: b.y, t: 0 };
     g.shotFrom = { x: p.x, i };
     b.fire = 0;
-    p.act = { type: 'kick', t: 0, dur: 0.62, loft };
+    p.act = { type: 'kick', t: 0, dur: 0.62, loft, shot: p.fromAct === 'windup' };
     this.sfx('kick', power);
     return true;
   }
@@ -1694,7 +1702,7 @@ class Component extends DCLogic {
     g.ps.forEach((p) => {
       p.cd = Math.max(0, p.cd - dt); p.inv = Math.max(0, p.inv - dt); p.ghost = Math.max(0, (p.ghost || 0) - dt); p.touchAnim = Math.max(0, (p.touchAnim || 0) - dt); p.skillCd = Math.max(0, p.skillCd - dt);
       p.wantsBall = Math.max(0, (p.wantsBall || 0) - dt); p.passReq = Math.max(0, (p.passReq || 0) - dt); p.shootReq = Math.max(0, (p.shootReq || 0) - dt); p.pressReq = Math.max(0, (p.pressReq || 0) - dt); p.defend = Math.max(0, (p.defend || 0) - dt);
-      if (p.act) { p.act.t += dt; if (p.act.t >= p.act.dur) { const a = p.act; p.act = null; if (a.then) a.then(); } }
+      if (p.act) { p.act.t += dt; if (p.act.t >= p.act.dur) { const a = p.act; p.act = null; if (a.then) { p.fromAct = a.type; a.then(); p.fromAct = null; } } }
     });
     if (g.phase === 'goal') { this.goalStep(dt); return; }
     if (g.phase === 'intro') { this.introStep(); return; }
@@ -2396,7 +2404,7 @@ class Component extends DCLogic {
     // the ball's height decides the dive: low ones skim the grass, high ones are a full leap to the top corner
     const z = iz == null ? 0.5 : iz, h = this.clamp((z - 0.45) * 0.9, 0, 1.15);
     const flight = this.clamp(Math.max(0.34 + 0.22 * h + 0.04 * Math.abs(p.vy) / 7, (t || 0) + 0.08), 0.32, 0.72);
-    p.act = { type: 'dive', t: 0, dur: flight + 0.75, lock: true, dl, s, h, flight, low: z < 0.45, stopY: iy - s * 0.9 };
+    p.act = { type: 'dive', t: 0, dur: flight + 0.75, lock: true, dl, s, h, z, flight, low: z < 0.45, stopY: iy - s * 0.9 };
   }
   // one against one: down at the attacker's feet, body across the ball
   smother(p, D) {
@@ -3585,6 +3593,14 @@ class Component extends DCLogic {
       pts.frustumCulled = false; S.add(pts);
       this.trail = { pts, life: new Float32Array(N), max: new Float32Array(N), col: new Float32Array(N * 3), k: 0, N };
     }
+    // motion blur of a hard-hit ball: a faint tapered streak along its flight, about one frame of travel long
+    // (at 30 m/s the ball jumps a metre between frames, and a sharp ball hopping across the screen looks fake)
+    {
+      const geo = new T.CylinderGeometry(Partido_BR * 0.92, Partido_BR * 0.15, 1, 14, 1, true);
+      geo.translate(0, -0.5, 0);
+      const mat = new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false });
+      this.streak = new T.Mesh(geo, mat); this.streak.visible = false; this.streak.renderOrder = 3; S.add(this.streak);
+    }
     // rain streaks or snowflakes in a box that follows the camera
     if (this.wx === 'lluvia' || this.wx === 'nieve') {
       const low = this.gfxNow === 'baja', snow = this.wx === 'nieve', N = snow ? (low ? 600 : 1100) : (low ? 700 : 1300), box = [64, 20, 40];
@@ -4189,9 +4205,26 @@ class Component extends DCLogic {
         const A = p.act, fl = A.flight || 0.5;
         // the dive clip already lifts the body off the ground: only a high dive gets a little extra height
         const clip = !!(window.AMChars && window.AMChars.clip && window.AMChars.clip('diveL'));
-        const lift = clip ? 0.5 * Math.max(0, (A.h || 0) - 0.3) : 0.12 + (A.h || 0) * 0.95;
-        // up quickly, down with gravity: back to nothing exactly as he lands
-        if (A.t < fl) { const q = A.t / fl; m.position.y += lift * 4 * q * (1 - q) * (q < 0.5 ? 1 : 1 - (q - 0.5) * 0.6); }
+        if (clip && !A.smother) {
+          // the body raised or lowered so the hands are at the ball's height as it arrives
+          const sh = Partido_diveShape(A), off = this.clamp((A.z ?? 0.5) - sh.hand, -0.35, 0.55);
+          const env = A.t < fl ? Math.min(1, A.t / Math.max(0.08, fl * 0.45)) : Math.max(0, 1 - (A.t - fl) / 0.22);
+          m.position.y += off * env * (2 - env);
+        } else if (!clip) {
+          // up quickly, down with gravity: back to nothing exactly as he lands
+          const lift = 0.12 + (A.h || 0) * 0.95;
+          if (A.t < fl) { const q = A.t / fl; m.position.y += lift * 4 * q * (1 - q) * (q < 0.5 ? 1 : 1 - (q - 0.5) * 0.6); }
+        }
+      }
+      if (p.act && (p.act.type === 'windup' || (p.act.type === 'kick' && p.act.shot && g.fx)) && window.AMChars && window.AMChars.clip && window.AMChars.clip('shot')) {
+        // the strike: the body set so the ball is where the boot meets it in the clip (in front and just
+        // to the right of the standing foot), so the ball leaves the instep instead of a step ahead of it
+        const A = p.act, B = A.type === 'windup' ? b : g.fx, f = p.face, cf = Math.cos(f), sf = Math.sin(f);
+        const w = A.type === 'windup' ? Math.min(1, A.t / Math.max(0.05, A.dur * 0.7)) : Math.max(0, 1 - A.t / 0.3);
+        let ox = B.x - 0.42 * cf + 0.3 * sf - p.x, oy = B.y - 0.42 * sf - 0.3 * cf - p.y;
+        const ol = Math.hypot(ox, oy); if (ol > 0.7) { ox *= 0.7 / ol; oy *= 0.7 / ol; }
+        const e = w * w * (3 - 2 * w);
+        m.position.x += ox * e; m.position.z += oy * e;
       }
       m.rotation.order = 'YXZ'; m.rotation.x = 0;
       if (p.act && p.act.type === 'header') {
@@ -4221,6 +4254,38 @@ class Component extends DCLogic {
       if (st.m.userData.anim) this.mocap(p, st.m, -1, dt || 0);
     });
     this.ball3.position.copy(this.W(b.x, b.y, b.z + Partido_BR));
+    // a ball the keeper holds is in his hands (lying on the grass after a diving catch too), not floating
+    // at chest height in front of him
+    if (g.hold >= 0 && this.pMeshes[g.hold]) {
+      const km = this.pMeshes[g.hold], u = km.userData;
+      if (u && u.anim && u.apply) {
+        if (u.hL === undefined) { u.hL = km.getObjectByName('mixamorigLeftHand') || null; u.hR = km.getObjectByName('mixamorigRightHand') || null; }
+        if (u.hL && u.hR) {
+          if (!this.hv1) { this.hv1 = new T.Vector3(); this.hv2 = new T.Vector3(); }
+          km.updateMatrixWorld(true); u.apply(); km.updateMatrixWorld(true);
+          u.hL.getWorldPosition(this.hv1); u.hR.getWorldPosition(this.hv2);
+          this.hv1.add(this.hv2).multiplyScalar(0.5); this.hv1.y = Math.max(Partido_BR, this.hv1.y);
+          // eased in from where it was caught
+          const hk = this.holdVis = g.hold === this.holdWho ? Math.min(1, (this.holdVis || 0) + (dt || 0.016) * 8) : 0;
+          this.holdWho = g.hold;
+          this.ball3.position.lerp(this.hv1, hk);
+        }
+      }
+    } else this.holdWho = -1;
+    if (this.streak) {
+      const v3 = Math.hypot(b.vx, b.vy, b.vz), free = g.own < 0 && g.hold < 0 && g.phase !== 'winners';
+      const on = free && v3 > 15 && (dt || 0) > 0;
+      this.streak.visible = on;
+      if (on) {
+        if (!this.sDir) { this.sDir = new T.Vector3(); this.sUp = new T.Vector3(0, 1, 0); }
+        // pointing backwards along the flight (pitch y is world z, height is world y)
+        this.sDir.set(-b.vx, -b.vz, -b.vy).normalize();
+        this.streak.quaternion.setFromUnitVectors(this.sUp, this.sDir.clone().negate());
+        this.streak.position.copy(this.ball3.position);
+        this.streak.scale.set(1, Math.min(1.6, v3 * Math.min(0.033, dt) * 1.1), 1);
+        this.streak.material.opacity = Math.min(0.32, (v3 - 15) / 45);
+      }
+    }
     // the net wraps round the ball pressing into it, then springs back
     if (this.nets) {
       const ns = b.x < 30 ? -1 : 1, dep = ns < 0 ? -b.x : b.x - 60, net = this.nets[ns];
@@ -4589,8 +4654,10 @@ class Component extends DCLogic {
     if (charging && (gk || sp < 2.2)) act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.7 + 0.3 * g.charge : 0.04 + 0.1 * g.charge, key: 'charge' };
     else if (a) {
       const k = Math.min(1, a.t / a.dur);
-      if (a.type === 'windup') { const f0 = a.from ?? 0.12; act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.75 + 0.3 * k : f0 + (0.42 - f0) * k, key: 'strike' }; }
-      else if (a.type === 'kick') act = gk ? { id: 'gkKick', t: 2.05 + 0.6 * k, key: a } : { id: 'shot', t: 0.42 + 0.8 * k, key: 'strike' };
+      // the windup ends just as the boot meets the ball (0.42-0.46 s in the clip), so the last frame before the
+      // ball leaves shows the foot on it, not still swinging through behind it
+      if (a.type === 'windup') { const f0 = a.from ?? 0.12; act = { id: gk ? 'gkKick' : 'shot', t: gk ? 1.75 + 0.3 * k : f0 + (0.46 - f0) * k, key: 'strike' }; }
+      else if (a.type === 'kick') act = gk ? { id: 'gkKick', t: 2.05 + 0.6 * k, key: a } : { id: 'shot', t: 0.46 + 0.76 * k, key: 'strike' };
       else if (a.type === 'pass') act = { id: 'pass', t: 0.09 + 0.41 * k, key: a };   // backswing -> contact (~0.13 s, when the ball leaves) -> follow-through
       else if (a.type === 'throw') act = { id: 'gkThrow', t: 1.3 + 0.6 * k, key: a };
       else if (a.type === 'slide') act = { id: 'slide', t: 0.2 + 0.75 * k, key: a };
@@ -4601,15 +4668,19 @@ class Component extends DCLogic {
         const fl = a.flight || 0.5, rest = Math.max(0.3, a.dur - fl), u = a.t - fl;
         // in the air the clip is held at its full stretch (a flat, sideways dive, as the shoot-out keeper), and only after
         // the flight does he come down: the sweep through the whole clip mid-air read as a somersault
-        const ct = a.smother ? 1.2 + 0.65 * k : a.t < fl ? 0.8 + 0.14 * Math.min(1, a.t / Math.min(fl, 0.22)) : u < 0.28 ? 0.94 + 0.48 * (u / 0.28) : u < 0.28 + rest * 0.4 ? 1.42 + 0.88 * ((u - 0.28) / (rest * 0.4)) : Math.min(3.15, 2.3 + 0.85 * (u - 0.28 - rest * 0.4) / Math.max(0.1, rest * 0.6 - 0.28));
-        act = { id: a.dl > 0 ? 'diveL' : 'diveR', t: ct, key: a };
+        // The two clips are different dives: 'diveL' a low/mid one, 'diveR' a high leap. Each is played as
+        // is or mirrored, so both sides get all three: skimming the grass, at full stretch at waist height,
+        // or flying up to the top corner (which one used to depend on the side, not on the ball)
+        const sh = Partido_diveShape(a), F = sh.F, pre = Math.min(0.1, fl * 0.3);
+        const ct = a.smother ? 1.2 + 0.65 * k : a.t < pre ? 0.6 + (F - 0.7) * (a.t / pre) : a.t < fl ? F - 0.1 + 0.1 * ((a.t - pre) / Math.max(0.05, fl - pre)) : u < 0.28 ? F + (1.42 - F) * (u / 0.28) : u < 0.28 + rest * 0.4 ? 1.42 + 0.88 * ((u - 0.28) / (rest * 0.4)) : Math.min(3.15, 2.3 + 0.85 * (u - 0.28 - rest * 0.4) / Math.max(0.1, rest * 0.6 - 0.28));
+        act = a.smother ? { id: a.dl > 0 ? 'diveL' : 'diveR', t: ct, key: a } : { id: sh.id, mir: sh.mir, t: ct, key: a };
       }
     } else if (gk && g.hold === i) act = { id: 'catch', t: 0.8, key: 'hold' };
     // poses only the procedural rig has (skills, stumbles, celebrations): clips fade out
     const procOnly = a && !act && a.type !== 'windup';
     st.on += ((procOnly ? 0 : 1) - st.on) * Math.min(1, dt * 10);
     if (act) {
-      if (!st.act || st.act.id !== act.id || (st.act.key !== act.key && act.key !== 'hold' && st.act.key !== 'charge')) st.act = { id: act.id, t: act.t, w: st.act && st.act.id === act.id ? st.act.w : 0, key: act.key };
+      if (!st.act || st.act.id !== act.id || !!st.act.mir !== !!act.mir || (st.act.key !== act.key && act.key !== 'hold' && st.act.key !== 'charge')) st.act = { id: act.id, mir: !!act.mir, t: act.t, w: st.act && st.act.id === act.id && !!st.act.mir === !!act.mir ? st.act.w : 0, key: act.key };
       st.act.t = act.t; st.act.key = act.key; st.act.live = true;
     } else if (st.act) {
       // finished: let the clip play on while it fades into the run/idle cycle
@@ -4638,7 +4709,7 @@ class Component extends DCLogic {
       const info = A.clip(id), t = id === 'idle' || id === 'gkIdle' ? st.idle : st.ph * info.dur;
       layers.push({ id, t, w: w1 * (1 - aw) * st.on });
     });
-    if (st.act) layers.push({ id: st.act.id, t: st.act.t, w: aw * st.on });
+    if (st.act) layers.push({ id: st.act.id, t: st.act.t, w: aw * st.on, mir: !!st.act.mir });
     u.anim.layers = st.on > 0.01 ? layers : [];
   }
   animate(p, m, i) {

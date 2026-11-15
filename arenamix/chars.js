@@ -36,7 +36,10 @@
         clips[c.id] = { fps: c.fps, n: c.n, loop: c.loop, dur: (c.n - 1) / c.fps,
           q: new Int16Array(buf.buffer, c.qOff, c.n * j.bones.length * 4), p: new Int16Array(buf.buffer, c.pOff, c.n * 3) };
       });
-      ANIM = { bones: j.bones, clips: clips };
+      // every bone's mirror twin (left <-> right), so a clip can be played mirrored: a dive to one side
+      // becomes the same dive to the other side
+      var mir = j.bones.map(function (n) { var t = n.indexOf('Left') >= 0 ? n.replace('Left', 'Right') : n.replace('Right', 'Left'), k = j.bones.indexOf(t); return k >= 0 ? k : j.bones.indexOf(n); });
+      ANIM = { bones: j.bones, clips: clips, mir: mir };
     }).catch(function () { ANIM = null; });
   }
   function clipInfo(id) { var c = ANIM && ANIM.clips[id]; return c ? { dur: c.dur, loop: c.loop } : null; }
@@ -955,10 +958,12 @@
         if (!c || !(l.w > 0)) continue;
         var f = l.t * c.fps, n = c.n;
         if (c.loop) { f %= (n - 1); if (f < 0) f += n - 1; } else f = Math.max(0, Math.min(n - 1, f));
-        var f0 = Math.floor(f), f1 = Math.min(n - 1, f0 + 1), u = f - f0, nb = ANIM.bones.length;
-        var a = (f0 * nb + k) * 4, b = (f1 * nb + k) * 4, q = c.q;
+        var f0 = Math.floor(f), f1 = Math.min(n - 1, f0 + 1), u = f - f0, nb = ANIM.bones.length, kk = l.mir ? ANIM.mir[k] : k;
+        var a = (f0 * nb + kk) * 4, b = (f1 * nb + kk) * 4, q = c.q;
         var s1 = (q[a] * q[b] + q[a + 1] * q[b + 1] + q[a + 2] * q[b + 2] + q[a + 3] * q[b + 3]) < 0 ? -1 : 1;
         var x = q[a] + (s1 * q[b] - q[a]) * u, y = q[a + 1] + (s1 * q[b + 1] - q[a + 1]) * u, z = q[a + 2] + (s1 * q[b + 2] - q[a + 2]) * u, ww = q[a + 3] + (s1 * q[b + 3] - q[a + 3]) * u;
+        // mirrored across the body's centre plane (x -> -x): a rotation (x, y, z, w) becomes (x, -y, -z, w)
+        if (l.mir) { y = -y; z = -z; }
         var len = Math.sqrt(x * x + y * y + z * z + ww * ww) || 1, s2 = (tw > 0 && acc[0] * x + acc[1] * y + acc[2] * z + acc[3] * ww < 0) ? -1 : 1, k2 = s2 * l.w / len;
         acc[0] += x * k2; acc[1] += y * k2; acc[2] += z * k2; acc[3] += ww * k2; tw += l.w;
       }
@@ -974,7 +979,7 @@
         var f = l.t * c.fps, n = c.n;
         if (c.loop) { f %= (n - 1); if (f < 0) f += n - 1; } else f = Math.max(0, Math.min(n - 1, f));
         var f0 = Math.floor(f), f1 = Math.min(n - 1, f0 + 1), u = f - f0;
-        for (var j = 0; j < 3; j++) pc[j] += (c.p[f0 * 3 + j] + (c.p[f1 * 3 + j] - c.p[f0 * 3 + j]) * u) / 8000 * l.w;
+        for (var j = 0; j < 3; j++) pc[j] += (c.p[f0 * 3 + j] + (c.p[f1 * 3 + j] - c.p[f0 * 3 + j]) * u) / 8000 * l.w * (j === 0 && l.mir ? -1 : 1);
         tw += l.w;
       }
       if (tw > 0) { pc[0] /= tw; pc[1] /= tw; pc[2] /= tw; }
