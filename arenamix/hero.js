@@ -40,6 +40,9 @@
     { id: 'throwin', clip: 'throwin', dur: 1.5 }
   ];
   var act = null, nextAuto = 0, ball = null, bst = null;
+  // quiet: no tricks on his own (after a defeat he just stands there); taps still work
+  var quiet = false;
+  function setQuiet(q) { quiet = !!q; }
   function ensureBall(V) {
     if (V.heroBall) return V.heroBall;
     var g = new T.SphereGeometry(0.11, 24, 16);
@@ -102,7 +105,7 @@
     m.visible = true;
     var now = performance.now(), t = (now - t0) / 1000;
     if (!nextAuto) nextAuto = now + 6000;
-    if (!act && now > nextAuto) { play(); nextAuto = now + 6000 + Math.random() * 5000; }
+    if (!act && now > nextAuto && !quiet) { play(); nextAuto = now + 6000 + Math.random() * 5000; }
     // a slow sway, turned a little towards the panel
     var baseRot = -0.35 + Math.sin(t * 0.5) * 0.12, extra = 0;
     var an = m.userData.anim, layers = [];
@@ -196,6 +199,7 @@
     }
     if (V.cv.parentNode === el) el.removeChild(V.cv);
     holder = null;
+    quiet = false;
   }
   // built ahead of time on the menus so the home screen shows you at once
   function warm() {
@@ -206,5 +210,5 @@
     m.visible = vis;
   }
   window.AMViewer = viewer;
-  window.AMHero = { attach: attach, detach: detach, warm: warm, play: play, setMates: setMates };
+  window.AMHero = { attach: attach, detach: detach, warm: warm, play: play, setMates: setMates, setQuiet: setQuiet };
 })();

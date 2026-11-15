@@ -259,6 +259,61 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 @keyframes cpEm{from{transform:scale(3) rotate(-30deg);opacity:0}}
 .cp-promo .k{position:relative;font:800 13px Exo2,sans-serif;letter-spacing:4px;color:#fff;animation:koFade .4s .4s both}
 .cp-promo .n{position:relative;font:800 italic 56px/1 'Barlow Condensed',sans-serif;letter-spacing:2px;color:var(--pt);text-shadow:0 4px 0 #0D0418,0 0 30px var(--pc);animation:cpEm .6s .5s cubic-bezier(.2,1.6,.4,1) both}
+/* ---- after the match, redone: you on a podium, the verdict in big letters, a TV scoreboard, your rank and your match ---- */
+.rs-root{background:radial-gradient(70% 90% at 18% 62%,var(--rc2) 0%,#06102E 55%,#02040C 100%)}
+.rs-rays{left:160px;top:250px}
+.rs-spot{left:20px;width:280px}
+.rs-podium{position:absolute;left:46px;bottom:30px;width:230px;height:46px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--rc) 70%,transparent),color-mix(in srgb,var(--rc) 18%,transparent) 70%,transparent);pointer-events:none}
+.rs-podium::before{content:'';position:absolute;inset:6px 18px;border-radius:50%;border:2px solid color-mix(in srgb,var(--rc) 80%,#fff);box-shadow:0 0 18px var(--rc),inset 0 0 14px var(--rc);opacity:.8}
+.rs-podium i{position:absolute;inset:-8px -4px;border-radius:50%;border:2px dashed color-mix(in srgb,var(--rc) 55%,transparent);animation:rsPod 9s linear infinite}
+@keyframes rsPod{to{rotate:360deg}}
+.rs-me3d{position:absolute;left:16px;bottom:44px;width:290px;height:320px;pointer-events:none;filter:drop-shadow(0 0 16px color-mix(in srgb,var(--rc) 50%,transparent));animation:rsMeIn .6s cubic-bezier(.2,1.4,.4,1) both}
+.rs-tap{position:absolute;left:80px;bottom:44px;width:160px;height:300px;cursor:pointer;z-index:2}
+.rs-plate{position:absolute;left:46px;bottom:10px;width:230px;display:flex;flex-direction:column;align-items:center;gap:1px;z-index:3;animation:emSlide .45s .25s both}
+.rs-plate b{max-width:220px;padding:3px 14px 2px;border-radius:9px;background:linear-gradient(180deg,#0B1A44F2,#02040CF2);box-shadow:inset 0 0 0 1.5px var(--rc),0 0 14px color-mix(in srgb,var(--rc) 45%,transparent);font:400 13px Titulos,sans-serif;letter-spacing:1.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs-plate span{display:none}
+.rs-col2{position:absolute;left:316px;right:18px;top:12px;bottom:14px;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;gap:6px}
+.rs-top{display:flex;align-items:center;gap:8px;min-height:22px}
+.rs-k{display:inline-flex;align-items:center;height:22px;padding:0 10px;border-radius:11px;background:#02040CB3;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--rc) 60%,transparent);font:400 10px Titulos,sans-serif;letter-spacing:2.2px;color:var(--rc)}
+.rs-fire{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 10px;border-radius:11px;background:linear-gradient(135deg,#FF8A3D,#FF3D6E);color:#fff;font:400 10px Titulos,sans-serif;letter-spacing:1.5px;box-shadow:0 0 12px #FF6A3D88;animation:emSlide .4s .5s both}
+.rs-t{align-self:flex-start;font:400 58px/1 Titulos,sans-serif;font-style:normal;letter-spacing:2px;padding:0 6px 0 0;color:transparent;-webkit-background-clip:text;background-clip:text;-webkit-text-stroke:1.5px #02040C;text-shadow:none;filter:drop-shadow(0 4px 0 #02040C) drop-shadow(0 0 20px var(--g));transform-origin:0 60%}
+.rs-t.w{--g:#22D3EE99;background-image:linear-gradient(180deg,#FFFFFF 0%,#C9F6FF 38%,#22D3EE 56%,#1E8BFF 100%)}
+.rs-t.l{--g:#FF5C5C88;background-image:linear-gradient(180deg,#FFFFFF 0%,#FFC9C9 38%,#FF5C5C 56%,#A3162A 100%)}
+.rs-t.d{--g:#A6DCFF88;background-image:linear-gradient(180deg,#FFFFFF 0%,#E3F0FF 38%,#A6DCFF 56%,#3D7BD9 100%)}
+.rs-board{height:50px;border-radius:14px;overflow:visible;box-shadow:0 10px 24px #000a,0 0 0 2px #02040C;background:#02040C}
+.rs-team{flex:1;width:auto;min-width:0;gap:10px;padding:0 12px;font:400 14px Titulos,sans-serif;letter-spacing:1.2px;color:#fff;text-shadow:0 1px 2px #0008}
+.rs-team>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rs-team.h{border-radius:14px 0 0 14px;background:linear-gradient(90deg,#0E7FA0,#0A3DCC);box-shadow:inset 4px 0 0 #22D3EE}
+.rs-team.a{justify-content:flex-end;border-radius:0 14px 14px 0;background:linear-gradient(270deg,color-mix(in srgb,var(--c) 70%,#02040C),color-mix(in srgb,var(--c) 30%,#0B1A44));box-shadow:inset -4px 0 0 var(--c)}
+.rs-crest{flex:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 30%,color-mix(in srgb,var(--c) 55%,#fff),var(--c) 55%,color-mix(in srgb,var(--c) 50%,#02040C));box-shadow:0 0 0 2px #FFFFFFE6,0 0 0 3.5px #02040C;font-style:normal}
+.rs-crest b{font:400 13px/1 Titulos,sans-serif;color:#fff;text-shadow:0 1px 0 #02040C}
+.rs-score{flex:none;padding:0 18px;background:linear-gradient(180deg,#0B1A44,#02040C);font:400 34px Titulos,sans-serif;gap:12px}
+.rs-score i{color:#3DA9FF}
+.rs-cards{flex:none;height:112px;display:flex;gap:8px;animation:emSlide .45s .45s cubic-bezier(.2,1.4,.4,1) both}
+.rs-card{position:relative;display:flex;align-items:center;gap:12px;padding:10px 14px;box-sizing:border-box;border-radius:16px;background:linear-gradient(160deg,#0B1A44D9,#02040CE6);box-shadow:inset 0 0 0 1px #3DA9FF44,inset 0 1px 0 #ffffff1a,0 8px 18px #0008;min-width:0}
+.rs-card.rank{flex:1.35;box-shadow:inset 3px 0 0 var(--rc),inset 0 0 0 1px #3DA9FF44,0 8px 18px #0008}
+.rs-card.mine{flex:1;flex-direction:column;align-items:stretch;justify-content:center;gap:8px;padding:9px 10px}
+.rs-rk{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.rs-rk1{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.rs-rkn{font:400 24px/1 Titulos,sans-serif;letter-spacing:1px;white-space:nowrap}
+.rs-cap{font:400 13px Titulos,sans-serif;letter-spacing:1.8px}
+.rs-bar{position:relative;height:10px;border-radius:5px;background:#ffffff14;box-shadow:inset 0 1px 2px #0009;overflow:hidden}
+.rs-bar i{position:absolute;left:0;top:0;bottom:0;box-shadow:0 0 10px currentColor}
+.rs-bar i::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,#ffffff88,transparent) -100% 0/40% 100% no-repeat;animation:rsShine 1.6s linear infinite}
+.rs-sub{font:600 11px Exo2,sans-serif;color:#BFD3F5}.rs-sub b{color:#fff;font-weight:800}
+.rs-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.rs-st{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;height:44px;border-radius:10px;background:#ffffff0d;box-shadow:inset 0 0 0 1px #ffffff14;animation:rsStIn .4s both}
+.rs-st b{font:400 20px/1 Titulos,sans-serif;color:#fff}
+.rs-st small{font:700 8.5px Exo2,sans-serif;letter-spacing:.8px;color:#9FC3F0;text-transform:uppercase}
+@keyframes rsStIn{from{opacity:0;transform:translateY(8px) scale(.9)}}
+.rs-gain{display:flex;gap:6px}
+.rs-gain .rs-chip{flex:1;justify-content:center;border-radius:10px;padding:4px 8px;font-size:12px}
+.rs-btns{margin-top:0;flex:none;gap:10px}
+.rs-go{display:flex;align-items:center;gap:10px;height:52px;padding:0 28px;border-radius:14px;background:linear-gradient(180deg,#7EE8FF,#22D3EE 45%,#1E8BFF);box-shadow:0 5px 0 #0A3DCC,0 0 24px #22D3EE66,inset 0 1px 0 #ffffffaa}
+.rs-go span{font:400 20px Titulos,sans-serif;font-style:normal;letter-spacing:1.5px}
+.rs-out{height:46px;border-radius:14px;padding:0 22px;background:#02040C99;box-shadow:inset 0 0 0 1.5px #A6DCFF88}
+.rs-out span{font:400 15px Titulos,sans-serif;font-style:normal;letter-spacing:1.5px}
+@keyframes rsShine{to{background-position:300% 0}}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; overflow: hidden;  isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif">
@@ -475,13 +530,13 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
     <div class="cp-promo" style="{{promoStyle}}"><i class="r"></i><div class="em"><svg width="120" height="130" viewBox="0 0 64 70"><path d="M32 2L60 12V34C60 52 47 63 32 68C17 63 4 52 4 34V12Z" fill="var(--pc)" stroke="#fff" stroke-width="3"/><path d="M32 18l4.5 9l10 1.4l-7.2 7l1.7 10L32 40.8l-9 4.6l1.7-10l-7.2-7l10-1.4z" fill="#fff"/></svg></div><b class="k">{{promoTier}}</b><b class="n">{{promoName}}</b></div>
   </sc-if>
   <sc-if value="{{isResult}}" hint-placeholder-val="{{ false }}">
+    <!-- after the match: you on a podium (3D, celebrating if you won), the verdict, the score, your rank moving and your match -->
     <div class="rs-root" style="{{rsVars}}">
       <div class="rs-stage">
         <div class="rs-roof"></div><div class="rs-stands"></div><div class="rs-ad"><i></i></div>
         <div class="rs-flash"><sc-for list="{{rsFlashes}}" as="f" hint-placeholder-count="0"><i style="{{f}}"></i></sc-for></div>
         <div class="rs-pitchw"><div class="rs-pitch"></div></div>
         <div class="rs-streak" style="top: 150px"></div><div class="rs-streak" style="top: 250px; animation-delay: -2.2s; height: 34px"></div>
-        <div class="rs-mark">{{rsH}}–{{rsA}}</div>
         <div class="rs-beam l" style="left: 40px"></div><div class="rs-beam r" style="left: 804px"></div>
         <div class="rs-tower" style="left: 12px"></div><div class="rs-tower" style="right: 12px"></div>
         <div class="rs-vig"></div>
@@ -489,48 +544,61 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
       <div class="rs-rays"></div>
       <sc-if value="{{rsWin}}" hint-placeholder-val="{{ false }}"><div class="rs-confetti"><sc-for list="{{rsBits}}" as="c" hint-placeholder-count="0"><i style="{{c}}"></i></sc-for></div></sc-if>
       <sc-if value="{{rsLoss}}" hint-placeholder-val="{{ false }}"><div class="rs-rain"><sc-for list="{{rsDrops}}" as="c" hint-placeholder-count="0"><i style="{{c}}"></i></sc-for></div></sc-if>
-      <!-- you, under a spotlight, with the cup if you won -->
+      <!-- you, under a spotlight on a lit podium -->
       <div class="rs-spot"></div>
-      <div style="position: absolute; left: 34px; bottom: 26px; width: 220px; height: 26px; border-radius: 50%; background: radial-gradient(closest-side, var(--rc) , transparent); opacity: .45"></div>
-      <img class="rs-me" src="{{rsMe}}" alt="" style="{{rsMeStyle}}">
-      <sc-if value="{{rsWin}}" hint-placeholder-val="{{ false }}"><img class="rs-cup" src="{{rsCup}}" alt="" style="position: absolute; left: 190px; top: 150px; width: 96px; height: 96px; object-fit: contain; filter: drop-shadow(0 6px 10px #000c)"></sc-if>
+      <div class="rs-podium"><i></i></div>
+      <sc-if value="{{rs3d}}" hint-placeholder-val="{{ false }}"><div class="rs-me3d" ref="{{heroRef}}"></div><div class="rs-tap" role="button" aria-label="Tu jugador: tócalo para que haga una jugada" onClick="{{heroTap}}"></div></sc-if>
+      <sc-if value="{{rs2d}}" hint-placeholder-val="{{ false }}"><img class="rs-me" src="{{rsMe}}" alt="" style="{{rsMeStyle}}"></sc-if>
+      <div class="rs-plate"><b translate="no">{{rsHome}}</b><span style="color: {{rsPlateC}}">{{rsPlateTag}}</span></div>
       <!-- the verdict -->
-      <div style="position: absolute; left: 300px; right: 22px; top: 18px; bottom: 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px">
-        <span class="rs-k">{{rsKicker}}</span>
-        <span class="rs-t">{{resTitle}}</span>
-        <!-- broadcast scoreboard -->
+      <div class="rs-col2">
+        <div class="rs-top"><span class="rs-k">{{rsKicker}}</span><sc-if value="{{rsHasStreak}}" hint-placeholder-val="{{ false }}"><span class="rs-fire"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5c0 2 1 3 2 3c0-3-1-6 1-9.5z"/></svg>{{rsStreak}}</span></sc-if></div>
+        <span class="{{rsTitleCls}}">{{resTitle}}</span>
+        <!-- broadcast scoreboard: crests, names and the score -->
         <div class="rs-board">
-          <span class="rs-team" style="background: linear-gradient(90deg, #22D3EE, #0E8FA3); color: #040A1C">{{rsHome}}</span>
+          <span class="rs-team h"><i class="rs-crest" style="--c: #22D3EE"><b>{{rsHomeIni}}</b></i><span translate="no">{{rsHome}}</span></span>
           <span class="rs-score"><b class="rs-d1">{{rsH}}</b><i>–</i><b class="rs-d2">{{rsA}}</b><sc-if value="{{rsHasPen}}" hint-placeholder-val="{{ false }}"><em class="rs-pen">{{rsPen}}</em></sc-if></span>
-          <span class="rs-team" style="background: linear-gradient(270deg, {{rsAwayC}}, #3F246E); color: #FFFFFF; justify-content: flex-end">{{rsAway}}</span>
+          <span class="rs-team a" style="--c: {{rsAwayC}}"><span translate="no">{{rsAway}}</span><i class="rs-crest" style="--c: {{rsAwayC}}"><b>{{rsAwayIni}}</b></i></span>
         </div>
-        <div class="rs-panel">
-          <sc-if value="{{ranked}}" hint-placeholder-val="{{ true }}">
-            <div style="display: flex; align-items: center; gap: 14px; width: 100%">
-              <svg width="78" height="84" viewBox="-6 -10 76 80" style="{{emblemPop}}"><circle cx="32" cy="32" r="34" fill="{{myC1}}" opacity=".18"/><sc-if value="{{myWings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{myC1}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{myC1}}"/></sc-if><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{myC1}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{myC2}}"/><path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{myText}}"/></svg>
-              <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
-                <div style="display: flex; align-items: baseline; gap: 10px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1; color: {{myText}}">{{myRank}}</span><sc-if value="{{deltaShown}}" hint-placeholder-val="{{ true }}"><span style="{{deltaStyle}}">{{deltaLabel}} MMR</span></sc-if></div>
-                <sc-if value="{{rankChanged}}" hint-placeholder-val="{{ false }}"><span style="{{changeStyle}}">{{changeLabel}}</span></sc-if>
-                <div style="height: 9px; background: #ffffff18; transform: skewX(0deg); overflow: hidden"><div style="{{resBar}}"></div></div>
-                <span style="font-size: 11px; color: #CACAE0">{{mmrLabel}} MMR · {{nextLabel}}</span>
-                <sc-if value="{{rsShield}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; font-weight: 800; color: #A6DCFF">🛡 Tu escudo de rango te ha salvado los MMR</span></sc-if>
+        <div class="rs-cards">
+          <!-- your rank: the emblem, the MMR counting up or down and the bar to the next rank -->
+          <div class="rs-card rank">
+            <sc-if value="{{ranked}}" hint-placeholder-val="{{ true }}">
+              <svg width="70" height="76" viewBox="-6 -10 76 80" style="flex: none; {{emblemPop}}"><circle cx="32" cy="32" r="34" fill="{{myC1}}" opacity=".18"/><sc-if value="{{myWings}}" hint-placeholder-val="{{ false }}"><path d="M8 14L-5 6L-3 24L8 34Z" fill="{{myC1}}"/><path d="M56 14L69 6L67 24L56 34Z" fill="{{myC1}}"/></sc-if><path d="M32 2L56 10V30C56 45 45 55 32 60C19 55 8 45 8 30V10Z" fill="{{myC1}}"/><path d="M32 8L50 14V30C50 41 42 49 32 53C22 49 14 41 14 30V14Z" fill="{{myC2}}"/><path d="M32 17l4.2 8.6 9.5 1.4-6.9 6.7 1.6 9.4L32 38.6l-8.4 4.5 1.6-9.4-6.9-6.7 9.5-1.4z" fill="{{myText}}"/></svg>
+              <div class="rs-rk">
+                <div class="rs-rk1"><span class="rs-rkn" style="color: {{myText}}">{{myRank}}</span><sc-if value="{{deltaShown}}" hint-placeholder-val="{{ true }}"><span style="{{deltaStyle}}">{{deltaLabel}} MMR</span></sc-if><sc-if value="{{rankChanged}}" hint-placeholder-val="{{ false }}"><span style="{{changeStyle}}">{{changeLabel}}</span></sc-if></div>
+                <div class="rs-bar"><i style="{{resBar}}"></i></div>
+                <span class="rs-sub"><b>{{mmrLabel}} MMR</b> · {{nextLabel}}</span>
+                <sc-if value="{{rsShield}}" hint-placeholder-val="{{ false }}"><span class="rs-sub" style="color: #A6DCFF; font-weight: 800">🛡 Tu escudo de rango te ha salvado los MMR</span></sc-if>
               </div>
+            </sc-if>
+            <sc-if value="{{placing}}" hint-placeholder-val="{{ false }}">
+              <div class="rs-rk">
+                <span class="rs-cap" style="color: #53D88E">{{placeTitle}}</span>
+                <div style="display: flex; gap: 8px"><sc-for list="{{placeDots}}" as="dt" hint-placeholder-count="5"><span style="{{dt.style}}"></span></sc-for></div>
+                <span class="rs-sub">Tu rango aparecerá al terminar las 5.</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{rsCasual}}" hint-placeholder-val="{{ false }}">
+              <div class="rs-rk">
+                <span class="rs-cap" style="color: #A6DCFF">PARTIDA INFORMAL</span>
+                <span class="rs-sub">No cuenta para tu rango: juega en Competitivo para subir.</span>
+              </div>
+            </sc-if>
+          </div>
+          <!-- your match: goals, shots, passes and possession, and what you earned -->
+          <div class="rs-card mine">
+            <sc-if value="{{rsHasStats}}" hint-placeholder-val="{{ true }}">
+              <div class="rs-stats"><sc-for list="{{rsStats}}" as="st" hint-placeholder-count="4"><span class="rs-st" style="{{st.style}}"><b>{{st.v}}</b><small>{{st.l}}</small></span></sc-for></div>
+            </sc-if>
+            <div class="rs-gain">
+              <span class="rs-chip" style="--cc: #22D3EE"><b>+{{rsXp}}</b> XP</span>
+              <span class="rs-chip" style="--cc: #FFC53D"><img src="{{rsCoin}}" alt=""><b>+{{rsVcd}}</b> VCD</span>
             </div>
-          </sc-if>
-          <sc-if value="{{placing}}" hint-placeholder-val="{{ false }}">
-            <div style="display: flex; align-items: center; gap: 14px">
-              <span style="font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #53D88E">{{placeTitle}}</span>
-              <div style="display: flex; gap: 6px"><sc-for list="{{placeDots}}" as="dt" hint-placeholder-count="5"><span style="{{dt.style}}"></span></sc-for></div>
-            </div>
-            <span style="font-size: 11px; color: #CACAE0">Tu rango aparecerá al terminar las 5.</span>
-          </sc-if>
-          <div style="display: flex; gap: 8px; margin-top: 2px">
-            <span class="rs-chip" style="--cc: #22D3EE"><b>+{{xp}}</b> XP</span>
-            <span class="rs-chip" style="--cc: #FFC53D"><img src="{{rsCoin}}" alt=""><b>+{{coins}}</b> VCD</span>
           </div>
         </div>
         <div class="rs-btns">
-          <button type="button" onClick="{{again}}" class="rs-go"><span>OTRA PARTIDA</span></button>
+          <button type="button" onClick="{{again}}" class="rs-go"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8L7 20z"/></svg><span>OTRA PARTIDA</span></button>
           <a href="Modos.dc.html" class="rs-out"><span>SALIR</span></a>
         </div>
       </div>
@@ -841,6 +909,7 @@ class Component extends DCLogic {
       // experience, coins, the weekly track and the daily missions, then the results screen plays it back
       if (window.AMProgress) {
         const sum = window.AMProgress.recordMatch({ home: r.home || 0, away: r.away || 0, pen: r.pen, kind, stats: r.stats, comp: !this.props.casual || !!(this.state.online || this.state.room) });
+        this.sum = sum;
         if (window.AMResults && !r.tutorial) setTimeout(() => window.AMResults.show(sum), 60);
       }
     } catch (e) {}
@@ -1083,13 +1152,25 @@ class Component extends DCLogic {
       duelKind: pl.duel || 'pen', mgMode: pl.mode || '',
       resTitle: won ? '¡VICTORIA!' : lost ? 'DERROTA' : 'EMPATE',
       ...(() => {
-        const col = won ? ['#22D3EE', '#1A316E', '#22D3EE22'] : lost ? ['#FF5C5C', '#3A1420', '#FF5C5C1c'] : ['#A6DCFF', '#381B6E', '#A78BFA1c'];
+        const col = won ? ['#22D3EE', '#0A3DCC', '#22D3EE22'] : lost ? ['#FF5C5C', '#4A1020', '#FF5C5C1c'] : ['#A6DCFF', '#14306E', '#3DA9FF1c'];
         const PO = window.AMPosters, G = window.AMGear, me = PO && PO.cardKey ? PO.get(PO.cardKey(), () => this.forceUpdate()) : '';
+        const A = window.AMChars, hero3d = !!(window.AMHero && window.THREE && A && A.pref() !== 'clasico');
+        if (window.AMHero && window.AMHero.setQuiet) window.AMHero.setQuiet(s.phase === 'result' && lost);
+        const ini = (nm) => String(nm).replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g, '').slice(0, 2).toUpperCase() || '?';
+        // what the match really gave you (AMProgress), and your own numbers when the mode has them
+        const SU = this.sum && res && this.sum.home === res.home && this.sum.away === res.away ? this.sum : null;
+        const st = pl.kind === 'team' && res && res.stats ? res.stats : null;
         const rnd = (k) => { const x = Math.sin(k * 99.7) * 43758.5; return x - Math.floor(x); };
         const CC = ['#22D3EE', '#FFC53D', '#FF5C8A', '#53D88E', '#A78BFA', '#FFFFFF'];
         return {
           rsVars: '--rc: ' + col[0] + '; --rc2: ' + col[1] + '; --rc3: ' + col[2] + ';',
           rsWin: won, rsLoss: lost, rsMe: me,
+          rs3d: hero3d, rs2d: !hero3d, rsTitleCls: 'rs-t ' + (won ? 'w' : lost ? 'l' : 'd'), rsCasual: casual,
+          rsHomeIni: ini(window.AMOnline ? window.AMOnline.myName() : 'TU'), rsAwayIni: ini(m && m.rivals ? (m.rivals.length > 1 ? 'Rivales' : m.rivals[0]) : 'Rival'),
+          rsPlateC: col[0], rsPlateTag: '',
+          rsHasStreak: !!(SU && won && SU.streak >= 2), rsStreak: SU ? SU.streak + ' SEGUIDAS' + (SU.streakBonus ? ' · +' + SU.streakBonus + ' VCD' : '') : '',
+          rsXp: SU ? SU.xpGain : xp, rsVcd: SU ? SU.coinsGain + (SU.levelBonus || 0) : coins,
+          rsHasStats: !!st, rsStats: st ? [['Goles', st.goals || 0], ['Tiros', st.shots || 0], ['Pases', st.passes || 0], st.poss != null ? ['Posesión', st.poss + '%'] : ['Robos', st.tackles || 0]].map(([l, v], k) => ({ l, v: String(v), style: 'animation-delay: ' + (0.6 + k * 0.08).toFixed(2) + 's' })) : [],
           rsMeStyle: 'left: 40px; bottom: 30px; width: 210px; height: 280px; object-fit: cover; object-position: 50% 0; filter: drop-shadow(0 10px 14px #000c)' + (lost ? ' grayscale(.5) brightness(.8)' : '') + '; opacity: ' + (me ? 1 : 0),
           rsCup: G ? G.prize('trophy') : '', rsCoin: G ? G.prize('coins:6') : '',
           rsKicker: (casual ? 'INFORMAL' : placing ? 'CLASIFICATORIA' : 'COMPETITIVO') + ' · ' + (pl.kind === 'team' ? pl.n + ' VS ' + pl.n : pl.title || '') + ' · FINAL',

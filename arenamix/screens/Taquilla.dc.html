@@ -57,117 +57,160 @@ input::placeholder{color:#8FA8CC}
 @keyframes tqNew{0%,100%{scale:1}50%{scale:1.12}}
 .tq-ed{margin-top:10px;padding:10px;border-radius:14px;background:linear-gradient(160deg,#1E8BFF22,#06102ECC);box-shadow:inset 0 0 0 1px #3DA9FF66;display:flex;flex-direction:column;gap:7px}
 .tq-er{display:flex;align-items:center;gap:8px}.tq-er>span{flex:none;width:54px;font:800 9px Exo2,sans-serif;letter-spacing:1px;color:#FDE68A}.tq-er>div{display:flex;flex-wrap:wrap;gap:3px}
+
+/* ---- the Taquilla, redone: a showroom with your player, a loadout down the side and the catalogue on the right ---- */
+.tq-stage{position:absolute;left:80px;top:0;bottom:0;width:400px;overflow:hidden}
+.tq-wall{position:absolute;inset:0;background:radial-gradient(55% 60% at 62% 34%,color-mix(in srgb,var(--kc) 55%,#1E8BFF55),transparent 72%),radial-gradient(90% 70% at 62% 100%,#0A3DCC66,transparent 70%),linear-gradient(180deg,#06102E,#081A4A 55%,#0A2160);}
+.tq-wall::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#3DA9FF14 1px,transparent 1px) 0 0/34px 34px,linear-gradient(0deg,#3DA9FF14 1px,transparent 1px) 0 0/34px 34px;-webkit-mask-image:radial-gradient(70% 70% at 62% 40%,#000,transparent);mask-image:radial-gradient(70% 70% at 62% 40%,#000,transparent)}
+.tq-wall::after{content:'';position:absolute;left:176px;top:36px;width:150px;height:150px;border-radius:50%;border:2px solid #3DA9FF22;box-shadow:0 0 0 22px #3DA9FF0a,0 0 0 46px #3DA9FF08}
+.tq-beam{position:absolute;left:150px;top:-40px;width:200px;height:440px;transform-origin:50% 0;background:linear-gradient(180deg,#FFFFFF55,#9FD4FF22 45%,transparent 85%);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);animation:tqBeam 7s ease-in-out infinite;pointer-events:none}
+.tq-halo{position:absolute;left:150px;top:54px;width:200px;height:200px;border-radius:50%;background:radial-gradient(closest-side,var(--kc),transparent);animation:tqPulse 3.5s ease-in-out infinite;pointer-events:none}
+.tq-floor{position:absolute;left:96px;right:-10px;bottom:0;height:150px;pointer-events:none}
+.tq-floor::before{content:'';position:absolute;inset:40px -20px 0;background:radial-gradient(60% 80% at 50% 30%,#1E8BFF55,transparent 75%),linear-gradient(180deg,#0D2F80,#040B24);border-top:2px solid #3DA9FF88;border-radius:50% 50% 0 0/24px 24px 0 0}
+.tq-floor i{position:absolute;left:50%;bottom:72px;width:230px;height:46px;margin-left:-115px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--kc) 90%,transparent),transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--cc) 70%,transparent),0 0 24px var(--cc)}
+.tq-floor b{position:absolute;left:50%;bottom:64px;width:270px;height:62px;margin-left:-135px;border-radius:50%;border:2px dashed color-mix(in srgb,var(--cc) 55%,transparent);animation:tqRing 14s linear infinite}
+.tq-view{position:absolute;left:96px;right:0;top:30px;bottom:30px;display:block;touch-action:none;cursor:grab}
+.tq-head{position:absolute;left:12px;top:10px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;z-index:2}
+.tq-fitname{display:flex;flex-direction:column;padding:4px 10px 4px 9px;border-radius:0 10px 10px 0;background:linear-gradient(90deg,#02040CCC,#02040C55);box-shadow:inset 3px 0 0 var(--kc);max-width:250px}
+.tq-fitname b{font:400 14px/1.15 Titulos,sans-serif;letter-spacing:1px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tq-fitname span{font:700 10px Exo2,sans-serif;color:#9FC3F0}
+.tq-hint{position:absolute;right:10px;top:12px;display:flex;align-items:center;gap:5px;height:24px;padding:0 10px;border-radius:12px;background:#02040C99;box-shadow:inset 0 0 0 1px #3DA9FF55;font:400 9.5px Titulos,sans-serif;letter-spacing:1.5px;color:#BFD3F5;pointer-events:none}
+.tq-trying{position:absolute;right:10px;top:42px;padding:4px 10px;border-radius:10px;background:#FFC53D;color:#2A1C02;font:400 10px Titulos,sans-serif;letter-spacing:1.5px;box-shadow:0 0 14px #FFC53D88;animation:tqNew 1.2s ease-in-out infinite;pointer-events:none}
+.tq-slots{position:absolute;left:12px;top:96px;bottom:12px;width:62px;display:flex;flex-direction:column;justify-content:space-between;gap:5px;z-index:2}
+.tq-slot{position:relative;flex:1;max-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:2px 0 3px;border:0;border-radius:12px;cursor:pointer;background:linear-gradient(160deg,#0B1A44E6,#02040CE6);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--sc) 45%,transparent);color:var(--sc);transition:transform .2s,box-shadow .2s;overflow:hidden}
+.tq-slot small{font:400 7.5px Titulos,sans-serif;letter-spacing:.8px;color:#BFD3F5;line-height:1}
+.tq-slot.on{transform:translateX(4px);background:linear-gradient(160deg,color-mix(in srgb,var(--sc) 45%,#0B1A44),#06102E);box-shadow:inset 0 0 0 2px var(--sc),0 0 16px color-mix(in srgb,var(--sc) 70%,transparent)}
+.tq-slot.on small{color:#fff}
+.tq-slot:active{transform:scale(.95)}
+.tq-fit{position:absolute;left:92px;right:6px;bottom:8px;display:flex;align-items:center;justify-content:center;gap:3px;height:30px;padding:0 6px;border-radius:15px;background:#02040CCC;box-shadow:inset 0 0 0 1px #3DA9FF55;z-index:2}
+.tq-fit span{font:400 8px Titulos,sans-serif;letter-spacing:1px;color:#22D3EE;margin:0 2px}
+.tq-fit i{width:1px;height:16px;background:#3DA9FF55;margin:0 3px}
+.tq-panel{position:absolute;left:480px;top:0;right:0;bottom:0;display:flex;flex-direction:column;gap:8px;padding:10px 12px 10px 16px;box-sizing:border-box;background:radial-gradient(60% 40% at 100% 0%,color-mix(in srgb,var(--cc) 30%,transparent),transparent 70%),linear-gradient(160deg,#0B1A44F5,#06102EF5 55%,#030817F5);box-shadow:-8px 0 24px #000a,inset 2px 0 0 color-mix(in srgb,var(--cc) 70%,transparent)}
+.tq-ph{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none}
+.tq-cat{display:flex;align-items:center;gap:7px;font:400 18px/1 Titulos,sans-serif;letter-spacing:1.5px;color:var(--cc);text-shadow:0 0 14px color-mix(in srgb,var(--cc) 60%,transparent)}
+.tq-cat small{font:700 10px Exo2,sans-serif;letter-spacing:.5px;color:#9FC3F0;text-shadow:none}
+.tq-coins{display:flex;align-items:center;gap:6px;height:30px;padding:0 4px 0 10px;border-radius:15px;background:linear-gradient(180deg,#3A2A0A,#1E1A10);box-shadow:inset 0 0 0 1.5px #FFC53D;color:#FFE38A;text-decoration:none;font:400 14px Titulos,sans-serif;letter-spacing:.5px}
+.tq-coins b{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:11px;background:#FFC53D;color:#2A1C02;font:400 15px/1 Titulos,sans-serif}
+.tq-filters{display:flex;gap:5px;flex:none;overflow-x:auto;scrollbar-width:none;padding:1px}
+.tq-filters::-webkit-scrollbar{display:none}
+.tq-scroll{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;padding:8px 2px 2px;margin:0 -2px}
+.tq-scroll::-webkit-scrollbar{display:none}
+.tq-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 8px}
+.tq-iname{max-width:100%;font-size:10.5px;font-weight:800;line-height:1.15;color:#F4F4FA;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tq-char img{width:62px;height:62px;border-radius:50%;object-fit:cover;object-position:50% 15%;box-shadow:0 0 0 2px #FFFFFFCC,0 0 0 4px #02040C,0 6px 12px #000a}
+.tq-classic{display:flex;align-items:center;justify-content:center;width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#13306E,#081A48);box-shadow:0 0 0 2px #FFFFFF66;font:400 18px Titulos,sans-serif;color:#BFD3F5}
+.tq-ilab{font-size:10px;font-weight:800}
+.tq-grid .tq-aw{width:76px;height:76px;margin:0}
+.tq-grid .tq-jw{transform:scale(1.15);margin:6px 0 10px}
+.tq-grid .tq-item:hover .tq-jw{transform:scale(1.24) rotate(-3deg)}
+.tq-act{flex:none;display:flex;align-items:center;gap:10px;min-height:50px;padding:6px 7px 6px 12px;border-radius:14px;background:linear-gradient(100deg,color-mix(in srgb,var(--cc) 35%,#0B1A44),#06102EF2 70%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cc) 60%,transparent),0 6px 16px #0009}
+.tq-selname{font:400 14px/1.15 Titulos,sans-serif;letter-spacing:.8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tq-btn{height:40px;padding:0 20px;border:0;border-radius:12px;cursor:pointer;background:linear-gradient(180deg,#7EE8FF,#22D3EE 45%,#1E8BFF);color:#040A1C;font:400 16px Titulos,sans-serif;letter-spacing:1.5px;box-shadow:0 4px 0 #0A3DCC,0 0 16px #22D3EE66}
+.tq-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #0A3DCC}
+.tq-on{display:flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:12px;background:#22D3EE1F;box-shadow:inset 0 0 0 1.5px #22D3EE88;color:#22D3EE;font:400 12px Titulos,sans-serif;letter-spacing:1.5px}
+.tq-how{display:flex;align-items:center;height:38px;padding:0 14px;border-radius:12px;box-shadow:inset 0 0 0 2px #9B6BFF;background:#9B6BFF22;color:#E9DDFF;text-decoration:none;font:400 11px Titulos,sans-serif;letter-spacing:1px;white-space:nowrap}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #0A2A6E 0%, #06102E 45%, #02040C 85%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
   <div class="am-bg under"></div>
   <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; height: 390px; z-index: 3"><dc-import name="Nav" active="taquilla" hint-size="80px,390px"></dc-import></div>
-  <!-- the locker room: lockers, spotlight, a turntable and you -->
-  <div style="position: absolute; left: 80px; top: 0; bottom: 0; width: 392px; overflow: hidden">
-    <div style="position: absolute; inset: 0 0 92px 0; background: radial-gradient(60% 60% at 50% 30%, #1E8BFF66, transparent 70%), linear-gradient(180deg, #06102E, #0A2160 60%, #0D2F80)"></div>
-    <sc-for list="{{lockers}}" as="lk" hint-placeholder-count="8"><div class="{{lk.cls}}" style="{{lk.style}}"><b>{{lk.n}}</b></div></sc-for>
-    <div style="position: absolute; left: 0; right: 0; top: 18px; height: 6px; background: linear-gradient(90deg, #0A3DCC, #3DA9FF 35%, #E8F6FF 50%, #3DA9FF 65%, #0A3DCC); box-shadow: 0 3px 12px #1E8BFFAA"></div>
-    <div style="position: absolute; left: 0; right: 0; top: 140px; bottom: 92px; background: linear-gradient(180deg, transparent, #02040C99); pointer-events: none"></div>
-    <div class="tq-glow" style="background: radial-gradient(closest-side, {{kitGlow}}, transparent)"></div>
-    <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 92px; background: radial-gradient(70% 90% at 50% 0%, #1E8BFF66, transparent 70%), linear-gradient(180deg, #123A8A, #0A1F5C 55%, #040B24); border-top: 3px solid #3DA9FF; box-shadow: 0 -4px 18px #EC489988"></div>
-    <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 92px; background: repeating-linear-gradient(100deg, #ffffff06 0 2px, transparent 2px 38px)"></div>
-    <div style="position: absolute; left: 96px; top: -40px; width: 200px; height: 440px; transform-origin: 50% 0; background: linear-gradient(180deg, #FFFFFF66, #9FD4FF33 45%, #E8F6FF00 85%); clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); animation: tqBeam 7s ease-in-out infinite; pointer-events: none; will-change: transform"></div>
+  <!-- the showroom: your player on a lit turntable, what you are wearing down the side -->
+  <div class="tq-stage" style="--kc: {{kitGlow}}; --cc: {{catC}}">
+    <div class="tq-wall"></div>
+    <div class="tq-beam"></div>
+    <div class="tq-halo"></div>
+    <div class="tq-floor"><i></i><b></b></div>
     <sc-for list="{{dust}}" as="d" hint-placeholder-count="6"><i class="tq-dust" style="{{d}}"></i></sc-for>
-    <!-- the bench -->
-    <div style="position: absolute; left: 44px; right: 10px; bottom: 112px; height: 8px; border-radius: 3px; background: linear-gradient(180deg, #B07A44, #6E4422); box-shadow: 0 5px 6px #0009"></div>
-    <div style="position: absolute; left: 62px; bottom: 92px; width: 5px; height: 20px; background: #3A3F5C"></div><div style="position: absolute; right: 30px; bottom: 92px; width: 5px; height: 20px; background: #3A3F5C"></div>
-    <div class="tq-ring" style="bottom: 62px; margin-left: 20px; width: 230px; height: 230px; margin-bottom: -115px"><i style="border: 3px dashed {{kit.primary}}AA"></i><i style="inset: 22px; border: 2px solid #22D3EE77; animation-direction: reverse; animation-duration: 9s"></i><i style="inset: 50px; background: radial-gradient(circle, #22D3EE55, transparent 70%); animation: none"></i></div>
     <sc-if value="{{show3d}}" hint-placeholder-val="{{ false }}">
-      <div ref="{{canvasRef}}" role="img" aria-label="{{viewerLabel}}" onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" style="position: absolute; left: 40px; right: 0; top: 40px; bottom: 6px; width: calc(100% - 40px); height: calc(100% - 46px); display: block; touch-action: none; cursor: grab"></div>
-      <span style="position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 12px; background: #06102ECC; border: 1px solid #3DA9FF55; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #CACAE0; pointer-events: none; white-space: nowrap"><svg style="animation: tqHint 1.6s ease-in-out infinite" width="16" height="14" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M8 8l-4 4l4 4M16 8l4 4l-4 4"/></svg>DESLIZA PARA GIRAR</span>
+      <div ref="{{canvasRef}}" role="img" aria-label="{{viewerLabel}}" onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" class="tq-view"></div>
     </sc-if>
     <sc-if value="{{show2d}}" hint-placeholder-val="{{ true }}">
-      <div style="position: absolute; left: 50%; bottom: 30px; transform: translateX(-38%)">
+      <div style="position: absolute; left: 50%; bottom: 46px; transform: translateX(-30%)">
         <dc-import name="Avatar" primary="{{kit.primary}}" secondary="{{kit.secondary}}" pattern="{{kit.pattern}}" shorts="{{kit.shorts}}" socks="{{kit.socks}}" shoe="{{shoe}}" number="{{number}}" crest="{{kit.crest}}" crest-shape="{{kit.crestShape}}" crest-mark="{{kit.crestMark}}" hat="{{hat}}" hat-color="{{hatColor}}" face="{{face}}" w="150" hint-size="150px,266px"></dc-import>
       </div>
     </sc-if>
-    <!-- title and the kit's swing tag -->
-    <div style="position: absolute; left: 14px; top: 12px; display: flex; align-items: center; gap: 10px">
-      <h1 class="bc-title hd">TAQUILLA</h1>
+    <!-- title and what you are wearing -->
+    <div class="tq-head">
+      <h1 class="bc-title hd" style="margin: 0">TAQUILLA</h1>
+      <div class="tq-fitname"><b>{{kitTeam}}</b><span>{{kitLeague}}</span></div>
     </div>
-    <div style="position: absolute; right: 14px; top: 10px; transform-origin: 50% 0; animation: tqTag 3s ease-in-out infinite; display: flex; flex-direction: column; align-items: center">
-      <span style="width: 2px; height: 12px; background: #A9BEDD"></span>
-      <div style="position: relative; width: 112px; padding: 14px 8px 8px; box-sizing: border-box; border-radius: 6px; background: linear-gradient(160deg, #FFFFFF, #DCE3EC); color: #040A1C; text-align: center; box-shadow: 0 8px 16px #0009">
-        <span style="position: absolute; left: 50%; top: 4px; width: 8px; height: 8px; margin-left: -4px; border-radius: 4px; background: #1C1145"></span>
-        <div style="font-size: 8px; font-weight: 800; letter-spacing: 1.5px; color: #4A5468">EQUIPACIÓN</div>
-        <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 15px; line-height: 1.05">{{kitTeam}}</div>
-        <div style="font-size: 9px; font-weight: 700; color: #4A5468">{{kitLeague}}</div>
-      </div>
-    </div>
-    <sc-if value="{{isPreviewing}}" hint-placeholder-val="{{ false }}">
-      <span class="am-pulse-gold" style="position: absolute; left: 50%; top: 58px; transform: translateX(-50%) skewX(0deg); padding: 4px 12px; background: #FFC53D; color: #2A1C02; font-size: 11px; font-weight: 800; letter-spacing: 1.5px">PROBÁNDOTELO</span>
+    <sc-if value="{{show3d}}" hint-placeholder-val="{{ false }}">
+      <span class="tq-hint"><svg style="animation: tqHint 1.6s ease-in-out infinite" width="15" height="13" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M8 8l-4 4l4 4M16 8l4 4l-4 4"/></svg>GIRA</span>
     </sc-if>
-    <!-- who you play as -->
-    <div role="radiogroup" aria-label="Personaje" style="position: absolute; left: 10px; top: 64px; bottom: 8px; display: flex; flex-direction: column; justify-content: flex-start; gap: 4px">
-      <sc-for list="{{charChips}}" as="ch" hint-placeholder-count="4">
-        <button type="button" role="radio" aria-checked="{{ch.on}}" aria-label="{{ch.name}}" onClick="{{ch.pick}}" style="{{ch.style}}"><img src="{{ch.img}}" alt="" style="{{ch.imgStyle}}"><span style="{{ch.textStyle}}">{{ch.short}}</span></button>
+    <sc-if value="{{isPreviewing}}" hint-placeholder-val="{{ false }}">
+      <span class="tq-trying">PROBÁNDOTELO</span>
+    </sc-if>
+    <!-- the loadout: one slot per category, showing what you have on; tap one to change it -->
+    <div role="tablist" aria-label="Categoría" class="tq-slots">
+      <sc-for list="{{slots}}" as="sl" hint-placeholder-count="5">
+        <button type="button" role="tab" aria-selected="{{sl.sel}}" aria-label="{{sl.aria}}" onClick="{{sl.pick}}" class="{{sl.cls}}" style="{{sl.style}}">
+          <sc-if value="{{sl.hasImg}}" hint-placeholder-val="{{ true }}"><img src="{{sl.img}}" alt="" draggable="false" style="{{sl.imgStyle}}"></sc-if>
+          <sc-if value="{{sl.noImg}}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{sl.icon}}"/></svg></sc-if>
+          <small>{{sl.label}}</small>
+        </button>
       </sc-for>
     </div>
+    <!-- the fit of the kit: sleeves and size -->
+    <sc-if value="{{isTeams}}" hint-placeholder-val="{{ true }}">
+      <div role="group" aria-label="Corte" class="tq-fit">
+        <span>MANGA</span>
+        <sc-for list="{{sleeveBtns}}" as="sb" hint-placeholder-count="2"><button type="button" aria-pressed="{{sb.on}}" onClick="{{sb.pick}}" style="{{sb.style}}">{{sb.label}}</button></sc-for>
+        <i></i>
+        <span>TALLA</span>
+        <sc-for list="{{sizeBtns}}" as="zb" hint-placeholder-count="4"><button type="button" aria-pressed="{{zb.on}}" onClick="{{zb.pick}}" style="{{zb.style}}">{{zb.label}}</button></sc-for>
+      </div>
+    </sc-if>
   </div>
 
-  <!-- the fit: sleeves and size -->
-  <div role="group" aria-label="Corte" style="position: absolute; left: 388px; top: 112px; width: 70px; display: flex; flex-direction: column; gap: 5px; padding: 7px 6px; box-sizing: border-box; border-radius: 12px; background: linear-gradient(170deg, #0B1A44EE, #06102EEE); border: 1px solid #3DA9FF88; box-shadow: 0 0 14px #1E8BFF55; z-index: 2">
-    <span style="font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE; text-align: center">MANGA</span>
-    <sc-for list="{{sleeveBtns}}" as="sb" hint-placeholder-count="2">
-      <button type="button" aria-pressed="{{sb.on}}" onClick="{{sb.pick}}" style="{{sb.style}}">{{sb.label}}</button>
-    </sc-for>
-    <span style="margin-top: 3px; font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: #22D3EE; text-align: center">TALLA</span>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px">
-      <sc-for list="{{sizeBtns}}" as="zb" hint-placeholder-count="4">
-        <button type="button" aria-pressed="{{zb.on}}" onClick="{{zb.pick}}" style="{{zb.style}}">{{zb.label}}</button>
-      </sc-for>
-    </div>
-  </div>
-
-  <!-- the rail: categories, leagues, the clothes on hangers, and the action -->
-  <div style="position: absolute; left: 462px; top: 0; right: 0; bottom: 0; border-radius: 24px 0 0 24px; background: radial-gradient(60% 45% at 100% 0%, #1E8BFF55, transparent 70%), radial-gradient(60% 50% at 0% 100%, #22D3EE33, transparent 70%), linear-gradient(160deg, #0B1A44F2, #06102EF2 55%, #030817F2)"></div>
-  <div style="position: absolute; left: 462px; top: 24px; width: 4px; bottom: 24px; border-radius: 2px; background: linear-gradient(180deg, #3DA9FF, #0A3DCC 50%, #3DA9FF); box-shadow: 0 0 12px #1E8BFF"></div>
-  <div style="position: absolute; left: 498px; right: 14px; top: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 8px">
-    <div style="display: flex; align-items: center; justify-content: space-between">
-      <span style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #22D3EE">VESTUARIO · FÚTBOL</span>
-      <a href="Tienda.dc.html" style="display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; transform: skewX(0deg); background: linear-gradient(135deg, #3A2A0A, #1E1A10); border: 1px solid #FFC53D; color: #FFE38A; text-decoration: none; font-weight: 800; font-size: 13px"><span style="display: flex; align-items: center; gap: 6px; transform: skewX(0deg)"><svg class="am-coin" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/></svg>{{coinsLabel}}</span></a>
-    </div>
-    <div role="tablist" aria-label="Categoría" style="position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 3px; border-radius: 14px; background: #06102ECC; border: 1px solid #3DA9FF55; box-shadow: inset 0 1px 0 #ffffff22">
-      <span style="{{catThumb}}"></span>
-      <sc-for list="{{cats}}" as="c" hint-placeholder-count="4">
-        <button type="button" role="tab" aria-selected="{{c.sel}}" onClick="{{c.pick}}" style="{{c.style}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{c.icon}}"/></svg>{{c.label}}</button>
-      </sc-for>
+  <!-- the catalogue: the category's things, filters on top, the action at the bottom -->
+  <div class="tq-panel" style="--cc: {{catC}}">
+    <div class="tq-ph">
+      <span class="tq-cat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{catIcon}}"/></svg>{{catTitle}}<small>{{catCount}}</small></span>
+      <a href="Tienda.dc.html" class="tq-coins" aria-label="{{coinsAria}}"><svg class="am-coin" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/><circle cx="12" cy="12" r="7" fill="none" stroke="#B7791F" stroke-width="1.5"/></svg>{{coinsLabel}}<b>+</b></a>
     </div>
     <sc-if value="{{isTeams}}" hint-placeholder-val="{{ true }}">
-      <div style="display: flex; gap: 5px; overflow-x: auto; flex: none; scrollbar-width: none">
+      <div class="tq-filters">
         <sc-for list="{{leagues}}" as="lg" hint-placeholder-count="5">
           <button type="button" onClick="{{lg.pick}}" style="{{lg.style}}">{{lg.name}}</button>
         </sc-for>
       </div>
     </sc-if>
-    <sc-if value="{{notTeams}}" hint-placeholder-val="{{ false }}">
-      <div role="radiogroup" aria-label="Rareza" style="display: flex; gap: 5px; flex: none">
+    <sc-if value="{{showRar}}" hint-placeholder-val="{{ false }}">
+      <div role="radiogroup" aria-label="Rareza" class="tq-filters">
         <sc-for list="{{rarChips}}" as="rc" hint-placeholder-count="5">
           <button type="button" role="radio" aria-checked="{{rc.on}}" onClick="{{rc.pick}}" style="{{rc.style}}">{{rc.label}}</button>
         </sc-for>
       </div>
     </sc-if>
-    <div key="{{gridKey}}" style="flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; padding-top: 2px">
-      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 6px">
+    <div key="{{gridKey}}" class="tq-scroll">
+      <sc-if value="{{isChar}}" hint-placeholder-val="{{ false }}">
+        <div class="tq-grid">
+          <sc-for list="{{charCards}}" as="cc" hint-placeholder-count="6">
+            <button type="button" role="radio" aria-checked="{{cc.on}}" aria-label="{{cc.name}}" onClick="{{cc.pick}}" class="tq-item tq-char" style="{{cc.style}}">
+              <sc-if value="{{cc.isOn}}" hint-placeholder-val="{{ false }}"><span class="tq-badge" style="background: #22D3EE"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#040A1C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg></span></sc-if>
+              <sc-if value="{{cc.hasImg}}" hint-placeholder-val="{{ true }}"><img src="{{cc.img}}" alt="" draggable="false"></sc-if>
+              <sc-if value="{{cc.noImg}}" hint-placeholder-val="{{ false }}"><span class="tq-classic">2D</span></sc-if>
+              <span class="tq-iname">{{cc.name}}</span>
+              <span class="tq-ilab" style="color: {{cc.labC}}">{{cc.label}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{notChar}}" hint-placeholder-val="{{ true }}">
+      <div class="tq-grid">
       <sc-for list="{{items}}" as="it" hint-placeholder-count="8">
         <button type="button" class="tq-item" onClick="{{it.pick}}" style="{{it.style}}">
           <sc-if value="{{it.isOn}}" hint-placeholder-val="{{ false }}"><span class="tq-badge" style="background: #22D3EE"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#040A1C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg></span></sc-if>
           <sc-if value="{{it.isLocked}}" hint-placeholder-val="{{ false }}"><span class="tq-badge" style="background: #0B1A44; box-shadow: 0 0 0 2px #02040C, inset 0 0 0 1.5px {{it.lockC}}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="{{it.lockC}}" stroke-width="3" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></sc-if>
           <sc-if value="{{it.isNew}}" hint-placeholder-val="{{ false }}"><span class="tq-new">¡NUEVO!</span></sc-if>
           <sc-if value="{{it.hasRar}}" hint-placeholder-val="{{ false }}"><span class="{{it.rarCls}}" style="{{it.rarStyle}}">{{it.rar}}</span></sc-if>
-          <svg width="26" height="12" viewBox="0 0 26 12" style="position: absolute; top: -9px; left: 50%; margin-left: -13px"><path d="M13 10V5a2.5 2.5 0 1 1 2.5-2.5M2 11L13 6l11 5" fill="none" stroke="#A9BEDD" stroke-width="1.6" stroke-linecap="round"/></svg>
           <sc-if value="{{it.isKit}}" hint-placeholder-val="{{ true }}">
             <span class="tq-jw" style="{{it.jwStyle}}"><sc-if value="{{it.has3dShirt}}" hint-placeholder-val="{{ false }}"><img class="tq-shirt3d" src="{{it.shirtImg}}" alt="" draggable="false"></sc-if><span style="{{it.jerseyStyle}}"><i class="tq-shade"></i><i class="tq-cuff l" style="{{it.cuffStyle}}"></i><i class="tq-cuff r" style="{{it.cuffStyle}}"></i><b class="tq-num" style="{{it.numStyle}}">10</b><span style="{{it.crestStyle}}">{{it.crest}}</span></span><i class="tq-collar" style="{{it.collarStyle}}"></i></span>
           </sc-if>
           <sc-if value="{{it.is3d}}" hint-placeholder-val="{{ false }}">
-            <span class="tq-aw" style="{{it.awStyle}}"><img src="{{it.thumb}}" alt="" draggable="false" class="tq-3d" style="position: relative; display: block; width: 64px; height: 64px; object-fit: contain; filter: drop-shadow(0 4px 5px #000a); pointer-events: none"></span>
+            <span class="tq-aw" style="{{it.awStyle}}"><img src="{{it.thumb}}" alt="" draggable="false" class="tq-3d" style="position: relative; display: block; width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(0 4px 5px #000a); pointer-events: none"></span>
           </sc-if>
-          <span style="max-width: 100%; font-size: 10px; font-weight: 700; line-height: 1.15; color: #F4F4FA; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{it.name}}</span>
+          <span class="tq-iname">{{it.name}}</span>
           <span style="{{it.labelStyle}}">
             <sc-if value="{{it.isCoins}}" hint-placeholder-val="{{ false }}"><svg width="10" height="10" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFC53D"/></svg></sc-if>
             {{it.label}}
@@ -175,6 +218,7 @@ input::placeholder{color:#8FA8CC}
         </button>
       </sc-for>
       </div>
+      </sc-if>
       <sc-if value="{{isMine}}" hint-placeholder-val="{{ false }}">
         <div class="tq-ed">
           <sc-for list="{{edRows}}" as="er" hint-placeholder-count="4">
@@ -183,22 +227,22 @@ input::placeholder{color:#8FA8CC}
         </div>
       </sc-if>
     </div>
-    <div style="flex: none; display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 6px 8px 6px 12px; border-radius: 14px; background: linear-gradient(100deg, #0A3DCCCC, #0B1A44E6 60%, #06102EE6); border: 1px solid #3DA9FFAA; box-shadow: inset 0 1px 0 #ffffff33, 0 0 16px #1E8BFF55">
-      <div style="flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0">
-        <span style="font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{selName}}<sc-if value="{{hasSelRar}}" hint-placeholder-val="{{ false }}"><span style="{{selRarStyle}}">{{selRar}}</span></sc-if></span>
-        <span style="font-size: 11px; color: #FDE7F3">{{selHint}}</span>
+    <div class="tq-act">
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0">
+        <span class="tq-selname">{{selName}}<sc-if value="{{hasSelRar}}" hint-placeholder-val="{{ false }}"><span style="{{selRarStyle}}">{{selRar}}</span></sc-if></span>
+        <span style="font-size: 11px; color: #BFD3F5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{selHint}}</span>
       </div>
       <sc-if value="{{showEquip}}" hint-placeholder-val="{{ true }}">
-        <button type="button" onClick="{{doEquip}}" class="am-pulse am-shine" style="height: 40px; padding: 0 18px; border: 0; transform: skewX(0deg); background: linear-gradient(135deg, #7EF0FF, #22D3EE 55%, #0EA5C0); color: #040A1C; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 20px; letter-spacing: 1.5px; cursor: pointer">EQUIPAR</button>
+        <button type="button" onClick="{{doEquip}}" class="tq-btn am-shine">EQUIPAR</button>
       </sc-if>
       <sc-if value="{{showEquipped}}" hint-placeholder-val="{{ false }}">
-        <span style="display: flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border-radius: 18px; background: #22D3EE1F; border: 1px solid #22D3EE66; color: #22D3EE; font-weight: 800; font-size: 12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg>Puesto</span>
+        <span class="tq-on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l9-10"/></svg>PUESTO</span>
       </sc-if>
       <sc-if value="{{showBuy}}" hint-placeholder-val="{{ false }}">
-        <button type="button" onClick="{{doBuy}}" style="{{buyStyle}}">COMPRAR · {{selPrice}}</button>
+        <button type="button" onClick="{{doBuy}}" style="{{buyStyle}}"><svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor" opacity=".9"/></svg>{{selPrice}}</button>
       </sc-if>
       <sc-if value="{{showReward}}" hint-placeholder-val="{{ false }}">
-        <a href="{{rewardHref}}" style="display: flex; align-items: center; height: 38px; padding: 0 14px; transform: skewX(0deg); border: 2px solid #9B6BFF; color: #A6DCFF; text-decoration: none; font-weight: 800; font-size: 12px"><span style="transform: skewX(0deg)">CÓMO CONSEGUIRLO</span></a>
+        <a href="{{rewardHref}}" class="tq-how">CÓMO CONSEGUIRLO</a>
       </sc-if>
       <sc-if value="{{showPremium}}" hint-placeholder-val="{{ false }}">
         <span style="display: flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border-radius: 10px; border: 1.5px dashed #FFFFFFAA; background: #00000033; color: #FFFFFFDD; font-weight: 800; font-size: 11px; letter-spacing: 1px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>PRÓXIMAMENTE</span>
@@ -299,10 +343,10 @@ class Component extends DCLogic {
       if (an && A.clip('idle')) an.layers = [{ id: 'idle', t: (now - this.t0) / 1000, w: 1 }];
     }
     // frame the whole body, a little lower than centre so the chips below don't cover the feet
-    const fit = Math.max(2.95 / (2 * Math.tan(this.cam.fov * Math.PI / 360)), 1.1 / (2 * Math.tan(this.cam.fov * Math.PI / 360) * this.cam.aspect));
+    const fit = Math.max(2.45 / (2 * Math.tan(this.cam.fov * Math.PI / 360)), 0.95 / (2 * Math.tan(this.cam.fov * Math.PI / 360) * this.cam.aspect));
     // the camera moves in on what you are looking at: the head for hats and glasses, the feet for boots
-    const FOC = { cabeza: [1.55, 0.4, 1.55], cara: [1.52, 0.36, 1.52], calzado: [0.4, 0.58, 0.14] }[this.state.cat];
-    const tgt = FOC ? { y: FOC[0], d: fit * FOC[1], ly: FOC[2] } : { y: 1.2, d: fit, ly: 0.98 };
+    const FOC = { cabeza: [1.6, 0.4, 1.58], cara: [1.56, 0.36, 1.55], calzado: [0.8, 0.58, 0.6] }[this.state.cat];
+    const tgt = FOC ? { y: FOC[0], d: fit * FOC[1], ly: FOC[2] } : { y: 1.1, d: fit, ly: 0.9 };
     const cf = this.camF || (this.camF = { ...tgt }), kk = 1 - Math.pow(0.02, dt);
     cf.y += (tgt.y - cf.y) * kk; cf.d += (tgt.d - cf.d) * kk; cf.ly += (tgt.ly - cf.ly) * kk;
     this.cam.position.set(0, cf.y, cf.d);
@@ -627,32 +671,33 @@ class Component extends DCLogic {
       { id: 'futbol', label: 'Fútbol', num: '10' }, { id: 'basket', label: 'Basket', num: '23' },
       { id: 'tenis', label: 'Tenis', num: '7' }, { id: 'voley', label: 'Vóley', num: '4' }
     ];
+    const isChar = s.cat === 'personaje', cat = isChar ? 'equipos' : s.cat;
     const CATS = [
-      { id: 'equipos', label: 'Equipos' }, { id: 'cabeza', label: 'Cabeza' },
+      { id: 'personaje', label: 'Personaje' }, { id: 'equipos', label: 'Equipos' }, { id: 'cabeza', label: 'Cabeza' },
       { id: 'cara', label: 'Cara' }, { id: 'calzado', label: 'Calzado' }
     ];
     const tab = (on) => 'min-height: 40px; padding: 0 4px; border-radius: 12px; font: 800 13px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #040A1C; border: 0; box-shadow: 0 3px 0 #0E8FA3;' : 'background: #0B1A44; color: #BFD3F5; border: 1px solid #3DA9FF44;');
     // each category and each league in its own colour
-    const CATC = { equipos: ['#22D3EE', '#3B82F6'], cabeza: ['#F472B6', '#A855F7'], cara: ['#FACC15', '#F97316'], calzado: ['#4ADE80', '#14B8A6'] };
+    const CATC = { personaje: ['#FFC53D', '#F97316'], equipos: ['#22D3EE', '#3B82F6'], cabeza: ['#F472B6', '#A855F7'], cara: ['#FACC15', '#F97316'], calzado: ['#4ADE80', '#14B8A6'] };
     const LGC = ['#FACC15', '#F43F5E', '#22D3EE', '#A855F7', '#4ADE80', '#F97316', '#3B82F6', '#EC4899'];
     const chip = (on, id) => 'position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 46px; border: 0; border-radius: 11px; background: transparent; font: 800 10px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (on ? '#040A1C;' : (CATC[id] || ['#A9BEDD'])[0] + ';');
     const lchip = (on, i) => { const c = LGC[i % LGC.length]; return 'flex: none; height: 28px; padding: 0 12px; border-radius: 14px; font: 800 11px Exo2, sans-serif; cursor: pointer; white-space: nowrap; ' + (on ? 'background: linear-gradient(135deg, #FFFFFF, ' + c + ' 45%); color: #1A1206; border: 0; box-shadow: 0 0 12px ' + c + 'AA;' : 'background: ' + c + '2E; color: ' + c + '; border: 1px solid ' + c + '88;'); };
 
     // only football for now: the other sports' kits come back with their own game
     const sports = SPORTS.filter((sp) => sp.id === 'futbol').map((sp) => ({ label: sp.label, style: tab(sp.id === sport), pick: () => this.setState({ sport: sp.id, preview: null }) }));
-    const ICON = { equipos: 'M8 3L3 6l2 5l3-1v11h8V10l3 1l2-5l-5-3a4 4 0 0 1-8 0z', cabeza: 'M4 16a8 8 0 0 1 16 0zM12 8V6M20 16h3', cara: 'M3 10h7v3a3 3 0 0 1-6 0zM14 10h7v3a3 3 0 0 1-6 0zM10 11h4', calzado: 'M4 8h7l2 4c4 0 8 1 9 5v2H4zM3 19h19' };
+    const ICON = { personaje: 'M12 12a5 5 0 1 0 0-10a5 5 0 0 0 0 10M3 22a9 9 0 0 1 18 0', equipos: 'M8 3L3 6l2 5l3-1v11h8V10l3 1l2-5l-5-3a4 4 0 0 1-8 0z', cabeza: 'M4 16a8 8 0 0 1 16 0zM12 8V6M20 16h3', cara: 'M3 10h7v3a3 3 0 0 1-6 0zM14 10h7v3a3 3 0 0 1-6 0zM10 11h4', calzado: 'M4 8h7l2 4c4 0 8 1 9 5v2H4zM3 19h19' };
     const cats = CATS.map((c) => ({ label: c.label.toUpperCase(), icon: ICON[c.id], sel: c.id === s.cat ? 'true' : 'false', style: chip(c.id === s.cat, c.id), pick: () => this.setState({ cat: c.id, preview: null }) }));
     const ci = CATS.findIndex((c) => c.id === s.cat);
     const li = s.league[sport];
     const leagues = L[sport].map((lg, i) => ({ name: lg.name, style: lchip(i === li, i), pick: () => this.setState({ league: { ...s.league, [sport]: i }, preview: null }) }));
 
-    const list = s.cat === 'equipos'
+    const list = isChar ? [] : cat === 'equipos'
       ? L[sport][li].teams.map((t, ti) => this.teamItem(sport, li, ti, L))
-      : X[s.cat].filter((it) => s.rarF == null || it.kind === 'none' || it.rar === s.rarF);
-    const selId = s.preview && s.preview.cat === s.cat ? s.preview.id : eq[s.cat];
+      : X[cat].filter((it) => s.rarF == null || it.kind === 'none' || it.rar === s.rarF);
+    const selId = s.preview && s.preview.cat === cat ? s.preview.id : eq[cat];
     const items = list.map((it) => {
       const own = owned(it);
-      const equipped = eq[s.cat] === it.id;
+      const equipped = eq[cat] === it.id;
       const sel = it.id === selId;
       let label = 'En propiedad', color = '#A9BEDD';
       if (equipped) { label = 'Equipado'; color = '#22D3EE'; }
@@ -663,32 +708,32 @@ class Component extends DCLogic {
       ['none', 'band', 'cap', 'top', 'chef', 'viking', 'prop', 'crown', 'sprout', 'phones', 'sun', 'round', 'star', 'd3', 'ski', 'stache'].forEach((x) => { k[x] = it.kind === x; });
       return {
         name: it.name, label, color: it.color || '#2F4BA8', k,
-        isKit: s.cat === 'equipos', is3d: s.cat !== 'equipos',
+        isKit: cat === 'equipos', is3d: cat !== 'equipos',
         isNew: (this.newIds || []).indexOf(it.id) >= 0,
         hasRar: it.rar != null, rar: it.rar != null ? Taq_RAR[it.rar][0] : '', rarCls: it.rar === 3 ? 'tq-rar tq-leg' : 'tq-rar',
         rarStyle: it.rar != null ? 'background: ' + Taq_RAR[it.rar][1] + '; color: ' + Taq_RAR[it.rar][2] + ';' : '',
-        thumb: s.cat !== 'equipos' && window.AMGear ? window.AMGear.thumb(s.cat, it) : '',
+        thumb: cat !== 'equipos' && window.AMGear ? window.AMGear.thumb(cat, it) : '',
         crest: it.crest || '',
-        crestStyle: s.cat === 'equipos' ? 'position: absolute; left: 24%; top: 26%; width: 14px; height: 14px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.6); ' + ({ shield: 'border-radius: 2px 2px 7px 7px;', circle: 'border-radius: 50%;', diamond: 'clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);' })[it.crestShape] + ' background: ' + it.secondary + '; color: ' + it.primary + '; font: 800 6px Exo2, sans-serif; display: flex; align-items: center; justify-content: center; letter-spacing: -.3px;' : '',
-        awStyle: '--ac: ' + (it.color || ({ cabeza: '#F472B6', cara: '#FACC15', calzado: '#4ADE80' })[s.cat] || '#A855F7') + 'AA;',
-        shirtImg: s.cat === 'equipos' ? this.shirtPic(it) : '', has3dShirt: s.cat === 'equipos' && !!this.shirtPic(it),
+        crestStyle: cat === 'equipos' ? 'position: absolute; left: 24%; top: 26%; width: 14px; height: 14px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.6); ' + ({ shield: 'border-radius: 2px 2px 7px 7px;', circle: 'border-radius: 50%;', diamond: 'clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);' })[it.crestShape] + ' background: ' + it.secondary + '; color: ' + it.primary + '; font: 800 6px Exo2, sans-serif; display: flex; align-items: center; justify-content: center; letter-spacing: -.3px;' : '',
+        awStyle: '--ac: ' + (it.color || ({ cabeza: '#F472B6', cara: '#FACC15', calzado: '#4ADE80' })[cat] || '#A855F7') + 'AA;',
+        shirtImg: cat === 'equipos' ? this.shirtPic(it) : '', has3dShirt: cat === 'equipos' && !!this.shirtPic(it),
         jwStyle: '--jc: ' + (it.primary || '#7C3AED') + ';',
         cuffStyle: 'background: ' + (it.secondary || '#040A1C') + ';',
         numStyle: 'color: ' + (it.secondary || '#040A1C') + ';',
         collarStyle: 'background: ' + (it.secondary || '#040A1C') + '; box-shadow: inset 0 -3px 0 ' + (it.primary || '#fff') + ';',
-        jerseyStyle: s.cat === 'equipos' ? 'position: relative; display: ' + (this.shirtPic(it) ? 'none' : 'block') + '; width: 64px; height: 58px; overflow: hidden; background: ' + this.jerseyBg(it.primary, it.secondary, it.pattern) + '; clip-path: polygon(32% 0, 68% 0, 100% 18%, 88% 42%, 78% 36%, 78% 100%, 22% 100%, 22% 36%, 12% 42%, 0 18%); filter: drop-shadow(0 2px 0 #00000055);' : '',
+        jerseyStyle: cat === 'equipos' ? 'position: relative; display: ' + (this.shirtPic(it) ? 'none' : 'block') + '; width: 64px; height: 58px; overflow: hidden; background: ' + this.jerseyBg(it.primary, it.secondary, it.pattern) + '; clip-path: polygon(32% 0, 68% 0, 100% 18%, 88% 42%, 78% 36%, 78% 100%, 22% 100%, 22% 36%, 12% 42%, 0 18%); filter: drop-shadow(0 2px 0 #00000055);' : '',
         isCoins: !own && it.st === 'coins', isOn: equipped, isLocked: !own, lockC: it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D',
         isReward: !own && it.st === 'reward',
-        style: (() => { const rc = it.rar != null ? Taq_RAR[it.rar][1] : equipped ? '#22D3EE' : own ? '#8A93C8' : it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D'; return 'position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 110px; margin-top: 8px; padding: 8px 3px 5px 3px; box-sizing: border-box; border-radius: 12px; font-family: Exo2, sans-serif; cursor: pointer; min-width: 0; background: ' + (it.rar != null ? 'radial-gradient(90% 60% at 50% 28%, ' + rc + 'CC, transparent 75%), radial-gradient(80% 50% at 50% 100%, ' + rc + '66, transparent 70%), linear-gradient(180deg, color-mix(in srgb, ' + rc + ' 55%, #0B1A44), color-mix(in srgb, ' + rc + ' 22%, #06102E) 75%)' : 'radial-gradient(90% 60% at 50% 25%, ' + rc + '55, transparent 75%), linear-gradient(180deg, #13306E, #081A48 70%)') + '; border: ' + (sel ? '2px solid ' + rc : '1px solid ' + rc + '55') + '; border-top: 3px solid ' + rc + '; box-shadow: ' + (sel ? '0 0 14px ' + rc + '88, 0 6px 12px #0008' : '0 6px 12px #0006') + ';'; })(),
+        style: (() => { const rc = it.rar != null ? Taq_RAR[it.rar][1] : equipped ? '#22D3EE' : own ? '#8A93C8' : it.st === 'coins' ? '#FFC53D' : it.st === 'reward' ? '#9B6BFF' : '#FF8A3D'; return 'position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 128px; margin-top: 0; padding: 8px 3px 5px 3px; box-sizing: border-box; border-radius: 12px; font-family: Exo2, sans-serif; cursor: pointer; min-width: 0; background: ' + (it.rar != null ? 'radial-gradient(90% 60% at 50% 28%, ' + rc + 'CC, transparent 75%), radial-gradient(80% 50% at 50% 100%, ' + rc + '66, transparent 70%), linear-gradient(180deg, color-mix(in srgb, ' + rc + ' 55%, #0B1A44), color-mix(in srgb, ' + rc + ' 22%, #06102E) 75%)' : 'radial-gradient(90% 60% at 50% 25%, ' + rc + '55, transparent 75%), linear-gradient(180deg, #13306E, #081A48 70%)') + '; border: ' + (sel ? '2px solid ' + rc : '1px solid ' + rc + '55') + '; border-top: 3px solid ' + rc + '; box-shadow: ' + (sel ? '0 0 14px ' + rc + '88, 0 6px 12px #0008' : '0 6px 12px #0006') + ';'; })(),
         labelStyle: 'display: flex; align-items: center; gap: 3px; max-width: 100%; white-space: nowrap; overflow: hidden; font-size: 10.5px; font-weight: 800; color: ' + color + ';',
-        pick: () => this.setState({ preview: { cat: s.cat, id: it.id } })
+        pick: () => this.setState({ preview: { cat: cat, id: it.id } })
       };
     });
 
-    const selItem = findItem(s.cat, selId);
+    const selItem = findItem(cat, selId);
 
     const selOwned = owned(selItem);
-    const selEquipped = eq[s.cat] === selItem.id;
+    const selEquipped = eq[cat] === selItem.id;
     const canAfford = selItem.st === 'coins' && s.coins >= selItem.price;
     let selHint = 'En tu taquilla';
     if (selEquipped) selHint = 'Lo llevas puesto';
@@ -697,7 +742,7 @@ class Component extends DCLogic {
     else if (!selOwned && selItem.st === 'premium') selHint = 'Objeto premium';
 
     const equipNow = (extra) => {
-      const equip = { ...s.equip, [sport]: { ...s.equip[sport], [s.cat]: selItem.id } };
+      const equip = { ...s.equip, [sport]: { ...s.equip[sport], [cat]: selItem.id } };
       this.saveLocker(equip, (extra && extra.bought) || s.bought);
       this.setState({ equip, preview: null, ...(extra || {}) });
       // your player shows it off: a full turn and a burst of confetti
@@ -722,11 +767,45 @@ class Component extends DCLogic {
       };
     });
     const A2 = window.AMChars, fitNow = A2 && A2.fitPref ? A2.fitPref() : { sleeve: 'short', size: 'M' };
-    const fitBtn = (on) => 'height: 26px; padding: 0; border-radius: 8px; font: 800 11px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #040A1C; border: 0; box-shadow: 0 2px 0 #0E8FA3;' : 'background: #0B1A44; color: #CACAE0; border: 1px solid #1E3A6E;');
+    const fitBtn = (on) => 'flex: none; height: 22px; min-width: 26px; padding: 0 6px; border-radius: 11px; font: 800 9.5px Exo2, sans-serif; cursor: pointer; ' + (on ? 'background: #22D3EE; color: #040A1C; border: 0; box-shadow: 0 0 10px #22D3EE88;' : 'background: transparent; color: #CACAE0; border: 1px solid #3DA9FF44;');
     const setFit = (f) => { if (A2 && A2.setFit) { A2.setFit(f); window.AMSfx && window.AMSfx.tap && window.AMSfx.tap(); this.forceUpdate(); } };
-    const sleeveBtns = [['short', 'CORTA'], ['long', 'LARGA']].map(([id, label]) => ({ label, on: String(fitNow.sleeve === id), style: fitBtn(fitNow.sleeve === id), pick: () => setFit({ sleeve: id }) }));
+    const sleeveBtns = [['short', 'Corta'], ['long', 'Larga']].map(([id, label]) => ({ label, on: String(fitNow.sleeve === id), style: fitBtn(fitNow.sleeve === id), pick: () => setFit({ sleeve: id }) }));
     const sizeBtns = (A2 && A2.sizes || ['S', 'M', 'L', 'XL']).map((id) => ({ label: id, on: String(fitNow.size === id), style: fitBtn(fitNow.size === id), pick: () => setFit({ size: id }) }));
+    // the loadout down the side of the showroom: what you have on, one slot per category
+    const G = window.AMGear, charOn = chars.find((c) => c.id === charId) || chars[chars.length - 1];
+    const eqItem = { personaje: null, equipos: findItem('equipos', eq.equipos), cabeza: findItem('cabeza', eq.cabeza), cara: findItem('cara', eq.cara), calzado: findItem('calzado', eq.calzado) };
+    const slots = CATS.map((c) => {
+      const on = c.id === s.cat, it = eqItem[c.id], col = CATC[c.id][0];
+      let img = '';
+      if (c.id === 'personaje') img = charId === 'clasico' ? '' : 'assets/chars/' + charId + '.png';
+      else if (c.id === 'equipos') img = this.shirtPic(it);
+      else if (it && it.kind !== 'none' && G) img = G.thumb(c.id, it);
+      return {
+        label: c.id === 'equipos' ? 'EQUIPO' : c.label.toUpperCase(), aria: c.label + ': ' + (c.id === 'personaje' ? charOn.name : it ? it.name : ''), sel: on ? 'true' : 'false',
+        cls: 'tq-slot' + (on ? ' on' : ''), style: '--sc: ' + col + ';', icon: ICON[c.id], hasImg: !!img, noImg: !img, img,
+        imgStyle: c.id === 'personaje' ? 'width: 30px; height: 30px; border-radius: 50%; object-fit: cover; object-position: 50% 15%; box-shadow: 0 0 0 1.5px ' + col + '; margin-bottom: 2px;' : 'width: 38px; height: 34px; object-fit: contain; filter: drop-shadow(0 2px 3px #000a);',
+        pick: () => { window.AMSfx && window.AMSfx.tap && window.AMSfx.tap(); this.setState({ cat: c.id, preview: null }); }
+      };
+    });
+    const nOwned = isChar ? chars.length : list.filter((it) => owned(it)).length;
+    const charCards = chars.map((c) => {
+      const on = c.id === charId;
+      return {
+        name: c.id === 'clasico' ? 'Clásico 2D' : c.name, on: on ? 'true' : 'false', isOn: on, hasImg: c.id !== 'clasico', noImg: c.id === 'clasico',
+        img: c.id === 'clasico' ? '' : 'assets/chars/' + c.id + '.png', label: on ? 'Elegido' : 'Elegir', labC: on ? '#22D3EE' : '#BFD3F5',
+        style: 'position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; height: 128px; padding: 8px 4px; box-sizing: border-box; border-radius: 14px; border: 0; cursor: pointer; min-width: 0; font-family: Exo2, sans-serif; ' + (on ? 'background: radial-gradient(80% 60% at 50% 30%, #FFC53D66, transparent 75%), linear-gradient(180deg, #2A3C7A, #0B1A44); box-shadow: inset 0 0 0 2px #FFC53D, 0 0 16px #FFC53D66;' : 'background: radial-gradient(80% 60% at 50% 30%, #3DA9FF33, transparent 75%), linear-gradient(180deg, #13306E, #0B1A44); box-shadow: inset 0 0 0 1px #3DA9FF55;'),
+        pick: () => { if (A) A.setPref(c.id); window.AMSfx && window.AMSfx.tap && window.AMSfx.tap(); this.setState({ char: c.id }); }
+      };
+    });
+    const charSel = isChar ? {
+      selName: charOn.id === 'clasico' ? 'Clásico 2D' : charOn.name, hasSelRar: false, selHint: 'Juegas con este personaje en todos los modos',
+      showEquipped: true, showEquip: false, showBuy: false, showReward: false, showPremium: false
+    } : {};
     return {
+      slots, isChar, notChar: !isChar, charCards, showRar: !isChar && cat !== 'equipos',
+      catC: CATC[s.cat][0], catIcon: ICON[s.cat], catTitle: (CATS.find((c) => c.id === s.cat) || CATS[1]).label.toUpperCase(),
+      catCount: isChar ? chars.length + ' personajes' : nOwned + ' / ' + list.length + ' tuyos',
+      coinsAria: this.fmt(s.coins) + ' VCD. Ir a la tienda',
       sleeveBtns, sizeBtns,
       show3d, show2d: !show3d, charChips, canvasRef: this.canvasRef,
       viewerLabel: 'Tu personaje con la equipación ' + kitItem.name + '. Desliza para girarlo.',
@@ -749,7 +828,7 @@ class Component extends DCLogic {
       lockers: Array.from({ length: 8 }, (_, k) => ({ n: k === 4 ? (window.AMOnline ? window.AMOnline.myName() : 'TÚ').toUpperCase().slice(0, 10) : String([3, 7, 11, 5, 10, 8, 14, 21][k]), cls: 'tq-locker' + (k === 4 ? ' tq-mine' : ''), style: 'left: ' + (k * 49 + 1) + 'px; width: 46px; --lc: ' + ['#2B4E9E', '#335AAE', '#28468F', '#3762B8', '#2E5AB8', '#2A4C98', '#3560B0', '#2B4E9E'][k] + '; --kc: ' + kitItem.primary + '88;' + (k === 4 ? ' z-index: 0;' : '') })),
       kitGlow: kitItem.primary + '66',
       dust: Array.from({ length: 7 }, (_, k) => 'left: ' + (150 + k * 13) + 'px; top: ' + (120 + (k * 37) % 150) + 'px; --dx: ' + ((k % 3) - 1) * 12 + 'px; --d: ' + (5 + k % 4) + 's; animation-delay: ' + (-k * 0.8).toFixed(1) + 's'),
-      isMine: s.cat === 'equipos' && !!(L[sport][li] && L[sport][li].custom),
+      isMine: cat === 'equipos' && !isChar && !!(L[sport][li] && L[sport][li].custom),
       edRows: (() => {
         const k = this.myKit(), C = ['#FFFFFF', '#0B0B14', '#DC2626', '#F97316', '#FACC15', '#16A34A', '#22D3EE', '#2563EB', '#7C3AED', '#EC4899', '#94A3B8', '#7A1C2C'];
         const sw = (key) => C.map((c) => ({ aria: key + ' ' + c, txt: '', on: k[key] === c ? 'true' : 'false', pick: () => this.setMyKit({ [key]: c, ...(key === 'primary' ? { socks: c } : {}) }), style: 'width: 16px; height: 16px; padding: 0; border-radius: 5px; cursor: pointer; background: ' + c + '; border: ' + (k[key] === c ? '2px solid #FFFFFF; box-shadow: 0 0 8px #FFFFFF' : '1px solid #ffffff44') + ';' }));
@@ -758,7 +837,7 @@ class Component extends DCLogic {
           { label: 'DISEÑO', opts: ch('pattern', [['solid', 'Liso'], ['stripes', 'Rayas'], ['hoops', 'Aros'], ['sash', 'Banda'], ['halves', 'Mitades'], ['pin', 'Finas']]) },
           { label: 'ESCUDO', opts: ch('crestShape', [['shield', 'Escudo'], ['circle', 'Círculo'], ['diamond', 'Rombo']]) }];
       })(),
-      isTeams: s.cat === 'equipos', notTeams: s.cat !== 'equipos',
+      isTeams: s.cat === 'equipos', notTeams: s.cat !== 'equipos' && !isChar,
       rarChips: [[null, 'TODAS', '#E9D5FF']].concat(Taq_RAR.map((r, i) => [i, r[0], r[1]])).map(([v, label, c]) => {
         const on = (s.rarF ?? null) === v;
         return { label, on: on ? 'true' : 'false', pick: () => this.setState({ rarF: v }),
@@ -780,8 +859,9 @@ class Component extends DCLogic {
       showBuy: !selOwned && selItem.st === 'coins',
       showReward: !selOwned && selItem.st === 'reward',
       showPremium: !selOwned && selItem.st === 'premium',
+      ...charSel,
       rewardHref: selItem.how === 'rank' ? 'Rangos.dc.html' : selItem.how === 'pass' ? 'Pase.dc.html' : 'Tienda.dc.html',
-      buyStyle: 'height: 40px; padding: 0 14px; border: 0; transform: skewX(0deg); font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: 18px; letter-spacing: .5px; cursor: pointer; ' + (canAfford ? 'background: linear-gradient(135deg, #FFE38A, #FFC53D 55%, #D9A520); color: #2A1C02; box-shadow: 0 0 14px #FFC53D66;' : 'background: #39206E; color: #6E6E92; cursor: default;'),
+      buyStyle: 'display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border: 0; border-radius: 12px; font: 400 16px Titulos, sans-serif; letter-spacing: 1px; cursor: pointer; ' + (canAfford ? 'background: linear-gradient(180deg, #FFE38A, #FFC53D 50%, #D9A520); color: #2A1C02; box-shadow: 0 4px 0 #8A6410, 0 0 14px #FFC53D66;' : 'background: #1E2A4E; color: #6E7FA8; cursor: default;'),
       doEquip: () => equipNow(),
       doBuy: () => {
         if (!canAfford) return;
