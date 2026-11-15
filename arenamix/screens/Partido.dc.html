@@ -1460,7 +1460,13 @@ class Component extends DCLogic {
     g.ps.forEach((p) => {
       if (p === sc && sc.team === team) p.act = { type: 'celebrate', t: 0, dur: 3, lock: true, style: g.ps.indexOf(p) === g.ctl && !this.ctxH ? this.myCeleb() : 'clasica' };
       else if (p.team === team) p.act = { type: 'cheer', t: 0, dur: 3, lock: true };
-      else p.act = { type: 'sad', t: 0, dur: 3, lock: true };
+      else {
+        // the beaten side: hands on hips, hands on knees, head down; the keeper may also boot the grass.
+        // A keeper still in his dive stays down on the grass a moment, then gets up to it
+        const gk = p.role === 'gk', r = Math.random(), sad = { type: 'sad', t: 0, dur: 3.2, lock: true, v: gk ? (r < 0.4 ? 'hips' : r < 0.7 ? 'knees' : 'kick') : (r < 0.45 ? 'hips' : r < 0.75 ? 'hang' : 'knees') };
+        if (p.act && p.act.type === 'dive' && !p.act.smother) { const d = p.act; d.dur = Math.max(d.dur, (d.flight || 0.5) + 1.3); d.then = () => { if (this.g.phase === 'goal') p.act = sad; }; }
+        else p.act = sad;
+      }
     });
     const mate = g.ps.find((q) => q.role === 'mate');
     if (mate && this.props.ping) this.say(mate, team === 0 ? ['¡Golazo!', '¡Vamos!', '¡Qué pase!'][Math.floor(Math.random() * 3)] : '¡Venga, remontamos!');
@@ -4860,9 +4866,35 @@ class Component extends DCLogic {
       A0.sho.rotation.set(0, 0, -2.6); A1.sho.rotation.set(0, 0, 2.6);
       Lg.knee.rotation.x = 0.4 * (1 - j); Rg.knee.rotation.x = 0.4 * (1 - j);
     } else if (a.type === 'sad') {
-      A0.sho.rotation.set(-0.3, 0, -2.3); A1.sho.rotation.set(-0.3, 0, 2.3);
-      A0.elb.rotation.x = -2.2; A1.elb.rotation.x = -2.2;
-      u.body.rotation.x = 0.2; u.head.rotation.set(0.35, 0, 0);
+      // eased in from whatever he was doing, never a snap into the pose
+      const E = Math.min(1, a.t / 0.45), e2 = E * E * (3 - 2 * E), v = a.v || 'hips';
+      const to = (o, x, y, z) => o.rotation.set(lerp(o.rotation.x, x, e2), lerp(o.rotation.y, y, e2), lerp(o.rotation.z, z, e2));
+      const shake = 0.28 * Math.sin(now * 4.2 + i) * Math.max(0, 1 - a.t / 1.8);
+      let hips = v === 'hips' || (v === 'kick' && a.t > 0.95);
+      if (v === 'kick' && a.t <= 0.95) {
+        // frustration: a swing of the boot at the turf, arms thrown down
+        const kk = Math.sin(Math.PI * Math.min(1, a.t / 0.6));
+        to(Rg.hip, -1.05 * kk + 0.25 * (1 - kk), 0, 0.05); to(Rg.knee, 0.25 + 0.5 * (1 - kk), 0, 0);
+        to(Lg.knee, 0.25, 0, 0); to(A0.sho, 0.45, 0, -0.35); to(A1.sho, 0.45, 0, 0.35);
+        to(A0.elb, -0.2, 0, 0); to(A1.elb, -0.2, 0, 0);
+        to(u.body, -0.12 * kk, 0, 0); to(u.head, 0.35, 0, 0);
+      } else if (v === 'knees') {
+        // bent over, hands on the knees, catching his breath
+        to(Lg.hip, -0.28, 0, -0.1); to(Rg.hip, -0.28, 0, 0.1); to(Lg.knee, 0.38, 0, 0); to(Rg.knee, 0.38, 0, 0);
+        to(A0.sho, -0.5, 0, -0.12); to(A1.sho, -0.5, 0, 0.12); to(A0.elb, -0.1, 0, 0); to(A1.elb, -0.1, 0, 0);
+        to(u.body, 0.42 + 0.03 * Math.sin(now * 3), 0, 0); to(u.head, 0.05, shake, 0);
+        u.body.position.y = lerp(u.body.position.y, -0.07, e2);
+      } else if (v === 'hang') {
+        // arms hanging, head down, a slow shake of the head
+        to(A0.sho, 0.05, 0, -0.08); to(A1.sho, 0.05, 0, 0.08); to(A0.elb, -0.15, 0, 0); to(A1.elb, -0.15, 0, 0);
+        to(u.body, 0.12, 0, 0); to(u.head, 0.55, shake, 0);
+      }
+      if (hips) {
+        // hands on the hips, elbows out, head dropped
+        const e3 = v === 'kick' ? Math.min(1, (a.t - 0.95) / 0.35) : 1, H = (o, x, y, z) => o.rotation.set(lerp(o.rotation.x, x, e3), lerp(o.rotation.y, y, e3), lerp(o.rotation.z, z, e3));
+        H(A0.sho, 0.1, 1.2, -0.5); H(A1.sho, 0.1, -1.2, 0.5); H(A0.elb, -1.6, 0, 0); H(A1.elb, -1.6, 0, 0);
+        to(u.body, 0.08, 0, 0); to(u.head, 0.45, shake, 0);
+      }
     }
   }
   renderVals() {
