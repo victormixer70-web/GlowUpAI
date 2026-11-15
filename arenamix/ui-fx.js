@@ -345,6 +345,29 @@
     // ---- titles: Russo One, upright (no italic) ----
     '.bc-title,.bc-title.hd,#stage .bc-title.hd,#stage .tn-big,#stage .ttl,#am-daily h2,#am-res .t,#am-res .t .lt,#am-res .lvup,.jc-wheel .side h2,.jc-wheel .won-card b{font-family:"Titulos",sans-serif!important;font-style:normal!important;font-weight:400!important}',
     '.bc-title.hd,#stage .bc-title.hd{font-size:21px!important;letter-spacing:1px!important;padding:3px 18px 0!important}',
+    // ---- game look, everywhere: chunky pieces with a thick dark outline, a glossy top and a solid shadow under;
+    // titles and numbers with a hard dark drop so they stand off the background ----
+    '#stage [style*="Barlow Condensed"],#stage [style*="Titulos"],#stage .bc-title,#am-res .t,#am-rw .it b{text-shadow:0 2px 0 #02040C,0 3px 6px #02040C88}',
+    '.bc-btn,.bc-btn-gold,#stage .bc-btn,#stage .bc-btn-gold{border:3px solid #02040C!important;border-radius:16px!important;color:#FFFFFF!important;-webkit-text-stroke:3.5px #02040C;paint-order:stroke fill;text-shadow:0 3px 0 #02040C!important;letter-spacing:.8px!important;animation:amGameBtn 1.8s ease-in-out infinite}',
+    '.bc-btn,#stage .bc-btn{background:linear-gradient(180deg,#9AF3FF,#22D3EE 45%,#0E8FD6)!important;box-shadow:inset 0 3px 0 #FFFFFFB0,inset 0 -5px 0 #0A6FA8,0 5px 0 #02040C,0 10px 18px #22D3EE44!important}',
+    '.bc-btn-gold,#stage .bc-btn-gold{background:linear-gradient(180deg,#FFF3A0,#FFD23D 45%,#FFA800)!important;box-shadow:inset 0 3px 0 #FFFFFFB0,inset 0 -5px 0 #C97800,0 5px 0 #02040C,0 10px 18px #FFC53D44!important}',
+    '.bc-btn *,.bc-btn-gold *{color:#FFFFFF!important;-webkit-text-stroke:2.2px #02040C;paint-order:stroke fill;text-shadow:0 2px 0 #02040C!important}',
+    '.bc-btn svg,.bc-btn-gold svg{filter:drop-shadow(0 2px 0 #02040C)}',
+    '.bc-btn.fx-down,.bc-btn-gold.fx-down,.bc-btn:active,.bc-btn-gold:active{translate:0 3px}',
+    '@keyframes amGameBtn{0%,100%{scale:1}50%{scale:1.035}}',
+    '.bc-title.hd,#stage .bc-title.hd{border:3px solid #02040C!important;border-radius:14px!important;box-shadow:inset 0 3px 0 #FFFFFF66,inset 0 -4px 0 #00000044,0 4px 0 #02040C!important;-webkit-text-stroke:3.5px #02040C;paint-order:stroke fill;text-shadow:0 3px 0 #02040C!important;overflow:visible!important}',
+    '.bc-para,#stage a.bc-para,#stage .bc-para{outline:none!important;border:2.5px solid #02040C!important;border-radius:12px!important;box-shadow:inset 0 2px 0 #FFFFFF44,0 3px 0 #02040C!important}',
+    '.bc-tile,#stage .bc-tile{border:3px solid #02040C!important;box-shadow:inset 0 3px 0 #FFFFFF33,inset 0 -4px 0 #00000055!important}',
+    '.nv-glass{box-shadow:inset 0 0 0 3px #02040C,inset 0 3px 0 #FFFFFF22!important}',
+    '.nv-item[aria-current="page"]{box-shadow:inset 0 0 0 2.5px #02040C,inset 0 3px 0 #FFFFFF66,0 3px 0 #02040C!important}',
+    '.nv-item{text-shadow:0 1.5px 0 #02040C}',
+    // inline cards, panels, tiles and pills (rounded boxes with a fill): a dark outline inside their edge, so it shows
+    // even where the box clips its corners; they keep their own colours and glows
+    '#stage [style*="border-radius: 10px"][style*="background"],#stage [style*="border-radius: 11px"][style*="background"],#stage [style*="border-radius: 12px"][style*="background"],#stage [style*="border-radius: 13px"][style*="background"],#stage [style*="border-radius: 14px"][style*="background"],#stage [style*="border-radius: 16px"][style*="background"],#stage [style*="border-radius: 18px"][style*="background"],#stage [style*="border-radius: 20px"][style*="background"],#stage [style*="round 12px"][style*="background"],#stage [style*="round 14px"][style*="background"],#stage [style*="round 16px"][style*="background"],#stage [style*="round 20px"][style*="background"]{outline:2.5px solid #02040C;outline-offset:-2.5px}',
+    '.tn-go,.cl-go,.mj-go,.lb-play,.lg-play,.so-btn,.lb-go,.vs-go,.pv-go,.tu-go,.du-go,.pd-go,.ps-claim,.am-logo-btn,#stage a.am-pulse-gold,#stage button.am-pulse-gold{border:3px solid #02040C!important;border-radius:16px!important;box-shadow:inset 0 3px 0 #FFFFFF99,inset 0 -5px 0 #00000040,0 5px 0 #02040C,0 10px 18px #0006!important;color:#FFFFFF!important;-webkit-text-stroke:3.5px #02040C;paint-order:stroke fill;text-shadow:0 3px 0 #02040C!important;letter-spacing:.6px}',
+    '.tn-go *,.cl-go *,.mj-go *,.lb-play *,.lg-play *,.so-btn *,.lb-go *,.vs-go *,.pv-go *,.tu-go *,.du-go *,.pd-go *,.ps-claim *,.am-logo-btn *,#stage a.am-pulse-gold *,#stage button.am-pulse-gold *{color:#FFFFFF!important;-webkit-text-stroke:2.2px #02040C;paint-order:stroke fill;text-shadow:0 2px 0 #02040C!important}',
+    '.tn-go svg,.cl-go svg,.mj-go svg,.lb-play svg,.lg-play svg,.so-btn svg,.vs-go svg,.pv-go svg,.tu-go svg,.du-go svg,.pd-go svg,.am-logo-btn svg{-webkit-text-stroke:0;filter:drop-shadow(0 2px 0 #02040C)}',
+    '.tn-go:active,.cl-go:active,.mj-go:active,.lb-play:active,.lg-play:active,.so-btn:active,.vs-go:active,.pv-go:active,.tu-go:active,.du-go:active,.pd-go:active,.am-logo-btn:active{translate:0 3px}',
   ].join('\n');
   // the colour rules that match on inline styles ([style*=...]) are costly to re-check while a match updates its
   // HUD every frame: they live in their own sheet, switched off while a game is on screen
