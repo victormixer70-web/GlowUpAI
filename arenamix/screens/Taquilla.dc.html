@@ -109,6 +109,35 @@ input::placeholder{color:#8FA8CC}
 .tq-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #0A3DCC}
 .tq-on{display:flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:12px;background:#22D3EE1F;box-shadow:inset 0 0 0 1.5px #22D3EE88;color:#22D3EE;font:400 12px Titulos,sans-serif;letter-spacing:1.5px}
 .tq-how{display:flex;align-items:center;height:38px;padding:0 14px;border-radius:12px;box-shadow:inset 0 0 0 2px #9B6BFF;background:#9B6BFF22;color:#E9DDFF;text-decoration:none;font:400 11px Titulos,sans-serif;letter-spacing:1px;white-space:nowrap}
+
+/* ---- game look: chunky outlined pieces, glossy tops, solid shadows ---- */
+.tq-slot{border-radius:14px;background:linear-gradient(180deg,#2A5AC0,#13306E 60%,#0B1A44);border:3px solid #02040C;box-shadow:inset 0 2px 0 #ffffff44,0 4px 0 #02040C}
+.tq-slot small{color:#fff;text-shadow:0 1.5px 0 #02040C}
+.tq-slot.on{background:linear-gradient(180deg,color-mix(in srgb,var(--sc) 80%,#fff),var(--sc) 50%,color-mix(in srgb,var(--sc) 55%,#02040C));box-shadow:inset 0 2px 0 #ffffff88,0 4px 0 #02040C,0 0 16px color-mix(in srgb,var(--sc) 70%,transparent)}
+.tq-slot.on svg{color:#fff;filter:drop-shadow(0 2px 0 #02040C)}
+.tq-fitname{border-radius:12px;background:linear-gradient(180deg,#2A5AC0,#13306E);border:3px solid #02040C;box-shadow:inset 0 2px 0 #ffffff44,0 4px 0 #02040C;padding:4px 12px}
+.tq-fitname b{-webkit-text-stroke:1px #02040C;text-shadow:0 2px 0 #02040C}
+.tq-fitname span{color:#E6F2FF}
+.tq-hint,.tq-fit{background:linear-gradient(180deg,#13306E,#0B1A44);border:2.5px solid #02040C;box-shadow:inset 0 2px 0 #ffffff33,0 3px 0 #02040C}
+.tq-cat{position:relative;z-index:0;color:#fff;-webkit-text-stroke:1.5px #02040C;text-shadow:0 3px 0 #02040C,0 0 16px color-mix(in srgb,var(--cc) 70%,transparent);font-size:20px}
+.tq-cat svg{color:var(--cc);filter:drop-shadow(0 2px 0 #02040C)}
+.tq-cat small{-webkit-text-stroke:0;text-shadow:0 1.5px 0 #02040C;color:#E6F2FF}
+.tq-coins{border-radius:12px;border:2.5px solid #02040C;background:linear-gradient(180deg,#3A2A0A,#1E1A10);box-shadow:inset 0 0 0 1.5px #FFC53D,0 3px 0 #02040C;color:#fff;-webkit-text-stroke:1px #02040C}
+.tq-coins b{border-radius:8px;background:linear-gradient(180deg,#FFF3A0,#FFC53D);border:2px solid #02040C;-webkit-text-stroke:0}
+.tq-grid .tq-item{outline:3px solid #02040C;outline-offset:-1px;filter:drop-shadow(0 4px 0 #02040C)}
+.tq-iname{text-shadow:0 1.5px 0 #02040C}
+.tq-act{border-radius:16px;background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 45%,#2A5AC0),#13306E 55%,#0B1A44);border:3px solid #02040C;box-shadow:inset 0 2px 0 #ffffff44,0 5px 0 #02040C}
+.tq-selname{-webkit-text-stroke:1px #02040C;text-shadow:0 2px 0 #02040C}
+.tq-btn{height:44px;border-radius:14px;background:linear-gradient(180deg,#FFF3A0,#FFD23D 45%,#FFA800);border:3px solid #02040C;box-shadow:inset 0 3px 0 #ffffffaa,inset 0 -4px 0 #C97800,0 4px 0 #02040C;color:#fff;-webkit-text-stroke:1.5px #02040C;text-shadow:0 3px 0 #02040C;font-size:18px;animation:tqBtn 1.6s ease-in-out infinite}
+@keyframes tqBtn{0%,100%{scale:1}50%{scale:1.05}}
+.tq-btn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 #ffffffaa,inset 0 -4px 0 #C97800,0 1px 0 #02040C}
+.tq-on{border-radius:12px;background:linear-gradient(180deg,#53E0FF,#0EA5C0);border:3px solid #02040C;box-shadow:inset 0 2px 0 #ffffff77,0 3px 0 #02040C;color:#fff;-webkit-text-stroke:1px #02040C;text-shadow:0 2px 0 #02040C}
+.tq-on svg{filter:drop-shadow(0 1.5px 0 #02040C)}
+.tq-how{border-radius:12px;background:linear-gradient(180deg,#B892FF,#7A3FE0);border:3px solid #02040C;box-shadow:inset 0 2px 0 #ffffff66,0 3px 0 #02040C;color:#fff;-webkit-text-stroke:1px #02040C;text-shadow:0 2px 0 #02040C}
+.tq-filters{padding:2px 2px 6px}
+.tq-filters button{border:2.5px solid #02040C!important;box-shadow:0 3px 0 #02040C!important}
+.tq-trying{border:2.5px solid #02040C;box-shadow:0 3px 0 #02040C}
+.tq-cat{letter-spacing:.6px}.tq-fitname b{letter-spacing:.4px}.tq-selname{letter-spacing:.3px}.tq-btn,.tq-on{letter-spacing:.8px}.tq-slot small{letter-spacing:.3px}.tq-fit span{letter-spacing:.5px}.tq-hint{letter-spacing:.8px}
 </style>
 </helmet>
 <div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; background: radial-gradient(120% 100% at 60% 0%, #0A2A6E 0%, #06102E 45%, #02040C 85%); isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -861,7 +890,7 @@ class Component extends DCLogic {
       showPremium: !selOwned && selItem.st === 'premium',
       ...charSel,
       rewardHref: selItem.how === 'rank' ? 'Rangos.dc.html' : selItem.how === 'pass' ? 'Pase.dc.html' : 'Tienda.dc.html',
-      buyStyle: 'display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border: 0; border-radius: 12px; font: 400 16px Titulos, sans-serif; letter-spacing: 1px; cursor: pointer; ' + (canAfford ? 'background: linear-gradient(180deg, #FFE38A, #FFC53D 50%, #D9A520); color: #2A1C02; box-shadow: 0 4px 0 #8A6410, 0 0 14px #FFC53D66;' : 'background: #1E2A4E; color: #6E7FA8; cursor: default;'),
+      buyStyle: 'display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border: 0; border-radius: 12px; font: 400 16px Titulos, sans-serif; letter-spacing: 1px; cursor: pointer; ' + (canAfford ? 'background: linear-gradient(180deg, #FFF3A0, #FFD23D 45%, #FFA800); color: #fff; border: 3px solid #02040C; -webkit-text-stroke: 1.5px #02040C; text-shadow: 0 3px 0 #02040C; box-shadow: inset 0 3px 0 #ffffffaa, inset 0 -4px 0 #C97800, 0 4px 0 #02040C;' : 'background: #1E2A4E; color: #6E7FA8; border: 3px solid #02040C; box-shadow: 0 4px 0 #02040C; cursor: default;'),
       doEquip: () => equipNow(),
       doBuy: () => {
         if (!canAfford) return;

@@ -33,7 +33,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .du-pip.ko::after{content:'×';font:900 13px/1 Exo2,sans-serif;color:#3A0606;margin-top:-1px}
 .du-pip.cur{box-shadow:inset 0 0 0 1.5px var(--yl),0 0 0 2px var(--yc);animation:duPip 1s ease-in-out infinite}
 @keyframes duPip{50%{box-shadow:inset 0 0 0 1.5px #BFE6FF,0 0 0 4px #3DA9FF33}}
-.du-rib{margin-top:5px;padding:2px 14px 1px;transform:skewX(-14deg);background:#02040Cdd;box-shadow:0 0 0 1.5px #1E8BFF66;font-family:'Titulos',sans-serif;font-size:11px;letter-spacing:2px;color:#9FD0FF}
+.du-rib{margin-top:5px;padding:2px 14px 1px;border-radius:6px;background:#02040Cdd;box-shadow:0 0 0 1.5px #1E8BFF66;font-family:'Titulos',sans-serif;font-size:11px;letter-spacing:2px;color:#9FD0FF}
 .du-rib.sd{background:linear-gradient(90deg,#B45309,#FFC53D,#B45309);color:#1A0E00;box-shadow:0 0 14px #FFC53D88;animation:duSd 1.2s ease-in-out infinite}
 @keyframes duSd{50%{filter:brightness(1.25)}}
 .du-back{position:absolute;left:12px;top:10px;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#F4F7FF;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 1.5px #1E8BFF88;z-index:5}
@@ -53,9 +53,9 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 .du-res.save .w{background-image:linear-gradient(180deg,#FFFFFF 0%,var(--rl) 40%,var(--rc) 55%,var(--rd) 100%);filter:drop-shadow(0 6px 0 #02040C) drop-shadow(0 0 24px var(--rc))}
 .du-res.miss .w{background-image:linear-gradient(180deg,#FFFFFF 0%,#D7DCE8 45%,#8D9AB6 55%,#3A4766 100%)}
 @keyframes duRes{from{opacity:0;transform:rotate(-4deg) scale(2.3)}}
-.du-res .s{margin-top:6px;padding:4px 16px 3px;transform:skewX(-14deg);background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 1.5px #1E8BFF;font-family:'Titulos',sans-serif;font-size:15px;letter-spacing:1px;color:#E6F2FF;animation:duIn .4s .2s both}
+.du-res .s{margin-top:6px;padding:4px 16px 3px;border-radius:8px;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 1.5px #1E8BFF;font-family:'Titulos',sans-serif;font-size:15px;letter-spacing:1px;color:#E6F2FF;animation:duIn .4s .2s both}
 .du-flash{position:absolute;left:0;right:0;top:128px;display:flex;justify-content:center;pointer-events:none}
-.du-flash b{padding:4px 22px 3px;transform:skewX(-14deg);background:linear-gradient(180deg,#FFE58A,#FFC53D 50%,#B45309);box-shadow:0 0 0 2px #02040C,0 0 22px #FFC53D;font-family:'Titulos',sans-serif;font-weight:400;font-size:28px;letter-spacing:2px;color:#1A0E00;animation:duRes .45s cubic-bezier(.2,1.6,.4,1) both}
+.du-flash b{padding:4px 22px 3px;border-radius:10px;background:linear-gradient(180deg,#FFE58A,#FFC53D 50%,#B45309);box-shadow:0 0 0 2px #02040C,0 0 22px #FFC53D;font-family:'Titulos',sans-serif;font-weight:400;font-size:28px;letter-spacing:2px;color:#1A0E00;animation:duRes .45s cubic-bezier(.2,1.6,.4,1) both}
 .du-hint{position:absolute;left:0;right:0;display:flex;justify-content:center;pointer-events:none}
 .du-hint span{max-width:520px;padding:6px 16px;border-radius:999px;background:#02040Ccc;box-shadow:0 0 0 1px #1E8BFF55;font-size:12px;font-weight:700;color:#CFE3FF;text-align:center}
 .du-panel{position:absolute;left:12px;bottom:12px;width:286px;padding:9px 11px 10px;border-radius:16px;background:linear-gradient(180deg,#0B1A44ee,#02040Cee);box-shadow:0 0 0 1.5px #1E8BFF66,0 10px 24px #02040C99;display:flex;flex-direction:column;gap:6px}
@@ -193,7 +193,7 @@ a{color:#22D3EE}a:hover{color:#67E8F9}
 
   <sc-if value="{{isFree}}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; left: 12px; top: 62px; display: flex; align-items: center; gap: 6px; z-index: 4">
-      <span style="padding: 4px 12px; transform: skewX(-14deg); background: #02040Ccc; box-shadow: 0 0 0 1.5px #FFC53D88; font-family: 'Titulos', sans-serif; font-size: 12px; letter-spacing: 1px; color: #FFC53D">{{fkLabel}}</span>
+      <span style="padding: 4px 12px; border-radius: 8px; background: #02040Ccc; box-shadow: 0 0 0 1.5px #FFC53D88; font-family: 'Titulos', sans-serif; font-size: 12px; letter-spacing: 1px; color: #FFC53D">{{fkLabel}}</span>
       <sc-if value="{{isPractice}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{nextFK}}" style="height: 30px; padding: 0 12px; border: 0; border-radius: 10px; background: #02040Ccc; box-shadow: 0 0 0 1.5px #1E8BFF66; color: #E6F2FF; font: 800 12px Exo2, sans-serif; cursor: pointer">Cambiar escenario ›</button></sc-if>
     </div>
   </sc-if>

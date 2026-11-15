@@ -15,12 +15,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ARENA MIX">
 <style>
-  /* the game's fonts, bundled so they look the same offline: Luckiest Guy for titles, buttons and numbers, Lilita One for
+  /* the game's fonts, bundled so they look the same offline: Titan One for titles, buttons and numbers, Fredoka for
      everything else. The screens ask for 'Barlow Condensed' (titles) and 'Exo2' (text); both names point at the new
      faces, sized to fit the room the old ones had. */
-  @font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 100 900; font-display: swap; size-adjust: 80%; src: url(vendor/fonts/russoone-latin.woff2) format('woff2'); }
-  @font-face { font-family: 'Exo2'; font-style: normal; font-weight: 100 900; font-display: swap; size-adjust: 96%; src: url(vendor/fonts/lilitaone-latin.woff2) format('woff2'); }
-  @font-face { font-family: 'Titulos'; font-display: swap; size-adjust: 92%; src: url(vendor/fonts/russoone-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 100 900; font-display: swap; size-adjust: 79%; src: url(vendor/fonts/titanone-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Exo2'; font-style: normal; font-weight: 100 900; font-display: swap; size-adjust: 92%; src: url(vendor/fonts/fredoka-700-latin.woff2) format('woff2'); }
+  @font-face { font-family: 'Titulos'; font-display: swap; size-adjust: 90%; src: url(vendor/fonts/titanone-latin.woff2) format('woff2'); }
   @font-face { font-family: 'Luckiest Guy'; font-display: swap; src: url(vendor/fonts/luckiestguy-latin.woff2) format('woff2'); }
   @font-face { font-family: 'Lilita One'; font-display: swap; src: url(vendor/fonts/lilitaone-latin.woff2) format('woff2'); }
   @font-face { font-family: 'Rajdhani'; font-weight: 500; src: url(vendor/fonts/rajdhani-500.woff2) format('woff2'); font-display: swap; }
@@ -28,6 +28,8 @@
   @font-face { font-family: 'Rajdhani'; font-weight: 700; src: url(vendor/fonts/rajdhani-700.woff2) format('woff2'); font-display: swap; }
   /* no slanted (fake italic) lettering anywhere */
   html, body, #stage * { font-synthesis-style: none; }
+  /* and nothing drawn in italics: every text stands upright */
+  body *, body *::before, body *::after { font-style: normal !important; }
   /* Luckiest Guy draws lowercase as small capitals: whatever uses the title face is shown in capitals */
   [style*="Barlow Condensed"], [font-family*="Barlow"], .bc-title, .bc-btn, .bc-btn-gold, .hm-pass-lv b, .st-plus1, #am-res .t, #am-res .sc, #am-res .lv, #am-res .lvup, #am-res .go, #am-res .cn b, #am-rw .it b, #am-rw .ok, #am-rw .tap { text-transform: uppercase; }
   html, body { margin: 0; height: 100%; background: #000000; overflow: hidden; overscroll-behavior: none; touch-action: none; -webkit-tap-highlight-color: transparent; }
@@ -58,7 +60,7 @@
   /* the live percentage in the medallion, over the picture's own number */
   /* the percentage, just above the bar */
   /* the percentage: a little plate of its own at the bar's right end, chrome figures like the title */
-  #loading .pct { position: absolute; left: calc(50% + min(25vw, 48vh) + max(1.6vw, 3vh)); bottom: calc(12% - max(.55vw, 1vh)); min-width: 3.4em; padding: .12em .5em; text-align: center; transform: skewX(-16deg); background: linear-gradient(180deg, #0A1A4A, #02040C); box-shadow: 0 0 0 3px #02040C, 0 0 0 5px #1E8BFF, 0 0 18px rgba(30,139,255,.6); color: #F4F7FF; font-family: 'Titulos', sans-serif; font-size: max(1.5vw, 2.8vh); line-height: 1.15; letter-spacing: .03em; text-shadow: 0 2px 0 #02040C, 0 0 10px #3DA9FF; z-index: 1; }
+  #loading .pct { position: absolute; left: calc(50% + min(25vw, 48vh) + max(1.6vw, 3vh)); bottom: calc(12% - max(.55vw, 1vh)); min-width: 3.4em; padding: .12em .5em; text-align: center; border-radius: .3em; background: linear-gradient(180deg, #0A1A4A, #02040C); box-shadow: 0 0 0 3px #02040C, 0 0 0 5px #1E8BFF, 0 0 18px rgba(30,139,255,.6); color: #F4F7FF; font-family: 'Titulos', sans-serif; font-size: max(1.5vw, 2.8vh); line-height: 1.15; letter-spacing: .03em; text-shadow: 0 2px 0 #02040C, 0 0 10px #3DA9FF; z-index: 1; }
   #rotate { display: none; position: fixed; inset: 0; z-index: 10; background: #0B0B14; color: #F4F4FA; align-items: center; justify-content: center; flex-direction: column; gap: 14px; font: 700 16px Exo2, system-ui, sans-serif; text-align: center; padding: 24px; }
   body.portrait #rotate { display: flex; }
   #rotate svg { animation: turn 1.6s ease-in-out infinite; }

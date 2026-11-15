@@ -12,7 +12,7 @@
 <style>
 
 /* ---- match HUD: glossy controls, glass panels and broadcast type, in your team's colour ---- */
-.pd-mode{position:absolute;left:12px;top:3px;padding:3px 12px 2px;transform:skewX(-14deg);font:400 10px 'Titulos',sans-serif;letter-spacing:2px;white-space:nowrap;color:#02040C;box-shadow:0 0 12px #0008}
+.pd-mode{position:absolute;left:12px;top:3px;padding:3px 12px 2px;border-radius:6px;font:400 10px 'Titulos',sans-serif;letter-spacing:2px;white-space:nowrap;color:#02040C;box-shadow:0 0 12px #0008}
 .pd-meters{position:absolute;left:10px;top:44px;width:118px;padding:6px 9px 7px;box-sizing:border-box;border-radius:12px;background:linear-gradient(180deg,#0B1A44d9,#02040Cd9);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--hc) 55%,transparent),0 6px 14px #0007;display:flex;flex-direction:column;gap:3px;pointer-events:none}
 .pd-meters b{display:flex;justify-content:space-between;font:400 9px 'Titulos',sans-serif;letter-spacing:1.5px;color:#9FC3F0}
 .pd-bar{height:7px;border-radius:4px;background:#02040C;box-shadow:inset 0 0 0 1px #24407E;overflow:hidden}
@@ -21,7 +21,7 @@
 .pd-orders small{font:400 9px 'Titulos',sans-serif;letter-spacing:1.5px;color:#9FC3F0}
 .pd-orders button{pointer-events:auto;height:30px;padding:0 13px;border-radius:15px;border:0;background:linear-gradient(180deg,#0B1A44e6,#02040Ce6);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--hc) 60%,transparent);color:#E6F2FF;font:400 12px 'Titulos',sans-serif;letter-spacing:.5px;cursor:pointer;touch-action:none}
 .pd-orders button:active{background:var(--hc);color:#02040C}
-.pd-flash{padding:4px 16px 3px;transform:skewX(-14deg);background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 1.5px #FFC53D;font:400 14px 'Titulos',sans-serif;letter-spacing:1px;color:#FFD772}
+.pd-flash{padding:4px 16px 3px;border-radius:8px;background:linear-gradient(180deg,#0B1A44,#02040C);box-shadow:0 0 0 1.5px #FFC53D;font:400 14px 'Titulos',sans-serif;letter-spacing:1px;color:#FFD772}
 .pd-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 34px 22px;border-radius:22px;background:linear-gradient(180deg,#0B1A44f2,#02040Cf2);box-shadow:0 0 0 2px var(--hc),0 0 40px color-mix(in srgb,var(--hc) 55%,transparent)}
 .pd-card .k{font:400 12px 'Titulos',sans-serif;letter-spacing:3px;color:#9FC3F0}
 .pd-card .t{font-family:'Titulos',sans-serif;font-size:38px;line-height:1.05;text-align:center;background:linear-gradient(180deg,#FFFFFF,#DCEBFF 45%,var(--hc) 60%,#02040C 140%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #02040C)}
@@ -49,7 +49,7 @@
 @keyframes pgLetter{0%{opacity:0;transform:translateY(-160px) scale(2.2) rotate(-14deg)}60%{opacity:1}100%{opacity:1;transform:none}}
 .pg-sub{position:absolute;left:0;right:0;top:50%;margin-top:84px;display:flex;justify-content:center;align-items:center;gap:12px;animation:pgSub .45s .55s cubic-bezier(.2,1.5,.4,1) both}
 @keyframes pgSub{from{opacity:0;transform:translateY(24px) scale(.8)}}
-.pg-who,.pg-score{display:inline-block;transform:skewX(-14deg);padding:5px 16px 4px;font-family:'Titulos',sans-serif;font-size:20px;letter-spacing:1px;color:#F4F7FF;background:linear-gradient(180deg,#0A1A4A,#02040C);box-shadow:0 0 0 2.5px #02040C,0 0 0 4.5px var(--c1),0 0 18px color-mix(in srgb,var(--c1) 60%,transparent);text-shadow:0 2px 0 #02040C}
+.pg-who,.pg-score{display:inline-block;border-radius:8px;padding:5px 16px 4px;font-family:'Titulos',sans-serif;font-size:20px;letter-spacing:1px;color:#F4F7FF;background:linear-gradient(180deg,#0A1A4A,#02040C);box-shadow:0 0 0 2.5px #02040C,0 0 0 4.5px var(--c1),0 0 18px color-mix(in srgb,var(--c1) 60%,transparent);text-shadow:0 2px 0 #02040C}
 .pg-score{font-size:24px;padding:3px 14px 2px;background:linear-gradient(180deg,var(--c2),var(--cd))}
 .pg-sp{position:absolute;left:50%;top:50%;width:26px;height:4px;margin:-2px 0 0 -13px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--c3),#FFFFFF);box-shadow:0 0 8px var(--c2);opacity:0;transform:rotate(var(--a)) translateX(20px);animation:pgSp .7s .1s ease-out both}
 @keyframes pgSp{0%{opacity:1;transform:rotate(var(--a)) translateX(20px) scaleX(.4)}70%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) scaleX(1.4)}}
