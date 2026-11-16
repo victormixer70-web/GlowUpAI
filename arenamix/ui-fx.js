@@ -551,7 +551,7 @@
   new MutationObserver(function () { var r = rootOf(); if (r) enter(r); }).observe(stage, { childList: true });
 
   // the backgrounds, decoded once and kept: no blank frame while a big photo is decoded again on each screen change
-  window.__amBgs = ['assets/bg_estadio.jpg', 'assets/bg_tribuna.jpg', 'assets/bg_trofeos.jpg', 'assets/lobby_bg.jpg'].map(function (u) { var im = new Image(); im.src = u; if (im.decode) im.decode().catch(function () {}); return im; });
+  window.__amBgs = ['assets/bg_estadio.jpg', 'assets/bg_tribuna.jpg', 'assets/bg_trofeos.jpg', 'assets/lobby_bg.jpg?v=10'].map(function (u) { var im = new Image(); im.src = u; if (im.decode) im.decode().catch(function () {}); return im; });
 
   // the coin and gem icons of the menus (flat drawings) get the 3D coin and gem: drawn once, used as the
   // background of those little svgs (their own shapes hidden), so the screens themselves don't change

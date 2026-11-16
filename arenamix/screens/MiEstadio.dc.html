@@ -309,7 +309,7 @@ class Component extends DCLogic {
     const near = B.half.clone(); near.scale.z = -1;
     G.add(B.half); G.add(near); G.add(B.whole);
     // a full house: a fan on most seats, facing the pitch, in the stadium's colours
-    const all = B.seats.concat(B.seats.map(([x, y, z]) => [x, y, -z])).filter((q, i) => ((i * 7919) % 100) < 80), n = all.length;
+    const all = B.seats.concat(B.seats.map(([x, y, z]) => [x, y, -z])).filter((q, i) => ((i * 7919) % 100) < (window.__meFull ? 100 : 80)), n = all.length;
     const body = new T.InstancedMesh(new T.CylinderGeometry(0.2, 0.25, 0.62, 6), new T.MeshStandardMaterial({ roughness: 0.85 }), n);
     const head = new T.InstancedMesh(new T.SphereGeometry(0.15, 8, 6), new T.MeshStandardMaterial({ roughness: 0.7 }), n);
     const M4 = new T.Matrix4(), q4 = new T.Quaternion(), upv = new T.Vector3(0, 1, 0), one = new T.Vector3(1, 1, 1), SK = ['#F1C7A5', '#D9A47E', '#A8714E', '#6E4630', '#F5D6BC'], PC = [c.c1, c.c2, c.c1, '#F4F4FA', '#1B2236', c.c2];
