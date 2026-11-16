@@ -76,6 +76,32 @@ input::placeholder{color:#8FA8CC}
 .md-card .md-rays2{position:absolute;left:-50%;top:-60%;width:200%;height:200%;-webkit-mask-image:radial-gradient(closest-side,#000 20%,transparent 75%);mask-image:radial-gradient(closest-side,#000 20%,transparent 75%);pointer-events:none}
 .md-card .md-dotsx{position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.16) 1.2px,transparent 1.8px) 0 0/10px 10px;-webkit-mask-image:linear-gradient(200deg,#000 0%,transparent 55%);mask-image:linear-gradient(200deg,#000 0%,transparent 55%);pointer-events:none}
 .md-card .md-glint{position:absolute;left:0;right:0;top:0;height:42%;border-radius:18px 18px 0 0;background:linear-gradient(180deg,rgba(255,255,255,.16),transparent);pointer-events:none}
+
+/* ---- the detail panel: the chosen mode, large ---- */
+.md-det{position:absolute;left:578px;right:12px;top:60px;bottom:12px;z-index:4;display:flex;flex-direction:column;gap:6px;padding:8px;box-sizing:border-box;border-radius:18px;border:3px solid #02040C;background:linear-gradient(180deg,color-mix(in srgb,var(--dc) 30%,#13306E),#0B1A44 45%,#06102E);box-shadow:inset 0 3px 0 #ffffff33,0 5px 0 #02040C,0 14px 28px #000a;animation:mdDet .35s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes mdDet{from{opacity:0;transform:translateX(16px)}}
+.md-det>*{flex:none}
+.md-dpic{position:relative;flex:none;height:92px;border-radius:12px;overflow:hidden;border:2.5px solid #02040C}
+.md-dpic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:mdZoom 8s ease-in-out infinite alternate}
+@keyframes mdZoom{to{transform:scale(1.08)}}
+.md-dfade{position:absolute;left:0;right:0;bottom:0;height:60%;background:linear-gradient(180deg,transparent,#02040CE6)}
+.md-dtag{position:absolute;left:7px;top:7px;padding:3px 9px;border-radius:9px;border:2px solid #02040C;background:var(--dc);color:#040A1C;font:400 9.5px Titulos,sans-serif;letter-spacing:.6px}
+.md-drib{position:absolute;right:7px;top:7px;padding:3px 9px;border-radius:9px;border:2px solid #02040C;color:#fff;font:400 9.5px Titulos,sans-serif;letter-spacing:.6px;-webkit-text-stroke:2px #02040C;paint-order:stroke fill}
+.md-dtitle{position:absolute;left:10px;right:8px;bottom:6px;font:400 26px/1 Titulos,sans-serif;letter-spacing:.5px;color:#fff;-webkit-text-stroke:4px #02040C;paint-order:stroke fill;text-shadow:0 3px 0 #02040C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.md-dkick{font:400 10px Titulos,sans-serif;letter-spacing:1.2px;color:var(--dc);text-shadow:0 2px 0 #02040C}
+.md-ddesc{margin:0;font:700 11px/1.35 Exo2,sans-serif;color:#DCE8FF;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.md-chips{display:flex;flex-wrap:wrap;gap:5px}
+.md-chip{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:8px;border:2px solid #02040C;background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 45%,#13306E),#0B1A44);color:#fff;font:700 10px Exo2,sans-serif;white-space:nowrap}
+.md-chip svg{color:var(--cc)}
+.md-rank{display:flex;flex-direction:column;gap:3px;padding:6px 8px;border-radius:10px;border:2px solid #02040C;background:#02040C66;text-decoration:none;color:#fff}
+.md-rk1{display:flex;align-items:baseline;justify-content:space-between;gap:6px}.md-rk1 b{font:400 14px Titulos,sans-serif;text-shadow:0 2px 0 #02040C}.md-rk1 small{font:700 10px Exo2,sans-serif;color:#BFD3F5}
+.md-rbar{height:8px;border-radius:5px;border:2px solid #02040C;background:#02040C;overflow:hidden}.md-rbar i{display:block;height:100%!important;border-radius:3px}
+.md-rk2{font:700 9.5px Exo2,sans-serif;color:#9FC3F0}
+.md-diff{display:flex;flex-direction:column;gap:4px}
+.md-diff>span{font:400 9.5px Titulos,sans-serif;letter-spacing:1px;color:#BFD3F5}
+.md-diff>div{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.md-diff button{height:20px!important;padding:0!important;border-radius:8px!important;border:2px solid #02040C!important;font:400 9.5px Titulos,sans-serif!important;letter-spacing:.4px!important}
+.md-play{flex:none;display:flex;align-items:center;justify-content:center;gap:10px;height:50px;padding:0 14px;text-decoration:none;font-size:21px;white-space:nowrap}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -113,7 +139,7 @@ input::placeholder{color:#8FA8CC}
   </div>
 
   <!-- every mode at once, in a grid of cards: tap one to choose it -->
-  <div key="{{listKey}}" style="position: absolute; left: 96px; right: 14px; top: 58px; height: 256px; z-index: 1">
+  <div key="{{listKey}}" style="position: absolute; left: 96px; top: 60px; width: 470px; height: 316px; z-index: 1">
     <sc-for list="{{cards}}" as="m" hint-placeholder-count="6">
       <button type="button" onClick="{{m.pick}}" aria-label="{{m.aria}}" aria-pressed="{{m.on}}" class="md-card" style="{{m.style}}">
         <span style="{{m.bg}}"></span>
@@ -128,27 +154,33 @@ input::placeholder{color:#8FA8CC}
     </sc-for>
   </div>
 
-  <!-- what you picked, in one line, and the big button -->
-  <div style="position: absolute; left: 96px; right: 14px; bottom: 12px; height: 54px; display: flex; align-items: center; gap: 14px; z-index: 4">
-    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
-      <span style="font-size: 12px; font-weight: 600; color: #CACAE0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{selDesc}}</span>
-      <sc-if value="{{showRank}}" hint-placeholder-val="{{ true }}">
-        <a href="Rangos.dc.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #F4F4FA">
-          <span style="font-size: 11px; font-weight: 800; color: {{rankColor}}; white-space: nowrap">{{rankLabel}}</span>
-          <span class="bc-para" style="flex: 0 1 160px; height: 6px; background: #39206E"><span class="am-bar-shine" style="display: block; {{rankBar}}"></span></span>
-          <span style="font-size: 10px; font-weight: 700; color: #A9BEDD; white-space: nowrap">{{mmrLabel}} · {{seasonLabel}}</span>
-        </a>
-      </sc-if>
-      <sc-if value="{{showDiff}}" hint-placeholder-val="{{ false }}">
-        <div role="radiogroup" aria-label="Dificultad de la IA" style="display: flex; align-items: center; gap: 6px">
-          <span style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #A9BEDD">IA</span>
-          <sc-for list="{{diffs}}" as="d" hint-placeholder-count="3">
-            <button type="button" role="radio" aria-checked="{{d.on}}" onClick="{{d.pick}}" style="{{d.style}}">{{d.label}}</button>
-          </sc-for>
-        </div>
-      </sc-if>
+  <!-- the mode you picked, large: its picture, what it is, what is at stake, and the big button -->
+  <div class="md-det" key="{{detKey}}" style="--dc: {{detC}}">
+    <div class="md-dpic" style="{{detBg}}">
+      <img src="{{detImg}}" alt="" draggable="false" style="{{detImgStyle}}">
+      <span class="md-dfade"></span>
+      <span class="md-dtag">{{detTag}}</span>
+      <sc-if value="{{detHasRib}}" hint-placeholder-val="{{ false }}"><span class="md-drib" style="background: {{detRibC}}">{{detRib}}</span></sc-if>
+      <b class="md-dtitle">{{detTitle}}</b>
     </div>
-    <a href="{{playHref}}" onClick="{{saveSel}}" class="bc-btn am-shine am-logo-btn" style="flex: none; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 30px 0 24px; text-decoration: none; font-size: 26px; white-space: nowrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="#040A1C"><path d="M6 3l15 9l-15 9z"/></svg>{{playLabel}}</a>
+    <span class="md-dkick">{{detKicker}}</span>
+    <p class="md-ddesc">{{selDesc}}</p>
+    <div class="md-chips"><sc-for list="{{detChips}}" as="c" hint-placeholder-count="3"><span class="md-chip" style="--cc: {{c.c}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{c.icon}}"/></svg>{{c.label}}</span></sc-for></div>
+    <sc-if value="{{showRank}}" hint-placeholder-val="{{ true }}">
+      <a href="Rangos.dc.html" class="md-rank">
+        <span class="md-rk1"><b style="color: {{rankColor}}">{{rankLabel}}</b><small>{{mmrLabel}}</small></span>
+        <span class="md-rbar"><i style="{{rankBar}}"></i></span>
+        <small class="md-rk2">{{seasonLabel}}</small>
+      </a>
+    </sc-if>
+    <sc-if value="{{showDiff}}" hint-placeholder-val="{{ false }}">
+      <div role="radiogroup" aria-label="Dificultad de la IA" class="md-diff">
+        <span>RIVAL IA</span>
+        <div><sc-for list="{{diffs}}" as="d" hint-placeholder-count="4"><button type="button" role="radio" aria-checked="{{d.on}}" onClick="{{d.pick}}" style="{{d.style}}">{{d.label}}</button></sc-for></div>
+      </div>
+    </sc-if>
+    <span style="flex: 1"></span>
+    <a href="{{playHref}}" onClick="{{saveSel}}" class="bc-btn am-shine am-logo-btn md-play"><svg width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M6 3l15 9l-15 9z"/></svg>{{playLabel}}</a>
   </div>
 </div>
 </x-dc>
@@ -291,9 +323,11 @@ class Component extends DCLogic {
       const tag = comp ? (placingOf(m) ? 'CLASIF. ' + this.placeOf(S, s.sport + ':' + m.id).g + '/5' : R.label.toUpperCase()) : s.cat === 'casual' ? (m.kind === 'private' ? 'CON AMIGOS' : 'SIN RANGO') : s.cat === 'tour' ? 'CONTRA LA IA' : 'LIBRE';
       const img = P ? P.get(this.posterKey(m), () => this.forceUpdate()) : '';
       // the grid: up to 4 per row, the cards filling the space
-      const cols = list.length <= 3 ? list.length : list.length <= 4 ? 2 : 4, rows = Math.ceil(list.length / cols);
-      const GW = 734, GH = 256, gap = 10, cw = (GW - (cols - 1) * gap) / cols, ch = (GH - (rows - 1) * gap) / rows;
-      const cx = (i % cols) * (cw + gap), cy = Math.floor(i / cols) * (ch + gap);
+      const cols = list.length <= 3 ? list.length : list.length <= 4 ? 2 : 3, rows = Math.ceil(list.length / cols);
+      const GW = 470, GH = 316, gap = 9, ch = (GH - (rows - 1) * gap) / rows;
+      // the last row, when it is short, spreads its cards over the whole width
+      const row = Math.floor(i / cols), inRow = row === rows - 1 ? list.length - row * cols : cols;
+      const cw = (GW - (inRow - 1) * gap) / inRow, cx = (i % cols) * (cw + gap), cy = row * (ch + gap);
       const big = rows === 1;
       // every mode its own colours: [glow, accent, top, bottom]
       const PAL = { m1: ['#22D3EE', '#3B82F6', '#1E3A8A', '#0B1030'], m2: ['#4ADE80', '#14B8A6', '#065F46', '#04201A'], m3: ['#FB923C', '#EF4444', '#7C2D12', '#250A06'], m4: ['#F472B6', '#A855F7', '#701A75', '#22062A'],
@@ -313,11 +347,22 @@ class Component extends DCLogic {
         rayStyle: 'background: repeating-conic-gradient(from 0deg at 50% 40%, ' + pal[0] + '40 0 7deg, transparent 7deg 18deg);',
         imgStyle: 'opacity: ' + (img ? 1 : 0) + ';',
         tagStyle: 'position: absolute; left: 10px; top: 10px; padding: 3px 9px; border-radius: 9px; background: ' + (on ? CAT[0] : '#0B1A44CC') + '; color: ' + (on ? '#040A1C' : '#CACAE0') + '; font: 800 9.5px Exo2, sans-serif; letter-spacing: 1px; white-space: nowrap;',
-        titleStyle: 'position: absolute; left: 12px; right: 10px; bottom: ' + (big ? 34 : 24) + 'px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + (big ? (title.length > 12 ? 34 : title.length > 7 ? 42 : 60) : (title.length > 12 ? 19 : title.length > 7 ? 23 : 34)) + 'px; line-height: .92; letter-spacing: -.5px; text-align: left; color: #F4F4FA; text-shadow: 0 3px 0 #0F061E, 0 0 18px ' + (on ? CAT[0] + '88' : 'transparent') + ';',
+        titleStyle: 'position: absolute; left: 12px; right: 10px; bottom: ' + (big ? 34 : 24) + 'px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + Math.round(Math.min(big ? 60 : 34, (cw - 22) / Math.max(4, Math.min(title.length, title.indexOf(' ') > 0 && title.length > 9 ? Math.max(...title.split(' ').map((w) => w.length)) : title.length)) * 1.45)) + 'px; line-height: .92; letter-spacing: -.5px; text-align: left; color: #F4F4FA; text-shadow: 0 3px 0 #0F061E, 0 0 18px ' + (on ? CAT[0] + '88' : 'transparent') + ';',
         kickStyle: 'position: absolute; left: 13px; right: 8px; bottom: ' + (big ? 14 : 9) + 'px; font-size: ' + (big ? 10 : 8.5) + 'px; font-weight: 800; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; color: ' + (on ? CAT[0] : '#A9BEDD') + ';',
-        pick: () => { if (!on) this.setState({ id: m.id }); }
+        pick: () => { if (!on) this.setState({ id: m.id }); },
+        // for the detail panel
+        pal, mode: m
       };
     });
+    // the detail panel: the chosen mode's picture, colours and what is at stake
+    const dc = cards[ci] || null, dm = cur || {};
+    const ICO = { users: 'M9 11a4 4 0 1 0 0-8a4 4 0 0 0 0 8M2 21v-1a6 6 0 0 1 12 0v1M17 11a3 3 0 1 0 0-6M18 15a5 5 0 0 1 4 5v1', clock: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18M12 7v5l3 2', coin: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18M9 9h4.5a1.5 1.5 0 0 1 0 3H10.5a1.5 1.5 0 0 0 0 3H15', trophy: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z', star: 'M12 3l2.7 5.6l6.1.9l-4.4 4.3l1 6.1L12 17l-5.4 2.9l1-6.1l-4.4-4.3l6.1-.9z', wifi: 'M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0M12 19h.01', ball: 'M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18M12 7l4 3l-1.5 4.5h-5L8 10z' };
+    const chip = (icon, label, c) => ({ icon: ICO[icon], label, c });
+    const detChips = !cur ? [] : dm.kind === 'team' ? [chip('users', 'Con porteros', '#22D3EE'), chip('clock', comp ? '2:00' : '1:30', '#A78BFA'), chip('coin', '+60 VCD', '#FFC53D')]
+      : dm.kind === 'duel' ? [chip('ball', dm.duel === 'pen' ? '5 tiros' : '5 rondas', '#53D88E'), chip('users', 'Cara a cara', '#22D3EE'), chip('coin', '+60 VCD', '#FFC53D')]
+      : dm.kind === 'private' ? [chip('wifi', 'Online', '#22D3EE'), chip('users', 'Hasta 4 VS 4', '#53D88E')]
+      : s.cat === 'tour' ? [chip('trophy', dm.id === 'retos' ? 'Cada día' : dm.id === 'evento' ? 'Fin de semana' : dm.id === 'carrera' ? 'Temporadas' : 'Eliminatorias', '#A78BFA'), chip('star', 'Premios', '#FFC53D')]
+      : [chip('ball', 'Sin reloj', '#53D88E'), chip('star', 'Sin presión', '#22D3EE')];
     const mmr = cur && comp ? this.mmrOf(s.sport, cur.id) : 0, R = this.rankOf(mmr);
     const curPlacing = cur && comp && placingOf(cur), curPc = cur ? this.placeOf(S, s.sport + ':' + cur.id) : null;
     const ti = ['comp', 'casual', 'tour', 'train'].indexOf(s.cat);
@@ -343,6 +388,11 @@ class Component extends DCLogic {
       thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 108) + 'px; width: 108px; height: 32px; border-radius: 11px; background: ' + TABS[ti].color + '; box-shadow: 0 0 16px ' + TABS[ti].color + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s, box-shadow .3s;',
       spot: 'position: absolute; left: 50%; top: 150px; width: 380px; height: 150px; margin-left: -190px; border-radius: 50%; background: radial-gradient(closest-side, ' + CAT[0] + '33, transparent); pointer-events: none;',
       cards,
+      detKey: s.cat + ':' + (cur ? cur.id : ''), detC: CAT[0],
+      detBg: dc ? 'background: radial-gradient(70% 70% at 50% 35%, ' + dc.pal[0] + 'CC, transparent 70%), linear-gradient(165deg, ' + dc.pal[2] + ', ' + dc.pal[3] + ');' : '',
+      detImg: dc ? dc.img : '', detImgStyle: 'opacity: ' + (dc && dc.img ? 1 : 0) + ';',
+      detTag: dc ? dc.tag : '', detHasRib: !!(dc && dc.hasRib), detRib: dc ? dc.rib : '', detRibC: dc ? dc.ribC : '',
+      detTitle: dc ? dc.title : '', detKicker: dc ? dc.kicker : '', detChips,
       bgVars: '--c: ' + CAT[0] + ';',
       bgComp: comp || s.cat === 'tour', bgCasual: s.cat === 'casual', bgTrain: s.cat === 'train',
       bgWord: (() => { const w = { comp: 'COMPETITIVO', casual: 'INFORMAL', tour: 'TORNEOS', train: 'ENTRENAMIENTO' }[s.cat] + ' · '; return w.repeat(4) + w.repeat(4); })(),
