@@ -102,6 +102,47 @@ input::placeholder{color:#8FA8CC}
 .md-diff>div{display:grid;grid-template-columns:1fr 1fr;gap:4px}
 .md-diff button{height:20px!important;padding:0!important;border-radius:8px!important;border:2px solid #02040C!important;font:400 9.5px Titulos,sans-serif!important;letter-spacing:.4px!important}
 .md-play{flex:none;display:flex;align-items:center;justify-content:center;gap:10px;height:50px;padding:0 14px;text-decoration:none;font-size:21px;white-space:nowrap}
+
+/* ---- the modes, as a carousel of posters over the chosen mode's own picture ---- */
+.md-bg{display:none}
+.mx-bg{position:absolute;inset:-30px;background-size:cover;background-position:center 40%;filter:blur(10px) saturate(1.35) brightness(.95);transform:scale(1.08);animation:mxBg .6s ease both;z-index:0}
+@keyframes mxBg{from{opacity:0;transform:scale(1.18)}}
+.mx-tint{position:absolute;inset:0;z-index:0;background:radial-gradient(60% 70% at 62% 45%,color-mix(in srgb,var(--dc) 22%,transparent),transparent 70%),linear-gradient(90deg,#02040CE6 0%,#02040C99 26%,#02040C22 55%,#02040C77 100%),linear-gradient(0deg,#02040CDD 0%,transparent 36%);transition:background .4s}
+.mx-cats{position:absolute;left:92px;top:58px;width:148px;display:flex;flex-direction:column;gap:7px;z-index:4}
+.mx-cat{display:flex;align-items:center;gap:8px;height:52px;padding:0 8px;border:3px solid #02040C;border-radius:14px;cursor:pointer;text-align:left;color:#fff;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.mx-cat .ic{flex:none;width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:2px solid #02040C;background:#02040C55}
+.mx-cat .tx{display:flex;flex-direction:column;min-width:0}
+.mx-cat b{font:400 12px Titulos,sans-serif;letter-spacing:.4px;-webkit-text-stroke:2.5px #02040C;paint-order:stroke fill}
+.mx-cat small{font:700 9.5px Exo2,sans-serif;opacity:.85}
+.mx-cat[aria-selected="true"]{transform:translateX(8px) scale(1.04)}
+.mx-cat:active{transform:scale(.96)}
+.mx-car{position:absolute;left:248px;right:10px;top:46px;height:250px;z-index:2;perspective:900px;touch-action:pan-y}
+.mx-card{position:absolute;left:50%;top:6px;width:168px;height:224px;margin-left:-84px;padding:0;border:3px solid #02040C;border-radius:18px;background:#0B1A44;cursor:pointer;overflow:hidden;transition:transform .45s cubic-bezier(.25,1.2,.4,1),opacity .35s,filter .35s;box-shadow:0 6px 0 #02040C,0 18px 30px #000c}
+.mx-card[aria-pressed="true"]{box-shadow:0 0 0 3px var(--cc,#fff),0 6px 0 #02040C,0 0 36px var(--cc,#fff),0 18px 30px #000c}
+.mx-art{position:absolute;inset:0}
+.mx-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mx-fade{position:absolute;left:0;right:0;bottom:0;height:55%}
+.mx-tag{position:absolute;left:8px;top:8px;padding:3px 8px;border-radius:8px;border:2px solid #02040C;background:#0B1A44E6;color:#fff;font:400 9px Titulos,sans-serif;letter-spacing:.5px}
+.mx-rib{position:absolute;right:8px;top:8px;padding:3px 8px;border-radius:8px;border:2px solid #02040C;color:#fff;font:400 9px Titulos,sans-serif;letter-spacing:.5px;-webkit-text-stroke:2px #02040C;paint-order:stroke fill}
+.mx-ct{position:absolute;left:10px;right:8px;bottom:10px;font:400 22px/1 Titulos,sans-serif;color:#fff;text-align:left;-webkit-text-stroke:4px #02040C;paint-order:stroke fill;text-shadow:0 3px 0 #02040C}
+.mx-arr{position:absolute;top:96px;width:38px;height:44px;border:3px solid #02040C;border-radius:12px;background:linear-gradient(180deg,#3DA9FF,#0A3DCC);color:#fff;box-shadow:inset 0 2px 0 #ffffff77,0 4px 0 #02040C;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:30}
+.mx-arr.l{left:4px}.mx-arr.r{right:4px}
+.mx-arr:active{transform:translateY(3px)}
+.mx-dots{position:absolute;left:0;right:0;bottom:-6px;display:flex;justify-content:center;gap:5px}
+.mx-dots i{width:8px;height:8px;border-radius:5px;border:2px solid #02040C;background:#ffffff55;transition:width .3s,background .3s}
+.mx-info{position:absolute;left:250px;right:236px;bottom:12px;z-index:4;display:flex;flex-direction:column;gap:3px;animation:mxIn .4s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes mxIn{from{opacity:0;transform:translateY(10px)}}
+.mx-kick{font:400 10px Titulos,sans-serif;letter-spacing:1.4px;color:var(--dc);text-shadow:0 2px 0 #02040C}
+.mx-name{font:400 32px/1 Titulos,sans-serif;letter-spacing:.5px;color:#fff;-webkit-text-stroke:5px #02040C;paint-order:stroke fill;text-shadow:0 4px 0 #02040C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mx-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.mx-chip{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:8px;border:2px solid #02040C;background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 45%,#13306E),#0B1A44);color:#fff;font:700 10px Exo2,sans-serif;white-space:nowrap;text-decoration:none}
+.mx-chip svg{color:var(--cc)}
+.mx-rank b{font:400 10.5px Titulos,sans-serif;color:var(--cc);margin-right:3px}
+.mx-go{position:absolute;right:12px;bottom:12px;width:214px;z-index:4;display:flex;flex-direction:column;align-items:stretch;gap:6px}
+.mx-diff{display:flex;align-items:center;gap:3px}
+.mx-diff>span{font:400 9.5px Titulos,sans-serif;color:#BFD3F5;margin-right:2px}
+.mx-diff button{flex:1;height:22px!important;padding:0!important;border-radius:8px!important;border:2px solid #02040C!important;font:400 9px Titulos,sans-serif!important;letter-spacing:.3px!important}
+.mx-play{display:flex;align-items:center;justify-content:center;gap:10px;height:54px;text-decoration:none;font-size:22px;white-space:nowrap}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; box-sizing: border-box; color: #F4F4FA; font-family: Exo2, sans-serif; overflow: hidden">
@@ -125,62 +166,48 @@ input::placeholder{color:#8FA8CC}
     <div class="md-vig"></div>
   </div>
   <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 80px; height: 390px; z-index: 3"><dc-import name="Nav" active="jugar" hint-size="80px,390px"></dc-import></div>
-  <!-- header: back, title, the three kinds of play -->
-  <div style="position: absolute; left: 96px; right: 12px; top: 10px; height: 40px; display: flex; align-items: center; gap: 10px; z-index: 4">
-    <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 44px; height: 36px; display: flex; align-items: center; justify-content: center; background: #0B1A44; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
-    <h1 class="bc-title hd" style="font-size: 23px; white-space: nowrap">¿A QUÉ JUGAMOS?</h1>
-    <span style="flex: 1"></span>
-    <div role="tablist" aria-label="Tipo de partida" style="position: relative; display: flex; gap: 0; padding: 3px; border-radius: 14px; background: #040A1CCC; border: 1px solid #2E2E58">
-      <span aria-hidden="true" style="{{thumbStyle}}"></span>
-      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
-        <button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" style="{{t.style}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{t.icon}}"/></svg>{{t.label}}</button>
-      </sc-for>
-    </div>
+  <!-- the whole screen is the chosen mode: its picture, blown up and tinted -->
+  <div class="mx-bg" key="{{detKey}}" style="{{mxBg}}"></div>
+  <div class="mx-tint" style="--dc: {{detC}}"></div>
+  <!-- header: back and title -->
+  <div style="position: absolute; left: 92px; top: 10px; display: flex; align-items: center; gap: 8px; z-index: 4">
+    <a href="Deportes.dc.html" aria-label="Volver" class="bc-para" style="flex: none; width: 42px; height: 36px; display: flex; align-items: center; justify-content: center; background: #0B1A44; color: #F4F4FA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></a>
+    <h1 class="bc-title hd" style="font-size: 20px; white-space: nowrap">¿A QUÉ JUGAMOS?</h1>
   </div>
-
-  <!-- every mode at once, in a grid of cards: tap one to choose it -->
-  <div key="{{listKey}}" style="position: absolute; left: 96px; top: 60px; width: 470px; height: 316px; z-index: 1">
-    <sc-for list="{{cards}}" as="m" hint-placeholder-count="6">
-      <button type="button" onClick="{{m.pick}}" aria-label="{{m.aria}}" aria-pressed="{{m.on}}" class="md-card" style="{{m.style}}">
-        <span style="{{m.bg}}"></span>
-        <span class="md-clip"><span class="md-rays2" style="{{m.rayStyle}}"></span><span class="md-dotsx"></span><img class="md-pic" src="{{m.img}}" alt="" draggable="false" style="{{m.imgStyle}}"><span class="md-fade" style="{{m.fadeStyle}}"></span><span class="md-glint"></span></span>
-        <span style="{{m.tagStyle}}">{{m.tag}}</span>
-        <sc-if value="{{m.hasRib}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; inset: 0; border-radius: 18px; overflow: hidden; pointer-events: none"><span class="md-rib" style="background: {{m.ribC}}">{{m.rib}}</span></span></sc-if>
-        <sc-if value="{{m.isOn}}" hint-placeholder-val="{{ false }}"><span class="md-sweep"></span></sc-if>
-        <span style="{{m.titleStyle}}">{{m.title}}</span>
-        <span style="{{m.kickStyle}}">{{m.kicker}}</span>
-        <span class="md-in"></span><span class="md-cn a"></span><span class="md-cn b"></span><span class="md-cn c"></span><span class="md-cn d"></span><span class="md-bar"></span>
-      </button>
+  <!-- the four kinds of play, stacked like a game menu -->
+  <div role="tablist" aria-label="Tipo de partida" class="mx-cats">
+    <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
+      <button type="button" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}" class="mx-cat" style="{{t.style}}"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{t.icon}}"/></svg></span><span class="tx"><b>{{t.label}}</b><small>{{t.count}}</small></span></button>
     </sc-for>
   </div>
-
-  <!-- the mode you picked, large: its picture, what it is, what is at stake, and the big button -->
-  <div class="md-det" key="{{detKey}}" style="--dc: {{detC}}">
-    <div class="md-dpic" style="{{detBg}}">
-      <img src="{{detImg}}" alt="" draggable="false" style="{{detImgStyle}}">
-      <span class="md-dfade"></span>
-      <span class="md-dtag">{{detTag}}</span>
-      <sc-if value="{{detHasRib}}" hint-placeholder-val="{{ false }}"><span class="md-drib" style="background: {{detRibC}}">{{detRib}}</span></sc-if>
-      <b class="md-dtitle">{{detTitle}}</b>
+  <!-- the modes: a carousel of posters, the chosen one in front -->
+  <div class="mx-car" key="{{listKey}}" onPointerDown="{{swDown}}" onPointerUp="{{swUp}}">
+    <sc-for list="{{cards}}" as="m" hint-placeholder-count="5">
+      <button type="button" onClick="{{m.pick}}" aria-label="{{m.aria}}" aria-pressed="{{m.on}}" class="mx-card" style="{{m.cstyle}}">
+        <span class="mx-art" style="{{m.bg}}"><img src="{{m.img}}" alt="" draggable="false" style="{{m.imgStyle}}"><span class="mx-fade" style="{{m.fadeStyle}}"></span></span>
+        <span class="mx-tag">{{m.tag}}</span>
+        <sc-if value="{{m.hasRib}}" hint-placeholder-val="{{ false }}"><span class="mx-rib" style="background: {{m.ribC}}">{{m.rib}}</span></sc-if>
+        <b class="mx-ct" style="{{m.ctStyle}}">{{m.title}}</b>
+      </button>
+    </sc-for>
+    <sc-if value="{{canPrev}}" hint-placeholder-val="{{ true }}"><button type="button" class="mx-arr l" aria-label="Modo anterior" onClick="{{prev}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></button></sc-if>
+    <sc-if value="{{canNext}}" hint-placeholder-val="{{ true }}"><button type="button" class="mx-arr r" aria-label="Modo siguiente" onClick="{{next}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></button></sc-if>
+    <div class="mx-dots"><sc-for list="{{pager}}" as="d" hint-placeholder-count="5"><i style="{{d}}"></i></sc-for></div>
+  </div>
+  <!-- the chosen mode: its name in big letters, what it is, what is at stake, and the big button -->
+  <div class="mx-info" key="{{detKey}}" style="--dc: {{detC}}">
+    <span class="mx-kick">{{detKicker}}</span>
+    <b class="mx-name">{{detTitle}}</b>
+    <div class="mx-chips">
+      <sc-for list="{{detChips}}" as="c" hint-placeholder-count="3"><span class="mx-chip" style="--cc: {{c.c}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{c.icon}}"/></svg>{{c.label}}</span></sc-for>
+      <sc-if value="{{showRank}}" hint-placeholder-val="{{ true }}"><a href="Rangos.dc.html" class="mx-chip mx-rank" style="--cc: {{rankColor}}"><b>{{rankLabel}}</b>{{mmrLabel}}</a></sc-if>
     </div>
-    <span class="md-dkick">{{detKicker}}</span>
-    <p class="md-ddesc">{{selDesc}}</p>
-    <div class="md-chips"><sc-for list="{{detChips}}" as="c" hint-placeholder-count="3"><span class="md-chip" style="--cc: {{c.c}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{c.icon}}"/></svg>{{c.label}}</span></sc-for></div>
-    <sc-if value="{{showRank}}" hint-placeholder-val="{{ true }}">
-      <a href="Rangos.dc.html" class="md-rank">
-        <span class="md-rk1"><b style="color: {{rankColor}}">{{rankLabel}}</b><small>{{mmrLabel}}</small></span>
-        <span class="md-rbar"><i style="{{rankBar}}"></i></span>
-        <small class="md-rk2">{{seasonLabel}}</small>
-      </a>
-    </sc-if>
+  </div>
+  <div class="mx-go">
     <sc-if value="{{showDiff}}" hint-placeholder-val="{{ false }}">
-      <div role="radiogroup" aria-label="Dificultad de la IA" class="md-diff">
-        <span>RIVAL IA</span>
-        <div><sc-for list="{{diffs}}" as="d" hint-placeholder-count="4"><button type="button" role="radio" aria-checked="{{d.on}}" onClick="{{d.pick}}" style="{{d.style}}">{{d.label}}</button></sc-for></div>
-      </div>
+      <div role="radiogroup" aria-label="Dificultad de la IA" class="mx-diff"><span>IA</span><sc-for list="{{diffs}}" as="d" hint-placeholder-count="4"><button type="button" role="radio" aria-checked="{{d.on}}" onClick="{{d.pick}}" style="{{d.style}}">{{d.short}}</button></sc-for></div>
     </sc-if>
-    <span style="flex: 1"></span>
-    <a href="{{playHref}}" onClick="{{saveSel}}" class="bc-btn am-shine am-logo-btn md-play"><svg width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M6 3l15 9l-15 9z"/></svg>{{playLabel}}</a>
+    <a href="{{playHref}}" onClick="{{saveSel}}" class="bc-btn am-shine am-logo-btn mx-play"><svg width="18" height="18" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M6 3l15 9l-15 9z"/></svg>{{playLabel}}</a>
   </div>
 </div>
 </x-dc>
@@ -350,6 +377,12 @@ class Component extends DCLogic {
         titleStyle: 'position: absolute; left: 12px; right: 10px; bottom: ' + (big ? 34 : 24) + 'px; font-family: \'Barlow Condensed\', sans-serif; font-weight: 800; font-style: italic; font-size: ' + Math.round(Math.min(big ? 60 : 34, (cw - 22) / Math.max(4, Math.min(title.length, title.indexOf(' ') > 0 && title.length > 9 ? Math.max(...title.split(' ').map((w) => w.length)) : title.length)) * 1.45)) + 'px; line-height: .92; letter-spacing: -.5px; text-align: left; color: #F4F4FA; text-shadow: 0 3px 0 #0F061E, 0 0 18px ' + (on ? CAT[0] + '88' : 'transparent') + ';',
         kickStyle: 'position: absolute; left: 13px; right: 8px; bottom: ' + (big ? 14 : 9) + 'px; font-size: ' + (big ? 10 : 8.5) + 'px; font-weight: 800; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; color: ' + (on ? CAT[0] : '#A9BEDD') + ';',
         pick: () => { if (!on) this.setState({ id: m.id }); },
+        // the carousel: the chosen poster in front, the others turning away on each side
+        cstyle: (() => {
+          const sg = Math.sign(off), k = Math.min(a, 3), X = [0, 152, 238, 300][k] * sg, Z = [0, -110, -230, -320][k], RY = [0, -26, -36, -44][k] * sg, SC = [1, 0.84, 0.7, 0.6][k];
+          return '--cc: ' + pal[0] + '; transform: translateX(' + X + 'px) translateZ(' + Z + 'px) rotateY(' + RY + 'deg) scale(' + SC + '); z-index: ' + (10 - k) + '; opacity: ' + (k >= 3 ? 0 : k === 2 ? 0.55 : 1) + '; filter: brightness(' + [1, 0.72, 0.5, 0.4][k] + '); pointer-events: ' + (k >= 3 ? 'none' : 'auto') + ';';
+        })(),
+        ctStyle: 'font-size: ' + Math.round(Math.min(30, 150 / Math.max(4, Math.min(title.length, title.indexOf(' ') > 0 && title.length > 9 ? Math.max(...title.split(' ').map((w) => w.length)) : title.length)) * 1.5)) + 'px;',
         // for the detail panel
         pal, mode: m
       };
@@ -375,20 +408,22 @@ class Component extends DCLogic {
     const go = (d) => { const j = ci + d; if (j >= 0 && j < list.length) this.setState({ id: list[j].id }); };
     const nav = {
       canPrev: ci > 0, canNext: ci < list.length - 1, prev: () => go(-1), next: () => go(1), accent: CAT[0],
-      pager: list.map((_, k) => k === ci ? 'width: 20px; background: ' + CAT[0] + '; box-shadow: 0 0 8px ' + CAT[0] : '')
+      pager: list.map((_, k) => k === ci ? 'width: 22px; background: ' + CAT[0] + ';' : '')
     };
     const href = !cur ? '#' : s.cat === 'train' || s.cat === 'tour' ? cur.href : cur.kind === 'private' ? 'Privada.dc.html' : comp ? 'Competitivo.dc.html' : 'Rapida.dc.html';
     return {
       ...nav,
       tabs: TABS.map((t, i) => ({
         label: t.label, icon: t.icon, sel: i === ti ? 'true' : 'false',
-        style: 'position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; height: 32px; width: 108px; justify-content: center; border: 0; background: none; font: 800 11.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; transition: color .3s; color: ' + (i === ti ? '#040A1C' : t.color) + ';',
+        count: (() => { const CC = this.catalog(s.sport); const n = t.id === 'train' ? CC.train.length : t.id === 'tour' ? (CC.tour || []).length : CC.modes.filter((m) => !m.soon).length + (t.id === 'casual' ? 1 : 0); return n + (n === 1 ? ' modo' : ' modos'); })(),
+        style: '--tc: ' + t.color + '; ' + (i === ti ? 'background: linear-gradient(180deg, color-mix(in srgb, ' + t.color + ' 75%, #fff), ' + t.color + ' 50%, color-mix(in srgb, ' + t.color + ' 60%, #02040C)); box-shadow: inset 0 3px 0 #ffffffaa, 0 5px 0 #02040C, 0 0 20px ' + t.color + '88;' : 'background: linear-gradient(180deg, #1B3F96E6, #0B1A44E6); box-shadow: inset 0 2px 0 #ffffff33, 0 4px 0 #02040C; color: ' + t.color + ';'),
         pick: () => { if (i !== ti) this.setState({ cat: t.id, id: null }); }
       })),
       thumbStyle: 'position: absolute; top: 3px; left: ' + (3 + ti * 108) + 'px; width: 108px; height: 32px; border-radius: 11px; background: ' + TABS[ti].color + '; box-shadow: 0 0 16px ' + TABS[ti].color + '88; transition: left .45s cubic-bezier(.3,1.4,.45,1), background .3s, box-shadow .3s;',
       spot: 'position: absolute; left: 50%; top: 150px; width: 380px; height: 150px; margin-left: -190px; border-radius: 50%; background: radial-gradient(closest-side, ' + CAT[0] + '33, transparent); pointer-events: none;',
       cards,
       detKey: s.cat + ':' + (cur ? cur.id : ''), detC: CAT[0],
+      mxBg: dc && dc.img ? 'background-image: url(' + dc.img + ');' : dc ? 'background: linear-gradient(165deg, ' + dc.pal[2] + ', ' + dc.pal[3] + ');' : '',
       detBg: dc ? 'background: radial-gradient(70% 70% at 50% 35%, ' + dc.pal[0] + 'CC, transparent 70%), linear-gradient(165deg, ' + dc.pal[2] + ', ' + dc.pal[3] + ');' : '',
       detImg: dc ? dc.img : '', detImgStyle: 'opacity: ' + (dc && dc.img ? 1 : 0) + ';',
       detTag: dc ? dc.tag : '', detHasRib: !!(dc && dc.hasRib), detRib: dc ? dc.rib : '', detRibC: dc ? dc.ribC : '',
@@ -411,7 +446,7 @@ class Component extends DCLogic {
       diffs: (() => {
         const A = window.AMProgress, now = A && A.aiPref ? A.aiPref() : 'normal';
         return [['auto', 'ADAPTATIVA', '#FFC53D'], ['facil', 'FÁCIL', '#53D88E'], ['normal', 'NORMAL', '#22D3EE'], ['dificil', 'DIFÍCIL', '#FF5C5C']].map(([id, label, c]) => ({
-          label, on: id === now ? 'true' : 'false',
+          label, short: { auto: 'AUTO', facil: 'FÁCIL', normal: 'NORMAL', dificil: 'DIFÍCIL' }[id], on: id === now ? 'true' : 'false',
           pick: () => { if (A && A.setAiPref) { A.setAiPref(id); this.forceUpdate(); } },
           style: 'height: 22px; padding: 0 10px; border: 0; transform: skewX(0deg); font: 800 10.5px Exo2, sans-serif; letter-spacing: .5px; cursor: pointer; ' + (id === now ? 'background: ' + c + '; color: #040A1C; box-shadow: 0 0 10px ' + c + '88;' : 'background: #0B1A44CC; color: ' + c + '; box-shadow: inset 0 0 0 1px ' + c + '55;')
         }));
