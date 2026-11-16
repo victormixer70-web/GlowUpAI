@@ -3290,20 +3290,27 @@ class Component extends DCLogic {
     // straight stands end at the corners of the pitch; quarter-circle stands fill each corner
     const kv = this.keeperMode();
     // the 3D stadium model when it has loaded (stadium.js); otherwise the stands built here
-    const STAD = window.AMStadium && window.AMStadium.ready() ? window.AMStadium : null;
+    // 1 VS 1 in someone's stadium: their own stadium (stadup.js), built in one piece and remodelled with gems. It
+    // takes the place of the stadium model: its far half, mirrored for the near half, and its seats for the crowd
+    const NEWST = this.size() === 1 && this.myStad && window.AMStadUp && !this.props.tutorial && !this.props.practice ? window.AMStadUp.make(this.myStad, { night }) : null;
+    this.newSt = NEWST;
+    const STAD = NEWST ? {
+      model: () => { const g = new T.Group(), h = NEWST.half.clone(); h.scale.set(1 / 0.9, 1, 1 / 0.9); g.add(h); return g; },
+      seats: () => NEWST.seats.map(([x, y, z]) => [x / 0.9, y, z / 0.9])
+    } : window.AMStadium && window.AMStadium.ready() ? window.AMStadium : null;
     if (STAD) {
       const model = STAD.model();
       model.position.y = -0.03;
-      if (this.myStad) { const tint = new T.Color(0xffffff).lerp(new T.Color(this.myStad.c1), 0.38); model.traverse((o) => { if (o.isMesh && o.material) { const ms = [].concat(o.material).map((mt) => { const c2 = mt.clone(); if (c2.color) c2.color.multiply(tint); return c2; }); o.material = ms.length === 1 ? ms[0] : ms; } }); }
+      if (this.myStad && !NEWST) { const tint = new T.Color(0xffffff).lerp(new T.Color(this.myStad.c1), 0.38); model.traverse((o) => { if (o.isMesh && o.material) { const ms = [].concat(o.material).map((mt) => { const c2 = mt.clone(); if (c2.color) c2.color.multiply(tint); return c2; }); o.material = ms.length === 1 ? ms[0] : ms; } }); }
       // and the seats in the colour chosen for that stadium
-      if (this.myStad && window.AMStad && window.AMStad.paintSeats) window.AMStad.paintSeats(model, this.myStad);
+      if (this.myStad && !NEWST && window.AMStad && window.AMStad.paintSeats) window.AMStad.paintSeats(model, this.myStad);
       // the stands brought in towards the pitch: the ends by 10 %, the far side too unless the near side
       // (the dugouts' side) is built as well
       const full = kv || this.proCam(), KX = 0.9, KZ = full ? 1 : 0.9;
       this.stadK = [KX, KZ];
       model.scale.set(KX, 1, KZ);
       const dim = (m) => m.traverse((o) => { if (o.isMesh && o.material) { const ms = [].concat(o.material).map((mt) => { const c2 = mt.clone(); if (c2.color) c2.color.multiplyScalar(0.45); return c2; }); o.material = ms.length === 1 ? ms[0] : ms; } });
-      if (night) model.traverse((o) => { if (o.isMesh && o.material) { const ms = [].concat(o.material).map((mt) => { const c2 = mt.clone(); if (c2.color) c2.color.multiplyScalar(0.45); return c2; }); o.material = ms.length === 1 ? ms[0] : ms; } });
+      if (night && !NEWST) model.traverse((o) => { if (o.isMesh && o.material) { const ms = [].concat(o.material).map((mt) => { const c2 = mt.clone(); if (c2.color) c2.color.multiplyScalar(0.45); return c2; }); o.material = ms.length === 1 ? ms[0] : ms; } });
       S.add(model);
       // the model is open on the side-on camera's side; for the cameras that look along the pitch (Pro and
       // goalkeeper) the bowl is closed with a mirror image of its far half, each half clipped at the halfway
@@ -3320,7 +3327,7 @@ class Component extends DCLogic {
           o.material = mats.length === 1 ? mats[0] : mats;
         });
         clipTo(model, -1);
-        const mirror = STAD.model(); mirror.position.y = -0.03; mirror.scale.set(KX, 1, -KZ); if (night) dim(mirror); clipTo(mirror, 1); mirror.visible = false; S.add(mirror);
+        const mirror = STAD.model(); mirror.position.y = -0.03; mirror.scale.set(KX, 1, -KZ); if (night && !NEWST) dim(mirror); clipTo(mirror, 1); mirror.visible = false; S.add(mirror);
         this.bowl = { mirror, o: [], c: [], closed: false };
         seatList = seatList.concat(seatList.filter((q) => q[3] === 'f').map(([x, y, z]) => [x, y, -z, 'c']));
       }
@@ -3332,7 +3339,7 @@ class Component extends DCLogic {
           o.material = mats.length === 1 ? mats[0] : mats;
         });
         clipTo(model, -1);
-        const mirror = STAD.model(); mirror.position.y = -0.03; mirror.scale.set(KX, 1, -KZ); if (night) dim(mirror); clipTo(mirror, 1); S.add(mirror);
+        const mirror = STAD.model(); mirror.position.y = -0.03; mirror.scale.set(KX, 1, -KZ); if (night && !NEWST) dim(mirror); clipTo(mirror, 1); S.add(mirror);
         const far = seatList.filter((q) => q[2] < 0);
         seatList = far.concat(far.map(([x, y, z]) => [x, y, -z, 'f']));
       }
@@ -3710,7 +3717,7 @@ class Component extends DCLogic {
       const hi = this.gfxNow !== 'baja', cv = document.createElement('canvas'); cv.width = hi ? 1024 : 512; cv.height = hi ? 512 : 256;
       const tex = new T.CanvasTexture(cv); tex.encoding = T.sRGBEncoding;
       const mat = new T.MeshBasicMaterial({ map: tex, toneMapped: false });
-      [-1, 1].forEach((sx) => { const m = new T.Mesh(new T.PlaneGeometry(12.4, 6.1), mat); const [kx, kz] = this.stadK || [1, 1]; m.scale.set(kz, 1, 1); m.position.set(sx * 40.9 * kx, 9.1, 0.2 * kz); m.rotation.y = sx > 0 ? -Math.PI / 2 : Math.PI / 2; S.add(m); });
+      [-1, 1].forEach((sx) => { const m = new T.Mesh(new T.PlaneGeometry(12.4, 6.1), mat); const [kx, kz] = this.stadK || [1, 1]; m.scale.set(kz, 1, 1); m.position.set(sx * (this.newSt ? this.newSt.screenX / 0.9 : 40.9) * kx, 9.1, 0.2 * kz); m.rotation.y = sx > 0 ? -Math.PI / 2 : Math.PI / 2; S.add(m); });
       this.screens = { cv, tex, key: '', hi };
     }
     // night: glowing floodlight heads above the stadium model
@@ -3719,15 +3726,15 @@ class Component extends DCLogic {
       sp.scale.set(26, 26, 1); sp.position.set(x, 30, z); S.add(sp);
     });
     // 1 VS 1: a street cage round the pitch (no wall on the camera's side)
-    // 1 VS 1 in someone's stadium: its remodelled parts (façade, roof, tiers, screens, lights, decoration); the near
-    // half only shows with the near stand (replays, the intro)
+    // what stands on its own of the 1 VS 1 stadium (façade, LED bands, screens, towers, beams, fireworks), scaled
+    // like the stands
     this.upB = null;
-    if (n === 1 && STAD && this.myStad && window.AMStadUp && !this.props.tutorial && !this.props.practice) {
+    if (this.newSt) {
+      const NEWST = this.newSt;
       const [kx0, kz0] = this.stadK || [0.9, 0.9];
-      this.upB = window.AMStadUp.build(this.myStad, { kx: kx0, kz: kz0, night: this.wx === 'noche' });
-      this.upB.group.traverse((o) => { if (o.isMesh && !o.material.transparent && o.material.side !== undefined) o.receiveShadow = true; });
-      S.add(this.upB.group);
-      if (this.bowl) { this.bowl.c.push(this.upB.near); this.upB.near.visible = !!this.bowl.closed; }
+      NEWST.whole.scale.set(kx0 / 0.9, 1, kz0 / 0.9);
+      S.add(NEWST.whole);
+      this.upB = { size: { x: NEWST.size.x * kx0 / 0.9, z: NEWST.size.z * kz0 / 0.9, h: NEWST.size.h }, update: NEWST.update, burst: NEWST.burst };
     }
     if (n === 1 && !this.props.tutorial && !this.props.practice) {
       const mesh = this.canvasTex(128, 128, (c, w, h) => {

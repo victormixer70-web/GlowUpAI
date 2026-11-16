@@ -155,9 +155,8 @@ class Component extends DCLogic {
   }
   /* ---------- the real stadium in 3D: the match's model, your colours, your grass, your name on the boards ---------- */
   init3D() {
-    const T = window.THREE, ST = window.AMStadium;
+    const T = window.THREE;
     if (!T || !this.cv || this.R) return;
-    if (!ST || !ST.ready()) { this.loading = true; this.forceUpdate(); if (ST && ST.load) { const pr = ST.load(); if (pr && pr.then) pr.then(() => { this.loading = false; this.init3D(); this.forceUpdate(); }); } return; }
     this.loading = false;
     if (/[?&]debug\b/.test(location.search)) window.__me = this;
     let R;
@@ -200,34 +199,7 @@ class Component extends DCLogic {
     if (GR && !pitch.material.normalMap) { let k = 0; const retry = () => { if (!this.R) return; const m = grassMat(); if (m.normalMap) { pitch.material.dispose(); pitch.material = m; } else if (++k < 20) setTimeout(retry, 500); }; setTimeout(retry, 500); }
     if (GR && GR.shells && !lite) { this.shells = GR.shells(this.ptex, 68, 36, 4); if (this.shells) S.add(this.shells); }
     const apron = new T.Mesh(new T.PlaneGeometry(400, 400), new T.MeshStandardMaterial({ color: 0x0a3a0c, roughness: 1 })); apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; apron.receiveShadow = true; S.add(apron);
-    // the stadium model, closed on every side with its mirror image (each half clipped at the halfway plane)
-    const clipTo = (m, nz) => m.traverse((o) => {
-      if (!o.isMesh) return;
-      const ms = [].concat(o.material).map((mt) => { const c2 = mt.clone(); c2.side = T.FrontSide; c2.clippingPlanes = [new T.Plane(new T.Vector3(0, 0, nz), 0)]; c2.userData.base = c2.color ? c2.color.clone() : null; return c2; });
-      o.material = ms.length === 1 ? ms[0] : ms;
-    });
-    const a = ST.model(); a.scale.set(0.9, 1, 0.9); a.position.y = -0.03; clipTo(a, -1); S.add(a);
-    const b = ST.model(); b.scale.set(0.9, 1, -0.9); b.position.y = -0.03; clipTo(b, 1); S.add(b);
-    this.stadMats = []; [a, b].forEach((m) => m.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; [].concat(o.material).forEach((mt) => this.stadMats.push(mt)); } }));
-    // a full house: fans in the seats (both halves of the bowl), facing the pitch, in your colours and others
-    {
-      const seats = ST.seats().filter((q) => q[2] < 0), all = seats.concat(seats.map(([x, y, z]) => [x, y, -z]));
-      const pick = all.filter((q, i) => ((i * 7919) % 100) < 82), n = pick.length;
-      const body = new T.InstancedMesh(new T.CylinderGeometry(0.2, 0.25, 0.62, 6), new T.MeshStandardMaterial({ roughness: 0.85 }), n);
-      const head = new T.InstancedMesh(new T.SphereGeometry(0.15, 8, 6), new T.MeshStandardMaterial({ roughness: 0.7 }), n);
-      const M4 = new T.Matrix4(), q4 = new T.Quaternion(), up = new T.Vector3(0, 1, 0), one = new T.Vector3(1, 1, 1), SK = ['#F1C7A5', '#D9A47E', '#A8714E', '#6E4630', '#F5D6BC'];
-      this.fanBody = body; this.fanN = n;
-      pick.forEach(([x, y, z], i) => {
-        const X = x * 0.9, Z = z * 0.9, r = ((i * 2654435761) >>> 0) / 4294967296;
-        q4.setFromAxisAngle(up, Math.atan2(-X, -Z));
-        M4.compose(new T.Vector3(X, y + 0.33 + r * 0.06, Z), q4, one); body.setMatrixAt(i, M4);
-        M4.compose(new T.Vector3(X, y + 0.82 + r * 0.06, Z), q4, one); head.setMatrixAt(i, M4);
-        head.setColorAt(i, new T.Color(SK[i % SK.length]));
-      });
-      body.castShadow = true; S.add(body); S.add(head);
-    }
-    // the seats in their own colour
-    if (window.AMStad.paintSeats) { const c0 = this.state.cfg || window.AMStad.get(); this.seatU = window.AMStad.paintSeats(a, c0); window.AMStad.paintSeats(b, c0, this.seatU); }
+    // the stadium itself (stadup.js) is built by buildUp(), called from apply3D()
     // goals
     if (window.AMNet && window.AMNet.goal) [-1, 1].forEach((sx) => { const G = window.AMNet.goal(6, 2.44, 1.9); G.group.position.set(30 * sx, 0, 0); G.group.rotation.y = sx * Math.PI / 2; S.add(G.group); });
     // LED boards round the pitch with the stadium's name
@@ -275,10 +247,6 @@ class Component extends DCLogic {
   apply3D(c) {
     const T = window.THREE;
     if (!this.R || !c) return;
-    // stadium tint
-    const tint = new T.Color(0xffffff).lerp(new T.Color(c.c1), 0.42).multiplyScalar(c.time === 'noche' ? 0.72 : 1);
-    (this.stadMats || []).forEach((m) => { if (m.color && m.userData.base) m.color.copy(m.userData.base).multiply(tint); });
-    if (this.seatU && window.AMStad.setSeats) window.AMStad.setSeats(this.seatU, c);
     // pitch
     const x = this.pcv.getContext('2d'), w = 1024, h = 544, ppm = w / 68, X = (u) => (u + 4) * ppm, Y = (v) => (v + 3) * ppm;
     const GT = { verde: ['#0a5c06', '#12780b'], oscuro: ['#06420a', '#0b5610'], claro: ['#1a7a14', '#25921c'], azulado: ['#0a5a3e', '#10704e'] }[c.grass] || ['#0a5c06', '#12780b'];
@@ -313,7 +281,6 @@ class Component extends DCLogic {
     S.fog = night ? new T.Fog(0x070a18, 110, 280) : dusk ? new T.Fog(0x7a3a5a, 120, 300) : new T.Fog(0x8f99a6, 130, 300);
     (this.glows || []).forEach((g) => { g.visible = night; });
     // the fans wear the stadium's colours (and some neutrals)
-    if (this.fanBody) { const P = [c.c1, c.c2, c.c1, '#F4F4FA', '#1B2236', c.c2]; for (let i = 0; i < this.fanN; i++) this.fanBody.setColorAt(i, new T.Color(P[(i * 31) % P.length]).multiplyScalar(night ? 0.8 : 1)); this.fanBody.instanceColor.needsUpdate = true; }
     this.R.toneMappingExposure = night ? 1.15 : 1.05;
     this.buildUp(c);
   }
@@ -333,13 +300,28 @@ class Component extends DCLogic {
   buildUp(c) {
     const U = window.AMStadUp, T = window.THREE;
     if (!U || !this.S || !c) return;
-    const key = JSON.stringify([c.up, c.c1, c.c2, c.name, c.time]);
+    const key = JSON.stringify([c.up, c.c1, c.c2, c.name, c.time, c.seat]);
     if (key === this.upKey) return;
     this.upKey = key;
-    if (this.upB) { this.S.remove(this.upB.group); this.upB.group.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); }
-    this.upB = U.build(c, { kx: 0.9, kz: 0.9, night: c.time === 'noche' });
-    this.upB.group.traverse((o) => { if (o.isMesh && !o.material.transparent) { o.receiveShadow = true; } });
-    this.S.add(this.upB.group);
+    if (this.upG) { this.S.remove(this.upG); this.upG.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); }
+    const B = this.upB = U.make(c, { night: c.time === 'noche' }), G = this.upG = new T.Group();
+    // the far half, its mirror image for the near half, and what stands on its own
+    const near = B.half.clone(); near.scale.z = -1;
+    G.add(B.half); G.add(near); G.add(B.whole);
+    // a full house: a fan on most seats, facing the pitch, in the stadium's colours
+    const all = B.seats.concat(B.seats.map(([x, y, z]) => [x, y, -z])).filter((q, i) => ((i * 7919) % 100) < 80), n = all.length;
+    const body = new T.InstancedMesh(new T.CylinderGeometry(0.2, 0.25, 0.62, 6), new T.MeshStandardMaterial({ roughness: 0.85 }), n);
+    const head = new T.InstancedMesh(new T.SphereGeometry(0.15, 8, 6), new T.MeshStandardMaterial({ roughness: 0.7 }), n);
+    const M4 = new T.Matrix4(), q4 = new T.Quaternion(), upv = new T.Vector3(0, 1, 0), one = new T.Vector3(1, 1, 1), SK = ['#F1C7A5', '#D9A47E', '#A8714E', '#6E4630', '#F5D6BC'], PC = [c.c1, c.c2, c.c1, '#F4F4FA', '#1B2236', c.c2];
+    all.forEach(([x, y, z], i) => {
+      const r = ((i * 2654435761) >>> 0) / 4294967296;
+      q4.setFromAxisAngle(upv, Math.atan2(-x, -z));
+      M4.compose(new T.Vector3(x, y + 0.33 + r * 0.06, z), q4, one); body.setMatrixAt(i, M4);
+      M4.compose(new T.Vector3(x, y + 0.82 + r * 0.06, z), q4, one); head.setMatrixAt(i, M4);
+      body.setColorAt(i, new T.Color(PC[(i * 31) % PC.length]).multiplyScalar(c.time === 'noche' ? 0.8 : 1)); head.setColorAt(i, new T.Color(SK[i % SK.length]));
+    });
+    body.castShadow = true; G.add(body); G.add(head);
+    this.S.add(G);
   }
   // the remodelling tab: each part with its levels (the ones you own can be picked; the next one is bought with gems)
   upVals(c) {
