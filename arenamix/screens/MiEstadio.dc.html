@@ -29,6 +29,18 @@ body{margin:0}
 .me-hint{position:absolute;left:50%;top:8px;translate:-50% 0;padding:3px 10px;border-radius:9px;background:#040A1CBB;font:800 10px Exo2,sans-serif;letter-spacing:.5px;color:#E9D5FF;pointer-events:none;transition:opacity .5s;white-space:nowrap}
 .me-led{animation:meLed 6s linear infinite}
 .me-light{animation:meFlash 2.4s ease-in-out infinite}
+.me-card{background:linear-gradient(180deg,#1B3F96F2,#0B1A44F2 55%,#06102EF2);border:3px solid #02040C;box-shadow:inset 0 3px 0 #ffffff33,0 5px 0 #02040C,0 14px 30px #0009}
+.me-h{font:400 11px Titulos,sans-serif;letter-spacing:1.2px;color:#FFE38A;text-shadow:0 2px 0 #02040C}
+.me-h i{height:3px;border-radius:2px;background:linear-gradient(90deg,#FFC53D,transparent)}
+.me-in{height:38px;border-radius:12px;border:2.5px solid #02040C;background:#02040C88;box-shadow:inset 0 3px 6px #0008;font:400 17px Titulos,sans-serif;letter-spacing:.5px}
+.me-in:focus{border-color:#FFC53D}
+.me-sw{width:26px;height:26px;border-radius:9px}
+.me-chip{height:28px;padding:0 11px;border:2.5px solid #02040C;border-radius:10px;font:400 11px Titulos,sans-serif;letter-spacing:.4px}
+.me-chip:active,.me-sw:active{transform:translateY(2px)}
+.me-ar{width:32px;height:32px;border:2.5px solid #02040C;border-radius:11px;background:linear-gradient(180deg,#3DA9FF,#0A3DCC);color:#fff;box-shadow:inset 0 2px 0 #ffffff77,0 3px 0 #02040C}
+.me-pad .c{background:linear-gradient(180deg,#FFF3A0,#FFC53D 50%,#FFA800);color:#2A1400}
+.me-ar:active{background:linear-gradient(180deg,#FFF3A0,#FFC53D);color:#2A1400;transform:translateY(2px);box-shadow:inset 0 2px 0 #ffffffaa,0 1px 0 #02040C}
+.me-hint{border:2px solid #02040C;background:#0B1A44E6;font:400 10px Titulos,sans-serif;letter-spacing:.5px;color:#fff}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; overflow: hidden; isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif">
@@ -44,10 +56,10 @@ body{margin:0}
 
   <div style="position: absolute; left: 96px; right: 16px; top: 62px; bottom: 12px; display: flex; gap: 12px">
     <!-- live preview -->
-    <div class="me-card" style="flex: none; width: 420px; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px">
-      <div style="position: relative; width: 400px; height: 268px; border-radius: 14px; overflow: hidden; background: {{skyCss}}">
-        <canvas ref="{{cvRef}}" aria-label="Tu estadio en 3D. Arrastra para girarlo." onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" onPointerLeave="{{pUp}}" onWheel="{{wheel}}" style="position: absolute; inset: 0; width: 400px; height: 268px; display: block; touch-action: none; cursor: grab"></canvas>
-        <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 800 italic 18px 'Barlow Condensed', sans-serif; letter-spacing: 1px; color: #A6DCFF">CARGANDO TU ESTADIO…</span></sc-if>
+    <div class="me-card" style="flex: none; width: 460px; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px">
+      <div style="position: relative; width: 440px; height: 268px; border-radius: 14px; overflow: hidden; background: {{skyCss}}; outline: 3px solid #02040C; outline-offset: -3px">
+        <canvas ref="{{cvRef}}" aria-label="Tu estadio en 3D. Arrastra para girarlo." onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" onPointerLeave="{{pUp}}" onWheel="{{wheel}}" style="position: absolute; inset: 0; width: 440px; height: 268px; display: block; touch-action: none; cursor: grab"></canvas>
+        <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 400 18px Titulos, sans-serif; letter-spacing: 1px; color: #A6DCFF">CARGANDO TU ESTADIO…</span></sc-if>
         <span class="me-hint" style="{{hintStyle}}">Arrastra para girarlo · usa las flechas</span>
         <!-- camera pad: rotate, tilt, zoom, reset -->
         <div class="me-pad" aria-label="Mover la cámara">
@@ -64,7 +76,7 @@ body{margin:0}
       </div>
       <div style="display: flex; align-items: center; gap: 8px">
         <span style="flex: none; width: 34px; height: 38px; display: flex; align-items: center; justify-content: center; clip-path: path('M17 0L34 6V20C34 30 26 35 17 38C8 35 0 30 0 20V6Z'); background: linear-gradient(160deg, {{c1}} 55%, {{c2}} 55%)"><b style="font: 800 12px Exo2, sans-serif; color: #fff; text-shadow: 0 1px 2px #000">{{ini}}</b></span>
-        <div style="display: flex; flex-direction: column; min-width: 0"><b translate="no" style="font: 800 italic 20px/1.05 'Barlow Condensed', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{name}}</b><span style="font-size: 10.5px; font-weight: 700; color: #A6DCFF">{{summary}}</span></div>
+        <div style="display: flex; flex-direction: column; min-width: 0"><b translate="no" style="font: 400 20px/1.05 Titulos, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{name}}</b><span style="font-size: 10.5px; font-weight: 700; color: #A6DCFF">{{summary}}</span></div>
       </div>
     </div>
     <!-- controls -->
@@ -88,6 +100,7 @@ body{margin:0}
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":844,"height":390}}'>
+const ME_W = 440, ME_H = 268;
 const ME_GRASS = { verde: ['#1f8f3a', '#27a447'], oscuro: ['#11531f', '#18682a'], claro: ['#3fae4f', '#52c463'], azulado: ['#1b6f55', '#23866a'] };
 const ME_SKY = { auto: ['#1B1050', '#7C3AED'], dia: ['#5DB4F0', '#CFE8FF'], atardecer: ['#2A1660', '#FF7A59'], noche: ['#04060F', '#1B2350'] };
 class Component extends DCLogic {
@@ -106,20 +119,44 @@ class Component extends DCLogic {
     if (/[?&]debug\b/.test(location.search)) window.__me = this;
     let R;
     try { R = new T.WebGLRenderer({ canvas: this.cv, antialias: true, alpha: true }); } catch (e) { return; }
-    R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); R.setSize(400, 268, false);
+    R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); R.setSize(ME_W, ME_H, false);
     R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.05;
     R.localClippingEnabled = true;
+    // Gráficos: Baja keeps it light (no shadows, no blades of grass)
+    let lite = false; try { lite = (window.AMPlay ? window.AMPlay() : {}).gfx === 'baja'; } catch (e) {}
+    R.shadowMap.enabled = !lite; R.shadowMap.type = T.PCFSoftShadowMap;
     this.R = R;
     const S = this.S = new T.Scene();
-    this.cam = new T.PerspectiveCamera(40, 400 / 268, 0.5, 700);
+    this.cam = new T.PerspectiveCamera(40, ME_W / ME_H, 0.5, 700);
     this.hemi = new T.HemisphereLight(0xcfe0ff, 0x1d5a33, 0.9); S.add(this.hemi);
-    this.sun = new T.DirectionalLight(0xfff4e0, 1.3); this.sun.position.set(-30, 60, 25); S.add(this.sun);
+    // the sun casts the stands' shadow across the pitch, as in a match
+    this.sun = new T.DirectionalLight(0xfff4e0, 1.3); this.sun.position.set(-30, 45, 25);
+    this.sun.castShadow = !lite; this.sun.shadow.mapSize.set(1536, 1536);
+    Object.assign(this.sun.shadow.camera, { left: -60, right: 60, top: 50, bottom: -50, near: 5, far: 160 });
+    this.sun.shadow.bias = -0.0006; this.sun.shadow.normalBias = 0.05;
+    S.add(this.sun);
+    this.fill = new T.DirectionalLight(0x9fc3ff, 0.35); this.fill.position.set(20, 20, -30); S.add(this.fill);
+    // the real sky (the match's stadium HDRI): light and reflections on the stadium; the photo as the sky behind
+    if (window.AMSky) {
+      this.skyBg = window.AMSky.bg(); if (this.skyBg) this.skyBg.mapping = T.EquirectangularReflectionMapping;
+      window.AMSky.env(R).then((e) => { if (e && this.R === R) { this.env = e; this.apply3D(this.state.cfg || window.AMStad.get()); } });
+    }
+    // floodlight heads on the four towers: glowing at night
+    const gcv = document.createElement('canvas'); gcv.width = gcv.height = 128;
+    { const g = gcv.getContext('2d'), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.22, 'rgba(225,236,255,0.6)'); gr.addColorStop(1, 'rgba(220,232,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }
+    const gtex = new T.CanvasTexture(gcv);
+    this.glows = [[-41, -31], [41, -31], [-41, 31], [41, 31]].map(([x, z]) => { const sp = new T.Sprite(new T.SpriteMaterial({ map: gtex, blending: T.AdditiveBlending, depthWrite: false, transparent: true, fog: false })); sp.scale.set(24, 24, 1); sp.position.set(x, 28, z); S.add(sp); return sp; });
     // the pitch (its texture is redrawn when the cut or the tone changes)
     this.pcv = document.createElement('canvas'); this.pcv.width = 1024; this.pcv.height = 544;
     this.ptex = new T.CanvasTexture(this.pcv); this.ptex.encoding = T.sRGBEncoding; this.ptex.anisotropy = 4;
-    const pitch = new T.Mesh(new T.PlaneGeometry(68, 36), new T.MeshLambertMaterial({ map: this.ptex }));
-    pitch.rotation.x = -Math.PI / 2; S.add(pitch);
-    const apron = new T.Mesh(new T.PlaneGeometry(400, 400), new T.MeshLambertMaterial({ color: 0x0a3a0c })); apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; S.add(apron);
+    // the real lawn of the match (blades, wear, the stripes catching the light) under the painted cut and lines
+    const GR = window.AMGrass, grassMat = () => GR ? GR.material(this.ptex, 68, 36) : new T.MeshStandardMaterial({ map: this.ptex, roughness: 0.95 });
+    const pitch = new T.Mesh(new T.PlaneGeometry(68, 36), grassMat());
+    pitch.rotation.x = -Math.PI / 2; pitch.receiveShadow = true; S.add(pitch);
+    // the lawn texture may still be loading: put it on as soon as it is there
+    if (GR && !pitch.material.normalMap) { let k = 0; const retry = () => { if (!this.R) return; const m = grassMat(); if (m.normalMap) { pitch.material.dispose(); pitch.material = m; } else if (++k < 20) setTimeout(retry, 500); }; setTimeout(retry, 500); }
+    if (GR && GR.shells && !lite) { this.shells = GR.shells(this.ptex, 68, 36, 4); if (this.shells) S.add(this.shells); }
+    const apron = new T.Mesh(new T.PlaneGeometry(400, 400), new T.MeshStandardMaterial({ color: 0x0a3a0c, roughness: 1 })); apron.rotation.x = -Math.PI / 2; apron.position.y = -0.02; apron.receiveShadow = true; S.add(apron);
     // the stadium model, closed on every side with its mirror image (each half clipped at the halfway plane)
     const clipTo = (m, nz) => m.traverse((o) => {
       if (!o.isMesh) return;
@@ -128,7 +165,24 @@ class Component extends DCLogic {
     });
     const a = ST.model(); a.scale.set(0.9, 1, 0.9); a.position.y = -0.03; clipTo(a, -1); S.add(a);
     const b = ST.model(); b.scale.set(0.9, 1, -0.9); b.position.y = -0.03; clipTo(b, 1); S.add(b);
-    this.stadMats = []; [a, b].forEach((m) => m.traverse((o) => { if (o.isMesh) [].concat(o.material).forEach((mt) => this.stadMats.push(mt)); }));
+    this.stadMats = []; [a, b].forEach((m) => m.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; [].concat(o.material).forEach((mt) => this.stadMats.push(mt)); } }));
+    // a full house: fans in the seats (both halves of the bowl), facing the pitch, in your colours and others
+    {
+      const seats = ST.seats().filter((q) => q[2] < 0), all = seats.concat(seats.map(([x, y, z]) => [x, y, -z]));
+      const pick = all.filter((q, i) => ((i * 7919) % 100) < 82), n = pick.length;
+      const body = new T.InstancedMesh(new T.CylinderGeometry(0.2, 0.25, 0.62, 6), new T.MeshStandardMaterial({ roughness: 0.85 }), n);
+      const head = new T.InstancedMesh(new T.SphereGeometry(0.15, 8, 6), new T.MeshStandardMaterial({ roughness: 0.7 }), n);
+      const M4 = new T.Matrix4(), q4 = new T.Quaternion(), up = new T.Vector3(0, 1, 0), one = new T.Vector3(1, 1, 1), SK = ['#F1C7A5', '#D9A47E', '#A8714E', '#6E4630', '#F5D6BC'];
+      this.fanBody = body; this.fanN = n;
+      pick.forEach(([x, y, z], i) => {
+        const X = x * 0.9, Z = z * 0.9, r = ((i * 2654435761) >>> 0) / 4294967296;
+        q4.setFromAxisAngle(up, Math.atan2(-X, -Z));
+        M4.compose(new T.Vector3(X, y + 0.33 + r * 0.06, Z), q4, one); body.setMatrixAt(i, M4);
+        M4.compose(new T.Vector3(X, y + 0.82 + r * 0.06, Z), q4, one); head.setMatrixAt(i, M4);
+        head.setColorAt(i, new T.Color(SK[i % SK.length]));
+      });
+      body.castShadow = true; S.add(body); S.add(head);
+    }
     // the seats in their own colour
     if (window.AMStad.paintSeats) { const c0 = this.state.cfg || window.AMStad.get(); this.seatU = window.AMStad.paintSeats(a, c0); window.AMStad.paintSeats(b, c0, this.seatU); }
     // goals
@@ -140,7 +194,7 @@ class Component extends DCLogic {
     [[0, -16.6, 64, 0], [0, 16.6, 64, Math.PI], [-32.6, 0, 33, Math.PI / 2], [32.6, 0, 33, -Math.PI / 2]].forEach(([x, z, len, ry]) => {
       const t = this.ltex.clone(); t.needsUpdate = true; t.repeat.set(len / 16, 1);
       const m = new T.Mesh(new T.BoxGeometry(len, 0.9, 0.15), new T.MeshBasicMaterial({ map: t, toneMapped: false }));
-      m.position.set(x, 0.45, z); m.rotation.y = ry; S.add(m); (this.ledTex = this.ledTex || []).push(t);
+      m.castShadow = true; m.position.set(x, 0.45, z); m.rotation.y = ry; S.add(m); (this.ledTex = this.ledTex || []).push(t);
     });
     this.apply3D(this.state.cfg || window.AMStad.get());
     let last = performance.now();
@@ -167,7 +221,7 @@ class Component extends DCLogic {
     const T = window.THREE;
     if (!this.R || !c) return;
     // stadium tint
-    const tint = new T.Color(0xffffff).lerp(new T.Color(c.c1), 0.42);
+    const tint = new T.Color(0xffffff).lerp(new T.Color(c.c1), 0.42).multiplyScalar(c.time === 'noche' ? 0.72 : 1);
     (this.stadMats || []).forEach((m) => { if (m.color && m.userData.base) m.color.copy(m.userData.base).multiply(tint); });
     if (this.seatU && window.AMStad.setSeats) window.AMStad.setSeats(this.seatU, c);
     // pitch
@@ -188,15 +242,24 @@ class Component extends DCLogic {
     // LED boards
     const L = this.lcv.getContext('2d'), name = c.name.toUpperCase();
     L.fillStyle = '#0B0B14'; L.fillRect(0, 0, 1024, 32);
-    L.font = 'italic 800 24px Barlow Condensed, Arial'; L.textBaseline = 'middle';
+    L.font = '24px Titulos, Arial'; L.textBaseline = 'middle';
     const step = Math.max(260, L.measureText(name + ' ·').width + 40);
     for (let u = 12, i = 0; u < 1024; u += step, i++) { L.fillStyle = i % 2 ? c.c1 : c.c2; L.fillText(name + ' ·', u, 17); }
     (this.ledTex || []).forEach((t) => { t.needsUpdate = true; });
     // time of day
-    const night = c.time === 'noche', dusk = c.time === 'atardecer';
-    this.sun.intensity = night ? 0.75 : dusk ? 1.0 : 1.3; this.sun.color.setHex(dusk ? 0xffa25a : night ? 0xdfe8ff : 0xfff4e0);
-    this.hemi.intensity = night ? 0.45 : 0.9; this.hemi.color.setHex(dusk ? 0xffb3c8 : 0xcfe0ff);
-    this.R.toneMappingExposure = night ? 1.2 : 1.05;
+    const night = c.time === 'noche', dusk = c.time === 'atardecer', S = this.S;
+    this.sun.intensity = night ? 1.5 : dusk ? 1.25 : 1.2; this.sun.color.setHex(dusk ? 0xffa25a : night ? 0xe6eeff : 0xfff4e0);
+    this.sun.position.set(dusk ? -46 : -30, dusk ? 15 : 45, dusk ? 14 : 25);
+    this.fill.intensity = night ? 0.7 : 0.35;
+    this.hemi.color.setHex(dusk ? 0xffb3c8 : night ? 0x6f84c0 : 0xcfe0ff); this.hemi.groundColor.setHex(dusk ? 0x3a1a2a : night ? 0x08160e : 0x1d5a33);
+    this.hemi.intensity = night ? 0.5 : this.env && !dusk ? 0.3 : 0.9;
+    S.environment = !night && this.env ? this.env : null;
+    S.background = night ? new T.Color(0x05060f) : dusk ? new T.Color(0x5a2a5a) : this.skyBg || new T.Color(0x8f99a6);
+    S.fog = night ? new T.Fog(0x070a18, 110, 280) : dusk ? new T.Fog(0x7a3a5a, 120, 300) : new T.Fog(0x8f99a6, 130, 300);
+    (this.glows || []).forEach((g) => { g.visible = night; });
+    // the fans wear the stadium's colours (and some neutrals)
+    if (this.fanBody) { const P = [c.c1, c.c2, c.c1, '#F4F4FA', '#1B2236', c.c2]; for (let i = 0; i < this.fanN; i++) this.fanBody.setColorAt(i, new T.Color(P[(i * 31) % P.length]).multiplyScalar(night ? 0.8 : 1)); this.fanBody.instanceColor.needsUpdate = true; }
+    this.R.toneMappingExposure = night ? 1.15 : 1.05;
   }
   hold3D(th, ph, rr) { this.hold = { th, ph, r: rr }; this.touched = true; this.forceUpdate(); }
   save(v) {
@@ -225,8 +288,8 @@ class Component extends DCLogic {
     const fans = [];
     for (let r = 0; r < 6; r++) for (let i = 0; i < 34; i++) { const y = 48 + r * 11, l = 30 - (y - 40) * 0.28, rr = 430 + (y - 40) * 0.28; if ((i * 7 + r * 3) % 5 === 0) continue; fans.push({ x: (l + (rr - l) * (i + 0.5) / 34).toFixed(1), y: y.toFixed(1), c: (i + r) % 3 ? c.c2 : '#F4F4FA' }); }
     const lab = (list, v) => (list.find((x) => x[0] === v) || [0, ''])[1];
-    const chip = (on) => on ? 'background: linear-gradient(135deg, #FDE68A, #F59E0B); color: #2A1400; box-shadow: 0 2px 0 #92400E;' : 'background: #ffffff1a; color: #fff;';
-    const sw = (key, cur) => (S ? S.COLORS : []).map((col) => ({ pick: () => this.save({ [key]: col }), style: 'background: ' + col + '; border: ' + (cur === col ? '3px solid #fff; box-shadow: 0 0 12px ' + col + ';' : '2px solid #ffffff33;') }));
+    const chip = (on) => on ? 'background: linear-gradient(180deg, #FFF3A0, #FFD23D 45%, #FFA800); color: #fff; -webkit-text-stroke: 2.5px #02040C; paint-order: stroke fill; box-shadow: inset 0 2px 0 #ffffffaa, 0 3px 0 #02040C;' : 'background: linear-gradient(180deg, #2A5AC0, #13306E); color: #fff; box-shadow: inset 0 2px 0 #ffffff33, 0 3px 0 #02040C;';
+    const sw = (key, cur) => (S ? S.COLORS : []).map((col) => ({ pick: () => this.save({ [key]: col }), style: 'background: linear-gradient(180deg, color-mix(in srgb, ' + col + ' 70%, #fff), ' + col + ' 55%, color-mix(in srgb, ' + col + ' 70%, #02040C)); border: 2.5px solid #02040C; ' + (cur === col ? 'box-shadow: 0 0 0 2.5px #fff, 0 0 0 5px #02040C, 0 0 14px ' + col + '; transform: scale(1.12);' : 'box-shadow: inset 0 2px 0 #ffffff66, 0 3px 0 #02040C;') }));
     const opts = (list, key) => (list || []).map(([v, label]) => ({ label, pick: () => this.save({ [key]: v }), style: chip(c[key] === v) }));
     const name = c.name, up = name.toUpperCase();
     const hasHist = typeof history !== 'undefined' && history.length > 1;
