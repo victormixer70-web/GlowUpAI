@@ -481,6 +481,8 @@ const Partido_diveShape = (a) => {
   return { id: "diveR", mir: left, F: 0.92, hand: 1.4 };
 };
 // a player's upgrades as sent in the room (an old app sends none: the starting values)
+// the 1 VS 1 fly-in (seconds): round the outside until [0], over the roof until [1], down to the halfway line until [2]
+const Partido_FLY = [3.8, 5.2, 7.2];
 const Partido_stats = (st) => {
   const o = { vel: 10, pot: 10, pre: 10, con: 10, res: 10, ref: 10 };
   if (st && typeof st === 'object') for (const k in o) { const v = Number(st[k]); if (isFinite(v)) o[k] = Math.max(10, Math.min(150, v)); }
@@ -982,12 +984,18 @@ class Component extends DCLogic {
   }
   start() {
     if (this.g.phase === 'end') this.newGame();
-    if (this.myStad && !this.stadSaid) {
+    if (this.myStad && !this.stadSaid && !(this.size() === 1 && this.upB && !this.net && !this.props.practice)) {
       this.stadSaid = true;
       const rival = this.props.awayName || 'tu rival';
       setTimeout(() => this.callout(this.adName, this.stadHome ? 'Juegas en casa' : 'Juegas en el campo de ' + rival, this.myStad.c2), 900);
     }
     // team matches open with the fans: the camera shows each end, flares lit, then kick-off
+    if (this.size() === 1 && this.upB && !this.props.tutorial && !this.props.practice && !this.net && !this.introDone) {
+      this.introDone = true; this.introFly = true;
+      this.g.phase = 'intro'; this.g.pt = 0; this.introK = -1; this.introT0 = null;
+      this.loop();
+      return;
+    }
     if (this.size() >= 2 && !this.props.tutorial && !this.net && !this.introDone) {
       this.introDone = true;
       this.g.phase = 'intro'; this.g.pt = 0; this.introK = -1; this.introT0 = null;
@@ -1008,13 +1016,18 @@ class Component extends DCLogic {
     g.countT = 3; g.countGo = 0; this.sfx('tick', 1);
   }
   // the three shots of the intro: home end, away end, the whole stadium
-  introShot() { const t = this.g.pt; return t < 2.8 ? 0 : t < 5.6 ? 1 : 2; }
+  introShot() { const t = this.g.pt; if (this.introFly) return t < Partido_FLY[0] ? 0 : 2; return t < 2.8 ? 0 : t < 5.6 ? 1 : 2; }
   introStep() {
     const g = this.g;
     // the clock starts with the first frame actually drawn (the first one can take a while on a slow phone)
     if (this.introT0 == null) this.introT0 = performance.now();
     g.pt = (performance.now() - this.introT0) / 1000;
     const k = this.introShot();
+    if (this.introFly) {
+      if (k !== this.introK) { this.introK = k; this.sfx(k === 0 ? 'roar' : 'whistle', k === 0 ? 1 : 2); if (k === 0 && this.upB) this.upB.burst(performance.now() / 1000); }
+      if (g.pt >= Partido_FLY[2]) this.endIntro();
+      return;
+    }
     if (k !== this.introK) {
       this.introK = k;
       if (k < 2) { this.flare = { team: k, intro: true }; this.sfx('roar', k === 0); }
@@ -2961,7 +2974,7 @@ class Component extends DCLogic {
       this.myStad = null;
       const SD = window.AMStad;
       if (SD && this.size() === 1 && !P0.tutorial && !P0.practice) {
-        let mine = SD.get(), theirs = SD.ai(P0.awayName || 'Rival'), meHome = r < 0.5;
+        let mine = SD.get(), theirs = SD.ai(P0.awayName || 'Rival'), meHome = window.__homeToss != null ? !!window.__homeToss : r < 0.5;
         if (rm && P0.online.roster) {
           const R0 = P0.online.roster, host = R0.find((x) => x.host) || R0[0], guest = R0.find((x) => x !== host);
           const hs = host && host.look && host.look.stad ? SD.clean(host.look.stad) : SD.ai(host ? host.name : 'A'), gs = guest && guest.look && guest.look.stad ? SD.clean(guest.look.stad) : SD.ai(guest ? guest.name : 'B');
@@ -3706,6 +3719,16 @@ class Component extends DCLogic {
       sp.scale.set(26, 26, 1); sp.position.set(x, 30, z); S.add(sp);
     });
     // 1 VS 1: a street cage round the pitch (no wall on the camera's side)
+    // 1 VS 1 in someone's stadium: its remodelled parts (façade, roof, tiers, screens, lights, decoration); the near
+    // half only shows with the near stand (replays, the intro)
+    this.upB = null;
+    if (n === 1 && STAD && this.myStad && window.AMStadUp && !this.props.tutorial && !this.props.practice) {
+      const [kx0, kz0] = this.stadK || [0.9, 0.9];
+      this.upB = window.AMStadUp.build(this.myStad, { kx: kx0, kz: kz0, night: this.wx === 'noche' });
+      this.upB.group.traverse((o) => { if (o.isMesh && !o.material.transparent && o.material.side !== undefined) o.receiveShadow = true; });
+      S.add(this.upB.group);
+      if (this.bowl) { this.bowl.c.push(this.upB.near); this.upB.near.visible = !!this.bowl.closed; }
+    }
     if (n === 1 && !this.props.tutorial && !this.props.practice) {
       const mesh = this.canvasTex(128, 128, (c, w, h) => {
         c.clearRect(0, 0, w, h); c.strokeStyle = 'rgba(205,215,230,0.95)'; c.lineWidth = 5;
@@ -4318,6 +4341,24 @@ class Component extends DCLogic {
       const f = 1 - Math.exp(-3 * (dt || 0.016) / 0.42);
       this.camPos.lerp(want, f); this.camLook.lerp(look, f);
       this.cam.position.copy(this.camPos); this.cam.lookAt(this.camLook);
+    } else if (g.phase === 'intro' && this.introFly && this.upB) {
+      // 1 VS 1: round the outside of the home stadium, up over the roof and straight down to the halfway line
+      const s = this.upB.size, t = g.pt, [T1, T2, T3] = Partido_FLY, ez = (x) => x * x * (3 - 2 * x);
+      const orbit = (u) => { const a = -2.2 + Math.PI * 2 * ez(u), R = s.x * (1.95 - 0.3 * u); return new T.Vector3(Math.cos(a) * R, s.h + 30 - 8 * u, Math.sin(a) * R * (s.z / s.x) * 1.12); };
+      let pos, look;
+      if (t < T1) { pos = orbit(t / T1); look = new T.Vector3(0, s.h * 0.4, 0); }
+      else if (t < T2) {
+        const u = ez((t - T1) / (T2 - T1)), a = orbit(1), b = new T.Vector3(0, s.h + 42, s.z * 0.5);
+        pos = a.lerp(b, u); look = new T.Vector3(0, s.h * 0.4 * (1 - u), 0);
+      } else {
+        const u = ez(Math.min(1, (t - T2) / (T3 - T2))), b = new T.Vector3(0, s.h + 42, s.z * 0.5), c = new T.Vector3(0, 3.4, 11.5);
+        // down in front of the hanging video cube, never through it
+        pos = b.lerp(c, u);
+        look = new T.Vector3(0, 0.6 * u, -2 * (1 - u));
+      }
+      if (this.cam.fov !== 46) { this.cam.fov = 46; this.cam.updateProjectionMatrix(); }
+      this.camPos.copy(pos); this.camLook.copy(look);
+      this.cam.position.copy(pos); this.cam.lookAt(look);
     } else if (g.phase === 'intro') {
       // a crane shot sweeping along each end's stand, then up and over the whole stadium
       const k = this.introShot(), t = g.pt - k * 2.8, u = Math.min(1, t / 2.8);
@@ -4399,6 +4440,7 @@ class Component extends DCLogic {
         B.o.forEach((x) => { x.visible = !closed; }); B.c.forEach((x) => { x.visible = closed; });
       }
     }
+    if (this.upB) this.upB.update(performance.now() / 1000);
     const tnow = performance.now() / 1000, scoring = g.phase === 'goal' ? 1 - g.concede : g.phase === 'intro' && this.flare ? this.flare.team : -1;
     (this.fanGroups || []).forEach((fg) => {
       const u = fg.userData;
@@ -5153,7 +5195,11 @@ class Component extends DCLogic {
           introKicker: k === 0 ? 'AFICIÓN LOCAL' : k === 1 ? 'AFICIÓN VISITANTE' : (this.wx === 'noche' ? 'PARTIDO NOCTURNO' : this.wx === 'lluvia' ? 'BAJO LA LLUVIA' : this.wx === 'nieve' ? 'PARTIDO CON NIEVE' : this.wx === 'atardecer' ? 'AL ATARDECER' : 'ARENA MIX') + ' · ' + n + ' VS ' + n,
           introTitle: k === 0 ? hn : k === 1 ? an : hn + '  VS  ' + an,
           introColor: col,
-          introTitleStyle: 'font-size: ' + (k === 2 ? 40 : 52) + 'px; background: linear-gradient(90deg, transparent, #0B0B14E6 12%, #0B0B14E6 88%, transparent); color: #F4F4FA; text-shadow: 0 4px 0 #05050A, 0 0 26px ' + col + '; box-shadow: inset 0 -4px 0 ' + col + ';'
+          introTitleStyle: 'font-size: ' + (k === 2 ? 40 : 52) + 'px; background: linear-gradient(90deg, transparent, #0B0B14E6 12%, #0B0B14E6 88%, transparent); color: #F4F4FA; text-shadow: 0 4px 0 #05050A, 0 0 26px ' + col + '; box-shadow: inset 0 -4px 0 ' + col + ';',
+          ...(this.introFly ? {
+            introKicker: k === 0 ? (this.stadHome ? 'JUEGAS EN CASA' : 'EL CAMPO DE ' + an) : (this.wx === 'noche' ? 'PARTIDO NOCTURNO' : this.wx === 'atardecer' ? 'AL ATARDECER' : 'ARENA MIX') + ' · 1 VS 1',
+            introTitle: k === 0 ? this.adName : hn + '  VS  ' + an
+          } : {})
         };
       })(),
       winKicker: g.phase === 'winners' ? (g.win.team < 0 ? 'FINAL DEL PARTIDO' : 'GANADORES') : '',

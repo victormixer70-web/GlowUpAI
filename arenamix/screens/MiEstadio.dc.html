@@ -41,6 +41,28 @@ body{margin:0}
 .me-pad .c{background:linear-gradient(180deg,#FFF3A0,#FFC53D 50%,#FFA800);color:#2A1400}
 .me-ar:active{background:linear-gradient(180deg,#FFF3A0,#FFC53D);color:#2A1400;transform:translateY(2px);box-shadow:inset 0 2px 0 #ffffffaa,0 1px 0 #02040C}
 .me-hint{border:2px solid #02040C;background:#0B1A44E6;font:400 10px Titulos,sans-serif;letter-spacing:.5px;color:#fff}
+.me-view{position:absolute;right:8px;top:8px;display:flex;gap:4px;z-index:2}
+.me-view button{height:26px;padding:0 10px;border:2.5px solid #02040C;border-radius:9px;font:400 10.5px Titulos,sans-serif;letter-spacing:.5px;cursor:pointer}
+.me-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:none}
+.me-tabs button{height:34px;border:3px solid #02040C;border-radius:12px;font:400 13px Titulos,sans-serif;letter-spacing:.6px;cursor:pointer;color:#fff;-webkit-text-stroke:2.5px #02040C;paint-order:stroke fill}
+.me-gems{flex:none;display:flex;align-items:center;gap:8px}
+.me-gems span{flex:1;font:700 10.5px/1.3 Exo2,sans-serif;color:#BFD3F5}
+.me-gem{display:flex;align-items:center;gap:5px;height:28px;padding:0 10px;border-radius:10px;border:2.5px solid #02040C;background:linear-gradient(180deg,#5A1F4F,#2A0B26);box-shadow:inset 0 0 0 1.5px #FF5CC8,0 3px 0 #02040C;color:#fff;text-decoration:none;font:400 14px Titulos,sans-serif}
+.me-part{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:14px;border:2.5px solid #02040C;background:linear-gradient(180deg,#22489E,#13306E 60%,#0B1A44);box-shadow:inset 0 2px 0 #ffffff33,0 3px 0 #02040C}
+.me-part .ic{flex:none;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:2.5px solid #02040C;color:#fff;box-shadow:inset 0 2px 0 #ffffff66}
+.me-part .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.me-part .tx b{font:400 13px/1 Titulos,sans-serif;letter-spacing:.4px;color:#fff;text-shadow:0 2px 0 #02040C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.me-part .tx small{font:700 10px Exo2,sans-serif;color:#BFD3F5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.me-part .pips{display:flex;gap:4px;margin-top:2px}
+.me-part .pips button{width:22px;height:18px;padding:0;border:2px solid #02040C;border-radius:6px;font:400 10px Titulos,sans-serif;cursor:pointer}
+.me-buy{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:74px;height:44px;padding:0 8px;border:3px solid #02040C;border-radius:12px;cursor:pointer}
+.me-buy small{font:700 8.5px Exo2,sans-serif;max-width:86px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.me-buy span{display:flex;align-items:center;gap:4px;font:400 15px Titulos,sans-serif;color:#fff;-webkit-text-stroke:2.5px #02040C;paint-order:stroke fill}
+.me-buy:active{transform:translateY(2px)}
+.me-max{flex:none;padding:4px 8px;border-radius:9px;border:2.5px solid #02040C;background:linear-gradient(180deg,#FFF3A0,#FFC53D);color:#2A1400;font:400 10px Titulos,sans-serif;letter-spacing:.5px}
+@keyframes meBuy{0%{transform:scale(1)}40%{transform:scale(1.15)}100%{transform:scale(1)}}
+.me-part.pop{animation:meBuy .45s cubic-bezier(.2,1.8,.4,1)}
+.me-hint{left:8px!important;translate:none!important}
 </style>
 </helmet>
 <div class="bc-stage" style="position: relative; width: 844px; height: 390px; overflow: hidden; isolation: isolate; color: #F4F4FA; font-family: Exo2, sans-serif">
@@ -61,6 +83,7 @@ body{margin:0}
         <canvas ref="{{cvRef}}" aria-label="Tu estadio en 3D. Arrastra para girarlo." onPointerDown="{{pDown}}" onPointerMove="{{pMove}}" onPointerUp="{{pUp}}" onPointerCancel="{{pUp}}" onPointerLeave="{{pUp}}" onWheel="{{wheel}}" style="position: absolute; inset: 0; width: 440px; height: 268px; display: block; touch-action: none; cursor: grab"></canvas>
         <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 400 18px Titulos, sans-serif; letter-spacing: 1px; color: #A6DCFF">CARGANDO TU ESTADIO…</span></sc-if>
         <span class="me-hint" style="{{hintStyle}}">Arrastra para girarlo · usa las flechas</span>
+        <div class="me-view" role="radiogroup" aria-label="Vista"><sc-for list="{{views}}" as="v" hint-placeholder-count="2"><button type="button" role="radio" aria-checked="{{v.on}}" onClick="{{v.pick}}" style="{{v.style}}">{{v.label}}</button></sc-for></div>
         <!-- camera pad: rotate, tilt, zoom, reset -->
         <div class="me-pad" aria-label="Mover la cámara">
           <button type="button" class="me-ar u" aria-label="Inclinar arriba" onPointerDown="{{hU}}" onPointerUp="{{hOff}}" onPointerLeave="{{hOff}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6l6 6"/></svg></button>
@@ -80,7 +103,25 @@ body{margin:0}
       </div>
     </div>
     <!-- controls -->
-    <div class="me-card" style="flex: 1; padding: 12px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; scrollbar-width: none">
+    <div class="me-card" style="flex: 1; padding: 10px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; min-width: 0">
+      <div class="me-tabs" role="tablist" aria-label="Personalizar"><sc-for list="{{tabs}}" as="tb" hint-placeholder-count="2"><button type="button" role="tab" aria-selected="{{tb.on}}" onClick="{{tb.pick}}" style="{{tb.style}}">{{tb.label}}</button></sc-for></div>
+      <sc-if value="{{isUp}}" hint-placeholder-val="{{ false }}">
+        <div class="me-gems"><span>Mejora tu estadio pieza a pieza. Lo verás en tus partidos en casa.</span><a href="Tienda.dc.html" class="me-gem" aria-label="Gemas: {{gems}}. Ir a la tienda"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M7 3h10l4 6l-9 12L3 9z" fill="#FF5CC8" stroke="#02040C" stroke-width="1.6"/><path d="M3 9h18M12 21L9 9l3-6l3 6z" fill="none" stroke="#FFD6F2" stroke-width="1.2"/></svg>{{gems}}</a></div>
+        <div style="flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 7px; padding: 2px 2px 4px">
+          <sc-for list="{{parts}}" as="pt" hint-placeholder-count="6">
+            <div class="me-part">
+              <span class="ic" style="{{pt.icStyle}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="{{pt.icon}}"/></svg></span>
+              <div class="tx"><b>{{pt.name}}</b><small>{{pt.cur}}</small>
+                <div class="pips" role="radiogroup" aria-label="{{pt.name}}"><sc-for list="{{pt.pips}}" as="pp" hint-placeholder-count="3"><button type="button" role="radio" aria-checked="{{pp.on}}" aria-label="{{pp.aria}}" onClick="{{pp.pick}}" style="{{pp.style}}">{{pp.n}}</button></sc-for></div>
+              </div>
+              <sc-if value="{{pt.canBuy}}" hint-placeholder-val="{{ true }}"><button type="button" class="me-buy" onClick="{{pt.buy}}" style="{{pt.buyStyle}}" aria-label="{{pt.buyAria}}"><small>{{pt.nextName}}</small><span><svg width="13" height="13" viewBox="0 0 24 24"><path d="M7 3h10l4 6l-9 12L3 9z" fill="#FF5CC8" stroke="#02040C" stroke-width="2"/></svg>{{pt.price}}</span></button></sc-if>
+              <sc-if value="{{pt.max}}" hint-placeholder-val="{{ false }}"><span class="me-max">MÁXIMO</span></sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{isCol}}" hint-placeholder-val="{{ true }}">
+      <div style="flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 6px">
       <span class="me-h">NOMBRE DEL ESTADIO<i></i></span>
       <input class="me-in" maxlength="22" value="{{draft}}" onInput="{{onName}}" aria-label="Nombre del estadio">
       <span class="me-h">COLOR DE LOS ASIENTOS<i></i></span>
@@ -95,6 +136,8 @@ body{margin:0}
       <div style="display: flex; flex-wrap: wrap; gap: 5px"><sc-for list="{{grs}}" as="c" hint-placeholder-count="4"><button type="button" class="me-chip" style="{{c.style}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div>
       <span class="me-h">HORARIO DE TUS PARTIDOS<i></i></span>
       <div style="display: flex; flex-wrap: wrap; gap: 5px"><sc-for list="{{tms}}" as="c" hint-placeholder-count="4"><button type="button" class="me-chip" style="{{c.style}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div>
+      </div>
+      </sc-if>
     </div>
   </div>
 </div>
@@ -106,7 +149,7 @@ const ME_SKY = { auto: ['#1B1050', '#7C3AED'], dia: ['#5DB4F0', '#CFE8FF'], atar
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { cfg: window.AMStad ? window.AMStad.get() : null, saved: 0 };
+    this.state = { cfg: window.AMStad ? window.AMStad.get() : null, saved: 0, tab: 'col', view: 'in', open: null };
     this.orb = { th: 0.35, ph: 1.12, r: 40, vth: 0, vph: 0, vr: 0 };
     this.cvRef = (el) => { if (el && el !== this.cv) { this.cv = el; setTimeout(() => this.init3D(), 30); } };
   }
@@ -198,6 +241,7 @@ class Component extends DCLogic {
     });
     this.apply3D(this.state.cfg || window.AMStad.get());
     let last = performance.now();
+    const OUT = this.out = this.out || { th: -0.6, r: 105, h: 42 };
     const loop = (now) => {
       this.raf = requestAnimationFrame(loop);
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
@@ -209,7 +253,18 @@ class Component extends DCLogic {
       // the camera stays over the pitch, inside the bowl (an ellipse: long towards the goals, short towards the sides)
       { const ct = Math.cos(O.th) / 34, st = Math.sin(O.th) / 15.5, Hmax = 1 / Math.sqrt(ct * ct + st * st), rHi = Hmax / Math.max(0.2, Math.sin(O.ph)); this.rCam = Math.min(O.r, rHi); }
       const C = this.cam;
+      if (this.upB) this.upB.update(now / 1000);
+      // outside: the camera circles the stadium (drag and the arrows turn it, + / − bring it closer)
+      if (this.state.view === 'out') {
+        if (this.S.background !== this.outSky()) { this.inBg = this.S.background; this.S.background = this.outSky(); }
+        const s = this.upB ? this.upB.size : { x: 50, z: 42, h: 21 }, rr = Math.max(s.x * 1.55, Math.min(200, s.x * 2.1 * O.r / 40)), hh = s.h + 14 + 26 * (1.42 - O.ph);
+        C.position.set(Math.cos(O.th) * rr, hh, Math.sin(O.th) * rr * (s.z / s.x) * 1.15);
+        C.lookAt(0, s.h * 0.45, 0);
+        this.R.render(this.S, C);
+        return;
+      }
       const rc = this.rCam || O.r; C.position.set(Math.sin(O.ph) * Math.cos(O.th) * rc, Math.cos(O.ph) * rc + 1.5, Math.sin(O.ph) * Math.sin(O.th) * rc);
+      if (this.inBg && this.S.background === this.skyT) { this.S.background = this.inBg; this.inBg = null; }
       // it looks across the pitch at the stand opposite (the stadium, not just the grass)
       C.lookAt(-Math.cos(O.th) * 14, 4 + 4 * (1 - Math.sin(O.ph)), -Math.sin(O.th) * 7);
       this.R.render(this.S, C);
@@ -254,13 +309,73 @@ class Component extends DCLogic {
     this.hemi.color.setHex(dusk ? 0xffb3c8 : night ? 0x6f84c0 : 0xcfe0ff); this.hemi.groundColor.setHex(dusk ? 0x3a1a2a : night ? 0x08160e : 0x1d5a33);
     this.hemi.intensity = night ? 0.5 : this.env && !dusk ? 0.3 : 0.9;
     S.environment = !night && this.env ? this.env : null;
-    S.background = night ? new T.Color(0x05060f) : dusk ? new T.Color(0x5a2a5a) : this.skyBg || new T.Color(0x8f99a6);
+    S.background = night ? new T.Color(0x05060f) : dusk ? new T.Color(0x5a2a5a) : this.skyBg || new T.Color(0x8f99a6); this.inBg = null;
     S.fog = night ? new T.Fog(0x070a18, 110, 280) : dusk ? new T.Fog(0x7a3a5a, 120, 300) : new T.Fog(0x8f99a6, 130, 300);
     (this.glows || []).forEach((g) => { g.visible = night; });
     // the fans wear the stadium's colours (and some neutrals)
     if (this.fanBody) { const P = [c.c1, c.c2, c.c1, '#F4F4FA', '#1B2236', c.c2]; for (let i = 0; i < this.fanN; i++) this.fanBody.setColorAt(i, new T.Color(P[(i * 31) % P.length]).multiplyScalar(night ? 0.8 : 1)); this.fanBody.instanceColor.needsUpdate = true; }
     this.R.toneMappingExposure = night ? 1.15 : 1.05;
+    this.buildUp(c);
   }
+  // the sky seen from outside the stadium, for the time of day
+  outSky() {
+    const c = this.state.cfg || window.AMStad.get(), k = c.time;
+    if (this.skyK === k && this.skyT) return this.skyT;
+    const cv = document.createElement('canvas'); cv.width = 16; cv.height = 256;
+    const x = cv.getContext('2d'), g = x.createLinearGradient(0, 0, 0, 256);
+    const C = k === 'noche' ? ['#02030A', '#0B1636', '#1B2A5A'] : k === 'atardecer' ? ['#2A1660', '#C2477A', '#FF9A5A'] : ['#2F7FE0', '#78B8F4', '#D8ECFF'];
+    g.addColorStop(0, C[0]); g.addColorStop(0.6, C[1]); g.addColorStop(1, C[2]); x.fillStyle = g; x.fillRect(0, 0, 16, 256);
+    if (this.skyT) this.skyT.dispose();
+    this.skyT = new window.THREE.CanvasTexture(cv); this.skyT.encoding = window.THREE.sRGBEncoding; this.skyK = k;
+    return this.skyT;
+  }
+  // the remodelled parts (stadup.js): rebuilt whenever a level, a colour, the name or the time of day changes
+  buildUp(c) {
+    const U = window.AMStadUp, T = window.THREE;
+    if (!U || !this.S || !c) return;
+    const key = JSON.stringify([c.up, c.c1, c.c2, c.name, c.time]);
+    if (key === this.upKey) return;
+    this.upKey = key;
+    if (this.upB) { this.S.remove(this.upB.group); this.upB.group.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); }
+    this.upB = U.build(c, { kx: 0.9, kz: 0.9, night: c.time === 'noche' });
+    this.upB.group.traverse((o) => { if (o.isMesh && !o.material.transparent) { o.receiveShadow = true; } });
+    this.S.add(this.upB.group);
+  }
+  // the remodelling tab: each part with its levels (the ones you own can be picked; the next one is bought with gems)
+  upVals(c) {
+    const U = window.AMStadUp, PR = window.AMProgress, gems = PR && PR.gems ? PR.gems() : 0, s = this.state;
+    const seg = (on, col) => on ? 'background: linear-gradient(180deg, color-mix(in srgb, ' + col + ' 70%, #fff), ' + col + ' 55%, color-mix(in srgb, ' + col + ' 65%, #02040C)); color: #fff; -webkit-text-stroke: 2.5px #02040C; paint-order: stroke fill; box-shadow: inset 0 2px 0 #ffffff99, 0 3px 0 #02040C;' : 'background: linear-gradient(180deg, #13306E, #0B1A44); color: #BFD3F5; box-shadow: inset 0 2px 0 #ffffff22, 0 3px 0 #02040C;';
+    const PC = { fachada: '#22D3EE', techo: '#A78BFA', aforo: '#53D88E', pantallas: '#3B82F6', focos: '#FFC53D', deco: '#FF5CC8' };
+    const parts = !U ? [] : U.PARTS.map((P) => {
+      const own = (c.own || {})[P.id] | 0, cur = (c.up || {})[P.id] | 0, nx = own + 1, max = nx >= P.levels.length, price = max ? 0 : U.PRICE[nx], col = PC[P.id];
+      return {
+        name: P.name.toUpperCase(), icon: P.icon, icStyle: 'background: linear-gradient(180deg, color-mix(in srgb, ' + col + ' 70%, #fff), ' + col + ');',
+        cur: 'Nivel ' + cur + ' · ' + P.levels[cur][0] + ' — ' + P.levels[cur][1],
+        pips: P.levels.map((lv, i) => {
+          const have = i <= own;
+          return { n: String(i), on: String(i === cur), aria: lv[0] + (have ? '' : ' (no comprado)'),
+            style: have ? (i === cur ? 'background: linear-gradient(180deg, #FFF3A0, #FFC53D); color: #2A1400;' : 'background: #3DA9FF; color: #02040C;') : 'background: #0B1A44; color: #4A5C88; cursor: default;',
+            pick: () => { if (!have) return; this.save({ up: Object.assign({}, c.up, { [P.id]: i }) }); this.view('out'); } };
+        }),
+        canBuy: !max, max, price: String(price), nextName: max ? '' : P.levels[nx][0], buyAria: max ? '' : 'Comprar ' + P.levels[nx][0] + ' por ' + price + ' gemas',
+        buyStyle: gems >= price ? 'background: linear-gradient(180deg, #FFB0E6, #FF5CC8 50%, #C21C8E); color: #fff; box-shadow: inset 0 2px 0 #ffffffaa, 0 4px 0 #02040C;' : 'background: linear-gradient(180deg, #3A2A4A, #241830); color: #A08AB8; box-shadow: 0 4px 0 #02040C;',
+        buy: () => {
+          if (max) return;
+          if (!PR || !PR.spendGems || !PR.spendGems(price)) { window.dispatchEvent(new CustomEvent('am:toast', { detail: { title: 'TE FALTAN GEMAS', sub: 'Necesitas ' + price + ' BOB · consíguelas en la Tienda', color: '#FF5CC8', icon: 'gift' } })); return; }
+          this.save({ own: Object.assign({}, c.own, { [P.id]: nx }), up: Object.assign({}, c.up, { [P.id]: nx }) });
+          this.view('out');
+          if (window.AMSfx && window.AMSfx.coin) window.AMSfx.coin();
+          if (window.AMJuice && window.AMJuice.confetti) window.AMJuice.confetti(250, 200, '#FF5CC8');
+        }
+      };
+    });
+    return {
+      gems: String(gems), parts, isUp: s.tab === 'up', isCol: s.tab !== 'up',
+      tabs: [['col', 'COLORES'], ['up', 'REMODELAR']].map(([id, label]) => ({ label, on: String(s.tab === id), style: seg(s.tab === id, id === 'up' ? '#FF5CC8' : '#3DA9FF'), pick: () => { this.setState({ tab: id }); this.view(id === 'up' ? 'out' : 'in'); } })),
+      views: [['in', 'DENTRO'], ['out', 'FUERA']].map(([id, label]) => ({ label, on: String(s.view === id), style: seg(s.view === id, '#FFC53D'), pick: () => this.view(id) }))
+    };
+  }
+  view(v) { if (this.state.view !== v) { Object.assign(this.orb, v === 'out' ? { th: -0.6, ph: 1.12, r: 40 } : { th: 0.35, ph: 1.12, r: 40 }); this.setState({ view: v }); } }
   hold3D(th, ph, rr) { this.hold = { th, ph, r: rr }; this.touched = true; this.forceUpdate(); }
   save(v) {
     if (!window.AMStad) return;
@@ -320,7 +435,8 @@ class Component extends DCLogic {
       onName: (e) => { const v = e.target.value; this.state.draft = v; if (v.trim()) this.save({ name: v }); else this.forceUpdate(); },
       sw1: sw('c1', c.c1), sw2: sw('c2', c.c2), swS: sw('seat', c.seat),
       seatOpts: (S && S.SEATS ? S.SEATS : []).map(([v, label]) => ({ label, pick: () => this.save({ seat: v }), style: chip(c.seat === v) })),
-      pats: opts(S && S.PATTERNS, 'pitch'), grs: opts(S && S.GRASS, 'grass'), tms: opts(S && S.TIMES, 'time')
+      pats: opts(S && S.PATTERNS, 'pitch'), grs: opts(S && S.GRASS, 'grass'), tms: opts(S && S.TIMES, 'time'),
+      ...this.upVals(c)
     };
   }
 }

@@ -18,9 +18,13 @@
       name: String(v.name || d.name).replace(/[<>]/g, '').slice(0, 22) || d.name,
       c1: /^#[0-9a-fA-F]{6}$/.test(v.c1 || '') ? v.c1 : d.c1, c2: /^#[0-9a-fA-F]{6}$/.test(v.c2 || '') ? v.c2 : d.c2,
       seat: v.seat === 'orig' || v.seat === 'club' || /^#[0-9a-fA-F]{6}$/.test(v.seat || '') ? v.seat : d.seat,
-      pitch: ok('pitch', PATTERNS), grass: ok('grass', GRASS), time: ok('time', TIMES)
+      pitch: ok('pitch', PATTERNS), grass: ok('grass', GRASS), time: ok('time', TIMES),
+      // the remodelling (stadup.js): own = the highest level bought of each part, up = the one in use
+      own: lv(v.own, null), up: lv(v.up, lv(v.own, null) && Object.assign({ fachada: 0, techo: 0, aforo: 0, pantallas: 0, focos: 0, deco: 0 }, lv(v.own, null)))
     };
   }
+  var UPK = ['fachada', 'techo', 'aforo', 'pantallas', 'focos', 'deco'];
+  function lv(o, cap) { var r = {}; o = o || {}; UPK.forEach(function (k) { var n = Math.max(0, Math.min(3, (o[k] | 0))); if (cap) n = Math.min(n, cap[k] | 0); if (n) r[k] = n; }); return r; }
   function get() { try { return clean(JSON.parse(localStorage.getItem(KEY) || 'null')); } catch (e) { return def(); } }
   function set(v) { var c = clean(Object.assign(get(), v)); try { localStorage.setItem(KEY, JSON.stringify(c)); } catch (e) {} return c; }
   // an AI rival's stadium: picked from its name, so the same rival always plays at home in the same place
@@ -29,7 +33,8 @@
     var h = 7, s = String(seed || 'Rival');
     for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
     var pick = function (list) { h = (h * 1103515245 + 12345) >>> 0; return list[h % list.length]; };
-    return clean({ name: pick(AINAMES), c1: pick(COLORS), c2: pick(COLORS), pitch: pick(PATTERNS)[0], grass: pick(GRASS)[0], time: pick(TIMES)[0], seat: pick(['orig', 'club', 'club'].concat(COLORS)) });
+    var L = {}; UPK.forEach(function (k) { L[k] = pick([0, 0, 1, 1, 2, 3]); }); L.aforo = Math.min(2, L.aforo); L.pantallas = Math.min(2, L.pantallas); L.focos = Math.min(2, L.focos);
+    return clean({ name: pick(AINAMES), c1: pick(COLORS), c2: pick(COLORS), pitch: pick(PATTERNS)[0], grass: pick(GRASS)[0], time: pick(TIMES)[0], seat: pick(['orig', 'club', 'club'].concat(COLORS)), own: L, up: L });
   }
   /* The seats of the 3D stadium are two small strips of its texture (a blue one and an orange one, x 1738-1938,
      y 346-381 of the 2048 atlas). A few lines in the shader paint the coloured pixels of those strips in the chosen
