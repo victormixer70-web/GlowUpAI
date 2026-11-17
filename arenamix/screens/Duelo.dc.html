@@ -1281,10 +1281,36 @@ class Component extends DCLogic {
     }
     return fanGroups;
   }
+  // whose stadium (Mi estadio) this is played in: yours in practice, the lucky shots and against the AI; a
+  // shoot-out after a match keeps the match's stadium; online, a toss from the room's code (the same on both
+  // phones) picks the host's or the guest's, as each of them set it up
+  stadCfg() {
+    if (this._stad !== undefined) return this._stad;
+    const SD = window.AMStad;
+    let cfg = null, home = true;
+    if (SD) {
+      cfg = SD.get();
+      if (this.props.shootout && window.__amMatchStad) { cfg = SD.clean(window.__amMatchStad); home = window.__amMatchHome !== false; }
+      const ol = this.ol;
+      if (ol && ol.roster && ol.roster.length) {
+        const R0 = ol.roster, host = R0.find((x) => x.host) || R0[0], guest = R0.find((x) => x !== host);
+        const of = (p, nm) => (p && p.id === ol.me ? SD.get() : p && p.look && p.look.stad ? SD.clean(p.look.stad) : SD.ai(p ? p.name : nm));
+        const rm = ol.room, key = String((rm && (rm.code || rm.id)) || '');
+        let h = 7; for (let k = 0; k < key.length; k++) h = (h * 31 + key.charCodeAt(k)) | 0;
+        const atHost = ((h >>> 0) % 1000) / 1000 < 0.5, iAmHost = host && host.id === ol.me;
+        cfg = atHost ? of(host, 'A') : of(guest, 'B'); home = atHost === !!iAmHost;
+      }
+    }
+    this.stadHome = home;
+    return (this._stad = cfg);
+  }
   // the match's stadium model, scaled from its small pitch to a real one: long axis along z with the goal end
   // behind this goal, closed on every side with a mirror image of its far half (clipped where they meet)
   buildOurStadium(E, STAD, teamCols) {
     const T = THREE, D = this.D, GX = this.GX, KL = 1.9, KY = 1.45, KW = 2.25;
+    const cfg = this.stadCfg(), NEWST = cfg && window.AMStadUp ? window.AMStadUp.make(cfg, { night: true }) : null;
+    this.newSt = NEWST;
+    if (NEWST) STAD = { model: () => { const g = new T.Group(); g.add(NEWST.half.clone()); return g; }, seats: () => NEWST.seats };
     const place = (m, mirror) => {
       m.scale.set(KL, KY, mirror ? -KW : KW);
       m.rotation.y = -Math.PI / 2;
@@ -1302,21 +1328,34 @@ class Component extends DCLogic {
     // the model's open side (+z, the TV side) becomes -x here: keep the far half (+x) and mirror it
     const a = place(STAD.model(), false); clip(a, planes[0]); E.add(a);
     const b = place(STAD.model(), true); clip(b, planes[1]); E.add(b);
-    // night: the stands in the dark (their materials were just cloned for the clipping)
-    [a, b].forEach((m) => m.traverse((o) => { if (o.isMesh && o.material) [].concat(o.material).forEach((mt) => { if (mt.color) mt.color.multiplyScalar(0.45); }); }));
+    // what stands on its own (square, towers, screens, beams, fireworks): placed like the stands, not mirrored
+    if (NEWST) E.add(place(NEWST.whole, false));
+    // night: the stands in the dark (their materials were just cloned for the clipping); your stadium has its own lights
+    if (!NEWST) [a, b].forEach((m) => m.traverse((o) => { if (o.isMesh && o.material) [].concat(o.material).forEach((mt) => { if (mt.color) mt.color.multiplyScalar(0.45); }); }));
     // the two big video screens of the stadium: the logo and what is being played, in the logo's colours
     {
       const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 512;
       const c = cv.getContext('2d'), w = 1024, h = 512, label = this.kind === 'pen' ? (this.props.shootout ? 'TANDA DE PENALTIS' : 'PENALTIS') : 'TIROS LIBRES';
+      const nm = NEWST ? String(cfg.name || '').toUpperCase() : '', k1 = NEWST ? cfg.c1 : '#3DA9FF', k2 = NEWST ? cfg.c2 : '#FFC53D';
       const paint = (logo) => {
         const gr = c.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#02040C'); gr.addColorStop(0.5, '#06102E'); gr.addColorStop(1, '#0A3DCC');
         c.fillStyle = gr; c.fillRect(0, 0, w, h);
         const gl = c.createRadialGradient(w * 0.28, h * 0.5, 10, w * 0.28, h * 0.5, 320); gl.addColorStop(0, 'rgba(30,139,255,.55)'); gl.addColorStop(1, 'rgba(30,139,255,0)');
         c.fillStyle = gl; c.fillRect(0, 0, w, h);
         c.fillStyle = 'rgba(255,255,255,0.04)'; for (let y = 0; y < h; y += 6) c.fillRect(0, y, w, 2);
-        c.strokeStyle = '#3DA9FF'; c.lineWidth = 10; c.shadowColor = '#1E8BFF'; c.shadowBlur = 24; c.strokeRect(14, 14, w - 28, h - 28); c.shadowBlur = 0;
+        c.strokeStyle = k1; c.lineWidth = 10; c.shadowColor = k1; c.shadowBlur = 24; c.strokeRect(14, 14, w - 28, h - 28); c.shadowBlur = 0;
         if (logo) c.drawImage(logo, 70, 86, 340, 340);
         c.textAlign = 'left'; c.textBaseline = 'middle';
+        if (nm) {
+          // the stadium's name, as large as fits, and what is being played
+          let fs = 92; c.font = '400 ' + fs + 'px Titulos, Barlow Condensed, Arial';
+          const words = nm.split(' '), l1 = words.length > 1 ? words.slice(0, Math.ceil(words.length / 2)).join(' ') : nm, l2 = words.length > 1 ? words.slice(Math.ceil(words.length / 2)).join(' ') : '';
+          while (fs > 40 && Math.max(c.measureText(l1).width, c.measureText(l2).width) > 520) { fs -= 4; c.font = '400 ' + fs + 'px Titulos, Barlow Condensed, Arial'; }
+          c.fillStyle = '#FFFFFF'; c.shadowColor = k1; c.shadowBlur = 26; c.fillText(l1, 450, l2 ? 190 : 240);
+          if (l2) { c.fillStyle = k1; c.fillText(l2, 450, 290); } c.shadowBlur = 0;
+          c.fillStyle = k2; c.fillRect(450, 352, 500, 64); c.fillStyle = '#02040C'; c.font = '400 40px Titulos, Barlow Condensed, Arial'; c.fillText(label, 466, 386);
+          return;
+        }
         c.font = '400 92px Titulos, Barlow Condensed, Arial'; c.fillStyle = '#FFFFFF'; c.shadowColor = '#3DA9FF'; c.shadowBlur = 26; c.fillText('ARENA', 450, 190);
         c.fillStyle = '#3DA9FF'; c.fillText('MIX', 450, 290); c.shadowBlur = 0;
         c.fillStyle = '#FFC53D'; c.fillRect(450, 352, 500, 64); c.fillStyle = '#02040C'; c.font = '400 40px Titulos, Barlow Condensed, Arial'; c.fillText(label, 466, 386);
@@ -1325,13 +1364,18 @@ class Component extends DCLogic {
       const tex = new T.CanvasTexture(cv); tex.encoding = T.sRGBEncoding;
       const img = new Image(); img.onload = () => { paint(img); tex.needsUpdate = true; }; img.src = 'icons/logo-512.png?v=5';
       const mat = new T.MeshBasicMaterial({ map: tex, toneMapped: false });
-      [-1, 1].forEach((sx) => { const m = new T.Mesh(new T.PlaneGeometry(12.4, 6.1), mat); m.position.set(sx * 40.9, 9.1, -0.2); m.rotation.y = sx > 0 ? -Math.PI / 2 : Math.PI / 2; a.add(m); });
+      [-1, 1].forEach((sx) => { const m = new T.Mesh(new T.PlaneGeometry(12.4, 6.1), mat); m.position.set(sx * (NEWST ? NEWST.screenX : 40.9), 9.1, -0.2); m.rotation.y = sx > 0 ? -Math.PI / 2 : Math.PI / 2; a.add(m); });
     }
     // the LED advertising boards behind the goal: bright panels in the logo's colours that scroll along
     {
       const cv = document.createElement('canvas'); cv.width = 2048; cv.height = 96;
       const c = cv.getContext('2d'), W = 2048, H = 96, seg = 512;
-      const ads = [
+      const ads = NEWST ? [
+        [cfg.c1, cfg.c1, '#02040C', String(cfg.name || '').toUpperCase(), '#FFFFFF'],
+        ['#02040C', '#06102E', cfg.c2, '⚡ ¡A POR EL GOL!', cfg.c2],
+        [cfg.c2, cfg.c2, '#02040C', String(cfg.name || '').toUpperCase(), '#FFFFFF'],
+        ['#02040C', '#0A1A44', cfg.c1, this.kind === 'pen' ? 'TANDA DE PENALTIS' : 'TIROS LIBRES', cfg.c1]
+      ] : [
         ['#0A3DCC', '#1E8BFF', '#FFFFFF', 'ARENA MIX', '#3DA9FF'],
         ['#02040C', '#06102E', '#FFC53D', '⚡ ¡A POR EL GOL!', '#FFC53D'],
         ['#1E8BFF', '#3DA9FF', '#02040C', 'ARENA MIX', '#FFFFFF'],
@@ -1343,6 +1387,7 @@ class Component extends DCLogic {
         c.fillStyle = edge; c.fillRect(x0, 0, seg, 5); c.fillRect(x0, H - 5, seg, 5);
         c.fillStyle = 'rgba(255,255,255,0.06)'; for (let x = x0; x < x0 + seg; x += 6) c.fillRect(x, 0, 2, H);
         c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = '400 50px Titulos, Barlow Condensed, Arial'; c.fillStyle = ink;
+        for (let fs = 50; fs > 26 && c.measureText(txt).width > seg - 30; fs -= 2) c.font = '400 ' + fs + 'px Titulos, Barlow Condensed, Arial';
         c.shadowColor = ink; c.shadowBlur = 14; c.fillText(txt, x0 + seg / 2, H / 2 + 3); c.shadowBlur = 0;
       });
       const tex = new T.CanvasTexture(cv); tex.encoding = T.sRGBEncoding; tex.wrapS = T.RepeatWrapping; tex.repeat.set(2.2, 1);
@@ -1353,14 +1398,16 @@ class Component extends DCLogic {
     }
     a.updateMatrix(); b.updateMatrix();
     const v = new T.Vector3(), cx = GX, cz = D - 30 * KL, items = [];
-    const low = this.gfx === 'baja';
-    STAD.seats().forEach(([x, y, z]) => {
+    const low = this.gfx === 'baja', seatL = STAD.seats();
+    // a bigger stadium (two or three tiers) is not a heavier crowd: about as many fans as the generic one
+    const nFar = seatL.filter((q) => q[2] < 0).length, thin = NEWST ? Math.max(0, 1 - 1000 / Math.max(1, nFar)) : 0;
+    seatL.forEach(([x, y, z]) => {
       if (z >= 0) return;
       [a, b].forEach((m) => {
-        if (Math.random() < (low ? 0.6 : 0.12)) return;
+        if (Math.random() < thin || Math.random() < (low ? 0.6 : 0.12)) return;
         v.set(x, y, z).applyMatrix4(m.matrix);
         const tx = cx + Math.max(-14, Math.min(14, v.x - cx)), rotY = Math.atan2(tx - v.x, cz - v.z);
-        const ultra = Math.abs(x) > 31;
+        const ultra = Math.abs(x) > (NEWST ? 33 : 31);
         items.push({ x: v.x, y: v.y, z: v.z, rotY, ultra, row: Math.round(y / 0.5), sec: Math.round(x / 12) + ':' + (m === a ? 'a' : 'b') });
       });
     });
@@ -1410,9 +1457,15 @@ class Component extends DCLogic {
     const zMin = FAR - 10, zMax = D + 10, W = 84, L = zMax - zMin, ppm = 18;
     const tex = this.canvasTex(W * ppm, L * ppm, (c, w, h) => {
       const X = (x) => (x - GX + W / 2) * ppm, Z = (z) => (z - zMin) * ppm;
-      c.fillStyle = '#095c04'; c.fillRect(0, 0, w, h);
-      // mowing stripes, 5.7 m each, meeting at the halfway line
-      for (let i = 0; i < 20; i++) if (i % 2) { c.fillStyle = '#0b6c05'; c.fillRect(0, Z(FAR + i * 5.7), w, 5.7 * ppm); }
+      // the grass tone and the way it is cut: those of the stadium (Mi estadio); stripes 5.7 m wide by default
+      const SC = this.stadCfg();
+      const GT = { verde: ['#095c04', '#0b6c05'], oscuro: ['#06420a', '#0b5610'], claro: ['#1a7a14', '#25921c'], azulado: ['#0a5a3e', '#10704e'] }[SC && SC.grass] || ['#095c04', '#0b6c05'];
+      const pat = SC ? SC.pitch : 'rayas';
+      c.fillStyle = GT[0]; c.fillRect(0, 0, w, h); c.fillStyle = GT[1];
+      if (pat === 'rayas' || pat === 'anchas') { const sw = pat === 'rayas' ? 5.7 : 11.4; for (let i = 0; i * sw < PL + 20; i++) if (i % 2) c.fillRect(0, Z(FAR + i * sw), w, sw * ppm); }
+      else if (pat === 'cuadros') { for (let i = 0; i * 7 < W; i++) for (let j = 0; j * 7 < L; j++) if ((i + j) % 2) c.fillRect(i * 7 * ppm, j * 7 * ppm, 7 * ppm, 7 * ppm); }
+      else if (pat === 'diagonal') { c.save(); c.translate(X(GX), Z(MID)); c.rotate(Math.PI / 4); for (let k = -40; k < 40; k += 2) c.fillRect(k * 6 * ppm, -120 * ppm, 6 * ppm, 240 * ppm); c.restore(); }
+      else if (pat === 'circulos') { for (let rr = 84; rr > 0; rr -= 7) { c.fillStyle = (rr / 7) % 2 ? GT[1] : GT[0]; c.beginPath(); c.arc(X(GX), Z(MID), rr * ppm, 0, Math.PI * 2); c.fill(); } }
       for (let i = 0; i < 9000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.035)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
       c.strokeStyle = '#f4f8f4'; c.lineWidth = 0.12 * ppm; c.lineCap = 'round';
       const ln = (x1, z1, x2, z2) => { c.beginPath(); c.moveTo(X(GX + x1), Z(z1)); c.lineTo(X(GX + x2), Z(z2)); c.stroke(); };
@@ -1442,7 +1495,8 @@ class Component extends DCLogic {
 
     // our stadium (the match's 3D model) at full size round this pitch; the generic bowl only if it isn't loaded
     const teamCols = [['#FF8A3D', '#0B0B14'], ['#3EA6FF', '#F4F4FA']];
-    const STAD = window.AMStadium && window.AMStadium.ready() ? window.AMStadium : null;
+    const STAD = window.AMStadium && window.AMStadium.ready() ? window.AMStadium : this.stadCfg() && window.AMStadUp ? {} : null;
+    this.newSt = null;
     this.usingModel = !!STAD;
     if (STAD) this.fans = this.buildOurStadium(E, STAD, teamCols);
     else {
@@ -1716,6 +1770,7 @@ class Component extends DCLogic {
         f.position.y = jump + (u.ultra ? Math.abs(Math.sin(now * u.w + u.ph)) * 0.05 : 0);
       });
     }
+    if (this.newSt) this.newSt.update(performance.now() / 1000);
     this.R.render(this.S, this.cam);
   }
   ray(e, z) {

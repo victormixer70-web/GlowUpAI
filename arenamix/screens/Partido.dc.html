@@ -2973,6 +2973,8 @@ class Component extends DCLogic {
       // 1 VS 1: a coin toss decides whose stadium it is (yours or your rival's, as each of you set it up in Mi estadio)
       this.myStad = null;
       const SD = window.AMStad;
+      // practice (Campo libre): always your own stadium
+      if (SD && this.size() === 1 && !P0.tutorial && P0.practice && !rm) { this.myStad = SD.get(); this.stadHome = true; this.stad = 'arena'; }
       if (SD && this.size() === 1 && !P0.tutorial && !P0.practice) {
         let mine = SD.get(), theirs = SD.ai(P0.awayName || 'Rival'), meHome = window.__homeToss != null ? !!window.__homeToss : r < 0.5;
         if (rm && P0.online.roster) {
@@ -2984,6 +2986,8 @@ class Component extends DCLogic {
         this.myStad = meHome ? mine : theirs; this.stadHome = meHome;
         this.stad = 'arena';
       }
+      // a shoot-out after this match (Duelo) is played in the same stadium
+      if (!P0.practice) { window.__amMatchStad = this.myStad; window.__amMatchHome = this.myStad ? !!this.stadHome : null; }
       this.adName = this.myStad ? this.myStad.name.toUpperCase() : 'ARENA MIX';
       this.adC = this.myStad ? [this.myStad.c2, this.myStad.c1] : ['#22D3EE', '#FFC53D'];
       this.wx = window.__amWx ? window.__amWx : this.myStad && this.myStad.time !== 'auto' ? this.myStad.time : this.stad === 'playa' ? (r < 0.7 ? 'dia' : 'atardecer') : this.stad === 'calle' ? 'noche' : this.stad === 'nevado' ? 'nieve' : this.stad === 'tormenta' ? 'lluvia' : P0.tutorial ? 'dia' : one ? (r < 0.45 ? 'noche' : r < 0.65 ? 'atardecer' : r < 0.85 ? 'lluvia' : 'nieve') : (r < 0.32 ? 'dia' : r < 0.5 ? 'atardecer' : r < 0.72 ? 'noche' : r < 0.88 ? 'lluvia' : 'nieve');
@@ -3292,7 +3296,7 @@ class Component extends DCLogic {
     // the 3D stadium model when it has loaded (stadium.js); otherwise the stands built here
     // 1 VS 1 in someone's stadium: their own stadium (stadup.js), built in one piece and remodelled with gems. It
     // takes the place of the stadium model: its far half, mirrored for the near half, and its seats for the crowd
-    const NEWST = this.size() === 1 && this.myStad && window.AMStadUp && !this.props.tutorial && !this.props.practice ? window.AMStadUp.make(this.myStad, { night }) : null;
+    const NEWST = this.size() === 1 && this.myStad && window.AMStadUp && !this.props.tutorial ? window.AMStadUp.make(this.myStad, { night }) : null;
     this.newSt = NEWST;
     const STAD = NEWST ? {
       model: () => { const g = new T.Group(), h = NEWST.half.clone(); h.scale.set(1 / 0.9, 1, 1 / 0.9); g.add(h); return g; },
