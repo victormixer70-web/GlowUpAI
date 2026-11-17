@@ -1311,10 +1311,13 @@ class Component extends DCLogic {
     const cfg = this.stadCfg(), NEWST = cfg && window.AMStadUp ? window.AMStadUp.make(cfg, { night: true }) : null;
     this.newSt = NEWST;
     if (NEWST) STAD = { model: () => { const g = new T.Group(); g.add(NEWST.half.clone()); return g; }, seats: () => NEWST.seats };
+    // your stadium (stadup.js) at its real size, round its own 60 x 30 m pitch: the same building as in Mi estadio
+    // and in the 1 VS 1 match, not stretched; the generic model, scaled up round a full-size pitch
+    const SL = NEWST ? 1 : KL, SY = NEWST ? 1 : KY, SW = NEWST ? 1 : KW;
     const place = (m, mirror) => {
-      m.scale.set(KL, KY, mirror ? -KW : KW);
+      m.scale.set(SL, SY, mirror ? -SW : SW);
       m.rotation.y = -Math.PI / 2;
-      m.position.set(GX, -0.03, D - 30 * KL);
+      m.position.set(GX, -0.03, D - 30 * SL);
       return m;
     };
     this.R.localClippingEnabled = true;
@@ -1392,12 +1395,12 @@ class Component extends DCLogic {
       });
       const tex = new T.CanvasTexture(cv); tex.encoding = T.sRGBEncoding; tex.wrapS = T.RepeatWrapping; tex.repeat.set(2.2, 1);
       const mat = new T.MeshBasicMaterial({ map: tex, toneMapped: false });
-      const board = new T.Mesh(new T.BoxGeometry(56, 0.95, 0.18), [this.mat(0x0b1a44), this.mat(0x0b1a44), this.mat(0x0b1a44), this.mat(0x0b1a44), mat, this.mat(0x0b1a44)]);
-      board.position.set(GX, 0.48, D + 4.6); board.rotation.y = Math.PI; E.add(board);
+      const board = new T.Mesh(new T.BoxGeometry(NEWST ? 30 : 56, 0.95, 0.18), [this.mat(0x0b1a44), this.mat(0x0b1a44), this.mat(0x0b1a44), this.mat(0x0b1a44), mat, this.mat(0x0b1a44)]);
+      board.position.set(GX, 0.48, D + (NEWST ? 3 : 4.6)); board.rotation.y = Math.PI; E.add(board);
       this.adLED = tex;
     }
     a.updateMatrix(); b.updateMatrix();
-    const v = new T.Vector3(), cx = GX, cz = D - 30 * KL, items = [];
+    const v = new T.Vector3(), cx = GX, cz = D - 30 * SL, items = [];
     const low = this.gfx === 'baja', seatL = STAD.seats();
     // a bigger stadium (two or three tiers) is not a heavier crowd: about as many fans as the generic one
     const nFar = seatL.filter((q) => q[2] < 0).length, thin = NEWST ? Math.max(0, 1 - 1000 / Math.max(1, nFar)) : 0;
@@ -1406,7 +1409,7 @@ class Component extends DCLogic {
       [a, b].forEach((m) => {
         if (Math.random() < thin || Math.random() < (low ? 0.6 : 0.12)) return;
         v.set(x, y, z).applyMatrix4(m.matrix);
-        const tx = cx + Math.max(-14, Math.min(14, v.x - cx)), rotY = Math.atan2(tx - v.x, cz - v.z);
+        const tx = cx + Math.max(-14 * SW / KW, Math.min(14 * SW / KW, v.x - cx)), rotY = Math.atan2(tx - v.x, cz - v.z);
         const ultra = Math.abs(x) > (NEWST ? 33 : 31);
         items.push({ x: v.x, y: v.y, z: v.z, rotY, ultra, row: Math.round(y / 0.5), sec: Math.round(x / 12) + ':' + (m === a ? 'a' : 'b') });
       });
@@ -1453,7 +1456,8 @@ class Component extends DCLogic {
 
     // a whole pitch, 68 m wide and as long as the stadium (114 m, the match's pitch at this scale), centred on
     // this goal: both halves, the halfway line and centre circle, both boxes and the far goal
-    const PL = 114, FAR = D - PL, HW = 34, MID = D - PL / 2;
+    const OWN = !!(this.stadCfg() && window.AMStadUp);
+    const PL = OWN ? 60 : 114, FAR = D - PL, HW = OWN ? 15 : 34, MID = D - PL / 2, BX = OWN ? 14 : 20.16;
     const zMin = FAR - 10, zMax = D + 10, W = 84, L = zMax - zMin, ppm = 18;
     const tex = this.canvasTex(W * ppm, L * ppm, (c, w, h) => {
       const X = (x) => (x - GX + W / 2) * ppm, Z = (z) => (z - zMin) * ppm;
@@ -1462,10 +1466,11 @@ class Component extends DCLogic {
       const GT = { verde: ['#095c04', '#0b6c05'], oscuro: ['#06420a', '#0b5610'], claro: ['#1a7a14', '#25921c'], azulado: ['#0a5a3e', '#10704e'] }[SC && SC.grass] || ['#095c04', '#0b6c05'];
       const pat = SC ? SC.pitch : 'rayas';
       c.fillStyle = GT[0]; c.fillRect(0, 0, w, h); c.fillStyle = GT[1];
-      if (pat === 'rayas' || pat === 'anchas') { const sw = pat === 'rayas' ? 5.7 : 11.4; for (let i = 0; i * sw < PL + 20; i++) if (i % 2) c.fillRect(0, Z(FAR + i * sw), w, sw * ppm); }
-      else if (pat === 'cuadros') { for (let i = 0; i * 7 < W; i++) for (let j = 0; j * 7 < L; j++) if ((i + j) % 2) c.fillRect(i * 7 * ppm, j * 7 * ppm, 7 * ppm, 7 * ppm); }
-      else if (pat === 'diagonal') { c.save(); c.translate(X(GX), Z(MID)); c.rotate(Math.PI / 4); for (let k = -40; k < 40; k += 2) c.fillRect(k * 6 * ppm, -120 * ppm, 6 * ppm, 240 * ppm); c.restore(); }
-      else if (pat === 'circulos') { for (let rr = 84; rr > 0; rr -= 7) { c.fillStyle = (rr / 7) % 2 ? GT[1] : GT[0]; c.beginPath(); c.arc(X(GX), Z(MID), rr * ppm, 0, Math.PI * 2); c.fill(); } }
+      if (pat === 'rayas' || pat === 'anchas') { const sw = (pat === 'rayas' ? 5.7 : 11.4) * (OWN ? 3.75 / 5.7 : 1); for (let i = 0; i * sw < PL + 20; i++) if (i % 2) c.fillRect(0, Z(FAR + i * sw), w, sw * ppm); }
+      const cs = OWN ? 5 : 7, ds = OWN ? 4 : 6, rs = OWN ? 4 : 7;
+      if (pat === 'cuadros') { for (let i = 0; i * cs < W; i++) for (let j = 0; j * cs < L; j++) if ((i + j) % 2) c.fillRect(i * cs * ppm, j * cs * ppm, cs * ppm, cs * ppm); }
+      else if (pat === 'diagonal') { c.save(); c.translate(X(GX), Z(MID)); c.rotate(Math.PI / 4); for (let k = -60; k < 60; k += 2) c.fillRect(k * ds * ppm, -160 * ppm, ds * ppm, 320 * ppm); c.restore(); }
+      else if (pat === 'circulos') { for (let rr = rs * 12; rr > 0; rr -= rs) { c.fillStyle = (rr / rs) % 2 ? GT[1] : GT[0]; c.beginPath(); c.arc(X(GX), Z(MID), rr * ppm, 0, Math.PI * 2); c.fill(); } }
       for (let i = 0; i < 9000; i++) { c.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.035)'; c.fillRect(Math.random() * w, Math.random() * h, 3, 3); }
       c.strokeStyle = '#f4f8f4'; c.lineWidth = 0.12 * ppm; c.lineCap = 'round';
       const ln = (x1, z1, x2, z2) => { c.beginPath(); c.moveTo(X(GX + x1), Z(z1)); c.lineTo(X(GX + x2), Z(z2)); c.stroke(); };
@@ -1477,7 +1482,7 @@ class Component extends DCLogic {
       // both ends: six-yard box, penalty box, spot and the arc
       [[D, -1], [FAR, 1]].forEach(([gz, s]) => {
         ln(-9.16, gz + s * 5.5, 9.16, gz + s * 5.5); ln(-9.16, gz + s * 5.5, -9.16, gz); ln(9.16, gz + s * 5.5, 9.16, gz);
-        ln(-20.16, gz + s * 16.5, 20.16, gz + s * 16.5); ln(-20.16, gz + s * 16.5, -20.16, gz); ln(20.16, gz + s * 16.5, 20.16, gz);
+        ln(-BX, gz + s * 16.5, BX, gz + s * 16.5); ln(-BX, gz + s * 16.5, -BX, gz); ln(BX, gz + s * 16.5, BX, gz);
         dot(gz + s * 11, 0.15);
         if (s < 0) arc(gz - 11, 9.15, Math.PI * 1.205, Math.PI * 1.795); else arc(gz + 11, 9.15, Math.PI * 0.205, Math.PI * 0.795);
         // corner arcs
@@ -1539,7 +1544,7 @@ class Component extends DCLogic {
 
     }
     // night over our stadium model: glowing floodlight heads above its four corners
-    if (this.usingModel) {
+    if (this.usingModel && !this.newSt) {
       const gt = this.canvasTex(128, 128, (c) => { const g2 = c.createRadialGradient(64, 64, 0, 64, 64, 64); g2.addColorStop(0, 'rgba(255,255,255,1)'); g2.addColorStop(0.25, 'rgba(220,232,255,0.55)'); g2.addColorStop(1, 'rgba(220,232,255,0)'); c.fillStyle = g2; c.fillRect(0, 0, 128, 128); });
       const KL = 1.9, KW = 2.25, cz = D - 30 * KL;
       [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sz]) => {
